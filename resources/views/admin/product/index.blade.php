@@ -18,7 +18,7 @@
                 </div>
                 <div class="col-auto ms-auto">
                     <div class="btn-list">
-                        <a href="#" class="btn btn-primary d-none d-sm-inline-block">
+                        <a href="{{ route('admin.product.create') }}" class="btn btn-primary d-none d-sm-inline-block">
                             <i class="ti ti-plus fs-4"></i>
                             Create Product
                         </a>
@@ -34,9 +34,9 @@
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-body">
-                            <table id="product" class="table table-responsive">
+                            <table id="productt" class="table table-responsive">
                                 <thead>
-                                    <tr>
+                                    <tr class="dark">
                                         <th>no</th>
                                         <th>Picture</th>
                                         <th>Name</th>
@@ -60,14 +60,14 @@
                                             <td>{{ $product->selling_price }}</td>
                                             <td>{{ $product->supplier_id }}</td>
                                             <td>
-                                                <a href="{{ route('#', $product->id) }}" class="btn btn-secondary"><i
-                                                        class="fas fa-edit"></i></a>
-                                                <form method="POST" action="{{ route('#', $product->id) }}">
-                                                    @method('delete')
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-danger"><i
-                                                            class="fas fa-trash-alt"></i></button>
-                                                </form>
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <a href="#" class="btn btn-secondary"><i class="ti ti-edit"></i></a>
+                                                    <form method="POST" action="#">
+                                                        @method('delete')
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-danger"><i class="ti ti-trash"></i></button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -75,7 +75,7 @@
                             </table>
                             <script>
                                 $(document).ready(function () {
-                                    $('#product').DataTable();
+                                    $('#productt').DataTable();
                                 });
                             </script>
                         </div>
@@ -86,36 +86,5 @@
     </div>
 </div>
 @push('styles')
-    <style>
-        /* Change DataTables search bar text color */
-        body.dark-mode .dataTables_filter input {
-            color: white !important;
-            background-color: #5d62714b !important;
-            border: 1px solid #bbb !important;
-            margin-bottom: 20px;
-        }
-
-        body.dark-mode .dataTables_filter input::placeholder {
-            color: rgba(255, 255, 255, 0) !important;
-        }
-
-        body.dark-mode .dataTables_filter label {
-            color: white !important;
-        }
-
-        body.dark-mode .dataTables_length label {
-            color: white !important;
-        }
-
-        body.dark-mode .dataTables_info {
-            color: white !important;
-        }
-
-        body.dark-mode .dataTables_empty {
-            color: white !important;
-            background-color: #182234;
-            opacity: 70%;
-        }
-    </style>
 @endpush
 @endsection

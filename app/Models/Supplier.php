@@ -9,7 +9,7 @@ class Supplier extends Model
 {
     use HasFactory;
 
-    protected $table = 'supplier';
+    protected $table = 'suppliers';
 
     protected $fillable = [
         'code',
@@ -18,9 +18,5 @@ class Supplier extends Model
         'phone_number',
         'location',
         'payment_terms'
-    ];
-
-    protected $casts = [
-        'payment_terms' => 'integer'
     ];
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('address');
             $table->integer('phone_number');
             $table->enum('location', ['IN','OUT']);
-            $table->integer('payment_terms');
+            $table->string('payment_terms');
             $table->timestamps();
         });
     }

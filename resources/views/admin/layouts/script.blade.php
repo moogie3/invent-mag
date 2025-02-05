@@ -595,3 +595,28 @@
       });
       // @formatter:on
     </script>
+    <script>
+        // Set theme based on session or default to light
+        document.addEventListener('DOMContentLoaded', function () {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+
+            // Event listener for theme toggle
+            const darkModeButton = document.querySelector('a[href="?theme=dark"]');
+            const lightModeButton = document.querySelector('a[href="?theme=light"]');
+
+            darkModeButton.addEventListener('click', () => {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            });
+
+            lightModeButton.addEventListener('click', () => {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            });
+        });
+    </script>

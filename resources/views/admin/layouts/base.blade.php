@@ -16,34 +16,60 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @stack('styles')
+    <style>
+
+        body .dataTables_filter input {
+            color: black !important;  /* Dark text for light mode */
+            background-color: #fff !important;  /* Light background */
+            border: 1px solid #bbb !important;
+            margin-bottom: 20px;
+        }
+
+        body.light-mode td, th {
+            background-color: #5d62714b !important;
+        }
+
+        body td,th {
+            text-align:center;
+        }
+
+        /* Change DataTables search bar text color */
+        body.dark-mode .dataTables_filter input {
+            color: white !important;
+            background-color: #5d62714b !important;
+            border: 1px solid #bbb !important;
+            margin-bottom: 20px;
+        }
+
+        body.dark-mode .dataTables_filter input::placeholder {
+            color: rgba(255, 255, 255, 0) !important;
+        }
+
+        body.dark-mode .dataTables_filter label {
+            color: white !important;
+        }
+
+        body.dark-mode .dataTables_length label {
+            color: white !important;
+        }
+
+        body.dark-mode .dataTables_info {
+            color: white !important;
+        }
+
+        body.dark-mode table tbody{
+            border: 1px solid gray !important;
+            color: black !important;
+        }
+
+        body.dark-mode td, th {
+            text-align: center;
+            background-color:#5d62714b;
+        }
+    </style>
 </head>
 
 <body>
-    <script>
-        // Set theme based on session or default to light
-        document.addEventListener('DOMContentLoaded', function () {
-            const theme = localStorage.getItem('theme') || 'light';
-            if (theme === 'dark') {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
-
-            // Event listener for theme toggle
-            const darkModeButton = document.querySelector('a[href="?theme=dark"]');
-            const lightModeButton = document.querySelector('a[href="?theme=light"]');
-
-            darkModeButton.addEventListener('click', () => {
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark');
-            });
-
-            lightModeButton.addEventListener('click', () => {
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('theme', 'light');
-            });
-        });
-    </script>
     @include('admin.layouts.navbar')
     <div class="main-content">
         @yield('content')

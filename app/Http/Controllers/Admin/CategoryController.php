@@ -20,8 +20,8 @@ class CategoryController extends Controller
 
     public function edit($id)
     {
-        $category = Categories::find($id);
-        return view('admin.category.category-edit', ['category' => $category]);
+        $categories = Categories::find($id);
+        return view('admin.category.category-edit', ['categories' => $categories]);
     }
 
     public function store(Request $request){
@@ -54,8 +54,8 @@ class CategoryController extends Controller
             'description' => 'required',
         ]);
 
-        $category = Categories::find($id);
-        $category->update($data);
+        $categories = Categories::find($id);
+        $categories->update($data);
         return redirect()->route('admin.category')->with('success', 'Category updated');
     }
 

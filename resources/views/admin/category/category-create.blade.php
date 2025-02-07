@@ -30,7 +30,7 @@
                                 action="{{ route('admin.category.store') }}">
                                 @csrf
                                 <fieldset class="form-fieldset container-xl">
-                                        <div class="col-md-6 mb-3">
+                                        <div class="col-md-12 mb-3">
                                             <label class="form-label">NAME</label>
                                             <input type="text" class="form-control" name="name" id="name"
                                                 placeholder="Name" required />

@@ -17,6 +17,27 @@ class SupplierController extends Controller
         $suppliers = Supplier::all();
         return view('admin.supplier.supplier-create', compact('suppliers'));
     }
+    public function edit($id)
+    {
+        $suppliers = Supplier::find($id);
+        return view('admin.supplier.supplier-edit', ['suppliers' => $suppliers]);
+    }
+
+    public function update(Request $request, $id){
+        $data = $request->except("_token");
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+            'address' => 'required',
+            'phone_number' => 'required',
+            'location' => 'required',
+            'payment_terms' => 'required'
+        ]);
+
+        $suppliers = Supplier::find($id);
+        $suppliers->update($data);
+        return redirect()->route('admin.supplier')->with('success', 'Supplier updated');
+    }
 
     public function store(Request $request){
         $request->validate([

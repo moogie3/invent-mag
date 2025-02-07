@@ -20,8 +20,8 @@ class UnitController extends Controller
 
     public function edit($id)
     {
-        $unit = Unit::find($id);
-        return view('admin.unit.unit-edit', ['unit' => $unit]);
+        $units = Unit::find($id);
+        return view('admin.unit.unit-edit', ['units' => $units]);
     }
 
     public function store(Request $request){
@@ -54,8 +54,8 @@ class UnitController extends Controller
             'symbol' => 'required',
         ]);
 
-        $unit = Unit::find($id);
-        $unit->update($data);
+        $units = Unit::find($id);
+        $units->update($data);
         return redirect()->route('admin.unit')->with('success', 'Unit updated');
     }
 

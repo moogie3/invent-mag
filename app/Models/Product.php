@@ -14,6 +14,7 @@ class Product extends Model
     protected $table = 'products';
 
     protected $fillable = [
+        'code',
         'name',
         'description',
         'image',
@@ -22,7 +23,7 @@ class Product extends Model
         'quantity',
         'category_id',
         'supplier_id',
-        'unit_id'
+        'units_id'
     ];
 
     protected $casts = [
@@ -41,16 +42,16 @@ class Product extends Model
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
-    public function unitType(): BelongsTo
+    public function unit(): BelongsTo
     {
-        return $this->belongsTo(Unit::class, 'unit_id');
+        return $this->belongsTo(Unit::class, 'units_id');
     }
 
     protected function image(): Attribute
     {
         return Attribute::make(
             get: fn($value) => $value
-            ? asset("storage/products/{$value}") // Convert filename to full URL
+            ? asset("storage/image/{$value}") // Convert filename to full URL
             : asset("storage/default.jpg"), // Default image if no image exists
         );
     }

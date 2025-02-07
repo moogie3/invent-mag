@@ -54,8 +54,8 @@
         <div class="navbar">
             <div class="container-xl d-flex justify-content-center">
                 <ul class="navbar-nav text-center">
-                    <li class="nav-item {{ request()->is('admin') ? 'active' : '' }}">
-                        <a class="nav-link" href="./">
+                    <li class="nav-item {{ request()->is('/') || request()->is('admin') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.dashboard') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-home fs-2"></i>
                             </span>
@@ -94,8 +94,8 @@
                             <span class="nav-link-title">Supplier</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('customer') ? 'active' : '' }}">
-                        <a class="nav-link" href="./form-elements.html">
+                    <li class="nav-item {{ request()->is('admin/customer', 'admin/customer/create', 'admin/customer/edit/*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.customer') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-user fs-2"></i>
                             </span>

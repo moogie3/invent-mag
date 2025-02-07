@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'Product')
+@section('title', 'Customer')
 
 @section('content')
 <div class="page-wrapper">
@@ -13,14 +13,14 @@
                         Overview
                     </div>
                     <h2 class="page-title">
-                        Product
+                        Customer
                     </h2>
                 </div>
                 <div class="col-auto ms-auto">
                     <div class="btn-list">
-                        <a href="{{ route('admin.product.create') }}" class="btn btn-primary d-none d-sm-inline-block">
+                        <a href="{{ route('admin.customer.create') }}" class="btn btn-primary d-none d-sm-inline-block">
                             <i class="ti ti-plus fs-4"></i>
-                            Create Product
+                            Create Customer
                         </a>
                     </div>
                 </div>
@@ -34,44 +34,33 @@
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-body">
-                            <table id="productt" class="table table-responsive">
+                            <table id="customert" class="table table-responsive">
                                 <thead>
                                     <tr class="dark">
                                         <th>no</th>
-                                        <th>Picture</th>
-                                        <th>Code</th>
                                         <th>Name</th>
-                                        <th>QTY</th>
-                                        <th>Category</th>
-                                        <th>Unit</th>
-                                        <th>Price</th>
-                                        <th>Selling Price</th>
-                                        <th>Supplier</th>
+                                        <th>Address</th>
+                                        <th>Phone Number</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($products as $product)
+                                    @foreach ($customers as $customer)
                                         <tr>
-                                            <td>{{ $product->id }}</td>
-                                            <td>
-                                                <img src="{{ asset($product->image) }}" width="100%">
-                                            </td>
-                                            <td>{{ $product->code }}</td>
-                                            <td>{{ $product->name }}</td>
-                                            <td>{{ $product->quantity }}</td>
-                                            <td>{{ $product->category->name ?? 'No Category' }}</td>
-                                            <td>{{ $product->unit->name ?? 'No Unit'}}</td>
-                                            <td>{{ $product->price }}</td>
-                                            <td>{{ $product->selling_price }}</td>
-                                            <td>{{ $product->supplier->name ?? 'No Supplier' }}</td>
+                                            <td>{{ $customer->id }}</td>
+                                            <td>{{ $customer->name }}</td>
+                                            <td>{{ $customer->address }}</td>
+                                            <td>{{ $customer->phone_number }}</td>
                                             <td>
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <a href="#" class="btn btn-secondary"><i class="ti ti-edit"></i></a>
-                                                    <form method="POST" action="#">
+                                                    <a href="{{ route('admin.customer.edit', $customer->id) }}"
+                                                        class="btn btn-secondary"><i class="ti ti-edit"></i></a>
+                                                    <form method="POST"
+                                                        action="{{ route('admin.customer.destroy', $customer->id) }}">
                                                         @method('delete')
                                                         @csrf
-                                                        <button type="submit" class="btn btn-danger"><i class="ti ti-trash"></i></button>
+                                                        <button type="submit" class="btn btn-danger"><i
+                                                                class="ti ti-trash"></i></button>
                                                     </form>
                                                 </div>
                                             </td>
@@ -81,7 +70,7 @@
                             </table>
                             <script>
                                 $(document).ready(function () {
-                                    $('#productt').DataTable();
+                                    $('#customert').DataTable();
                                 });
                             </script>
                         </div>

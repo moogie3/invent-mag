@@ -13,45 +13,55 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
     public function index(){
-        $products = Product::all();
-        return view ('admin..product.index', ['products' => $products]);
+    $products = Product::with(['category', 'supplier' ,'unit'])->get();
+    return view('admin.product.index', ['products' => $products]);
     }
+
 
     public function create()
     {
+    $products = Product::all();
     $categories = Categories::all();
     $units = Unit::all();
     $suppliers = Supplier::all();
 
-    return view('admin.product.product-create', compact('categories', 'units', 'suppliers'));
+    return view('admin.product.product-create', compact('products', 'units', 'suppliers','categories'));
     }
 
     public function store(Request $request)
-    {
-        $data = $request->except('_token');
-        $request->validate([
-            'code' => 'required|string',
-            'name' => 'required|string',
-            'quantity' => 'required|int',
-            'price' => 'required|float',
-            'selling_price' => 'required|float',
-            'category_id' => 'int',
-            'units_id' => 'int',
-            'supplier_id' => 'int',
-            'description' => 'string',
-            'image' => 'required|image|mimes:jpeg,jpg,png'
-        ]);
+{
+    // Validate the data
+    $request->validate([
+        'code' => 'required|string',
+        'name' => 'required|string',
+        'quantity' => 'required|integer',
+        'price' => 'required|numeric',
+        'selling_price' => 'required|numeric',
+        'category_id' => 'required|integer',
+        'units_id' => 'required|integer',
+        'supplier_id' => 'required|integer',
+        'description' => 'nullable|string',
+        'image' => 'required|image|mimes:jpeg,jpg,png'
+    ]);
 
-        $image = $request->image;
+    $data = $request->except('_token');
 
-        $originalImage = Str::random(10) . $image->getClientOriginalName();
-
-        $image->storeAs("public/item", $originalImage);
-
-        $data['image'] = $originalImage;
-
-        Product::create($data);
-
-        return redirect()->route('admin.product.index')->with('success', 'Product created');
+     $isProductExist = Product::where('name', $request->name)->exists();
+    if ($isProductExist) {
+        return back()->withErrors([
+            'name' => 'This product already exists'
+        ])->withInput();
     }
+
+    $images = $request->image;
+    $originalImage= Str::random(10) . $images->getClientOriginalName();
+    $images->storeAs("/image", $originalImage);
+    $data['image'] = $originalImage;
+
+    Product::create($data);
+
+    return redirect()->route('admin.product')->with('success', 'Product created');
+}
+
+
 }

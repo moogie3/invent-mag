@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UnitController;
@@ -40,6 +41,15 @@ Route::group(['prefix' => 'admin'], function (){
         Route::get('/edit/{id}', [SupplierController::class, 'edit'])->name('admin.supplier.edit');
         Route::put('/update/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update');
         Route::delete('/destroy/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
+    });
+
+    Route::group(['prefix' => 'customer'], function () {
+        Route::get('/', [CustomerController::class, 'index'])->name('admin.customer');
+        Route::get('/create', [CustomerController::class, 'create'])->name('admin.customer.create');
+        Route::post('/store', [CustomerController::class, 'store'])->name('admin.customer.store');
+        Route::get('/edit/{id}', [CustomerController::class, 'edit'])->name('admin.customer.edit');
+        Route::put('/update/{id}', [CustomerController::class, 'update'])->name('admin.customer.update');
+        Route::delete('/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.customer.destroy');
     });
 
 });

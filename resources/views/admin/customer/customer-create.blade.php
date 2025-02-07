@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'Unit')
+@section('title', 'Customer')
 
 @section('content')
 <div class="page-wrapper">
@@ -13,7 +13,7 @@
                         Overview
                     </div>
                     <h2 class="page-title">
-                        Edit Unit
+                        Create Customer
                     </h2>
                 </div>
             </div>
@@ -26,23 +26,26 @@
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-body">
-                            <form enctype="multipart/form-data" method="POST"
-                                action="{{ route('admin.unit.update', $units->id) }}">
+                            <form enctype="multipart/form-data" method="POST" action="{{ route('admin.customer.store') }}">
                                 @csrf
-                                @method('PUT')
                                 <fieldset class="form-fieldset container-xl">
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">NAME</label>
                                         <input type="text" class="form-control" name="name" id="name" placeholder="Name"
-                                            value="{{$units->name}}" />
+                                            required />
                                     </div>
                                     <div class="col-md-12 mb-3">
-                                        <label class="form-label">SYMBOL</label>
-                                        <input type="text" class="form-control" name="symbol" id="symbol"
-                                            placeholder="Symbol" value="{{$units->symbol}}" />
+                                        <label class="form-label">ADDRESS</label>
+                                        <input type="text" class="form-control" name="address" id="address"
+                                            placeholder="Address" required />
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">PHONE NUMBER</label>
+                                        <input type="text" class="form-control" name="phone_number" id="phone_number" placeholder="Phone number" required />
                                     </div>
                                     <div class="text-end">
-                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                        <button type="submit"
+                                            class="btn btn-primary justify-content-right">Submit</button>
                                     </div>
                                 </fieldset>
                             </form>

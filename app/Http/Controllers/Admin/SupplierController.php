@@ -23,22 +23,6 @@ class SupplierController extends Controller
         return view('admin.supplier.supplier-edit', ['suppliers' => $suppliers]);
     }
 
-    public function update(Request $request, $id){
-        $data = $request->except("_token");
-        $request->validate([
-            'code' => 'required',
-            'name' => 'required',
-            'address' => 'required',
-            'phone_number' => 'required',
-            'location' => 'required',
-            'payment_terms' => 'required'
-        ]);
-
-        $suppliers = Supplier::find($id);
-        $suppliers->update($data);
-        return redirect()->route('admin.supplier')->with('success', 'Supplier updated');
-    }
-
     public function store(Request $request){
         $request->validate([
             'code' => 'required',
@@ -66,6 +50,22 @@ class SupplierController extends Controller
         Supplier::create($data);
 
         return redirect()->route('admin.supplier')->with('success','Supplier created');
+    }
+
+    public function update(Request $request, $id){
+        $data = $request->except("_token");
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+            'address' => 'required',
+            'phone_number' => 'required',
+            'location' => 'required',
+            'payment_terms' => 'required'
+        ]);
+
+        $suppliers = Supplier::find($id);
+        $suppliers->update($data);
+        return redirect()->route('admin.supplier')->with('success', 'Supplier updated');
     }
 
     public function destroy($id)

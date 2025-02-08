@@ -37,6 +37,7 @@
                             <table id="productt" class="table table-responsive">
                                 <thead>
                                     <tr class="dark">
+                                        <th style="display:none;">id</th>
                                         <th>no</th>
                                         <th>Picture</th>
                                         <th>Code</th>
@@ -51,11 +52,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($products as $product)
+                                    @foreach ($products as $index => $product)
                                         <tr>
-                                            <td>{{ $product->id }}</td>
-                                            <td>
-                                                <img src="{{ asset($product->image) }}" width="100%">
+                                            <td style="display: none;">{{ $product->id }}</td>
+                                            <td>{{$index + 1}}</td>
+                                            <td style="width:120px">
+                                                <img src="{{ asset($product->image) }}" width="120px">
                                             </td>
                                             <td>{{ $product->code }}</td>
                                             <td>{{ $product->name }}</td>
@@ -67,8 +69,8 @@
                                             <td>{{ $product->supplier->name ?? 'No Supplier' }}</td>
                                             <td>
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <a href="#" class="btn btn-secondary"><i class="ti ti-edit"></i></a>
-                                                    <form method="POST" action="#">
+                                                    <a href="{{ route('admin.product.edit', $product->id) }}" class="btn btn-secondary"><i class="ti ti-edit"></i></a>
+                                                    <form method="POST" action="{{ route('admin.product.destroy', $product->id) }}">
                                                         @method('delete')
                                                         @csrf
                                                         <button type="submit" class="btn btn-danger"><i class="ti ti-trash"></i></button>

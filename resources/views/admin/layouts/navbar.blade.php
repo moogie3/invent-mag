@@ -62,8 +62,8 @@
                             <span class="nav-link-title">Home</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('purchase-order') ? 'active' : '' }}">
-                        <a class="nav-link" href="#">
+                    <li class="nav-item {{ request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.po') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-shopping-cart fs-2"></i>
                             </span>

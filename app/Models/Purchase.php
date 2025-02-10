@@ -15,11 +15,9 @@ class Purchase extends Model
         'invoice',
         'supplier_id',
         'order_date',
-        'due_date',
+        'payment_terms',
         'payment_type',
-        'product_id',
-        'quantity',
-        'price',
+        'total',
         'status'
     ];
 
@@ -34,8 +32,11 @@ class Purchase extends Model
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
+    public function items() {
+        return $this->hasMany(POItem::class, 'po_id');
+    }
+
     protected $casts = [
-        'price' => 'float',
-        'quantity' => 'float'
+        'price' => 'double',
     ];
 }

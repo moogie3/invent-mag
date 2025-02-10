@@ -55,7 +55,7 @@
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">LOCATION</label>
                                             <select class="form-control" name="location" id="location" required>
-                                                <option value="IN">Select location</option>
+                                                <option>Select location</option>
                                                 <option value="IN">IN</option>
                                                 <option value="OUT">OUT</option>
                                             </select>

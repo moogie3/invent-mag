@@ -17,6 +17,7 @@ class SupplierController extends Controller
         $suppliers = Supplier::all();
         return view('admin.supplier.supplier-create', compact('suppliers'));
     }
+
     public function edit($id)
     {
         $suppliers = Supplier::find($id);

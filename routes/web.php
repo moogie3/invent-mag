@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UnitController;
 use Illuminate\Support\Facades\Route;
@@ -55,4 +56,14 @@ Route::group(['prefix' => 'admin'], function (){
         Route::delete('/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.customer.destroy');
     });
 
+    Route::group(['prefix' => 'po'], function () {
+        Route::get('/', [PurchaseController::class, 'index'])->name('admin.po');
+        Route::get('/create', [PurchaseController::class, 'create'])->name('admin.po.create');
+        Route::post('/store', [PurchaseController::class, 'store'])->name('admin.po.store');
+        Route::get('/edit/{id}', [PurchaseController::class, 'edit'])->name('admin.po.edit');
+        Route::put('/update/{id}', [PurchaseController::class, 'update'])->name('admin.po.update');
+        Route::delete('/destroy/{id}', [PurchaseController::class, 'destroy'])->name('admin.po.destroy');
+        Route::get('/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('product.details');
+
+    });
 });

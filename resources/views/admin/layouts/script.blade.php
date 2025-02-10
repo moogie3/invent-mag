@@ -1,4 +1,4 @@
-<script src="{{asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js?1692870487')}}" defer></script>
+    <script src="{{asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js?1692870487')}}" defer></script>
     <script src="{{asset('tabler/dist/libs/jsvectormap/dist/js/jsvectormap.min.js?1692870487')}}" defer></script>
     <script src="{{asset('tabler/dist/libs/jsvectormap/dist/maps/world.js?1692870487')}}" defer></script>
     <script src="{{asset('tabler/dist/libs/jsvectormap/dist/maps/world-merc.js?1692870487')}}" defer></script>
@@ -620,3 +620,5 @@
             });
         });
     </script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

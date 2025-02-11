@@ -80,7 +80,7 @@
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
                                             <label class="form-label">PRODUCT</label>
-                                            <select class="form-control" name="product_id" id="product_id" required>
+                                            <select class="form-control" name="product_id" id="product_id">
                                                 <option value="">Select Product</option>
                                                 @foreach($products as $product)
                                                     <option value="{{ $product->id }}" data-price="{{ $product->price }}" data-quantity="{{ $product->quantity }}">
@@ -145,40 +145,108 @@
     });
 
     // Function to calculate the due date
-    function calculateDueDate() {
-        const orderDate = new Date(orderDateField.value);
-        const paymentTerms = supplierSelect.options[supplierSelect.selectedIndex]?.dataset.paymentTerms;
+        function calculateDueDate() {
+            const orderDateValue = orderDateField.value;
+            const orderDate = new Date(orderDateValue);
 
-        if (orderDate && paymentTerms) {
-            // Calculate the due date by adding payment terms (in days) to the order date
-            orderDate.setDate(orderDate.getDate() + parseInt(paymentTerms));
+            // Check if the order date is valid
+            if (isNaN(orderDate.getTime())) {
+                console.error('Invalid order date:', orderDateValue);
+                alert('Please select a valid order date.');
+                return;  // Exit the function if the date is invalid
+            }
 
-            // Format the due date to YYYY-MM-DD
-            const dueDate = orderDate.toISOString().split('T')[0];
-            dueDateField.value = dueDate;
+            const paymentTerms = supplierSelect.options[supplierSelect.selectedIndex]?.dataset.paymentTerms;
+
+            if (paymentTerms) {
+                // Calculate the due date by adding payment terms (in days) to the order date
+                orderDate.setDate(orderDate.getDate() + parseInt(paymentTerms));
+
+                // Format the due date to YYYY-MM-DD
+                const dueDate = orderDate.toISOString().split('T')[0];
+                dueDateField.value = dueDate;
+            }
         }
-    }
+
+
     });
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-            const productSelect = document.getElementById('product_id');
-            const quantityField = document.getElementById('quantity');
-            const priceField = document.getElementById('selling_price');
+        const productSelect = document.getElementById('product_id');
+        const quantityField = document.getElementById('quantity');
+        const priceField = document.getElementById('selling_price');
+        const addProductButton = document.getElementById('addProduct');
+        const productTableBody = document.getElementById('productTableBody');
+        const productsField = document.getElementById('productsField');
 
-            // Listen for changes on the product select dropdown
-            productSelect.addEventListener('change', function () {
-                const selectedOption = productSelect.options[productSelect.selectedIndex];
+        let products = []; // Array to store added products
 
-                // Get the price and quantity data attributes from the selected option
-                const price = selectedOption.getAttribute('data-price');
-                const quantity = selectedOption.getAttribute('data-quantity');
+        // Auto-fill quantity and price on product selection
+        productSelect.addEventListener('change', function () {
+            const selectedOption = productSelect.options[productSelect.selectedIndex];
+            const price = selectedOption.getAttribute('data-price');
+            const quantity = selectedOption.getAttribute('data-quantity');
 
-                // Set the price and quantity fields automatically
-                priceField.value = price ? price : '';  // set price if available
-                quantityField.value = quantity ? quantity : '';  // set stock quantity if available
+            priceField.value = price ? price : '';
+            quantityField.value = quantity ? quantity : '';
+        });
+
+        // Add product to the table
+        addProductButton.addEventListener('click', function () {
+            const selectedOption = productSelect.options[productSelect.selectedIndex];
+            const productId = productSelect.value;
+            const productName = selectedOption.text;
+            const quantity = quantityField.value;
+            const price = priceField.value;
+            const total = (parseFloat(price) * parseInt(quantity)).toFixed(2);
+
+            if (!productId || !quantity || !price) {
+                alert('Please select a product and enter quantity and price.');
+                return;
+            }
+
+            // Prevent duplicate products
+            if (products.some(p => p.id == productId)) {
+                alert('Product already added.');
+                return;
+            }
+
+            // Add product to the list
+            const productData = { id: productId, name: productName, quantity: quantity, price: price, total: total };
+            products.push(productData);
+            updateHiddenField();
+
+            // Append new row to the table
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${productName}</td>
+                <td>${quantity}</td>
+                <td>${price}</td>
+                <td>${total}</td>
+                <td><button type="button" class="btn btn-danger btn-sm removeProduct">Remove</button></td>
+            `;
+            productTableBody.appendChild(row);
+
+            // Reset fields
+            productSelect.value = '';
+            quantityField.value = '';
+            priceField.value = '';
+
+            // Remove product event
+            row.querySelector('.removeProduct').addEventListener('click', function () {
+                row.remove();
+                products = products.filter(p => p.id !== productId);
+                updateHiddenField();
             });
         });
+
+        // Update hidden input field with JSON data
+        function updateHiddenField() {
+            productsField.value = JSON.stringify(products);
+        }
+
+    });
 </script>
 @if($errors->any())
     <div class="alert alert-danger">

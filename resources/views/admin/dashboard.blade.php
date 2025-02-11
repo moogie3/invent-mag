@@ -3,6 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
+<script src="{{asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js?1692870487')}}" defer></script>
     <div class="page-wrapper">
         <!-- Page header -->
         <div class="page-header d-print-none">

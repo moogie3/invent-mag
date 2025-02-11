@@ -21,6 +21,6 @@ class POItem extends Model
     }
 
     public function purchaseOrder() {
-        return $this->belongsTo(Purchase::class);
+        return $this->belongsTo(Purchase::class , 'po_id');
     }
 }

@@ -15,17 +15,11 @@ class Purchase extends Model
         'invoice',
         'supplier_id',
         'order_date',
-        'payment_terms',
+        'due_date',
         'payment_type',
         'total',
         'status'
     ];
-
-
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class, 'product_id');
-    }
 
     public function supplier(): BelongsTo
     {
@@ -37,6 +31,6 @@ class Purchase extends Model
     }
 
     protected $casts = [
-        'price' => 'double',
+        'total' => 'double',
     ];
 }

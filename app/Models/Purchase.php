@@ -16,14 +16,21 @@ class Purchase extends Model
         'supplier_id',
         'order_date',
         'due_date',
-        'payment_type',
         'total',
-        'status'
+    ];
+
+    protected $attributes = [
+    'status' => 'Unpaid',
     ];
 
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'product_id');
     }
 
     public function items() {

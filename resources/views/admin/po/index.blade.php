@@ -42,8 +42,8 @@
                                         <th>Invoice</th>
                                         <th>Supplier</th>
                                         <th>Order Date</th>
-                                        <th>Total</th>
                                         <th>Due Date</th>
+                                        <th>Total</th>
                                         <th>Payment Type</th>
                                         <th>Status</th>
                                         <th>Action</th>
@@ -55,22 +55,19 @@
                                             <td style="display: none;">{{ $po->id }}</td>
                                             <td>{{$index + 1}}</td>
                                             <td>{{ $po->invoice }}</td>
-                                            <td>{{ $po->supplier }}</td>
+                                            <td>{{ $po->supplier->name }}</td>
                                             <td>{{ $po->order_date }}</td>
+                                            <td>{{ $po->due_date}}</td>
                                             <td>{{ $po->total }}</td>
-                                            <td>{{ $po->supplier->payment_terms}}</td>
                                             <td>{{ $po->payment_type }}</td>
                                             <td>{{ $po->status }}</td>
                                             <td>
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <a href="#
-                                                        class="btn btn-secondary"><i class="ti ti-edit"></i></a>
-                                                    <form method="POST"
-                                                        action="#">
+                                                    <a href="{{ route('admin.po.edit', $po->id) }}" class=" btn btn-secondary"><i class="ti ti-zoom-scan"></i></a>
+                                                    <form method="POST" action="{{ route('admin.po.destroy', $po->id) }}">
                                                         @method('delete')
                                                         @csrf
-                                                        <button type="submit" class="btn btn-danger"><i
-                                                                class="ti ti-trash"></i></button>
+                                                        <button type="submit" class="btn btn-danger"><i class="ti ti-trash"></i></button>
                                                     </form>
                                                 </div>
                                             </td>

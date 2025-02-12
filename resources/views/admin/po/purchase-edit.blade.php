@@ -14,7 +14,7 @@
                         Overview
                     </div>
                     <h2 class="page-title">
-                        Create Purchase Order
+                        Edit Purchase Order
                     </h2>
                 </div>
             </div>
@@ -27,64 +27,49 @@
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-body">
-                            <form enctype="multipart/form-data" method="POST"
-                                action="{{ route('admin.po.store') }}" id="invoiceForm">
+                            <form enctype="multipart/form-data" method="POST" action="{{ route('admin.po.store') }}"
+                                id="invoiceForm">
                                 @csrf
                                 <fieldset class="form-fieldset container-xl">
                                     <div class="row">
                                         <div class="col-md-1 mb-3">
                                             <label class="form-label">INVOICE</label>
                                             <input type="text" class="form-control" name="invoice" id="invoice"
-                                                placeholder="Invoice" required />
+                                                placeholder="Invoice" value="{{$pos->invoice}}"  disabled/>
                                         </div>
                                         <div class="col-md-2 mb-3">
                                             <label class="form-label">ORDER DATE</label>
-                                            <input type="date" class="form-control" name="order_date" id="order_date" placeholder="Order date" required />
+                                            <input type="date" class="form-control" name="order_date" id="order_date"
+                                                placeholder="Order date" value="{{$pos->order_date}}" disabled/>
                                         </div>
                                         <div class="col-md-2 mb-3">
                                             <label class="form-label">DUE DATE</label>
-                                            <input type="date" class="form-control" name="due_date" id="due_date" placeholder="Due date" readonly/>
+                                            <input type="date" class="form-control" name="due_date" id="due_date"
+                                                placeholder="Due date" value="{{$pos->due_date}}" disabled/>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
                                             <label class="form-label">SUPPLIER</label>
-                                            <select class="form-control" name="supplier_id" id="supplier_id" required>
-                                                <option value="">Select Supplier</option>
-                                                @foreach($suppliers as $supplier)
-                                                    <option value="{{ $supplier->id }}" data-payment-terms="{{ $supplier->payment_terms }}">
-                                                        {{ $supplier->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <input type="text" class="form-control" name="supplier" id="supplier" placeholder="Order date"
+                                                value="{{$pos->supplier->name}}" disabled />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
-                                            <label class="form-label">PRODUCT</label>
-                                            <select class="form-control" name="product_id" id="product_id">
-                                                <option value="">Select Product</option>
-                                                @foreach($products as $product)
-                                                    <option value="{{ $product->id }}" data-price="{{ $product->price }}" data-quantity="{{ $product->quantity }}">
-                                                        {{ $product->name }}
-                                                    </option>
-                                                @endforeach
+                                            <label class="form-label">PAYMENT TYPE</label>
+                                            <select class="form-control" name="payment_type" id="payment_type">
+                                                <option value="Cash" {{ $pos->payment_type == 'Cash' ? 'selected' : '' }}>Cash</option>
+                                                <option value="Transfer" {{ $pos->payment_type == 'Transfer' ? 'selected' : '' }}>Transfer</option>
                                             </select>
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <label class="form-label">QTY</label>
-                                            <input type="text" class="form-control" name="quantity"
-                                                id="quantity" placeholder="Quantity"/>
+                                            <label class="form-label">STATUS</label>
+                                            <select class="form-control" name="status" id="status">
+                                                <option value="Cash" {{ $pos->status == 'Paid' ? 'selected' : '' }}>Paid</option>
+                                                <option value="Unpaid" {{ $pos->status == 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
+                                            </select>
                                         </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label class="form-label">PRICE</label>
-                                            <input type="text" class="form-control" name="selling_price" id="selling_price" placeholder="Selling Price" />
-                                        </div>
-                                        <input type="hidden" name="products" id="productsField">
-                                    </div>
-                                    <div class="text-end">
-                                        <button type="button" id="addProduct" class="btn btn-secondary">Add Product</button>
-                                        <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                 </fieldset>
                                 <table class="table">
@@ -98,6 +83,16 @@
                                         </tr>
                                     </thead>
                                     <tbody id="productTableBody">
+                                        @foreach ($items as $index => $po)
+                                            <tr>
+                                                <td style="display: none;">{{ $po->id }}</td>
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{ $po->name }}</td>
+                                                <td>{{ $po->quantity }}</td>
+                                                <td>{{ $po->price }}</td>
+                                                <td>{{ $po->total }}</td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                                 <h4>Total: <span id="totalPrice">0</span></h4>
@@ -112,21 +107,21 @@
 <script>
     //automatically input the due date
     document.addEventListener('DOMContentLoaded', function () {
-    const orderDateField = document.getElementById('order_date');
-    const dueDateField = document.getElementById('due_date');
-    const supplierSelect = document.getElementById('supplier_id');
+        const orderDateField = document.getElementById('order_date');
+        const dueDateField = document.getElementById('due_date');
+        const supplierSelect = document.getElementById('supplier_id');
 
-    // Event listener for supplier selection change
-    supplierSelect.addEventListener('change', function () {
-        calculateDueDate();
-    });
+        // Event listener for supplier selection change
+        supplierSelect.addEventListener('change', function () {
+            calculateDueDate();
+        });
 
-    // Event listener for order date selection change
-    orderDateField.addEventListener('change', function () {
-        calculateDueDate();
-    });
+        // Event listener for order date selection change
+        orderDateField.addEventListener('change', function () {
+            calculateDueDate();
+        });
 
-    // Function to calculate the due date
+        // Function to calculate the due date
         function calculateDueDate() {
             const orderDateValue = orderDateField.value;
             const orderDate = new Date(orderDateValue);

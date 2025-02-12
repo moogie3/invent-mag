@@ -10,7 +10,7 @@ class POItem extends Model
     protected $fillable = [
         'po_id',
         'product_id',
-        'product_name',
+        'name',
         'quantity',
         'price',
         'total'

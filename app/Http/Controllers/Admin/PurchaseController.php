@@ -27,57 +27,74 @@ class PurchaseController extends Controller
         return view('admin.po.purchase-create', compact('pos', 'suppliers', 'products'));
     }
 
-    public function store(Request $request)
+
+    public function edit($id){
+        $pos = Purchase::with(['items', 'supplier'])->find($id);
+        $suppliers = Supplier::all();
+        $items = POItem::all();
+        return view('admin.po.purchase-edit', compact('pos','suppliers', 'items'));
+    }
+
+      public function store(Request $request)
 {
     try {
-        // Validate form input
+        // Validate the request
         $validatedData = $request->validate([
             'invoice'       => 'required|string|unique:po,invoice',
             'supplier_id'   => 'required|exists:suppliers,id',
             'order_date'    => 'required|date',
             'due_date'      => 'required|date',
-            'payment_type'  => 'required|string',
-            'status'        => 'required|string',
             'products'      => 'required|json',
         ]);
 
-        // Decode JSON products array
-        $products = json_decode($request->products, true);
+        // Log request data for debugging
+        \Log::info('Received Data:', $request->all());
 
+        // Check if products are valid JSON
+        $products = json_decode($request->products, true);
         if (!$products || !is_array($products)) {
-            return back()->with('error', 'Invalid product data.');
+            \Log::error('Invalid product data:', ['products' => $request->products]);
+            return back()->withErrors(['products' => 'Invalid product data'])->withInput();
         }
 
-        // Calculate total price of all products
+        // Calculate total price
         $totalPrice = array_sum(array_column($products, 'total'));
 
-        // Store data into `po` table
+        // Store Purchase Order
         $purchase = Purchase::create([
             'invoice'       => $request->invoice,
             'supplier_id'   => $request->supplier_id,
             'order_date'    => $request->order_date,
             'due_date'      => $request->due_date,
-            'payment_type'  => $request->payment_type,
-            'status'        => $request->status,
             'total'         => $totalPrice,
         ]);
 
-        // Store each product into `po_items` table
+        \Log::info('Decoded Products:', $products);
+        // Store PO items
         foreach ($products as $product) {
             POItem::create([
                 'po_id'        => $purchase->id,
                 'product_id'   => $product['id'],
-                'product_name' => $product['name'],
+                'name'         => $product['name'],
                 'quantity'     => $product['quantity'],
                 'price'        => $product['price'],
                 'total'        => $product['total'],
             ]);
         }
 
-        return redirect()->route('admin.po.index')->with('success', 'Purchase Order created successfully.');
+        return redirect()->route('admin.po')->with('success', 'Purchase Order created successfully.');
     } catch (\Exception $e) {
-        return back()->with('error', 'Error: ' . $e->getMessage());
+        \Log::error('Error storing purchase order:', ['exception' => $e]);
+        return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
     }
 }
+
+    public function destroy($id)
+    {
+        Purchase::find($id)->delete();
+
+        return redirect()->route('admin.po')->with('success', 'Purchase order deleted');
+    }
+
 
 }

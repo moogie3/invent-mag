@@ -69,7 +69,7 @@
                                             35 Invoice OUT
                                         </div>
                                         <div class="text-secondary">
-                                            12 waiting payments today
+                                            12 waiting payments
                                         </div>
                                     </div>
                                 </div>

@@ -17,6 +17,8 @@ class Purchase extends Model
         'order_date',
         'due_date',
         'total',
+        'payment_type',
+        'status'
     ];
 
     protected $attributes = [
@@ -39,5 +41,8 @@ class Purchase extends Model
 
     protected $casts = [
         'total' => 'double',
+        'order_date' => 'datetime',
+        'due_date' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 }

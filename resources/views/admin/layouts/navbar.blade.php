@@ -115,6 +115,14 @@
                             <span class="nav-link-title">Category</span>
                         </a>
                     </li>
+                    <li class="nav-item {{ request()->is('admin/currency/edit') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.currency.edit') }}">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                <i class="ti ti-currency fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Currency</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

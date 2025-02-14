@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UnitController;
+use App\Http\Controllers\Admin\CurrencyController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'admin'], function (){
@@ -64,6 +65,10 @@ Route::group(['prefix' => 'admin'], function (){
         Route::put('/update/{id}', [PurchaseController::class, 'update'])->name('admin.po.update');
         Route::delete('/destroy/{id}', [PurchaseController::class, 'destroy'])->name('admin.po.destroy');
         Route::get('/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('product.details');
+    });
 
+    Route::group(['prefix' => 'currency'], function () {
+        Route::get('/', [CurrencyController::class, 'edit'])->name('admin.currency.edit');
+        Route::post('/edit', [CurrencyController::class, 'update'])->name('admin.currency.update');
     });
 });

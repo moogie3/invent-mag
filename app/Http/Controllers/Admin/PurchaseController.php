@@ -73,6 +73,11 @@ class PurchaseController extends Controller
                     'price'        => $product['price'],
                     'total'        => $product['total'],
                 ]);
+
+                // Update product price in the products table
+                Product::where('id', $product['id'])->update([
+                'price' => $product['price']
+                ]);
             }
 
             return redirect()->route('admin.po')->with('success', 'Purchase Order created successfully.');

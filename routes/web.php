@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\CurrencyController;
+use App\Http\Controllers\Admin\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'admin'], function (){
@@ -71,4 +72,7 @@ Route::group(['prefix' => 'admin'], function (){
         Route::get('/', [CurrencyController::class, 'edit'])->name('admin.currency.edit');
         Route::post('/edit', [CurrencyController::class, 'update'])->name('admin.currency.update');
     });
+
+    Route::post('/admin/profile/update', [ProfileController::class, 'update'])->name('admin.profile.update');
+
 });

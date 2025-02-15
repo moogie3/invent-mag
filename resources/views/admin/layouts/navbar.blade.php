@@ -5,7 +5,7 @@
 
         <!-- Centered Brand Title -->
         <h1 class="navbar-brand navbar-brand-autodark position-absolute start-50 translate-middle-x m-0">
-            Invent-MAG
+            <a href="{{ route('admin.dashboard') }}" class="nav-link"><i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
         </h1>
 
         <!-- Right Side Icons -->
@@ -37,7 +37,7 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <a href="./profile.html" class="dropdown-item">Profile</a>
-                    <a href="./settings.html" class="dropdown-item">Settings</a>
+                    <a href="{{ route('admin.currency.edit') }}" class="dropdown-item">Settings</a>
                     <a href="./sign-in.html" class="dropdown-item">Logout</a>
                 </div>
             </div>
@@ -56,7 +56,7 @@
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-home fs-2"></i>
                             </span>
-                            <span class="nav-link-title">Home</span>
+                            <span class="nav-link-title">Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item {{ request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*') ? 'active' : '' }}">
@@ -113,14 +113,6 @@
                                 <i class="ti ti-category fs-2"></i>
                             </span>
                             <span class="nav-link-title">Category</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {{ request()->is('admin/currency/edit') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('admin.currency.edit') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                <i class="ti ti-currency fs-2"></i>
-                            </span>
-                            <span class="nav-link-title">Currency</span>
                         </a>
                     </li>
                 </ul>

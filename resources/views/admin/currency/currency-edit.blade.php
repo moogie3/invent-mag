@@ -23,7 +23,7 @@
         <div class="page-body">
             <div class="container-xl">
                 <div class="row row-deck row-cards">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="card card-primary">
                             <div class="card-body">
                                 @if(session('success'))
@@ -52,6 +52,45 @@
                                     </div>
                                     </fieldset>
                                     <button type="submit" class="btn btn-primary">Save Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3>Profile Settings</h3>
+                            </div>
+                            <div class="card-body">
+                                @if(session('success_profile'))
+                                    <div class="alert alert-success">{{ session('success_profile') }}</div>
+                                @endif
+                                <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label>Avatar</label><br>
+                                        <img src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('default-avatar.png') }}"
+                                            alt="Avatar" class="img-thumbnail mb-2" width="100">
+                                        <input type="file" name="avatar" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Name</label>
+                                        <input type="text" name="name" class="form-control" value="{{ auth()->user()->name }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Email</label>
+                                        <input type="email" name="email" class="form-control" value="{{ auth()->user()->email }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>New Password</label>
+                                        <input type="password" name="password" class="form-control" placeholder="Enter new password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Confirm Password</label>
+                                        <input type="password" name="password_confirmation" class="form-control"
+                                            placeholder="Confirm new password">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Profile</button>
                                 </form>
                             </div>
                         </div>

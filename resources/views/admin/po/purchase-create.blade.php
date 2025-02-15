@@ -60,7 +60,7 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label class="form-label">PRODUCT</label>
                                                 <select class="form-control" name="product_id" id="product_id">
                                                     <option value="">Select Product</option>
@@ -71,14 +71,18 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-2 mb-3">
                                                 <label class="form-label">QTY</label>
                                                 <input type="text" class="form-control" name="quantity"
                                                     id="quantity" placeholder="Quantity"/>
                                             </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">PRICE</label>
-                                                <input type="text" class="form-control" name="selling_price" id="selling_price" placeholder="Selling Price" readonly/>
+                                            <div class="col-md-2 mb-3">
+                                                <label class="form-label">LAST PRICE</label>
+                                                <input type="text" class="form-control" name="last_price" id="last_price" placeholder="Last price" disabled/>
+                                            </div>
+                                            <div class="col-md-2 mb-3">
+                                                <label class="form-label">NEW PRICE</label>
+                                                <input type="text" class="form-control" name="new_price" id="new_price" placeholder="New price"/>
                                             </div>
                                             <input type="hidden" name="products" id="productsField">
                                         </div>
@@ -100,7 +104,7 @@
                                         <tbody id="productTableBody">
                                         </tbody>
                                     </table>
-                                    <h1>Total Price: <span id="totalPrice">
+                                    <h1 class="text-end">Total Price: <span id="totalPrice">
                                         </span></h1>
                                 </form>
                             </div>
@@ -153,33 +157,35 @@
         });
     </script>
     <script>
+        //automatically input the product
         document.addEventListener('DOMContentLoaded', function () {
             const productSelect = document.getElementById('product_id');
+            const priceField = document.getElementById('last_price');
             const quantityField = document.getElementById('quantity');
-            const priceField = document.getElementById('selling_price');
+            const newpriceField = document.getElementById('new_price');
             const addProductButton = document.getElementById('addProduct');
             const productTableBody = document.getElementById('productTableBody');
             const productsField = document.getElementById('productsField');
 
             let products = []; // Array to store added products
 
-            // Auto-fill quantity and price on product selection
+            // Auto-fill price on product selection
             productSelect.addEventListener('change', function () {
                 const selectedOption = productSelect.options[productSelect.selectedIndex];
                 const price = selectedOption.getAttribute('data-price');
-                const quantity = selectedOption.getAttribute('data-quantity');
-
                 priceField.value = price ? price : '';
-                quantityField.value = quantity ? quantity : '';
             });
-
+            const quantity = selectedOption.getAttribute('quantity');
+            const new_price = selectedOption.getAttribute('new_price');
+            quantityField.value = quantity ? quantity : '';
+            newpriceField.value = new_price ? new_price : '';
             // Add product to the table
             addProductButton.addEventListener('click', function () {
                 const selectedOption = productSelect.options[productSelect.selectedIndex];
                 const productId = productSelect.value;
                 const productName = selectedOption.text;
                 const quantity = quantityField.value;
-                const price = priceField.value;
+                const price = newpriceField.value;
                 const total = (parseFloat(price) * parseInt(quantity)).toFixed(2);
 
                 if (!productId || !quantity || !price) {

@@ -19,6 +19,7 @@ class Sales extends Model
         'product_id',
         'quantity',
         'price',
+        'selling_price_cust',
         'status'
     ];
 

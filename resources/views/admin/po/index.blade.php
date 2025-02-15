@@ -58,7 +58,7 @@
                                                 <td>{{ $po->supplier->name }}</td>
                                                 <td>{{ $po->order_date->format('d F Y') }}</td>
                                                 <td>{{ $po->due_date->format('d F Y')}}</td>
-                                                <td>{{ $po->total }}</td>
+                                                <td>{{ \App\Helpers\CurrencyHelper::format($po->total) }}</td>
                                                 <td>{{ $po->payment_type }}</td>
                                                 <td>{{ $po->status }}</td>
                                                 <td>

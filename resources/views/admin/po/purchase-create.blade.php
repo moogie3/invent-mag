@@ -65,7 +65,7 @@
                                                 <select class="form-control" name="product_id" id="product_id">
                                                     <option value="">Select Product</option>
                                                     @foreach($products as $product)
-                                                        <option value="{{ $product->id }}" data-price="{{ $product->price }}" data-quantity="{{ $product->quantity }}">
+                                                        <option value="{{ $product->id }}" data-price="{{ $product->price }}">
                                                             {{ $product->name }}
                                                         </option>
                                                     @endforeach
@@ -78,7 +78,7 @@
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">PRICE</label>
-                                                <input type="text" class="form-control" name="selling_price" id="selling_price" placeholder="Selling Price" />
+                                                <input type="text" class="form-control" name="selling_price" id="selling_price" placeholder="Selling Price" readonly/>
                                             </div>
                                             <input type="hidden" name="products" id="productsField">
                                         </div>

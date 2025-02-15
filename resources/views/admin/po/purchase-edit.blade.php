@@ -98,16 +98,18 @@
                                                     <td>{{$index + 1}}</td>
                                                     <td>{{ $item->product->name }}</td>
                                                     <td>{{ $item->quantity }}</td>
-                                                    <td>{{ number_format($item->price, 2) }}</td>
-                                                    <td>{{ number_format($item->quantity * $item->price, 2) }}</td>
+                                                    <td>{{ \App\Helpers\CurrencyHelper::format($item->price) }}</td>
+                                                    <td>{{ \App\Helpers\CurrencyHelper::format($item->quantity * $item->price) }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
-
-                                    <h1>Total Price: <span id="totalPrice">
-                                            {{ number_format($pos->items->sum(fn($item) => $item->quantity * $item->price)) }}
-                                        </span></h1>
+                                    <br>
+                                    <h1 class="text-end">
+                                        Total Invoice: <span id="totalPrice">
+                                            {{ \App\Helpers\CurrencyHelper::format($pos->items->sum(fn($item) => $item->quantity * $item->price)) }}
+                                        </span>
+                                    </h1>
 
                                     <div class="text-end">
                                         @if($pos->status !== 'Paid')

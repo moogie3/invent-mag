@@ -40,7 +40,7 @@ class Purchase extends Model
     }
 
     protected $casts = [
-        'total' => 'double',
+        'total' => 'float',
         'order_date' => 'datetime',
         'due_date' => 'datetime',
         'updated_at' => 'datetime'

@@ -62,11 +62,11 @@
                                                 <td>{{ $product->code }}</td>
                                                 <td>{{ $product->name }}</td>
                                                 <td>{{ $product->quantity }}</td>
-                                                <td>{{ $product->category->name ?? 'No Category' }}</td>
-                                                <td>{{ $product->unit->name ?? 'No Unit'}}</td>
+                                                <td>{{ $product->category->name}}</td>
+                                                <td>{{ $product->unit->symbol}}</td>
                                                 <td>{{ \App\Helpers\CurrencyHelper::format($product->price) }}</td>
                                                 <td>{{ \App\Helpers\CurrencyHelper::format($product->selling_price) }}</td>
-                                                <td>{{ $product->supplier->name ?? 'No Supplier' }}</td>
+                                                <td>{{ $product->supplier->name}}</td>
                                                 <td>
                                                     <div class="d-flex gap-2 justify-content-center">
                                                         <a href="{{ route('admin.product.edit', $product->id) }}" class="btn btn-secondary"><i class="ti ti-edit"></i></a>

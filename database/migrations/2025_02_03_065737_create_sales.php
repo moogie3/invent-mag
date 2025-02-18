@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('invoice');
             $table->string('customer_id');
-            $table->date('order_date');
-            $table->enum('payment_type', ['Cash','Transfer']);
-            $table->integer('product_id');
+            $table->timestamp('order_date');
+            $table->enum('payment_type', ['Cash','Transfer','-']);
             $table->float('selling_price_cust');
-            $table->enum('status', ['Paid', 'Unpaid']);
+            $table->float('total');
+            $table->enum('status', ['Unpaid', 'Paid']);
             $table->timestamps();
         });
     }

@@ -35,11 +35,11 @@
                                         <div class="col-md-1 mb-3">
                                             <label class="form-label">CODE</label>
                                             <input type="text" class="form-control" name="code" id="code"
-                                                placeholder="Code" value="{{$products->code}}" />
+                                                placeholder="Code" value="{{$products->code}}" disabled/>
                                         </div>
                                         <div class="col-md-2 mb-3">
                                             <label class="form-label">SUPPLIER</label>
-                                            <select class="form-control" name="supplier_id" required>
+                                            <select class="form-control" name="supplier_id">
                                                 <option value="{{ $products->supplier_id }}">{{ $products->supplier->name}}</option>
                                                 @foreach($suppliers as $supplier)
                                                     <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
@@ -64,7 +64,7 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">CATEGORY</label>
-                                            <select class="form-control" name="category_id" required>
+                                            <select class="form-control" name="category_id">
                                                 <option value="{{ $products->category_id }}">{{ $products->category->name}}</option>
                                                 @foreach($categories as $category)
                                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -82,7 +82,7 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">UNIT</label>
-                                            <select class="form-control" name="units_id" required>
+                                            <select class="form-control" name="units_id">
                                                 <option value="{{ $products->units_id }}">{{ $products->unit->name}}</option>
                                                 @foreach($units as $unit)
                                                     <option value="{{ $unit->id }}">{{ $unit->name }}</option>

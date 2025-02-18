@@ -12,6 +12,6 @@ class CurrencyHelper {
         }
 
         return $settings->currency_symbol . ' ' .
-               number_format($amount, $settings->decimal_places, $settings->decimal_separator, $settings->thousand_separator);
+        number_format($amount, $settings->decimal_places, $settings->decimal_separator, $settings->thousand_separator);
     }
 }

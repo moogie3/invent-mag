@@ -49,31 +49,6 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($pos as $index => $po)
-                                            <tr>
-                                                <td style="display: none;">{{ $po->id }}</td>
-                                                <td>{{$index + 1}}</td>
-                                                <td>{{ $po->invoice }}</td>
-                                                <td>{{ $po->supplier->name }}</td>
-                                                <td>{{ $po->order_date->format('d F Y') }}</td>
-                                                <td>{{ $po->due_date->format('d F Y')}}</td>
-                                                <td>{{ \App\Helpers\CurrencyHelper::format($po->total) }}</td>
-                                                <td>{{ $po->payment_type }}</td>
-                                                <td>{{ $po->status }}</td>
-                                                <td>
-                                                    <div class="d-flex gap-2 justify-content-center">
-                                                        <a href="{{ route('admin.po.edit', $po->id) }}"
-                                                            class=" btn btn-secondary"><i class="ti ti-zoom-scan"></i></a>
-                                                        <form method="POST" action="{{ route('admin.po.destroy', $po->id) }}">
-                                                            @method('delete')
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-danger"><i
-                                                                    class="ti ti-trash"></i></button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
                                     </tbody>
                                 </table>
                                 <script>

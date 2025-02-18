@@ -8,7 +8,10 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\CurrencyController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Helpers\CurrencyHelper;
+use App\Http\Controllers\Admin\SalesController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 Route::group(['prefix' => 'admin'], function (){
     Route::view('/', 'admin.dashboard')->name('admin.dashboard');
@@ -68,7 +71,17 @@ Route::group(['prefix' => 'admin'], function (){
         Route::get('/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('product.details');
     });
 
-    Route::group(['prefix' => 'currency'], function () {
+    Route::group(['prefix' => 'sales'], function () {
+        Route::get('/', [SalesController::class, 'index'])->name('admin.sales');
+        Route::get('/create', [SalesController::class, 'create'])->name('admin.sales.create');
+        Route::post('/store', [SalesController::class, 'store'])->name('admin.sales.store');
+        Route::get('/edit/{id}', [SalesController::class, 'edit'])->name('admin.sales.edit');
+        Route::put('/update/{id}', [SalesController::class, 'update'])->name('admin.sales.update');
+        Route::delete('/destroy/{id}', [SalesController::class, 'destroy'])->name('admin.sales.destroy');
+        Route::get('/product/{id}', [SalesController::class, 'getProductDetails'])->name('product.details');
+    });
+
+    Route::group(['prefix' => 'setting'], function () {
         Route::get('/', [CurrencyController::class, 'edit'])->name('admin.currency.edit');
         Route::post('/edit', [CurrencyController::class, 'update'])->name('admin.currency.update');
     });

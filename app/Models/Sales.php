@@ -16,14 +16,11 @@ class Sales extends Model
         'customer_id',
         'order_date',
         'payment_type',
-        'product_id',
-        'quantity',
-        'price',
         'selling_price_cust',
         'status'
     ];
 
-        public function product(): BelongsTo
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
@@ -34,9 +31,8 @@ class Sales extends Model
     }
 
     protected $casts = [
-        'quantity' =>  'float',
-        'price' => 'float'
+        'total' => 'float',
+        'order_date' => 'datetime',
+        'updated_at' => 'datetime'
     ];
-
-
 }

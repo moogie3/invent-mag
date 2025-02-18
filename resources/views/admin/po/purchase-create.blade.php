@@ -162,10 +162,11 @@
             const productSelect = document.getElementById('product_id');
             const priceField = document.getElementById('last_price');
             const quantityField = document.getElementById('quantity');
-            const newpriceField = document.getElementById('new_price');
+            const newPriceField = document.getElementById('new_price');
             const addProductButton = document.getElementById('addProduct');
             const productTableBody = document.getElementById('productTableBody');
             const productsField = document.getElementById('productsField');
+            const totalPriceElement = document.getElementById('totalPrice');
 
             let products = []; // Array to store added products
 
@@ -175,18 +176,15 @@
                 const price = selectedOption.getAttribute('data-price');
                 priceField.value = price ? price : '';
             });
-            const quantity = selectedOption.getAttribute('quantity');
-            const new_price = selectedOption.getAttribute('new_price');
-            quantityField.value = quantity ? quantity : '';
-            newpriceField.value = new_price ? new_price : '';
+
             // Add product to the table
             addProductButton.addEventListener('click', function () {
                 const selectedOption = productSelect.options[productSelect.selectedIndex];
                 const productId = productSelect.value;
                 const productName = selectedOption.text;
                 const quantity = quantityField.value;
-                const price = newpriceField.value;
-                const total = (parseFloat(price) * parseInt(quantity)).toFixed(2);
+                const price = newPriceField.value;
+                const total = (parseFloat(price) * parseInt(quantity)) || 0;
 
                 if (!productId || !quantity || !price) {
                     alert('Please select a product and enter quantity and price.');
@@ -209,22 +207,26 @@
                 row.innerHTML = `
                     <td>${productName}</td>
                     <td>${quantity}</td>
-                    <td>${price}</td>
-                    <td>${total}</td>
+                    <td>${formatCurrency(price)}</td>
+                    <td>${formatCurrency(total)}</td>
                     <td><button type="button" class="btn btn-danger btn-sm removeProduct">Remove</button></td>
                 `;
                 productTableBody.appendChild(row);
+
+                updateTotalPrice();
 
                 // Reset fields
                 productSelect.value = '';
                 quantityField.value = '';
                 priceField.value = '';
+                newPriceField.value = '';
 
                 // Remove product event
                 row.querySelector('.removeProduct').addEventListener('click', function () {
                     row.remove();
                     products = products.filter(p => p.id !== productId);
                     updateHiddenField();
+                    updateTotalPrice();
                 });
             });
 
@@ -233,6 +235,22 @@
                 productsField.value = JSON.stringify(products);
             }
 
+            // Calculate and update the total price
+            function updateTotalPrice() {
+                const total = products.reduce((sum, product) => sum + product.total, 0);
+                totalPriceElement.innerHTML = formatCurrency(total) || 0;
+            }
+
+            // You can either call your server-side method via AJAX or handle it entirely in JS
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+            }
+
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#pctable').DataTable();
         });
     </script>
     @if($errors->any())

@@ -67,8 +67,8 @@
                             <span class="nav-link-title">Purchase Order</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('sales') ? 'active' : '' }}">
-                        <a class="nav-link" href="./form-elements.html">
+                    <li class="nav-item {{ request()->is('admin/sales', 'admin/sales/create', 'admin/sales/edit/*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.sales') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-currency-dollar fs-2"></i>
                             </span>

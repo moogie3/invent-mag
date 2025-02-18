@@ -75,16 +75,16 @@ class ProductController extends Controller
         $products = Product::find($id);
 
         $request->validate([
-        'code' => 'required|string',
-        'name' => 'required|string',
-        'quantity' => 'required|integer',
-        'price' => 'required|numeric',
-        'selling_price' => 'required|numeric',
-        'category_id' => 'required|integer',
-        'units_id' => 'required|integer',
-        'supplier_id' => 'required|integer',
+        'code' => 'string',
+        'name' => 'string',
+        'quantity' => 'integer',
+        'price' => 'numeric',
+        'selling_price' => 'numeric',
+        'category_id' => 'integer',
+        'units_id' => 'integer',
+        'supplier_id' => 'integer',
         'description' => 'nullable|string',
-        'image' => 'required|image|mimes:jpeg,jpg,png'
+        'image' => 'image|mimes:jpeg,jpg,png'
         ]);
 
         $data = $request->except(["_token"]);

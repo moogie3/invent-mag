@@ -33,14 +33,14 @@
             <div class="row row-deck row-cards">
                 <div class="col-md-12">
                     <div class="card card-primary">
-                        <div class="card-body">
-                            <table id="categoryt" class="table table-responsive">
+                        <div class="table-responsive" id="table-default">
+                            <table class="table">
                                 <thead>
                                     <tr class="dark">
                                         <th>no</th>
                                         <th>Category</th>
                                         <th>Description</th>
-                                        <th>Action</th>
+                                        <th style="width:180px; text-align: center;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -51,7 +51,7 @@
                                             <td>{{ $category->description }}</td>
                                             <td>
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <a href="{{ route('admin.category.edit', $category->id) }}" class="btn btn-secondary"><i class="ti ti-edit"></i></a>
+                                                    <button href="{{ route('admin.category.edit', $category->id) }}" class="btn btn-secondary"><i class="ti ti-edit"></i></button>
                                                     <form method="POST" action="{{ route('admin.category.destroy', $category->id) }}">
                                                         @method('delete')
                                                         @csrf
@@ -64,11 +64,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                            <script>
-                                $(document).ready(function () {
-                                    $('#categoryt').DataTable();
-                                });
-                            </script>
                         </div>
                     </div>
                 </div>
@@ -76,6 +71,4 @@
         </div>
     </div>
 </div>
-@push('styles')
-@endpush
 @endsection

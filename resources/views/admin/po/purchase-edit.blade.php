@@ -125,11 +125,6 @@
             </div>
         </div>
     </div>
-    <script>
-        $(document).ready(function () {
-            $('#ptable').DataTable();
-        });
-    </script>
     @if($errors->any())
         <div class="alert alert-danger">
             <ul>

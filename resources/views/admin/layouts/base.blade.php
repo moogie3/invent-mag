@@ -10,63 +10,10 @@
     <link href="{{asset('tabler/dist/css/tabler-payments.min.css?1692870487')}}" rel="stylesheet" />
     <link href="{{asset('tabler/dist/css/tabler-vendors.min.css?1692870487')}}" rel="stylesheet" />
     <link href="{{asset('tabler/dist/css/demo.min.css?1692870487')}}" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    @stack('styles')
-    <style>
-
-        body .dataTables_filter input {
-            color: black !important;  /* Dark text for light mode */
-            background-color: #fff !important;  /* Light background */
-            border: 1px solid #bbb !important;
-            margin-bottom: 20px;
-        }
-
-        body.light-mode td, th {
-            background-color: #5d62714b !important;
-        }
-
-        body td,th {
-            text-align:center;
-        }
-
-        /* Change DataTables search bar text color */
-        body.dark-mode .dataTables_filter input {
-            color: white !important;
-            background-color: #5d62714b !important;
-            border: 1px solid #bbb !important;
-            margin-bottom: 20px;
-        }
-
-        body.dark-mode .dataTables_filter input::placeholder {
-            color: rgba(255, 255, 255, 0) !important;
-        }
-
-        body.dark-mode .dataTables_filter label {
-            color: white !important;
-        }
-
-        body.dark-mode .dataTables_length label {
-            color: white !important;
-        }
-
-        body.dark-mode .dataTables_info {
-            color: white !important;
-        }
-
-        body.dark-mode table tbody{
-            border: 1px solid gray !important;
-            color: black !important;
-        }
-
-        body.dark-mode td, th {
-            text-align: center;
-            background-color:#5d62714b;
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 </head>
 <body>
     @include('admin.layouts.navbar')

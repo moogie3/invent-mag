@@ -109,3 +109,70 @@
             });
         });
 </script>
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle changing the number of entries
+            document.getElementById('entriesSelect').addEventListener('change', function () {
+                window.location.href = '?entries=' + this.value;
+            });
+
+            // Live search functionality
+            const searchInput = document.getElementById('searchInput');
+            const tableRows = document.querySelectorAll('#invoiceTableBody tr');
+
+            searchInput.addEventListener('keyup', function () {
+                const searchTerm = searchInput.value.toLowerCase();
+
+                tableRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+        });
+</script>
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+                // Initialize List.js
+                const list = new List('invoiceTableContainer', {
+        sortClass: 'table-sort',
+        listClass: 'table-tbody',
+        valueNames: [
+            'sort-no',
+            'sort-invoice',
+            'sort-supplier',
+            'sort-orderdate',
+            {
+                name: 'sort-duedate',
+                attr: 'data-date'
+            },
+            {
+                name: 'sort-amount',
+                attr: 'data-amount'
+            },
+            'sort-payment',
+            'sort-status',
+        ],
+    });
+
+                // Ensure "Show Entries" dropdown updates the URL
+                document.getElementById('entriesSelect').addEventListener('change', function () {
+                    window.location.href = '?entries=' + this.value;
+                });
+
+                // Enhanced search for formatted and raw amounts
+                const searchInput = document.getElementById('searchInput');
+                const tableRows = document.querySelectorAll('#invoiceTableBody tr');
+
+                searchInput.addEventListener('keyup', function () {
+                    const searchTerm = searchInput.value.toLowerCase();
+
+                    tableRows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        const rawAmount = row.querySelector('.raw-amount')?.textContent.toLowerCase() || '';
+
+                        // Match either formatted text OR raw amount
+                        row.style.display = (text.includes(searchTerm) || rawAmount.includes(searchTerm)) ? '' : 'none';
+                    });
+                });
+            });
+</script>

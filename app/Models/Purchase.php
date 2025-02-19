@@ -18,7 +18,8 @@ class Purchase extends Model
         'due_date',
         'total',
         'payment_type',
-        'status'
+        'status',
+        'updated_at'
     ];
 
     protected $attributes = [
@@ -45,4 +46,5 @@ class Purchase extends Model
         'due_date' => 'datetime',
         'updated_at' => 'datetime'
     ];
+
 }

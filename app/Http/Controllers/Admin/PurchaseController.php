@@ -7,17 +7,17 @@ use App\Models\POItem;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Supplier;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class PurchaseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pos = Purchase::with(['product', 'supplier'])->get();
-        return view('admin.po.index', ['pos' => $pos]);
+    $entries = $request->input('entries', 10); // Default: 10 entries
+    $pos = Purchase::with(['product', 'supplier'])->paginate($entries);
+    return view('admin.po.index', ['pos' => $pos]);
     }
+
 
     public function create()
     {
@@ -87,17 +87,17 @@ class PurchaseController extends Controller
     }
 
     public function update(Request $request, $id){
-    $pos = Purchase::findOrFail($id);
+        $pos = Purchase::findOrFail($id);
 
-    $request->validate([
-        'payment_type' => 'required',
-        'status' => 'required'
-    ]);
+        $request->validate([
+            'payment_type' => 'required',
+            'status' => 'required'
+        ]);
 
-    $data = $request->except(["_token", "_method"]);
-    $pos->update($data);
+        $data = $request->except(["_token", "_method"]);
+        $pos->update($data);
 
-    return redirect()->route('admin.po')->with('success', 'Purchase updated successfully!');
+        return redirect()->route('admin.po')->with('success', 'Purchase updated successfully!');
     }
 
     public function destroy($id)

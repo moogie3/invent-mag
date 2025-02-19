@@ -34,7 +34,7 @@
                     <div class="col-md-12">
                         <div class="card card-primary">
                             <div class="card-body">
-                                <table id="pott" class="table table-responsive">
+                                <table id="table-default" class="table table-responsive">
                                     <thead>
                                         <tr class="dark">
                                             <th style="display:none;">id</th>
@@ -53,7 +53,7 @@
                                 </table>
                                 <script>
                                     $(document).ready(function () {
-                                        $('#pott').DataTable();
+                                        $('#stt').DataTable();
                                     });
                                 </script>
                             </div>

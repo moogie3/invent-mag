@@ -20,6 +20,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Page body -->
         <div class="page-body">
             <div class="container-xl">
@@ -71,7 +72,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-2 mb-3">
+                                            <div class="col-md-1 mb-3">
                                                 <label class="form-label">QTY</label>
                                                 <input type="text" class="form-control" name="quantity"
                                                     id="quantity" placeholder="Quantity"/>
@@ -84,27 +85,28 @@
                                                 <label class="form-label">NEW PRICE</label>
                                                 <input type="text" class="form-control" name="new_price" id="new_price" placeholder="New price"/>
                                             </div>
+                                            <div class="col-md-4 mb-3 text-end">
+                                                <label class="form-label">BUTTON</label>
+                                                <button type="button" id="addProduct" class="btn btn-secondary">Add Product</button>
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                            </div>
                                             <input type="hidden" name="products" id="productsField">
                                         </div>
-                                        <div class="text-end">
-                                            <button type="button" id="addProduct" class="btn btn-secondary">Add Product</button>
-                                            <button type="submit" class="btn btn-primary">Submit</button>
-                                        </div>
                                     </fieldset>
-                                    <table class="table">
-                                        <thead>
+                                    <table class="table card-table table-vcenter table-responsive">
+                                        <thead style="font-size: large">
                                             <tr>
-                                                <th>Product</th>
-                                                <th>Quantity</th>
-                                                <th>Price</th>
-                                                <th>Total</th>
-                                                <th>Action</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-product">Product</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-quantity">Quantity</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-price">Price</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-total">Amount</th>
+                                                <th style="width:200px;text-align:center" class="fs-4 py-3">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="productTableBody">
                                         </tbody>
                                     </table>
-                                    <h1 class="text-end">Total Price: <span id="totalPrice">
+                                    <h1 class="mt-3 text-end">Total Price: <span id="totalPrice">
                                         </span></h1>
                                 </form>
                             </div>
@@ -209,7 +211,7 @@
                     <td>${quantity}</td>
                     <td>${formatCurrency(price)}</td>
                     <td>${formatCurrency(total)}</td>
-                    <td><button type="button" class="btn btn-danger btn-sm removeProduct">Remove</button></td>
+                    <td style="text-align:center"><button type="button" class="btn btn-danger btn-sm removeProduct">Remove</button></td>
                 `;
                 productTableBody.appendChild(row);
 

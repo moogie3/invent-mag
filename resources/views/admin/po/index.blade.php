@@ -33,12 +33,11 @@
                                         <div class="ms-2 d-inline-block">
                                         <input type="text" id="searchInput" class="form-control form-control-sm">
                                         </div>
-
                                     </div>
                                 </div>
-                                <div class="ms-auto">
+                                <div class="text-end">
                                     Show
-                                    <div class="mx-2 d-inline-block">
+                                    <div class="mx-1 d-inline-block">
                                         <select name="entries" id="entriesSelect" onchange="this.form.submit()">
                                             <option value="10">10</option>
                                             <option value="25">25</option>

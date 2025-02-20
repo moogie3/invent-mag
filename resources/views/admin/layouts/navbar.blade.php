@@ -4,7 +4,7 @@
         <div class="d-flex" style="width: 150px;"></div>
 
         <!-- Centered Brand Title -->
-        <h1 class="navbar-brand navbar-brand-autodark position-absolute start-50 translate-middle-x m-0">
+        <h1 class="navbar-brand position-absolute start-50 translate-middle-x m-0">
             <a href="{{ route('admin.dashboard') }}" class="nav-link"><i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
         </h1>
 

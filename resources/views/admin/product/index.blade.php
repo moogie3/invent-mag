@@ -34,9 +34,9 @@
                     <div class="col-md-12">
                         <div class="card card-primary">
                             <div class="card-body">
-                                <table id="productt" class="table table-responsive">
+                                <table class="table table-responsive">
                                     <thead>
-                                        <tr class="dark">
+                                        <tr>
                                             <th style="display:none;">id</th>
                                             <th>no</th>
                                             <th>Picture</th>
@@ -81,11 +81,6 @@
                                         @endforeach
                                     </tbody>
                                 </table>
-                                <script>
-                                    $(document).ready(function () {
-                                        $('#productt').DataTable();
-                                    });
-                                </script>
                             </div>
                         </div>
                     </div>

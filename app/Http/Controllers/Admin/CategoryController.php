@@ -8,10 +8,12 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index(){
-        $categories = Categories::all();
-        return view ('admin.category.index', ['categories' => $categories]);
+    public function index(Request $request) {
+        $entries = $request->input('entries', 10);
+        $categories = Categories::paginate($entries);
+        return view('admin.category.index', compact('categories', 'entries'));
     }
+
 
     public function create(){
         $categories = Categories::all();

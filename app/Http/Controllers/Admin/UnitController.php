@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 
 class UnitController extends Controller
 {
-    public function index(){
-        $units = Unit::all();
-        return view ('admin.unit.index', ['units' => $units]);
+    public function index(Request $request){
+        $entries = $request->input('entries', 10);
+        $units = Unit::paginate($entries);
+        return view('admin.category.index', compact('units', 'entries'));
     }
 
     public function create(){
@@ -28,7 +29,7 @@ class UnitController extends Controller
         $data = $request->except("_token");
         $request->validate([
             'name' => 'required',
-            'symbol' => 'required',
+            'code' => 'required',
         ]);
 
         $isUnitExist = Unit::where('name', $request->name)->exists();
@@ -51,7 +52,7 @@ class UnitController extends Controller
         $data = $request->except("_token");
         $request->validate([
             'name' => 'required',
-            'symbol' => 'required',
+            'code' => 'required',
         ]);
 
         $units = Unit::find($id);

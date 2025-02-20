@@ -1,6 +1,9 @@
 <script src="{{asset('tabler/dist/js/tabler.min.js?1692870487')}}" defer></script>
 <script src="{{asset('tabler/dist/js/demo.min.js?1692870487')}}" defer></script>
 <script src="{{asset('tabler/dist/js/demo-theme.min.js?1692870487')}}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 <script>
       // @formatter:off
       document.addEventListener("DOMContentLoaded", function () {
@@ -85,55 +88,9 @@
       // @formatter:on
 </script>
 <script>
-        // Set theme based on session or default to light
-        document.addEventListener('DOMContentLoaded', function () {
-            const theme = localStorage.getItem('theme') || 'light';
-            if (theme === 'dark') {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
-
-            // Event listener for theme toggle
-            const darkModeButton = document.querySelector('a[href="?theme=dark"]');
-            const lightModeButton = document.querySelector('a[href="?theme=light"]');
-
-            darkModeButton.addEventListener('click', () => {
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark');
-            });
-
-            lightModeButton.addEventListener('click', () => {
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('theme', 'light');
-            });
-        });
-</script>
-<script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Handle changing the number of entries
-            document.getElementById('entriesSelect').addEventListener('change', function () {
-                window.location.href = '?entries=' + this.value;
-            });
-
-            // Live search functionality
-            const searchInput = document.getElementById('searchInput');
-            const tableRows = document.querySelectorAll('#invoiceTableBody tr');
-
-            searchInput.addEventListener('keyup', function () {
-                const searchTerm = searchInput.value.toLowerCase();
-
-                tableRows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    row.style.display = text.includes(searchTerm) ? '' : 'none';
-                });
-            });
-        });
-</script>
-<script>
-        document.addEventListener('DOMContentLoaded', function () {
-                // Initialize List.js
-                const list = new List('invoiceTableContainer', {
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize List.js
+        const list = new List('invoiceTableContainer', {
         sortClass: 'table-sort',
         listClass: 'table-tbody',
         valueNames: [
@@ -141,6 +98,9 @@
             'sort-invoice',
             'sort-supplier',
             'sort-orderdate',
+            'sort-quantity',
+            'sort-name',
+            'sort-description',
             {
                 name: 'sort-duedate',
                 attr: 'data-date'
@@ -154,25 +114,20 @@
         ],
     });
 
-                // Ensure "Show Entries" dropdown updates the URL
-                document.getElementById('entriesSelect').addEventListener('change', function () {
-                    window.location.href = '?entries=' + this.value;
-                });
+    // Enhanced search for formatted and raw amounts
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('#invoiceTableBody tr');
 
-                // Enhanced search for formatted and raw amounts
-                const searchInput = document.getElementById('searchInput');
-                const tableRows = document.querySelectorAll('#invoiceTableBody tr');
+    searchInput.addEventListener('keyup', function () {
+            const searchTerm = searchInput.value.toLowerCase();
 
-                searchInput.addEventListener('keyup', function () {
-                    const searchTerm = searchInput.value.toLowerCase();
+            tableRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const rawAmount = row.querySelector('.raw-amount')?.textContent.toLowerCase() || '';
 
-                    tableRows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        const rawAmount = row.querySelector('.raw-amount')?.textContent.toLowerCase() || '';
-
-                        // Match either formatted text OR raw amount
-                        row.style.display = (text.includes(searchTerm) || rawAmount.includes(searchTerm)) ? '' : 'none';
-                    });
-                });
+                // Match either formatted text OR raw amount
+                row.style.display = (text.includes(searchTerm) || rawAmount.includes(searchTerm)) ? '' : 'none';
             });
+        });
+    });
 </script>

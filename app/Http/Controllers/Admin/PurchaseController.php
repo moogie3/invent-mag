@@ -7,15 +7,24 @@ use App\Models\POItem;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Supplier;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
 {
-    public function index(Request $request)
-    {
-    $entries = $request->input('entries', 10); // Default: 10 entries
-    $pos = Purchase::with(['product', 'supplier'])->paginate($entries);
-    return view('admin.po.index', ['pos' => $pos]);
+    public function index(Request $request){
+        $entries = $request->input('entries', 10); // Default: 10 entries
+        $pos = Purchase::with(['product', 'supplier', 'user'])->paginate($entries);
+        $inCount = Purchase::whereHas('supplier', function ($query) {
+            $query->where('location', 'IN');
+        })->count();
+
+        $outCount = Purchase::whereHas('supplier', function ($query) {
+            $query->where('location', 'OUT');
+        })->count();
+        $shopname = User::whereNotNull('shopname')->value('shopname');
+        $address = User::whereNotNull('address')->value('address');
+        return view('admin.po.index', compact('pos','inCount','outCount','shopname','address', 'entries'));
     }
 
 

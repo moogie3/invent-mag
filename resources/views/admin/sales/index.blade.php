@@ -59,9 +59,9 @@
                                                         <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                                                <i class="ti ti-step-out fs-2"></i>
+                                                                <i class="ti ti-moneybag fs-2"></i>
                                                             </span>
-                                                            Unpaid Debt: <strong>{{ $outCount }}</strong>
+                                                            Total Unpaid Debt: <strong></strong>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -100,12 +100,10 @@
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-no">No</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-invoice">Invoice
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-supplier">Supplier
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-customer">Customer
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-orderdate">Order
                                                         Date</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-duedate">Due Date
-                                                </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-amount">Amount</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-payment">Payment
                                                         Type</th>
@@ -114,42 +112,29 @@
                                             </tr>
                                         </thead>
                                         <tbody id="invoiceTableBody" class="table-tbody">
-                                            @foreach ($pos as $index => $po)
+                                            @foreach ($sales as $index => $sale)
                                                 <tr>
-                                                    <td class="sort-no">{{ $pos->firstItem() + $index }}</td>
-                                                    <td class="sort-invoice">{{ $po->invoice }}</td>
-                                                    <td class="sort-supplier">{{ $po->supplier->name }}</td>
-                                                    <td class="sort-orderdate">{{ $po->order_date->format('d F Y') }}</td>
-                                                    <td class="sort-duedate"
-                                                        data-date="{{ $po->due_date->format('Y-m-d') }}">
-                                                        {{ $po->due_date->format('d F Y') }}
+                                                    <td class="sort-no">{{ $sales->firstItem() + $index }}</td>
+                                                    <td class="sort-invoice">{{ $sale->invoice }}</td>
+                                                    <td class="sort-customer">{{ $sale->customer->name }}</td>
+                                                    <td class="sort-orderdate">{{ $sale->order_date->format('d F Y') }}
                                                     </td>
-                                                    <td class="sort-amount" data-amount="{{ $po->total }}">
-                                                        {{ \App\Helpers\CurrencyHelper::format($po->total) }}<span
-                                                            class="raw-amount" style="display: none;">{{ $po->total }}
+                                                    <td class="sort-amount" data-amount="{{ $sale->total }}">
+                                                        {{ \App\Helpers\CurrencyHelper::format($sale->total) }}<span
+                                                            class="raw-amount" style="display: none;">{{ $sale->total }}
                                                     </td>
-                                                    <td class="sort-payment">{{ $po->payment_type }}</td>
+                                                    <td class="sort-payment">{{ $sale->payment_type }}</td>
                                                     <td class="sort-status">
                                                         @php
                                                             $today = now();
-                                                            $dueDate = $po->due_date;
-                                                            $paymentDate = $po->payment_date;
-                                                            $diffDays = $today->diffInDays($dueDate, false);
+                                                            $paymentDate = $sale->payment_date;
 
-                                                            if ($po->status === 'Paid') {
+                                                            if ($sale->status === 'Paid') {
                                                                 if ($paymentDate && $today->isSameDay($paymentDate)) {
                                                                     echo '<span class="badge bg-success me-1"></span>Paid Today';
                                                                 } else {
-                                                                    echo '<span class="badge bg-success me-1"></span>Paid';
+                                                                    echo '<span class="badge bg-info me-1"></span>Pending';
                                                                 }
-                                                            } elseif ($diffDays <= 3 && $diffDays > 0) {
-                                                                echo '<span class="badge bg-danger me-1"></span>Due in 3 Days';
-                                                            } elseif ($diffDays <= 7 && $diffDays > 3) {
-                                                                echo '<span class="badge bg-warning me-1"></span>Due in 1 Week';
-                                                            } elseif ($diffDays < 0) {
-                                                                echo '<span class="badge bg-secondary me-1"></span>Overdue';
-                                                            } else {
-                                                                echo '<span class="badge bg-info me-1"></span>Pending';
                                                             }
                                                         @endphp
                                                     </td>
@@ -191,11 +176,12 @@
                             <!-- Pagination -->
                             <div class="card-footer d-flex align-items-center">
                                 <p class="m-0 text-secondary">
-                                    Showing {{ $pos->firstItem() }} to {{ $pos->lastItem() }} of {{ $pos->total() }}
+                                    Showing {{ $sales->firstItem() }} to {{ $sales->lastItem() }} of
+                                    {{ $sales->total() }}
                                     entries
                                 </p>
                                 <div class="ms-auto">
-                                    {{ $pos->appends(request()->query())->links('vendor.pagination.tabler') }}
+                                    {{ $sales->appends(request()->query())->links('vendor.pagination.tabler') }}
                                 </div>
                             </div>
                         </div>

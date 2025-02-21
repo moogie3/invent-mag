@@ -149,9 +149,11 @@
                                                                 } else {
                                                                     echo '<span class="badge bg-success me-1"></span>Paid';
                                                                 }
-                                                            } elseif ($diffDays <= 3 && $diffDays > 0) {
+                                                            } elseif ($diffDays == 0) {
+                                                                echo '<span class="badge bg-danger me-1"></span>Due Today';
+                                                            } elseif ($diffDays > 0 && $diffDays <= 3) {
                                                                 echo '<span class="badge bg-danger me-1"></span>Due in 3 Days';
-                                                            } elseif ($diffDays <= 7 && $diffDays > 3) {
+                                                            } elseif ($diffDays > 3 && $diffDays <= 7) {
                                                                 echo '<span class="badge bg-warning me-1"></span>Due in 1 Week';
                                                             } elseif ($diffDays < 0) {
                                                                 echo '<span class="badge bg-secondary me-1"></span>Overdue';

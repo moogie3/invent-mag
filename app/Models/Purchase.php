@@ -19,7 +19,7 @@ class Purchase extends Model
         'total',
         'payment_type',
         'status',
-        'updated_at'
+        'payment_date',
     ];
 
     protected $attributes = [
@@ -49,7 +49,7 @@ class Purchase extends Model
         'total' => 'float',
         'order_date' => 'datetime',
         'due_date' => 'datetime',
-        'updated_at' => 'datetime'
+        'payment_date' => 'datetime',
     ];
 
 }

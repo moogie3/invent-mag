@@ -107,6 +107,11 @@ class PurchaseController extends Controller
         ]);
 
         $data = $request->except(["_token", "_method"]);
+
+        if ($request->status === 'Paid') {
+        $data['payment_date'] = now();
+        }
+
         $pos->update($data);
 
         return redirect()->route('admin.po')->with('success', 'Purchase updated successfully!');

@@ -132,6 +132,7 @@
                     name: 'sort-amount',
                     attr: 'data-amount'
                 },
+                'sort-amount',
                 'sort-payment',
                 'sort-status',
             ],

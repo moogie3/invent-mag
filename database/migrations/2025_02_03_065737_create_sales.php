@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('customer_id');
             $table->timestamp('order_date');
             $table->enum('payment_type', ['Cash','Transfer','-']);
-            $table->float('selling_price_cust');
             $table->float('total');
             $table->enum('status', ['Unpaid', 'Paid']);
+            $table->timestamp('payment_date');
             $table->timestamps();
         });
     }

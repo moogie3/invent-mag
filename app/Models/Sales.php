@@ -16,8 +16,8 @@ class Sales extends Model
         'customer_id',
         'order_date',
         'payment_type',
-        'selling_price_cust',
-        'status'
+        'status',
+        'payment_date'
     ];
 
     public function product(): BelongsTo
@@ -33,6 +33,6 @@ class Sales extends Model
     protected $casts = [
         'total' => 'float',
         'order_date' => 'datetime',
-        'updated_at' => 'datetime'
+        'payment_date' => 'datetime'
     ];
 }

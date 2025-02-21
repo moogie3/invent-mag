@@ -36,7 +36,7 @@ class ProductController extends Controller
         $categories = Categories::all();
         $units = Unit::all();
         $suppliers = Supplier::all();
-        return view('admin.product.product-edit', compact('products', 'categories', 'units', 'suppliers','productsr'));
+        return view('admin.product.product-edit', compact('products', 'categories', 'units', 'suppliers'));
     }
 
     public function store(Request $request)
@@ -89,25 +89,24 @@ class ProductController extends Controller
             'units_id' => 'integer',
             'supplier_id' => 'integer',
             'description' => 'nullable|string',
-            'image' => 'image|mimes:jpeg,jpg,png',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
-        $data = $request->except(['_token', 'image']); // Exclude image field
+        // Get all fields except image
+        $data = $request->except(['_token', 'image']);
 
-        // If a new image is uploaded, update it; otherwise, keep the old one
+        // If a new image is uploaded, process and save it
         if ($request->hasFile('image')) {
-            $images = $request->file('image');
-            $originalImagesName = Str::random(10) . $images->getClientOriginalName();
-            $images->storeAs('image', $originalImagesName); // Store new image
+            $image = $request->file('image');
+            $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
+            $image->storeAs('/image', $imageName); // Store in storage/app/public/image/
 
-            // Delete old image
+            // Delete old image if it exists
             if ($products->image) {
-                Storage::delete('image/' . $products->image);
+                Storage::delete('/image' . $products->image);
             }
 
-            $data['image'] = $originalImagesName; // Set new image name
-        } else {
-            $data['image'] = $products->image; // Keep the old image
+            $data['image'] = $imageName; // Save new image
         }
 
         $products->update($data);

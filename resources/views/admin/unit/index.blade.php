@@ -82,8 +82,10 @@
                                     <table class="table card-table table-vcenter">
                                         <thead style="font-size: large">
                                             <tr>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-no">No</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-code">Code</th>
+                                                <th style="width: 200px;"><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-no">No</th>
+                                                <th style="width: 200px;"><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-code">Code</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-name">Name</th>
                                                 <th style="width:180px;text-align:center" class="fs-4 py-3">Action</th>
                                             </tr>

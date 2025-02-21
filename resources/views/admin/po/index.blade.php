@@ -38,14 +38,14 @@
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-building-store fs-2"></i>
                                                             </span>
-                                                            Shop : <strong>{{ $shopname }}</strong>
+                                                            User Store : <strong>{{ $shopname }}</strong>
                                                         </div>
                                                         <div>
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-map fs-2"></i>
                                                             </span>
-                                                            Address : <strong>{{ $address }}</strong>
+                                                            Store Address : <strong>{{ $address }}</strong>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
@@ -54,14 +54,14 @@
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-step-out fs-2"></i>
                                                             </span>
-                                                            OUT: <strong>{{ $outCount }}</strong>
+                                                            Invoice OUT: <strong>{{ $outCount }}</strong>
                                                         </div>
                                                         <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-step-into fs-2"></i>
                                                             </span>
-                                                            IN: <strong>{{ $inCount }}</strong>
+                                                            Invoice IN: <strong>{{ $inCount }}</strong>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -76,11 +76,15 @@
                                         <div class="text-end">
                                             Show
                                             <div class="mx-1 mt-2 d-inline-block">
-                                                <select name="entries" id="entriesSelect" onchange="window.location.href='?entries=' + this.value;">
-                                                <option value="10" {{ $entries == 10 ? 'selected' : '' }}>10</option>
-                                                <option value="25" {{ $entries == 25 ? 'selected' : '' }}>25</option>
-                                                <option value="50" {{ $entries == 50 ? 'selected' : '' }}>50</option>
-                                            </select> entries
+                                                <select name="entries" id="entriesSelect"
+                                                    onchange="window.location.href='?entries=' + this.value;">
+                                                    <option value="10" {{ $entries == 10 ? 'selected' : '' }}>10
+                                                    </option>
+                                                    <option value="25" {{ $entries == 25 ? 'selected' : '' }}>25
+                                                    </option>
+                                                    <option value="50" {{ $entries == 50 ? 'selected' : '' }}>50
+                                                    </option>
+                                                </select> entries
                                             </div>
                                         </div>
                                     </div>

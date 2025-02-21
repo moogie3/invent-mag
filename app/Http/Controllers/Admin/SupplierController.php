@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 
 class SupplierController extends Controller
 {
-    public function index(){
-        $suppliers = Supplier::all();
-        return view ('admin.supplier.index', ['suppliers' => $suppliers]);
+    public function index(Request $request){
+        $entries = $request->input('entries', 10);
+        $suppliers = Supplier::paginate($entries);
+        return view ('admin.supplier.index', compact('suppliers','entries'));
     }
 
     public function create(){

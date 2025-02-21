@@ -79,8 +79,8 @@
                                             @foreach ($units as $index => $unit)
                                                 <tr>
                                                     <td class="sort-no">{{ $units->firstItem() + $index }}</td>
-                                                    <td class="sort-name">{{ $unit->code }}</td>
-                                                    <td class="sort-description">{{ $unit->name }}</td>
+                                                    <td class="sort-code">{{ $unit->code }}</td>
+                                                    <td class="sort-name">{{ $unit->name }}</td>
                                                     <td style="text-align:center">
                                                         <div class="dropdown">
                                                             <button class="btn dropdown-toggle align-text-top"

@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    public function index(){
-        $customers = Customer::all();
-        return view ('admin.customer.index', ['customers' => $customers]);
+    public function index(Request $request){
+        $entries = $request->input('entries', 10);
+        $customers = Customer::paginate($entries);
+        return view ('admin.customer.index', compact('customers','entries'));
     }
 
     public function create(){

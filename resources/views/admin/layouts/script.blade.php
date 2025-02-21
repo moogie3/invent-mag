@@ -101,6 +101,9 @@
             'sort-quantity',
             'sort-name',
             'sort-description',
+            'sort-phonenumber',
+            'sort-code',
+            'sort-address',
             {
                 name: 'sort-duedate',
                 attr: 'data-date'

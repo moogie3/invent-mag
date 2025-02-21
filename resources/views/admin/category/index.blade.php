@@ -37,7 +37,7 @@
                                     <div class="d-flex justify-content-between">
                                         <div class="col">
                                             <h2 class="page-title">
-                                                Category Information
+                                                Category List
                                             </h2>
                                         </div>
                                         <div class="ms-auto text-secondary">

@@ -40,12 +40,19 @@
                                                             </span>
                                                             User Store : <strong>{{ $shopname }}</strong>
                                                         </div>
-                                                        <div>
+                                                        <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-map fs-2"></i>
                                                             </span>
                                                             Store Address : <strong>{{ $address }}</strong>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-file-invoice fs-2"></i>
+                                                            </span>
+                                                            Total Invoice : <strong>{{ $totalinvoice }}</strong>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">

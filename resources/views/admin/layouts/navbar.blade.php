@@ -5,7 +5,8 @@
 
         <!-- Centered Brand Title -->
         <h1 class="navbar-brand position-absolute start-50 translate-middle-x m-0">
-            <a href="{{ route('admin.dashboard') }}" class="nav-link"><i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
+            <a href="{{ route('admin.dashboard') }}" class="nav-link"><i
+                    class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
         </h1>
 
         <!-- Right Side Icons -->
@@ -59,7 +60,8 @@
                             <span class="nav-link-title">Dashboard</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*') ? 'active' : '' }}">
+                    <li
+                        class="nav-item {{ request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.po') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-shopping-cart fs-2"></i>
@@ -67,7 +69,8 @@
                             <span class="nav-link-title">Purchase Order</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('admin/sales', 'admin/sales/create', 'admin/sales/edit/*') ? 'active' : '' }}">
+                    <li
+                        class="nav-item {{ request()->is('admin/sales', 'admin/sales/create', 'admin/sales/edit/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.sales') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-currency-dollar fs-2"></i>
@@ -75,7 +78,8 @@
                             <span class="nav-link-title">Sales</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('admin/product', 'admin/product/create', 'admin/product/edit/*') ? 'active' : '' }}">
+                    <li
+                        class="nav-item {{ request()->is('admin/product', 'admin/product/create', 'admin/product/edit/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.product') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-box fs-2"></i>
@@ -83,7 +87,8 @@
                             <span class="nav-link-title">Product</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('admin/supplier', 'admin/supplier/create', 'admin/supplier/edit/*') ? 'active' : '' }}">
+                    <li
+                        class="nav-item {{ request()->is('admin/supplier', 'admin/supplier/create', 'admin/supplier/edit/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.supplier') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-building fs-2"></i>
@@ -91,7 +96,8 @@
                             <span class="nav-link-title">Supplier</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('admin/customer', 'admin/customer/create', 'admin/customer/edit/*') ? 'active' : '' }}">
+                    <li
+                        class="nav-item {{ request()->is('admin/customer', 'admin/customer/create', 'admin/customer/edit/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.customer') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-user fs-2"></i>
@@ -99,7 +105,8 @@
                             <span class="nav-link-title">Customer</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('admin/unit', 'admin/unit/create', 'admin/unit/edit/*') ? 'active' : '' }}">
+                    <li
+                        class="nav-item {{ request()->is('admin/unit', 'admin/unit/create', 'admin/unit/edit/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.unit') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-universe fs-2"></i>
@@ -107,7 +114,8 @@
                             <span class="nav-link-title">Units</span>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('admin/category', 'admin/category/create', 'admin/category/edit/*') ? 'active' : '' }}">
+                    <li
+                        class="nav-item {{ request()->is('admin/category', 'admin/category/create', 'admin/category/edit/*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.category') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                 <i class="ti ti-category fs-2"></i>
@@ -120,4 +128,3 @@
         </div>
     </div>
 </header>
-

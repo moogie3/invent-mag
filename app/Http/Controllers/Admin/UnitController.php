@@ -11,7 +11,8 @@ class UnitController extends Controller
     public function index(Request $request){
         $entries = $request->input('entries', 10);
         $units = Unit::paginate($entries);
-        return view('admin.unit.index', compact('units', 'entries'));
+        $totalunit = Unit::count();
+        return view('admin.unit.index', compact('units', 'entries','totalunit'));
     }
 
     public function create(){

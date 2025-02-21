@@ -35,10 +35,23 @@
                         <div class="card card-primary">
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex justify-content-between">
-                                    <div class="col">
-                                        <h2 class="page-title">
-                                            Unit Information
-                                        </h2>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="card-title">Unit information</div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-universe fs-2"></i>
+                                                            </span>
+                                                            Total Unit : <strong>{{ $totalunit }}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="ms-auto text-secondary">
                                         Search :

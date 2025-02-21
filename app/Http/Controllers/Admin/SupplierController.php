@@ -11,7 +11,12 @@ class SupplierController extends Controller
     public function index(Request $request){
         $entries = $request->input('entries', 10);
         $suppliers = Supplier::paginate($entries);
-        return view ('admin.supplier.index', compact('suppliers','entries'));
+
+        $inCount = Supplier::where('location', 'IN')->count();
+        $outCount = Supplier::where('location', 'OUT')->count();
+
+        $totalsupplier = Supplier::count();
+        return view ('admin.supplier.index', compact('suppliers','entries','totalsupplier','inCount','outCount'));
     }
 
     public function create(){

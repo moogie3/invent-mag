@@ -15,6 +15,8 @@ class PurchaseController extends Controller
     public function index(Request $request){
         $entries = $request->input('entries', 10); // Default: 10 entries
         $pos = Purchase::with(['product', 'supplier', 'user'])->paginate($entries);
+        $totalinvoice = Purchase::count();
+
         $inCount = Purchase::whereHas('supplier', function ($query) {
             $query->where('location', 'IN');
         })->count();
@@ -22,9 +24,10 @@ class PurchaseController extends Controller
         $outCount = Purchase::whereHas('supplier', function ($query) {
             $query->where('location', 'OUT');
         })->count();
+
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
-        return view('admin.po.index', compact('pos','inCount','outCount','shopname','address', 'entries'));
+        return view('admin.po.index', compact('pos','inCount','outCount','shopname','address', 'entries','totalinvoice'));
     }
 
 

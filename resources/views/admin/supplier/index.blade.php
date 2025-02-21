@@ -35,10 +35,39 @@
                         <div class="card card-primary">
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex justify-content-between">
-                                    <div class="col">
-                                        <h2 class="page-title">
-                                            Supplier List
-                                        </h2>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="card-title">Supplier information</div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-step-out fs-2"></i>
+                                                            </span>
+                                                            Supplier OUT: <strong>{{ $outCount }}</strong>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-step-into fs-2"></i>
+                                                            </span>
+                                                            Supplier IN: <strong>{{ $inCount }}</strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-building fs-2"></i>
+                                                            </span>
+                                                            Total Supplier : <strong>{{ $totalsupplier }}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="ms-auto text-secondary">
                                         Search :
@@ -75,7 +104,8 @@
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-location">Location
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-paymentterms">Payment Terms</th>
+                                                        data-sort="sort-paymentterms">Payment
+                                                        Terms</th>
                                                 <th style="width:180px;text-align:center" class="fs-4 py-3">Action</th>
                                             </tr>
                                         </thead>

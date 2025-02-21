@@ -11,7 +11,8 @@ class CategoryController extends Controller
     public function index(Request $request) {
         $entries = $request->input('entries', 10);
         $categories = Categories::paginate($entries);
-        return view('admin.category.index', compact('categories', 'entries'));
+        $totalcategory = Categories::count();
+        return view('admin.category.index', compact('categories', 'entries','totalcategory'));
     }
 
 

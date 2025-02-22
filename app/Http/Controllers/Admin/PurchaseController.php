@@ -21,13 +21,22 @@ class PurchaseController extends Controller
             $query->where('location', 'IN');
         })->count();
 
+        $inCountamount = Purchase::whereHas('supplier', function ($query) {
+        $query->where('location', 'IN');
+        })->sum('total');
+
         $outCount = Purchase::whereHas('supplier', function ($query) {
             $query->where('location', 'OUT');
         })->count();
 
+        $outCountamount = Purchase::whereHas('supplier', function ($query) {
+        $query->where('location', 'OUT');
+        })->sum('total');
+
+
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
-        return view('admin.po.index', compact('pos','inCount','outCount','shopname','address', 'entries','totalinvoice'));
+        return view('admin.po.index', compact('inCountamount','outCountamount', 'pos','inCount','outCount','shopname','address', 'entries','totalinvoice'));
     }
 
 

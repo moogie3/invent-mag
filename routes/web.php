@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController;
@@ -11,14 +8,23 @@ use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\CurrencyController;
-use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SalesController;
-use App\Http\Controllers\AuthController;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
-Route::middleware(['auth'])->group(function () {
+// Public Routes
+Route::get('/login', fn () => view('auth.login'))->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+// Authenticated Routes
+Route::middleware('auth')->group(function () {
+
+    // Admin Routes
     Route::prefix('admin')->group(function () {
-        Route::view('/', 'admin.dashboard')->name('admin.dashboard');
 
+        Route::view('/dashboard', 'admin.dashboard')->name('admin.dashboard');
+
+        // Product Management
         Route::prefix('product')->group(function () {
             Route::get('/', [ProductController::class, 'index'])->name('admin.product');
             Route::get('/create', [ProductController::class, 'create'])->name('admin.product.create');
@@ -28,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
         });
 
+        // Category Management
         Route::prefix('category')->group(function () {
             Route::get('/', [CategoryController::class, 'index'])->name('admin.category');
             Route::get('/create', [CategoryController::class, 'create'])->name('admin.category.create');
@@ -37,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/destroy/{id}', [CategoryController::class, 'destroy'])->name('admin.category.destroy');
         });
 
+        // Unit Management
         Route::prefix('unit')->group(function () {
             Route::get('/', [UnitController::class, 'index'])->name('admin.unit');
             Route::get('/create', [UnitController::class, 'create'])->name('admin.unit.create');
@@ -46,6 +54,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/destroy/{id}', [UnitController::class, 'destroy'])->name('admin.unit.destroy');
         });
 
+        // Supplier Management
         Route::prefix('supplier')->group(function () {
             Route::get('/', [SupplierController::class, 'index'])->name('admin.supplier');
             Route::get('/create', [SupplierController::class, 'create'])->name('admin.supplier.create');
@@ -55,6 +64,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/destroy/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
         });
 
+        // Customer Management
         Route::prefix('customer')->group(function () {
             Route::get('/', [CustomerController::class, 'index'])->name('admin.customer');
             Route::get('/create', [CustomerController::class, 'create'])->name('admin.customer.create');
@@ -64,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.customer.destroy');
         });
 
+        // Purchase Order Management
         Route::prefix('po')->group(function () {
             Route::get('/', [PurchaseController::class, 'index'])->name('admin.po');
             Route::get('/create', [PurchaseController::class, 'create'])->name('admin.po.create');
@@ -74,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('product.details');
         });
 
+        // Sales Management
         Route::prefix('sales')->group(function () {
             Route::get('/', [SalesController::class, 'index'])->name('admin.sales');
             Route::get('/create', [SalesController::class, 'create'])->name('admin.sales.create');
@@ -84,24 +96,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('product.details');
         });
 
+        // Settings
         Route::prefix('setting')->group(function () {
             Route::get('/', [CurrencyController::class, 'edit'])->name('admin.currency.edit');
             Route::post('/edit', [CurrencyController::class, 'update'])->name('admin.currency.update');
         });
 
-        Route::post('/admin/profile/update', [ProfileController::class, 'update'])->name('admin.profile.update');
-    });
-});
-
-// Fortify Authentication Routes
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
-
-RateLimiter::for('login', function (Request $request) {
-    return Limit::perMinute(5)->by($request->email . $request->ip());
-});
-
-RateLimiter::for('two-factor', function (Request $request) {
-    return Limit::perMinute(5)->by($request->session()->get('login.id'));
-});
+    }); // End Admin Routes
+}); // End Authenticated Routes

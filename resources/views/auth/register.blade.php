@@ -1,88 +1,133 @@
-@section('title', 'Login')
-<!doctype html>
-<html lang="en">
+@extends('admin.layouts.authbase')
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Invent-Mag | @yield('title')</title>
-    <link href="{{ asset('tabler/dist/css/tabler.min.css?1692870487') }}" rel="stylesheet" />
-    <link href="{{ asset('tabler/dist/css/tabler-flags.min.css?1692870487') }}" rel="stylesheet" />
-    <link href="{{ asset('tabler/dist/css/tabler-payments.min.css?1692870487') }}" rel="stylesheet" />
-    <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css?1692870487') }}" rel="stylesheet" />
-    <link href="{{ asset('tabler/dist/css/demo.min.css?1692870487') }}" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    <style>
-        @import url('https://rsms.me/inter/inter.css');
+@section('title', 'Register')
 
-        :root {
-            --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
-        }
+@section('content')
+    <div class="card card-md">
+        <div class="card-body">
+            <h2 class="h2 text-center mb-4">Create New Account</h2>
 
-        body {
-            font-feature-settings: "cv03", "cv04", "cv11";
-        }
-    </style>
-</head>
-
-<body class=" d-flex flex-column">
-    <script src="./dist/js/demo-theme.min.js?1692870487"></script>
-    <div class="page page-center">
-        <div class="container container-tight py-4">
-            <div class="text-center mb-4">
-                <h1 class="navbar-brand text-center mx-auto m-0">
-                    <a href="" class="nav-link fs-1 fw-bold">
-                        <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
-                    </a>
-                </h1>
-            </div>
-            <div class="card card-md">
-                <div class="card-body">
-                    <h2 class="h2 text-center mb-4">Login to your account</h2>
-                    <form class="card card-md" action="./" method="get" autocomplete="off" novalidate>
-                        <div class="card-body">
-                            <h2 class="card-title text-center mb-4">Create new account</h2>
-                            <div class="mb-3">
-                                <label class="form-label">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter name">
+            @if (session('successr'))
+                <div class="modal fade show" id="successModal" tabindex="-1" aria-labelledby="successModalLabel"
+                    aria-hidden="true" style="display: block;">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-success text-white">
+                                <h5 class="modal-title" id="successModalLabel">Success</h5>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Email address</label>
-                                <input type="email" class="form-control" placeholder="Enter email">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Password</label>
-                                <div class="input-group input-group-flat">
-                                    <input type="password" class="form-control" placeholder="Password"
-                                        autocomplete="off">
-                                    <span class="input-group-text">
-                                        <a href="#" class="link-secondary" title="Show password"
-                                            data-bs-toggle="tooltip">
-                                            <i class="ti ti-eye fs-1"></i>
-                                        </a>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-check">
-                                    <input type="checkbox" class="form-check-input" />
-                                    <span class="form-check-label">Agree the <a href="./terms-of-service.html"
-                                            tabindex="-1">terms and policy</a>.</span>
-                                </label>
-                            </div>
-                            <div class="form-footer">
-                                <button type="submit" class="btn btn-primary w-100">Create new account</button>
+                            <div class="modal-body text-center">
+                                {{ session('success') }}
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
-            <div class="text-center text-secondary mt-3">
-                Already have account? <a href="./sign-in." tabindex="-1">Sign in</a>
-            </div>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        var successModal = new bootstrap.Modal(document.getElementById("successModal"));
+                        successModal.show();
+
+                        setTimeout(function() {
+                            window.location.href = "{{ route('auth.login') }}";
+                        }, 1800);
+                    });
+                </script>
+            @endif
+
+            @if ($errors->any())
+                <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-sm modal-dialog-centered">
+                        <div class="modal-content">
+                            <button type="button" class="btn-close m-2" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                            <div class="modal-body text-center py-4">
+                                <i class="ti ti-alert-triangle icon text-danger icon-lg mb-4"></i>
+                                <h3 class="mb-3">Error!</h3>
+                                <div class="text-secondary">
+                                    <div class="text-danger text-start text-center">
+                                        @foreach ($errors->all() as $error)
+                                            {{ $error }}<br>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        var errorModalElement = document.getElementById("errorModal");
+                        var errorModal = new bootstrap.Modal(errorModalElement, {
+                            backdrop: "static", // Prevents clicking outside to close immediately
+                            keyboard: false
+                        });
+
+                        // Show modal with a slight delay for smoothness
+                        setTimeout(() => {
+                            errorModal.show();
+                            document.body.insertAdjacentHTML("beforeend",
+                                '<div class="modal-backdrop fade show modal-backdrop-custom"></div>');
+                        }, 5);
+
+                        // Hide modal after 1.8 seconds with fade effect
+                        setTimeout(() => {
+                            errorModal.hide();
+                            setTimeout(() => {
+                                document.querySelector(".modal-backdrop-custom")?.remove();
+                            }, 5); // Allow fade-out effect
+                        }, 1800);
+                    });
+                </script>
+            @endif
+
+            <form action="{{ route('register') }}" method="POST" autocomplete="off" novalidate>
+                @csrf
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="Enter name" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email address</label>
+                    <input type="email" name="email" class="form-control" placeholder="Enter email" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group input-group-flat">
+                        <input type="password" name="password" class="form-control" placeholder="Password"
+                            autocomplete="off" id="password" required>
+                        <span class="input-group-text">
+                            <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip"
+                                id="toggle-password">
+                                <i class="ti ti-eye fs-1"></i>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" name="password_confirmation" class="form-control" placeholder="Confirm password"
+                        required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-check">
+                        <input type="checkbox" class="form-check-input" name="terms" required />
+                        <span class="form-check-label">
+                            I agree to the <a href="./terms-of-service.html" tabindex="-1">terms and
+                                policy</a>.
+                        </span>
+                    </label>
+                </div>
+                <div class="form-footer">
+                    <button type="submit" class="btn btn-primary w-100">Create New Account</button>
+                </div>
+            </form>
         </div>
     </div>
-</body>
-
-</html>
+    <div class="text-center text-secondary mt-3">
+        Already have an account? <a href="{{ route('login') }}" tabindex="-1">Sign in</a>
+    </div>
+@endsection

@@ -43,10 +43,13 @@
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <a href="./profile.html" class="dropdown-item">Profile</a>
                     <a href="{{ route('admin.currency.edit') }}" class="dropdown-item">Settings</a>
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                         @csrf
-                        <button type="submit" class="dropdown-item">Logout</button>
                     </form>
+                    <a href="#" class="dropdown-item"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        Logout
+                    </a>
                 </div>
             </div>
         </div>

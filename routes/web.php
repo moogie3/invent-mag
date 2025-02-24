@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ProductController;
@@ -14,14 +16,17 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 // Public Routes
 Route::get('/login', fn () => view('auth.login'))->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect('/login');
+})->name('logout');
 
 // Authenticated Routes
 Route::middleware('auth')->group(function () {
-
     // Admin Routes
     Route::prefix('admin')->group(function () {
-
         Route::view('/dashboard', 'admin.dashboard')->name('admin.dashboard');
 
         // Product Management

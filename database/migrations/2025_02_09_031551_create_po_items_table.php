@@ -11,19 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('po_items', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('po_id');
-            $table->unsignedBigInteger('product_id');
-            $table->string('name');
-            $table->integer('quantity');
-            $table->decimal('price', 10, 2);
-            $table->decimal('total', 10, 2);
-            $table->timestamps();
+        if (!Schema::hasTable('po_items')) {
+            Schema::create('po_items', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('po_id');
+                $table->unsignedBigInteger('product_id');
+                $table->string('name');
+                $table->integer('quantity');
+                $table->decimal('price', 10, 2);
+                $table->decimal('total', 10, 2);
+                $table->timestamps();
 
-            $table->foreign('po_id')->references('id')->on('po')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-        });
+                // Define foreign key constraints
+                $table->foreign('po_id')->references('id')->on('po')->onDelete('cascade');
+                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            });
+        }
+
     }
 
     /**

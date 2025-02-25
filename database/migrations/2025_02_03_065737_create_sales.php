@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('payment_type', ['Cash','Transfer','-']);
             $table->float('total');
             $table->enum('status', ['Unpaid', 'Paid']);
-            $table->timestamp('payment_date');
+            $table->timestamp('payment_date')->nullable(); // Make payment_date nullable
             $table->timestamps();
         });
     }

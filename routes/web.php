@@ -3,18 +3,31 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\PurchaseController;
-use App\Http\Controllers\Admin\SupplierController;
-use App\Http\Controllers\Admin\UnitController;
-use App\Http\Controllers\Admin\CurrencyController;
-use App\Http\Controllers\Admin\SalesController;
+use App\Http\Controllers\Admin\{
+    CategoryController, CustomerController, ProductController, PurchaseController,
+    SupplierController, UnitController, CurrencyController, SalesController, DashboardController
+};
+use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use Laravel\Fortify\Http\Controllers\NewPasswordController;
+use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
+use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 
-// Public Routes
-Route::get('/login', fn () => view('auth.login'))->name('login');
+// Fortify Authentication Views
+Fortify::registerView(fn () => view('admin.auth.register'));
+Route::get('/register', fn () => view('admin.auth.register'))->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
+
+// Forgot Password Routes
+Route::get('/forgot-password', fn () => view('admin.auth.forgot-password'))->name('password.request');
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+
+// Reset Password Routes
+Route::get('/reset-password/{token}', fn ($token) => view('admin.auth.reset-password', ['token' => $token]))->name('password.reset');
+Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.update');
+
+// Authentication Routes
+Route::get('/login', fn () => view('admin.auth.login'))->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
 Route::post('/logout', function (Request $request) {
     Auth::logout();
@@ -23,89 +36,39 @@ Route::post('/logout', function (Request $request) {
     return redirect('/login');
 })->name('logout');
 
-// Authenticated Routes
-Route::middleware('auth')->group(function () {
-    // Admin Routes
-    Route::prefix('admin')->group(function () {
-        Route::view('/dashboard', 'admin.dashboard')->name('admin.dashboard');
+// Admin Routes (Protected by 'auth' Middleware)
+Route::middleware('auth')->prefix('admin')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-        // Product Management
-        Route::prefix('product')->group(function () {
-            Route::get('/', [ProductController::class, 'index'])->name('admin.product');
-            Route::get('/create', [ProductController::class, 'create'])->name('admin.product.create');
-            Route::post('/store', [ProductController::class, 'store'])->name('admin.product.store');
-            Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('admin.product.edit');
-            Route::put('/update/{id}', [ProductController::class, 'update'])->name('admin.product.update');
-            Route::delete('/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
+    // Resource Routes
+    $resources = [
+        'product' => ProductController::class,
+        'category' => CategoryController::class,
+        'unit' => UnitController::class,
+        'supplier' => SupplierController::class,
+        'customer' => CustomerController::class,
+        'po' => PurchaseController::class,
+        'sales' => SalesController::class,
+    ];
+
+    foreach ($resources as $route => $controller) {
+        Route::prefix($route)->group(function () use ($route, $controller) {
+            Route::get('/', [$controller, 'index'])->name("admin.$route");
+            Route::get('/create', [$controller, 'create'])->name("admin.$route.create");
+            Route::post('/store', [$controller, 'store'])->name("admin.$route.store");
+            Route::get('/edit/{id}', [$controller, 'edit'])->name("admin.$route.edit");
+            Route::put('/update/{id}', [$controller, 'update'])->name("admin.$route.update");
+            Route::delete('/destroy/{id}', [$controller, 'destroy'])->name("admin.$route.destroy");
         });
+    }
 
-        // Category Management
-        Route::prefix('category')->group(function () {
-            Route::get('/', [CategoryController::class, 'index'])->name('admin.category');
-            Route::get('/create', [CategoryController::class, 'create'])->name('admin.category.create');
-            Route::post('/store', [CategoryController::class, 'store'])->name('admin.category.store');
-            Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('admin.category.edit');
-            Route::put('/update/{id}', [CategoryController::class, 'update'])->name('admin.category.update');
-            Route::delete('/destroy/{id}', [CategoryController::class, 'destroy'])->name('admin.category.destroy');
-        });
+    // Additional Routes
+    Route::get('po/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('product.details');
+    Route::get('sales/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('product.details');
 
-        // Unit Management
-        Route::prefix('unit')->group(function () {
-            Route::get('/', [UnitController::class, 'index'])->name('admin.unit');
-            Route::get('/create', [UnitController::class, 'create'])->name('admin.unit.create');
-            Route::post('/store', [UnitController::class, 'store'])->name('admin.unit.store');
-            Route::get('/edit/{id}', [UnitController::class, 'edit'])->name('admin.unit.edit');
-            Route::put('/update/{id}', [UnitController::class, 'update'])->name('admin.unit.update');
-            Route::delete('/destroy/{id}', [UnitController::class, 'destroy'])->name('admin.unit.destroy');
-        });
-
-        // Supplier Management
-        Route::prefix('supplier')->group(function () {
-            Route::get('/', [SupplierController::class, 'index'])->name('admin.supplier');
-            Route::get('/create', [SupplierController::class, 'create'])->name('admin.supplier.create');
-            Route::post('/store', [SupplierController::class, 'store'])->name('admin.supplier.store');
-            Route::get('/edit/{id}', [SupplierController::class, 'edit'])->name('admin.supplier.edit');
-            Route::put('/update/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update');
-            Route::delete('/destroy/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
-        });
-
-        // Customer Management
-        Route::prefix('customer')->group(function () {
-            Route::get('/', [CustomerController::class, 'index'])->name('admin.customer');
-            Route::get('/create', [CustomerController::class, 'create'])->name('admin.customer.create');
-            Route::post('/store', [CustomerController::class, 'store'])->name('admin.customer.store');
-            Route::get('/edit/{id}', [CustomerController::class, 'edit'])->name('admin.customer.edit');
-            Route::put('/update/{id}', [CustomerController::class, 'update'])->name('admin.customer.update');
-            Route::delete('/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.customer.destroy');
-        });
-
-        // Purchase Order Management
-        Route::prefix('po')->group(function () {
-            Route::get('/', [PurchaseController::class, 'index'])->name('admin.po');
-            Route::get('/create', [PurchaseController::class, 'create'])->name('admin.po.create');
-            Route::post('/store', [PurchaseController::class, 'store'])->name('admin.po.store');
-            Route::get('/edit/{id}', [PurchaseController::class, 'edit'])->name('admin.po.edit');
-            Route::put('/update/{id}', [PurchaseController::class, 'update'])->name('admin.po.update');
-            Route::delete('/destroy/{id}', [PurchaseController::class, 'destroy'])->name('admin.po.destroy');
-            Route::get('/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('product.details');
-        });
-
-        // Sales Management
-        Route::prefix('sales')->group(function () {
-            Route::get('/', [SalesController::class, 'index'])->name('admin.sales');
-            Route::get('/create', [SalesController::class, 'create'])->name('admin.sales.create');
-            Route::post('/store', [SalesController::class, 'store'])->name('admin.sales.store');
-            Route::get('/edit/{id}', [SalesController::class, 'edit'])->name('admin.sales.edit');
-            Route::put('/update/{id}', [SalesController::class, 'update'])->name('admin.sales.update');
-            Route::delete('/destroy/{id}', [SalesController::class, 'destroy'])->name('admin.sales.destroy');
-            Route::get('/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('product.details');
-        });
-
-        // Settings
-        Route::prefix('setting')->group(function () {
-            Route::get('/', [CurrencyController::class, 'edit'])->name('admin.currency.edit');
-            Route::post('/edit', [CurrencyController::class, 'update'])->name('admin.currency.update');
-        });
-
-    }); // End Admin Routes
-}); // End Authenticated Routes
+    // Settings
+    Route::prefix('setting')->group(function () {
+        Route::get('/', [CurrencyController::class, 'edit'])->name('admin.currency.edit');
+        Route::post('/edit', [CurrencyController::class, 'update'])->name('admin.currency.update');
+    });
+});

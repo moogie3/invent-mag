@@ -7,33 +7,7 @@
         <div class="card-body">
             <h2 class="h2 text-center mb-4">Create New Account</h2>
 
-            @if (session('successr'))
-                <div class="modal fade show" id="successModal" tabindex="-1" aria-labelledby="successModalLabel"
-                    aria-hidden="true" style="display: block;">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header bg-success text-white">
-                                <h5 class="modal-title" id="successModalLabel">Success</h5>
-                            </div>
-                            <div class="modal-body text-center">
-                                {{ session('success') }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <script>
-                    document.addEventListener("DOMContentLoaded", function() {
-                        var successModal = new bootstrap.Modal(document.getElementById("successModal"));
-                        successModal.show();
-
-                        setTimeout(function() {
-                            window.location.href = "{{ route('auth.login') }}";
-                        }, 1800);
-                    });
-                </script>
-            @endif
-
+            {{-- ERROR MODAL --}}
             @if ($errors->any())
                 <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-sm modal-dialog-centered">
@@ -62,28 +36,27 @@
                     document.addEventListener("DOMContentLoaded", function() {
                         var errorModalElement = document.getElementById("errorModal");
                         var errorModal = new bootstrap.Modal(errorModalElement, {
-                            backdrop: "static", // Prevents clicking outside to close immediately
+                            backdrop: "static",
                             keyboard: false
                         });
 
-                        // Show modal with a slight delay for smoothness
                         setTimeout(() => {
                             errorModal.show();
                             document.body.insertAdjacentHTML("beforeend",
                                 '<div class="modal-backdrop fade show modal-backdrop-custom"></div>');
                         }, 5);
 
-                        // Hide modal after 1.8 seconds with fade effect
                         setTimeout(() => {
                             errorModal.hide();
                             setTimeout(() => {
                                 document.querySelector(".modal-backdrop-custom")?.remove();
-                            }, 5); // Allow fade-out effect
+                            }, 5);
                         }, 1800);
                     });
                 </script>
             @endif
 
+            {{-- FORM REGISTER --}}
             <form action="{{ route('register') }}" method="POST" autocomplete="off" novalidate>
                 @csrf
                 <div class="mb-3">
@@ -92,7 +65,8 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Email address</label>
-                    <input type="email" name="email" class="form-control" placeholder="Enter email" required>
+                    <input type="email" name="email" class="form-control" placeholder="Enter email" required
+                        value="{{ old('email') }}">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>
@@ -111,15 +85,6 @@
                     <label class="form-label">Confirm Password</label>
                     <input type="password" name="password_confirmation" class="form-control" placeholder="Confirm password"
                         required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-check">
-                        <input type="checkbox" class="form-check-input" name="terms" required />
-                        <span class="form-check-label">
-                            I agree to the <a href="./terms-of-service.html" tabindex="-1">terms and
-                                policy</a>.
-                        </span>
-                    </label>
                 </div>
                 <div class="form-footer">
                     <button type="submit" class="btn btn-primary w-100">Create New Account</button>

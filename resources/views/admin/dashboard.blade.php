@@ -3,7 +3,8 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <script src="{{ asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js?1692870487') }}" defer></script>
+    <script src="{{ asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js') }}" defer></script>
+
     <div class="page-wrapper">
         <div class="page-header d-print-none">
             <div class="container-xl">
@@ -21,27 +22,21 @@
         </div>
 
         @if (session('success'))
-            <div class="modal modal-blur fade show" id="modal-success" tabindex="-1" role="dialog" aria-hidden="true"
-                style="display: block; background: rgba(0, 0, 0, 0.6);">
-                <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm modal-dialog-centered">
                     <div class="modal-content">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        <div class="modal-status bg-success"></div>
+                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
                         <div class="modal-body text-center py-4">
-                            <!-- Success Icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-success icon-lg" width="24"
-                                height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M5 12l5 5l10 -10" />
-                            </svg>
-                            <h3>Success!</h3>
-                            <div class="text-secondary">{{ session('success') }}</div>
+                            <i class="ti ti-circle-check icon text-success icon-lg mb-4"></i>
+                            <h3 class="mb-3">Success!</h3>
+                            <div class="text-secondary">
+                                <div class="text-success text-start text-center">
+                                    {{ session('success') }}
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-footer">
-                            <div class="w-100">
-                                <a href="#" class="btn btn-success w-100" data-bs-dismiss="modal">OK</a>
-                            </div>
+                            <button type="button" class="btn btn-success w-100" data-bs-dismiss="modal">OK</button>
                         </div>
                     </div>
                 </div>
@@ -49,14 +44,24 @@
 
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
-                    setTimeout(function() {
-                        let successModal = document.getElementById("modal-success");
-                        successModal.style.display = "none";
+                    var successModalElement = document.getElementById("successModal");
+                    var successModal = new bootstrap.Modal(successModalElement);
+
+                    setTimeout(() => {
+                        successModal.show();
+                        document.body.insertAdjacentHTML("beforeend",
+                            '<div class="modal-backdrop fade show modal-backdrop-custom"></div>');
+                    }, 5);
+
+                    setTimeout(() => {
+                        successModal.hide();
+                        setTimeout(() => {
+                            document.querySelector(".modal-backdrop-custom")?.remove();
+                        }, 300);
                     }, 2000);
                 });
             </script>
         @endif
-
 
         <div class="page-body">
             <div class="container-xl">
@@ -68,10 +73,11 @@
                                     <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                         <i class="ti ti-moneybag fs-2"></i>
                                     </span>
-                                    <div class="header">Revenue</div>
+                                    <div class="header">Revenue from Customer</div>
                                 </div>
                                 <div class="d-flex align-items-baseline">
-                                    <div class="h1 mt-2 ms-2">Rp.- 1.000.000.000</div>
+                                    <div class="h1 mt-2 ms-2">{{ \App\Helpers\CurrencyHelper::format($countcustrevenue) }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -86,7 +92,8 @@
                                     <div class="header">Liability</div>
                                 </div>
                                 <div class="d-flex align-items-baseline">
-                                    <div class="h1 mt-2 ms-2">2,986</div>
+                                    <div class="h1 mt-2 ms-2">{{ \App\Helpers\CurrencyHelper::format($countliability) }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -102,10 +109,10 @@
                                     </div>
                                     <div class="col">
                                         <div class="font-weight-medium">
-                                            35 Invoice OUT
+                                            {{ $outCount }} Invoice OUT
                                         </div>
                                         <div class="text-secondary">
-                                            12 waiting payments
+                                            {{ $outCountUnpaid }} waiting payments
                                         </div>
                                     </div>
                                 </div>
@@ -119,10 +126,10 @@
                                     </div>
                                     <div class="col">
                                         <div class="font-weight-medium">
-                                            78 Invoice IN
+                                            {{ $inCount }} Invoice IN
                                         </div>
                                         <div class="text-secondary">
-                                            10 waiting payments
+                                            {{ $inCountUnpaid }} waiting payments
                                         </div>
                                     </div>
                                 </div>
@@ -132,8 +139,8 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <h3 class="card-title">Monthly Revenue</h3>
-                                <div id="chart-mentions" class="chart-lg"></div>
+                                <h3 class="card-title">Daily Invoices Overview</h3>
+                                <div id="chart-daily-invoices" class="chart-lg"></div>
                             </div>
                         </div>
                     </div>
@@ -141,4 +148,61 @@
             </div>
         </div>
     </div>
+    <script>
+        window.onload = function() {
+            var chartElement = document.querySelector("#chart-daily-invoices");
+
+            if (!chartElement) {
+                console.error("Chart container not found! Check if #chart-daily-invoices exists in the DOM.");
+                return;
+            }
+
+            var chartData = @json($chartData);
+
+            var options = {
+                series: [{
+                        name: "Invoices Count",
+                        type: "bar",
+                        data: chartData.map(item => item.invoice_count)
+                    },
+                    {
+                        name: "Total Amount",
+                        type: "line",
+                        data: chartData.map(item => item.total_amount_raw)
+                    }
+                ],
+                chart: {
+                    type: "line",
+                    height: 350
+                },
+                stroke: {
+                    width: [0, 4]
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false
+                    }
+                },
+                colors: ["#206bc4", "#f59f00"],
+                xaxis: {
+                    categories: chartData.map(item => item.date)
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val, {
+                            seriesIndex
+                        }) {
+                            if (seriesIndex === 1) {
+                                return "{{ \App\Helpers\CurrencyHelper::format(0) }}".replace("0", val);
+                            }
+                            return val;
+                        }
+                    }
+                }
+            };
+
+            var chart = new ApexCharts(chartElement, options);
+            chart.render();
+        };
+    </script>
 @endsection

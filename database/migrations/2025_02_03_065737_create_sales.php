@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->string('invoice');
-            $table->string('customer_id');
+            $table->string('invoice')->unique();
+            $table->string('customer_id')->constrained()->cascadeOnDelete();
             $table->timestamp('order_date');
             $table->enum('payment_type', ['Cash','Transfer','-']);
             $table->float('total');
             $table->enum('status', ['Unpaid', 'Paid']);
-            $table->timestamp('payment_date')->nullable(); // Make payment_date nullable
+            $table->timestamp('payment_date')->nullable();
             $table->timestamps();
         });
     }

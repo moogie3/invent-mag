@@ -20,9 +20,7 @@ class DashboardController extends Controller
 
         $inCountUnpaid = Purchase::whereHas('supplier', function ($query) {
             $query->where('location', 'IN');
-        })
-            ->where('status', 'Unpaid')
-            ->count();
+        })->where('status', 'Unpaid')->count();
 
         $outCount = Purchase::whereHas('supplier', function ($query) {
             $query->where('location', 'OUT');
@@ -30,12 +28,10 @@ class DashboardController extends Controller
 
         $outCountUnpaid = Purchase::whereHas('supplier', function ($query) {
             $query->where('location', 'OUT');
-        })
-            ->where('status', 'Unpaid')
-            ->count();
+        })->where('status', 'Unpaid')->count();
 
         $countcustrevenue = Sales::sum('total');
-        $countliability = Purchase::sum('total');
+        $countliability = Purchase::where('status', 'Unpaid')->sum('total');
 
         // Fetch daily invoice count and total amount
         $dailyInvoices = Purchase::select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(id) as invoice_count'), DB::raw('SUM(total) as total_amount'))

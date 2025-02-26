@@ -1,125 +1,272 @@
-@extends('admin.layouts.base')
+    @extends('admin.layouts.base')
 
-@section('title', 'Product')
+    @section('title', 'Sales')
 
-@section('content')
-<div class="page-wrapper">
-    <!-- Page header -->
-    <div class="page-header">
-        <div class="container-xl">
-            <div class="row align-items-center">
-                <div class="col">
-                    <div class="page-pretitle">
-                        Overview
+    @section('content')
+        <div class="page-wrapper">
+            <div class="page-header">
+                <div class="container-xl">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="page-pretitle">
+                                Overview
+                            </div>
+                            <h2 class="page-title">
+                                Create Sales
+                            </h2>
+                        </div>
                     </div>
-                    <h2 class="page-title">
-                        Create Sales
-                    </h2>
                 </div>
             </div>
-        </div>
-    </div>
-    <!-- Page body -->
-    <div class="page-body">
-        <div class="container-xl">
-            <div class="row row-deck row-cards">
-                <div class="col-md-12">
-                    <div class="card card-primary">
-                        <div class="card-body">
-                            <form enctype="multipart/form-data" method="POST" action="">
-                                @csrf
-                            <fieldset class="form-fieldset container-xl">
-                                <div class="row">
-                                    <div class="col-md-1 mb-3">
-                                        <label class="form-label">CODE</label>
-                                        <input type="text" class="form-control" name="code" id="code"
-                                            placeholder="Code" required/>
-                                    </div>
-                                    <div class="col-md-2 mb-3">
-                                        <label class="form-label">CUSTOMER</label>
-                                        <select class="form-control" name="customer_id" required>
-                                            <option value="">Select Customer</option>
-                                            @foreach($customers as $customer)
-                                                <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
 
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">NAME</label>
-                                        <input type="text" class="form-control" name="name" id="name"
-                                            placeholder="Name" required/>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">QTY</label>
-                                        <input type="text" class="form-control" name="quantity" id="quantity" placeholder="Quantity" required />
-                                    </div>
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row row-deck row-cards">
+                        <div class="col-md-12">
+                            <div class="card card-primary">
+                                <div class="card-body">
+                                    <form enctype="multipart/form-data" method="POST"
+                                        action="{{ route('admin.sales.store') }}" id="invoiceForm">
+                                        @csrf
+                                        <fieldset class="form-fieldset container-xl">
+                                            <div class="row">
+                                                <div class="col-md-1 mb-3">
+                                                    <label class="form-label">INVOICE</label>
+                                                    <input type="text" class="form-control" name="invoice" id="invoice"
+                                                        placeholder="Invoice" required />
+                                                </div>
+                                                <div class="col-md-2 mb-3">
+                                                    <label class="form-label">ORDER DATE</label>
+                                                    <input type="date" class="form-control" name="order_date"
+                                                        id="order_date" placeholder="Order date" required />
+                                                </div>
+                                                <div class="col-md-2 mb-3">
+                                                    <label class="form-label">CUSTOMER</label>
+                                                    <select class="form-control" name="customer_id" id="customer_id"
+                                                        required>
+                                                        <option value="">Select Customer</option>
+                                                        @foreach ($customers as $customer)
+                                                            <option value="{{ $customer->id }}">
+                                                                {{ $customer->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3 mb-3">
+                                                    <label class="form-label">PRODUCT</label>
+                                                    <select class="form-control" name="product_id" id="product_id">
+                                                        <option value="">Select Product</option>
+                                                        @foreach ($products as $product)
+                                                            <option value="{{ $product->id }}"
+                                                                data-price="{{ $product->price }}"
+                                                                data-selling-price="{{ $product->selling_price }}"
+                                                                data-past-price="{{ $sales->customer_price }}">
+                                                                {{ $product->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-1 mb-3">
+                                                    <label class="form-label">QTY</label>
+                                                    <input type="text" class="form-control" name="quantity"
+                                                        id="quantity" placeholder="Quantity" />
+                                                </div>
+                                                <div class="col-md-2 mb-3">
+                                                    <label class="form-label">CUSTOMER SELLING PRICE</label>
+                                                    <input type="text" class="form-control" name="new_price"
+                                                        id="new_price" placeholder="New price" />
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-2 mb-3">
+                                                    <label class="form-label">PRICE FROM SUPPLIER</label>
+                                                    <input type="text" class="form-control" name="price" id="price"
+                                                        placeholder="Price" disabled />
+                                                </div>
+                                                <div class="col-md-2 mb-3">
+                                                    <label class="form-label">SELLING PRICE</label>
+                                                    <input type="text" class="form-control" name="selling_price"
+                                                        id="selling_price" placeholder="Selling price" disabled />
+                                                </div>
+                                                <div class="col-md-2 mb-3">
+                                                    <label class="form-label">CUSTOMER PAST PRICE</label>
+                                                    <input type="text" class="form-control" name="past_price"
+                                                        id="past_price" placeholder="Past price" disabled />
+                                                </div>
+                                                <div class="col-md-6 mb-3 text-end">
+                                                    <label class="form-label">BUTTON</label>
+                                                    <button type="button" id="addProduct" class="btn btn-secondary">Add
+                                                        Product</button>
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                </div>
+                                                <input type="hidden" name="products" id="productsField">
+                                            </div>
+                                        </fieldset>
+                                        <table class="table card-table table-vcenter table-responsive">
+                                            <thead style="font-size: large">
+                                                <tr>
+                                                    <th><button class="table-sort fs-4 py-3"
+                                                            data-sort="sort-product">Product
+                                                    </th>
+                                                    <th><button class="table-sort fs-4 py-3"
+                                                            data-sort="sort-quantity">Quantity
+                                                    </th>
+                                                    <th><button class="table-sort fs-4 py-3" data-sort="sort-price">Price
+                                                    </th>
+                                                    <th><button class="table-sort fs-4 py-3" data-sort="sort-total">Amount
+                                                    </th>
+                                                    <th style="width:200px;text-align:center" class="fs-4 py-3">Action
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="productTableBody">
+                                            </tbody>
+                                        </table>
+                                        <h1 class="mt-3 text-end">Total Price: <span id="totalPrice">
+                                            </span></h1>
+                                    </form>
                                 </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">CATEGORY</label>
-                                        <select class="form-control" name="category_id" required>
-                                            <option value="">Select Category</option>
-                                            @foreach($categories as $category)
-                                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Buying Price</label>
-                                        <input type="text" class="form-control" name="price" id="price" placeholder="Price" required/>
-                                    </div>
-
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">UNIT</label>
-                                        <select class="form-control" name="units_id" required>
-                                            <option value="">Select Unit</option>
-                                            @foreach($units as $unit)
-                                                <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Selling Price</label>
-                                        <input type="text" class="form-control" name="selling_price" id="selling_price" placeholder="Selling Price"
-                                            required />
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">DESC</label>
-                                        <input type="text" class="form-control" name="description" id="description" placeholder="Description" />
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">IMAGE</label>
-                                        <input type="file" class="form-control" name="image" />
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </div>
-                            </fieldset>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-@if($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-@endsection
+        <script>
+            //automatically input the product
+            document.addEventListener('DOMContentLoaded', function() {
+                const productSelect = document.getElementById('product_id');
+                const customerSelect = document.getElementById('customer_id');
+                const priceField = document.getElementById('price');
+                const quantityField = document.getElementById('quantity');
+                const sellPriceField = document.getElementById('selling_price');
+                const newPriceField = document.getElementById('new_price');
+                const pastPriceField = document.getElementById('past_price');
+                const addProductButton = document.getElementById('addProduct');
+                const productTableBody = document.getElementById('productTableBody');
+                const productsField = document.getElementById('productsField');
+                const totalPriceElement = document.getElementById('totalPrice');
+
+                let products = []; // Array to store added products
+
+                // Auto-fill price on product selection and fetch past price
+                productSelect.addEventListener('change', function() {
+                    const selectedOption = productSelect.options[productSelect.selectedIndex];
+                    const price = selectedOption.getAttribute('data-price');
+                    const sellprice = selectedOption.getAttribute('data-selling-price');
+                    const pastprice = selectedOption.getAttribute('data-past-price');
+                    const customerId = customerSelect.value;
+                    const productId = productSelect.value;
+
+                    priceField.value = price ? price : '';
+                    sellPriceField.value = sellprice ? sellprice : '';
+                    pastPriceField.value = pastprice ? pastprice : '';
+
+                    if (customerId && productId) {
+                        fetchPastCustomerPrice(customerId, productId);
+                    }
+                });
+
+                // Fetch past price from the database
+                function fetchPastCustomerPrice(customerId, productId) {
+                    fetch(`/admin/sales/get-past-price?customer_id=${customerId}&product_id=${productId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            pastPriceField.value = data.last_price ? data.last_price : '0';
+                        })
+                        .catch(error => console.error('Error fetching past price:', error));
+                }
+
+                // Add product to the table
+                addProductButton.addEventListener('click', function() {
+                    const selectedOption = productSelect.options[productSelect.selectedIndex];
+                    const productId = productSelect.value;
+                    const productName = selectedOption.text;
+                    const quantity = quantityField.value;
+                    const price = newPriceField.value;
+                    const total = (parseFloat(price) * parseInt(quantity)) || 0;
+
+                    if (!productId || !quantity || !price) {
+                        alert('Please select a product and enter quantity and price.');
+                        return;
+                    }
+
+                    // Prevent duplicate products
+                    if (products.some(p => p.id == productId)) {
+                        alert('Product already added.');
+                        return;
+                    }
+
+                    // Add product to the list
+                    const productData = {
+                        id: productId,
+                        name: productName,
+                        quantity: quantity,
+                        price: price,
+                        customer_price: newPriceField.value,
+                        total: total
+                    };
+                    products.push(productData);
+                    updateHiddenField();
+
+                    // Append new row to the table
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                <td>${productName}</td>
+                <td>${quantity}</td>
+                <td>${formatCurrency(price)}</td>
+                <td>${formatCurrency(total)}</td>
+                <td style="text-align:center"><button type="button" class="btn btn-danger btn-sm removeProduct">Remove</button></td>
+            `;
+                    productTableBody.appendChild(row);
+
+                    updateTotalPrice();
+
+                    // Reset fields
+                    productSelect.value = '';
+                    quantityField.value = '';
+                    priceField.value = '';
+                    sellPriceField.value = '';
+                    newPriceField.value = '';
+
+                    // Remove product event
+                    row.querySelector('.removeProduct').addEventListener('click', function() {
+                        row.remove();
+                        products = products.filter(p => p.id !== productId);
+                        updateHiddenField();
+                        updateTotalPrice();
+                    });
+                });
+
+                // Update hidden input field with JSON data
+                function updateHiddenField() {
+                    productsField.value = JSON.stringify(products);
+                }
+
+                // Calculate and update the total price
+                function updateTotalPrice() {
+                    const total = products.reduce((sum, product) => sum + product.total, 0);
+                    totalPriceElement.innerHTML = formatCurrency(total) || 0;
+                }
+
+                function formatCurrency(amount) {
+                    return new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                        minimumFractionDigits: 0
+                    }).format(amount);
+                }
+            });
+        </script>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+    @endsection

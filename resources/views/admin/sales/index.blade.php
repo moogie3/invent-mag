@@ -12,7 +12,7 @@
                         <h2 class="page-title">Sales Order</h2>
                     </div>
                     <div class="col-auto ms-auto">
-                        <a href="{{ route('admin.po.create') }}" class="btn btn-primary">
+                        <a href="{{ route('admin.sales.create') }}" class="btn btn-primary">
                             <i class="ti ti-plus fs-4"></i> Create Sales Order
                         </a>
                     </div>
@@ -146,14 +146,14 @@
                                                             </button>
                                                             <div class="dropdown-menu">
                                                                 <!-- View Button -->
-                                                                <a href="{{ route('admin.po.edit', $po->id) }}"
+                                                                <a href="{{ route('admin.sales.edit', $sale->id) }}"
                                                                     class="dropdown-item">
                                                                     <i class="ti ti-zoom-scan me-2"></i> View
                                                                 </a>
 
                                                                 <!-- Delete Form -->
                                                                 <form method="POST"
-                                                                    action="{{ route('admin.po.destroy', $po->id) }}"
+                                                                    action="{{ route('admin.sales.destroy', $sale->id) }}"
                                                                     onsubmit="return confirm('Are you sure?')"
                                                                     class="m-0">
                                                                     @csrf

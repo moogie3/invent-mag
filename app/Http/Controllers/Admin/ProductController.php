@@ -67,7 +67,7 @@ class ProductController extends Controller
 
         $images = $request->image;
         $originalImagesName = Str::random(10) . $images->getClientOriginalName();
-        $images->storeAs('/image', $originalImagesName);
+        $images->storeAs('public/image', $originalImagesName);
         $data['image'] = $originalImagesName;
 
         Product::create($data);
@@ -99,11 +99,11 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-            $image->storeAs('/image', $imageName); // Store in storage/app/public/image/
+            $image->storeAs('public/image', $imageName); // Store in storage/app/public/image/
 
             // Delete old image if it exists
             if ($products->image) {
-                Storage::delete('/image' . $products->image);
+                Storage::delete('public/image' . $products->image);
             }
 
             $data['image'] = $imageName; // Save new image

@@ -23,7 +23,7 @@ class PurchaseController extends Controller
 
         $inCountamount = Purchase::whereHas('supplier', function ($query) {
         $query->where('location', 'IN');
-        })->sum('total');
+        })->where('status', 'Unpaid')->sum('total');
 
         $outCount = Purchase::whereHas('supplier', function ($query) {
             $query->where('location', 'OUT');
@@ -31,12 +31,20 @@ class PurchaseController extends Controller
 
         $outCountamount = Purchase::whereHas('supplier', function ($query) {
         $query->where('location', 'OUT');
-        })->sum('total');
+        })->where('status', 'Unpaid')->sum('total');
 
+        $totalMonthly = Purchase::whereMonth('created_at', now()->month)
+        ->whereYear('created_at', now()->year)
+        ->sum('total');
+
+        $paymentMonthly = Purchase::whereMonth('created_at', now()->month)
+        ->whereYear('created_at', now()->year)
+        ->where('status','Paid')
+        ->sum('total');
 
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
-        return view('admin.po.index', compact('inCountamount','outCountamount', 'pos','inCount','outCount','shopname','address', 'entries','totalinvoice'));
+        return view('admin.po.index', compact('inCountamount','outCountamount', 'pos','inCount','outCount','shopname','address', 'entries','totalinvoice', 'totalMonthly','paymentMonthly'));
     }
 
 
@@ -89,7 +97,6 @@ class PurchaseController extends Controller
                 POItem::create([
                     'po_id'        => $purchase->id,
                     'product_id'   => $product['id'],
-                    'name'         => $product['name'],
                     'quantity'     => $product['quantity'],
                     'price'        => $product['price'],
                     'total'        => $product['total'],

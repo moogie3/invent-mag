@@ -30,7 +30,7 @@ class UnitController extends Controller
         $data = $request->except("_token");
         $request->validate([
             'name' => 'required',
-            'code' => 'required',
+            'symbol' => 'required',
         ]);
 
         $isUnitExist = Unit::where('name', $request->name)->exists();

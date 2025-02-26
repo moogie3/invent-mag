@@ -159,6 +159,15 @@
 
             var chartData = @json($chartData);
 
+            // Convert date format from yy-mm-dd to dd-mm-yy
+            function formatDate(dateString) {
+                let parts = dateString.split("-");
+                if (parts.length === 3) {
+                    return `${parts[2]}-${parts[1]}-${parts[0]}`; // Rearrange to dd-mm-yy
+                }
+                return dateString; // Return as is if format is incorrect
+            }
+
             var options = {
                 series: [{
                         name: "Invoices Count",
@@ -173,7 +182,7 @@
                 ],
                 chart: {
                     type: "line",
-                    height: 350
+                    height: 400
                 },
                 stroke: {
                     width: [0, 4]
@@ -185,7 +194,7 @@
                 },
                 colors: ["#206bc4", "#f59f00"],
                 xaxis: {
-                    categories: chartData.map(item => item.date)
+                    categories: chartData.map(item => formatDate(item.date)) // Apply date formatting here
                 },
                 tooltip: {
                     y: {

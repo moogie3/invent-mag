@@ -111,7 +111,7 @@
                                                     <td class="sort-name">{{ $product->name }}</td>
                                                     <td class="sort-quantity">{{ $product->quantity }}</td>
                                                     <td class="sort-category">{{ $product->category->name }}</td>
-                                                    <td class="sort-unit">{{ $product->unit->code }}</td>
+                                                    <td class="sort-unit">{{ $product->unit->symbol }}</td>
                                                     <td class="sort-price">
                                                         {{ \App\Helpers\CurrencyHelper::format($product->price) }}</td>
                                                     <td class="sort-sellingprice">

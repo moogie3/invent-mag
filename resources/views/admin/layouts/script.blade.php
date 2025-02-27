@@ -4,7 +4,23 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
-@if (!request()->is('admin/dashboard'))
+@if (
+    !request()->is(
+        'admin/dashboard',
+        'admin/po/create',
+        'admin/po/edit',
+        'admin/sales/create',
+        'admin/sales/edit',
+        'admin/product/create',
+        'admin/product/edit',
+        'admin/supplier/create',
+        'admin/supplier/edit',
+        'admin/customer/create',
+        'admin/customer/edit',
+        'admin/unit/create',
+        'admin/unit/edit',
+        'admin/category/create',
+        'admin/category/edit'))
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize List.js

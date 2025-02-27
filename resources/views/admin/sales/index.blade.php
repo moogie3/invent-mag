@@ -61,7 +61,8 @@
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-moneybag fs-2"></i>
                                                             </span>
-                                                            Total Unpaid Debt: <strong></strong>
+                                                            Unpaid Receivable:
+                                                            <strong>{{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}</strong>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -133,8 +134,10 @@
                                                                 if ($paymentDate && $today->isSameDay($paymentDate)) {
                                                                     echo '<span class="badge bg-success me-1"></span>Paid Today';
                                                                 } else {
-                                                                    echo '<span class="badge bg-info me-1"></span>Pending';
+                                                                    echo '<span class="badge bg-success me-1"></span>Paid';
                                                                 }
+                                                            } else {
+                                                                echo '<span class="badge bg-info me-1"></span>Pending';
                                                             }
                                                         @endphp
                                                     </td>

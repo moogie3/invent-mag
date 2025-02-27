@@ -26,7 +26,7 @@ class Sales extends Model
 
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(Supplier::class, 'customer_id');
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 
     public function user(): BelongsTo
@@ -38,9 +38,9 @@ class Sales extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
-    public function items(): BelongsTo
+    public function items()
     {
-        return $this->belongsTo(SalesItem::class, 'sales_id');
+        return $this->hasMany(SalesItem::class, 'sales_id');
     }
 
     protected $casts = [

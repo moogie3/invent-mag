@@ -78,7 +78,7 @@
                                                 <div class="card card-lg">
                                                     <div class="card-body">
                                                         <div class="col-auto">
-                                                            <h3>{{ $pos->invoice }} / {{ $pos->supplier->location }} /
+                                                            <h3>PO / {{ $pos->invoice }} / {{ $pos->supplier->location }} /
                                                                 {{ $pos->supplier->code }}</h3>
                                                         </div>
                                                         <div class="row">

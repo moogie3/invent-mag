@@ -4,24 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
+use App\Models\DailySales;
 use App\Models\Purchase;
 use App\Models\Sales;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $inCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })->count();
-
-        $inCountUnpaid = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })->where('status', 'Unpaid')->count();
-
+        //INVOICE STATUS
         $outCount = Purchase::whereHas('supplier', function ($query) {
             $query->where('location', 'OUT');
         })->count();
@@ -30,21 +23,38 @@ class DashboardController extends Controller
             $query->where('location', 'OUT');
         })->where('status', 'Unpaid')->count();
 
-        $countcustrevenue = Sales::sum('total');
+
+        $inCount = Purchase::whereHas('supplier', function ($query) {
+            $query->where('location', 'IN');
+        })->count();
+
+        $inCountUnpaid = Purchase::whereHas('supplier', function ($query) {
+            $query->where('location', 'IN');
+        })->where('status', 'Unpaid')->count();
+
+        //CUSTOMER STATUS
+        $totalRevenue = Sales::whereMonth('created_at', now()->month)
+        ->whereYear('created_at', now()->year)
+        ->sum('total');
+        $countRevenue = Sales::all()->where('status','Unpaid')->sum('total');
+        $paidDebtMonthly = Sales::whereMonth('created_at',now()->month)
+        ->whereYear('created_at',now()->year)
+        ->where('status', 'Paid')
+        ->sum('total');
+
+        //LIABILITIES
         $countliability = Purchase::where('status', 'Unpaid')->sum('total');
+        $totalliability = Purchase::all()->sum('total');
+        $liabilitypaymentMonthly = Purchase::whereMonth('created_at', now()->month)
+        ->whereYear('created_at', now()->year)
+        ->where('status','Paid')
+        ->sum('total');
 
-        // Fetch daily invoice count and total amount
-        $dailyInvoices = Purchase::select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(id) as invoice_count'), DB::raw('SUM(total) as total_amount'))
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get();
 
-        // Fetch daily invoices and their total amount
+        // CHART
         $chartData = Purchase::selectRaw('DATE(created_at) as date, COUNT(id) as invoice_count, SUM(total) as total_amount')
-            ->groupBy('date')
-            ->orderBy('date')
+            ->groupByRaw('DATE(created_at)')
+            ->orderBy('date','asc')
             ->get()
             ->map(function ($item) {
                 return [
@@ -56,7 +66,22 @@ class DashboardController extends Controller
             })
             ->toArray();
 
+        $chartDataEarning = DailySales::selectRaw('DATE(created_at) as date, SUM(total) as total_amount')
+            ->groupByRaw('DATE(created_at)')
+            ->orderBy('date','asc')
+            ->get()
+            ->map(function ($dss) {
+                return [
+                    'date' => $dss->date,
+                    'total_amount' => CurrencyHelper::format($dss->total_amount), // Format currency
+                    'total_amount_raw' => $dss->total_amount // Raw value for JavaScript
+                ];
+            })
+            ->toArray();
 
-        return view('admin.dashboard', compact('inCount', 'outCount', 'inCountUnpaid', 'outCountUnpaid', 'countcustrevenue', 'countliability', 'chartData'));
+        //DAILY SALES
+        $totalDailySales = DailySales::all()->sum('total');
+
+        return view('admin.dashboard', compact('chartDataEarning','totalDailySales','totalliability','paidDebtMonthly','countRevenue','liabilitypaymentMonthly','inCount', 'outCount', 'inCountUnpaid', 'outCountUnpaid', 'totalRevenue', 'countliability', 'chartData'));
     }
 }

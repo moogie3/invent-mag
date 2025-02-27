@@ -10,7 +10,6 @@ class Purchase extends Model
 {
     use HasFactory;
     protected $table = 'po';
-
     protected $fillable = [
         'invoice',
         'supplier_id',

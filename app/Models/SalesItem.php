@@ -22,7 +22,7 @@ class SalesItem extends Model
     public function product() {
         return $this->belongsTo(Product::class);
     }
-    public function sales(){
+    public function sale(){
         return $this->belongsTo(Sales::class , 'sales_id');
     }
 }

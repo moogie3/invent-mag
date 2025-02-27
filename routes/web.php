@@ -5,8 +5,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\{
     CategoryController, CustomerController, ProductController, PurchaseController,
-    SupplierController, UnitController, CurrencyController, SalesController, DashboardController
+    SupplierController, UnitController, CurrencyController, DailySalesController, SalesController, DashboardController
 };
+use App\Models\SalesItem;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
@@ -40,7 +41,6 @@ Route::post('/logout', function (Request $request) {
 Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    // Resource Routes
     $resources = [
         'product' => ProductController::class,
         'category' => CategoryController::class,
@@ -49,6 +49,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
         'customer' => CustomerController::class,
         'po' => PurchaseController::class,
         'sales' => SalesController::class,
+        'ds' => DailySalesController::class
     ];
 
     foreach ($resources as $route => $controller) {
@@ -62,7 +63,6 @@ Route::middleware('auth')->prefix('admin')->group(function () {
         });
     }
 
-    // Additional Routes
     Route::get('po/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('product.details');
     Route::get('sales/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('product.details');
 
@@ -71,4 +71,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
         Route::get('/', [CurrencyController::class, 'edit'])->name('admin.currency.edit');
         Route::post('/edit', [CurrencyController::class, 'update'])->name('admin.currency.update');
     });
+
+    Route::get('/sales/get-past-price', [SalesController::class, 'getPastPrice']);
+
 });

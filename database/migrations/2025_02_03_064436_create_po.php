@@ -19,9 +19,9 @@ return new class extends Migration
             $table->timestamp('order_date');
             $table->timestamp('due_date')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->enum('payment_type', ['Cash', 'Transfer', '-']);
-            $table->float('total', 53);
+            $table->float('total');
             $table->enum('status', ['Unpaid', 'Paid']);
-            $table->timestamp('payment_date')->default(DB::raw('CURRENT_TIMESTAMP')); // Default value for payment_date
+            $table->timestamp('payment_date')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamps();
         });
 

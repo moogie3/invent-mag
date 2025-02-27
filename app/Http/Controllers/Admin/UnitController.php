@@ -67,4 +67,5 @@ class UnitController extends Controller
 
         return redirect()->route('admin.unit')->with('success', 'Unit deleted');
     }
+
 }

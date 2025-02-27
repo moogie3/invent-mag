@@ -16,12 +16,12 @@ return new class extends Migration
             $table->string('code');
             $table->string('name');
             $table->integer('quantity');
-            $table->float('price');
-            $table->float('selling_price');
+            $table->double('price');
+            $table->double('selling_price');
             $table->integer('category_id');
             $table->integer('units_id');
             $table->integer('supplier_id');
-            $table->string('description');
+            $table->text('description');
             $table->string('image');
             $table->timestamps();
         });

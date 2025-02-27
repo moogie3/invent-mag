@@ -61,8 +61,7 @@
                                                         @foreach ($products as $product)
                                                             <option value="{{ $product->id }}"
                                                                 data-price="{{ $product->price }}"
-                                                                data-selling-price="{{ $product->selling_price }}"
-                                                                data-past-price="{{ $sales->customer_price }}">
+                                                                data-selling-price="{{ $product->selling_price }}">
                                                                 {{ $product->name }}
                                                             </option>
                                                         @endforeach
@@ -162,22 +161,42 @@
 
                     priceField.value = price ? price : '';
                     sellPriceField.value = sellprice ? sellprice : '';
-                    pastPriceField.value = pastprice ? pastprice : '';
 
                     if (customerId && productId) {
                         fetchPastCustomerPrice(customerId, productId);
                     }
                 });
 
-                // Fetch past price from the database
+                // When the customer changes
+                customerSelect.addEventListener('change', function() {
+                    const customerId = customerSelect.value;
+                    const productId = productSelect.value;
+
+                    // Only fetch past price if a product is already selected
+                    if (customerId && productId) {
+                        fetchPastCustomerPrice(customerId, productId);
+                    }
+                });
+
+                // Function to fetch past customer price from the database
                 function fetchPastCustomerPrice(customerId, productId) {
                     fetch(`/admin/sales/get-past-price?customer_id=${customerId}&product_id=${productId}`)
                         .then(response => response.json())
                         .then(data => {
-                            pastPriceField.value = data.last_price ? data.last_price : '0';
+                            console.log("Past Price Data:", data); // Debugging: Check the response in console
+
+                            if (data && data.past_price !== null) {
+                                pastPriceField.value = data.past_price; // Correctly update the input field
+                            } else {
+                                pastPriceField.value = "0"; // Set default value if no past price found
+                            }
                         })
-                        .catch(error => console.error('Error fetching past price:', error));
+                        .catch(error => {
+                            console.error('Error fetching past price:', error);
+                            pastPriceField.value = "0"; // Handle errors gracefully
+                        });
                 }
+
 
                 // Add product to the table
                 addProductButton.addEventListener('click', function() {
@@ -194,8 +213,12 @@
                     }
 
                     // Prevent duplicate products
-                    if (products.some(p => p.id == productId)) {
-                        alert('Product already added.');
+                    let existingProduct = products.find(p => p.id == productId);
+                    if (existingProduct) {
+                        existingProduct.quantity = parseInt(existingProduct.quantity) + parseInt(quantity);
+                        existingProduct.total = parseFloat(existingProduct.price) * existingProduct.quantity;
+                        updateTotalPrice();
+                        updateHiddenField();
                         return;
                     }
 

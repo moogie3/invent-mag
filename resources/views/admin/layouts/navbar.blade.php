@@ -71,11 +71,10 @@
                         <span class="nav-link-title">Dashboard</span>
                     </a>
                 </li>
-                <li
-                    class="nav-item {{ request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*') ? 'active' : '' }}">
-                    <a class="nav-link gap-1" href="{{ route('admin.po') }}">
-                        <i class="ti ti-shopping-cart fs-2"></i>
-                        <span class="nav-link-title">Purchase Order</span>
+                <li class="nav-item {{ request()->is('/') || request()->is('admin') ? 'active' : '' }}">
+                    <a class="nav-link gap-1" href="{{ route('admin.ds') }}">
+                        <i class="ti ti-presentation-analytics fs-2"></i>
+                        <span class="nav-link-title">Daily Sales</span>
                     </a>
                 </li>
                 <li
@@ -86,6 +85,13 @@
                     </a>
                 </li>
                 <li
+                    class="nav-item {{ request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*') ? 'active' : '' }}">
+                    <a class="nav-link gap-1" href="{{ route('admin.po') }}">
+                        <i class="ti ti-shopping-cart fs-2"></i>
+                        <span class="nav-link-title">Purchase Order</span>
+                    </a>
+                </li>
+                <li
                     class="nav-item {{ request()->is('admin/product', 'admin/product/create', 'admin/product/edit/*') ? 'active' : '' }}">
                     <a class="nav-link gap-1" href="{{ route('admin.product') }}">
                         <i class="ti ti-box fs-2"></i>
@@ -93,17 +99,17 @@
                     </a>
                 </li>
                 <li
-                    class="nav-item {{ request()->is('admin/supplier', 'admin/supplier/create', 'admin/supplier/edit/*') ? 'active' : '' }}">
-                    <a class="nav-link gap-1" href="{{ route('admin.supplier') }}">
-                        <i class="ti ti-building fs-2"></i>
-                        <span class="nav-link-title">Supplier</span>
-                    </a>
-                </li>
-                <li
                     class="nav-item {{ request()->is('admin/customer', 'admin/customer/create', 'admin/customer/edit/*') ? 'active' : '' }}">
                     <a class="nav-link gap-1" href="{{ route('admin.customer') }}">
                         <i class="ti ti-user fs-2"></i>
                         <span class="nav-link-title">Customer</span>
+                    </a>
+                </li>
+                <li
+                    class="nav-item {{ request()->is('admin/supplier', 'admin/supplier/create', 'admin/supplier/edit/*') ? 'active' : '' }}">
+                    <a class="nav-link gap-1" href="{{ route('admin.supplier') }}">
+                        <i class="ti ti-building fs-2"></i>
+                        <span class="nav-link-title">Supplier</span>
                     </a>
                 </li>
                 <li

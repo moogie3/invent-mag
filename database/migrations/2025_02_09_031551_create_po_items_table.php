@@ -17,8 +17,8 @@ return new class extends Migration
                 $table->unsignedBigInteger('po_id');
                 $table->unsignedBigInteger('product_id');
                 $table->integer('quantity');
-                $table->decimal('price', 10, 2);
-                $table->decimal('total', 10, 2);
+                $table->decimal('price', 10);
+                $table->decimal('total', 10);
                 $table->timestamps();
 
                 // Define foreign key constraints

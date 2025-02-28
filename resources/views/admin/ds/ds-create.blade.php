@@ -4,7 +4,6 @@
 
 @section('content')
     <div class="page-wrapper">
-        <!-- Page header -->
         <div class="page-header">
             <div class="container-xl">
                 <div class="row align-items-center">
@@ -19,7 +18,7 @@
                 </div>
             </div>
         </div>
-        <!-- Page body -->
+
         <div class="page-body">
             <div class="container-xl">
                 <div class="row row-deck row-cards">
@@ -32,7 +31,7 @@
                                         <div class="col-md-12 mb-3">
                                             <label class="form-label">DATE</label>
                                             <input type="date" class="form-control" name="date" id="date"
-                                                placeholder="Date" required />
+                                                placeholder="Date" />
                                         </div>
                                         <div class="col-md-12 mb-3">
                                             <label class="form-label">TOTAL</label>

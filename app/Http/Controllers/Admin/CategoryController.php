@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
     public function index(Request $request) {
-        $entries = $request->input('entries', 10);
+        $entries = $request->input('entries', 10);//pagination
         $categories = Categories::paginate($entries);
         $totalcategory = Categories::count();
         return view('admin.category.index', compact('categories', 'entries','totalcategory'));

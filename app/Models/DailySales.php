@@ -18,6 +18,6 @@ class DailySales extends Model
 
     protected $casts = [
         'total' => 'double',
-        'date' => 'datetime'
+        'date' => 'datetime',
     ];
 }

@@ -3,8 +3,6 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <script src="{{ asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js') }}" defer></script>
-
     <div class="page-wrapper">
         <div class="page-header d-print-none">
             <div class="container-xl">
@@ -20,48 +18,6 @@
                 </div>
             </div>
         </div>
-
-        @if (session('success'))
-            <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-sm modal-dialog-centered">
-                    <div class="modal-content">
-                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                        <div class="modal-body text-center py-4">
-                            <i class="ti ti-circle-check icon text-success icon-lg mb-4"></i>
-                            <h3 class="mb-3">Success!</h3>
-                            <div class="text-secondary">
-                                <div class="text-success text-start text-center">
-                                    {{ session('success') }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-success w-100" data-bs-dismiss="modal">OK</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    var successModalElement = document.getElementById("successModal");
-                    var successModal = new bootstrap.Modal(successModalElement);
-
-                    setTimeout(() => {
-                        successModal.show();
-                        document.body.insertAdjacentHTML("beforeend",
-                            '<div class="modal-backdrop fade show modal-backdrop-custom"></div>');
-                    }, 5);
-
-                    setTimeout(() => {
-                        successModal.hide();
-                        setTimeout(() => {
-                            document.querySelector(".modal-backdrop-custom")?.remove();
-                        }, 300);
-                    }, 2000);
-                });
-            </script>
-        @endif
 
         <div class="page-body">
             <div class="container-xl">
@@ -195,12 +151,11 @@
                             </div>
                         </div>
                     </div>
+                    {{-- CHART --}}
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">Overview</h3>
-
-                                <!-- Tab Navigation -->
                                 <ul class="nav nav-tabs" id="chartTabs">
                                     <li class="nav-item">
                                         <a class="nav-link active" id="invoices-tab" data-bs-toggle="tab"
@@ -211,8 +166,6 @@
                                             Earnings</a>
                                     </li>
                                 </ul>
-
-                                <!-- Chart Container -->
                                 <div id="chart-container" class="chart-lg mt-3"></div>
                             </div>
                         </div>
@@ -221,101 +174,4 @@
             </div>
         </div>
     </div>
-    <script>
-        window.onload = function() {
-            var chartElement = document.querySelector("#chart-container");
-
-            if (!chartElement) {
-                console.error("Chart container not found! Check if #chart-container exists in the DOM.");
-                return;
-            }
-
-            var invoicesData = @json($chartData);
-            var earningsData = @json($chartDataEarning);
-
-            function formatDate(dateString) {
-                let parts = dateString.split("-");
-                if (parts.length === 3) {
-                    return `${parts[2]}-${parts[1]}-${parts[0]}`;
-                }
-                return dateString;
-            }
-
-            function renderChart(type) {
-                var options;
-                if (type === "invoices") {
-                    options = {
-                        series: [{
-                                name: "Invoices Count",
-                                type: "bar",
-                                data: invoicesData.map(item => item.invoice_count)
-                            },
-                            {
-                                name: "Total Amount",
-                                type: "line",
-                                data: invoicesData.map(item => item.total_amount_raw)
-                            }
-                        ],
-                        xaxis: {
-                            categories: invoicesData.map(item => formatDate(item.date))
-                        }
-                    };
-                } else {
-                    options = {
-                        series: [{
-                            name: "Daily Earnings",
-                            type: "line",
-                            data: earningsData.map(item => item.total_earning)
-                        }],
-                        xaxis: {
-                            categories: earningsData.map(item => formatDate(item.date))
-                        }
-                    };
-                }
-
-                options = {
-                    ...options,
-                    chart: {
-                        type: "line",
-                        height: 400
-                    },
-                    stroke: {
-                        width: [0, 4]
-                    },
-                    plotOptions: {
-                        bar: {
-                            horizontal: false
-                        }
-                    },
-                    colors: ["#206bc4", "#f59f00"],
-                    tooltip: {
-                        y: {
-                            formatter: function(val) {
-                                return "{{ \App\Helpers\CurrencyHelper::format(0) }}".replace("0", val);
-                            }
-                        }
-                    }
-                };
-
-                if (window.chartInstance) {
-                    window.chartInstance.destroy();
-                }
-
-                window.chartInstance = new ApexCharts(chartElement, options);
-                window.chartInstance.render();
-            }
-
-            // Initial Load
-            renderChart("invoices");
-
-            // Tab Click Events
-            document.querySelector("#invoices-tab").addEventListener("click", function() {
-                renderChart("invoices");
-            });
-
-            document.querySelector("#earnings-tab").addEventListener("click", function() {
-                renderChart("earnings");
-            });
-        };
-    </script>
 @endsection

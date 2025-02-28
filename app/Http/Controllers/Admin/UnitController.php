@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class UnitController extends Controller
 {
     public function index(Request $request){
-        $entries = $request->input('entries', 10);
+        $entries = $request->input('entries', 10);//pagination
         $units = Unit::paginate($entries);
         $totalunit = Unit::count();
         return view('admin.unit.index', compact('units', 'entries','totalunit'));

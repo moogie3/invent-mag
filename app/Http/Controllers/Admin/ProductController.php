@@ -15,7 +15,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $entries = $request->input('entries', 10);
+        $entries = $request->input('entries', 10);//pagination
         $products = Product::with(['category', 'supplier', 'unit'])->paginate($entries);
         $totalproduct = Product::count();
         return view('admin.product.index', compact('products', 'entries', 'totalproduct'));
@@ -51,24 +51,28 @@ class ProductController extends Controller
             'units_id' => 'required|integer',
             'supplier_id' => 'required|integer',
             'description' => 'nullable|string',
-            'image' => 'required|image|mimes:jpeg,jpg,png',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
-        $data = $request->except('_token');
+        $data = $request->except('_token','image');
 
         $isProductExist = Product::where('name', $request->name)->exists();
         if ($isProductExist) {
             return back()
-                ->withErrors([
-                    'name' => 'This product already exists',
-                ])
-                ->withInput();
+            ->withErrors([
+                'name' => 'This product already exists',
+            ])
+            ->withInput();
         }
 
-        $images = $request->image;
-        $originalImagesName = Str::random(10) . $images->getClientOriginalName();
-        $images->storeAs('public/image', $originalImagesName);
-        $data['image'] = $originalImagesName;
+        if ($request->hasFile('image')) {
+            $images = $request->file('image'); // use file() to get the uploaded file
+            $originalImagesName = Str::random(10) . '_' . $images->getClientOriginalName();
+            $images->storeAs('public/image', $originalImagesName);
+            $data['image'] = $originalImagesName;
+        } else {
+            $data['image'] = null;
+        }
 
         Product::create($data);
 
@@ -92,21 +96,21 @@ class ProductController extends Controller
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
-        // Get all fields except image
+        // get all fields except image
         $data = $request->except(['_token', 'image']);
 
-        // If a new image is uploaded, process and save it
+        // if a new image is uploaded, process and save it
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/image', $imageName); // Store in storage/app/public/image/
+            $image->storeAs('public/image', $imageName); // store in storage/app/public/image/
 
-            // Delete old image if it exists
+            // delete old image if it exists
             if ($products->image) {
                 Storage::delete('public/image' . $products->image);
             }
 
-            $data['image'] = $imageName; // Save new image
+            $data['image'] = $imageName; // save new image
         }
 
         $products->update($data);

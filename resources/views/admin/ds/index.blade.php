@@ -4,7 +4,6 @@
 
 @section('content')
     <div class="page-wrapper">
-        <!-- Page header -->
         <div class="page-header">
             <div class="container-xl">
                 <div class="row align-items-center">
@@ -77,7 +76,6 @@
                                 </div>
                             </div>
 
-                            <!-- Table -->
                             <div id="invoiceTableContainer">
                                 <div class="table-responsive">
                                     <table class="table card-table table-vcenter">
@@ -105,17 +103,11 @@
                                                                 Actions
                                                             </button>
                                                             <div class="dropdown-menu">
-                                                                <form method="POST"
-                                                                    action="{{ route('admin.ds.destroy', $ds->id) }}"
-                                                                    onsubmit="return confirm('Are you sure?')"
-                                                                    class="m-0">
-                                                                    @csrf
-                                                                    @method('delete')
-                                                                    <button type="submit"
-                                                                        class="dropdown-item text-danger">
-                                                                        <i class="ti ti-trash me-2"></i> Delete
-                                                                    </button>
-                                                                </form>
+                                                                <button type="button" class="dropdown-item text-danger"
+                                                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                                    onclick="setDeleteFormAction('{{ route('admin.ds.destroy', $ds->id) }}')">
+                                                                    <i class="ti ti-trash me-2"></i> Delete
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -126,7 +118,32 @@
                                 </div>
                             </div>
 
-                            <!-- Pagination -->
+                            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-danger" id="deleteModalLabel">Confirm Delete</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center">
+                                            <i class="ti ti-alert-circle icon text-danger icon-lg mb-10"></i>
+                                            <p class="mt-3">Are you sure you want to delete this ?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Cancel</button>
+                                            <form id="deleteForm" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="card-footer d-flex align-items-center">
                                 <p class="m-0 text-secondary">
                                     Showing {{ $dss->firstItem() }} to {{ $dss->lastItem() }} of

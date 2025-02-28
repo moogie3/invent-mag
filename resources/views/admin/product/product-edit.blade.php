@@ -4,7 +4,6 @@
 
 @section('content')
     <div class="page-wrapper">
-        <!-- Page header -->
         <div class="page-header">
             <div class="container-xl">
                 <div class="row align-items-center">
@@ -19,7 +18,7 @@
                 </div>
             </div>
         </div>
-        <!-- Page body -->
+
         <div class="page-body">
             <div class="container-xl">
                 <div class="row row-deck row-cards">
@@ -124,13 +123,4 @@
             </div>
         </div>
     </div>
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
 @endsection

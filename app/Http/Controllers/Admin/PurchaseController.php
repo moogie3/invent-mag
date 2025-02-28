@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 class PurchaseController extends Controller
 {
     public function index(Request $request){
-        $entries = $request->input('entries', 10); // Default: 10 entries
+        $entries = $request->input('entries', 10); // pagination
         $pos = Purchase::with(['product', 'supplier', 'user'])->paginate($entries);
         $totalinvoice = Purchase::count();
 
@@ -65,7 +65,7 @@ class PurchaseController extends Controller
 
     public function store(Request $request){
         try {
-            // Validate the request
+            // validate the request
             $validatedData = $request->validate([
                 'invoice'       => 'required|string|unique:po,invoice',
                 'supplier_id'   => 'required|exists:suppliers,id',
@@ -74,16 +74,16 @@ class PurchaseController extends Controller
                 'products'      => 'required|json',
             ]);
 
-            // Check if products are valid JSON
+            // check if products are valid JSON
             $products = json_decode($request->products, true);
             if (!$products || !is_array($products)) {
                 return back()->withErrors(['products' => 'Invalid product data'])->withInput();
             }
 
-            // Calculate total price
+            // calculate total price
             $totalPrice = array_sum(array_column($products, 'total'));
 
-            // Store Purchase Order
+            // store Purchase Order
             $purchase = Purchase::create([
                 'invoice'       => $request->invoice,
                 'supplier_id'   => $request->supplier_id,
@@ -92,7 +92,7 @@ class PurchaseController extends Controller
                 'total'         => $totalPrice,
             ]);
 
-            // Store PO items
+            // store PO items
             foreach ($products as $product) {
                 POItem::create([
                     'po_id'        => $purchase->id,
@@ -102,7 +102,7 @@ class PurchaseController extends Controller
                     'total'        => $product['total'],
                 ]);
 
-                // Update product price in the products table
+                // update product price in the products table
                 Product::where('id', $product['id'])->update([
                 'price' => $product['price']
                 ]);

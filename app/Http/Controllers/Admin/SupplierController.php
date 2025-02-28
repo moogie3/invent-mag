@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class SupplierController extends Controller
 {
     public function index(Request $request){
-        $entries = $request->input('entries', 10);
+        $entries = $request->input('entries', 10);//pagination
         $suppliers = Supplier::paginate($entries);
 
         $inCount = Supplier::where('location', 'IN')->count();

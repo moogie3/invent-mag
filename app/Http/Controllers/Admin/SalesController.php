@@ -14,7 +14,7 @@ class SalesController extends Controller
 {
     public function index(Request $request)
     {
-        $entries = $request->input('entries', 10);
+        $entries = $request->input('entries', 10);//pagination
         $sales = Sales::with(['product', 'customer', 'user'])->paginate($entries);
         $totalinvoice = Sales::count();
 
@@ -45,7 +45,7 @@ class SalesController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validate the request
+            // validate the request
             $validatedData = $request->validate([
                 'invoice' => 'required|string|unique:sales,invoice',
                 'customer_id' => 'required|exists:customers,id',
@@ -53,7 +53,7 @@ class SalesController extends Controller
                 'products' => 'required|json',
             ]);
 
-            // Check if products are valid JSON
+            // check if products are valid JSON
             $products = json_decode($request->products, true);
             if (!$products || !is_array($products)) {
                 return back()
@@ -61,10 +61,10 @@ class SalesController extends Controller
                     ->withInput();
             }
 
-            // Calculate total price
+            // calculate total price
             $totalPrice = array_sum(array_column($products, 'total'));
 
-            // Store Purchase Order
+            // store sales
             $sales = Sales::create([
                 'invoice' => $request->invoice,
                 'customer_id' => $request->customer_id,
@@ -72,7 +72,7 @@ class SalesController extends Controller
                 'total' => $totalPrice,
             ]);
 
-            // Store Sales items
+            // store sales items
             foreach ($products as $product) {
                 SalesItem::create([
                     'sales_id' => $sales->id,
@@ -107,7 +107,7 @@ class SalesController extends Controller
 
         $sales->update($data);
 
-        return redirect()->route('admin.sales')->with('success', 'Sales updated successfully!');
+        return redirect()->route('admin.sales')->with('success', 'Sales has been updated');
     }
 
     public function getPastPrice(Request $request)
@@ -118,10 +118,10 @@ class SalesController extends Controller
         $pastPrice = SalesItem::join('sales', 'sales_items.sales_id', '=', 'sales.id')
             ->where('sales.customer_id', $customerId)
             ->where('sales_items.product_id', $productId)
-            ->orderBy('sales.order_date', 'desc') // Get the most recent price
-            ->value('sales_items.customer_price'); // Get the last price customer paid
+            ->orderBy('sales.order_date', 'desc') // get the most recent price
+            ->value('sales_items.customer_price'); // get the last price customer paid
 
-        return response()->json(['past_price' => $pastPrice ?? 0]); // Return 0 if no past price found
+        return response()->json(['past_price' => $pastPrice ?? 0]); // return 0 if no past price found
     }
 
     public function destroy($id)

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('remember_token', 100)->nullable();
             $table->string('avatar')->nullable();
             $table->enum('role', ['admin','member']);
             $table->timestamps();

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class DailySalesController extends Controller
 {
     public function index(Request $request){
-        $entries = $request->input('entries', 10);
+        $entries = $request->input('entries', 10);//pagination
         $dss = DailySales::paginate($entries);
         $totaldss = DailySales::count();
 

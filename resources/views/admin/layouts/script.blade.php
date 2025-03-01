@@ -4,6 +4,54 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+{{-- SCRIPT ONLY FOR SETTING PROFILE --}}
+@if (request()->is('admin/setting/profile'))
+    <script>
+        function togglePasswordModal() {
+            let newPassword = document.getElementById('new_password').value;
+            let confirmPasswordContainer = document.getElementById('confirmPasswordContainer');
+
+            if (newPassword) {
+                confirmPasswordContainer.style.display = 'block';
+            } else {
+                confirmPasswordContainer.style.display = 'none';
+            }
+        }
+
+        document.getElementById('profileForm').addEventListener('submit', function(event) {
+            let newPassword = document.getElementById('new_password').value;
+
+            if (newPassword) {
+                event.preventDefault();
+                openPasswordModal();
+            }
+        });
+
+        function openPasswordModal() {
+            const modal = new bootstrap.Modal(document.getElementById('passwordModal'));
+            modal.show();
+        }
+
+        function submitProfileForm() {
+            let currentPassword = document.getElementById('modal_current_password').value;
+            let newPassword = document.getElementById('new_password').value;
+            let confirmNewPassword = document.getElementById('confirm_new_password').value;
+
+            if (!currentPassword) {
+                alert('Please enter your current password.');
+                return;
+            }
+
+            if (newPassword && newPassword !== confirmNewPassword) {
+                alert('New password and re-entered password do not match.');
+                return;
+            }
+
+            document.getElementById('current_password').value = currentPassword;
+            document.getElementById('profileForm').submit();
+        }
+    </script>
+@endif
 {{-- SCRIPT ONLY FOR ADMIN SALES CREATE --}}
 @if (request()->is('admin/sales/create'))
     <script>
@@ -384,7 +432,7 @@
         };
     </script>
 @endif
-{{-- SCRIPT FOR SORTIN TABLE --}}
+{{-- SCRIPT FOR SORTING TABLE --}}
 @if (
     !request()->is(
         'admin/dashboard',
@@ -402,7 +450,9 @@
         'admin/unit/edit',
         'admin/category/create',
         'admin/category/edit',
-        'admin/ds/create'))
+        'admin/ds/create',
+        'admin/setting/currency',
+        'admin/setting/profile'))
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize List.js

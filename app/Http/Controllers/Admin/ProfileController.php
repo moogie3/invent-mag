@@ -26,7 +26,7 @@ class ProfileController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'shopname' => 'required|string',
-            'address' => 'address|string',
+            'address' => 'required|string',
             'password' => 'nullable|min:6|confirmed',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -34,8 +34,18 @@ class ProfileController extends Controller
         // Update user details
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->shopname = $request->shopname;
+        $user->address = $request->address;
 
         if ($request->filled('password')) {
+            $request->validate([
+                'current_password' => 'required|string',
+            ]);
+
+            if (!Hash::check($request->current_password, $user->password)) {
+                return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
+            }
+
             $user->password = Hash::make($request->password);
         }
 
@@ -47,6 +57,6 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return redirect()->back()->with('success_profile', 'Profile updated successfully!');
+        return redirect()->back()->with('success', 'Profile updated successfully!');
     }
 }

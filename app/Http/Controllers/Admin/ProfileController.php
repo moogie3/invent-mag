@@ -6,17 +6,27 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
+    public function edit(){
+        return view('admin.profile.profile-edit');
+    }
+
     public function update(Request $request)
     {
+        /**
+        * @var \App\Models\User $user
+        */
         $user = Auth::user();
 
         // Validate input
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'shopname' => 'required|string',
+            'address' => 'address|string',
             'password' => 'nullable|min:6|confirmed',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);

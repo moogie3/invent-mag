@@ -323,7 +323,9 @@
                             categories: invoicesData.map(item => item.date)
                         }
                     };
-                } else {
+                }
+
+                if (type === "earnings") {
                     options = {
                         series: [{
                             name: "Daily Earnings",
@@ -343,7 +345,7 @@
                         height: 400
                     },
                     stroke: {
-                        width: [0, 4]
+                        width: [2, 4]
                     },
                     plotOptions: {
                         bar: {

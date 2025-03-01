@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\{
     CategoryController, CustomerController, ProductController, PurchaseController,
-    SupplierController, UnitController, CurrencyController, DailySalesController, SalesController, DashboardController
+    SupplierController, UnitController, CurrencyController, DailySalesController,
+    SalesController, DashboardController, ProfileController
 };
 use App\Models\SalesItem;
 use Laravel\Fortify\Fortify;
@@ -49,7 +50,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
         'customer' => CustomerController::class,
         'po' => PurchaseController::class,
         'sales' => SalesController::class,
-        'ds' => DailySalesController::class
+        'ds' => DailySalesController::class,
     ];
 
     foreach ($resources as $route => $controller) {
@@ -68,8 +69,10 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 
     // Settings
     Route::prefix('setting')->group(function () {
-        Route::get('/', [CurrencyController::class, 'edit'])->name('admin.currency.edit');
-        Route::post('/edit', [CurrencyController::class, 'update'])->name('admin.currency.update');
+        Route::get('/currency', [CurrencyController::class, 'edit'])->name('admin.currency.edit');
+        Route::post('/currency/update', [CurrencyController::class, 'update'])->name('admin.currency.update');
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('admin.profile.edit');
+        Route::put('/profile/update', [ProfileController::class,'update'])->name('admin.profile.update');
     });
 
     Route::get('/sales/get-past-price', [SalesController::class, 'getPastPrice']);

@@ -15,11 +15,11 @@ class CurrencyController extends Controller
 
     public function update(Request $request) {
         $request->validate([
-        'currency_symbol' => 'required|string|max:5',
-        'decimal_separator' => 'required|string|max:1',
-        'thousand_separator' => 'required|string|max:1',
-        'decimal_places' => 'required|integer|min:0|max:4',
-    ]);
+            'currency_symbol' => 'required|string|max:5',
+            'decimal_separator' => 'required|string|max:1',
+            'thousand_separator' => 'required|string|max:1',
+            'decimal_places' => 'required|integer|min:0|max:4',
+        ]);
 
     $setting = CurrencySetting::first();
     $setting->update($request->all());

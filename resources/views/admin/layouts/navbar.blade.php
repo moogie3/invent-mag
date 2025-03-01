@@ -41,8 +41,8 @@
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <a href="./profile.html" class="dropdown-item">Profile</a>
-                    <a href="{{ route('admin.currency.edit') }}" class="dropdown-item">Settings</a>
+                    <a href="{{ route('admin.profile.edit') }}" class="dropdown-item">Profile Setting</a>
+                    <a href="{{ route('admin.currency.edit') }}" class="dropdown-item">Currency Setting</a>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                         @csrf
                     </form>
@@ -56,8 +56,6 @@
     </div>
 </header>
 
-
-<!-- Responsive Navbar -->
 <header class="navbar navbar-expand-md">
     <div class="container-xl">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu">

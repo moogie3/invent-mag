@@ -32,42 +32,42 @@
                                     enctype="multipart/form-data">
                                     @method('PUT')
                                     @csrf
-                                    <div class="mb-3">
+                                    <div class="col-md-12 mb-3">
                                         <label>Avatar</label><br>
                                         <img src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('default-avatar.png') }}"
                                             alt="Avatar" class="img-thumbnail mb-2" width="100">
                                         <input type="file" name="avatar" class="form-control">
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-12 mb-3">
                                         <label>Name</label>
                                         <input type="text" name="name" class="form-control"
                                             value="{{ auth()->user()->name }}" required>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-12 mb-3">
                                         <label>Email</label>
                                         <input type="email" name="email" class="form-control"
                                             value="{{ auth()->user()->email }}" required>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-12 mb-3">
                                         <label>Store Name</label>
                                         <input type="text" name="shopname" class="form-control"
                                             value="{{ auth()->user()->shopname }}" required>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-12 mb-3">
                                         <label>Address</label>
                                         <input type="text" name="address" class="form-control"
                                             value="{{ auth()->user()->address }}" required>
                                     </div>
 
                                     <!-- New Password Field -->
-                                    <div class="mb-3">
+                                    <div class="col-md-12 mb-3">
                                         <label>New Password (Leave empty if not changing)</label>
                                         <input type="password" name="password" id="new_password" class="form-control"
                                             placeholder="Enter new password" oninput="togglePasswordModal()">
                                     </div>
 
                                     <!-- Confirm New Password Field -->
-                                    <div class="mb-3" id="confirmPasswordContainer" style="display: none;">
+                                    <div class="col-md-12 mb-3" id="confirmPasswordContainer" style="display: none;">
                                         <label>Re-enter New Password</label>
                                         <input type="password" name="password_confirmation" id="confirm_new_password"
                                             class="form-control" placeholder="Re-enter new password">
@@ -92,7 +92,7 @@
                                                     aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <div class="mb-3">
+                                                <div class="col-md-12 mb-3">
                                                     <label>Enter Current Password</label>
                                                     <input type="password" id="modal_current_password" class="form-control"
                                                         placeholder="Enter your current password">

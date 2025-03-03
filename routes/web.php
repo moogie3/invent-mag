@@ -6,16 +6,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\{
     CategoryController, CustomerController, ProductController, PurchaseController,
     SupplierController, UnitController, CurrencyController, DailySalesController,
-    SalesController, DashboardController, ProfileController
+    SalesController, DashboardController, ProfileController, NotificationController
 };
-use App\Models\Purchase;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
-use App\Models\PurchaseOrder;
-use Illuminate\Support\Carbon;
 
 // Fortify Authentication Views
 Fortify::registerView(fn () => view('admin.auth.register'));
@@ -37,7 +34,7 @@ Route::post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
-    return redirect('/login');
+    return redirect('/login')->with('success', 'You just logged out!');
 })->name('logout');
 
 // Admin Routes
@@ -75,19 +72,10 @@ Route::middleware('auth')->prefix('admin')->group(function () {
         Route::post('/currency/update', [CurrencyController::class, 'update'])->name('admin.currency.update');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('admin.profile.edit');
         Route::put('/profile/update', [ProfileController::class,'update'])->name('admin.profile.update');
+        Route::delete('/profile/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.profile.delete-avatar');
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
+        Route::get('/notifications/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
     });
 
     Route::get('/sales/get-past-price', [SalesController::class, 'getPastPrice']);
-
-    // Notification Route
-    Route::get('/notifications', function () {
-    return view('admin.notifications');})->name('admin.notifications');
-
-    Route::get('/admin/notifications', function () {
-    $purchaseOrders = Purchase::where('due_date', '<=', now()->addDays(7))
-                                   ->where('status', '!=', 'Paid')
-                                   ->get();
-
-    return view('admin.notifications', compact('purchaseOrders'));
-})->name('admin.notifications');
 });

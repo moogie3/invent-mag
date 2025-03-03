@@ -126,24 +126,28 @@
             <a href="?theme=light" class="nav-link px-2 hide-theme-light">
                 <i class="ti ti-sun fs-2"></i>
             </a>
-            <div class="nav-item dropdown">
+            <div class="nav-item dropdown me-3">
                 <a href="#" class="nav-link px-2 position-relative" data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                    aria-expanded="false" id="notification-icon">
                     <i class="ti ti-bell fs-2"></i>
                     @php
                         $hasDueNotes = false;
-                        foreach ($purchaseOrders as $po) {
+                    @endphp
+                    @foreach ($purchaseOrders as $po)
+                        @php
                             $today = now();
                             $dueDate = $po->due_date;
                             $diffDays = $today->diffInDays($dueDate, false);
-                            if ($diffDays <= 7 && $po->status !== 'Paid') {
+                        @endphp
+                        @if ($diffDays <= 7 && $po->status !== 'Paid')
+                            @php
                                 $hasDueNotes = true;
                                 break;
-                            }
-                        }
-                    @endphp
+                            @endphp
+                        @endif
+                    @endforeach
                     @if ($hasDueNotes)
-                        <span
+                        <span id="notification-dot"
                             class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
                     @endif
                 </a>
@@ -158,7 +162,9 @@
                             $diffDays = $today->diffInDays($dueDate, false);
                         @endphp
                         @if ($diffDays <= 7 && $po->status !== 'Paid')
-                            <a href="{{ route('admin.po') }}" class="dropdown-item d-flex align-items-center">
+                            <a href="{{ route('admin.po.edit', ['id' => $po->id]) }}"
+                                class="dropdown-item d-flex align-items-center notification-item"
+                                data-id="{{ $po->id }}">
                                 <span class="badge bg-danger me-2"></span>
                                 Due Note: PO #{{ $po->id }} - {{ $po->due_date->format('M d, Y') }}
                             </a>
@@ -180,8 +186,7 @@
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <a href="{{ route('admin.profile.edit') }}" class="dropdown-item">Profile Setting</a>
-                    <a href="{{ route('admin.currency.edit') }}" class="dropdown-item">Currency Setting</a>
+                    <a href="{{ route('admin.profile.edit') }}" class="dropdown-item">Settings</a>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                         @csrf
                     </form>
@@ -194,6 +199,22 @@
         </div>
     </div>
 </header>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const notificationItems = document.querySelectorAll(".notification-item");
+        const notificationDot = document.getElementById("notification-dot");
+
+        notificationItems.forEach(item => {
+            item.addEventListener("click", function() {
+                // Mark as read (Remove red dot)
+                if (notificationDot) {
+                    notificationDot.remove();
+                }
+            });
+        });
+    });
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {

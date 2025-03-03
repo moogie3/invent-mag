@@ -7,18 +7,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    public function edit(){
+    public function edit()
+    {
         return view('admin.profile.profile-edit');
     }
 
     public function update(Request $request)
     {
         /**
-        * @var \App\Models\User $user
-        */
+         * @var \App\Models\User $user
+         */
         $user = Auth::user();
 
         // Validate input
@@ -43,7 +45,9 @@ class ProfileController extends Controller
             ]);
 
             if (!Hash::check($request->current_password, $user->password)) {
-                return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
+                return redirect()
+                    ->back()
+                    ->withErrors(['current_password' => 'Current password is incorrect.']);
             }
 
             $user->password = Hash::make($request->password);
@@ -51,6 +55,12 @@ class ProfileController extends Controller
 
         // Handle avatar upload
         if ($request->hasFile('avatar')) {
+            // Delete the old avatar if it exists
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            // Upload new avatar
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
             $user->avatar = $avatarPath;
         }
@@ -58,5 +68,20 @@ class ProfileController extends Controller
         $user->save();
 
         return redirect()->back()->with('success', 'Profile updated successfully!');
+    }
+
+    public function deleteAvatar()
+    {
+        /**
+         * @var \App\Models\User $user
+         */
+        $user = Auth::user();
+
+        if ($user->avatar) {
+            Storage::delete('public/' . $user->avatar); // Corrected the path
+            $user->save();
+        }
+
+        return redirect()->back()->with('success', 'Avatar deleted successfully!');
     }
 }

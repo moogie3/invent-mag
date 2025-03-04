@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Invent-Mag | @yield('title')</title>
+    <title>Invent-MAG | @yield('title')</title>
     <link href="{{ asset('tabler/dist/css/tabler.min.css?1692870487') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-flags.min.css?1692870487') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-payments.min.css?1692870487') }}" rel="stylesheet" />
@@ -25,11 +25,34 @@
             font-feature-settings: "cv03", "cv04", "cv11";
         }
     </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Hide the loader once the page has fully loaded
+            setTimeout(() => {
+                document.querySelector(".page-center").style.display = "none";
+            }, 300); // Smooth transition delay (optional)
+        });
+    </script>
+
 </head>
 
 {{-- BODY --}}
 
 <body>
+    <div class="page page-center">
+        <div class="container container-slim py-4">
+            <div class="text-center">
+                <div class="mb-3">
+                    <a href="." class="navbar-brand navbar-brand-autodark"><img src="./static/logo-small.svg"
+                            height="36" alt=""></a>
+                </div>
+                <div class="text-secondary mb-3">Loading</div>
+                <div class="progress progress-sm">
+                    <div class="progress-bar progress-bar-indeterminate"></div>
+                </div>
+            </div>
+        </div>
+    </div>
     @include('admin.layouts.navbar')
     <div class="main-content">
         @yield('content')

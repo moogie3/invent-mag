@@ -433,26 +433,15 @@
     </script>
 @endif
 {{-- SCRIPT FOR SORTING TABLE --}}
-@if (
-    !request()->is(
-        'admin/dashboard',
-        'admin/po/create',
-        'admin/po/edit',
-        'admin/sales/create',
-        'admin/sales/edit',
-        'admin/product/create',
-        'admin/product/edit',
-        'admin/supplier/create',
-        'admin/supplier/edit',
-        'admin/customer/create',
-        'admin/customer/edit',
-        'admin/unit/create',
-        'admin/unit/edit',
-        'admin/category/create',
-        'admin/category/edit',
-        'admin/ds/create',
-        'admin/setting/currency',
-        'admin/setting/profile'))
+@if (request()->is(
+        'admin/ds',
+        'admin/po',
+        'admin/sales',
+        'admin/product',
+        'admin/supplier',
+        'admin/customer',
+        'admin/unit',
+        'admin/category'))
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize List.js
@@ -462,6 +451,8 @@
                 valueNames: [
                     'sort-no',
                     'sort-invoice',
+                    'sort-date',
+                    'sort-total',
                     'sort-supplier',
                     'sort-orderdate',
                     'sort-quantity',

@@ -15,7 +15,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $entries = $request->input('entries', 10);//pagination
+        $entries = $request->input('entries', 10); // Pagination
         $products = Product::with(['category', 'supplier', 'unit'])->paginate($entries);
         $totalproduct = Product::count();
         return view('admin.product.index', compact('products', 'entries', 'totalproduct'));
@@ -23,16 +23,15 @@ class ProductController extends Controller
 
     public function create()
     {
-        $products = Product::all();
         $categories = Categories::all();
         $units = Unit::all();
         $suppliers = Supplier::all();
-        return view('admin.product.product-create', compact('products', 'units', 'suppliers', 'categories'));
+        return view('admin.product.product-create', compact('categories', 'units', 'suppliers'));
     }
 
     public function edit($id)
     {
-        $products = Product::find($id);
+        $products = Product::findOrFail($id);
         $categories = Categories::all();
         $units = Unit::all();
         $suppliers = Supplier::all();
@@ -54,24 +53,15 @@ class ProductController extends Controller
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
-        $data = $request->except('_token','image');
-
-        $isProductExist = Product::where('name', $request->name)->exists();
-        if ($isProductExist) {
-            return back()
-            ->withErrors([
-                'name' => 'This product already exists',
-            ])
-            ->withInput();
-        }
+        $data = $request->except('_token', 'image');
 
         if ($request->hasFile('image')) {
-            $images = $request->file('image'); // use file() to get the uploaded file
-            $originalImagesName = Str::random(10) . '_' . $images->getClientOriginalName();
-            $images->storeAs('public/image', $originalImagesName);
-            $data['image'] = $originalImagesName;
-        } else {
-            $data['image'] = null;
+            $image = $request->file('image');
+            $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
+            $image->storeAs('public/image', $imageName);
+
+            // Store only the relative path
+            $data['image'] = $imageName;
         }
 
         Product::create($data);
@@ -79,7 +69,7 @@ class ProductController extends Controller
         return redirect()->route('admin.product')->with('success', 'Product created');
     }
 
-public function update(Request $request, $id)
+    public function update(Request $request, $id)
 {
     $products = Product::findOrFail($id);
 
@@ -96,36 +86,41 @@ public function update(Request $request, $id)
         'image' => 'nullable|image|mimes:jpeg,jpg,png',
     ]);
 
-    // Get all fields except image
     $data = $request->except(['_token', 'image']);
 
-    // If a new image is uploaded, process and save it
+    // Check if a new image is uploaded
     if ($request->hasFile('image')) {
-        // Check if the old image exists
-        if (!empty($products->image)) {
-            $oldImagePath = 'public/image/' . $products->image;
-            if (Storage::exists($oldImagePath)) {
-                Storage::delete($oldImagePath);
-            }
-        }
+    // Delete old image if exists
+    $oldImagePath = 'public/image/' . basename($products->image); // Use only filename
 
-        // Upload new image
-        $image = $request->file('image');
-        $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-        $image->storeAs('public/image', $imageName); // store in storage/app/public/image/
-
-        $data['image'] = $imageName; // save new image
+    if (!empty($products->image) && Storage::exists($oldImagePath)) {
+        Storage::delete($oldImagePath);
     }
+
+    // Upload new image
+    $image = $request->file('image');
+    $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
+    $image->storeAs('public/image', $imageName);
+
+    // Store only the image filename, NOT the full URL
+    $data['image'] = $imageName;
+}
 
     $products->update($data);
 
-    return redirect()->route('admin.product')->with('success', 'Product updated');
+    return redirect()->route('admin.product')->with('success', 'Product updated successfully');
 }
-
 
     public function destroy($id)
     {
-        Product::find($id)->delete();
+        $product = Product::findOrFail($id);
+
+        // Delete image from storage if exists
+        if (!empty($product->image)) {
+            Storage::delete('public/' . $product->image);
+        }
+
+        $product->delete();
 
         return redirect()->route('admin.product')->with('success', 'Product deleted');
     }

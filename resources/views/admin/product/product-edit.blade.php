@@ -107,8 +107,15 @@
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">IMAGE</label>
-                                                <input type="file" class="form-control" name="image"
-                                                    value="{{ $products->image }}" />
+                                                <div class="d-flex flex-column align-items-start">
+                                                    <div class="mb-2">
+                                                        <img src="{{ asset($products->image) }}" width="200"
+                                                            class="rounded border shadow-sm">
+                                                    </div>
+                                                    <input type="file" class="form-control" name="image">
+                                                    <small class="text-muted mt-1">Upload a new image to replace the current
+                                                        one.</small>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="text-end">

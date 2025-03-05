@@ -59,11 +59,39 @@
                                         </div>
                                     </div>
                                     <div class="ms-auto text-secondary no-print">
-                                        Search :
-                                        <div class="ms-2 d-inline-block">
-                                            <input type="text" id="searchInput" class="form-control form-control-sm">
+                                        <div class="ms-2 mb-2 text-end">
+                                            Search :
+                                            <div class="ms-2">
+                                                <input type="text" id="searchInput" class="form-control form-control-sm">
+                                            </div>
                                         </div>
-                                        <div class="text-end">
+                                        <div class="mb-2 text-end">
+                                            Filter by:
+                                            <form method="GET" action="{{ route('admin.ds') }}" class="d-inline-block">
+                                                <select name="month"
+                                                    class="form-select form-select-sm d-inline-block w-auto">
+                                                    <option value="">Select Month</option>
+                                                    @foreach (range(1, 12) as $m)
+                                                        <option value="{{ $m }}"
+                                                            {{ request('month') == $m ? 'selected' : '' }}>
+                                                            {{ date('F', mktime(0, 0, 0, $m, 1)) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <select name="year"
+                                                    class="form-select form-select-sm d-inline-block w-auto">
+                                                    <option value="">Select Year</option>
+                                                    @foreach (range(date('Y') - 5, date('Y')) as $y)
+                                                        <option value="{{ $y }}"
+                                                            {{ request('year') == $y ? 'selected' : '' }}>
+                                                            {{ $y }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                                            </form>
+                                        </div>
+                                        <div class="mb-2 text-end">
                                             Show
                                             <div class="mx-1 mt-2 d-inline-block">
                                                 <select name="entries" id="entriesSelect"
@@ -100,7 +128,9 @@
                                                     <td class="sort-no">{{ $dss->firstItem() + $index }}</td>
                                                     <td class="sort-date">{{ $ds->date->format('d F Y') }}</td>
                                                     <td class="sort-total">
-                                                        {{ \App\Helpers\CurrencyHelper::format($ds->total) }}</td>
+                                                        {{ \App\Helpers\CurrencyHelper::format($ds->total) }}<span
+                                                            class="raw-amount"
+                                                            style="display: none;">{{ $ds->total }}</span></td>
                                                     <td class="no-print" style="text-align:center">
                                                         <div class="dropdown">
                                                             <button class="btn dropdown-toggle align-text-top"

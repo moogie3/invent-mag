@@ -12,7 +12,7 @@ class NotificationController extends Controller
     public function index()
     {
         $dueNotes = Purchase::where('due_date', '<=', Carbon::now()->addDays(7))
-            ->where('status', 'pending') // Adjust this based on your status column
+            ->where('status', 'pending') // adjust this based on your status column
             ->orderBy('due_date', 'asc')
             ->get();
 

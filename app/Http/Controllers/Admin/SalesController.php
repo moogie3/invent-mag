@@ -14,15 +14,24 @@ class SalesController extends Controller
 {
     public function index(Request $request)
     {
-        $entries = $request->input('entries', 10);//pagination
-        $sales = Sales::with(['product', 'customer', 'user'])->paginate($entries);
-        $totalinvoice = Sales::count();
+        $entries = $request->input('entries', 10); // pagination
+        $query = Sales::with(['product', 'customer', 'user']); // apply relationships first
 
+        // apply filters
+        if ($request->has('month') && $request->month) {
+            $query->whereMonth('order_date', $request->month);
+        }
+        if ($request->has('year') && $request->year) {
+            $query->whereYear('order_date', $request->year);
+        }
+
+        $sales = $query->paginate($entries); // apply pagination on the filtered query
+        $totalinvoice = $query->count(); // count the filtered records
         $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
 
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
-        return view('admin.sales.index', compact('entries', 'sales', 'totalinvoice', 'shopname', 'address','unpaidDebt'));
+        return view('admin.sales.index', compact('entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt'));
     }
 
     public function create()
@@ -91,18 +100,19 @@ class SalesController extends Controller
         }
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
         $sales = Sales::findOrFail($id);
 
         $request->validate([
             'payment_type' => 'required',
-            'status' => 'required'
+            'status' => 'required',
         ]);
 
-        $data = $request->except(["_token", "_method"]);
+        $data = $request->except(['_token', '_method']);
 
         if ($request->status === 'Paid') {
-        $data['payment_date'] = now();
+            $data['payment_date'] = now();
         }
 
         $sales->update($data);

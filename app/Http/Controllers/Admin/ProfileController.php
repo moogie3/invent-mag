@@ -23,7 +23,7 @@ class ProfileController extends Controller
          */
         $user = Auth::user();
 
-        // Validate input
+        // validate input
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -33,7 +33,7 @@ class ProfileController extends Controller
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Update user details
+        // update user details
         $user->name = $request->name;
         $user->email = $request->email;
         $user->shopname = $request->shopname;
@@ -53,14 +53,14 @@ class ProfileController extends Controller
             $user->password = Hash::make($request->password);
         }
 
-        // Handle avatar upload
+        // handle avatar upload
         if ($request->hasFile('avatar')) {
-            // Delete the old avatar if it exists
+            // delete the old avatar if it exists
             if ($user->avatar) {
                 Storage::disk('public')->delete($user->avatar);
             }
 
-            // Upload new avatar
+            // upload new avatar
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
             $user->avatar = $avatarPath;
         }
@@ -78,7 +78,7 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         if ($user->avatar) {
-            Storage::delete('public/' . $user->avatar); // Corrected the path
+            Storage::delete('public/' . $user->avatar);
             $user->save();
         }
 

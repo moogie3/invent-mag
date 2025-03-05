@@ -74,7 +74,6 @@
             }, 300); // Smooth transition delay (optional)
         });
     </script>
-
 </head>
 
 {{-- BODY --}}
@@ -84,13 +83,13 @@
         <div class="container container-slim py-4">
             <div class="text-center">
                 <div class="mb-3">
-                    <a href="." class="navbar-brand navbar-brand-autodark"><img src="./static/logo-small.svg"
-                            height="36" alt=""></a>
+                    <a href="." class="navbar-brand navbar-brand-autodark"><i
+                            class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG</a>
                 </div>
-                <div class="text-secondary mb-3">Loading</div>
-                <div class="progress progress-sm">
+                <div class="progress progress-sm mb-3">
                     <div class="progress-bar progress-bar-indeterminate"></div>
                 </div>
+                <div class="text-secondary">Loading</div>
             </div>
         </div>
     </div>

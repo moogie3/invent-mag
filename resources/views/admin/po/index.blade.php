@@ -32,7 +32,7 @@
                         <div class="card card-primary">
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex justify-content-between">
-                                    <div class="col-md-9">
+                                    <div class="col-md-8">
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="card-title">Invoice information</div>
@@ -81,7 +81,7 @@
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-currency fs-2"></i>
                                                             </span>
-                                                            This Month Purchase:
+                                                            This Month PO:
                                                             <strong>{{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</strong>
                                                         </div>
                                                     </div>
@@ -115,11 +115,39 @@
                                         </div>
                                     </div>
                                     <div class="ms-auto text-secondary no-print">
-                                        Search :
-                                        <div class="ms-2 d-inline-block">
-                                            <input type="text" id="searchInput" class="form-control form-control-sm">
+                                        <div class="ms-2 mb-2 text-end">
+                                            Search :
+                                            <div class="ms-2">
+                                                <input type="text" id="searchInput" class="form-control form-control-sm">
+                                            </div>
                                         </div>
-                                        <div class="text-end">
+                                        <div class="mb-2 text-end">
+                                            Filter by:
+                                            <form method="GET" action="{{ route('admin.po') }}" class="d-inline-block">
+                                                <select name="month"
+                                                    class="form-select form-select-sm d-inline-block w-auto">
+                                                    <option value="">Select Month</option>
+                                                    @foreach (range(1, 12) as $m)
+                                                        <option value="{{ $m }}"
+                                                            {{ request('month') == $m ? 'selected' : '' }}>
+                                                            {{ date('F', mktime(0, 0, 0, $m, 1)) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <select name="year"
+                                                    class="form-select form-select-sm d-inline-block w-auto">
+                                                    <option value="">Select Year</option>
+                                                    @foreach (range(date('Y') - 5, date('Y')) as $y)
+                                                        <option value="{{ $y }}"
+                                                            {{ request('year') == $y ? 'selected' : '' }}>
+                                                            {{ $y }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                                            </form>
+                                        </div>
+                                        <div class="mb-2 text-end">
                                             Show
                                             <div class="mx-1 mt-2 d-inline-block">
                                                 <select name="entries" id="entriesSelect"
@@ -154,12 +182,15 @@
                                                         Date</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-duedate">Due Date
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-amount">Amount</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-amount">Amount
+                                                </th>
                                                 <th class="no-print"><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-payment">Payment
                                                         Type</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-status">Status</th>
-                                                <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">Action
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-status">Status
+                                                </th>
+                                                <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">
+                                                    Action
                                                 </th>
                                             </tr>
                                         </thead>

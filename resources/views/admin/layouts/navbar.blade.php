@@ -290,7 +290,7 @@
 
         notificationItems.forEach(item => {
             item.addEventListener("click", function() {
-                // Mark as read (Remove red dot)
+                // mark as read (Remove red dot)
                 if (notificationDot) {
                     notificationDot.remove();
                 }
@@ -309,20 +309,20 @@
 
         let timeout;
 
-        // Show dropdown on hover
+        // show dropdown on hover
         brandTrigger.addEventListener("mouseenter", function() {
             clearTimeout(timeout);
             navContainer.classList.add("active");
         });
 
-        // Hide dropdown when mouse leaves the dropdown or brand
+        // hide dropdown when mouse leaves the dropdown or brand
         navContainer.addEventListener("mouseleave", function() {
             timeout = setTimeout(() => {
                 navContainer.classList.remove("active");
-            }, 300); // Delay closing to prevent accidental closing when moving mouse
+            }, 300); // delay closing to prevent accidental closing when moving mouse
         });
 
-        // Prevent dropdown from closing when hovering inside it
+        // prevent dropdown from closing when hovering inside it
         dropdown.addEventListener("mouseenter", function() {
             clearTimeout(timeout);
         });
@@ -344,7 +344,7 @@
             mobileNav.classList.toggle("active");
         });
 
-        // Close menu when clicking outside
+        // close menu when clicking outside
         document.addEventListener("click", function(event) {
             if (!mobileNav.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
                 mobileNav.classList.remove("active");

@@ -75,11 +75,39 @@
                                         </div>
                                     </div>
                                     <div class="ms-auto text-secondary no-print">
-                                        Search :
-                                        <div class="ms-2 d-inline-block">
-                                            <input type="text" id="searchInput" class="form-control form-control-sm">
+                                        <div class="ms-2 mb-2 text-end">
+                                            Search :
+                                            <div class="ms-2">
+                                                <input type="text" id="searchInput" class="form-control form-control-sm">
+                                            </div>
                                         </div>
-                                        <div class="text-end">
+                                        <div class="mb-2 text-end">
+                                            Filter by:
+                                            <form method="GET" action="{{ route('admin.sales') }}" class="d-inline-block">
+                                                <select name="month"
+                                                    class="form-select form-select-sm d-inline-block w-auto">
+                                                    <option value="">Select Month</option>
+                                                    @foreach (range(1, 12) as $m)
+                                                        <option value="{{ $m }}"
+                                                            {{ request('month') == $m ? 'selected' : '' }}>
+                                                            {{ date('F', mktime(0, 0, 0, $m, 1)) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <select name="year"
+                                                    class="form-select form-select-sm d-inline-block w-auto">
+                                                    <option value="">Select Year</option>
+                                                    @foreach (range(date('Y') - 5, date('Y')) as $y)
+                                                        <option value="{{ $y }}"
+                                                            {{ request('year') == $y ? 'selected' : '' }}>
+                                                            {{ $y }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                                            </form>
+                                        </div>
+                                        <div class="mb-2 text-end">
                                             Show
                                             <div class="mx-1 mt-2 d-inline-block">
                                                 <select name="entries" id="entriesSelect"
@@ -129,7 +157,8 @@
                                                     </td>
                                                     <td class="sort-amount" data-amount="{{ $sale->total }}">
                                                         {{ \App\Helpers\CurrencyHelper::format($sale->total) }}<span
-                                                            class="raw-amount" style="display: none;">{{ $sale->total }}
+                                                            class="raw-amount"
+                                                            style="display: none;">{{ $sale->total }}</span>
                                                     </td>
                                                     <td class="sort-payment no-print">{{ $sale->payment_type }}</td>
                                                     <td class="sort-status">

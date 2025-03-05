@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="page-wrapper">
-        <div class="page-header">
+        <div class="page-header no-print">
             <div class="container-xl">
                 <div class="row align-items-center">
                     <div class="col">
@@ -17,7 +17,7 @@
                         @endif
                     </div>
                     <div class="col text-end">
-                        <button type="button" class="btn btn-primary" onclick="javascript:window.print();">
+                        <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">
                             Print Invoice
                         </button>
                     </div>
@@ -76,7 +76,7 @@
                                                 <div class="card card-lg">
                                                     <div class="card-body">
                                                         <div class="col-auto">
-                                                            <h3>SALES / {{ $sales->invoice }} /
+                                                            <h3>SALE / {{ $sales->invoice }} /
                                                                 {{ $sales->customer->address }}
                                                             </h3>
                                                         </div>

@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="page-wrapper">
-        <div class="page-header">
+        <div class="page-header no-print">
             <div class="container-xl">
                 <div class="row align-items-center">
                     <div class="col">
@@ -14,6 +14,11 @@
                         <h2 class="page-title">
                             Product
                         </h2>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">
+                            Export PDF
+                        </button>
                     </div>
                     <div class="col-auto ms-auto">
                         <div class="btn-list">
@@ -52,7 +57,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="ms-auto text-secondary">
+                                    <div class="ms-auto text-secondary no-print">
                                         Search :
                                         <div class="ms-2 d-inline-block">
                                             <input type="text" id="searchInput" class="form-control form-control-sm">
@@ -83,19 +88,24 @@
                                             <tr>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-no">No</th>
                                                 <th><button class="table-sort fs-4 py-3">Picture</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-code">Code</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-name">Name</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-quantity">QTY
+                                                <th class="no-print"><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-code">Code
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-category">Category
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-name">Name</th>
+                                                <th class="no-print"><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-quantity">QTY
+                                                </th>
+                                                <th class="no-print"><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-category">Category
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-unit">Unit</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-price">price</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-price">Price</th>
                                                 <th><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-sellingprice">Selling Price</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-supplier">Supplier
                                                 </th>
-                                                <th style="width:100px;text-align:center" class="fs-4 py-3">Action</th>
+                                                <th style="width:100px;text-align:center" class="fs-4 py-3 no-print">Action
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody id="invoiceTableBody" class="table-tbody">
@@ -106,10 +116,10 @@
                                                         <img src="{{ asset($product->image) }}" width="80px"
                                                             height="80px">
                                                     </td>
-                                                    <td class="sort-code">{{ $product->code }}</td>
+                                                    <td class="sort-code no-print">{{ $product->code }}</td>
                                                     <td class="sort-name">{{ $product->name }}</td>
-                                                    <td class="sort-quantity">{{ $product->quantity }}</td>
-                                                    <td class="sort-category">{{ $product->category->name }}</td>
+                                                    <td class="sort-quantity no-print">{{ $product->quantity }}</td>
+                                                    <td class="sort-category no-print">{{ $product->category->name }}</td>
                                                     <td class="sort-unit">{{ $product->unit->symbol }}</td>
                                                     <td class="sort-price">
                                                         {{ \App\Helpers\CurrencyHelper::format($product->price) }}</td>
@@ -117,7 +127,7 @@
                                                         {{ \App\Helpers\CurrencyHelper::format($product->selling_price) }}
                                                     </td>
                                                     <td class="sort-supplier">{{ $product->supplier->name }}</td>
-                                                    <td style="text-align:center">
+                                                    <td class="no-print" style="text-align:center">
                                                         <div class="dropdown">
                                                             <button class="btn dropdown-toggle align-text-top"
                                                                 data-bs-toggle="dropdown" data-bs-boundary="viewport">

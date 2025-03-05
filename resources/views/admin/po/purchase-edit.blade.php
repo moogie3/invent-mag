@@ -4,21 +4,21 @@
 
 @section('content')
     <div class="page-wrapper">
-        <div class="page-header">
+        <div class="page-header no-print">
             <div class="container-xl">
                 <div class="row align-items-center">
                     <div class="col">
                         @if ($pos->status == 'Unpaid')
                             <div class="page-pretitle">Overview</div>
-                            <h2 class="page-title">Edit Purchase Order</h2>
+                            <h2 class="page-title no-print">Edit Purchase Order</h2>
                         @else
                             <div class="page-pretitle">Overview</div>
-                            <h2 class="page-title">PO Invoice Information</h2>
+                            <h2 class="page-title no-print">PO Invoice Information</h2>
                         @endif
                     </div>
                     <div class="col text-end">
-                        <button type="button" class="btn btn-primary" onclick="javascript:window.print();">
-                            Print Invoice
+                        <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">
+                            Export Invoice
                         </button>
                     </div>
                 </div>

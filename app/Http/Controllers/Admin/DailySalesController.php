@@ -12,7 +12,6 @@ class DailySalesController extends Controller
         $entries = $request->input('entries', 10);//pagination
         $dss = DailySales::paginate($entries);
         $totaldss = DailySales::count();
-
         $totalDailySales = DailySales::all()->sum('total');
 
         return view('admin.ds.index', compact('dss', 'entries','totaldss','totalDailySales'));

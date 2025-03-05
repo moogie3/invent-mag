@@ -157,8 +157,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="col-md-12 mb-3">
-                        <label>Enter Current Password</label>
+                    <div class="col-md-12 mb-1">
+                        <label class="mb-2">Enter Current Password</label>
                         <input type="password" id="modal_current_password" class="form-control"
                             placeholder="Enter your current password">
                     </div>

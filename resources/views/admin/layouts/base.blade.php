@@ -24,6 +24,47 @@
         body {
             font-feature-settings: "cv03", "cv04", "cv11";
         }
+
+        @media print {
+            .purchase-info {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                /* Change to 3 for a 3-column layout */
+                gap: 15px;
+            }
+
+            .purchase-info>div {
+                break-inside: avoid;
+                /* Prevents column breaks in print */
+                page-break-inside: avoid;
+            }
+
+            .sales-info {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                /* Change to 3 for a 3-column layout */
+                gap: 15px;
+            }
+
+            .sales-info>div {
+                break-inside: avoid;
+                /* Prevents column breaks in print */
+                page-break-inside: avoid;
+            }
+
+            /* Hide elements that shouldn't be included in the PDF */
+            .no-print {
+                display: none !important;
+            }
+
+            /* Ensure the invoice prints properly */
+            body {
+                font-size: 12px;
+                /* Adjust font size */
+                color: black;
+                /* Ensure text is black */
+            }
+        }
     </style>
     <script>
         document.addEventListener("DOMContentLoaded", function() {

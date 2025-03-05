@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="page-wrapper">
-        <div class="page-header">
+        <div class="page-header no-print">
             <div class="container-xl">
                 <div class="row align-items-center">
                     <div class="col">
@@ -14,6 +14,11 @@
                         <h2 class="page-title">
                             Daily Sales
                         </h2>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">
+                            Export PDF
+                        </button>
                     </div>
                     <div class="col-auto ms-auto">
                         <div class="btn-list">
@@ -53,7 +58,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="ms-auto text-secondary">
+                                    <div class="ms-auto text-secondary no-print">
                                         Search :
                                         <div class="ms-2 d-inline-block">
                                             <input type="text" id="searchInput" class="form-control form-control-sm">
@@ -83,10 +88,10 @@
                                             <tr>
                                                 <th style="width: 100px;"><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-no">No</th>
-                                                <th style="width: 200px;"><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-date">Date</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-date">Date</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-total">Total</th>
-                                                <th style="width:180px;text-align:center" class="fs-4 py-3">Action</th>
+                                                <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">Action
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody id="invoiceTableBody" class="table-tbody">
@@ -96,7 +101,7 @@
                                                     <td class="sort-date">{{ $ds->date->format('d F Y') }}</td>
                                                     <td class="sort-total">
                                                         {{ \App\Helpers\CurrencyHelper::format($ds->total) }}</td>
-                                                    <td style="text-align:center">
+                                                    <td class="no-print" style="text-align:center">
                                                         <div class="dropdown">
                                                             <button class="btn dropdown-toggle align-text-top"
                                                                 data-bs-toggle="dropdown" data-bs-boundary="viewport">

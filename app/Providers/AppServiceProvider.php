@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Customize login view
+        // customize the login view
         View::composer('*', function ($view) {
             $purchaseOrders = Purchase::where('due_date', '<=', now()->addDays(7))
                                         ->where('status', '!=', 'Paid')

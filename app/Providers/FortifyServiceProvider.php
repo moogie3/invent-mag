@@ -34,24 +34,24 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Use admin-specific authentication views
+        // use admin-specific authentication views
         Fortify::loginView(fn () => view('admin.auth.login'));
         Fortify::registerView(fn () => view('admin.auth.register'));
         Fortify::requestPasswordResetLinkView(fn () => view('admin.auth.forgot-password'));
         Fortify::resetPasswordView(fn ($request) => view('admin.auth.reset-password', ['request' => $request]));
 
-        // Register Fortify actions
+        // register Fortify actions
         Fortify::createUsersUsing(CreateNewUser::class);
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
-        // Custom authentication logic
+        // custom authentication logic
         Fortify::authenticateUsing(function (Request $request) {
             $user = \App\Models\User::where('email', $request->email)->first();
 
             if ($user && Hash::check($request->password, $user->password)) {
-                // Reset login attempts on success
+                // reset login attempts on success
                 RateLimiter::clear($request->ip());
                 return $user;
             }
@@ -59,7 +59,7 @@ class FortifyServiceProvider extends ServiceProvider
             return null;
         });
 
-        // Throttling login attempts
+        // throttling login attempts
         RateLimiter::for('login', function (Request $request) {
             $email = Str::lower($request->input('email', 'guest'));
             $ip = $request->ip() ?? '127.0.0.1';

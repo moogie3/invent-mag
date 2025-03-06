@@ -124,12 +124,21 @@
             </div>
             <div class="nav-item dropdown ms-2">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
-                    <span class="avatar avatar-sm"
-                        style="background-image: url('{{ asset('storage/' . Auth::user()->avatar) }}');"></span>
-                    <div class="d-none d-xl-block ps-2">
-                        <div>{{ Auth::user()->shopname ?? 'No Shop Name' }}</div>
-                        <div class="mt-1 small text-secondary">{{ Auth::user()->role }}</div>
-                    </div>
+                    @if (Auth::check())
+                        <span class="avatar avatar-sm"
+                            style="background-image: url('{{ asset('storage/' . Auth::user()->avatar) }}');"></span>
+                        <div class="d-none d-xl-block ps-2">
+                            <div>{{ Auth::user()->shopname ?? 'No Shop Name' }}</div>
+                            <div class="mt-1 small text-secondary">{{ Auth::user()->role }}</div>
+                        </div>
+                    @else
+                        <span class="avatar avatar-sm"
+                            style="background-image: url('{{ asset('storage/default-avatar.png') }}');"></span>
+                        <div class="d-none d-xl-block ps-2">
+                            <div>Guest</div>
+                            <div class="mt-1 small text-secondary">Not logged in</div>
+                        </div>
+                    @endif
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <a href="{{ route('admin.profile.edit') }}" class="dropdown-item">Settings</a>

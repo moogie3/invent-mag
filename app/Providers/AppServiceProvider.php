@@ -26,23 +26,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Define Fortify Login Authentication Logic
-    Fortify::authenticateUsing(function (Request $request) {
-        $user = User::where('email', $request->email)->first();
+        // Customize login view
+        View::composer('*', function ($view) {
+            $purchaseOrders = Purchase::where('due_date', '<=', now()->addDays(7))
+                                        ->where('status', '!=', 'Paid')
+                                        ->get();
 
-        if ($user && Hash::check($request->password, $user->password)) {
-            return $user;
-        }
-    });
-
-    // Customize login view
-    Fortify::loginView(fn () => view('auth.login'));
-    View::composer('*', function ($view) {
-        $purchaseOrders = Purchase::where('due_date', '<=', now()->addDays(7))
-                                       ->where('status', '!=', 'Paid')
-                                       ->get();
-
-        $view->with('purchaseOrders', $purchaseOrders);
-    });
+            $view->with('purchaseOrders', $purchaseOrders);
+        });
     }
 }

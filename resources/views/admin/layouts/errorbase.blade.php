@@ -43,47 +43,13 @@
             margin-top: auto;
             /* Ensures it stays at the bottom */
         }
-
-        @media print {
-            .purchase-info {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 15px;
-            }
-
-            .purchase-info>div {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-
-            .sales-info {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-
-            .sales-info>div {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-
-            .no-print {
-                display: none !important;
-            }
-
-            body {
-                font-size: 12px;
-                color: black;
-            }
-        }
     </style>
-    {{-- PAGE LOADER SCRIPT --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // hide the loader once the page has fully loaded
+            // Hide the loader once the page has fully loaded
             setTimeout(() => {
                 document.querySelector(".page-center").style.display = "none";
-            }, 300); // smooth transition delay (optional)
+            }, 300); // Smooth transition delay (optional)
         });
     </script>
 </head>
@@ -105,7 +71,6 @@
             </div>
         </div>
     </div>
-    @include('admin.layouts.navbar')
     <div class="main-content">
         @yield('content')
     </div>

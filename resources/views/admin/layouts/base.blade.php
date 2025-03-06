@@ -33,15 +33,12 @@
             min-height: 85vh;
         }
 
-        .page-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+        .main-content {
+            visibility: hidden;
         }
 
         .footer {
             margin-top: auto;
-            /* Ensures it stays at the bottom */
         }
 
         @media print {
@@ -80,10 +77,10 @@
     {{-- PAGE LOADER SCRIPT --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // hide the loader once the page has fully loaded
             setTimeout(() => {
                 document.querySelector(".page-center").style.display = "none";
-            }, 300); // smooth transition delay (optional)
+                document.querySelector(".main-content").style.visibility = "visible";
+            }, 300);
         });
     </script>
 </head>
@@ -105,8 +102,8 @@
             </div>
         </div>
     </div>
-    @include('admin.layouts.navbar')
     <div class="main-content">
+        @include('admin.layouts.navbar')
         @yield('content')
     </div>
     @include('admin.layouts.footer')

@@ -23,6 +23,64 @@
 
         body {
             font-feature-settings: "cv03", "cv04", "cv11";
+            background: url('{{ asset('storage/background/background.jpeg') }}') no-repeat center center;
+            background-size: cover;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('{{ asset('storage/background/background.jpeg') }}') no-repeat center center;
+            background-size: cover;
+            filter: blur(10px);
+            /* Start with blur */
+            opacity: 0;
+            animation: blurFadeIn 1.5s ease-in-out forwards;
+        }
+
+        .page-center {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInBackground {
+            from {
+                opacity: 0;
+                filter: blur(15px);
+            }
+
+            to {
+                opacity: 1;
+                filter: blur(0);
+            }
+        }
+
+        body,
+        body::before {
+            opacity: 0;
+            animation: fadeInBackground 1s ease-in-out forwards;
+            animation-delay: 0s;
         }
     </style>
 </head>
@@ -48,19 +106,19 @@
 @if (!request()->is('forgot-password'))
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Password Toggle Feature
+            // password toggle feature
             const passwordField = document.getElementById("password");
             const togglePassword = document.getElementById("toggle-password");
             const toggleIcon = togglePassword.querySelector("i");
 
             togglePassword.addEventListener("click", function(e) {
-                e.preventDefault(); // Prevent link jump
+                e.preventDefault(); // prevent link jump
                 if (passwordField.type === "password") {
-                    passwordField.type = "text"; // Show password
+                    passwordField.type = "text"; // show password
                     toggleIcon.classList.remove("ti-eye");
                     toggleIcon.classList.add("ti-eye-off");
                 } else {
-                    passwordField.type = "password"; // Hide password
+                    passwordField.type = "password"; // hide password
                     toggleIcon.classList.remove("ti-eye-off");
                     toggleIcon.classList.add("ti-eye");
                 }
@@ -146,7 +204,7 @@
             setTimeout(() => {
                 successModal.hide();
                 document.querySelector(".modal-backdrop-custom")?.remove();
-                window.location.href = "{{ route('login') }}";
+                window.location.href = "{{ route('admin.login') }}";
             }, 2000);
         });
     </script>

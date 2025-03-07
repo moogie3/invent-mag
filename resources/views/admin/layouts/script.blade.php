@@ -528,23 +528,40 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var errorModalElement = document.getElementById("errorModal");
-            var errorModal = new bootstrap.Modal(errorModalElement, {
-                backdrop: "static",
-                keyboard: false
-            });
+            var errorModal = new bootstrap.Modal(errorModalElement);
+            var backdropSelector = ".modal-backdrop-custom";
 
-            setTimeout(() => {
-                errorModal.show();
+            function removeBackdrop() {
+                document.querySelector(backdropSelector)?.remove();
+            }
+
+            function showModal(modal) {
+                document.body.style.overflow = "hidden"; // Prevent scrollbar flicker
+                modal.show();
                 document.body.insertAdjacentHTML("beforeend",
                     '<div class="modal-backdrop fade show modal-backdrop-custom"></div>');
-            }, 100);
+            }
 
-            setTimeout(() => {
-                errorModal.hide();
-                document.querySelector(".modal-backdrop-custom")?.remove();
-            }, 1800);
+            function hideModal(modal) {
+                modal.hide();
+                removeBackdrop();
+                document.body.style.overflow = ""; // Restore scrollbar
+            }
+
+            // Show error modal if it exists
+            if (errorModalElement) {
+                setTimeout(() => showModal(errorModal), 100);
+
+                setTimeout(() => hideModal(errorModal), 2000);
+
+                errorModalElement.addEventListener("hidden.bs.modal", () => {
+                    removeBackdrop();
+                    document.body.style.overflow = "";
+                });
+            }
         });
     </script>
+
 @endif
 {{-- SUCCESS MODAL --}}
 @if (session('success'))
@@ -572,17 +589,36 @@
         document.addEventListener("DOMContentLoaded", function() {
             var successModalElement = document.getElementById("successModal");
             var successModal = new bootstrap.Modal(successModalElement);
+            var backdropSelector = ".modal-backdrop-custom";
 
-            setTimeout(() => {
-                successModal.show();
+            function removeBackdrop() {
+                document.querySelector(backdropSelector)?.remove();
+            }
+
+            function showModal(modal) {
+                document.body.style.overflow = "hidden"; // Prevent scrollbar flicker
+                modal.show();
                 document.body.insertAdjacentHTML("beforeend",
                     '<div class="modal-backdrop fade show modal-backdrop-custom"></div>');
-            }, 100);
+            }
 
-            setTimeout(() => {
-                successModal.hide();
-                document.querySelector(".modal-backdrop-custom")?.remove();
-            }, 2000);
+            function hideModal(modal) {
+                modal.hide();
+                removeBackdrop();
+                document.body.style.overflow = ""; // Restore scrollbar
+            }
+
+            // Show success modal if it exists
+            if (successModalElement) {
+                setTimeout(() => showModal(successModal), 100);
+
+                setTimeout(() => hideModal(successModal), 2000);
+
+                successModalElement.addEventListener("hidden.bs.modal", () => {
+                    removeBackdrop();
+                    document.body.style.overflow = "";
+                });
+            }
         });
     </script>
 @endif

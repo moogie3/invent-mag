@@ -26,25 +26,10 @@
             background: url('{{ asset('storage/background/background.jpeg') }}') no-repeat center center;
             background-size: cover;
             height: 100vh;
-            align-items: center;
             justify-content: center;
             opacity: 0;
+            overflow: hidden;
             animation: fadeIn 1s ease-in-out forwards;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('{{ asset('storage/background/background.jpeg') }}') no-repeat center center;
-            background-size: cover;
-            filter: blur(10px);
-            /* Start with blur */
-            opacity: 0;
-            animation: blurFadeIn 1.5s ease-in-out forwards;
         }
 
         .page-center {
@@ -52,7 +37,12 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease-in-out forwards;
+            animation-delay: 0s;
         }
+
 
         @keyframes fadeIn {
             from {
@@ -64,23 +54,16 @@
             }
         }
 
-        @keyframes fadeInBackground {
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                filter: blur(15px);
+                transform: translateY(20px);
             }
 
             to {
                 opacity: 1;
-                filter: blur(0);
+                transform: translateY(0);
             }
-        }
-
-        body,
-        body::before {
-            opacity: 0;
-            animation: fadeInBackground 1s ease-in-out forwards;
-            animation-delay: 0s;
         }
     </style>
 </head>
@@ -154,19 +137,39 @@
         document.addEventListener("DOMContentLoaded", function() {
             var errorModalElement = document.getElementById("errorModal");
             var errorModal = new bootstrap.Modal(errorModalElement);
+            var backdropSelector = ".modal-backdrop-custom";
 
-            setTimeout(() => {
-                errorModal.show();
+            function removeBackdrop() {
+                document.querySelector(backdropSelector)?.remove();
+            }
+
+            function showModal(modal) {
+                document.body.style.overflow = "hidden"; // Prevent scrollbar flicker
+                modal.show();
                 document.body.insertAdjacentHTML("beforeend",
                     '<div class="modal-backdrop fade show modal-backdrop-custom"></div>');
-            }, 100);
+            }
 
-            setTimeout(() => {
-                errorModal.hide();
-                document.querySelector(".modal-backdrop-custom")?.remove();
-            }, 2000);
+            function hideModal(modal) {
+                modal.hide();
+                removeBackdrop();
+                document.body.style.overflow = ""; // Restore scrollbar
+            }
+
+            // Show error modal if it exists
+            if (errorModalElement) {
+                setTimeout(() => showModal(errorModal), 100);
+
+                setTimeout(() => hideModal(errorModal), 2000);
+
+                errorModalElement.addEventListener("hidden.bs.modal", () => {
+                    removeBackdrop();
+                    document.body.style.overflow = "";
+                });
+            }
         });
     </script>
+
 @endif
 {{-- SUCCESS MODAL --}}
 @if (session('success'))
@@ -194,18 +197,36 @@
         document.addEventListener("DOMContentLoaded", function() {
             var successModalElement = document.getElementById("successModal");
             var successModal = new bootstrap.Modal(successModalElement);
+            var backdropSelector = ".modal-backdrop-custom";
 
-            setTimeout(() => {
-                successModal.show();
+            function removeBackdrop() {
+                document.querySelector(backdropSelector)?.remove();
+            }
+
+            function showModal(modal) {
+                document.body.style.overflow = "hidden"; // Prevent scrollbar flicker
+                modal.show();
                 document.body.insertAdjacentHTML("beforeend",
                     '<div class="modal-backdrop fade show modal-backdrop-custom"></div>');
-            }, 100);
+            }
 
-            setTimeout(() => {
-                successModal.hide();
-                document.querySelector(".modal-backdrop-custom")?.remove();
-                window.location.href = "{{ route('admin.login') }}";
-            }, 2000);
+            function hideModal(modal) {
+                modal.hide();
+                removeBackdrop();
+                document.body.style.overflow = ""; // Restore scrollbar
+            }
+
+            // Show success modal if it exists
+            if (successModalElement) {
+                setTimeout(() => showModal(successModal), 100);
+
+                setTimeout(() => hideModal(successModal), 2000);
+
+                successModalElement.addEventListener("hidden.bs.modal", () => {
+                    removeBackdrop();
+                    document.body.style.overflow = "";
+                });
+            }
         });
     </script>
 @endif

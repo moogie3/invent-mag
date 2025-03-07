@@ -1,6 +1,6 @@
 <header class="navbar navbar-expand-md d-print-none nav-container">
     <div class="container-xl d-flex justify-content-between align-items-center">
-        <div class="d-flex" style="width: 150px;">
+        <div class="d-flex" style="width: 225px;">
             <!-- Hamburger Button for Mobile -->
             <button class="navbar-toggler d-md-none" type="button" id="mobile-menu-toggle">
                 <i class="ti ti-menu fs-2"></i>

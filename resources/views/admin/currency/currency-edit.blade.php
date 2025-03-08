@@ -67,13 +67,13 @@
                                                     value="{{ $setting->decimal_places }}" required>
                                             </div>
                                         </div>
+                                        <div class="card-footer bg-transparent mt-auto">
+                                            <div class="btn-list justify-content-end">
+                                                <button type="submit" class="btn btn-primary">Save
+                                                    Settings</button>
+                                            </div>
+                                        </div>
                                     </form>
-                                </div>
-                                <div class="card-footer bg-transparent mt-auto">
-                                    <div class="btn-list justify-content-end">
-                                        <button type="submit" class="btn btn-primary">Save
-                                            Settings</button>
-                                    </div>
                                 </div>
                             </div>
                         </div>

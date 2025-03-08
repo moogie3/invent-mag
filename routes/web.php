@@ -82,3 +82,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/sales/get-past-price', [SalesController::class, 'getPastPrice']);
     });
 });
+
+// Redirect root URL to admin login
+Route::get('/', function () {
+    return redirect('/admin/login');
+});

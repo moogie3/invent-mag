@@ -59,6 +59,7 @@ class SalesController extends Controller
                 'invoice' => 'required|string|unique:sales,invoice',
                 'customer_id' => 'required|exists:customers,id',
                 'order_date' => 'required|date',
+                'due_date' => 'required|date',
                 'products' => 'required|json',
             ]);
 
@@ -78,6 +79,7 @@ class SalesController extends Controller
                 'invoice' => $request->invoice,
                 'customer_id' => $request->customer_id,
                 'order_date' => $request->order_date,
+                'due_date' => $request->due_date,
                 'total' => $totalPrice,
             ]);
 

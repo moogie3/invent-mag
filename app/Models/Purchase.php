@@ -15,8 +15,8 @@ class Purchase extends Model
         'supplier_id',
         'order_date',
         'due_date',
-        'total',
         'payment_type',
+        'total',
         'status',
         'payment_date',
     ];

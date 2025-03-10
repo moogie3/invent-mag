@@ -14,6 +14,7 @@ class Sales extends Model
         'invoice',
         'customer_id',
         'order_date',
+        'due_date',
         'payment_type',
         'total',
         'status',
@@ -46,6 +47,7 @@ class Sales extends Model
     protected $casts = [
         'total' => 'float',
         'order_date' => 'datetime',
+        'due_date' => 'datetime',
         'payment_date' => 'datetime'
     ];
 }

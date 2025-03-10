@@ -31,6 +31,7 @@ class CustomerController extends Controller
             'name' => 'required',
             'address' => 'required',
             'phone_number' => 'required',
+            'payment_terms' => 'required',
         ]);
 
         $isCustomerExists = Customer::where('name', $request->name)->exists();
@@ -57,6 +58,7 @@ class CustomerController extends Controller
             'name' => 'required',
             'address' => 'required',
             'phone_number' => 'required',
+            'payment_terms' => 'required',
         ]);
 
         $customers = Customer::find($id);

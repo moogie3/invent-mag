@@ -138,6 +138,8 @@
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-orderdate">Order
                                                         Date</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-duedate">Due Date
+                                                </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-amount">Amount</th>
                                                 <th class="no-print"><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-payment">Payment
@@ -155,6 +157,10 @@
                                                     <td class="sort-customer">{{ $sale->customer->name }}</td>
                                                     <td class="sort-orderdate">{{ $sale->order_date->format('d F Y') }}
                                                     </td>
+                                                    <td class="sort-duedate"
+                                                        data-date="{{ $sale->due_date->format('Y-m-d') }}">
+                                                        {{ $sale->due_date->format('d F Y') }}
+                                                    </td>
                                                     <td class="sort-amount" data-amount="{{ $sale->total }}">
                                                         {{ \App\Helpers\CurrencyHelper::format($sale->total) }}<span
                                                             class="raw-amount"
@@ -164,7 +170,9 @@
                                                     <td class="sort-status">
                                                         @php
                                                             $today = now();
+                                                            $dueDate = $sale->due_date;
                                                             $paymentDate = $sale->payment_date;
+                                                            $diffDays = $today->diffInDays($dueDate, false);
 
                                                             if ($sale->status === 'Paid') {
                                                                 if ($paymentDate && $today->isSameDay($paymentDate)) {
@@ -172,6 +180,14 @@
                                                                 } else {
                                                                     echo '<span class="badge bg-success me-1"></span>Paid';
                                                                 }
+                                                            } elseif ($diffDays == 0) {
+                                                                echo '<span class="badge bg-danger me-1"></span>Due Today';
+                                                            } elseif ($diffDays > 0 && $diffDays <= 3) {
+                                                                echo '<span class="badge bg-danger me-1"></span>Due in 3 Days';
+                                                            } elseif ($diffDays > 3 && $diffDays <= 7) {
+                                                                echo '<span class="badge bg-warning me-1"></span>Due in 1 Week';
+                                                            } elseif ($diffDays < 0) {
+                                                                echo '<span class="badge bg-secondary me-1"></span>Overdue';
                                                             } else {
                                                                 echo '<span class="badge bg-info me-1"></span>Pending';
                                                             }

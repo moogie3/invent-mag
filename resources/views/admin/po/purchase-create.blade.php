@@ -106,7 +106,7 @@
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-price">Price</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-total">Amount</th>
-                                                <th style="width:200px;text-align:center" class="fs-4 py-3">Action</th>
+                                                <th style="width:100px;text-align:center" class="fs-4 py-3">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="productTableBody">

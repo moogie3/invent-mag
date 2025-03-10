@@ -46,6 +46,12 @@
                                             <input type="text" class="form-control" name="phone_number" id="phone_number"
                                                 placeholder="Phone number" value="{{ $customers->phone_number }}" />
                                         </div>
+                                        <div class="col-md-12 mb-3">
+                                            <label class="form-label">PAYMENT TERMS</label>
+                                            <input type="text" class="form-control" name="payment_terms"
+                                                id="payment_terms" placeholder="Payment terms"
+                                                value="{{ $customers->payment_terms }}" />
+                                        </div>
                                         <div class="text-end">
                                             <button type="submit"
                                                 class="btn btn-primary justify-content-right">Submit</button>

@@ -15,5 +15,6 @@ class Customer extends Model
         'name',
         'address',
         'phone_number',
+        'payment_terms'
     ];
 }

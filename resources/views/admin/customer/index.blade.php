@@ -92,6 +92,8 @@
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-phonenumber">Phone
                                                         Number</th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-phonenumber">Payment Terms</th>
                                                 <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">Action
                                                 </th>
                                             </tr>
@@ -103,6 +105,7 @@
                                                     <td class="sort-name">{{ $customer->name }}</td>
                                                     <td class="sort-address">{{ $customer->address }}</td>
                                                     <td class="sort-phonenumber">{{ $customer->phone_number }}</td>
+                                                    <td class="sort-paymentterms">{{ $customer->payment_terms }}</td>
                                                     <td class="no-print" style="text-align:center">
                                                         <div class="dropdown">
                                                             <button class="btn dropdown-toggle align-text-top"

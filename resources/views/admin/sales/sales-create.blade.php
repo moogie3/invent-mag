@@ -41,15 +41,23 @@
                                                     placeholder="Order date" />
                                             </div>
                                             <div class="col-md-2 mb-3">
-                                                <label class="form-label">CUSTOMER</label>
-                                                <select class="form-control" name="customer_id" id="customer_id">
-                                                    <option value="">Select Customer</option>
-                                                    @foreach ($customers as $customer)
-                                                        <option value="{{ $customer->id }}">
-                                                            {{ $customer->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                                <label class="form-label">DUE DATE</label>
+                                                <input type="date" class="form-control" name="due_date" id="due_date"
+                                                    placeholder="Due date" readonly />
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-2 mb-3">
+                                                    <label class="form-label">CUSTOMER</label>
+                                                    <select class="form-control" name="customer_id" id="customer_id">
+                                                        <option value="">Select Customer</option>
+                                                        @foreach ($customers as $customer)
+                                                            <option value="{{ $customer->id }}"
+                                                                data-payment-terms="{{ $customer->payment_terms }}">
+                                                                {{ $customer->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -84,7 +92,7 @@
                                                     placeholder="Price" disabled />
                                             </div>
                                             <div class="col-md-2 mb-3">
-                                                <label class="form-label">SELLING PRICE</label>
+                                                <label class="form-label">RETAIL SELLING PRICE</label>
                                                 <input type="text" class="form-control" name="selling_price"
                                                     id="selling_price" placeholder="Selling price" disabled />
                                             </div>

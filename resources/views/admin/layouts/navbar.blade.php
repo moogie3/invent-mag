@@ -27,8 +27,6 @@
                 <li><a href="{{ route('admin.product') }}"><i class="ti ti-package"></i>Product</a></li>
                 <li><a href="{{ route('admin.customer') }}"><i class="ti ti-users"></i>Customer</a></li>
                 <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-truck"></i>Supplier</a></li>
-                <li><a href="{{ route('admin.unit') }}"><i class="ti ti-ruler"></i>Units</a></li>
-                <li><a href="{{ route('admin.category') }}"><i class="ti ti-tag"></i>Category</a></li>
             </ul>
         </nav>
 
@@ -41,14 +39,12 @@
                 <li><a href="{{ route('admin.product') }}"><i class="ti ti-package"></i>Product</a></li>
                 <li><a href="{{ route('admin.customer') }}"><i class="ti ti-users"></i>Customer</a></li>
                 <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-truck"></i>Supplier</a></li>
-                <li><a href="{{ route('admin.unit') }}"><i class="ti ti-ruler"></i>Units</a></li>
-                <li><a href="{{ route('admin.category') }}"><i class="ti ti-tag"></i>Category</a></li>
                 <li><a href="?theme=light" class="hide-theme-light">
                         <i class="ti ti-sun"></i>Light Mode
                     </a><a href="?theme=dark" class="hide-theme-dark">
                         <i class="ti ti-moon"></i>Dark Mode
                     </a></li>
-                <li><a href="{{ route('admin.profile.edit') }}" class="dropdown-item"><i
+                <li><a href="{{ route('admin.setting.notifications') }}" class="dropdown-item"><i
                             class="ti ti-settings"></i>Settings</a></li>
                 <li><a href="#" class="dropdown-item"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
@@ -66,7 +62,7 @@
             <a href="?theme=light" class="nav-link px-2 hide-theme-light">
                 <i class="ti ti-sun fs-2"></i>
             </a>
-            <a href="{{ route('admin.notifications') }}" class="nav-link px-2 position-relative">
+            <a href="{{ route('admin.setting.notifications') }}" class="nav-link px-2 position-relative">
                 <i class="ti ti-bell fs-2"></i>
             </a>
             <div class="nav-item dropdown me-3">
@@ -141,7 +137,7 @@
                     @endif
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <a href="{{ route('admin.profile.edit') }}" class="dropdown-item">Settings</a>
+                    <a href="{{ route('admin.setting.profile.edit') }}" class="dropdown-item">Settings</a>
                     <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
                         @csrf
                     </form>

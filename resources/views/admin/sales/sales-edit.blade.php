@@ -36,7 +36,7 @@
                                     @csrf
                                     @method('PUT')
                                     @if ($sales->status !== 'Paid')
-                                        <fieldset class="form-fieldset">
+                                        <fieldset class="form-fieldset no-print">
                                             <div class="row">
                                                 <div class="col-md-2 mb-3">
                                                     <label class="form-label">PAYMENT TYPE</label>

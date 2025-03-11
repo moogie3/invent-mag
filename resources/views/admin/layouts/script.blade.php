@@ -4,6 +4,99 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+{{-- SCRIPT ONLY FOR ADMIN POS  --}}
+@if (request()->is('admin/pos/'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const productSelect = document.getElementById('product_id');
+            const quantityField = document.getElementById('quantity');
+            const newPriceField = document.getElementById('new_price');
+            const addProductButton = document.getElementById('addProduct');
+            const productTableBody = document.getElementById('productTableBody');
+            const totalPriceElement = document.getElementById('totalPrice');
+            const productsField = document.getElementById('productsField');
+
+            let products = JSON.parse(localStorage.getItem('poProducts')) || [];
+
+            function saveToLocalStorage() {
+                localStorage.setItem('poProducts', JSON.stringify(products));
+            }
+
+            function renderTable() {
+                productTableBody.innerHTML = '';
+                let total = 0;
+
+                products.forEach((product, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${product.name}</td>
+                        <td>${product.quantity}</td>
+                        <td>${formatCurrency(product.price)}</td>
+                        <td>${formatCurrency(product.total)}</td>
+                        <td><button class="btn btn-danger btn-sm removeProduct" data-index="${index}">Remove</button></td>
+                    `;
+                    productTableBody.appendChild(row);
+                    total += product.total;
+                });
+
+                totalPriceElement.innerText = formatCurrency(total);
+                productsField.value = JSON.stringify(products);
+
+                document.querySelectorAll('.removeProduct').forEach(button => {
+                    button.addEventListener('click', function() {
+                        products.splice(this.dataset.index, 1);
+                        saveToLocalStorage();
+                        renderTable();
+                    });
+                });
+            }
+
+            productSelect.addEventListener('change', function() {
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                newPriceField.value = selectedOption.getAttribute('data-price');
+            });
+
+            addProductButton.addEventListener('click', function() {
+                const productId = productSelect.value;
+                const productName = productSelect.options[productSelect.selectedIndex].text;
+                const quantity = parseInt(quantityField.value);
+                const price = parseFloat(newPriceField.value);
+                const total = price * quantity;
+
+                if (!productId || !quantity || !price) return alert('Complete all fields!');
+
+                const existingProduct = products.find(p => p.id == productId);
+                if (existingProduct) {
+                    existingProduct.quantity += quantity;
+                    existingProduct.total += total;
+                } else {
+                    products.push({
+                        id: productId,
+                        name: productName,
+                        quantity,
+                        price,
+                        total
+                    });
+                }
+
+                saveToLocalStorage();
+                renderTable();
+                productSelect.value = '';
+                quantityField.value = '';
+                newPriceField.value = '';
+            });
+
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR'
+                }).format(amount);
+            }
+
+            renderTable();
+        });
+    </script>
+@endif
 {{-- SCRIPT ONLY FOR SETTING PROFILE --}}
 @if (request()->is('admin/setting/profile'))
     <script>

@@ -28,14 +28,20 @@
                                 <div class="card-body">
                                     <h4 class="subheader">Business settings</h4>
                                     <div class="list-group list-group-transparent">
-                                        <a href="{{ route('admin.profile.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center active">My
-                                            Account</a>
-                                        <a href="{{ route('admin.notifications') }}"
+                                        <a href="{{ route('admin.setting.notifications') }}"
                                             class="list-group-item list-group-item-action d-flex align-items-center">My
                                             Notifications</a>
-                                        <a href="{{ route('admin.currency.edit') }}"
+                                        <a href="{{ route('admin.setting.profile.edit') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center active">Account
+                                            Settings</a>
+                                        <a href="{{ route('admin.setting.currency.edit') }}"
                                             class="list-group-item list-group-item-action d-flex align-items-center">Currency
+                                            Settings</a>
+                                        <a href="{{ route('admin.setting.unit') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center">Units
+                                            Settings</a>
+                                        <a href="{{ route('admin.setting.category') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center">Category
                                             Settings</a>
                                     </div>
                                 </div>
@@ -50,8 +56,8 @@
                                             Delete avatar
                                         </button>
                                     </div>
-                                    <form id="profileForm" action="{{ route('admin.profile.update') }}" method="POST"
-                                        enctype="multipart/form-data">
+                                    <form id="profileForm" action="{{ route('admin.setting.profile.update') }}"
+                                        method="POST" enctype="multipart/form-data">
                                         @method('PUT')
                                         @csrf
 
@@ -121,7 +127,8 @@
                                                 <button type="button" class="btn btn-secondary"
                                                     data-bs-dismiss="modal">Cancel</button>
                                                 <form id="delete-avatar-form"
-                                                    action="{{ route('admin.profile.delete-avatar') }}" method="POST">
+                                                    action="{{ route('admin.setting.profile.delete-avatar') }}"
+                                                    method="POST">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger">Delete</button>

@@ -28,24 +28,30 @@
                                 <div class="card-body">
                                     <h4 class="subheader">Business settings</h4>
                                     <div class="list-group list-group-transparent">
-                                        <a href="{{ route('admin.profile.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">My
-                                            Account</a>
-                                        <a href="{{ route('admin.notifications') }}"
+                                        <a href="{{ route('admin.setting.notifications') }}"
                                             class="list-group-item list-group-item-action d-flex align-items-center">My
                                             Notifications</a>
-                                        <a href="{{ route('admin.currency.edit') }}"
+                                        <a href="{{ route('admin.setting.profile.edit') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center">Account
+                                            Settings</a>
+                                        <a href="{{ route('admin.setting.currency.edit') }}"
                                             class="list-group-item list-group-item-action d-flex align-items-center active">Currency
+                                            Settings</a>
+                                        <a href="{{ route('admin.setting.unit') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center">Units
+                                            Settings</a>
+                                        <a href="{{ route('admin.setting.category') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center">Category
                                             Settings</a>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-12 col-md-9 d-flex flex-column">
                                 <div class="card-body">
-                                    <form action="{{ route('admin.currency.update') }}" method="POST">
+                                    <form action="{{ route('admin.setting.currency.update') }}" method="POST">
                                         @csrf
                                         <h2 class="mb-4">Currency Settings</h2>
-                                        <div class="row g-3">
+                                        <div class="row g-3 mb-3">
                                             <div class="col-md-6">
                                                 <label>Currency Symbol</label>
                                                 <input type="text" name="currency_symbol" class="form-control"

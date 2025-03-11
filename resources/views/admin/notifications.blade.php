@@ -28,21 +28,27 @@
                                 <div class="card-body">
                                     <h4 class="subheader">Business settings</h4>
                                     <div class="list-group list-group-transparent">
-                                        <a href="{{ route('admin.profile.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">My
-                                            Account</a>
-                                        <a href="{{ route('admin.notifications') }}"
+                                        <a href="{{ route('admin.setting.notifications') }}"
                                             class="list-group-item list-group-item-action d-flex align-items-center active">My
                                             Notifications</a>
-                                        <a href="{{ route('admin.currency.edit') }}"
+                                        <a href="{{ route('admin.setting.profile.edit') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center">My
+                                            Account</a>
+                                        <a href="{{ route('admin.setting.currency.edit') }}"
                                             class="list-group-item list-group-item-action d-flex align-items-center">Currency
+                                            Settings</a>
+                                        <a href="{{ route('admin.setting.unit') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center">Units
+                                            Settings</a>
+                                        <a href="{{ route('admin.setting.category') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center">Category
                                             Settings</a>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-12 col-md-9 d-flex flex-column">
                                 <div class="card-body">
-                                    <h3 class="card-title">Due Notes</h3>
+                                    <h2 class="mb-4">Due Invoice</h2>
                                     <div class="list-group">
                                         @php
                                             $hasNotifications = false;

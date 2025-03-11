@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\{
     CategoryController, CustomerController, ProductController, PurchaseController,
     SupplierController, UnitController, CurrencyController, DailySalesController,
-    SalesController, DashboardController, ProfileController, NotificationController
+    SalesController, DashboardController, ProfileController, NotificationController,
+    POSController
 };
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
@@ -45,13 +46,12 @@ Route::prefix('admin')->group(function () {
 
         $resources = [
             'product' => ProductController::class,
-            'category' => CategoryController::class,
-            'unit' => UnitController::class,
             'supplier' => SupplierController::class,
             'customer' => CustomerController::class,
             'po' => PurchaseController::class,
             'sales' => SalesController::class,
             'ds' => DailySalesController::class,
+            'pos' => POSController::class,
         ];
 
         foreach ($resources as $route => $controller) {
@@ -65,18 +65,36 @@ Route::prefix('admin')->group(function () {
             });
         }
 
-        Route::get('po/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('admin.product.details');
-        Route::get('sales/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('admin.product.details');
+        Route::get('po/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('admin.po.product.details');
+        Route::get('sales/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('admin.sales.product.details');
 
         // Settings
         Route::prefix('setting')->group(function () {
-            Route::get('/currency', [CurrencyController::class, 'edit'])->name('admin.currency.edit');
-            Route::post('/currency/update', [CurrencyController::class, 'update'])->name('admin.currency.update');
-            Route::get('/profile', [ProfileController::class, 'edit'])->name('admin.profile.edit');
-            Route::put('/profile/update', [ProfileController::class, 'update'])->name('admin.profile.update');
-            Route::delete('/profile/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.profile.delete-avatar');
-            Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
+            Route::get('/currency', [CurrencyController::class, 'edit'])->name('admin.setting.currency.edit');
+            Route::post('/currency/update', [CurrencyController::class, 'update'])->name('admin.setting.currency.update');
+            Route::get('/profile', [ProfileController::class, 'edit'])->name('admin.setting.profile.edit');
+            Route::put('/profile/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update');
+            Route::delete('/profile/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
+            Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.setting.notifications');
             Route::get('/notifications/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
+
+            Route::prefix('category')->group(function () {
+            Route::get('/', [CategoryController::class, 'index'])->name('admin.setting.category');
+            Route::get('/create', [CategoryController::class, 'create'])->name('admin.setting.category.create');
+            Route::post('/store', [CategoryController::class, 'store'])->name('admin.setting.category.store');
+            Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('admin.setting.category.edit');
+            Route::put('/update/{id}', [CategoryController::class, 'update'])->name('admin.setting.category.update');
+            Route::delete('/destroy/{id}', [CategoryController::class, 'destroy'])->name('admin.setting.category.destroy');
+            });
+
+            Route::prefix('unit')->group(function () {
+            Route::get('/', [UnitController::class, 'index'])->name('admin.setting.unit');
+            Route::get('/create', [UnitController::class, 'create'])->name('admin.setting.unit.create');
+            Route::post('/store', [UnitController::class, 'store'])->name('admin.setting.unit.store');
+            Route::get('/edit/{id}', [UnitController::class, 'edit'])->name('admin.setting.unit.edit');
+            Route::put('/update/{id}', [UnitController::class, 'update'])->name('admin.setting.unit.update');
+            Route::delete('/destroy/{id}', [UnitController::class, 'destroy'])->name('admin.setting.unit.destroy');
+            });
         });
 
         Route::get('/sales/get-past-price', [SalesController::class, 'getPastPrice']);

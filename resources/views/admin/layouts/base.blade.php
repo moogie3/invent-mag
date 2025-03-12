@@ -41,6 +41,36 @@
             margin-top: auto;
         }
 
+        #invoiceContainer {
+            display: flex;
+            flex-direction: column;
+            height: 560px;
+            /* Match the height of the product grid */
+        }
+
+        #productList {
+            flex-grow: 1;
+            /* Makes the list take up available space */
+            overflow-y: hidden;
+            /* Initially hides scrolling */
+            border: 1px solid gray;
+            /* Optional border for styling */
+            padding: 10px;
+        }
+
+        #productList:hover {
+            overflow-y: auto;
+            /* Enables scrolling only on hover */
+        }
+
+        #totalPriceContainer {
+            padding-top: 10px;
+            /* Adds some space above the total price */
+            background: white;
+            /* Ensures background consistency */
+        }
+
+
         @media print {
             .purchase-info {
                 display: grid;

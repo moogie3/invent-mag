@@ -13,7 +13,7 @@ class POSController extends Controller
     public function index()
     {
         $pos = Purchase::all();
-        $products = Product::all();
+        $products = Product::with('unit')->get();
         $customers = Customer::all();
         return view('admin.pos.index', compact('pos', 'customers', 'products'));
     }

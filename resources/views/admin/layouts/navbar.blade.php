@@ -27,6 +27,7 @@
                 <li><a href="{{ route('admin.product') }}"><i class="ti ti-package"></i>Product</a></li>
                 <li><a href="{{ route('admin.customer') }}"><i class="ti ti-users"></i>Customer</a></li>
                 <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-truck"></i>Supplier</a></li>
+                <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-building-warehouse"></i>Warehouse</a></li>
             </ul>
         </nav>
 
@@ -39,6 +40,7 @@
                 <li><a href="{{ route('admin.product') }}"><i class="ti ti-package"></i>Product</a></li>
                 <li><a href="{{ route('admin.customer') }}"><i class="ti ti-users"></i>Customer</a></li>
                 <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-truck"></i>Supplier</a></li>
+                <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-building-warehouse"></i>Warehouse</a></li>
                 <li><a href="?theme=light" class="hide-theme-light">
                         <i class="ti ti-sun"></i>Light Mode
                     </a><a href="?theme=dark" class="hide-theme-dark">

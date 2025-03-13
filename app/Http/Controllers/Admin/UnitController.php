@@ -15,17 +15,6 @@ class UnitController extends Controller
         return view('admin.unit.index', compact('units', 'entries','totalunit'));
     }
 
-    public function create(){
-        $units = Unit::all();
-        return view('admin.unit.unit-create', compact('units'));
-    }
-
-    public function edit($id)
-    {
-        $units = Unit::find($id);
-        return view('admin.unit.unit-edit', ['units' => $units]);
-    }
-
     public function store(Request $request){
         $data = $request->except("_token");
         $request->validate([
@@ -46,26 +35,26 @@ class UnitController extends Controller
 
         Unit::create($data);
 
-        return redirect()->route('admin.unit')->with('success','Unit created');
+        return redirect()->route('admin.setting.unit')->with('success','Unit created');
     }
 
     public function update(Request $request, $id){
         $data = $request->except("_token");
         $request->validate([
             'name' => 'required',
-            'code' => 'required',
+            'symbol' => 'required',
         ]);
 
         $units = Unit::find($id);
         $units->update($data);
-        return redirect()->route('admin.unit')->with('success', 'Unit updated');
+        return redirect()->route('admin.setting.unit')->with('success', 'Unit updated');
     }
 
     public function destroy($id)
     {
         Unit::find($id)->delete();
 
-        return redirect()->route('admin.unit')->with('success', 'Unit deleted');
+        return redirect()->route('admin.setting.unit')->with('success', 'Unit deleted');
     }
 
 }

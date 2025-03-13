@@ -7,7 +7,7 @@ use App\Http\Controllers\Admin\{
     CategoryController, CustomerController, ProductController, PurchaseController,
     SupplierController, UnitController, CurrencyController, DailySalesController,
     SalesController, DashboardController, ProfileController, NotificationController,
-    POSController
+    POSController, WarehouseController,
 };
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
@@ -51,6 +51,7 @@ Route::prefix('admin')->group(function () {
             'po' => PurchaseController::class,
             'sales' => SalesController::class,
             'ds' => DailySalesController::class,
+            'warehouse' => WarehouseController::class,
             'pos' => POSController::class,
         ];
 

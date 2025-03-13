@@ -15,18 +15,6 @@ class CategoryController extends Controller
         return view('admin.category.index', compact('categories', 'entries','totalcategory'));
     }
 
-
-    public function create(){
-        $categories = Categories::all();
-        return view('admin.category.category-create', compact('categories'));
-    }
-
-    public function edit($id)
-    {
-        $categories = Categories::find($id);
-        return view('admin.category.category-edit', ['categories' => $categories]);
-    }
-
     public function store(Request $request){
         $data = $request->except("_token");
         $request->validate([
@@ -47,7 +35,7 @@ class CategoryController extends Controller
 
         Categories::create($data);
 
-        return redirect()->route('admin.category')->with('success','Category created');
+        return redirect()->route('admin.setting.category')->with('success','Category created');
     }
 
     public function update(Request $request, $id){
@@ -59,13 +47,13 @@ class CategoryController extends Controller
 
         $categories = Categories::find($id);
         $categories->update($data);
-        return redirect()->route('admin.category')->with('success', 'Category updated');
+        return redirect()->route('admin.setting.category')->with('success', 'Category updated');
     }
 
     public function destroy($id)
     {
         Categories::find($id)->delete();
 
-        return redirect()->route('admin.category')->with('success', 'Category deleted');
+        return redirect()->route('admin.setting.category')->with('success', 'Category deleted');
     }
 }

@@ -24,11 +24,6 @@
                                 <form enctype="multipart/form-data" method="POST" action="{{ route('admin.po.store') }}"
                                     id="invoiceForm">
                                     @csrf
-                                    <div class="d-flex align-items-center">
-                                        <label for="order_date" class="me-2">ORDER DATE :</label>
-                                        <input type="datetime-local" class="form-control" name="order_date" id="order_date"
-                                            value="{{ date('Y-m-d\TH:i') }}" style="width: 200px;" readonly />
-                                    </div>
                                     <input type="hidden" name="products" id="productsField">
                                     <div class="row mt-3">
                                         <div class="col-md-6">

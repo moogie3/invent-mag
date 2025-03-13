@@ -21,26 +21,28 @@
         <nav class="nav-dropdown d-none d-md-flex" id="nav-dropdown">
             <ul class="d-flex gap-3">
                 <li><a href="{{ route('admin.dashboard') }}"><i class="ti ti-home"></i>Dashboard</a></li>
+                <li><a href="{{ route('admin.pos') }}"><i class="ti ti-cash"></i>POS</a></li>
                 <li><a href="{{ route('admin.ds') }}"><i class="ti ti-calendar"></i>Daily Sales</a></li>
                 <li><a href="{{ route('admin.sales') }}"><i class="ti ti-shopping-cart"></i>Sales</a></li>
                 <li><a href="{{ route('admin.po') }}"><i class="ti ti-file-invoice"></i>Purchase Order</a></li>
                 <li><a href="{{ route('admin.product') }}"><i class="ti ti-package"></i>Product</a></li>
                 <li><a href="{{ route('admin.customer') }}"><i class="ti ti-users"></i>Customer</a></li>
                 <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-truck"></i>Supplier</a></li>
-                <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-building-warehouse"></i>Warehouse</a></li>
+                <li><a href="{{ route('admin.warehouse') }}"><i class="ti ti-building-warehouse"></i>Warehouse</a></li>
             </ul>
         </nav>
 
         <div class="mobile-nav d-md-none" id="mobile-nav">
             <ul>
                 <li><a href="{{ route('admin.dashboard') }}"><i class="ti ti-home"></i>Dashboard</a></li>
+                <li><a href="{{ route('admin.pos') }}"><i class="ti ti-cash"></i>POS</a></li>
                 <li><a href="{{ route('admin.ds') }}"><i class="ti ti-calendar"></i>Daily Sales</a></li>
                 <li><a href="{{ route('admin.sales') }}"><i class="ti ti-shopping-cart"></i>Sales</a></li>
                 <li><a href="{{ route('admin.po') }}"><i class="ti ti-file-invoice"></i>Purchase Order</a></li>
                 <li><a href="{{ route('admin.product') }}"><i class="ti ti-package"></i>Product</a></li>
                 <li><a href="{{ route('admin.customer') }}"><i class="ti ti-users"></i>Customer</a></li>
                 <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-truck"></i>Supplier</a></li>
-                <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-building-warehouse"></i>Warehouse</a></li>
+                <li><a href="{{ route('admin.warehouse') }}"><i class="ti ti-building-warehouse"></i>Warehouse</a></li>
                 <li><a href="?theme=light" class="hide-theme-light">
                         <i class="ti ti-sun"></i>Light Mode
                     </a><a href="?theme=dark" class="hide-theme-dark">

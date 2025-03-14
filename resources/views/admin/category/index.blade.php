@@ -25,26 +25,7 @@
                     <div class="card">
                         <div class="row g-0">
                             <div class="col-12 col-md-3 border-end">
-                                <div class="card-body">
-                                    <h4 class="subheader">Business settings</h4>
-                                    <div class="list-group list-group-transparent">
-                                        <a href="{{ route('admin.setting.notifications') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">My
-                                            Notifications</a>
-                                        <a href="{{ route('admin.setting.profile.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Account
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.currency.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Currency
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.unit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Units
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.category') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center active">Category
-                                            Settings</a>
-                                    </div>
-                                </div>
+                                @include('admin.layouts.menu')
                             </div>
                             <div class="col-12 col-md-9 d-flex flex-column">
                                 <div class="row row-deck row-cards">
@@ -115,13 +96,14 @@
                                                                                 Actions
                                                                             </button>
                                                                             <div class="dropdown-menu">
-                                                                                <button type="button" class="dropdown-item"
+                                                                                <a href="#" class="dropdown-item"
                                                                                     data-bs-toggle="modal"
                                                                                     data-bs-target="#editCategoryModal"
-                                                                                    onclick="editCategory({{ $category->id }}, '{{ $category->name }}', '{{ $category->description }}', '{{ route('admin.setting.category.update', $category->id) }}')">
-                                                                                    <i class="ti ti-zoom-scan me-2"></i>
-                                                                                    View
-                                                                                </button>
+                                                                                    data-id="{{ $category->id }}"
+                                                                                    data-name="{{ $category->name }}"
+                                                                                    data-description="{{ $category->description }}">
+                                                                                    <i class="ti ti-edit me-2"></i> Edit
+                                                                                </a>
 
                                                                                 <button type="button"
                                                                                     class="dropdown-item text-danger"
@@ -224,16 +206,18 @@
                                                             @csrf
                                                             @method('PUT')
                                                             <div class="modal-body">
+                                                                <input type="hidden" id="categoryId" name="id">
                                                                 <div class="mb-3">
-                                                                    <label for="edit-name" class="form-label">Name</label>
+                                                                    <label for="categoryNameEdit"
+                                                                        class="form-label">Name</label>
                                                                     <input type="text" class="form-control"
-                                                                        id="edit-name" name="name">
+                                                                        id="categoryNameEdit" name="name">
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="edit-description"
+                                                                    <label for="categoryDescriptionEdit"
                                                                         class="form-label">Description</label>
                                                                     <input type="text" class="form-control"
-                                                                        id="edit-description" name="description">
+                                                                        id="categoryDescriptionEdit" name="description">
                                                                 </div>
                                                             </div>
                                                             <div class="modal-footer">
@@ -270,11 +254,3 @@
         </div>
     </div>
 @endsection
-
-<script>
-    function editCategory(id, name, description, updateUrl) {
-        document.getElementById('edit-name').value = name;
-        document.getElementById('edit-description').value = description;
-        document.getElementById('editCategoryForm').action = updateUrl;
-    }
-</script>

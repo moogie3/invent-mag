@@ -15,17 +15,6 @@ class CustomerController extends Controller
         return view ('admin.customer.index', compact('customers','entries','totalcustomer'));
     }
 
-    public function create(){
-        $customers = Customer::all();
-        return view ('admin.customer.customer-create', compact('customers'));
-    }
-
-    public function edit($id)
-    {
-        $customers = Customer::find($id);
-        return view('admin.customer.customer-edit', ['customers' => $customers]);
-    }
-
     public function store(Request $request) {
         $request->validate([
             'name' => 'required',

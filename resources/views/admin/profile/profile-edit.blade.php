@@ -25,26 +25,7 @@
                     <div class="card">
                         <div class="row g-0">
                             <div class="col-12 col-md-3 border-end">
-                                <div class="card-body">
-                                    <h4 class="subheader">Business settings</h4>
-                                    <div class="list-group list-group-transparent">
-                                        <a href="{{ route('admin.setting.notifications') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">My
-                                            Notifications</a>
-                                        <a href="{{ route('admin.setting.profile.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center active">Account
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.currency.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Currency
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.unit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Units
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.category') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Category
-                                            Settings</a>
-                                    </div>
-                                </div>
+                                @include('admin.layouts.menu') <!-- Include the new menu component -->
                             </div>
                             <div class="col-12 col-md-9 d-flex flex-column">
                                 <div class="card-body">
@@ -138,8 +119,6 @@
                                     </div>
                                 </div>
 
-
-
                                 <div class="card-footer bg-transparent mt-auto">
                                     <div class="btn-list justify-content-end">
                                         <a href="#" class="btn">Cancel</a>
@@ -199,24 +178,6 @@
             let currentPasswordInput = document.getElementById('modal_current_password').value;
             document.getElementById('current_password').value = currentPasswordInput;
             document.getElementById('profileForm').submit();
-        }
-    </script>
-
-    <script>
-        function togglePasswordModal() {
-            let newPassword = document.getElementById('new_password').value;
-            let confirmContainer = document.getElementById('confirmPasswordContainer');
-            confirmContainer.style.display = newPassword ? 'block' : 'none';
-        }
-
-        function showPasswordModal() {
-            let newPassword = document.getElementById('new_password').value;
-            if (newPassword) {
-                let modal = new bootstrap.Modal(document.getElementById('passwordModal'));
-                modal.show();
-            } else {
-                document.getElementById('profileForm').submit();
-            }
         }
     </script>
 @endsection

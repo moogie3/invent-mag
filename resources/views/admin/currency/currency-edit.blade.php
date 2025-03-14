@@ -25,26 +25,7 @@
                     <div class="card">
                         <div class="row g-0">
                             <div class="col-12 col-md-3 border-end">
-                                <div class="card-body">
-                                    <h4 class="subheader">Business settings</h4>
-                                    <div class="list-group list-group-transparent">
-                                        <a href="{{ route('admin.setting.notifications') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">My
-                                            Notifications</a>
-                                        <a href="{{ route('admin.setting.profile.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Account
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.currency.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center active">Currency
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.unit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Units
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.category') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Category
-                                            Settings</a>
-                                    </div>
-                                </div>
+                                @include('admin.layouts.menu')
                             </div>
                             <div class="col-12 col-md-9 d-flex flex-column">
                                 <div class="card-body">

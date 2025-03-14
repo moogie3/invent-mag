@@ -19,17 +19,6 @@ class SupplierController extends Controller
         return view ('admin.supplier.index', compact('suppliers','entries','totalsupplier','inCount','outCount'));
     }
 
-    public function create(){
-        $suppliers = Supplier::all();
-        return view('admin.supplier.supplier-create', compact('suppliers'));
-    }
-
-    public function edit($id)
-    {
-        $suppliers = Supplier::find($id);
-        return view('admin.supplier.supplier-edit', ['suppliers' => $suppliers]);
-    }
-
     public function store(Request $request){
         $request->validate([
             'code' => 'required',

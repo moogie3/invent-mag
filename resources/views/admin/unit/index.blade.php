@@ -25,26 +25,7 @@
                     <div class="card">
                         <div class="row g-0">
                             <div class="col-12 col-md-3 border-end">
-                                <div class="card-body">
-                                    <h4 class="subheader">Business settings</h4>
-                                    <div class="list-group list-group-transparent">
-                                        <a href="{{ route('admin.setting.notifications') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">My
-                                            Notifications</a>
-                                        <a href="{{ route('admin.setting.profile.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Account
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.currency.edit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Currency
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.unit') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center active">Units
-                                            Settings</a>
-                                        <a href="{{ route('admin.setting.category') }}"
-                                            class="list-group-item list-group-item-action d-flex align-items-center">Category
-                                            Settings</a>
-                                    </div>
-                                </div>
+                                @include('admin.layouts.menu')
                             </div>
                             <div class="col-12 col-md-9 d-flex flex-column">
                                 <div class="row row-deck row-cards">
@@ -74,7 +55,7 @@
                                                         <div class="btn-list">
                                                             <button type="button" class="btn btn-primary"
                                                                 data-bs-toggle="modal" data-bs-target="#createUnitModal">
-                                                                <i class="ti ti-plus fs-4"></i> Create Warehouse
+                                                                <i class="ti ti-plus fs-4"></i> Create Unit
                                                             </button>
                                                         </div>
                                                     </div>
@@ -118,9 +99,12 @@
                                                                                 <a href="#" class="dropdown-item"
                                                                                     data-bs-toggle="modal"
                                                                                     data-bs-target="#editUnitModal"
-                                                                                    onclick="editUnit({{ $unit->id }}, '{{ $unit->symbol }}', '{{ $unit->name }}')">
+                                                                                    data-id="{{ $unit->id }}"
+                                                                                    data-symbol="{{ $unit->symbol }}"
+                                                                                    data-name="{{ $unit->name }}">
                                                                                     <i class="ti ti-edit me-2"></i> Edit
                                                                                 </a>
+
 
                                                                                 <button type="button"
                                                                                     class="dropdown-item text-danger"
@@ -154,8 +138,7 @@
                                                         <div class="modal-body text-center">
                                                             <i
                                                                 class="ti ti-alert-circle icon text-danger icon-lg mb-10"></i>
-                                                            <p class="mt-3">Are you sure you want to delete this
-                                                                unit?</p>
+                                                            <p class="mt-3">Are you sure you want to delete this unit?</p>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
@@ -208,7 +191,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Edit Unit Modal -->
                                             <div class="modal fade" id="editUnitModal" tabindex="-1"
                                                 aria-labelledby="editUnitModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
@@ -223,7 +205,6 @@
                                                             @method('PUT')
                                                             <div class="modal-body">
                                                                 <input type="hidden" id="unitId" name="id">
-
                                                                 <div class="mb-3">
                                                                     <label for="unitSymbolEdit"
                                                                         class="form-label">Code</label>
@@ -271,16 +252,3 @@
         </div>
     </div>
 @endsection
-
-<script>
-    function editUnit(id, symbol, name) {
-        // Set form action dynamically
-        let form = document.getElementById('editUnitForm');
-        form.action = "{{ route('admin.setting.unit.update', ':id') }}".replace(':id', id);
-
-        // Set input field values
-        document.getElementById('unitId').value = id;
-        document.getElementById('unitSymbolEdit').value = symbol;
-        document.getElementById('unitNameEdit').value = name;
-    }
-</script>

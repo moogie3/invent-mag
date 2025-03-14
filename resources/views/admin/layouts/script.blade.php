@@ -567,6 +567,161 @@
         };
     </script>
 @endif
+{{-- SCRIPT FOR WAREHOUSE --}}
+@if (request()->is('admin/warehouse'))
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const editWarehouseModal = document.getElementById("editWarehouseModal");
+
+            editWarehouseModal.addEventListener("show.bs.modal", function(event) {
+                // Get the button that triggered the modal
+                const button = event.relatedTarget;
+
+                // Get warehouse data from the button attributes
+                const warehouseId = button.getAttribute("data-id");
+                const warehouseName = button.getAttribute("data-name");
+                const warehouseAddress = button.getAttribute("data-address");
+                const warehouseDescription = button.getAttribute("data-description");
+
+                // Populate the form fields inside the modal
+                document.getElementById("warehouseId").value = warehouseId;
+                document.getElementById("warehouseNameEdit").value = warehouseName;
+                document.getElementById("warehouseAddressEdit").value = warehouseAddress;
+                document.getElementById("warehouseDescriptionEdit").value = warehouseDescription;
+
+                // Set the form action dynamically
+                document.getElementById("editWarehouseForm").action =
+                    "{{ route('admin.warehouse.update', '') }}/" + warehouseId;
+            });
+        });
+    </script>
+@endif
+{{-- SCRIPT FOR UNIT --}}
+@if (request()->is('admin/setting/unit'))
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const editUnitModal = document.getElementById("editUnitModal");
+
+            editUnitModal.addEventListener("show.bs.modal", function(event) {
+                // Get the button that triggered the modal
+                const button = event.relatedTarget;
+
+                // Get unit data from the button attributes
+                const unitId = button.getAttribute("data-id");
+                const unitSymbol = button.getAttribute("data-symbol");
+                const unitName = button.getAttribute("data-name");
+
+                // Populate the form fields inside the modal
+                document.getElementById("unitId").value = unitId;
+                document.getElementById("unitSymbolEdit").value = unitSymbol;
+                document.getElementById("unitNameEdit").value = unitName;
+
+                // Set the form action dynamically
+                document.getElementById("editUnitForm").action =
+                    "{{ route('admin.setting.unit.update', '') }}/" + unitId;
+            });
+        });
+    </script>
+@endif
+{{-- SCRIPT FOR CATEGORY --}}
+@if (request()->is('admin/setting/category'))
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const editCategoryModal = document.getElementById("editCategoryModal");
+
+            editCategoryModal.addEventListener("show.bs.modal", function(event) {
+                // Get the button that triggered the modal
+                const button = event.relatedTarget;
+
+                // Get category data from the button attributes
+                const categoryId = button.getAttribute("data-id");
+                const categoryName = button.getAttribute("data-name");
+                const categoryDescription = button.getAttribute("data-description");
+
+                // Populate the form fields inside the modal
+                document.getElementById("categoryId").value = categoryId;
+                document.getElementById("categoryNameEdit").value = categoryName;
+                document.getElementById("categoryDescriptionEdit").value = categoryDescription;
+
+                // Set the form action dynamically
+                document.getElementById("editCategoryForm").action =
+                    "{{ route('admin.setting.category.update', '') }}/" + categoryId;
+            });
+        });
+    </script>
+@endif
+{{-- SCRIPT FOR SUPPLIER --}}
+@if (request()->is('admin/supplier'))
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const editSupplierModal = document.getElementById("editSupplierModal");
+
+            editSupplierModal.addEventListener("show.bs.modal", function(event) {
+                const button = event.relatedTarget;
+
+                if (!button) return; // Prevent errors if button is null
+
+                // Get supplier data from the button attributes
+                const supplierId = button.getAttribute("data-id") || "";
+                const supplierCode = button.getAttribute("data-code") || "";
+                const supplierName = button.getAttribute("data-name") || "";
+                const supplierAddress = button.getAttribute("data-address") || "";
+                const supplierPhone = button.getAttribute("data-phone_number") || "";
+                const supplierLocation = button.getAttribute("data-location") || "";
+                const supplierPayment = button.getAttribute("data-payment_terms") || "";
+
+                // Populate the form fields inside the modal
+                document.getElementById("supplierId").value = supplierId;
+                if (document.getElementById("supplierCodeEdit")) {
+                    document.getElementById("supplierCodeEdit").value = supplierCode;
+                }
+                document.getElementById("supplierNameEdit").value = supplierName;
+                document.getElementById("supplierAddressEdit").value = supplierAddress;
+                document.getElementById("supplierPhoneEdit").value = supplierPhone;
+                document.getElementById("supplierLocationEdit").value = supplierLocation;
+                document.getElementById("supplierPaymentTermsEdit").value = supplierPayment;
+
+                // Set the form action dynamically
+                document.getElementById("editSupplierForm").action =
+                    "{{ route('admin.supplier.update', '') }}/" + supplierId;
+            });
+        });
+    </script>
+@endif
+{{-- SCRIPT FOR CUSTOMER --}}
+@if (request()->is('admin/customer'))
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const editCustomerModal = document.getElementById("editCustomerModal");
+
+            editCustomerModal.addEventListener("show.bs.modal", function(event) {
+                const button = event.relatedTarget;
+
+                if (!button) return; // Prevent errors if button is null
+
+                // Get supplier data from the button attributes
+                const customerId = button.getAttribute("data-id") || "";
+                const customerCode = button.getAttribute("data-code") || "";
+                const customerName = button.getAttribute("data-name") || "";
+                const customerAddress = button.getAttribute("data-address") || "";
+                const customerPhone = button.getAttribute("data-phone_number") || "";
+                const customerLocation = button.getAttribute("data-location") || "";
+                const customerPayment = button.getAttribute("data-payment_terms") || "";
+
+                // Populate the form fields inside the modal
+                document.getElementById("customerId").value = customerId;
+                document.getElementById("customerNameEdit").value = customerName;
+                document.getElementById("customerAddressEdit").value = customerAddress;
+                document.getElementById("customerPhoneEdit").value = customerPhone;
+                document.getElementById("customerPaymentTermsEdit").value = customerPayment;
+
+                // Set the form action dynamically
+                document.getElementById("editCustomerForm").action =
+                    "{{ route('admin.customer.update', '') }}/" + customerId;
+            });
+        });
+    </script>
+@endif
 {{-- SCRIPT FOR SORTING TABLE --}}
 @if (request()->is(
         'admin/ds',
@@ -762,31 +917,4 @@
     function setDeleteFormAction(action) {
         document.getElementById('deleteForm').setAttribute('action', action);
     }
-</script>
-{{-- SCRIPT FOR WAREHOUSE --}}
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const editWarehouseModal = document.getElementById("editWarehouseModal");
-
-        editWarehouseModal.addEventListener("show.bs.modal", function(event) {
-            // Get the button that triggered the modal
-            const button = event.relatedTarget;
-
-            // Get warehouse data from the button attributes
-            const warehouseId = button.getAttribute("data-id");
-            const warehouseName = button.getAttribute("data-name");
-            const warehouseAddress = button.getAttribute("data-address");
-            const warehouseDescription = button.getAttribute("data-description");
-
-            // Populate the form fields inside the modal
-            document.getElementById("warehouseId").value = warehouseId;
-            document.getElementById("warehouseNameEdit").value = warehouseName;
-            document.getElementById("warehouseAddressEdit").value = warehouseAddress;
-            document.getElementById("warehouseDescriptionEdit").value = warehouseDescription;
-
-            // Set the form action dynamically
-            document.getElementById("editWarehouseForm").action =
-                "{{ route('admin.warehouse.update', '') }}/" + warehouseId;
-        });
-    });
 </script>

@@ -75,6 +75,14 @@ class PurchaseController extends Controller
         return view('admin.po.purchase-edit', compact('pos', 'suppliers', 'items'));
     }
 
+    public function view($id)
+    {
+        $pos = Purchase::with(['items', 'supplier'])->find($id);
+        $suppliers = Supplier::all();
+        $items = POItem::all();
+        return view('admin.po.purchase-view', compact('pos', 'suppliers', 'items'));
+    }
+
     public function store(Request $request)
     {
         try {

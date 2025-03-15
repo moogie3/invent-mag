@@ -27,7 +27,7 @@
                                     <input type="hidden" name="products" id="productsField">
                                     <div class="row mt-3">
                                         <div class="col-md-6">
-                                            <h2>Product List</h2>
+                                            <h1>Product List</h1>
                                             <div class="input-group mb-3">
                                                 <input type="text" class="form-control" id="searchProduct"
                                                     placeholder="Search Product">

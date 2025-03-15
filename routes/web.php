@@ -61,6 +61,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/create', [$controller, 'create'])->name("admin.$route.create");
                 Route::post('/store', [$controller, 'store'])->name("admin.$route.store");
                 Route::get('/edit/{id}', [$controller, 'edit'])->name("admin.$route.edit");
+                Route::get('/view/{id}', [$controller, 'view'])->name("admin.$route.view");
                 Route::put('/update/{id}', [$controller, 'update'])->name("admin.$route.update");
                 Route::delete('/destroy/{id}', [$controller, 'destroy'])->name("admin.$route.destroy");
             });

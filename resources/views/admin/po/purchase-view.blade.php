@@ -10,7 +10,7 @@
                     <div class="col">
                         @if ($pos->status == 'Unpaid')
                             <div class="page-pretitle">Overview</div>
-                            <h2 class="page-title no-print">Edit Purchase Order</h2>
+                            <h2 class="page-title no-print">View Purchase Order</h2>
                         @else
                             <div class="page-pretitle">Overview</div>
                             <h2 class="page-title no-print">PO Invoice Information</h2>
@@ -20,6 +20,7 @@
                         <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">
                             Export Invoice
                         </button>
+                        <a href="{{ route('admin.po.edit', $pos->id) }}" class="btn btn-primary">Edit Invoice</a>
                     </div>
                 </div>
             </div>
@@ -35,6 +36,7 @@
                                     action="{{ route('admin.po.update', $pos->id) }}">
                                     @csrf
                                     @method('PUT')
+                                    <h1 class="text-center">Invoice Information</h1>
                                     @if ($pos->status !== 'Paid')
                                         <fieldset class="form-fieldset no-print">
                                             <div class="row">
@@ -62,11 +64,9 @@
                                                             Unpaid</option>
                                                     </select>
                                                 </div>
-                                                @if ($pos->status !== 'Paid')
-                                                    <div class="col-md-9 mb-3 mt-4 text-end">
-                                                        <button type="submit" class="btn btn-success">Save</button>
-                                                    </div>
-                                                @endif
+                                                <div class="col-md-9 mb-3 mt-4 text-end">
+                                                    <button type="submit" class="btn btn-success">Save</button>
+                                                </div>
                                             </div>
                                         </fieldset>
                                     @endif
@@ -111,7 +111,7 @@
                                                                 <tr>
                                                                     <th class="text-center" style="width: 1%">No</th>
                                                                     <th>Product</th>
-                                                                    <th class="text-center" style="width: 10%">QTY</th>
+                                                                    <th class="text-center" style="width: 1%">QTY</th>
                                                                     <th class="text-end" style="width: 20%">Unit</th>
                                                                     <th class="text-end" style="width: 20%">Amount</th>
                                                                 </tr>
@@ -124,24 +124,12 @@
                                                                             <p class="strong mb-1">
                                                                                 {{ $item->product->name }}</p>
                                                                         </td>
-                                                                        <td>
-                                                                            <input type="number"
-                                                                                name="items[{{ $index }}][quantity]"
-                                                                                value="{{ $item->quantity }}"
-                                                                                class="form-control" style="width: 100%;" />
+                                                                        <td>{{ $item->quantity }}</td>
+                                                                        <td class="text-end">
+                                                                            {{ \App\Helpers\CurrencyHelper::format($item->price) }}
                                                                         </td>
                                                                         <td class="text-end">
-                                                                            <input type="text"
-                                                                                name="items[{{ $index }}][price]"
-                                                                                value="{{ $item->price }}"
-                                                                                class="form-control" style="width: 100%;" />
-                                                                        </td>
-                                                                        <td class="text-end">
-                                                                            <input type="text"
-                                                                                name="items[{{ $index }}][amount]"
-                                                                                value="{{ $item->quantity * $item->price }}"
-                                                                                class="form-control" readonly
-                                                                                style="width: 100%;" />
+                                                                            {{ \App\Helpers\CurrencyHelper::format($item->quantity * $item->price) }}
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach

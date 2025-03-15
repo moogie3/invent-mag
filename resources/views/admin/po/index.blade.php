@@ -243,7 +243,7 @@
                                                                 Actions
                                                             </button>
                                                             <div class="dropdown-menu">
-                                                                <a href="{{ route('admin.po.edit', $po->id) }}"
+                                                                <a href="{{ route('admin.po.view', $po->id) }}"
                                                                     class="dropdown-item">
                                                                     <i class="ti ti-zoom-scan me-2"></i> View
                                                                 </a>

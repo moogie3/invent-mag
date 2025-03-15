@@ -32,25 +32,12 @@
                                     <div class="col-md-12">
                                         <div class="card card-primary">
                                             <div class="card-body border-bottom py-3">
-                                                <h2 class="mb-4">Category</h2>
+                                                <h2 class="mb-4">
+                                                    <i class="ti ti-category fs-2"></i>
+                                                    Total Category :
+                                                    <strong>{{ $totalcategory }}</strong>
+                                                </h2>
                                                 <div class="d-flex justify-content-between">
-                                                    <div class="col-md-5">
-                                                        <div class="card">
-                                                            <div class="card-body">
-                                                                <div class="row">
-                                                                    <div class="col-md-6">
-                                                                        <span
-                                                                            class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                                                            <i class="ti ti-category fs-2"></i>
-                                                                        </span>
-                                                                        Total Category :
-                                                                        <strong>{{ $totalcategory }}</strong>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
                                                     <div class="col-auto ms-auto">
                                                         <div class="btn-list">
                                                             <button type="button" class="btn btn-primary"

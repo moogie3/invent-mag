@@ -118,7 +118,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="card-footer bg-transparent mt-auto">
                                     <div class="btn-list justify-content-end">
                                         <a href="#" class="btn">Cancel</a>
@@ -134,7 +133,6 @@
         </div>
     </div>
 
-    <!-- Password Confirmation Modal -->
     <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -156,28 +154,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function togglePasswordModal() {
-            let newPassword = document.getElementById('new_password').value;
-            let confirmContainer = document.getElementById('confirmPasswordContainer');
-            confirmContainer.style.display = newPassword ? 'block' : 'none';
-        }
-
-        function showPasswordModal() {
-            let newPassword = document.getElementById('new_password').value;
-            if (newPassword) {
-                let modal = new bootstrap.Modal(document.getElementById('passwordModal'));
-                modal.show();
-            } else {
-                document.getElementById('profileForm').submit();
-            }
-        }
-
-        function submitProfileForm() {
-            let currentPasswordInput = document.getElementById('modal_current_password').value;
-            document.getElementById('current_password').value = currentPasswordInput;
-            document.getElementById('profileForm').submit();
-        }
-    </script>
 @endsection

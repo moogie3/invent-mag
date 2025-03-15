@@ -4,7 +4,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
-{{-- SCRIPT ONLY FOR ADMIN POS  --}}
+{{-- SCRIPT FOR ADMIN POS  --}}
 @if (request()->is('admin/pos/'))
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -97,7 +97,7 @@
         });
     </script>
 @endif
-{{-- SCRIPT ONLY FOR SETTING PROFILE --}}
+{{-- SCRIPT FOR SETTING PROFILE --}}
 @if (request()->is('admin/setting/profile'))
     <script>
         function togglePasswordModal() {
@@ -145,7 +145,7 @@
         }
     </script>
 @endif
-{{-- SCRIPT ONLY FOR ADMIN SALES CREATE --}}
+{{-- SCRIPT FOR ADMIN SALES CREATE --}}
 @if (request()->is('admin/sales/create'))
     <script>
         //automatically input the due date
@@ -342,7 +342,7 @@
         });
     </script>
 @endif
-{{-- SCRIPT ONLY FOR ADMIN PO CREATE --}}
+{{-- SCRIPT FOR ADMIN PO CREATE --}}
 @if (request()->is('admin/po/create'))
     <script>
         //automatically input the due date
@@ -472,7 +472,7 @@
         });
     </script>
 @endif
-{{-- SCRIPT ONLY FOR ADMIN DASHBOARD --}}
+{{-- SCRIPT FOR ADMIN DASHBOARD --}}
 @if (request()->is('admin/dashboard'))
     <script src="{{ asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js') }}" defer></script>
     <script>
@@ -789,6 +789,51 @@
                 });
             });
         });
+    </script>
+@endif
+{{-- SCRIPT FOR CURRENCY SETTING --}}
+@if (request()->is('admin/setting/currency'))
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const showModalButton = document.getElementById("showModalButton");
+            const confirmSubmitButton = document.getElementById("confirmSubmit");
+            const currencySettingsForm = document.getElementById("currencySettingsForm");
+
+            showModalButton.addEventListener("click", function() {
+                const confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
+                confirmModal.show();
+            });
+
+            confirmSubmitButton.addEventListener("click", function() {
+                currencySettingsForm.submit();
+            });
+        });
+    </script>
+@endif
+{{-- SCRIPT FOR PROFILE SETTING --}}
+@if (request()->is('admin/setting/profile'))
+    <script>
+        function togglePasswordModal() {
+            let newPassword = document.getElementById('new_password').value;
+            let confirmContainer = document.getElementById('confirmPasswordContainer');
+            confirmContainer.style.display = newPassword ? 'block' : 'none';
+        }
+
+        function showPasswordModal() {
+            let newPassword = document.getElementById('new_password').value;
+            if (newPassword) {
+                let modal = new bootstrap.Modal(document.getElementById('passwordModal'));
+                modal.show();
+            } else {
+                document.getElementById('profileForm').submit();
+            }
+        }
+
+        function submitProfileForm() {
+            let currentPasswordInput = document.getElementById('modal_current_password').value;
+            document.getElementById('current_password').value = currentPasswordInput;
+            document.getElementById('profileForm').submit();
+        }
     </script>
 @endif
 {{-- ERROR MODAL --}}

@@ -8,13 +8,8 @@
             <div class="container-xl">
                 <div class="row align-items-center">
                     <div class="col">
-                        @if ($pos->status == 'Unpaid')
-                            <div class="page-pretitle">Overview</div>
-                            <h2 class="page-title no-print">View Purchase Order</h2>
-                        @else
-                            <div class="page-pretitle">Overview</div>
-                            <h2 class="page-title no-print">PO Invoice Information</h2>
-                        @endif
+                        <div class="page-pretitle">Overview</div>
+                        <h2 class="page-title no-print">View Invoice Information</h2>
                     </div>
                     <div class="col text-end">
                         <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">
@@ -45,8 +40,8 @@
                                                     <select class="form-control" name="payment_type" id="payment_type"
                                                         {{ $pos->status == 'Paid' ? 'disabled' : '' }}>
                                                         <option value="Cash"
-                                                            {{ $pos->payment_type == 'Cash' ? 'selected' : '' }}>
-                                                            Cash</option>
+                                                            {{ $pos->payment_type == 'Cash' ? 'selected' : '' }}>Cash
+                                                        </option>
                                                         <option value="Transfer"
                                                             {{ $pos->payment_type == 'Transfer' ? 'selected' : '' }}>
                                                             Transfer</option>
@@ -57,11 +52,9 @@
                                                     <select class="form-control" name="status" id="status"
                                                         {{ $pos->status == 'Paid' ? 'disabled' : '' }}>
                                                         <option value="Paid"
-                                                            {{ $pos->status == 'Paid' ? 'selected' : '' }}>Paid
-                                                        </option>
+                                                            {{ $pos->status == 'Paid' ? 'selected' : '' }}>Paid</option>
                                                         <option value="Unpaid"
-                                                            {{ $pos->status == 'Unpaid' ? 'selected' : '' }}>
-                                                            Unpaid</option>
+                                                            {{ $pos->status == 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-9 mb-3 mt-4 text-end">
@@ -94,14 +87,11 @@
                                                                 <p class="h3">Payment Status</p>
                                                                 <h3>
                                                                     @if ($pos->status !== 'Paid')
-                                                                        <span class="badge bg-blue-lt">
-                                                                            Payment Pending
-                                                                        </span>
+                                                                        <span class="badge bg-blue-lt">Payment
+                                                                            Pending</span>
                                                                     @else
                                                                         <span class="badge bg-green-lt">Paid in
-                                                                            {{ $pos->payment_date->format('d F Y') }}<br>
-                                                                            {{ $pos->payment_date->format('H:i:s') }}</i>
-                                                                        </span>
+                                                                            {{ $pos->payment_date->format('d F Y') }}<br>{{ $pos->payment_date->format('H:i:s') }}</span>
                                                                     @endif
                                                                 </h3>
                                                             </div>
@@ -112,24 +102,28 @@
                                                                     <th class="text-center" style="width: 1%">No</th>
                                                                     <th>Product</th>
                                                                     <th class="text-center" style="width: 1%">QTY</th>
-                                                                    <th class="text-end" style="width: 20%">Unit</th>
+                                                                    <th class="text-end" style="width: 15%">Unit Price</th>
+                                                                    <th class="text-end" style="width: 10%">Discount</th>
                                                                     <th class="text-end" style="width: 20%">Amount</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 @foreach ($pos->items as $index => $item)
                                                                     <tr>
-                                                                        <td>{{ $index + 1 }}</td>
+                                                                        <td class="text-center">{{ $index + 1 }}</td>
                                                                         <td>
                                                                             <p class="strong mb-1">
                                                                                 {{ $item->product->name }}</p>
                                                                         </td>
-                                                                        <td>{{ $item->quantity }}</td>
+                                                                        <td class="text-center">{{ $item->quantity }}</td>
                                                                         <td class="text-end">
                                                                             {{ \App\Helpers\CurrencyHelper::format($item->price) }}
                                                                         </td>
                                                                         <td class="text-end">
-                                                                            {{ \App\Helpers\CurrencyHelper::format($item->quantity * $item->price) }}
+                                                                            {{ $item->discount }}%
+                                                                        </td>
+                                                                        <td class="text-end">
+                                                                            {{ \App\Helpers\CurrencyHelper::format($item->quantity * $item->price - $item->discount) }}
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach
@@ -137,8 +131,10 @@
                                                         </table>
                                                         <br>
                                                         <h2 class="text-end">
-                                                            Total Amount : <span id="totalPrice">
-                                                                {{ \App\Helpers\CurrencyHelper::format($pos->items->sum(fn($item) => $item->quantity * $item->price)) }}
+                                                            Total Amount: <span id="totalPrice">
+                                                                {{ \App\Helpers\CurrencyHelper::format(
+                                                                    $pos->items->sum(fn($item) => $item->quantity * $item->price * (1 - $item->discount / 100)),
+                                                                ) }}
                                                             </span>
                                                         </h2>
                                                     </div>

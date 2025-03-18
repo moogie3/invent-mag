@@ -38,18 +38,47 @@
                                         @foreach ($purchaseOrders as $po)
                                             @php
                                                 $dueDate = $po->due_date;
+                                                $paymentDate = $po->payment_date;
                                                 $diffDays = $today->diffInDays($dueDate, false);
+                                                $statusBadge = 'bg-info'; // Default
+                                                $statusText = 'Pending'; // Default
+
+                                                if ($po->status === 'Paid') {
+                                                    if ($paymentDate && $today->isSameDay($paymentDate)) {
+                                                        $statusBadge = 'bg-success';
+                                                        $statusText = 'Paid Today';
+                                                    } else {
+                                                        $statusBadge = 'bg-success';
+                                                        $statusText = 'Paid';
+                                                    }
+                                                } elseif ($diffDays == 0) {
+                                                    $statusBadge = 'bg-danger';
+                                                    $statusText = 'Due Today';
+                                                } elseif ($diffDays > 0 && $diffDays <= 3) {
+                                                    $statusBadge = 'bg-danger';
+                                                    $statusText = 'Due in 3 Days';
+                                                } elseif ($diffDays > 3 && $diffDays <= 7) {
+                                                    $statusBadge = 'bg-warning';
+                                                    $statusText = 'Due in 1 Week';
+                                                } elseif ($diffDays < 0) {
+                                                    $statusBadge = 'bg-dark'; // Use a darker color for visibility
+                                                    $statusText = 'Overdue'; // Ensure this text is always set
+                                                }
                                             @endphp
-                                            @if ($diffDays <= 7 && $po->status !== 'Paid')
+
+                                            @if ($po->status !== 'Paid' || ($po->status === 'Paid' && $today->isSameDay($paymentDate)))
                                                 <a href="{{ route('admin.po.edit', ['id' => $po->id]) }}"
                                                     class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                                     <span>PO #{{ $po->id }} - Due on
                                                         {{ $po->due_date->format('M d, Y') }}</span>
-                                                    <span class="badge bg-danger">Due Soon</span>
+                                                    <span
+                                                        class="badge {{ $statusBadge }}">{{ $statusText ?: 'Overdue' }}</span>
+                                                    <!-- Ensure text is always set -->
                                                 </a>
                                                 @php $hasNotifications = true; @endphp
                                             @endif
                                         @endforeach
+
 
                                         @if (!$hasNotifications)
                                             <div class="list-group-item text-muted text-center">No new notifications</div>

@@ -88,6 +88,11 @@
                                                 <input type="text" class="form-control" name="new_price" id="new_price"
                                                     placeholder="New price" />
                                             </div>
+                                            <div class="col-md-2 mb-3">
+                                                <label class="form-label">DISCOUNT</label>
+                                                <input type="number" class="form-control" name="discount" id="discount"
+                                                    placeholder="Discount" min="0" />
+                                            </div>
                                             <div class="col-md-4 mb-3 text-end">
                                                 <label class="form-label">BUTTON</label>
                                                 <button type="button" id="addProduct" class="btn btn-secondary">Add
@@ -102,10 +107,14 @@
                                             <tr>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-product">Product
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-quantity">Quantity
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-quantity">Quantity
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-price">Price</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-total">Amount</th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-discount">Discount</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-total">Amount
+                                                </th>
                                                 <th style="width:100px;text-align:center" class="fs-4 py-3">Action</th>
                                             </tr>
                                         </thead>

@@ -141,22 +141,35 @@ class PurchaseController extends Controller
 
     public function update(Request $request, $id)
     {
-        $pos = Purchase::findOrFail($id);
+        $po = Purchase::findOrFail($id);
+        $totalAmount = 0;
 
-        $request->validate([
-            'payment_type' => 'required',
-            'status' => 'required',
-        ]);
+        foreach ($request->items as $itemId => $itemData) {
+            $poItem = PoItem::findOrFail($itemId);
+            $quantity = $itemData['quantity'];
+            $price = $itemData['price'];
+            $discount = $itemData['discount']; // save discount
 
-        $data = $request->except(['_token', '_method']);
+            // calculate item total with discount
+            $discountAmount = ($price * $discount) / 100;
+            $itemTotal = $quantity * ($price - $discountAmount);
 
-        if ($request->status === 'Paid') {
-            $data['payment_date'] = now();
+            // update the PO item
+            $poItem->quantity = $quantity;
+            $poItem->price = $price;
+            $poItem->discount = $discount;
+            $poItem->total = floor($itemTotal); // no decimals
+            $poItem->save();
+
+            // add to total purchase order amount
+            $totalAmount += $itemTotal;
         }
 
-        $pos->update($data);
+        // update total field in the PO table
+        $po->total = floor($totalAmount); // no decimals
+        $po->save();
 
-        return redirect()->route('admin.po')->with('success', 'Purchase updated successfully!');
+        return redirect()->route('admin.po.view', $id)->with('success', 'Purchase order updated successfully.');
     }
 
     public function destroy($id)

@@ -4,22 +4,17 @@
 
 @section('content')
     <div class="page-wrapper">
-        <div class="page-header no-print">
+        <div class="page-header ">
             <div class="container-xl">
                 <div class="row align-items-center">
                     <div class="col">
                         @if ($pos->status == 'Unpaid')
                             <div class="page-pretitle">Overview</div>
-                            <h2 class="page-title no-print">Edit Purchase Order</h2>
+                            <h2 class="page-title ">Edit Purchase Order</h2>
                         @else
                             <div class="page-pretitle">Overview</div>
-                            <h2 class="page-title no-print">PO Invoice Information</h2>
+                            <h2 class="page-title ">PO Invoice Information</h2>
                         @endif
-                    </div>
-                    <div class="col text-end">
-                        <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">
-                            Export Invoice
-                        </button>
                     </div>
                 </div>
             </div>
@@ -35,8 +30,9 @@
                                     action="{{ route('admin.po.update', $pos->id) }}">
                                     @csrf
                                     @method('PUT')
+                                    <h1 class="text-center">Edit Invoice Information</h1>
                                     @if ($pos->status !== 'Paid')
-                                        <fieldset class="form-fieldset no-print">
+                                        <fieldset class="form-fieldset ">
                                             <div class="row">
                                                 <div class="col-md-2 mb-3">
                                                     <label class="form-label">PAYMENT TYPE</label>
@@ -112,7 +108,8 @@
                                                                     <th class="text-center" style="width: 1%">No</th>
                                                                     <th>Product</th>
                                                                     <th class="text-center" style="width: 10%">QTY</th>
-                                                                    <th class="text-end" style="width: 20%">Unit</th>
+                                                                    <th class="text-end" style="width: 15%">Price</th>
+                                                                    <th class="text-end" style="width: 13%">Discount</th>
                                                                     <th class="text-end" style="width: 20%">Amount</th>
                                                                 </tr>
                                                             </thead>
@@ -126,22 +123,37 @@
                                                                         </td>
                                                                         <td>
                                                                             <input type="number"
-                                                                                name="items[{{ $index }}][quantity]"
+                                                                                name="items[{{ $item->id }}][quantity]"
                                                                                 value="{{ $item->quantity }}"
-                                                                                class="form-control" style="width: 100%;" />
+                                                                                class="form-control text-end quantity-input"
+                                                                                data-item-id="{{ $item->id }}"
+                                                                                min="1" />
                                                                         </td>
                                                                         <td class="text-end">
-                                                                            <input type="text"
-                                                                                name="items[{{ $index }}][price]"
+                                                                            <input type="number"
+                                                                                name="items[{{ $item->id }}][price]"
                                                                                 value="{{ $item->price }}"
-                                                                                class="form-control" style="width: 100%;" />
+                                                                                class="form-control text-end price-input"
+                                                                                data-item-id="{{ $item->id }}"
+                                                                                step="1" min="0" />
+                                                                        </td>
+                                                                        <td class="input-group text-end">
+                                                                            <input type="number"
+                                                                                name="items[{{ $item->id }}][discount]"
+                                                                                value="{{ $item->discount }}"
+                                                                                class="form-control discount-input text-end"
+                                                                                data-item-id="{{ $item->id }}"
+                                                                                step="1" min="0"
+                                                                                max="100" />
+                                                                            <span class="input-group-text">%</span>
                                                                         </td>
                                                                         <td class="text-end">
                                                                             <input type="text"
-                                                                                name="items[{{ $index }}][amount]"
-                                                                                value="{{ $item->quantity * $item->price }}"
-                                                                                class="form-control" readonly
-                                                                                style="width: 100%;" />
+                                                                                name="items[{{ $item->id }}][amount]"
+                                                                                value="{{ $item->quantity * $item->price - $item->discount }}"
+                                                                                class="form-control text-end amount-input"
+                                                                                data-item-id="{{ $item->id }}"
+                                                                                readonly />
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach

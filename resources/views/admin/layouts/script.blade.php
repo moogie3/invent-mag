@@ -472,6 +472,52 @@
         });
     </script>
 @endif
+{{-- SCRIPT FOR ADMIN PO EDIT --}}
+@if (request()->is('admin/po/edit/*'))
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function updateAmountAndTotal() {
+                document.querySelectorAll(".quantity-input, .price-input, .discount-input").forEach(input => {
+                    input.addEventListener("input", function() {
+                        let itemId = this.dataset.itemId;
+                        let quantity = parseFloat(document.querySelector(
+                            `.quantity-input[data-item-id='${itemId}']`).value) || 0;
+                        let price = parseFloat(document.querySelector(
+                            `.price-input[data-item-id='${itemId}']`).value) || 0;
+                        let discountPercent = parseFloat(document.querySelector(
+                            `.discount-input[data-item-id='${itemId}']`).value) || 0;
+
+                        // Convert discount percentage to amount
+                        let discountAmount = (price * discountPercent) / 100;
+                        let amount = (quantity * (price - discountAmount));
+
+                        document.querySelector(`.amount-input[data-item-id='${itemId}']`).value =
+                            Math.floor(amount); // No decimals
+
+                        // Update total amount
+                        let totalAmount = 0;
+                        document.querySelectorAll("tbody tr").forEach(row => {
+                            let qty = parseFloat(row.querySelector(".quantity-input")
+                                .value) || 0;
+                            let prc = parseFloat(row.querySelector(".price-input").value) ||
+                                0;
+                            let dscPercent = parseFloat(row.querySelector(".discount-input")
+                                .value) || 0;
+
+                            let dscAmount = (prc * dscPercent) / 100;
+                            totalAmount += (qty * (prc - dscAmount));
+                        });
+
+                        document.getElementById("totalPrice").innerText = Math.floor(
+                        totalAmount);
+                    });
+                });
+            }
+
+            updateAmountAndTotal();
+        });
+    </script>
+@endif
 {{-- SCRIPT FOR ADMIN DASHBOARD --}}
 @if (request()->is('admin/dashboard'))
     <script src="{{ asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js') }}" defer></script>

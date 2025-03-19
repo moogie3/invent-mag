@@ -200,7 +200,7 @@
                                                                 Actions
                                                             </button>
                                                             <div class="dropdown-menu">
-                                                                <a href="{{ route('admin.sales.edit', $sale->id) }}"
+                                                                <a href="{{ route('admin.sales.view', $sale->id) }}"
                                                                     class="dropdown-item">
                                                                     <i class="ti ti-zoom-scan me-2"></i> View
                                                                 </a>

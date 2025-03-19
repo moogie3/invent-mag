@@ -140,7 +140,7 @@
                                                                         <td class="input-group text-end">
                                                                             <input type="number"
                                                                                 name="items[{{ $item->id }}][discount]"
-                                                                                value="{{ $item->discount }}"
+                                                                                value="{{ (int) $item->discount }}"
                                                                                 class="form-control discount-input text-end"
                                                                                 data-item-id="{{ $item->id }}"
                                                                                 step="1" min="0"

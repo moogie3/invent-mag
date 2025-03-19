@@ -70,6 +70,7 @@ Route::prefix('admin')->group(function () {
         Route::get('po/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('admin.po.product.details');
         Route::get('sales/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('admin.sales.product.details');
         Route::get('/admin/po/view/{id}', [PurchaseController::class, 'view'])->name('admin.po.view');
+        Route::get('/admin/sales/view/{id}', [SalesController::class, 'view'])->name('admin.sales.view');
 
         // Settings
         Route::prefix('setting')->group(function () {

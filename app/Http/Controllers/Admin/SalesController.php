@@ -51,6 +51,14 @@ class SalesController extends Controller
         return view('admin.sales.sales-edit', compact('sales', 'customer', 'items'));
     }
 
+    public function view($id)
+    {
+        $sales = Sales::with(['items', 'customer'])->find($id);
+        $customer = Customer::all();
+        $items = SalesItem::all();
+        return view('admin.sales.sales-view', compact('sales', 'customer', 'items'));
+    }
+
     public function store(Request $request)
     {
         try {
@@ -103,24 +111,48 @@ class SalesController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $sales = Sales::findOrFail($id);
+{
+    $sales = Sales::findOrFail($id);
+    $totalAmount = 0;
 
-        $request->validate([
-            'payment_type' => 'required',
-            'status' => 'required',
-        ]);
+    $request->validate([
+        'payment_type' => 'required',
+        'status' => 'required',
+    ]);
 
-        $data = $request->except(['_token', '_method']);
+    foreach ($request->items as $itemId => $itemData) {
+        $salesItem = SalesItem::findOrFail($itemId);
+        $quantity = $itemData['quantity'];
+        $price = $itemData['price'];
+        $discount = $itemData['discount'] ?? 0; // default to 0 if not provided
 
-        if ($request->status === 'Paid') {
-            $data['payment_date'] = now();
-        }
+        // Calculate item total with discount
+        $discountAmount = ($price * $discount) / 100;
+        $itemTotal = $quantity * ($price - $discountAmount);
 
-        $sales->update($data);
+        // Update sales item
+        $salesItem->quantity = $quantity;
+        $salesItem->price = $price;
+        $salesItem->discount = $discount;
+        $salesItem->total = floor($itemTotal); // no decimals
+        $salesItem->save();
 
-        return redirect()->route('admin.sales')->with('success', 'Sales has been updated');
+        // Add to total sales amount
+        $totalAmount += $itemTotal;
     }
+
+    // Update total field in the Sales table
+    $sales->total = floor($totalAmount); // no decimals
+    if ($request->status === 'Paid') {
+        $sales->payment_date = now();
+    }
+    $sales->payment_type = $request->payment_type;
+    $sales->status = $request->status;
+    $sales->save();
+
+    return redirect()->route('admin.sales.view', $id)->with('success', 'Sales updated successfully.');
+}
+
 
     public function getPastPrice(Request $request)
     {

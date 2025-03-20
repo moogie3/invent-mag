@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('invoice')->unique();
             $table->string('customer_id')->constrained()->cascadeOnDelete();
             $table->timestamp('order_date');
+            $table->timestamp('due_date');
             $table->enum('payment_type', ['Cash','Transfer','-']);
             $table->decimal('tax_amount', 10, 2)->default(0);
             $table->double('total');

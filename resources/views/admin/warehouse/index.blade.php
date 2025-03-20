@@ -36,7 +36,7 @@
                                             <div class="card-body">
                                                 <div class="card-title">Warehouse information</div>
                                                 <div class="purchase-info row">
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-4">
                                                         <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">

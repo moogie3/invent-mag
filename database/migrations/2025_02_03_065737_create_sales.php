@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('customer_id')->constrained()->cascadeOnDelete();
             $table->timestamp('order_date');
             $table->enum('payment_type', ['Cash','Transfer','-']);
+            $table->decimal('tax_amount', 10, 2)->default(0);
             $table->double('total');
             $table->enum('status', ['Unpaid', 'Paid']);
             $table->timestamp('payment_date')->nullable();

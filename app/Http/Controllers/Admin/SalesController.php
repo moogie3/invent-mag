@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
+use App\Models\Tax;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -46,9 +47,10 @@ class SalesController extends Controller
     public function edit($id)
     {
         $sales = Sales::with(['items', 'customer'])->find($id);
-        $customer = Customer::all();
+        $customers = Customer::all();
         $items = SalesItem::all();
-        return view('admin.sales.sales-edit', compact('sales', 'customer', 'items'));
+        $tax = Tax::where('is_active', 1)->first();
+        return view('admin.sales.sales-edit', compact('sales', 'customers', 'items','tax'));
     }
 
     public function view($id)
@@ -56,7 +58,8 @@ class SalesController extends Controller
         $sales = Sales::with(['items', 'customer'])->find($id);
         $customer = Customer::all();
         $items = SalesItem::all();
-        return view('admin.sales.sales-view', compact('sales', 'customer', 'items'));
+        $tax = Tax::where('is_active', 1)->first();
+        return view('admin.sales.sales-view', compact('sales', 'customer', 'items','tax'));
     }
 
     public function store(Request $request)
@@ -118,13 +121,19 @@ class SalesController extends Controller
     $request->validate([
         'payment_type' => 'required',
         'status' => 'required',
+        'order_date' => 'required|date',
+        'due_date' => 'required|date|after_or_equal:order_date',
     ]);
+
+    // Fetch active tax (if any)
+    $tax = Tax::where('is_active', 1)->first();
+    $taxRate = $tax ? $tax->rate : 0; // Default to 0 if no tax
 
     foreach ($request->items as $itemId => $itemData) {
         $salesItem = SalesItem::findOrFail($itemId);
         $quantity = $itemData['quantity'];
         $price = $itemData['price'];
-        $discount = $itemData['discount'] ?? 0; // default to 0 if not provided
+        $discount = $itemData['discount'] ?? 0; // Default to 0 if not provided
 
         // Calculate item total with discount
         $discountAmount = ($price * $discount) / 100;
@@ -134,18 +143,27 @@ class SalesController extends Controller
         $salesItem->quantity = $quantity;
         $salesItem->price = $price;
         $salesItem->discount = $discount;
-        $salesItem->total = floor($itemTotal); // no decimals
+        $salesItem->total = floor($itemTotal); // No decimals
         $salesItem->save();
 
         // Add to total sales amount
         $totalAmount += $itemTotal;
     }
 
-    // Update total field in the Sales table
-    $sales->total = floor($totalAmount); // no decimals
+    // Calculate tax amount
+    $taxAmount = ($totalAmount * $taxRate) / 100;
+    $totalWithTax = $totalAmount + $taxAmount;
+
+    // Update Sales record
+    $sales->total = floor($totalWithTax); // Total amount with tax
+    $sales->tax_amount = floor($taxAmount); // Store tax amount separately
+    $sales->order_date = $request->order_date;
+    $sales->due_date = $request->due_date;
+
     if ($request->status === 'Paid') {
         $sales->payment_date = now();
     }
+
     $sales->payment_type = $request->payment_type;
     $sales->status = $request->status;
     $sales->save();

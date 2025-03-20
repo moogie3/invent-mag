@@ -342,6 +342,106 @@
         });
     </script>
 @endif
+@if (request()->is('admin/sales/edit/*'))
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function updateAmountAndTotal() {
+                document.querySelectorAll(".quantity-input, .price-input, .discount-input").forEach(input => {
+                    input.addEventListener("input", function() {
+                        let itemId = this.dataset.itemId;
+                        let quantity = parseFloat(document.querySelector(
+                            `.quantity-input[data-item-id='${itemId}']`).value) || 0;
+                        let price = parseFloat(document.querySelector(
+                            `.price-input[data-item-id='${itemId}']`).value) || 0;
+                        let discountPercent = parseFloat(document.querySelector(
+                            `.discount-input[data-item-id='${itemId}']`).value) || 0;
+
+                        let discountAmount = quantity * price * (discountPercent / 100);
+                        let netAmount = quantity * price - discountAmount;
+
+                        document.querySelector(`.amount-input[data-item-id='${itemId}']`).value =
+                            Math.floor(netAmount);
+
+                        let totalDiscount = 0;
+                        let totalAmount = 0;
+                        document.querySelectorAll("tbody tr").forEach(row => {
+                            let qty = parseFloat(row.querySelector(".quantity-input")
+                                .value) || 0;
+                            let prc = parseFloat(row.querySelector(".price-input").value) ||
+                                0;
+                            let dscPercent = parseFloat(row.querySelector(".discount-input")
+                                .value) || 0;
+
+                            let rowDiscount = qty * prc * (dscPercent / 100);
+                            let rowAmount = qty * prc - rowDiscount;
+
+                            totalDiscount += rowDiscount;
+                            totalAmount += rowAmount;
+                        });
+
+                        // Get tax rate from dataset
+                        let taxElement = document.getElementById("totalTax");
+                        let taxRate = taxElement ? parseFloat(taxElement.dataset.taxRate) || 0 : 0;
+                        let taxAmount = Math.floor(totalAmount * (taxRate / 100));
+
+                        // Calculate Grand Total
+                        let grandTotal = totalAmount + taxAmount;
+
+                        // Update values on the page
+                        document.getElementById("totalDiscount").innerText = Math.floor(
+                            totalDiscount).toLocaleString('id-ID');
+                        if (taxElement) {
+                            taxElement.innerText = Math.floor(taxAmount).toLocaleString('id-ID');
+                        }
+                        document.getElementById("totalPrice").innerText = totalAmount
+                            .toLocaleString('id-ID');
+                        document.getElementById("grandTotal").innerText = grandTotal.toLocaleString(
+                            'id-ID');
+                    });
+                });
+            }
+
+            updateAmountAndTotal();
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const orderDateField = document.getElementById('order_date');
+            const dueDateField = document.getElementById('due_date');
+            const customerSelect = document.getElementById('customer_id');
+
+            // Event listener for customer selection change
+            customerSelect.addEventListener('change', function() {
+                calculateDueDate();
+            });
+
+            // Event listener for order date selection change
+            orderDateField.addEventListener('change', function() {
+                calculateDueDate();
+            });
+
+            function calculateDueDate() {
+                const orderDateValue = orderDateField.value;
+                const selectedOption = customerSelect.options[customerSelect.selectedIndex];
+
+                if (!orderDateValue || !selectedOption) {
+                    return;
+                }
+
+                const orderDate = new Date(orderDateValue);
+                const paymentTerms = selectedOption.dataset.paymentTerms || 0;
+
+                if (paymentTerms) {
+                    orderDate.setDate(orderDate.getDate() + parseInt(paymentTerms));
+
+                    // Format the due date to YYYY-MM-DD
+                    dueDateField.value = orderDate.toISOString().split('T')[0];
+                }
+            }
+        });
+    </script>
+@endif
 {{-- SCRIPT FOR ADMIN PO CREATE --}}
 @if (request()->is('admin/po/create'))
     <script>
@@ -509,7 +609,7 @@
                         });
 
                         document.getElementById("totalPrice").innerText = Math.floor(
-                        totalAmount);
+                            totalAmount);
                     });
                 });
             }

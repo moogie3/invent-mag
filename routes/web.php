@@ -7,7 +7,7 @@ use App\Http\Controllers\Admin\{
     CategoryController, CustomerController, ProductController, PurchaseController,
     SupplierController, UnitController, CurrencyController, DailySalesController,
     SalesController, DashboardController, ProfileController, NotificationController,
-    POSController, WarehouseController,
+    POSController, WarehouseController, TaxController
 };
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
@@ -81,6 +81,8 @@ Route::prefix('admin')->group(function () {
             Route::delete('/profile/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
             Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.setting.notifications');
             Route::get('/notifications/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
+            Route::get('/tax', [TaxController::class, 'index'])->name('admin.setting.tax');
+            Route::post('/tax/update', [TaxController::class, 'update'])->name('admin.setting.tax.update');
 
             Route::prefix('category')->group(function () {
             Route::get('/', [CategoryController::class, 'index'])->name('admin.setting.category');

@@ -21,5 +21,9 @@
             class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.category') ? 'active' : '' }}">Category
             Settings</a>
 
+        <a href="{{ route('admin.setting.tax') }}"
+            class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.tax') ? 'active' : '' }}">Tax
+            Settings</a>
+
     </div>
 </div>

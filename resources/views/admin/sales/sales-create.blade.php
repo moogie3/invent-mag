@@ -84,6 +84,23 @@
                                                 <input type="text" class="form-control" name="new_price" id="new_price"
                                                     placeholder="New price" />
                                             </div>
+                                            <div class="col-md-2 mb-3">
+                                                <label class="form-label">DISCOUNT TYPE</label>
+                                                <select class="form-control" name="discount_type" id="discount_type">
+                                                    <option value="fixed">Fixed</option>
+                                                    <option value="percentage">Percentage</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2 mb-3">
+                                                <label class="form-label">DISCOUNT</label>
+                                                <input type="number" class="form-control" name="discount" id="discount"
+                                                    placeholder="Discount" min="0" />
+                                            </div>
+                                            <div class="col-md-2 mb-3">
+                                                <label class="form-label">TAX RATE (%)</label>
+                                                <input type="number" class="form-control" name="tax_rate" id="tax_rate"
+                                                    placeholder="Tax %" min="0" />
+                                            </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-2 mb-3">
@@ -98,8 +115,8 @@
                                             </div>
                                             <div class="col-md-2 mb-3">
                                                 <label class="form-label">CUSTOMER PAST PRICE</label>
-                                                <input type="text" class="form-control" name="past_price" id="past_price"
-                                                    placeholder="Past price" disabled />
+                                                <input type="text" class="form-control" name="past_price"
+                                                    id="past_price" placeholder="Past price" disabled />
                                             </div>
                                             <div class="col-md-6 mb-3 text-end">
                                                 <label class="form-label">BUTTON</label>
@@ -129,8 +146,10 @@
                                         <tbody id="productTableBody">
                                         </tbody>
                                     </table>
-                                    <h1 class="mt-3 text-end">Total Price: <span id="totalPrice">
-                                        </span></h1>
+                                    <h3 class="mt-3 text-end">Subtotal: <span id="subtotal">0</span></h3>
+                                    <h3 class="mt-3 text-end">Discount Total: <span id="discountTotal">0</span></h3>
+                                    <h3 class="mt-3 text-end">Tax Total: <span id="taxTotal">0</span></h3>
+                                    <h3 class="mt-3 text-end">Final Total: <span id="finalTotal">0</span></h3>
                                 </form>
                             </div>
                         </div>

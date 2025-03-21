@@ -84,6 +84,8 @@
                                                             id="due_date" value="{{ $sales->due_date->format('Y-m-d') }}"
                                                             required readonly>
                                                     </div>
+                                                    <input type="hidden" id="grandTotalInput" name="total"
+                                                        value="0">
                                                     <div class="col-md-3 mb-3 mt-4 text-end">
                                                         <button type="submit" class="btn btn-success">Save</button>
                                                     </div>
@@ -138,8 +140,8 @@
                                                                         <th class="text-center" style="width: 1%">No</th>
                                                                         <th>Product</th>
                                                                         <th class="text-center" style="width: 10%">QTY</th>
-                                                                        <th class="text-end" style="width: 15%">Price</th>
-                                                                        <th class="text-end" style="width: 13%">Discount
+                                                                        <th class="text-end" style="width: 20%">Price</th>
+                                                                        <th class="text-end" style="width: 20%">Discount
                                                                         </th>
                                                                         <th class="text-end" style="width: 20%">Amount</th>
                                                                     </tr>
@@ -174,9 +176,18 @@
                                                                                     value="{{ (int) $item->discount }}"
                                                                                     class="form-control discount-input text-end"
                                                                                     data-item-id="{{ $item->id }}"
-                                                                                    step="1" min="0"
-                                                                                    max="100" />
-                                                                                <span class="input-group-text">%</span>
+                                                                                    step="1" min="0" />
+                                                                                <select
+                                                                                    name="items[{{ $item->id }}][discount_type]"
+                                                                                    class="input-group-text discount-type"
+                                                                                    data-item-id="{{ $item->id }}">
+                                                                                    <option value="percentage"
+                                                                                        {{ $item->discount_type == 'percentage' ? 'selected' : '' }}>
+                                                                                        %</option>
+                                                                                    <option value="fixed"
+                                                                                        {{ $item->discount_type == 'fixed' ? 'selected' : '' }}>
+                                                                                        Rp</option>
+                                                                                </select>
                                                                             </td>
                                                                             <td class="text-end">
                                                                                 <input type="text"

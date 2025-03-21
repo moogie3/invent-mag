@@ -113,8 +113,9 @@
                                                                     <th>Product</th>
                                                                     <th class="text-center" style="width: 1%">QTY</th>
                                                                     <th class="text-end" style="width: 15%">Unit Price</th>
-                                                                    <th class="text-end" style="width: 15%">Discount (%)
+                                                                    <th class="text-end" style="width: 15%">Discount Type
                                                                     </th>
+                                                                    <th class="text-end" style="width: 15%">Discount</th>
                                                                     <th class="text-end" style="width: 15%">Total</th>
                                                                 </tr>
                                                             </thead>
@@ -122,9 +123,11 @@
                                                                 @foreach ($sales->items as $index => $item)
                                                                     @php
                                                                         $discountAmount =
-                                                                            $item->price *
-                                                                            $item->quantity *
-                                                                            ($item->discount / 100);
+                                                                            $item->discount_type === 'percentage'
+                                                                                ? $item->price *
+                                                                                    $item->quantity *
+                                                                                    ($item->discount / 100)
+                                                                                : $item->discount;
                                                                         $totalAmount =
                                                                             $item->price * $item->quantity -
                                                                             $discountAmount;
@@ -133,83 +136,92 @@
                                                                         <td class="text-center">{{ $index + 1 }}</td>
                                                                         <td>
                                                                             <p class="strong mb-1">
-                                                                                {{ $item->product->name }}
-                                                                            </p>
+                                                                                {{ $item->product->name }}</p>
                                                                         </td>
                                                                         <td class="text-center">{{ $item->quantity }}</td>
                                                                         <td class="text-end">
                                                                             {{ \App\Helpers\CurrencyHelper::format($item->price) }}
                                                                         </td>
-                                                                        <td class="text-end">{{ $item->discount }}%</td>
+                                                                        <td class="text-end">
+                                                                            @if ($item->discount_type === 'percentage')
+                                                                                Percentage
+                                                                            @else
+                                                                                Fixed
+                                                                            @endif
+                                                                        </td>
+                                                                        <td class="text-end">
+                                                                            @if ($item->discount_type === 'percentage')
+                                                                                {{ $item->discount }}%
+                                                                            @else
+                                                                                {{ \App\Helpers\CurrencyHelper::format($item->discount) }}
+                                                                            @endif
+                                                                        </td>
                                                                         <td class="text-end">
                                                                             {{ \App\Helpers\CurrencyHelper::format($totalAmount) }}
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach
                                                             </tbody>
+                                                            @php
+                                                                // Calculate total discount as a fixed amount
+                                                                $totalDiscount = $sales->items->sum(function ($item) {
+                                                                    return $item->discount_type === 'percentage'
+                                                                        ? $item->price *
+                                                                                $item->quantity *
+                                                                                ($item->discount / 100)
+                                                                        : // Apply percentage discount to total item price
+                                                                        $item->discount; // Fixed discount is applied only once per item, not per unit
+                                                                });
+
+                                                                // Calculate total before discount
+                                                                $totalBeforeDiscount = $sales->items->sum(
+                                                                    fn($item) => $item->price * $item->quantity,
+                                                                );
+
+                                                                // Apply discount correctly
+                                                                $subTotal = $totalBeforeDiscount - $totalDiscount;
+
+                                                                // Calculate tax amount if applicable
+                                                                $taxAmount =
+                                                                    isset($tax) && $tax->is_active
+                                                                        ? $subTotal * ($tax->rate / 100)
+                                                                        : 0;
+                                                                $grandTotal = $subTotal + $taxAmount;
+                                                            @endphp
+
                                                             <tfoot>
-                                                                @php
-                                                                    // Calculate total discount
-                                                                    $totalDiscount = $sales->items->sum(
-                                                                        fn($item) => $item->price *
-                                                                            $item->quantity *
-                                                                            ($item->discount / 100),
-                                                                    );
-
-                                                                    // Calculate the total before discount
-                                                                    $totalBeforeDiscount = $sales->items->sum(
-                                                                        fn($item) => $item->price * $item->quantity,
-                                                                    );
-
-                                                                    // Calculate sub total (after discount)
-                                                                    $subTotal = $totalBeforeDiscount - $totalDiscount;
-
-                                                                    // Calculate tax (if applicable)
-                                                                    $taxAmount =
-                                                                        isset($tax) && $tax->is_active
-                                                                            ? $subTotal * ($tax->rate / 100)
-                                                                            : 0;
-
-                                                                    // Calculate grand total
-                                                                    $grandTotal = $subTotal + $taxAmount;
-                                                                @endphp
                                                                 <tr>
-                                                                    <td colspan="4"></td>
-                                                                    <td class="text-end"><strong>Discount:</strong></td>
+                                                                    <td colspan="6" class="text-end">
+                                                                        <strong>Discount:</strong>
+                                                                    </td>
                                                                     <td class="text-end">
-                                                                        <span id="totalDiscount">
-                                                                            {{ \App\Helpers\CurrencyHelper::format($totalDiscount) }}
-                                                                        </span>
+                                                                        {{ \App\Helpers\CurrencyHelper::format($totalDiscount) }}
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td colspan="4"></td>
-                                                                    <td class="text-end"><strong>Sub Amount:</strong></td>
+                                                                    <td colspan="6" class="text-end"><strong>Sub
+                                                                            Total:</strong></td>
                                                                     <td class="text-end">
-                                                                        <span id="totalPrice">
-                                                                            {{ \App\Helpers\CurrencyHelper::format($subTotal) }}
-                                                                        </span>
+                                                                        <span
+                                                                            id="totalPrice">{{ \App\Helpers\CurrencyHelper::format($subTotal) }}</span>
                                                                     </td>
                                                                 </tr>
                                                                 @if (isset($tax) && $tax->is_active)
                                                                     <tr>
-                                                                        <td colspan="4"></td>
-                                                                        <td class="text-end"><strong>Tax
+                                                                        <td colspan="6" class="text-end"><strong>Tax
                                                                                 ({{ $tax->rate }}%):</strong></td>
                                                                         <td class="text-end">
-                                                                            <span id="totalTax">
-                                                                                {{ \App\Helpers\CurrencyHelper::format($taxAmount) }}
-                                                                            </span>
+                                                                            <span
+                                                                                id="totalTax">{{ \App\Helpers\CurrencyHelper::format($taxAmount) }}</span>
                                                                         </td>
                                                                     </tr>
                                                                 @endif
                                                                 <tr>
-                                                                    <td colspan="4"></td>
-                                                                    <td class="text-end"><strong>Grand Total:</strong></td>
+                                                                    <td colspan="6" class="text-end"><strong>Grand
+                                                                            Total:</strong></td>
                                                                     <td class="text-end">
-                                                                        <span id="grandTotal">
-                                                                            {{ \App\Helpers\CurrencyHelper::format($grandTotal) }}
-                                                                        </span>
+                                                                        <span
+                                                                            id="grandTotal">{{ \App\Helpers\CurrencyHelper::format($grandTotal) }}</span>
                                                                     </td>
                                                                 </tr>
                                                             </tfoot>

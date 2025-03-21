@@ -341,101 +341,170 @@
             });
         });
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let products = [];
+
+            function updateTotals() {
+                let subtotal = 0;
+                let totalDiscount = 0;
+                let totalTax = 0;
+
+                products.forEach((product) => {
+                    let itemTotal = product.quantity * product.price;
+                    let discountAmount = 0;
+
+                    // Calculate Discount
+                    if (product.discount_type === "percentage") {
+                        discountAmount = itemTotal * (product.discount / 100);
+                    } else {
+                        discountAmount = product.discount;
+                    }
+
+                    totalDiscount += discountAmount;
+
+                    // Apply Discount
+                    let afterDiscount = itemTotal - discountAmount;
+
+                    // Calculate Tax
+                    let taxAmount = (product.tax_rate / 100) * afterDiscount;
+                    totalTax += taxAmount;
+
+                    subtotal += itemTotal;
+                });
+
+                let finalTotal = subtotal - totalDiscount + totalTax;
+
+                document.getElementById("subtotal").textContent = subtotal.toFixed(2);
+                document.getElementById("discountTotal").textContent = totalDiscount.toFixed(2);
+                document.getElementById("taxTotal").textContent = totalTax.toFixed(2);
+                document.getElementById("finalTotal").textContent = finalTotal.toFixed(2);
+
+                document.getElementById("productsField").value = JSON.stringify(products);
+            }
+
+            document.getElementById("addProduct").addEventListener("click", function() {
+                let productSelect = document.getElementById("product_id");
+                let quantity = parseFloat(document.getElementById("quantity").value) || 1;
+                let price = parseFloat(document.getElementById("new_price").value) || 0;
+                let discount = parseFloat(document.getElementById("discount").value) || 0;
+                let discountType = document.getElementById("discount_type").value;
+                let taxRate = parseFloat(document.getElementById("tax_rate").value) || 0;
+
+                let productId = productSelect.value;
+                let productName = productSelect.options[productSelect.selectedIndex].text;
+
+                if (!productId || price <= 0 || quantity <= 0) {
+                    alert("Please select a valid product and enter a valid price/quantity.");
+                    return;
+                }
+
+                products.push({
+                    id: productId,
+                    name: productName,
+                    quantity: quantity,
+                    price: price,
+                    discount: discount,
+                    discount_type: discountType,
+                    tax_rate: taxRate
+                });
+
+                updateTotals();
+            });
+        });
+    </script>
 @endif
+{{-- SCRIPT FOR ADMIN SALES EDIT --}}
 @if (request()->is('admin/sales/edit/*'))
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             function updateAmountAndTotal() {
-                document.querySelectorAll(".quantity-input, .price-input, .discount-input").forEach(input => {
-                    input.addEventListener("input", function() {
-                        let itemId = this.dataset.itemId;
-                        let quantity = parseFloat(document.querySelector(
-                            `.quantity-input[data-item-id='${itemId}']`).value) || 0;
-                        let price = parseFloat(document.querySelector(
-                            `.price-input[data-item-id='${itemId}']`).value) || 0;
-                        let discountPercent = parseFloat(document.querySelector(
-                            `.discount-input[data-item-id='${itemId}']`).value) || 0;
-
-                        let discountAmount = quantity * price * (discountPercent / 100);
-                        let netAmount = quantity * price - discountAmount;
-
-                        document.querySelector(`.amount-input[data-item-id='${itemId}']`).value =
-                            Math.floor(netAmount);
-
-                        let totalDiscount = 0;
-                        let totalAmount = 0;
-                        document.querySelectorAll("tbody tr").forEach(row => {
-                            let qty = parseFloat(row.querySelector(".quantity-input")
-                                .value) || 0;
-                            let prc = parseFloat(row.querySelector(".price-input").value) ||
-                                0;
-                            let dscPercent = parseFloat(row.querySelector(".discount-input")
-                                .value) || 0;
-
-                            let rowDiscount = qty * prc * (dscPercent / 100);
-                            let rowAmount = qty * prc - rowDiscount;
-
-                            totalDiscount += rowDiscount;
-                            totalAmount += rowAmount;
-                        });
-
-                        // Get tax rate from dataset
-                        let taxElement = document.getElementById("totalTax");
-                        let taxRate = taxElement ? parseFloat(taxElement.dataset.taxRate) || 0 : 0;
-                        let taxAmount = Math.floor(totalAmount * (taxRate / 100));
-
-                        // Calculate Grand Total
-                        let grandTotal = totalAmount + taxAmount;
-
-                        // Update values on the page
-                        document.getElementById("totalDiscount").innerText = Math.floor(
-                            totalDiscount).toLocaleString('id-ID');
-                        if (taxElement) {
-                            taxElement.innerText = Math.floor(taxAmount).toLocaleString('id-ID');
-                        }
-                        document.getElementById("totalPrice").innerText = totalAmount
-                            .toLocaleString('id-ID');
-                        document.getElementById("grandTotal").innerText = grandTotal.toLocaleString(
-                            'id-ID');
+                document.querySelectorAll(".quantity-input, .price-input, .discount-input, .discount-type").forEach(
+                    input => {
+                        input.addEventListener("input", calculateTotals);
                     });
+            }
+
+            function calculateTotals() {
+                let totalDiscount = 0;
+                let totalAmount = 0;
+
+                document.querySelectorAll("tbody tr").forEach(row => {
+                    let itemId = row.querySelector(".quantity-input").dataset.itemId;
+                    let quantity = parseFloat(row.querySelector(`.quantity-input[data-item-id='${itemId}']`)
+                        .value) || 0;
+                    let price = parseFloat(row.querySelector(`.price-input[data-item-id='${itemId}']`)
+                        .value) || 0;
+                    let discountInput = row.querySelector(`.discount-input[data-item-id='${itemId}']`);
+                    let discountType = row.querySelector(`.discount-type[data-item-id='${itemId}']`)
+                        ?.value || "fixed";
+
+                    let discountValue = parseFloat(discountInput?.value) || 0;
+                    let discountAmount = 0;
+
+                    let totalItemPrice = quantity * price;
+
+                    // ✅ Apply the correct discount type
+                    if (discountType === "percentage") {
+                        discountAmount = totalItemPrice * (discountValue / 100);
+                    } else {
+                        discountAmount = discountValue; // ✅ Fixed discount applies the full value
+                    }
+
+                    let netAmount = totalItemPrice - discountAmount;
+
+                    row.querySelector(`.amount-input[data-item-id='${itemId}']`).value = Math.floor(
+                        netAmount);
+
+                    totalDiscount += discountAmount;
+                    totalAmount += netAmount;
                 });
+
+                // ✅ Ensure discount type affects footer calculation correctly
+                let taxElement = document.getElementById("totalTax");
+                let taxRate = taxElement ? parseFloat(taxElement.dataset.taxRate) || 0 : 0;
+                let taxAmount = Math.floor(totalAmount * (taxRate / 100));
+
+                let grandTotal = totalAmount + taxAmount;
+
+                document.getElementById("totalDiscount").innerText = Math.floor(totalDiscount).toLocaleString(
+                    'id-ID');
+                if (taxElement) {
+                    taxElement.innerText = Math.floor(taxAmount).toLocaleString('id-ID');
+                }
+                document.getElementById("totalPrice").innerText = totalAmount.toLocaleString('id-ID');
+                document.getElementById("grandTotal").innerText = grandTotal.toLocaleString('id-ID');
             }
 
             updateAmountAndTotal();
-        });
-    </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+            // ✅ Automatically trigger calculation on page load
+            calculateTotals();
+
+            document.querySelectorAll(".quantity-input, .price-input, .discount-input, .discount-type").forEach(
+                input => {
+                    input.addEventListener("input", calculateTotals);
+                });
+
+            // Due date calculations
             const orderDateField = document.getElementById('order_date');
             const dueDateField = document.getElementById('due_date');
             const customerSelect = document.getElementById('customer_id');
 
-            // Event listener for customer selection change
-            customerSelect.addEventListener('change', function() {
-                calculateDueDate();
-            });
-
-            // Event listener for order date selection change
-            orderDateField.addEventListener('change', function() {
-                calculateDueDate();
-            });
+            customerSelect?.addEventListener('change', calculateDueDate);
+            orderDateField?.addEventListener('change', calculateDueDate);
 
             function calculateDueDate() {
                 const orderDateValue = orderDateField.value;
                 const selectedOption = customerSelect.options[customerSelect.selectedIndex];
 
-                if (!orderDateValue || !selectedOption) {
-                    return;
-                }
+                if (!orderDateValue || !selectedOption) return;
 
                 const orderDate = new Date(orderDateValue);
                 const paymentTerms = selectedOption.dataset.paymentTerms || 0;
 
                 if (paymentTerms) {
                     orderDate.setDate(orderDate.getDate() + parseInt(paymentTerms));
-
-                    // Format the due date to YYYY-MM-DD
                     dueDateField.value = orderDate.toISOString().split('T')[0];
                 }
             }
@@ -576,45 +645,51 @@
 @if (request()->is('admin/po/edit/*'))
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            function updateAmountAndTotal() {
-                document.querySelectorAll(".quantity-input, .price-input, .discount-input").forEach(input => {
-                    input.addEventListener("input", function() {
-                        let itemId = this.dataset.itemId;
-                        let quantity = parseFloat(document.querySelector(
-                            `.quantity-input[data-item-id='${itemId}']`).value) || 0;
-                        let price = parseFloat(document.querySelector(
-                            `.price-input[data-item-id='${itemId}']`).value) || 0;
-                        let discountPercent = parseFloat(document.querySelector(
-                            `.discount-input[data-item-id='${itemId}']`).value) || 0;
+            function updateTotalAmount() {
+                let totalAmount = 0;
 
-                        // Convert discount percentage to amount
-                        let discountAmount = (price * discountPercent) / 100;
-                        let amount = (quantity * (price - discountAmount));
+                document.querySelectorAll("tbody tr").forEach(row => {
+                    let quantity = parseFloat(row.querySelector(".quantity-input").value) || 0;
+                    let price = parseFloat(row.querySelector(".price-input").value) || 0;
 
-                        document.querySelector(`.amount-input[data-item-id='${itemId}']`).value =
-                            Math.floor(amount); // No decimals
-
-                        // Update total amount
-                        let totalAmount = 0;
-                        document.querySelectorAll("tbody tr").forEach(row => {
-                            let qty = parseFloat(row.querySelector(".quantity-input")
-                                .value) || 0;
-                            let prc = parseFloat(row.querySelector(".price-input").value) ||
-                                0;
-                            let dscPercent = parseFloat(row.querySelector(".discount-input")
-                                .value) || 0;
-
-                            let dscAmount = (prc * dscPercent) / 100;
-                            totalAmount += (qty * (prc - dscAmount));
-                        });
-
-                        document.getElementById("totalPrice").innerText = Math.floor(
-                            totalAmount);
-                    });
+                    let itemTotal = quantity * price;
+                    totalAmount += itemTotal;
                 });
+
+                // Get discount type and value
+                let discountValue = parseFloat(document.getElementById("discountValue").value) || 0;
+                let discountType = document.getElementById("discountType").value;
+
+                // Apply discount on total
+                let totalDiscount = discountType === "percentage" ? (totalAmount * discountValue) / 100 :
+                    discountValue;
+
+                // Calculate subtotal after discount
+                let subtotalAfterDiscount = totalAmount - totalDiscount;
+
+                // Fetch tax rate from hidden input
+                let taxRate = parseFloat(document.getElementById("taxRate").value) || 0;
+                let taxAmount = (subtotalAfterDiscount * taxRate) / 100;
+
+                let finalTotal = subtotalAfterDiscount + taxAmount;
+
+                // Update values in HTML
+                document.getElementById("totalAmount").innerText = Math.floor(totalAmount);
+                document.getElementById("discountTotal").innerText = Math.floor(totalDiscount);
+                document.getElementById("taxTotal").innerText = Math.floor(taxAmount);
+                document.getElementById("finalTotal").innerText = Math.floor(finalTotal);
+
+                // Save grand total in hidden input field
+                document.getElementById("grandTotalInput").value = Math.floor(finalTotal);
             }
 
-            updateAmountAndTotal();
+            // Attach event listeners
+            document.querySelectorAll(".quantity-input, .price-input, #discountValue, #discountType").forEach(
+                input => {
+                    input.addEventListener("input", updateTotalAmount);
+                });
+
+            updateTotalAmount(); // Initial calculation
         });
     </script>
 @endif

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->decimal('price', 10);
             $table->decimal('discount', 10);
+            $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage');
             $table->decimal('customer_price', 10);
             $table->decimal('total', 10);
             $table->timestamps();

@@ -204,7 +204,6 @@
                                                                     class="dropdown-item">
                                                                     <i class="ti ti-zoom-scan me-2"></i> View
                                                                 </a>
-
                                                                 <button type="button" class="dropdown-item text-danger"
                                                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
                                                                     onclick="setDeleteFormAction('{{ route('admin.sales.destroy', $sale->id) }}')">

@@ -86,6 +86,7 @@
                                                     </div>
                                                     <input type="hidden" id="grandTotalInput" name="total"
                                                         value="0">
+                                                    <input type="hidden" id="taxInput" name="tax_amount" value="0">
                                                     <div class="col-md-3 mb-3 mt-4 text-end">
                                                         <button type="submit" class="btn btn-success">Save</button>
                                                     </div>

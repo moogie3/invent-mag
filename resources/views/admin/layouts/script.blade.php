@@ -418,13 +418,6 @@
 @if (request()->is('admin/sales/edit/*'))
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            function updateAmountAndTotal() {
-                document.querySelectorAll(".quantity-input, .price-input, .discount-input, .discount-type").forEach(
-                    input => {
-                        input.addEventListener("input", calculateTotals);
-                    });
-            }
-
             function calculateTotals() {
                 let totalDiscount = 0;
                 let totalAmount = 0;
@@ -441,7 +434,6 @@
 
                     let discountValue = parseFloat(discountInput?.value) || 0;
                     let discountAmount = 0;
-
                     let totalItemPrice = quantity * price;
 
                     // ✅ Apply the correct discount type
@@ -460,13 +452,14 @@
                     totalAmount += netAmount;
                 });
 
-                // ✅ Ensure discount type affects footer calculation correctly
+                // ✅ Tax Calculation
                 let taxElement = document.getElementById("totalTax");
                 let taxRate = taxElement ? parseFloat(taxElement.dataset.taxRate) || 0 : 0;
                 let taxAmount = Math.floor(totalAmount * (taxRate / 100));
 
                 let grandTotal = totalAmount + taxAmount;
 
+                // ✅ Update UI Values
                 document.getElementById("totalDiscount").innerText = Math.floor(totalDiscount).toLocaleString(
                     'id-ID');
                 if (taxElement) {
@@ -474,19 +467,25 @@
                 }
                 document.getElementById("totalPrice").innerText = totalAmount.toLocaleString('id-ID');
                 document.getElementById("grandTotal").innerText = grandTotal.toLocaleString('id-ID');
+
+                let grandTotalInput = document.getElementById("grandTotalInput");
+                if (grandTotalInput) {
+                    grandTotalInput.value = grandTotal;
+                }
             }
 
-            updateAmountAndTotal();
+            // ✅ Use Event Delegation to Handle New Rows
+            document.addEventListener("input", function(event) {
+                if (event.target.matches(
+                        ".quantity-input, .price-input, .discount-input, .discount-type")) {
+                    calculateTotals();
+                }
+            });
 
-            // ✅ Automatically trigger calculation on page load
+            // ✅ Automatically Trigger Calculation on Page Load
             calculateTotals();
 
-            document.querySelectorAll(".quantity-input, .price-input, .discount-input, .discount-type").forEach(
-                input => {
-                    input.addEventListener("input", calculateTotals);
-                });
-
-            // Due date calculations
+            // ✅ Due Date Calculation
             const orderDateField = document.getElementById('order_date');
             const dueDateField = document.getElementById('due_date');
             const customerSelect = document.getElementById('customer_id');
@@ -501,10 +500,10 @@
                 if (!orderDateValue || !selectedOption) return;
 
                 const orderDate = new Date(orderDateValue);
-                const paymentTerms = selectedOption.dataset.paymentTerms || 0;
+                const paymentTerms = parseInt(selectedOption.dataset.paymentTerms) || 0;
 
-                if (paymentTerms) {
-                    orderDate.setDate(orderDate.getDate() + parseInt(paymentTerms));
+                if (paymentTerms > 0) {
+                    orderDate.setDate(orderDate.getDate() + paymentTerms);
                     dueDateField.value = orderDate.toISOString().split('T')[0];
                 }
             }

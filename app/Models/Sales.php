@@ -10,19 +10,10 @@ class Sales extends Model
 {
     use HasFactory;
     protected $table = 'sales';
-    protected $fillable = [
-        'invoice',
-        'customer_id',
-        'order_date',
-        'due_date',
-        'payment_type',
-        'total',
-        'status',
-        'payment_date'
-    ];
+    protected $fillable = ['invoice', 'customer_id', 'order_date', 'due_date', 'payment_type', 'total', 'status', 'payment_date'];
 
     protected $attributes = [
-    'status' => 'Unpaid',
+        'status' => 'Unpaid',
     ];
 
     public function customer(): BelongsTo
@@ -44,10 +35,24 @@ class Sales extends Model
         return $this->hasMany(SalesItem::class, 'sales_id');
     }
 
+    public function discount()
+    {
+        return $this->hasOne(Discount::class);
+    }
+
+    public function getTotalAfterDiscountAttribute()
+    {
+        $total = $this->total;
+        if ($this->discount) {
+            return $this->discount->applyDiscount($total);
+        }
+        return $total;
+    }
+
     protected $casts = [
         'total' => 'float',
         'order_date' => 'datetime',
         'due_date' => 'datetime',
-        'payment_date' => 'datetime'
+        'payment_date' => 'datetime',
     ];
 }

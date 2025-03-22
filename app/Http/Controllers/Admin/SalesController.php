@@ -155,62 +155,45 @@ class SalesController extends Controller
     public function update(Request $request, $id)
     {
         $sales = Sales::findOrFail($id);
-        $totalAmount = 0;
-        $totalDiscount = 0; // Initialize discount total
 
         $request->validate([
             'payment_type' => 'required',
             'status' => 'required',
             'order_date' => 'required|date',
             'due_date' => 'required|date|after_or_equal:order_date',
+            'total' => 'required|numeric|min:0',
         ]);
 
         // Fetch active tax (if any)
         $tax = Tax::where('is_active', 1)->first();
         $taxRate = $tax ? $tax->rate : 0;
 
+        $totalAmount = 0;
+
         foreach ($request->items as $itemId => $itemData) {
             $salesItem = SalesItem::findOrFail($itemId);
             $quantity = $itemData['quantity'];
             $price = $itemData['price'];
-            $discountValue = $itemData['discount'] ?? 0;
-            $discountType = $itemData['discount_type'] ?? $salesItem->discount_type;
 
-            // Correct discount calculation
-            if ($discountType === 'percentage') {
-                $discountAmount = $quantity * $price * ($discountValue / 100);
-            } else {
-                $discountAmount = $discountValue * $quantity; // Ensure currency discount is per unit
-            }
-
-            // Sum total discount
-            $totalDiscount += $discountAmount;
-
-            // Calculate item total after discount
-            $itemTotal = $quantity * $price - $discountAmount;
+            // Calculate item total
+            $itemTotal = $quantity * $price;
+            $totalAmount += $itemTotal;
 
             // Update Sales Item
             $salesItem->update([
                 'quantity' => $quantity,
                 'price' => $price,
-                'discount' => $discountValue,
-                'discount_type' => $discountType,
                 'total' => floor($itemTotal),
             ]);
-
-            $totalAmount += $itemTotal;
         }
 
-        // Calculate Tax Amount (AFTER Discount)
-        $taxAmount = ($totalAmount * $taxRate) / 100;
-        $finalTotal = $totalAmount + $taxAmount;
+        // ✅ Fix: Ensure frontend total is correctly applied
+        $finalTotal = $request->total;
 
-        // Update Sales record
+        // ✅ Update Sales record
         $sales->update([
             'total' => floor($finalTotal),
             'subtotal' => floor($totalAmount),
-            'discount_total' => floor($totalDiscount), // Save total discount
-            'tax_total' => floor($taxAmount), // Use consistent tax naming
             'order_date' => $request->order_date,
             'due_date' => $request->due_date,
             'payment_type' => $request->payment_type,

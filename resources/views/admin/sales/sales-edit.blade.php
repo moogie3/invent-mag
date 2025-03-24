@@ -238,6 +238,8 @@
                                                                                         $sales->items->sum(fn($item) => $item->quantity * $item->price * (1 - $item->discount / 100)) * ($tax->rate / 100),
                                                                                     ) }}
                                                                                 </span>
+                                                                                <input type="hidden" name="total_tax"
+                                                                                    id="total_tax_input" value="0">
                                                                             </td>
                                                                         </tr>
                                                                     @endif

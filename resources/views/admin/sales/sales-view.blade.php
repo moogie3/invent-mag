@@ -32,39 +32,6 @@
                                     @csrf
                                     @method('PUT')
                                     <h1 class="text-center no-print">Invoice Details</h1>
-                                    @if ($sales->status !== 'Paid')
-                                        <fieldset class="form-fieldset no-print">
-                                            <div class="row">
-                                                <div class="col-md-2 mb-3">
-                                                    <label class="form-label">PAYMENT TYPE</label>
-                                                    <select class="form-control" name="payment_type" id="payment_type"
-                                                        {{ $sales->status == 'Paid' ? 'disabled' : '' }}>
-                                                        <option value="Cash"
-                                                            {{ $sales->payment_type == 'Cash' ? 'selected' : '' }}>
-                                                            Cash</option>
-                                                        <option value="Transfer"
-                                                            {{ $sales->payment_type == 'Transfer' ? 'selected' : '' }}>
-                                                            Transfer</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-1 mb-3">
-                                                    <label class="form-label">STATUS</label>
-                                                    <select class="form-control" name="status" id="status"
-                                                        {{ $sales->status == 'Paid' ? 'disabled' : '' }}>
-                                                        <option value="Paid"
-                                                            {{ $sales->status == 'Paid' ? 'selected' : '' }}>Paid
-                                                        </option>
-                                                        <option value="Unpaid"
-                                                            {{ $sales->status == 'Unpaid' ? 'selected' : '' }}>
-                                                            Unpaid</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-9 mb-3 mt-4 text-end">
-                                                    <button type="submit" class="btn btn-success">Save</button>
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                    @endif
                                     <div class="page-wrapper">
                                         <div class="page-body">
                                             <div class="container-xl">

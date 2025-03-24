@@ -153,57 +153,56 @@ class SalesController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $sales = Sales::findOrFail($id);
+{
+    $sales = Sales::findOrFail($id);
 
-        $request->validate([
-            'payment_type' => 'required',
-            'status' => 'required',
-            'order_date' => 'required|date',
-            'due_date' => 'required|date|after_or_equal:order_date',
-            'total' => 'required|numeric|min:0',
+    $request->validate([
+        'payment_type' => 'required',
+        'status' => 'required',
+        'order_date' => 'required|date',
+        'due_date' => 'required|date|after_or_equal:order_date',
+        'total' => 'required|numeric|min:0',
+        'total_tax' => 'required|numeric|min:0', // ✅ Ensure total_tax is included in the validation
+    ]);
+
+    $totalAmount = 0;
+
+    foreach ($request->items as $itemId => $itemData) {
+        $salesItem = SalesItem::findOrFail($itemId);
+        $quantity = $itemData['quantity'];
+        $price = $itemData['price'];
+
+        // Calculate item total
+        $itemTotal = $quantity * $price;
+        $totalAmount += $itemTotal;
+
+        // Update Sales Item
+        $salesItem->update([
+            'quantity' => $quantity,
+            'price' => $price,
+            'total' => floor($itemTotal),
         ]);
-
-        // Fetch active tax (if any)
-        $tax = Tax::where('is_active', 1)->first();
-        $taxRate = $tax ? $tax->rate : 0;
-
-        $totalAmount = 0;
-
-        foreach ($request->items as $itemId => $itemData) {
-            $salesItem = SalesItem::findOrFail($itemId);
-            $quantity = $itemData['quantity'];
-            $price = $itemData['price'];
-
-            // Calculate item total
-            $itemTotal = $quantity * $price;
-            $totalAmount += $itemTotal;
-
-            // Update Sales Item
-            $salesItem->update([
-                'quantity' => $quantity,
-                'price' => $price,
-                'total' => floor($itemTotal),
-            ]);
-        }
-
-        // ✅ Fix: Ensure frontend total is correctly applied
-        $finalTotal = $request->total;
-
-        // ✅ Update Sales record
-        $sales->update([
-            'total' => floor($finalTotal),
-            'subtotal' => floor($totalAmount),
-            'order_date' => $request->order_date,
-            'due_date' => $request->due_date,
-            'payment_type' => $request->payment_type,
-            'status' => $request->status,
-            'payment_date' => $request->status === 'Paid' ? now() : null,
-        ]);
-
-        return redirect()->route('admin.sales.view', $id)->with('success', 'Sales updated successfully.');
     }
 
+    // ✅ Get total tax and tax rate from the frontend calculation
+    $totalTax = floor($request->total_tax);
+    $taxRate = Tax::where('is_active', 1)->value('rate') ?? 0; // Ensure we get the active tax rate
+
+    // ✅ Update Sales record
+    $sales->update([
+        'total' => floor($request->total),
+        'subtotal' => floor($totalAmount),
+        'total_tax' => $totalTax, // ✅ Use the exact value from frontend
+        'tax_rate' => $taxRate, // ✅ Store the current tax percentage
+        'order_date' => $request->order_date,
+        'due_date' => $request->due_date,
+        'payment_type' => $request->payment_type,
+        'status' => $request->status,
+        'payment_date' => $request->status === 'Paid' ? now() : null,
+    ]);
+
+    return redirect()->route('admin.sales.view', $id)->with('success', 'Sales updated successfully.');
+}
     public function getPastPrice(Request $request)
     {
         $customerId = $request->customer_id;

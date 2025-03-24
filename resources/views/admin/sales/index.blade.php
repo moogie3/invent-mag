@@ -140,6 +140,7 @@
                                                         Date</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-duedate">Due Date
                                                 </th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-tax">Tax</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-amount">Amount</th>
                                                 <th class="no-print"><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-payment">Payment
@@ -160,6 +161,14 @@
                                                     <td class="sort-duedate"
                                                         data-date="{{ $sale->due_date->format('Y-m-d') }}">
                                                         {{ $sale->due_date->format('d F Y') }}
+                                                    </td>
+                                                    <td class="sort-tax">
+                                                        @if ($sale->tax_rate)
+                                                            <span class="badge bg-indigo-lt">Tax
+                                                                {{ $sale->tax_rate }}%</span>
+                                                        @else
+                                                            <span class="badge bg-indigo-lt">Not Applied</span>
+                                                        @endif
                                                     </td>
                                                     <td class="sort-amount" data-amount="{{ $sale->total }}">
                                                         {{ \App\Helpers\CurrencyHelper::format($sale->total) }}<span

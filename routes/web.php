@@ -3,12 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Admin\{
-    CategoryController, CustomerController, ProductController, PurchaseController,
-    SupplierController, UnitController, CurrencyController, DailySalesController,
-    SalesController, DashboardController, ProfileController, NotificationController,
-    POSController, WarehouseController, TaxController
-};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, DailySalesController, SalesController, DashboardController, ProfileController, NotificationController, POSController, WarehouseController, TaxController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -17,11 +12,11 @@ use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 // Admin Authentication Routes (Move Inside "admin" Prefix)
 Route::prefix('admin')->group(function () {
     // Register
-    Route::get('/register', fn () => view('admin.auth.register'))->name('admin.register');
+    Route::get('/register', fn() => view('admin.auth.register'))->name('admin.register');
     Route::post('/register', [RegisteredUserController::class, 'store'])->name('admin.register.post');
 
     // Login
-    Route::get('/login', fn () => view('admin.auth.login'))->name('admin.login');
+    Route::get('/login', fn() => view('admin.auth.login'))->name('admin.login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('admin.login.post');
 
     // Logout
@@ -33,11 +28,11 @@ Route::prefix('admin')->group(function () {
     })->name('admin.logout');
 
     // Forgot Password
-    Route::get('/forgot-password', fn () => view('admin.auth.forgot-password'))->name('admin.password.request');
+    Route::get('/forgot-password', fn() => view('admin.auth.forgot-password'))->name('admin.password.request');
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('admin.password.email');
 
     // Reset Password
-    Route::get('/reset-password/{token}', fn ($token) => view('admin.auth.reset-password', ['token' => $token]))->name('admin.password.reset');
+    Route::get('/reset-password/{token}', fn($token) => view('admin.auth.reset-password', ['token' => $token]))->name('admin.password.reset');
     Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('admin.password.update');
 
     // Protected Admin Routes (Require Authentication)
@@ -85,22 +80,27 @@ Route::prefix('admin')->group(function () {
             Route::post('/tax/update', [TaxController::class, 'update'])->name('admin.setting.tax.update');
 
             Route::prefix('category')->group(function () {
-            Route::get('/', [CategoryController::class, 'index'])->name('admin.setting.category');
-            Route::get('/create', [CategoryController::class, 'create'])->name('admin.setting.category.create');
-            Route::post('/store', [CategoryController::class, 'store'])->name('admin.setting.category.store');
-            Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('admin.setting.category.edit');
-            Route::put('/update/{id}', [CategoryController::class, 'update'])->name('admin.setting.category.update');
-            Route::delete('/destroy/{id}', [CategoryController::class, 'destroy'])->name('admin.setting.category.destroy');
+                Route::get('/', [CategoryController::class, 'index'])->name('admin.setting.category');
+                Route::get('/create', [CategoryController::class, 'create'])->name('admin.setting.category.create');
+                Route::post('/store', [CategoryController::class, 'store'])->name('admin.setting.category.store');
+                Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('admin.setting.category.edit');
+                Route::put('/update/{id}', [CategoryController::class, 'update'])->name('admin.setting.category.update');
+                Route::delete('/destroy/{id}', [CategoryController::class, 'destroy'])->name('admin.setting.category.destroy');
             });
 
             Route::prefix('unit')->group(function () {
-            Route::get('/', [UnitController::class, 'index'])->name('admin.setting.unit');
-            Route::get('/create', [UnitController::class, 'create'])->name('admin.setting.unit.create');
-            Route::post('/store', [UnitController::class, 'store'])->name('admin.setting.unit.store');
-            Route::get('/edit/{id}', [UnitController::class, 'edit'])->name('admin.setting.unit.edit');
-            Route::put('/update/{id}', [UnitController::class, 'update'])->name('admin.setting.unit.update');
-            Route::delete('/destroy/{id}', [UnitController::class, 'destroy'])->name('admin.setting.unit.destroy');
+                Route::get('/', [UnitController::class, 'index'])->name('admin.setting.unit');
+                Route::get('/create', [UnitController::class, 'create'])->name('admin.setting.unit.create');
+                Route::post('/store', [UnitController::class, 'store'])->name('admin.setting.unit.store');
+                Route::get('/edit/{id}', [UnitController::class, 'edit'])->name('admin.setting.unit.edit');
+                Route::put('/update/{id}', [UnitController::class, 'update'])->name('admin.setting.unit.update');
+                Route::delete('/destroy/{id}', [UnitController::class, 'destroy'])->name('admin.setting.unit.destroy');
             });
+
+            Route::get('/admin/setting/tax/get', function () {
+                $tax = \App\Models\Tax::where('is_active', 1)->first();
+                return response()->json(['tax_rate' => $tax ? $tax->rate : 0]);
+            })->name('admin.setting.tax.get');
         });
 
         Route::get('/sales/get-past-price', [SalesController::class, 'getPastPrice']);

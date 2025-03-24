@@ -452,26 +452,33 @@
                     totalAmount += netAmount;
                 });
 
-                // ✅ Tax Calculation
-                let taxElement = document.getElementById("totalTax");
-                let taxRate = taxElement ? parseFloat(taxElement.dataset.taxRate) || 0 : 0;
-                let taxAmount = Math.floor(totalAmount * (taxRate / 100));
+                // ✅ Fetch tax rate from backend
+                fetch("{{ route('admin.setting.tax.get') }}")
+                    .then(response => response.json())
+                    .then(data => {
+                        let taxRate = data.tax_rate || 0;
+                        let taxAmount = Math.floor(totalAmount * (taxRate / 100));
+                        let grandTotal = totalAmount + taxAmount;
 
-                let grandTotal = totalAmount + taxAmount;
+                        // ✅ Update UI Values
+                        document.getElementById("totalDiscount").innerText = Math.floor(totalDiscount)
+                            .toLocaleString('id-ID');
+                        document.getElementById("totalTax").innerText = Math.floor(taxAmount).toLocaleString(
+                            'id-ID');
+                        document.getElementById("totalPrice").innerText = totalAmount.toLocaleString('id-ID');
+                        document.getElementById("grandTotal").innerText = grandTotal.toLocaleString('id-ID');
 
-                // ✅ Update UI Values
-                document.getElementById("totalDiscount").innerText = Math.floor(totalDiscount).toLocaleString(
-                    'id-ID');
-                if (taxElement) {
-                    taxElement.innerText = Math.floor(taxAmount).toLocaleString('id-ID');
-                }
-                document.getElementById("totalPrice").innerText = totalAmount.toLocaleString('id-ID');
-                document.getElementById("grandTotal").innerText = grandTotal.toLocaleString('id-ID');
+                        let grandTotalInput = document.getElementById("grandTotalInput");
+                        if (grandTotalInput) {
+                            grandTotalInput.value = grandTotal;
+                        }
 
-                let grandTotalInput = document.getElementById("grandTotalInput");
-                if (grandTotalInput) {
-                    grandTotalInput.value = grandTotal;
-                }
+                        // ✅ Update hidden total_tax input
+                        let totalTaxInput = document.getElementById("total_tax_input");
+                        if (totalTaxInput) {
+                            totalTaxInput.value = taxAmount;
+                        }
+                    });
             }
 
             // ✅ Use Event Delegation to Handle New Rows
@@ -510,6 +517,7 @@
         });
     </script>
 @endif
+
 {{-- SCRIPT FOR ADMIN PO CREATE --}}
 @if (request()->is('admin/po/create'))
     <script>

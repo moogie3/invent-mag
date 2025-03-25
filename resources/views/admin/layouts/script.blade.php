@@ -517,7 +517,6 @@
         });
     </script>
 @endif
-
 {{-- SCRIPT FOR ADMIN PO CREATE --}}
 @if (request()->is('admin/po/create'))
     <script>

@@ -162,38 +162,49 @@ class SalesController extends Controller
         'order_date' => 'required|date',
         'due_date' => 'required|date|after_or_equal:order_date',
         'total' => 'required|numeric|min:0',
-        'total_tax' => 'required|numeric|min:0', // ✅ Ensure total_tax is included in the validation
+        'items' => 'required|array', // Ensure items array exists
     ]);
 
     $totalAmount = 0;
+    $totalDiscount = 0;
 
     foreach ($request->items as $itemId => $itemData) {
         $salesItem = SalesItem::findOrFail($itemId);
         $quantity = $itemData['quantity'];
         $price = $itemData['price'];
+        $discountValue = $itemData['discount'] ?? 0;
+        $discountType = $itemData['discount_type'] ?? 'fixed';
 
-        // Calculate item total
-        $itemTotal = $quantity * $price;
-        $totalAmount += $itemTotal;
+        // Calculate Discount
+        $discountAmount = $discountType === 'percentage'
+            ? $quantity * $price * ($discountValue / 100)
+            : $discountValue;
+        $totalDiscount += $discountAmount;
 
-        // Update Sales Item
+        // Calculate Item Total (after discount)
+        $itemTotal = ($quantity * $price) - $discountAmount;
+
+        // Update Sales Item (fixing missing fields)
         $salesItem->update([
             'quantity' => $quantity,
             'price' => $price,
-            'total' => floor($itemTotal),
+            'discount' => $discountValue,
+            'discount_type' => $discountType,
+            'total' => floor($itemTotal + $salesItem->tax_amount), // Keep tax unchanged
         ]);
+
+        // Accumulate subtotal
+        $totalAmount += $quantity * $price;
     }
 
-    // ✅ Get total tax and tax rate from the frontend calculation
-    $totalTax = floor($request->total_tax);
-    $taxRate = Tax::where('is_active', 1)->value('rate') ?? 0; // Ensure we get the active tax rate
+    // Final Total Calculation
+    $finalTotal = $totalAmount - $totalDiscount + $sales->total_tax;
 
-    // ✅ Update Sales record
+    // Update Sales Order
     $sales->update([
-        'total' => floor($request->total),
+        'total' => floor($finalTotal),
         'subtotal' => floor($totalAmount),
-        'total_tax' => $totalTax, // ✅ Use the exact value from frontend
-        'tax_rate' => $taxRate, // ✅ Store the current tax percentage
+        'discount_total' => floor($totalDiscount),
         'order_date' => $request->order_date,
         'due_date' => $request->due_date,
         'payment_type' => $request->payment_type,
@@ -203,6 +214,7 @@ class SalesController extends Controller
 
     return redirect()->route('admin.sales.view', $id)->with('success', 'Sales updated successfully.');
 }
+
     public function getPastPrice(Request $request)
     {
         $customerId = $request->customer_id;

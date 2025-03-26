@@ -96,11 +96,6 @@
                                                 <input type="number" class="form-control" name="discount" id="discount"
                                                     placeholder="Discount" min="0" />
                                             </div>
-                                            <div class="col-md-2 mb-3">
-                                                <label class="form-label">TAX RATE (%)</label>
-                                                <input type="number" class="form-control" name="tax_rate" id="tax_rate"
-                                                    placeholder="Tax %" min="0" />
-                                            </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-2 mb-3">
@@ -118,6 +113,7 @@
                                                 <input type="text" class="form-control" name="past_price"
                                                     id="past_price" placeholder="Past price" disabled />
                                             </div>
+                                            <input type="hidden" id="taxInput" name="tax_amount" value="0">
                                             <div class="col-md-6 mb-3 text-end">
                                                 <label class="form-label">BUTTON</label>
                                                 <button type="button" id="addProduct" class="btn btn-secondary">Add
@@ -148,8 +144,10 @@
                                     </table>
                                     <h3 class="mt-3 text-end">Subtotal: <span id="subtotal">0</span></h3>
                                     <h3 class="mt-3 text-end">Discount Total: <span id="discountTotal">0</span></h3>
-                                    <h3 class="mt-3 text-end">Tax Total: <span id="taxTotal">0</span></h3>
-                                    <h3 class="mt-3 text-end">Final Total: <span id="finalTotal">0</span></h3>
+                                    <h3 class="mt-3 text-end">
+                                        Tax Total ({{ $tax->rate }}%): <span id="taxTotal">0</span>
+                                    </h3>
+                                    <h3 class="mt-3 text-end">Grand Total: <span id="finalTotal">0</span></h3>
                                 </form>
                             </div>
                         </div>

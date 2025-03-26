@@ -164,10 +164,10 @@
                                                     </td>
                                                     <td class="sort-tax">
                                                         @if ($sale->tax_rate)
-                                                            <span class="badge bg-indigo-lt">Tax
+                                                            <span class="badge bg-black-lt">Tax
                                                                 {{ $sale->tax_rate }}%</span>
                                                         @else
-                                                            <span class="badge bg-indigo-lt">Not Applied</span>
+                                                            <span class="badge bg-black-lt">Not Applied</span>
                                                         @endif
                                                     </td>
                                                     <td class="sort-amount" data-amount="{{ $sale->total }}">

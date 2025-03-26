@@ -41,7 +41,8 @@ class SalesController extends Controller
         $customers = Customer::all();
         $products = Product::all();
         $items = SalesItem::all();
-        return view('admin.sales.sales-create', compact('sales', 'customers', 'products', 'items'));
+        $tax = Tax::first();
+        return view('admin.sales.sales-create', compact('sales', 'customers', 'products', 'items','tax'));
     }
 
     public function edit($id)
@@ -83,7 +84,7 @@ class SalesController extends Controller
             }
 
             // Initialize totals
-            $subtotal = 0;
+            $totalAmount = 0;
             $totalDiscount = 0;
             $totalTax = 0;
 
@@ -100,16 +101,17 @@ class SalesController extends Controller
             foreach ($products as $product) {
                 $quantity = $product['quantity'];
                 $price = $product['price'];
+                $customerPrice = $product['customer_price'] ?? $price;
                 $discountValue = $product['discount'] ?? 0;
                 $discountType = $product['discount_type'] ?? 'fixed';
                 $taxRate = $product['tax_rate'] ?? 0;
 
                 // Calculate Discount
                 $discountAmount = $discountType === 'percentage' ? $quantity * $price * ($discountValue / 100) : $discountValue;
+                $totalDiscount += $discountAmount;
 
                 // Calculate Item Total (after discount)
-                $itemTotal = $quantity * $price - $discountAmount;
-                $totalDiscount += $discountAmount;
+                $itemTotal = $quantity * $customerPrice - $discountAmount;
 
                 // Calculate Tax (after discount is applied)
                 $taxAmount = ($taxRate / 100) * $itemTotal;
@@ -121,7 +123,7 @@ class SalesController extends Controller
                     'product_id' => $product['id'],
                     'quantity' => $quantity,
                     'price' => $price,
-                    'customer_price' => $product['customer_price'] ?? $price,
+                    'customer_price' => $customerPrice,
                     'discount' => $discountValue,
                     'discount_type' => $discountType,
                     'tax_rate' => $taxRate,
@@ -129,17 +131,17 @@ class SalesController extends Controller
                     'total' => floor($itemTotal + $taxAmount),
                 ]);
 
-                // Accumulate subtotal
-                $subtotal += $quantity * $price;
+                // Accumulate total amount
+                $totalAmount += $quantity * $customerPrice;
             }
 
             // Final Total Calculation
-            $finalTotal = $subtotal - $totalDiscount + $totalTax;
+            $finalTotal = $totalAmount - $totalDiscount + $totalTax;
 
             // Update Sales Order with Final Totals
             $sales->update([
                 'total' => floor($finalTotal),
-                'subtotal' => floor($subtotal),
+                'subtotal' => floor($totalAmount),
                 'discount_total' => floor($totalDiscount),
                 'tax_total' => floor($totalTax),
             ]);
@@ -153,67 +155,65 @@ class SalesController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $sales = Sales::findOrFail($id);
+    {
+        $sales = Sales::findOrFail($id);
 
-    $request->validate([
-        'payment_type' => 'required',
-        'status' => 'required',
-        'order_date' => 'required|date',
-        'due_date' => 'required|date|after_or_equal:order_date',
-        'total' => 'required|numeric|min:0',
-        'items' => 'required|array', // Ensure items array exists
-    ]);
-
-    $totalAmount = 0;
-    $totalDiscount = 0;
-
-    foreach ($request->items as $itemId => $itemData) {
-        $salesItem = SalesItem::findOrFail($itemId);
-        $quantity = $itemData['quantity'];
-        $price = $itemData['price'];
-        $discountValue = $itemData['discount'] ?? 0;
-        $discountType = $itemData['discount_type'] ?? 'fixed';
-
-        // Calculate Discount
-        $discountAmount = $discountType === 'percentage'
-            ? $quantity * $price * ($discountValue / 100)
-            : $discountValue;
-        $totalDiscount += $discountAmount;
-
-        // Calculate Item Total (after discount)
-        $itemTotal = ($quantity * $price) - $discountAmount;
-
-        // Update Sales Item (fixing missing fields)
-        $salesItem->update([
-            'quantity' => $quantity,
-            'price' => $price,
-            'discount' => $discountValue,
-            'discount_type' => $discountType,
-            'total' => floor($itemTotal + $salesItem->tax_amount), // Keep tax unchanged
+        $request->validate([
+            'payment_type' => 'required',
+            'status' => 'required',
+            'order_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:order_date',
+            'total' => 'required|numeric|min:0',
+            'items' => 'required|array', // Ensure items array exists
         ]);
 
-        // Accumulate subtotal
-        $totalAmount += $quantity * $price;
+        $totalAmount = 0;
+        $totalDiscount = 0;
+
+        foreach ($request->items as $itemId => $itemData) {
+            $salesItem = SalesItem::findOrFail($itemId);
+            $quantity = $itemData['quantity'];
+            $price = $itemData['price'];
+            $discountValue = $itemData['discount'] ?? 0;
+            $discountType = $itemData['discount_type'] ?? 'fixed';
+
+            // Calculate Discount
+            $discountAmount = $discountType === 'percentage' ? $quantity * $price * ($discountValue / 100) : $discountValue;
+            $totalDiscount += $discountAmount;
+
+            // Calculate Item Total (after discount)
+            $itemTotal = $quantity * $price - $discountAmount;
+
+            // Update Sales Item (fixing missing fields)
+            $salesItem->update([
+                'quantity' => $quantity,
+                'price' => $price,
+                'discount' => $discountValue,
+                'discount_type' => $discountType,
+                'total' => floor($itemTotal + $salesItem->tax_amount), // Keep tax unchanged
+            ]);
+
+            // Accumulate subtotal
+            $totalAmount += $quantity * $price;
+        }
+
+        // Final Total Calculation
+        $finalTotal = $totalAmount - $totalDiscount + $sales->total_tax;
+
+        // Update Sales Order
+        $sales->update([
+            'total' => floor($finalTotal),
+            'subtotal' => floor($totalAmount),
+            'discount_total' => floor($totalDiscount),
+            'order_date' => $request->order_date,
+            'due_date' => $request->due_date,
+            'payment_type' => $request->payment_type,
+            'status' => $request->status,
+            'payment_date' => $request->status === 'Paid' ? now() : null,
+        ]);
+
+        return redirect()->route('admin.sales.view', $id)->with('success', 'Sales updated successfully.');
     }
-
-    // Final Total Calculation
-    $finalTotal = $totalAmount - $totalDiscount + $sales->total_tax;
-
-    // Update Sales Order
-    $sales->update([
-        'total' => floor($finalTotal),
-        'subtotal' => floor($totalAmount),
-        'discount_total' => floor($totalDiscount),
-        'order_date' => $request->order_date,
-        'due_date' => $request->due_date,
-        'payment_type' => $request->payment_type,
-        'status' => $request->status,
-        'payment_date' => $request->status === 'Paid' ? now() : null,
-    ]);
-
-    return redirect()->route('admin.sales.view', $id)->with('success', 'Sales updated successfully.');
-}
 
     public function getPastPrice(Request $request)
     {

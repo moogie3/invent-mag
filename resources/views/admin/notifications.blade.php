@@ -40,28 +40,28 @@
                                                 $dueDate = $po->due_date;
                                                 $paymentDate = $po->payment_date;
                                                 $diffDays = $today->diffInDays($dueDate, false);
-                                                $statusBadge = 'bg-info'; // Default
+                                                $statusBadge = 'text-blue'; // Default
                                                 $statusText = 'Pending'; // Default
 
                                                 if ($po->status === 'Paid') {
                                                     if ($paymentDate && $today->isSameDay($paymentDate)) {
-                                                        $statusBadge = 'bg-success';
+                                                        $statusBadge = 'text-green';
                                                         $statusText = 'Paid Today';
                                                     } else {
-                                                        $statusBadge = 'bg-success';
+                                                        $statusBadge = 'text-green';
                                                         $statusText = 'Paid';
                                                     }
                                                 } elseif ($diffDays == 0) {
-                                                    $statusBadge = 'bg-danger';
+                                                    $statusBadge = 'text-red';
                                                     $statusText = 'Due Today';
                                                 } elseif ($diffDays > 0 && $diffDays <= 3) {
-                                                    $statusBadge = 'bg-danger';
+                                                    $statusBadge = 'text-red';
                                                     $statusText = 'Due in 3 Days';
                                                 } elseif ($diffDays > 3 && $diffDays <= 7) {
-                                                    $statusBadge = 'bg-warning';
+                                                    $statusBadge = 'text-yellow';
                                                     $statusText = 'Due in 1 Week';
                                                 } elseif ($diffDays < 0) {
-                                                    $statusBadge = 'bg-dark'; // Use a darker color for visibility
+                                                    $statusBadge = 'text-black'; // Use a darker color for visibility
                                                     $statusText = 'Overdue'; // Ensure this text is always set
                                                 }
                                             @endphp
@@ -72,7 +72,7 @@
                                                     <span>PO #{{ $po->id }} - Due on
                                                         {{ $po->due_date->format('M d, Y') }}</span>
                                                     <span
-                                                        class="badge {{ $statusBadge }}">{{ $statusText ?: 'Overdue' }}</span>
+                                                        class="badge badge-outline {{ $statusBadge }}">{{ $statusText ?: 'Overdue' }}</span>
                                                     <!-- Ensure text is always set -->
                                                 </a>
                                                 @php $hasNotifications = true; @endphp

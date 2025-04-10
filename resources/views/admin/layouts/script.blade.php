@@ -149,7 +149,6 @@
 @if (request()->is('admin/sales/create'))
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 🟢 Elements
             const orderDateField = document.getElementById('order_date');
             const dueDateField = document.getElementById('due_date');
             const customerSelect = document.getElementById('customer_id');
@@ -216,16 +215,25 @@
             }
 
             function addProductRow(product) {
+                let itemTotal = product.price * product.quantity;
+                let discountAmount = product.discount_type === "percentage" ?
+                    (product.discount / 100) * itemTotal :
+                    product.discount;
+                let finalAmount = itemTotal - discountAmount; // ✅ Ensure correct discount calculation
+                let discountDisplay = product.discount_type === "percentage" ?
+                    `${product.discount}%` :
+                    formatCurrency(discountAmount);
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>${product.quantity}</td>
-                    <td>${formatCurrency(product.price)}</td>
-                    <td>${formatCurrency(product.total)}</td>
-                    <td style="text-align:center">
-                        <button type="button" class="btn btn-danger btn-sm removeProduct">Remove</button>
-                    </td>
-                `;
+        <td>${product.name}</td>
+        <td>${product.quantity}</td>
+        <td>${formatCurrency(product.price)}</td>
+        <td>${discountDisplay}</td>
+        <td>${formatCurrency(finalAmount)}</td> <!-- ✅ Fixed amount calculation -->
+        <td style="text-align:center">
+            <button type="button" class="btn btn-danger btn-sm removeProduct">Remove</button>
+        </td>
+    `;
                 productTableBody.appendChild(row);
 
                 row.querySelector('.removeProduct').addEventListener('click', function() {
@@ -322,35 +330,33 @@
                     totalTax = 0,
                     finalTotal = 0;
 
-                // 🔹 Step 1: Calculate Subtotal and Discount
+                // 🔹 Step 1: Calculate Subtotal (After Discounts)
                 products.forEach((product) => {
                     let itemTotal = product.price * product.quantity;
                     let discountAmount = product.discount_type === "percentage" ?
                         (product.discount / 100) * itemTotal :
                         product.discount;
 
-                    subtotal += itemTotal;
+                    subtotal += (itemTotal - discountAmount); // ✅ Subtotal is now correct after discounts
                     totalDiscount += discountAmount;
                 });
 
-                // 🔹 Step 2: Calculate Tax Based on Subtotal (After Discount)
-                let taxableAmount = subtotal - totalDiscount;
-                totalTax = (taxRate / 100) * taxableAmount; // ✅ Apply tax to subtotal
+                // 🔹 Step 2: Calculate Tax Based on Subtotal
+                totalTax = (taxRate / 100) * subtotal; // ✅ Tax is now based only on subtotal
 
                 // 🔹 Step 3: Calculate Final Total
-                finalTotal = taxableAmount + totalTax;
+                finalTotal = subtotal + totalTax; // ✅ Grand total is subtotal + tax
 
                 // 🔹 Step 4: Update the <h3> elements
                 subtotalElement.textContent = formatCurrency(subtotal);
                 discountTotalElement.textContent = formatCurrency(totalDiscount);
-                taxTotalElement.textContent = formatCurrency(totalTax); // ✅ Now updates tax total correctly
-                finalTotalElement.textContent = formatCurrency(finalTotal); // ✅ Final total now correct
+                taxTotalElement.textContent = formatCurrency(totalTax);
+                finalTotalElement.textContent = formatCurrency(finalTotal);
 
                 // 🔹 Step 5: Update hidden input fields for form submission
                 productsField.value = JSON.stringify(products);
                 taxInputField.value = totalTax;
             }
-
 
             function formatCurrency(amount) {
                 return new Intl.NumberFormat('id-ID', {
@@ -522,7 +528,6 @@
             const newPriceField = document.getElementById('new_price');
             const addProductButton = document.getElementById('addProduct');
             const productTableBody = document.getElementById('productTableBody');
-            const totalPriceElement = document.getElementById('totalPrice');
             const productsField = document.getElementById('productsField');
 
             let products = JSON.parse(localStorage.getItem('poProducts')) || [];
@@ -531,31 +536,158 @@
                 localStorage.setItem('poProducts', JSON.stringify(products));
             }
 
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    maximumFractionDigits: 0
+                }).format(amount);
+            }
+
+            function calculateTotal(price, quantity, discount, discountType) {
+                if (discountType === 'percent') {
+                    return (price * quantity) - ((price * quantity) * discount / 100);
+                }
+                return (price * quantity) - discount;
+            }
+
+            function updateTotalPrice() {
+                let subtotal = 0;
+                let totalDiscount = 0;
+
+                products.forEach(product => {
+                    const productSubtotal = Number(product.price) * Number(product.quantity);
+                    const productDiscount = product.discountType === 'percent' ?
+                        (productSubtotal * product.discount / 100) :
+                        product.discount;
+                    subtotal += productSubtotal;
+                    totalDiscount += productDiscount;
+
+                    console.log(`Product ${product.name}:`);
+                    console.log(`Price: ${product.price}, Quantity: ${product.quantity}`);
+                    console.log(`Subtotal: ${productSubtotal}, Discount: ${productDiscount}`);
+                });
+
+                const finalTotal = subtotal - totalDiscount;
+
+                // Update UI
+                document.getElementById('subtotal').innerText = formatCurrency(subtotal);
+                document.getElementById('discountTotal').innerText = formatCurrency(totalDiscount);
+                document.getElementById('finalTotal').innerText = formatCurrency(finalTotal);
+
+                document.getElementById('totalDiscountInput').value = totalDiscount;
+                productsField.value = JSON.stringify(products);
+            }
+
             function renderTable() {
                 productTableBody.innerHTML = '';
-                let total = 0;
-
                 products.forEach(product => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${product.name}</td>
-                        <td>${product.quantity}</td>
-                        <td>${formatCurrency(product.price)}</td>
-                        <td>${formatCurrency(product.total)}</td>
-                        <td><button class="btn btn-danger btn-sm removeProduct" data-id="${product.id}">Remove</button></td>
+                        <td>
+                            <input type="number" class="form-control quantity-input"
+                                value="${product.quantity}" data-id="${product.id}" min="1" style="width:80px;" />
+                        </td>
+                        <td>
+                            <input type="number" class="form-control price-input"
+                                value="${product.price}" data-id="${product.id}" min="0" style="width:100px;" />
+                        </td>
+                        <td>
+                            <div class="input-group" style="width:200px;">
+                                <input type="number" class="form-control discount-input"
+                                    value="${product.discount}" data-id="${product.id}" min="0" />
+                                <select class="form-select discount-type" data-id="${product.id}">
+                                    <option value="currency" ${product.discountType === 'currency' ? 'selected' : ''}>Rp</option>
+                                    <option value="percent" ${product.discountType === 'percent' ? 'selected' : ''}>%</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td class="product-total">${formatCurrency(product.total)}</td>
+                        <td style="text-align:center">
+                            <button class="btn btn-danger btn-sm removeProduct" data-id="${product.id}">Remove</button>
+                        </td>
                     `;
                     productTableBody.appendChild(row);
-                    total += product.total;
                 });
 
-                totalPriceElement.innerText = formatCurrency(total);
+                updateTotalPrice();
                 productsField.value = JSON.stringify(products);
 
+                // Event listeners
                 document.querySelectorAll('.removeProduct').forEach(button => {
                     button.addEventListener('click', function() {
                         products = products.filter(p => p.id != this.dataset.id);
                         saveToLocalStorage();
                         renderTable();
+                    });
+                });
+
+                document.querySelectorAll('.quantity-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const id = this.dataset.id;
+                        const value = parseInt(this.value) || 1;
+                        const product = products.find(p => p.id == id);
+                        if (product) {
+                            product.quantity = value;
+                            product.total = calculateTotal(product.price, product.quantity, product
+                                .discount, product.discountType);
+                            saveToLocalStorage();
+                            this.closest('tr').querySelector('.product-total').innerText =
+                                formatCurrency(product.total);
+                            updateTotalPrice();
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.price-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const id = this.dataset.id;
+                        const value = parseFloat(this.value) || 0;
+                        const product = products.find(p => p.id == id);
+                        if (product) {
+                            product.price = value;
+                            product.total = calculateTotal(product.price, product.quantity, product
+                                .discount, product.discountType);
+                            saveToLocalStorage();
+                            this.closest('tr').querySelector('.product-total').innerText =
+                                formatCurrency(product.total);
+                            updateTotalPrice();
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.discount-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const id = this.dataset.id;
+                        const value = parseFloat(this.value) || 0;
+                        const product = products.find(p => p.id == id);
+                        if (product) {
+                            product.discount = value;
+                            product.total = calculateTotal(product.price, product.quantity, product
+                                .discount, product.discountType);
+                            saveToLocalStorage();
+                            this.closest('tr').querySelector('.product-total').innerText =
+                                formatCurrency(product.total);
+                            updateTotalPrice();
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.discount-type').forEach(select => {
+                    select.addEventListener('change', function() {
+                        const id = this.dataset.id;
+                        const value = this.value;
+                        const product = products.find(p => p.id == id);
+                        if (product) {
+                            product.discountType = value;
+                            product.total = calculateTotal(product.price, product.quantity, product
+                                .discount, product.discountType);
+                            saveToLocalStorage();
+                            this.closest('tr').querySelector('.product-total').innerText =
+                                formatCurrency(product.total);
+                            updateTotalPrice();
+                        }
                     });
                 });
             }
@@ -570,19 +702,29 @@
                 const productName = productSelect.options[productSelect.selectedIndex].text;
                 const quantity = parseInt(quantityField.value);
                 const price = parseFloat(newPriceField.value);
-                const total = price * quantity;
 
-                if (!productId || !quantity || !price) return alert('Complete all fields!');
+                if (!productId || !quantity || isNaN(price)) {
+                    return alert('Complete all fields!');
+                }
 
-                if (products.some(p => p.id == productId)) return alert('Product already added.');
+                if (products.some(p => p.id == productId)) {
+                    return alert('Product already added.');
+                }
+
+                const discount = 0;
+                const discountType = 'currency';
+                const total = calculateTotal(price, quantity, discount, discountType);
 
                 products.push({
                     id: productId,
                     name: productName,
                     quantity,
                     price,
+                    discount,
+                    discountType,
                     total
                 });
+
                 saveToLocalStorage();
                 renderTable();
 
@@ -590,13 +732,6 @@
                 quantityField.value = '';
                 newPriceField.value = '';
             });
-
-            function formatCurrency(amount) {
-                return new Intl.NumberFormat('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR'
-                }).format(amount);
-            }
 
             renderTable();
         });

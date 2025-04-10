@@ -56,13 +56,6 @@
                                                         <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                                                <i class="ti ti-building-warehouse fs-2"></i>
-                                                            </span>
-                                                            Main Warehouse : <strong></strong>
-                                                        </div>
-                                                        <div class="mb-2">
-                                                            <span
-                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-file-invoice fs-2"></i>
                                                             </span>
                                                             Total Warehouse : <strong>{{ $totalwarehouse }}</strong>

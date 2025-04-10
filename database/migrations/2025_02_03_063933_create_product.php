@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('units_id');
             $table->integer('supplier_id');
             $table->text('description');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

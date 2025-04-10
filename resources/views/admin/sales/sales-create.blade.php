@@ -99,12 +99,12 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-2 mb-3">
-                                                <label class="form-label">PRICE FROM SUPPLIER</label>
+                                                <label class="form-label">SUPPLIER PRICE</label>
                                                 <input type="text" class="form-control" name="price" id="price"
                                                     placeholder="Price" disabled />
                                             </div>
                                             <div class="col-md-2 mb-3">
-                                                <label class="form-label">RETAIL SELLING PRICE</label>
+                                                <label class="form-label">RETAIL PRICE</label>
                                                 <input type="text" class="form-control" name="selling_price"
                                                     id="selling_price" placeholder="Selling price" disabled />
                                             </div>
@@ -133,6 +133,8 @@
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-price">Price
                                                 </th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-discount">Discount</button></th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-total">Amount
                                                 </th>
                                                 <th style="width:200px;text-align:center" class="fs-4 py-3">Action
@@ -148,6 +150,10 @@
                                         Tax Total ({{ $tax->rate }}%): <span id="taxTotal">0</span>
                                     </h3>
                                     <h3 class="mt-3 text-end">Grand Total: <span id="finalTotal">0</span></h3>
+                                    <input type="hidden" id="totalDiscountInput" name="total_discount" value="0">
+                                    <input type="hidden" id="taxInput" name="tax_amount" value="0">
+                                    <input type="hidden" id="totalDiscountInput" name="total_discount" value="0">
+                                    <input type="hidden" id="taxInput" name="tax_amount" value="0">
                                 </form>
                             </div>
                         </div>

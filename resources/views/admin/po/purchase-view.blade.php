@@ -130,13 +130,13 @@
                                                             </tbody>
                                                         </table>
                                                         <br>
-                                                        <h2 class="text-end">
+                                                        <h3 class="text-end">
                                                             Total Amount: <span id="totalPrice">
                                                                 {{ \App\Helpers\CurrencyHelper::format(
                                                                     $pos->items->sum(fn($item) => $item->quantity * $item->price * (1 - $item->discount / 100)),
                                                                 ) }}
                                                             </span>
-                                                        </h2>
+                                                        </h3>
                                                     </div>
                                                 </div>
                                             </div>

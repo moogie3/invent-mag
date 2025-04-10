@@ -43,13 +43,13 @@
                                                                 style="height: 85px; object-fit: cover; cursor: pointer;"
                                                                 data-product-id="{{ $product->id }}"
                                                                 data-product-name="{{ $product->name }}"
-                                                                data-product-price="{{ $product->price }}"
+                                                                data-product-price="{{ $product->selling_price }}"
                                                                 data-product-unit="{{ $product->unit->symbol }}">
                                                             <div class="card-body p-1">
                                                                 <h5 class="card-title" style="font-size: 12px;">
                                                                     {{ $product->name }}</h5>
                                                                 <p class="card-text text-muted" style="font-size: 10px;">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($product->price) }}
+                                                                    {{ \App\Helpers\CurrencyHelper::format($product->selling_price) }}
                                                                 </p>
                                                             </div>
                                                         </div>

@@ -160,11 +160,18 @@
                                                             </tbody>
                                                         </table>
                                                         <br>
-                                                        <h2 class="text-end">
-                                                            Total Amount : <span id="totalPrice">
-                                                                {{ \App\Helpers\CurrencyHelper::format($pos->items->sum(fn($item) => $item->quantity * $item->price)) }}
-                                                            </span>
-                                                        </h2>
+                                                        <div class="row mt-4">
+                                                            <div class="col-md-12 text-end">
+                                                                <h3 class="mb-2">Subtotal: <span id="subtotal">0</span>
+                                                                </h3>
+                                                                <h3 class="mb-2">Discount Total: <span
+                                                                        id="discountTotal">0</span></h3>
+                                                                <h3 class="mb-2">Grand Total: <span
+                                                                        id="finalTotal">0</span></h3>
+                                                                <input type="hidden" id="totalDiscountInput"
+                                                                    name="total_discount" value="0">
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

@@ -31,7 +31,7 @@
                                     action="{{ route('admin.po.update', $pos->id) }}">
                                     @csrf
                                     @method('PUT')
-                                    <h1 class="text-center no-print">Invoice Information</h1>
+                                    <h1 class="text-center no-print">Invoice Details</h1>
                                     @if ($pos->status !== 'Paid')
                                         <fieldset class="form-fieldset no-print">
                                             <div class="row">
@@ -79,8 +79,7 @@
                                                                     {{ $pos->supplier->address }}<br>
                                                                     {{ $pos->supplier->phone_number }}<br>
                                                                     Order Date :
-                                                                    {{ $pos->order_date->format('d-m-Y') }}<br>
-                                                                    Due Date : {{ $pos->due_date->format('d-m-Y') }}
+                                                                    {{ $pos->order_date->format('d-m-Y') }}
                                                                 </address>
                                                             </div>
                                                             <div class="col-6 text-end">
@@ -94,6 +93,9 @@
                                                                             {{ $pos->payment_date->format('d F Y') }}<br>{{ $pos->payment_date->format('H:i:s') }}</span>
                                                                     @endif
                                                                 </h3>
+                                                                <address>
+                                                                    Due Date : {{ $pos->due_date->format('d-m-Y') }}</br>
+                                                                </address>
                                                             </div>
                                                         </div>
                                                         <table class="table table-transparent table-responsive">
@@ -103,12 +105,36 @@
                                                                     <th>Product</th>
                                                                     <th class="text-center" style="width: 1%">QTY</th>
                                                                     <th class="text-end" style="width: 15%">Unit Price</th>
-                                                                    <th class="text-end" style="width: 10%">Discount</th>
-                                                                    <th class="text-end" style="width: 20%">Amount</th>
+                                                                    <th class="text-end" style="width: 15%">Discount Type
+                                                                    </th>
+                                                                    <th class="text-end" style="width: 15%">Discount</th>
+                                                                    <th class="text-end" style="width: 15%">Total</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
+                                                                @php
+                                                                    $subtotal = 0;
+                                                                    $totalDiscount = 0;
+                                                                @endphp
+
                                                                 @foreach ($pos->items as $index => $item)
+                                                                    @php
+                                                                        $discount =
+                                                                            $item->discount_type === 'percentage'
+                                                                                ? ($item->price *
+                                                                                        $item->quantity *
+                                                                                        $item->discount) /
+                                                                                    100
+                                                                                : $item->discount;
+
+                                                                        $productSubtotal =
+                                                                            $item->price * $item->quantity;
+                                                                        $total = $productSubtotal - $discount;
+
+                                                                        $subtotal += $productSubtotal;
+                                                                        $totalDiscount += $discount;
+                                                                    @endphp
+
                                                                     <tr>
                                                                         <td class="text-center">{{ $index + 1 }}</td>
                                                                         <td>
@@ -120,23 +146,48 @@
                                                                             {{ \App\Helpers\CurrencyHelper::format($item->price) }}
                                                                         </td>
                                                                         <td class="text-end">
-                                                                            {{ $item->discount }}%
+                                                                            @if ($item->discount_type === 'percentage')
+                                                                                Percentage
+                                                                            @else
+                                                                                Fixed
+                                                                            @endif
                                                                         </td>
                                                                         <td class="text-end">
-                                                                            {{ \App\Helpers\CurrencyHelper::format($item->quantity * $item->price - $item->discount) }}
+                                                                            {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::format($item->discount) }}
+                                                                        </td>
+                                                                        <td class="text-end">
+                                                                            {{ \App\Helpers\CurrencyHelper::format($total) }}
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach
                                                             </tbody>
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td colspan="6" class="text-end">
+                                                                        <strong>Sub Total :</strong>
+                                                                    </td>
+                                                                    <td class="text-end">
+                                                                        {{ \App\Helpers\CurrencyHelper::format($subtotal) }}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td colspan="6" class="text-end">
+                                                                        <strong>Discount :</strong>
+                                                                    </td>
+                                                                    <td class="text-end">
+                                                                        {{ \App\Helpers\CurrencyHelper::format($totalDiscount) }}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td colspan="6" class="text-end">
+                                                                        <strong>Grand Total :</strong>
+                                                                    </td>
+                                                                    <td class="text-end">
+                                                                        {{ \App\Helpers\CurrencyHelper::format($subtotal - $totalDiscount) }}
+                                                                    </td>
+                                                                </tr>
+                                                            </tfoot>
                                                         </table>
-                                                        <br>
-                                                        <h3 class="text-end">
-                                                            Total Amount: <span id="totalPrice">
-                                                                {{ \App\Helpers\CurrencyHelper::format(
-                                                                    $pos->items->sum(fn($item) => $item->quantity * $item->price * (1 - $item->discount / 100)),
-                                                                ) }}
-                                                            </span>
-                                                        </h3>
                                                     </div>
                                                 </div>
                                             </div>

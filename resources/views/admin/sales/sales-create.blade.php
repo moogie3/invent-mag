@@ -152,8 +152,6 @@
                                     <h3 class="mt-3 text-end">Grand Total: <span id="finalTotal">0</span></h3>
                                     <input type="hidden" id="totalDiscountInput" name="total_discount" value="0">
                                     <input type="hidden" id="taxInput" name="tax_amount" value="0">
-                                    <input type="hidden" id="totalDiscountInput" name="total_discount" value="0">
-                                    <input type="hidden" id="taxInput" name="tax_amount" value="0">
                                 </form>
                             </div>
                         </div>

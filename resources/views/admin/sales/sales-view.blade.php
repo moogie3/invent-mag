@@ -164,37 +164,34 @@
                                                             @endphp
                                                             <tfoot>
                                                                 <tr>
+                                                                    <td colspan="6" class="text-end"><strong>Sub
+                                                                            Total :</strong></td>
+                                                                    <td class="text-end">
+                                                                        {{ \App\Helpers\CurrencyHelper::format($totals['subTotal']) }}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
                                                                     <td colspan="6" class="text-end">
-                                                                        <strong>Discount:</strong>
+                                                                        <strong>Discount :</strong>
                                                                     </td>
                                                                     <td class="text-end">
                                                                         {{ \App\Helpers\CurrencyHelper::format($totals['totalDiscount']) }}
                                                                     </td>
                                                                 </tr>
-                                                                <tr>
-                                                                    <td colspan="6" class="text-end"><strong>Sub
-                                                                            Total:</strong></td>
-                                                                    <td class="text-end">
-                                                                        <span
-                                                                            id="totalPrice">{{ \App\Helpers\CurrencyHelper::format($totals['subTotal']) }}</span>
-                                                                    </td>
-                                                                </tr>
                                                                 @if (isset($tax) && $tax->is_active)
                                                                     <tr>
                                                                         <td colspan="6" class="text-end"><strong>Tax
-                                                                                ({{ $tax->rate }}%):</strong></td>
+                                                                                ({{ $tax->rate }}%) :</strong></td>
                                                                         <td class="text-end">
-                                                                            <span
-                                                                                id="totalTax">{{ \App\Helpers\CurrencyHelper::format($totals['taxAmount']) }}</span>
+                                                                            {{ \App\Helpers\CurrencyHelper::format($totals['taxAmount']) }}
                                                                         </td>
                                                                     </tr>
                                                                 @endif
                                                                 <tr>
                                                                     <td colspan="6" class="text-end"><strong>Grand
-                                                                            Total:</strong></td>
+                                                                            Total :</strong></td>
                                                                     <td class="text-end">
-                                                                        <span
-                                                                            id="grandTotal">{{ \App\Helpers\CurrencyHelper::format($totals['grandTotal']) }}</span>
+                                                                        {{ \App\Helpers\CurrencyHelper::format($totals['grandTotal']) }}
                                                                     </td>
                                                                 </tr>
                                                             </tfoot>

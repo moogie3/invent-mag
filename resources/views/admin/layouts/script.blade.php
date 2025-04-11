@@ -545,7 +545,7 @@
             }
 
             function calculateTotal(price, quantity, discount, discountType) {
-                if (discountType === 'percent') {
+                if (discountType === 'percentage') {
                     return (price * quantity) - ((price * quantity) * discount / 100);
                 }
                 return (price * quantity) - discount;
@@ -557,7 +557,7 @@
 
                 products.forEach(product => {
                     const productSubtotal = Number(product.price) * Number(product.quantity);
-                    const productDiscount = product.discountType === 'percent' ?
+                    const productDiscount = product.discountType === 'percentage' ?
                         (productSubtotal * product.discount / 100) :
                         product.discount;
                     subtotal += productSubtotal;
@@ -598,8 +598,8 @@
                                 <input type="number" class="form-control discount-input"
                                     value="${product.discount}" data-id="${product.id}" min="0" />
                                 <select class="form-select discount-type" data-id="${product.id}">
-                                    <option value="currency" ${product.discountType === 'currency' ? 'selected' : ''}>Rp</option>
-                                    <option value="percent" ${product.discountType === 'percent' ? 'selected' : ''}>%</option>
+                                    <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
+                                    <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
                                 </select>
                             </div>
                         </td>
@@ -711,8 +711,8 @@
                     return alert('Product already added.');
                 }
 
-                const discount = 0;
-                const discountType = 'currency';
+                const discount = parseFloat(document.getElementById('discount').value) || 0;
+                const discountType = document.getElementById('discount_type').value;
                 const total = calculateTotal(price, quantity, discount, discountType);
 
                 products.push({
@@ -740,52 +740,54 @@
 {{-- SCRIPT FOR ADMIN PO EDIT --}}
 @if (request()->is('admin/po/edit/*'))
     <script>
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
-            function updateTotalAmount() {
-                let totalAmount = 0;
+            function updateTotals() {
+                let subtotal = 0;
+                let discountTotal = 0;
 
                 document.querySelectorAll("tbody tr").forEach(row => {
-                    let quantity = parseFloat(row.querySelector(".quantity-input").value) || 0;
-                    let price = parseFloat(row.querySelector(".price-input").value) || 0;
+                    let quantity = parseFloat(row.querySelector(".quantity-input")?.value) || 0;
+                    let price = parseFloat(row.querySelector(".price-input")?.value) || 0;
+                    let discount = parseFloat(row.querySelector(".discount-input")?.value) || 0;
+                    let discountType = row.querySelector(".discount-type-input")?.value;
 
-                    let itemTotal = quantity * price;
-                    totalAmount += itemTotal;
+                    let total = quantity * price;
+                    let discountAmount = discountType === "percentage" ? (total * discount / 100) :
+                        discount;
+                    let finalAmount = total - discountAmount;
+
+                    // Update amount field
+                    let amountInput = row.querySelector(".amount-input");
+                    if (amountInput) {
+                        amountInput.value = Math.floor(finalAmount);
+                    }
+
+                    subtotal += total;
+                    discountTotal += discountAmount;
                 });
 
-                // Get discount type and value
-                let discountValue = parseFloat(document.getElementById("discountValue").value) || 0;
-                let discountType = document.getElementById("discountType").value;
-
-                // Apply discount on total
-                let totalDiscount = discountType === "percentage" ? (totalAmount * discountValue) / 100 :
-                    discountValue;
-
-                // Calculate subtotal after discount
-                let subtotalAfterDiscount = totalAmount - totalDiscount;
-
-                // Fetch tax rate from hidden input
-                let taxRate = parseFloat(document.getElementById("taxRate").value) || 0;
-                let taxAmount = (subtotalAfterDiscount * taxRate) / 100;
-
-                let finalTotal = subtotalAfterDiscount + taxAmount;
-
-                // Update values in HTML
-                document.getElementById("totalAmount").innerText = Math.floor(totalAmount);
-                document.getElementById("discountTotal").innerText = Math.floor(totalDiscount);
-                document.getElementById("taxTotal").innerText = Math.floor(taxAmount);
-                document.getElementById("finalTotal").innerText = Math.floor(finalTotal);
-
-                // Save grand total in hidden input field
-                document.getElementById("grandTotalInput").value = Math.floor(finalTotal);
+                document.getElementById("subtotal").innerText = formatCurrency(Math.floor(subtotal));
+                document.getElementById("discountTotal").innerText = formatCurrency(Math.floor(discountTotal));
+                document.getElementById("finalTotal").innerText = formatCurrency(Math.floor(subtotal -
+                    discountTotal));
+                document.getElementById("totalDiscountInput").value = Math.floor(discountTotal);
             }
 
-            // Attach event listeners
-            document.querySelectorAll(".quantity-input, .price-input, #discountValue, #discountType").forEach(
-                input => {
-                    input.addEventListener("input", updateTotalAmount);
+            // Event listeners
+            document.querySelectorAll(".quantity-input, .price-input, .discount-input, .discount-type-input")
+                .forEach(input => {
+                    input.addEventListener("input", updateTotals);
                 });
 
-            updateTotalAmount(); // Initial calculation
+            updateTotals(); // initial calc
         });
     </script>
 @endif

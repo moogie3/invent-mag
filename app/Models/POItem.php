@@ -14,6 +14,8 @@ class POItem extends Model
         'product_id',
         'quantity',
         'price',
+        'discount',
+        'discount_type',
         'total'
     ];
 

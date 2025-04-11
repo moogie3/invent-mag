@@ -132,25 +132,39 @@
                                                                         <td class="text-end">
                                                                             <input type="number"
                                                                                 name="items[{{ $item->id }}][price]"
-                                                                                value="{{ $item->price }}"
+                                                                                value="{{ intval($item->price) }}"
                                                                                 class="form-control text-end price-input"
                                                                                 data-item-id="{{ $item->id }}"
                                                                                 step="1" min="0" />
                                                                         </td>
-                                                                        <td class="input-group text-end">
-                                                                            <input type="number"
-                                                                                name="items[{{ $item->id }}][discount]"
-                                                                                value="{{ (int) $item->discount }}"
-                                                                                class="form-control discount-input text-end"
-                                                                                data-item-id="{{ $item->id }}"
-                                                                                step="1" min="0"
-                                                                                max="100" />
-                                                                            <span class="input-group-text">%</span>
+                                                                        <td>
+                                                                            <div class="input-group">
+                                                                                <input type="number"
+                                                                                    name="items[{{ $item->id }}][discount]"
+                                                                                    value="{{ (float) $item->discount }}"
+                                                                                    class="form-control text-end discount-input"
+                                                                                    style="min-width: 80px;" step="0.01"
+                                                                                    min="0"
+                                                                                    data-item-id="{{ $item->id }}" />
+
+                                                                                <select
+                                                                                    name="items[{{ $item->id }}][discountType]"
+                                                                                    class="form-select discount-type-input"
+                                                                                    style="min-width: 70px;"
+                                                                                    data-item-id="{{ $item->id }}">
+                                                                                    <option value="percentage"
+                                                                                        {{ $item->discount_type === 'percentage' ? 'selected' : '' }}>
+                                                                                        %</option>
+                                                                                    <option value="fixed"
+                                                                                        {{ $item->discount_type === 'fixed' ? 'selected' : '' }}>
+                                                                                        Rp</option>
+                                                                                </select>
+                                                                            </div>
                                                                         </td>
                                                                         <td class="text-end">
                                                                             <input type="text"
                                                                                 name="items[{{ $item->id }}][amount]"
-                                                                                value="{{ $item->quantity * $item->price - $item->discount }}"
+                                                                                value="{{ intval($item->quantity * $item->price - $item->discount) }}"
                                                                                 class="form-control text-end amount-input"
                                                                                 data-item-id="{{ $item->id }}"
                                                                                 readonly />
@@ -159,6 +173,10 @@
                                                                 @endforeach
                                                             </tbody>
                                                         </table>
+                                                        <small class="text-muted d-block mt-1 text-end">
+                                                            Select <strong>%</strong> for percentage or
+                                                            <strong>Rp</strong> for fixed discount.
+                                                        </small>
                                                         <br>
                                                         <div class="row mt-4">
                                                             <div class="col-md-12 text-end">

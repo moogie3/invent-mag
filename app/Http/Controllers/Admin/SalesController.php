@@ -65,89 +65,102 @@ class SalesController extends Controller
     }
 
     public function store(Request $request)
-    {
-        try {
-            // Validate request
-            $validatedData = $request->validate([
-                'invoice' => 'required|string|unique:sales,invoice',
-                'customer_id' => 'required|exists:customers,id',
-                'order_date' => 'required|date',
-                'due_date' => 'required|date|after_or_equal:order_date',
-                'products' => 'required|json',
-            ]);
+{
+    try {
+        // Validate the request
+        $validatedData = $request->validate([
+            'invoice' => 'nullable|string|unique:sales,invoice',
+            'customer_id' => 'required|exists:customers,id',
+            'order_date' => 'required|date',
+            'due_date' => 'required|date',
+            'products' => 'required|json',
+        ]);
 
-            // Decode products JSON safely
-            $products = json_decode($request->products, true);
-            if (!is_array($products)) {
-                return back()
-                    ->withErrors(['products' => 'Invalid product data'])
-                    ->withInput();
-            }
-
-            // Create Sales Order (initially with zero total)
-            $sales = Sales::create([
-                'invoice' => $request->invoice,
-                'customer_id' => $request->customer_id,
-                'order_date' => $request->order_date,
-                'due_date' => $request->due_date,
-                'total' => 0, // Placeholder, updated later
-            ]);
-
-            // Store Sales Items
-            foreach ($products as $product) {
-                $quantity = $product['quantity'];
-                $price = $product['price'];
-                $customerPrice = $product['customer_price'] ?? $price;
-                $discountValue = $product['discount'] ?? 0;
-                $discountType = $product['discount_type'] ?? 'fixed';
-                $taxRate = $product['tax_rate'] ?? 0;
-
-                // Calculate Discount
-                $discountAmount = $discountType === 'percentage' ? $quantity * $price * ($discountValue / 100) : $discountValue;
-
-                // Calculate Item Total (after discount)
-                $itemTotal = $quantity * $customerPrice - $discountAmount;
-
-                // Calculate Tax (after discount is applied)
-                $taxAmount = ($taxRate / 100) * $itemTotal;
-
-                // Save Sales Item
-                SalesItem::create([
-                    'sales_id' => $sales->id,
-                    'product_id' => $product['id'],
-                    'quantity' => $quantity,
-                    'price' => $price,
-                    'customer_price' => $customerPrice,
-                    'discount' => $discountValue,
-                    'discount_type' => $discountType,
-                    'tax_rate' => $taxRate,
-                    'tax_amount' => $taxAmount,
-                    'total' => floor($itemTotal + $taxAmount),
-                ]);
-            }
-
-            // Calculate totals using the helper function
-            $totals = \App\Helpers\SalesHelper::calculateTotals(collect($products), 0); // Assuming no tax for initial creation
-
-            // Update Sales Order with Final Totals
-            $sales->update([
-                'total' => floor($totals['grandTotal']),
-                'subtotal' => floor($totals['subTotal']),
-                'discount_total' => floor($totals['totalDiscount']),
-                'order_date' => $request->order_date,
-                'due_date' => $request->due_date,
-            ]);
-
-            return redirect()->route('admin.sales')->with('success', 'Sales Order created successfully.');
-        } catch (\Exception $e) {
+        // Decode products
+        $products = json_decode($request->products, true);
+        if (!$products || !is_array($products)) {
             return back()
-                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withErrors(['products' => 'Invalid product data'])
                 ->withInput();
         }
-    }
 
-    public function update(Request $request, $id)
-    {
+        // Calculate totals
+        $subTotal = 0;
+        $totalDiscount = 0;
+
+        foreach ($products as $product) {
+            $quantity = $product['quantity'];
+            $price = $product['price']; // Price from the JSON
+            $discount = $product['discount'] ?? 0;
+            $discountType = $product['discountType'] ?? 'fixed';
+
+            $productSubtotal = $price * $quantity;
+            $discountAmount = $discountType === 'percentage'
+                ? ($productSubtotal * $discount / 100)
+                : $discount;
+
+            $totalDiscount += $discountAmount;
+            $subTotal += $productSubtotal;
+        }
+
+        // Calculate tax
+        $tax = Tax::where('is_active', 1)->first();
+        $taxRate = $tax ? $tax->rate : 0;
+        $taxAmount = ($subTotal - $totalDiscount) * ($taxRate / 100);
+        $grandTotal = $subTotal - $totalDiscount + $taxAmount;
+
+        // Generate invoice number if not provided
+        if (empty($request->invoice)) {
+            $lastInvoice = Sales::latest()->first();
+            $invoiceNumber = $lastInvoice ? intval(substr($lastInvoice->invoice, -4)) + 1 : 1;
+            $invoice = 'INV-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+        } else {
+            $invoice = $request->invoice;
+        }
+
+        // Create Sale
+        $sale = Sales::create([
+            'invoice' => $invoice,
+            'customer_id' => $request->customer_id,
+            'order_date' => $request->order_date,
+            'due_date' => $request->due_date,
+            'tax_rate' => $taxRate,
+            'total_tax' => $taxAmount,
+            'total' => $grandTotal,
+            'status' => 'Unpaid', // Default status
+        ]);
+
+        // Insert sale items
+        foreach ($products as $product) {
+            $productSubtotal = $product['price'] * $product['quantity'];
+            $discountAmount = $product['discountType'] === 'percentage'
+                ? ($productSubtotal * $product['discount'] / 100)
+                : $product['discount'];
+
+            $itemTotal = $productSubtotal - $discountAmount;
+
+            SalesItem::create([
+                'sales_id' => $sale->id,
+                'product_id' => $product['id'],
+                'quantity' => $product['quantity'],
+                'customer_price' => $product['price'], // Use customer_price column instead of price
+                'discount' => $product['discount'] ?? 0,
+                'discount_type' => $product['discountType'] ?? 'fixed',
+                'total' => $itemTotal,
+            ]);
+        }
+
+        return redirect()->route('admin.sales')->with('success', 'Sale created successfully.');
+    } catch (\Exception $e) {
+        return back()
+            ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+            ->withInput();
+    }
+}
+
+public function update(Request $request, $id)
+{
+    try {
         $sales = Sales::findOrFail($id);
 
         $request->validate([
@@ -155,52 +168,120 @@ class SalesController extends Controller
             'status' => 'required',
             'order_date' => 'required|date',
             'due_date' => 'required|date|after_or_equal:order_date',
-            'total' => 'required|numeric|min:0',
-            'items' => 'required|array', // Ensure items array exists
+            'products' => 'required|json',
         ]);
 
-        $totals = \App\Helpers\SalesHelper::calculateTotals(collect($request->items), $sales->total_tax);
-
-        // Update Sales Item
-        foreach ($request->items as $itemId => $itemData) {
-            $salesItem = SalesItem::findOrFail($itemId);
-            $salesItem->update([
-                'quantity' => $itemData['quantity'],
-                'price' => $itemData['price'],
-                'discount' => $itemData['discount'] ?? 0,
-                'discount_type' => $itemData['discount_type'] ?? 'fixed',
-                'total' => floor($itemData['quantity'] * $itemData['price'] - $totals['totalDiscount'] / count($request->items)), // Adjust total based on new calculations
-            ]);
+        // Decode products
+        $products = json_decode($request->products, true);
+        if (!$products || !is_array($products)) {
+            return back()
+                ->withErrors(['products' => 'Invalid product data'])
+                ->withInput();
         }
+
+        // Calculate totals
+        $subTotal = 0;
+        $totalDiscount = 0;
+
+        // Update or create sales items
+        foreach ($products as $product) {
+            $quantity = $product['quantity'];
+            $price = $product['price'];
+            $discount = $product['discount'] ?? 0;
+            $discountType = $product['discountType'] ?? 'fixed';
+
+            $productSubtotal = $price * $quantity;
+            $discountAmount = $discountType === 'percentage'
+                ? ($productSubtotal * $discount / 100)
+                : $discount;
+
+            $itemTotal = $productSubtotal - $discountAmount;
+            $totalDiscount += $discountAmount;
+            $subTotal += $productSubtotal;
+
+            // If the product already exists as a sales item, update it
+            // Otherwise, create a new sales item
+            $salesItem = SalesItem::where('sales_id', $sales->id)
+                                ->where('product_id', $product['id'])
+                                ->first();
+
+            if ($salesItem) {
+                $salesItem->update([
+                    'quantity' => $quantity,
+                    'customer_price' => $price, // Use customer_price column instead of price
+                    'discount' => $discount,
+                    'discount_type' => $discountType,
+                    'total' => $itemTotal,
+                ]);
+            } else {
+                SalesItem::create([
+                    'sales_id' => $sales->id,
+                    'product_id' => $product['id'],
+                    'quantity' => $quantity,
+                    'customer_price' => $price, // Use customer_price column instead of price
+                    'discount' => $discount,
+                    'discount_type' => $discountType,
+                    'total' => $itemTotal,
+                ]);
+            }
+        }
+
+        // Calculate tax
+        $tax = Tax::where('is_active', 1)->first();
+        $taxRate = $tax ? $tax->rate : 0;
+        $taxAmount = ($subTotal - $totalDiscount) * ($taxRate / 100);
+        $grandTotal = $subTotal - $totalDiscount + $taxAmount;
 
         // Update Sales Order
         $sales->update([
-            'total' => floor($totals['grandTotal']),
-            'subtotal' => floor($totals['subTotal']),
-            'discount_total' => floor($totals['totalDiscount']),
             'order_date' => $request->order_date,
             'due_date' => $request->due_date,
             'payment_type' => $request->payment_type,
             'status' => $request->status,
+            'tax_rate' => $taxRate,
+            'total_tax' => $taxAmount,
+            'total' => $grandTotal,
             'payment_date' => $request->status === 'Paid' ? now() : null,
         ]);
 
+        // Remove any sales items that are no longer in the products array
+        $existingProductIds = collect($products)->pluck('id')->toArray();
+        SalesItem::where('sales_id', $sales->id)
+                ->whereNotIn('product_id', $existingProductIds)
+                ->delete();
+
         return redirect()->route('admin.sales.view', $id)->with('success', 'Sales updated successfully.');
+    } catch (\Exception $e) {
+        return back()
+            ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+            ->withInput();
+    }
+}
+
+    public function getCustomerPrice(Customer $customer, Product $product)
+{
+    // Find the most recent sale for this customer and product
+    $latestSale = Sales::where('customer_id', $customer->id)
+                      ->whereHas('saleItems', function ($query) use ($product) {
+                          $query->where('product_id', $product->id);
+                      })
+                      ->latest()
+                      ->first();
+
+    $pastPrice = 0;
+
+    if ($latestSale) {
+        $saleItem = $latestSale->saleItems()
+                              ->where('product_id', $product->id)
+                              ->first();
+
+        if ($saleItem) {
+            $pastPrice = $saleItem->price;
+        }
     }
 
-    public function getPastPrice(Request $request)
-    {
-        $customerId = $request->customer_id;
-        $productId = $request->product_id;
-
-        $pastPrice = SalesItem::join('sales', 'sales_items.sales_id', '=', 'sales.id')
-            ->where('sales.customer_id', $customerId)
-            ->where('sales_items.product_id', $productId)
-            ->orderBy('sales.order_date', 'desc') // get the most recent price
-            ->value('sales_items.customer_price'); // get the last price customer paid
-
-        return response()->json(['past_price' => $pastPrice ?? 0]); // return 0 if no past price found
-    }
+    return response()->json(['past_price' => $pastPrice]);
+}
 
     public function destroy($id)
     {

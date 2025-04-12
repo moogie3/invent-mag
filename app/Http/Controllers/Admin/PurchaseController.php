@@ -143,41 +143,64 @@ class PurchaseController extends Controller
 
     public function update(Request $request, $id)
 {
-    $po = Purchase::findOrFail($id);
-    $totalAmount = 0;
+    try {
+        $po = Purchase::findOrFail($id);
 
-    foreach ($request->items as $itemId => $itemData) {
-        $poItem = PoItem::findOrFail($itemId);
-        $quantity = $itemData['quantity'];
-        $price = $itemData['price'];
-        $discount = $itemData['discount'];
-        $discountType = $itemData['discountType'] ?? 'percentage';
+        // Update payment type and status
+        $po->payment_type = $request->payment_type;
+        $po->status = $request->status;
 
-        // Calculate discount
-        $totalBeforeDiscount = $quantity * $price;
-        $discountAmount = $discountType === 'percentage'
-            ? ($totalBeforeDiscount * $discount) / 100
-            : $discount;
+        if ($request->status === 'Paid') {
+            $po->payment_date = now(); // Automatically set payment date if paid
+        } else {
+            $po->payment_date = null; // Reset if marked unpaid again
+        }
 
-        $itemTotal = $totalBeforeDiscount - $discountAmount;
+        $totalAmount = 0;
 
-        // Update PO item
-        $poItem->quantity = $quantity;
-        $poItem->price = $price;
-        $poItem->discount = $discount;
-        $poItem->discount_type = $discountType;
-        $poItem->total = floor($itemTotal);
-        $poItem->save();
+        // Update each item
+        foreach ($request->items as $itemId => $itemData) {
+            $poItem = POItem::findOrFail($itemId);
 
-        $totalAmount += $itemTotal;
+            $quantity = (int) $itemData['quantity'];
+            $price = (int) $itemData['price'];
+            $discount = (float) $itemData['discount'];
+            $discountType = $itemData['discountType'] ?? 'percentage';
+
+            $totalBeforeDiscount = $quantity * $price;
+            $discountAmount = $discountType === 'percentage'
+                ? ($totalBeforeDiscount * $discount) / 100
+                : $discount;
+
+            $itemTotal = $totalBeforeDiscount - $discountAmount;
+
+            $poItem->update([
+                'quantity' => $quantity,
+                'price' => $price,
+                'discount' => $discount,
+                'discount_type' => $discountType,
+                'total' => floor($itemTotal),
+            ]);
+
+            // Optional: update product purchase price if needed
+            Product::where('id', $poItem->product_id)->update([
+                'price' => $price,
+            ]);
+
+            $totalAmount += $itemTotal;
+        }
+
+        // Update PO total
+        $po->total = floor($totalAmount);
+        $po->save();
+
+        return redirect()->route('admin.po.view', $po->id)->with('success', 'Purchase order updated successfully.');
+    } catch (\Exception $e) {
+        return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
     }
-
-    // Update main PO total
-    $po->total = floor($totalAmount);
-    $po->save();
-
-    return redirect()->route('admin.po.view', $id)->with('success', 'Purchase order updated successfully.');
 }
+
+
     public function destroy($id)
     {
         Purchase::find($id)->delete();

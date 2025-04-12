@@ -148,230 +148,327 @@
 {{-- SCRIPT FOR ADMIN SALES CREATE --}}
 @if (request()->is('admin/sales/create'))
     <script>
+        //automatically input the due date
         document.addEventListener('DOMContentLoaded', function() {
             const orderDateField = document.getElementById('order_date');
             const dueDateField = document.getElementById('due_date');
             const customerSelect = document.getElementById('customer_id');
-            const productSelect = document.getElementById('product_id');
-            const priceField = document.getElementById('price');
-            const quantityField = document.getElementById('quantity');
-            const sellPriceField = document.getElementById('selling_price');
-            const newPriceField = document.getElementById('new_price');
-            const pastPriceField = document.getElementById('past_price');
-            const discountField = document.getElementById('discount');
-            const discountTypeField = document.getElementById('discount_type');
-            const addProductButton = document.getElementById('addProduct');
-            const productTableBody = document.getElementById('productTableBody');
-            const productsField = document.getElementById('productsField');
-            const subtotalElement = document.getElementById('subtotal');
-            const discountTotalElement = document.getElementById('discountTotal');
-            const taxTotalElement = document.getElementById('taxTotal');
-            const finalTotalElement = document.getElementById('finalTotal');
-            const taxInputField = document.getElementById('taxInput');
 
-            let products = JSON.parse(localStorage.getItem('products')) || [];
-            let taxRate = 0; // Store tax rate globally
+            // event listener for customer selection change
+            customerSelect.addEventListener('change', function() {
+                calculateDueDate();
+            });
 
-            // 🟢 Fetch Tax Rate
-            function fetchTaxRate() {
-                fetch("{{ route('admin.setting.tax.get') }}")
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Fetched Tax Rate:", data);
-                        taxRate = parseFloat(data.tax_rate) || 0;
-                        updateTotals();
-                    })
-                    .catch((error) => {
-                        console.error("Tax Fetch Error:", error);
-                        taxRate = 0;
-                        updateTotals();
-                    });
-            }
+            // event listener for order date selection change
+            orderDateField.addEventListener('change', function() {
+                calculateDueDate();
+            });
 
-            // 🟢 Set Due Date Based on Payment Terms
-            customerSelect.addEventListener('change', calculateDueDate);
-            orderDateField.addEventListener('change', calculateDueDate);
-
+            // function to calculate the due date
             function calculateDueDate() {
                 const orderDateValue = orderDateField.value;
                 const selectedOption = customerSelect.options[customerSelect.selectedIndex];
 
-                if (!orderDateValue || !selectedOption) return;
+                if (!orderDateValue || !selectedOption) {
+                    return; // Exit if either field is empty
+                }
 
                 const orderDate = new Date(orderDateValue);
                 const paymentTerms = selectedOption.dataset.paymentTerms;
 
                 if (paymentTerms) {
+                    // calculate the due date by adding payment terms (in days) to the order date
                     orderDate.setDate(orderDate.getDate() + parseInt(paymentTerms));
-                    dueDateField.value = orderDate.toISOString().split('T')[0];
+
+                    // format the due date to YYYY-MM-DD
+                    const dueDate = orderDate.toISOString().split('T')[0];
+                    dueDateField.value = dueDate;
                 }
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const taxRate = {{ $tax->rate ?? 0 }}; // Get tax rate from blade
+            const customerSelect = document.getElementById('customer_id');
+            const productSelect = document.getElementById('product_id');
+            const customerPriceField = document.getElementById('customer_price');
+            const pastPriceField = document.getElementById('past_price');
+            const priceField = document.getElementById('price');
+            const sellingPriceField = document.getElementById('selling_price');
+            const quantityField = document.getElementById('quantity');
+            const addProductButton = document.getElementById('addProduct');
+            const productTableBody = document.getElementById('productTableBody');
+            const productsField = document.getElementById('productsField');
 
-            // 🟢 Load Products from Local Storage
-            function loadProductsFromStorage() {
-                productTableBody.innerHTML = '';
-                products.forEach(addProductRow);
-                updateTotals();
-            }
+            let products = JSON.parse(localStorage.getItem('salesProducts')) || [];
 
-            function addProductRow(product) {
-                let itemTotal = product.price * product.quantity;
-                let discountAmount = product.discount_type === "percentage" ?
-                    (product.discount / 100) * itemTotal :
-                    product.discount;
-                let finalAmount = itemTotal - discountAmount; // ✅ Ensure correct discount calculation
-                let discountDisplay = product.discount_type === "percentage" ?
-                    `${product.discount}%` :
-                    formatCurrency(discountAmount);
-                const row = document.createElement('tr');
-                row.innerHTML = `
-        <td>${product.name}</td>
-        <td>${product.quantity}</td>
-        <td>${formatCurrency(product.price)}</td>
-        <td>${discountDisplay}</td>
-        <td>${formatCurrency(finalAmount)}</td> <!-- ✅ Fixed amount calculation -->
-        <td style="text-align:center">
-            <button type="button" class="btn btn-danger btn-sm removeProduct">Remove</button>
-        </td>
-    `;
-                productTableBody.appendChild(row);
-
-                row.querySelector('.removeProduct').addEventListener('click', function() {
-                    products = products.filter(p => p.id !== product.id);
-                    row.remove();
-                    updateTotals();
-                    localStorage.setItem('products', JSON.stringify(products));
-                });
-            }
-
-            // 🟢 Fetch Past Customer Price
-            productSelect.addEventListener('change', updateProductPrice);
-            customerSelect.addEventListener('change', updateProductPrice);
-
-            function updateProductPrice() {
-                const selectedOption = productSelect.options[productSelect.selectedIndex];
-                priceField.value = selectedOption.getAttribute('data-price') || '';
-                sellPriceField.value = selectedOption.getAttribute('data-selling-price') || '';
-
-                if (customerSelect.value && productSelect.value) {
-                    fetchPastCustomerPrice(customerSelect.value, productSelect.value);
-                }
-            }
-
-            function fetchPastCustomerPrice(customerId, productId) {
-                fetch(`/admin/sales/get-past-price?customer_id=${customerId}&product_id=${productId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Fetched Past Price:", data);
-                        pastPriceField.value = data.past_price || "0";
-                    })
-                    .catch(() => {
-                        pastPriceField.value = "0";
-                    });
-            }
-
-            // 🟢 Add Product to Invoice
-            addProductButton.addEventListener('click', function() {
-                const selectedOption = productSelect.options[productSelect.selectedIndex];
-                const productId = productSelect.value;
-                const productName = selectedOption.text;
-                const quantity = parseInt(quantityField.value) || 1;
-                const price = parseFloat(newPriceField.value) || 0;
-                const discount = parseFloat(discountField.value) || 0;
-                const discountType = discountTypeField.value;
-
-                if (!productId || quantity <= 0 || price <= 0) {
-                    alert('Please select a product and enter valid quantity and price.');
-                    return;
-                }
-
-                let existingProduct = products.find(p => p.id == productId);
-                if (existingProduct) {
-                    alert(`Product "${productName}" has already been added!`);
-                    return;
-                }
-
-                let itemTotal = price * quantity;
-                let discountAmount = discountType === "percentage" ? (discount / 100) * itemTotal :
-                    discount;
-                let afterDiscount = itemTotal - discountAmount;
-                let taxAmount = (taxRate / 100) * afterDiscount;
-                let finalTotal = afterDiscount + taxAmount;
-
-                const productData = {
-                    id: productId,
-                    name: productName,
-                    quantity,
-                    price,
-                    discount,
-                    discount_type: discountType,
-                    tax_rate: taxRate,
-                    tax_amount: taxAmount,
-                    total: finalTotal
-                };
-
-                products.push(productData);
-                addProductRow(productData);
-                updateTotals();
-                localStorage.setItem('products', JSON.stringify(products));
-
-                productSelect.value = '';
-                quantityField.value = '';
-                priceField.value = '';
-                sellPriceField.value = '';
-                newPriceField.value = '';
-                discountField.value = '';
-            });
-
-            // 🟢 Update Totals
-            function updateTotals() {
-                let subtotal = 0,
-                    totalDiscount = 0,
-                    totalTax = 0,
-                    finalTotal = 0;
-
-                // 🔹 Step 1: Calculate Subtotal (After Discounts)
-                products.forEach((product) => {
-                    let itemTotal = product.price * product.quantity;
-                    let discountAmount = product.discount_type === "percentage" ?
-                        (product.discount / 100) * itemTotal :
-                        product.discount;
-
-                    subtotal += (itemTotal - discountAmount); // ✅ Subtotal is now correct after discounts
-                    totalDiscount += discountAmount;
-                });
-
-                // 🔹 Step 2: Calculate Tax Based on Subtotal
-                totalTax = (taxRate / 100) * subtotal; // ✅ Tax is now based only on subtotal
-
-                // 🔹 Step 3: Calculate Final Total
-                finalTotal = subtotal + totalTax; // ✅ Grand total is subtotal + tax
-
-                // 🔹 Step 4: Update the <h3> elements
-                subtotalElement.textContent = formatCurrency(subtotal);
-                discountTotalElement.textContent = formatCurrency(totalDiscount);
-                taxTotalElement.textContent = formatCurrency(totalTax);
-                finalTotalElement.textContent = formatCurrency(finalTotal);
-
-                // 🔹 Step 5: Update hidden input fields for form submission
-                productsField.value = JSON.stringify(products);
-                taxInputField.value = totalTax;
+            function saveToLocalStorage() {
+                localStorage.setItem('salesProducts', JSON.stringify(products));
             }
 
             function formatCurrency(amount) {
                 return new Intl.NumberFormat('id-ID', {
                     style: 'currency',
                     currency: 'IDR',
-                    minimumFractionDigits: 0
+                    maximumFractionDigits: 0
                 }).format(amount);
             }
 
-            fetchTaxRate();
-            loadProductsFromStorage();
+            function calculateTotal(price, quantity, discount, discountType) {
+                if (discountType === 'percentage') {
+                    return (price * quantity) - ((price * quantity) * discount / 100);
+                }
+                return (price * quantity) - discount;
+            }
 
-            document.getElementById('invoiceForm').addEventListener('submit', function() {
-                localStorage.setItem('products', JSON.stringify(products));
+            function updateTotalPrice() {
+                let subtotal = 0;
+                let totalDiscount = 0;
+
+                products.forEach(product => {
+                    const productSubtotal = Number(product.price) * Number(product.quantity);
+                    const productDiscount = product.discountType === 'percentage' ?
+                        (productSubtotal * product.discount / 100) :
+                        product.discount;
+                    subtotal += productSubtotal;
+                    totalDiscount += productDiscount;
+                });
+
+                const taxAmount = (subtotal - totalDiscount) * (taxRate / 100);
+                const finalTotal = subtotal - totalDiscount + taxAmount;
+
+                // Update UI
+                document.getElementById('subtotal').innerText = formatCurrency(subtotal);
+                document.getElementById('discountTotal').innerText = formatCurrency(totalDiscount);
+                document.getElementById('taxTotal').innerText = formatCurrency(taxAmount);
+                document.getElementById('finalTotal').innerText = formatCurrency(finalTotal);
+
+                // Update hidden inputs for form submission
+                document.getElementById('totalDiscountInput').value = totalDiscount;
+                document.getElementById('taxInput').value = taxAmount;
+                productsField.value = JSON.stringify(products);
+            }
+
+            function renderTable() {
+                productTableBody.innerHTML = '';
+                products.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${product.name}</td>
+                            <td>
+                                <input type="number" class="form-control quantity-input"
+                                    value="${product.quantity}" data-id="${product.id}" min="1" style="width:80px;" />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control price-input"
+                                    value="${product.price}" data-id="${product.id}" min="0" style="width:100px;" />
+                            </td>
+                            <td>
+                                <div class="input-group" style="width:200px;">
+                                    <input type="number" class="form-control discount-input"
+                                        value="${product.discount}" data-id="${product.id}" min="0" />
+                                    <select class="form-select discount-type" data-id="${product.id}">
+                                        <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
+                                        <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td class="product-total">${formatCurrency(product.total)}</td>
+                            <td style="text-align:center">
+                                <button class="btn btn-danger btn-sm removeProduct" data-id="${product.id}">Remove</button>
+                            </td>
+                        `;
+                    productTableBody.appendChild(row);
+                });
+
+                updateTotalPrice();
+                productsField.value = JSON.stringify(products);
+
+                // Event listeners
+                document.querySelectorAll('.removeProduct').forEach(button => {
+                    button.addEventListener('click', function() {
+                        products = products.filter(p => p.id != this.dataset.id);
+                        saveToLocalStorage();
+                        renderTable();
+                    });
+                });
+
+                document.querySelectorAll('.quantity-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const id = this.dataset.id;
+                        const value = parseInt(this.value) || 1;
+                        const product = products.find(p => p.id == id);
+                        if (product) {
+                            product.quantity = value;
+                            product.total = calculateTotal(product.price, product.quantity, product
+                                .discount, product.discountType);
+                            saveToLocalStorage();
+                            this.closest('tr').querySelector('.product-total').innerText =
+                                formatCurrency(product.total);
+                            updateTotalPrice();
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.price-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const id = this.dataset.id;
+                        const value = parseFloat(this.value) || 0;
+                        const product = products.find(p => p.id == id);
+                        if (product) {
+                            product.price = value;
+                            product.total = calculateTotal(product.price, product.quantity, product
+                                .discount, product.discountType);
+                            saveToLocalStorage();
+                            this.closest('tr').querySelector('.product-total').innerText =
+                                formatCurrency(product.total);
+                            updateTotalPrice();
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.discount-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const id = this.dataset.id;
+                        const value = parseFloat(this.value) || 0;
+                        const product = products.find(p => p.id == id);
+                        if (product) {
+                            product.discount = value;
+                            product.total = calculateTotal(product.price, product.quantity, product
+                                .discount, product.discountType);
+                            saveToLocalStorage();
+                            this.closest('tr').querySelector('.product-total').innerText =
+                                formatCurrency(product.total);
+                            updateTotalPrice();
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.discount-type').forEach(select => {
+                    select.addEventListener('change', function() {
+                        const id = this.dataset.id;
+                        const value = this.value;
+                        const product = products.find(p => p.id == id);
+                        if (product) {
+                            product.discountType = value;
+                            product.total = calculateTotal(product.price, product.quantity, product
+                                .discount, product.discountType);
+                            saveToLocalStorage();
+                            this.closest('tr').querySelector('.product-total').innerText =
+                                formatCurrency(product.total);
+                            updateTotalPrice();
+                        }
+                    });
+                });
+            }
+
+            // Function to fetch customer's past purchase price for a product
+            function fetchCustomerPastPrice() {
+                const customerId = customerSelect.value;
+                const productId = productSelect.value;
+
+                if (!customerId || !productId) {
+                    pastPriceField.value = '';
+                    return;
+                }
+
+                // Make AJAX request to get past price
+                fetch(`/admin/sales/get-customer-price/${customerId}/${productId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.past_price) {
+                            pastPriceField.value = data.past_price;
+                            // Optionally populate the customer price field with past price
+                            customerPriceField.value = data.past_price;
+                        } else {
+                            pastPriceField.value = '0';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching past price:', error);
+                        pastPriceField.value = '0';
+                    });
+            }
+
+            // When product is selected, populate price fields
+            productSelect.addEventListener('change', function() {
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                if (!selectedOption || selectedOption.value === '') {
+                    priceField.value = '';
+                    sellingPriceField.value = '';
+                    customerPriceField.value = '';
+                    return;
+                }
+
+                // Set prices from data attributes
+                priceField.value = selectedOption.getAttribute('data-price');
+                sellingPriceField.value = selectedOption.getAttribute('data-selling-price');
+                customerPriceField.value = selectedOption.getAttribute(
+                'data-selling-price'); // Default to selling price
+
+                // Also fetch the customer's past price
+                fetchCustomerPastPrice();
             });
+
+            // Call fetchCustomerPastPrice when customer changes
+            customerSelect.addEventListener('change', fetchCustomerPastPrice);
+
+            addProductButton.addEventListener('click', function() {
+                const productId = productSelect.value;
+                const productName = productSelect.options[productSelect.selectedIndex].text;
+                const quantity = parseInt(quantityField.value);
+                const price = parseFloat(customerPriceField.value);
+
+                if (!productId || !quantity || isNaN(price)) {
+                    return alert('Complete all fields!');
+                }
+
+                if (products.some(p => p.id == productId)) {
+                    return alert('Product already added.');
+                }
+
+                const discount = parseFloat(document.getElementById('discount').value) || 0;
+                const discountType = document.getElementById('discount_type').value;
+                const total = calculateTotal(price, quantity, discount, discountType);
+
+                products.push({
+                    id: productId,
+                    name: productName,
+                    quantity,
+                    price,
+                    discount,
+                    discountType,
+                    total
+                });
+
+                saveToLocalStorage();
+                renderTable();
+
+                // Reset form fields
+                productSelect.value = '';
+                quantityField.value = '';
+                customerPriceField.value = '';
+                document.getElementById('discount').value = '';
+                priceField.value = '';
+                sellingPriceField.value = '';
+                pastPriceField.value = '';
+            });
+
+            // Clear localStorage when form is submitted
+            document.querySelector('form').addEventListener('submit', function(e) {
+                // Prevent form submission if no products added
+                if (products.length === 0) {
+                    e.preventDefault();
+                    alert('Please add at least one product before submitting.');
+                    return false;
+                }
+
+                localStorage.removeItem('salesProducts');
+            });
+
+            // Initial render
+            renderTable();
         });
     </script>
 @endif
@@ -584,30 +681,30 @@
                 products.forEach(product => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${product.name}</td>
-                        <td>
-                            <input type="number" class="form-control quantity-input"
-                                value="${product.quantity}" data-id="${product.id}" min="1" style="width:80px;" />
-                        </td>
-                        <td>
-                            <input type="number" class="form-control price-input"
-                                value="${product.price}" data-id="${product.id}" min="0" style="width:100px;" />
-                        </td>
-                        <td>
-                            <div class="input-group" style="width:200px;">
-                                <input type="number" class="form-control discount-input"
-                                    value="${product.discount}" data-id="${product.id}" min="0" />
-                                <select class="form-select discount-type" data-id="${product.id}">
-                                    <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
-                                    <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
-                                </select>
-                            </div>
-                        </td>
-                        <td class="product-total">${formatCurrency(product.total)}</td>
-                        <td style="text-align:center">
-                            <button class="btn btn-danger btn-sm removeProduct" data-id="${product.id}">Remove</button>
-                        </td>
-                    `;
+                            <td>${product.name}</td>
+                            <td>
+                                <input type="number" class="form-control quantity-input"
+                                    value="${product.quantity}" data-id="${product.id}" min="1" style="width:80px;" />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control price-input"
+                                    value="${product.price}" data-id="${product.id}" min="0" style="width:100px;" />
+                            </td>
+                            <td>
+                                <div class="input-group" style="width:200px;">
+                                    <input type="number" class="form-control discount-input"
+                                        value="${product.discount}" data-id="${product.id}" min="0" />
+                                    <select class="form-select discount-type" data-id="${product.id}">
+                                        <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
+                                        <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td class="product-total">${formatCurrency(product.total)}</td>
+                            <td style="text-align:center">
+                                <button class="btn btn-danger btn-sm removeProduct" data-id="${product.id}">Remove</button>
+                            </td>
+                        `;
                     productTableBody.appendChild(row);
                 });
 
@@ -731,6 +828,10 @@
                 productSelect.value = '';
                 quantityField.value = '';
                 newPriceField.value = '';
+            });
+
+            document.querySelector('form').addEventListener('submit', () => {
+                localStorage.removeItem('poProducts');
             });
 
             renderTable();

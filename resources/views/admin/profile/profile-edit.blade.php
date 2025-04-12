@@ -41,7 +41,6 @@
                                         method="POST" enctype="multipart/form-data">
                                         @method('PUT')
                                         @csrf
-
                                         <div class="row align-items-center">
                                             <span class="avatar avatar-xl"
                                                 style="background-image: url('{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('default-avatar.png') }}');">
@@ -67,11 +66,22 @@
                                                     value="{{ auth()->user()->address }}" required>
                                             </div>
                                         </div>
-                                        <h3 class="card-title mt-4">Email</h3>
-                                        <div class="row g-2">
-                                            <div class="col-auto">
+                                        <div class="row g-3 mt-2">
+                                            <div class="col-md-4">
+                                                <div class="form-label">Email</div>
                                                 <input type="email" name="email" class="form-control w-auto"
                                                     value="{{ auth()->user()->email }}" required>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-label">Timezone</div>
+                                                <select name="timezone" class="form-control" required>
+                                                    @foreach (timezone_identifiers_list() as $tz)
+                                                        <option value="{{ $tz }}"
+                                                            {{ auth()->user()->timezone === $tz ? 'selected' : '' }}>
+                                                            {{ $tz }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                         <h3 class="card-title mt-4">Password</h3>

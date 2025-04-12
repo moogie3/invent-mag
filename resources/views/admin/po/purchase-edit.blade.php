@@ -30,42 +30,37 @@
                                     action="{{ route('admin.po.update', $pos->id) }}">
                                     @csrf
                                     @method('PUT')
-                                    <h1 class="text-center">Edit Invoice Information</h1>
-                                    @if ($pos->status !== 'Paid')
-                                        <fieldset class="form-fieldset ">
-                                            <div class="row">
-                                                <div class="col-md-2 mb-3">
-                                                    <label class="form-label">PAYMENT TYPE</label>
-                                                    <select class="form-control" name="payment_type" id="payment_type"
-                                                        {{ $pos->status == 'Paid' ? 'disabled' : '' }}>
-                                                        <option value="Cash"
-                                                            {{ $pos->payment_type == 'Cash' ? 'selected' : '' }}>
-                                                            Cash</option>
-                                                        <option value="Transfer"
-                                                            {{ $pos->payment_type == 'Transfer' ? 'selected' : '' }}>
-                                                            Transfer</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-1 mb-3">
-                                                    <label class="form-label">STATUS</label>
-                                                    <select class="form-control" name="status" id="status"
-                                                        {{ $pos->status == 'Paid' ? 'disabled' : '' }}>
-                                                        <option value="Paid"
-                                                            {{ $pos->status == 'Paid' ? 'selected' : '' }}>Paid
-                                                        </option>
-                                                        <option value="Unpaid"
-                                                            {{ $pos->status == 'Unpaid' ? 'selected' : '' }}>
-                                                            Unpaid</option>
-                                                    </select>
-                                                </div>
-                                                @if ($pos->status !== 'Paid')
-                                                    <div class="col-md-9 mb-3 mt-4 text-end">
-                                                        <button type="submit" class="btn btn-success">Save</button>
-                                                    </div>
-                                                @endif
+                                    <h1 class="text-center">Edit Invoice {{ $pos->invoice }} {{ $pos->supplier->code }}</h1>
+                                    <fieldset class="form-fieldset">
+                                        <div class="row">
+                                            <div class="col-md-2 mb-3">
+                                                <label class="form-label">PAYMENT TYPE</label>
+                                                <select class="form-control" name="payment_type" id="payment_type"
+                                                    {{ $pos->status }}>
+                                                    <option value="Cash"
+                                                        {{ $pos->payment_type == 'Cash' ? 'selected' : '' }}>
+                                                        Cash</option>
+                                                    <option value="Transfer"
+                                                        {{ $pos->payment_type == 'Transfer' ? 'selected' : '' }}>
+                                                        Transfer</option>
+                                                </select>
                                             </div>
-                                        </fieldset>
-                                    @endif
+                                            <div class="col-md-1 mb-3">
+                                                <label class="form-label">STATUS</label>
+                                                <select class="form-control" name="status" id="status"
+                                                    {{ $pos->status }}>
+                                                    <option value="Paid" {{ $pos->status == 'Paid' ? 'selected' : '' }}>
+                                                        Paid
+                                                    </option>
+                                                    <option value="Unpaid" {{ $pos->status == 'Unpaid' ? 'selected' : '' }}>
+                                                        Unpaid</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-9 mb-3 mt-4 text-end">
+                                                <button type="submit" class="btn btn-success">Save</button>
+                                            </div>
+                                        </div>
+                                    </fieldset>
                                     <div class="page-wrapper">
                                         <div class="page-body">
                                             <div class="container-xl">
@@ -82,8 +77,7 @@
                                                                     {{ $pos->supplier->address }}<br>
                                                                     {{ $pos->supplier->phone_number }}<br>
                                                                     Order Date :
-                                                                    {{ $pos->order_date->format('d-m-Y') }}<br>
-                                                                    Due Date : {{ $pos->due_date->format('d-m-Y') }}
+                                                                    {{ $pos->order_date->format('d-m-Y') }}
                                                                 </address>
                                                             </div>
                                                             <div class="col-6 text-end">
@@ -94,12 +88,20 @@
                                                                             Payment Pending
                                                                         </span>
                                                                     @else
-                                                                        <span class="badge bg-green-lt">Paid in
-                                                                            {{ $pos->payment_date->format('d F Y') }}<br>
-                                                                            {{ $pos->payment_date->format('H:i:s') }}</i>
+                                                                        <span class="badge bg-green-lt">
+                                                                            Paid in
+                                                                            {{ $pos->payment_date->setTimezone(auth()->user()->timezone)->format('d F Y') }}<br>
+                                                                            {{ $pos->payment_date->setTimezone(auth()->user()->timezone)->format('H:i:s') }}
                                                                         </span>
                                                                     @endif
                                                                 </h3>
+                                                                <address>
+                                                                    Due Date : {{ $pos->due_date->format('d-m-Y') }}
+                                                                </address>
+                                                                <small class="text-muted d-block mb-3 text-end">
+                                                                    Select <strong>%</strong> for percentage or
+                                                                    <strong>Rp</strong> for fixed discount.
+                                                                </small>
                                                             </div>
                                                         </div>
                                                         <table class="table table-transparent table-responsive">
@@ -172,24 +174,42 @@
                                                                     </tr>
                                                                 @endforeach
                                                             </tbody>
-                                                        </table>
-                                                        <small class="text-muted d-block mt-1 text-end">
-                                                            Select <strong>%</strong> for percentage or
-                                                            <strong>Rp</strong> for fixed discount.
-                                                        </small>
-                                                        <br>
-                                                        <div class="row mt-4">
-                                                            <div class="col-md-12 text-end">
-                                                                <h3 class="mb-2">Subtotal: <span id="subtotal">0</span>
-                                                                </h3>
-                                                                <h3 class="mb-2">Discount Total: <span
-                                                                        id="discountTotal">0</span></h3>
-                                                                <h3 class="mb-2">Grand Total: <span
-                                                                        id="finalTotal">0</span></h3>
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td colspan="5" class="text-end">
+                                                                        <strong>Sub Total :</strong>
+                                                                    </td>
+                                                                    <td class="text-end">
+                                                                        <span id="subtotal">
+                                                                            0
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td colspan="5" class="text-end">
+                                                                        <strong>Discount :</strong>
+                                                                    </td>
+                                                                    <td class="text-end">
+                                                                        <span id="discountTotal">
+                                                                            0
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td colspan="5" class="text-end">
+                                                                        <strong>Grand Total :</strong>
+                                                                    </td>
+                                                                    <td class="text-end">
+                                                                        <span id="finalTotal">
+                                                                            0
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
                                                                 <input type="hidden" id="totalDiscountInput"
                                                                     name="total_discount" value="0">
-                                                            </div>
-                                                        </div>
+                                                            </tfoot>
+                                                        </table>
+                                                        <br>
                                                     </div>
                                                 </div>
                                             </div>

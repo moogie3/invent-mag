@@ -36,6 +36,18 @@
                                                     placeholder="Invoice" />
                                             </div>
                                             <div class="col-md-2 mb-3">
+                                                <label class="form-label">CUSTOMER</label>
+                                                <select class="form-control" name="customer_id" id="customer_id">
+                                                    <option value="">Select Customer</option>
+                                                    @foreach ($customers as $customer)
+                                                        <option value="{{ $customer->id }}"
+                                                            data-payment-terms="{{ $customer->payment_terms }}">
+                                                            {{ $customer->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2 mb-3">
                                                 <label class="form-label">ORDER DATE</label>
                                                 <input type="date" class="form-control" name="order_date" id="order_date"
                                                     placeholder="Order date" />
@@ -45,23 +57,9 @@
                                                 <input type="date" class="form-control" name="due_date" id="due_date"
                                                     placeholder="Due date" readonly />
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-2 mb-3">
-                                                    <label class="form-label">CUSTOMER</label>
-                                                    <select class="form-control" name="customer_id" id="customer_id">
-                                                        <option value="">Select Customer</option>
-                                                        @foreach ($customers as $customer)
-                                                            <option value="{{ $customer->id }}"
-                                                                data-payment-terms="{{ $customer->payment_terms }}">
-                                                                {{ $customer->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-3 mb-3">
+                                            <div class="col-md-2 mb-3">
                                                 <label class="form-label">PRODUCT</label>
                                                 <select class="form-control" name="product_id" id="product_id">
                                                     <option value="">Select Product</option>
@@ -80,40 +78,38 @@
                                                     placeholder="Quantity" />
                                             </div>
                                             <div class="col-md-2 mb-3">
-                                                <label class="form-label">CUSTOMER SELLING PRICE</label>
-                                                <input type="text" class="form-control" name="new_price" id="new_price"
-                                                    placeholder="New price" />
-                                            </div>
-                                            <div class="col-md-2 mb-3">
-                                                <label class="form-label">DISCOUNT TYPE</label>
-                                                <select class="form-control" name="discount_type" id="discount_type">
-                                                    <option value="fixed">Fixed</option>
-                                                    <option value="percentage">Percentage</option>
-                                                </select>
+                                                <label class="form-label">NEW PRICE</label>
+                                                <input type="text" class="form-control" name="customer_price"
+                                                    id="customer_price" placeholder="New price" />
                                             </div>
                                             <div class="col-md-2 mb-3">
                                                 <label class="form-label">DISCOUNT</label>
-                                                <input type="number" class="form-control" name="discount" id="discount"
-                                                    placeholder="Discount" min="0" />
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" id="discount"
+                                                        placeholder="Discount" />
+                                                    <select class="form-select" id="discount_type">
+                                                        <option value="fixed">Rp</option>
+                                                        <option value="percentage">%</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-2 mb-3">
                                                 <label class="form-label">SUPPLIER PRICE</label>
                                                 <input type="text" class="form-control" name="price" id="price"
-                                                    placeholder="Price" disabled />
+                                                    placeholder="Supplier price" disabled />
                                             </div>
                                             <div class="col-md-2 mb-3">
                                                 <label class="form-label">RETAIL PRICE</label>
                                                 <input type="text" class="form-control" name="selling_price"
-                                                    id="selling_price" placeholder="Selling price" disabled />
+                                                    id="selling_price" placeholder="Retail price" disabled />
                                             </div>
                                             <div class="col-md-2 mb-3">
-                                                <label class="form-label">CUSTOMER PAST PRICE</label>
+                                                <label class="form-label">CUSTOMER PRICE</label>
                                                 <input type="text" class="form-control" name="past_price"
                                                     id="past_price" placeholder="Past price" disabled />
                                             </div>
-                                            <input type="hidden" id="taxInput" name="tax_amount" value="0">
                                             <div class="col-md-6 mb-3 text-end">
                                                 <label class="form-label">BUTTON</label>
                                                 <button type="button" id="addProduct" class="btn btn-secondary">Add
@@ -144,14 +140,24 @@
                                         <tbody id="productTableBody">
                                         </tbody>
                                     </table>
-                                    <h3 class="mt-3 text-end">Subtotal: <span id="subtotal">0</span></h3>
-                                    <h3 class="mt-3 text-end">Discount Total: <span id="discountTotal">0</span></h3>
-                                    <h3 class="mt-3 text-end">
-                                        Tax Total ({{ $tax->rate }}%): <span id="taxTotal">0</span>
-                                    </h3>
-                                    <h3 class="mt-3 text-end">Grand Total: <span id="finalTotal">0</span></h3>
-                                    <input type="hidden" id="totalDiscountInput" name="total_discount" value="0">
-                                    <input type="hidden" id="taxInput" name="tax_amount" value="0">
+                                    <small class="text-muted d-block mt-1 text-end">
+                                        Select <strong>%</strong> for percentage or
+                                        <strong>Rp</strong> for fixed discount.
+                                    </small>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12 text-end">
+                                            <h3 class="mb-2">Subtotal: <span id="subtotal">0</span></h3>
+                                            <h3 class="mb-2">Discount: <span id="discountTotal">0</span>
+                                            </h3>
+                                            <h3 class="mb-2">
+                                                Tax Total ({{ $tax->rate }}%): <span id="taxTotal">0</span>
+                                            </h3>
+                                            <h3 class="mb-2">Grand Total: <span id="finalTotal">0</span></h3>
+                                            <input type="hidden" id="totalDiscountInput" name="total_discount"
+                                                value="0">
+                                            <input type="hidden" id="taxInput" name="tax_amount" value="0">
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         </div>

@@ -57,12 +57,6 @@
                                                 <input type="date" class="form-control" name="due_date" id="due_date"
                                                     placeholder="Due date" readonly />
                                             </div>
-                                            <div class="col-md-5 mb-3 text-end">
-                                                <label class="form-label">BUTTON</label>
-                                                <button type="button" id="addProduct" class="btn btn-secondary">Add
-                                                    Product</button>
-                                                <button type="submit" class="btn btn-primary">Submit</button>
-                                            </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-2 mb-3">
@@ -83,11 +77,6 @@
                                                     placeholder="Quantity" />
                                             </div>
                                             <div class="col-md-2 mb-3">
-                                                <label class="form-label">LAST PRICE</label>
-                                                <input type="text" class="form-control" name="last_price" id="last_price"
-                                                    placeholder="Last price" disabled />
-                                            </div>
-                                            <div class="col-md-2 mb-3">
                                                 <label class="form-label">NEW PRICE</label>
                                                 <input type="text" class="form-control" name="new_price" id="new_price"
                                                     placeholder="New price" />
@@ -102,6 +91,19 @@
                                                         <option value="percentage">%</option>
                                                     </select>
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2 mb-3">
+                                                <label class="form-label">SUPPLIER PRICE</label>
+                                                <input type="text" class="form-control" name="last_price" id="last_price"
+                                                    placeholder="Supplier price" disabled />
+                                            </div>
+                                            <div class="col-md-10 mb-3 text-end">
+                                                <label class="form-label">BUTTON</label>
+                                                <button type="button" id="addProduct" class="btn btn-secondary">Add
+                                                    Product</button>
+                                                <button type="submit" class="btn btn-primary">Submit</button>
                                             </div>
                                             <input type="hidden" name="products" id="productsField">
                                         </div>
@@ -133,7 +135,7 @@
                                     <div class="row mt-4">
                                         <div class="col-md-12 text-end">
                                             <h3 class="mb-2">Subtotal: <span id="subtotal">0</span></h3>
-                                            <h3 class="mb-2">Discount Total: <span id="discountTotal">0</span></h3>
+                                            <h3 class="mb-2">Discount: <span id="discountTotal">0</span></h3>
                                             <h3 class="mb-2">Grand Total: <span id="finalTotal">0</span></h3>
                                             <input type="hidden" id="totalDiscountInput" name="total_discount"
                                                 value="0">

@@ -121,7 +121,7 @@
     <div class="page page-center">
         <div class="container container-slim py-4">
             <div class="text-center">
-                <div class="spinner-border text-blue" role="status"></div>
+                <div class="spinner-border" role="status"></div>
                 <div class="mt-3">
                     <a class="navbar-brand navbar-brand-autodark"><i
                             class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG</a>

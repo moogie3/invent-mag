@@ -76,7 +76,7 @@
         <div class="container container-tight py-4">
             <div class="text-center mb-4">
                 <h1 class="navbar-brand text-center mx-auto m-0">
-                    <a href="{{ route('login') }}" class="nav-link fs-1 fw-bold">
+                    <a href="{{ route('admin.login') }}" class="nav-link fs-1 fw-bold">
                         <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
                     </a>
                 </h1>

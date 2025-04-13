@@ -6,7 +6,7 @@
     <div class="card card-md">
         <div class="card-body">
             <h2 class="h2 text-center mb-4">Create New Account</h2>
-            <form action="{{ route('register') }}" method="POST" autocomplete="off" novalidate>
+            <form action="{{ route('admin.register.post') }}" method="POST" autocomplete="off" novalidate>
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Name</label>

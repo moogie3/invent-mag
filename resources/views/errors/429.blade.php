@@ -22,8 +22,10 @@
     </div>
 
     <script>
-        let timeLeft = 120; // 2 minutes
+        let timeLeft = 60; // 2 minutes
         let countdownElement = document.getElementById("countdown");
+
+        countdownElement.textContent = timeLeft;
 
         let countdownTimer = setInterval(function() {
             timeLeft--;

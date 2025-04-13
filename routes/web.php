@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, DailySalesController, SalesController, DashboardController, ProfileController, NotificationController, POSController, WarehouseController, TaxController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
@@ -16,7 +18,22 @@ Route::prefix('admin')->group(function () {
     Route::post('/register', [RegisteredUserController::class, 'store'])->name('admin.register.post');
 
     // Login
-    Route::get('/login', fn() => view('admin.auth.login'))->name('admin.login');
+    // Login
+    Route::get('/login', function (Request $request) {
+        // Check if there's an attempted email in the session
+        $email = $request->session()->get('attempted_email');
+
+        if ($email) {
+            $throttleKey = Str::lower($email) . '|' . $request->ip();
+
+            if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+                $seconds = RateLimiter::availableIn($throttleKey);
+                return response()->view('errors.429', ['seconds' => $seconds], 429);
+            }
+        }
+
+        return view('admin.auth.login');
+    })->name('admin.login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('admin.login.post');
 
     // Logout

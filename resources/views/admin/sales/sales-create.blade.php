@@ -117,6 +117,8 @@
                                                 <button type="submit" class="btn btn-primary">Submit</button>
                                             </div>
                                             <input type="hidden" name="products" id="productsField">
+                                            <input type="hidden" name="tax_rate" id="taxRateInput"
+                                                value="{{ $tax->rate ?? 0 }}">
                                         </div>
                                     </fieldset>
                                     <table class="table card-table table-vcenter table-responsive">
@@ -150,7 +152,7 @@
                                             <h3 class="mb-2">Discount: <span id="discountTotal">0</span>
                                             </h3>
                                             <h3 class="mb-2">
-                                                Tax Total ({{ $tax->rate }}%): <span id="taxTotal">0</span>
+                                                Tax Total ({{ $tax->rate ?? 0 }}%): <span id="taxTotal">0</span>
                                             </h3>
                                             <h3 class="mb-2">Grand Total: <span id="finalTotal">0</span></h3>
                                             <input type="hidden" id="totalDiscountInput" name="total_discount"

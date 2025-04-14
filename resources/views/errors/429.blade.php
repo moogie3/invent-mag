@@ -15,7 +15,7 @@
                 <p class="empty-title">Too Many Requests</p>
                 <p class="empty-subtitle text-secondary">
                     You have made too many requests in a short period. Please wait
-                    <span id="countdown">120</span> seconds before trying again.
+                    <span id="countdown"></span> seconds before trying again.
                 </p>
             </div>
         </div>

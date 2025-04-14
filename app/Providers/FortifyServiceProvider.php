@@ -72,9 +72,6 @@ class FortifyServiceProvider extends ServiceProvider
                 return $user;
             }
 
-            // Increment the rate limiter on failed attempts
-            RateLimiter::hit($throttleKey, 60); // lock for 60 seconds per attempt
-
             // Check if we've now hit the limit (5 attempts)
             if (RateLimiter::attempts($throttleKey) >= 5) {
                 $seconds = RateLimiter::availableIn($throttleKey);

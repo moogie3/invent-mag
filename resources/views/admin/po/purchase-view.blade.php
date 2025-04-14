@@ -94,11 +94,11 @@
                                                                                 100
                                                                             : $item->discount;
 
-                                                                    $productSubtotal = $item->price * $item->quantity;
-                                                                    $total = $productSubtotal - $discount;
+                                                                    $productTotal = $item->price * $item->quantity;
+                                                                    $finalAmount = $productTotal - $discount;
 
-                                                                    $subtotal += $productSubtotal;
-                                                                    $totalDiscount += $discount;
+                                                                    // Add to subtotal after discount is applied
+                                                                    $subtotal += $finalAmount;
                                                                 @endphp
 
                                                                 <tr>
@@ -122,7 +122,7 @@
                                                                         {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::format($item->discount) }}
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        {{ \App\Helpers\CurrencyHelper::format($total) }}
+                                                                        {{ \App\Helpers\CurrencyHelper::format($productTotal) }}
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
@@ -130,26 +130,10 @@
                                                         <tfoot>
                                                             <tr>
                                                                 <td colspan="6" class="text-end">
-                                                                    <strong>Sub Total :</strong>
-                                                                </td>
-                                                                <td class="text-end">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($subtotal) }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td colspan="6" class="text-end">
-                                                                    <strong>Discount :</strong>
-                                                                </td>
-                                                                <td class="text-end">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($totalDiscount) }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td colspan="6" class="text-end">
                                                                     <strong>Grand Total :</strong>
                                                                 </td>
                                                                 <td class="text-end">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($subtotal - $totalDiscount) }}
+                                                                    {{ \App\Helpers\CurrencyHelper::format($subtotal) }}
                                                                 </td>
                                                             </tr>
                                                         </tfoot>

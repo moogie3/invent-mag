@@ -60,7 +60,7 @@ class SalesController extends Controller
         $sales = Sales::with(['items', 'customer'])->find($id);
         $customer = Customer::all();
         $items = SalesItem::all();
-        $tax = Tax::where('is_active', 1)->first();
+        $tax = Tax::first();
         return view('admin.sales.sales-view', compact('sales', 'customer', 'items', 'tax'));
     }
 

@@ -189,7 +189,8 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const taxRate = {{ $tax->rate ?? 0 }}; // Get tax rate from blade
+            const taxRateInput = document.getElementById('taxRateInput');
+            const taxRate = parseFloat(taxRateInput.value) || 0; // Get tax rate from hidden input
             const customerSelect = document.getElementById('customer_id');
             const productSelect = document.getElementById('product_id');
             const customerPriceField = document.getElementById('customer_price');
@@ -215,11 +216,17 @@
                 }).format(amount);
             }
 
-            function calculateTotal(price, quantity, discount, discountType) {
+            function calculateDiscountAmount(price, quantity, discount, discountType) {
+                // Calculate the discount amount based on discount type
                 if (discountType === 'percentage') {
-                    return (price * quantity) - ((price * quantity) * discount / 100);
+                    return (price * quantity) * discount / 100;
                 }
-                return (price * quantity) - discount;
+                return discount; // Fixed amount
+            }
+
+            function calculateTotal(price, quantity, discount, discountType) {
+                const discountAmount = calculateDiscountAmount(price, quantity, discount, discountType);
+                return (price * quantity) - discountAmount;
             }
 
             function updateTotalPrice() {
@@ -228,9 +235,13 @@
 
                 products.forEach(product => {
                     const productSubtotal = Number(product.price) * Number(product.quantity);
-                    const productDiscount = product.discountType === 'percentage' ?
-                        (productSubtotal * product.discount / 100) :
-                        product.discount;
+                    const productDiscount = calculateDiscountAmount(
+                        product.price,
+                        product.quantity,
+                        product.discount,
+                        product.discountType
+                    );
+
                     subtotal += productSubtotal;
                     totalDiscount += productDiscount;
                 });
@@ -255,30 +266,30 @@
                 products.forEach(product => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                            <td>${product.name}</td>
-                            <td>
-                                <input type="number" class="form-control quantity-input"
-                                    value="${product.quantity}" data-id="${product.id}" min="1" style="width:80px;" />
-                            </td>
-                            <td>
-                                <input type="number" class="form-control price-input"
-                                    value="${product.price}" data-id="${product.id}" min="0" style="width:100px;" />
-                            </td>
-                            <td>
-                                <div class="input-group" style="width:200px;">
-                                    <input type="number" class="form-control discount-input"
-                                        value="${product.discount}" data-id="${product.id}" min="0" />
-                                    <select class="form-select discount-type" data-id="${product.id}">
-                                        <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
-                                        <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
-                                    </select>
-                                </div>
-                            </td>
-                            <td class="product-total">${formatCurrency(product.total)}</td>
-                            <td style="text-align:center">
-                                <button class="btn btn-danger btn-sm removeProduct" data-id="${product.id}">Remove</button>
-                            </td>
-                        `;
+                                <td>${product.name}</td>
+                                <td>
+                                    <input type="number" class="form-control quantity-input"
+                                        value="${product.quantity}" data-id="${product.id}" min="1" style="width:80px;" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control price-input"
+                                        value="${product.price}" data-id="${product.id}" min="0" style="width:100px;" />
+                                </td>
+                                <td>
+                                    <div class="input-group" style="width:200px;">
+                                        <input type="number" class="form-control discount-input"
+                                            value="${product.discount}" data-id="${product.id}" min="0" />
+                                        <select class="form-select discount-type" data-id="${product.id}">
+                                            <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
+                                            <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class="product-total">${formatCurrency(product.total)}</td>
+                                <td style="text-align:center">
+                                    <button class="btn btn-danger btn-sm removeProduct" data-id="${product.id}">Remove</button>
+                                </td>
+                            `;
                     productTableBody.appendChild(row);
                 });
 
@@ -405,7 +416,7 @@
                 priceField.value = selectedOption.getAttribute('data-price');
                 sellingPriceField.value = selectedOption.getAttribute('data-selling-price');
                 customerPriceField.value = selectedOption.getAttribute(
-                'data-selling-price'); // Default to selling price
+                    'data-selling-price'); // Default to selling price
 
                 // Also fetch the customer's past price
                 fetchCustomerPastPrice();
@@ -430,7 +441,14 @@
 
                 const discount = parseFloat(document.getElementById('discount').value) || 0;
                 const discountType = document.getElementById('discount_type').value;
-                const total = calculateTotal(price, quantity, discount, discountType);
+
+                // Calculate the total using the correct discount type
+                const discountAmount = (discountType === 'percentage') ?
+                    (price * quantity) * discount / 100 // Percentage discount
+                    :
+                    discount; // Fixed discount
+
+                const total = (price * quantity) - discountAmount;
 
                 products.push({
                     id: productId,
@@ -657,20 +675,16 @@
                     const productDiscount = product.discountType === 'percentage' ?
                         (productSubtotal * product.discount / 100) :
                         product.discount;
-                    subtotal += productSubtotal;
-                    totalDiscount += productDiscount;
 
-                    console.log(`Product ${product.name}:`);
-                    console.log(`Price: ${product.price}, Quantity: ${product.quantity}`);
-                    console.log(`Subtotal: ${productSubtotal}, Discount: ${productDiscount}`);
+                    // Add to subtotal after discount is applied
+                    subtotal += productSubtotal - productDiscount;
+                    totalDiscount += productDiscount;
                 });
 
-                const finalTotal = subtotal - totalDiscount;
-
-                // Update UI
+                // Update UI - subtotal now represents post-discount sum
                 document.getElementById('subtotal').innerText = formatCurrency(subtotal);
                 document.getElementById('discountTotal').innerText = formatCurrency(totalDiscount);
-                document.getElementById('finalTotal').innerText = formatCurrency(finalTotal);
+                document.getElementById('finalTotal').innerText = formatCurrency(subtotal);
 
                 document.getElementById('totalDiscountInput').value = totalDiscount;
                 productsField.value = JSON.stringify(products);
@@ -860,10 +874,10 @@
                     let discount = parseFloat(row.querySelector(".discount-input")?.value) || 0;
                     let discountType = row.querySelector(".discount-type-input")?.value;
 
-                    let total = quantity * price;
-                    let discountAmount = discountType === "percentage" ? (total * discount / 100) :
+                    let itemTotal = quantity * price;
+                    let discountAmount = discountType === "percentage" ? (itemTotal * discount / 100) :
                         discount;
-                    let finalAmount = total - discountAmount;
+                    let finalAmount = itemTotal - discountAmount;
 
                     // Update amount field
                     let amountInput = row.querySelector(".amount-input");
@@ -871,14 +885,14 @@
                         amountInput.value = Math.floor(finalAmount);
                     }
 
-                    subtotal += total;
+                    // Add to subtotal after discount is applied
+                    subtotal += finalAmount;
                     discountTotal += discountAmount;
                 });
 
                 document.getElementById("subtotal").innerText = formatCurrency(Math.floor(subtotal));
                 document.getElementById("discountTotal").innerText = formatCurrency(Math.floor(discountTotal));
-                document.getElementById("finalTotal").innerText = formatCurrency(Math.floor(subtotal -
-                    discountTotal));
+                document.getElementById("finalTotal").innerText = formatCurrency(Math.floor(subtotal));
                 document.getElementById("totalDiscountInput").value = Math.floor(discountTotal);
             }
 

@@ -145,26 +145,23 @@
                                                             // Apply discount correctly
                                                             $subTotal = $totalBeforeDiscount - $totalDiscount;
 
-                                                            // Calculate tax amount if applicable
+                                                            // Use tax_rate stored in the sales record
+                                                            $taxRate = $sales->tax_rate ?? 0;
                                                             $taxAmount =
-                                                                isset($tax) && $tax->is_active
-                                                                    ? $subTotal * ($tax->rate / 100)
-                                                                    : 0;
+                                                                $taxRate > 0 ? $subTotal * ($taxRate / 100) : 0;
+
+                                                            // Or use the stored total_tax directly if available
+                                                            // $taxAmount = $sales->total_tax ?? 0;
+
                                                             $grandTotal = $subTotal + $taxAmount;
                                                         @endphp
 
-                                                        @php
-                                                            $totals = \App\Helpers\SalesHelper::calculateTotals(
-                                                                $sales->items,
-                                                                $tax->rate,
-                                                            );
-                                                        @endphp
                                                         <tfoot>
                                                             <tr>
                                                                 <td colspan="6" class="text-end"><strong>Sub
                                                                         Total :</strong></td>
                                                                 <td class="text-end">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($totals['subTotal']) }}
+                                                                    {{ \App\Helpers\CurrencyHelper::format($subTotal) }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -172,15 +169,15 @@
                                                                     <strong>Discount :</strong>
                                                                 </td>
                                                                 <td class="text-end">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($totals['totalDiscount']) }}
+                                                                    {{ \App\Helpers\CurrencyHelper::format($totalDiscount) }}
                                                                 </td>
                                                             </tr>
-                                                            @if (isset($tax) && $tax->is_active)
+                                                            @if ($taxRate > 0)
                                                                 <tr>
                                                                     <td colspan="6" class="text-end"><strong>Tax
-                                                                            ({{ $tax->rate }}%) :</strong></td>
+                                                                            ({{ $taxRate }}%) :</strong></td>
                                                                     <td class="text-end">
-                                                                        {{ \App\Helpers\CurrencyHelper::format($totals['taxAmount']) }}
+                                                                        {{ \App\Helpers\CurrencyHelper::format($taxAmount) }}
                                                                     </td>
                                                                 </tr>
                                                             @endif
@@ -188,7 +185,7 @@
                                                                 <td colspan="6" class="text-end"><strong>Grand
                                                                         Total :</strong></td>
                                                                 <td class="text-end">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($totals['grandTotal']) }}
+                                                                    {{ \App\Helpers\CurrencyHelper::format($grandTotal) }}
                                                                 </td>
                                                             </tr>
                                                         </tfoot>

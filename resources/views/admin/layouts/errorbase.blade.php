@@ -64,10 +64,7 @@
                     <a class="navbar-brand navbar-brand-autodark"><i
                             class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG</a>
                 </div>
-                <div class="progress progress-sm mb-3">
-                    <div class="progress-bar progress-bar-indeterminate"></div>
-                </div>
-                <div class="text-secondary">Loading</div>
+                <div class="spinner-border" role="status"></div>
             </div>
         </div>
     </div>

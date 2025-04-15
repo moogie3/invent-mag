@@ -103,7 +103,9 @@
                                                 <label class="form-label">BUTTON</label>
                                                 <button type="button" id="addProduct" class="btn btn-secondary">Add
                                                     Product</button>
-                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                <button type="button" id="clearProducts"
+                                                    class="btn btn-danger">Clear</button>
+                                                <button type="submit" class="btn btn-success">Submit</button>
                                             </div>
                                             <input type="hidden" name="products" id="productsField">
                                         </div>
@@ -128,19 +130,56 @@
                                         <tbody id="productTableBody">
                                         </tbody>
                                     </table>
-                                    <small class="text-muted d-block mt-1 text-end">
-                                        Select <strong>%</strong> for percentage or
-                                        <strong>Rp</strong> for fixed discount.
-                                    </small>
-                                    <div class="row mt-4">
-                                        <div class="col-md-12 text-end">
-                                            <h3 class="mb-2">Subtotal: <span id="subtotal">0</span></h3>
-                                            <h3 class="mb-2">Discount: <span id="discountTotal">0</span></h3>
-                                            <h3 class="mb-2">Grand Total: <span id="finalTotal">0</span></h3>
+                                    <div class="row mt-4 align-items-start">
+                                        <div class="col-md-6 text-center">
+                                            <label class="form-label">Order Discount</label>
+                                            <div class="d-flex justify-content-center my-3">
+                                                <div class="d-flex gap-2 flex-wrap align-items-center">
+                                                    <input type="number" class="form-control w-auto"
+                                                        id="discountTotalValue" name="discount_total" value="0"
+                                                        placeholder="Order Discount" style="max-width: 120px;">
+                                                    <select class="form-select w-auto" id="discountTotalType"
+                                                        name="discount_total_type" style="max-width: 90px;">
+                                                        <option value="fixed">Rp</option>
+                                                        <option value="percentage">%</option>
+                                                    </select>
+                                                    <button class="btn btn-secondary" type="button"
+                                                        id="applyTotalDiscount">Apply</button>
+                                                </div>
+                                            </div>
+                                            <small class="text-muted d-block mt-1 text-center">
+                                                Select <strong>%</strong> for percentage or
+                                                <strong>Rp</strong> for fixed discount.
+                                            </small>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="card p-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <strong>Subtotal:</strong>
+                                                    <span id="subtotal">Rp 0</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <strong>Order Discount:</strong>
+                                                    <span id="orderDiscountTotal">Rp 0</span>
+                                                </div>
+                                                <hr class="my-2" />
+                                                <div class="d-flex justify-content-between fs-4 fw-bold text-primary">
+                                                    <strong>Grand Total:</strong>
+                                                    <span id="finalTotal">Rp 0</span>
+                                                </div>
+                                            </div>
+
+                                            {{-- Hidden fields --}}
                                             <input type="hidden" id="totalDiscountInput" name="total_discount"
                                                 value="0">
+                                            <input type="hidden" id="orderDiscountInput" name="discount_total"
+                                                value="0">
+                                            <input type="hidden" id="orderDiscountTypeInput" name="discount_total_type"
+                                                value="fixed">
                                         </div>
                                     </div>
+
                                 </form>
                             </div>
                         </div>

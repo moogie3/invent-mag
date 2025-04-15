@@ -637,6 +637,17 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if we're coming back after a successful submission - MOVED INSIDE DOMContentLoaded
+            const justSubmitted = sessionStorage.getItem('poJustSubmitted');
+            if (justSubmitted) {
+                // Clear the stored products in localStorage
+                products = [];
+                localStorage.removeItem('poProducts');
+                localStorage.removeItem('poOrderDiscount');
+                // Clear the flag
+                sessionStorage.removeItem('poJustSubmitted');
+            }
+
             const productSelect = document.getElementById('product_id');
             const priceField = document.getElementById('last_price');
             const quantityField = document.getElementById('quantity');
@@ -644,11 +655,20 @@
             const addProductButton = document.getElementById('addProduct');
             const productTableBody = document.getElementById('productTableBody');
             const productsField = document.getElementById('productsField');
+            const discountTotalValue = document.getElementById('discountTotalValue');
+            const discountTotalType = document.getElementById('discountTotalType');
+            const applyTotalDiscount = document.getElementById('applyTotalDiscount');
+            const invoiceField = document.getElementById('invoice');
 
             let products = JSON.parse(localStorage.getItem('poProducts')) || [];
+            let orderDiscount = {
+                value: 0,
+                type: 'fixed'
+            };
 
             function saveToLocalStorage() {
                 localStorage.setItem('poProducts', JSON.stringify(products));
+                localStorage.setItem('poOrderDiscount', JSON.stringify(orderDiscount));
             }
 
             function formatCurrency(amount) {
@@ -666,9 +686,16 @@
                 return (price * quantity) - discount;
             }
 
+            function calculateOrderDiscount(subtotal, discount, discountType) {
+                if (discountType === 'percentage') {
+                    return subtotal * discount / 100;
+                }
+                return discount;
+            }
+
             function updateTotalPrice() {
                 let subtotal = 0;
-                let totalDiscount = 0;
+                let totalProductDiscount = 0;
 
                 products.forEach(product => {
                     const productSubtotal = Number(product.price) * Number(product.quantity);
@@ -676,17 +703,30 @@
                         (productSubtotal * product.discount / 100) :
                         product.discount;
 
-                    // Add to subtotal after discount is applied
                     subtotal += productSubtotal - productDiscount;
-                    totalDiscount += productDiscount;
+                    totalProductDiscount += productDiscount;
                 });
 
-                // Update UI - subtotal now represents post-discount sum
-                document.getElementById('subtotal').innerText = formatCurrency(subtotal);
-                document.getElementById('discountTotal').innerText = formatCurrency(totalDiscount);
-                document.getElementById('finalTotal').innerText = formatCurrency(subtotal);
+                // Calculate order discount
+                const orderDiscountAmount = calculateOrderDiscount(
+                    subtotal,
+                    Number(orderDiscount.value),
+                    orderDiscount.type
+                );
 
-                document.getElementById('totalDiscountInput').value = totalDiscount;
+                // Final total after all discounts
+                const finalTotal = subtotal - orderDiscountAmount;
+
+                // Update UI
+                document.getElementById('subtotal').innerText = formatCurrency(subtotal);
+                document.getElementById('orderDiscountTotal').innerText = formatCurrency(orderDiscountAmount);
+                document.getElementById('finalTotal').innerText = formatCurrency(finalTotal);
+
+                // Update hidden fields
+                document.getElementById('totalDiscountInput').value = totalProductDiscount;
+                document.getElementById('orderDiscountInput').value = orderDiscount.value;
+                document.getElementById('orderDiscountTypeInput').value = orderDiscount.type;
+
                 productsField.value = JSON.stringify(products);
             }
 
@@ -695,35 +735,45 @@
                 products.forEach(product => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                            <td>${product.name}</td>
-                            <td>
-                                <input type="number" class="form-control quantity-input"
-                                    value="${product.quantity}" data-id="${product.id}" min="1" style="width:80px;" />
-                            </td>
-                            <td>
-                                <input type="number" class="form-control price-input"
-                                    value="${product.price}" data-id="${product.id}" min="0" style="width:100px;" />
-                            </td>
-                            <td>
-                                <div class="input-group" style="width:200px;">
-                                    <input type="number" class="form-control discount-input"
-                                        value="${product.discount}" data-id="${product.id}" min="0" />
-                                    <select class="form-select discount-type" data-id="${product.id}">
-                                        <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
-                                        <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
-                                    </select>
-                                </div>
-                            </td>
-                            <td class="product-total">${formatCurrency(product.total)}</td>
-                            <td style="text-align:center">
-                                <button class="btn btn-danger btn-sm removeProduct" data-id="${product.id}">Remove</button>
-                            </td>
-                        `;
+            <td>${product.name}</td>
+            <td>
+                <input type="number" class="form-control quantity-input"
+                    value="${product.quantity}" data-id="${product.id}" min="1" style="width:80px;" />
+            </td>
+            <td>
+                <input type="number" class="form-control price-input"
+                    value="${product.price}" data-id="${product.id}" min="0" style="width:100px;" />
+            </td>
+            <td>
+                <div class="input-group" style="width:200px;">
+                    <input type="number" class="form-control discount-input"
+                        value="${product.discount}" data-id="${product.id}" min="0" />
+                    <select class="form-select discount-type" data-id="${product.id}">
+                        <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
+                        <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
+                    </select>
+                </div>
+            </td>
+            <td class="product-total">${formatCurrency(product.total)}</td>
+            <td style="text-align:center">
+                <button class="btn btn-danger btn-icon btn-md removeProduct" data-id="${product.id}" title="Remove">
+                    <i class="ti ti-trash"></i>
+                </button>
+            </td>
+        `;
                     productTableBody.appendChild(row);
                 });
 
                 updateTotalPrice();
                 productsField.value = JSON.stringify(products);
+
+                // Load saved order discount
+                const savedOrderDiscount = JSON.parse(localStorage.getItem('poOrderDiscount'));
+                if (savedOrderDiscount) {
+                    orderDiscount = savedOrderDiscount;
+                    discountTotalValue.value = orderDiscount.value;
+                    discountTotalType.value = orderDiscount.type;
+                }
 
                 // Event listeners
                 document.querySelectorAll('.removeProduct').forEach(button => {
@@ -844,8 +894,44 @@
                 newPriceField.value = '';
             });
 
-            document.querySelector('form').addEventListener('submit', () => {
+            // Add event listener for order discount
+            applyTotalDiscount.addEventListener('click', function() {
+                orderDiscount = {
+                    value: parseFloat(discountTotalValue.value) || 0,
+                    type: discountTotalType.value
+                };
+                saveToLocalStorage();
+                updateTotalPrice();
+            });
+
+            document.getElementById('clearProducts').addEventListener('click', function() {
+                // Clear the products array
+                products = [];
+
+                // Clear localStorage
                 localStorage.removeItem('poProducts');
+                localStorage.removeItem('poOrderDiscount');
+
+                // Reset order discount
+                orderDiscount = {
+                    value: 0,
+                    type: 'fixed'
+                };
+
+                // Reset discount fields
+                discountTotalValue.value = 0;
+                discountTotalType.value = 'fixed';
+
+                // Re-render the table
+                renderTable();
+            });
+
+            document.querySelector('form').addEventListener('submit', function(e) {
+                // Set a flag in sessionStorage to indicate we've just submitted a form
+                sessionStorage.setItem('poJustSubmitted', 'true');
+                products = [];
+                // Let the form submission continue normally
+                return true;
             });
 
             renderTable();
@@ -864,6 +950,13 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
+            function calculateOrderDiscount(subtotal, discount, discountType) {
+                if (discountType === 'percentage') {
+                    return subtotal * discount / 100;
+                }
+                return discount;
+            }
+
             function updateTotals() {
                 let subtotal = 0;
                 let discountTotal = 0;
@@ -885,24 +978,39 @@
                         amountInput.value = Math.floor(finalAmount);
                     }
 
-                    // Add to subtotal after discount is applied
+                    // Add to subtotal after product discounts
                     subtotal += finalAmount;
                     discountTotal += discountAmount;
                 });
 
+                // Calculate order discount
+                const discountTotalValue = parseFloat(document.getElementById("discountTotalValue")?.value) || 0;
+                const discountTotalType = document.getElementById("discountTotalType")?.value || 'fixed';
+                const orderDiscountAmount = calculateOrderDiscount(subtotal, discountTotalValue, discountTotalType);
+
+                // Final total after all discounts
+                const finalTotal = subtotal - orderDiscountAmount;
+
+                // Update totals display
                 document.getElementById("subtotal").innerText = formatCurrency(Math.floor(subtotal));
-                document.getElementById("discountTotal").innerText = formatCurrency(Math.floor(discountTotal));
-                document.getElementById("finalTotal").innerText = formatCurrency(Math.floor(subtotal));
-                document.getElementById("totalDiscountInput").value = Math.floor(discountTotal);
+                document.getElementById("orderDiscountTotal").innerText = formatCurrency(Math.floor(
+                    orderDiscountAmount));
+                document.getElementById("finalTotal").innerText = formatCurrency(Math.floor(finalTotal));
+
+                // Removed totalDiscountInput since the field doesn't exist in the database
             }
 
-            // Event listeners
+            // Event listeners for product item changes
             document.querySelectorAll(".quantity-input, .price-input, .discount-input, .discount-type-input")
                 .forEach(input => {
                     input.addEventListener("input", updateTotals);
                 });
 
-            updateTotals(); // initial calc
+            // Event listeners for order discount changes
+            document.getElementById("discountTotalValue")?.addEventListener("input", updateTotals);
+            document.getElementById("discountTotalType")?.addEventListener("change", updateTotals);
+
+            updateTotals(); // initial calculation
         });
     </script>
 @endif

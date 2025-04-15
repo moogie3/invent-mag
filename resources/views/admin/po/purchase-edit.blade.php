@@ -137,7 +137,7 @@
                                                                                 value="{{ intval($item->price) }}"
                                                                                 class="form-control text-end price-input"
                                                                                 data-item-id="{{ $item->id }}"
-                                                                                step="1" min="0" />
+                                                                                step="0" min="0" />
                                                                         </td>
                                                                         <td>
                                                                             <div class="input-group">
@@ -145,7 +145,7 @@
                                                                                     name="items[{{ $item->id }}][discount]"
                                                                                     value="{{ (float) $item->discount }}"
                                                                                     class="form-control text-end discount-input"
-                                                                                    style="min-width: 80px;" step="0.01"
+                                                                                    style="min-width: 80px;" step="0"
                                                                                     min="0"
                                                                                     data-item-id="{{ $item->id }}" />
 
@@ -180,19 +180,35 @@
                                                                         <strong>Sub Total :</strong>
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        <span id="subtotal">
-                                                                            0
-                                                                        </span>
+                                                                        <span id="subtotal">0</span>
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td colspan="5" class="text-end">
-                                                                        <strong>Discount :</strong>
+                                                                    <td colspan="4" class="text-end">
+                                                                        <strong>Order Discount :</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="input-group">
+                                                                            <input type="number" name="discount_total"
+                                                                                value="{{ (float) $pos->discount_total }}"
+                                                                                class="form-control text-end"
+                                                                                id="discountTotalValue" step="0"
+                                                                                min="0" style="min-width: 80px;" />
+
+                                                                            <select name="discount_total_type"
+                                                                                class="form-select" id="discountTotalType"
+                                                                                style="min-width: 70px;">
+                                                                                <option value="percentage"
+                                                                                    {{ $pos->discount_total_type === 'percentage' ? 'selected' : '' }}>
+                                                                                    %</option>
+                                                                                <option value="fixed"
+                                                                                    {{ $pos->discount_total_type === 'fixed' ? 'selected' : '' }}>
+                                                                                    Rp</option>
+                                                                            </select>
+                                                                        </div>
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        <span id="discountTotal">
-                                                                            0
-                                                                        </span>
+                                                                        <span id="orderDiscountTotal">0</span>
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
@@ -200,9 +216,7 @@
                                                                         <strong>Grand Total :</strong>
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        <span id="finalTotal">
-                                                                            0
-                                                                        </span>
+                                                                        <span id="finalTotal">0</span>
                                                                     </td>
                                                                 </tr>
                                                                 <input type="hidden" id="totalDiscountInput"

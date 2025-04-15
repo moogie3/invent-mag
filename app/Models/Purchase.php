@@ -16,6 +16,8 @@ class Purchase extends Model
         'order_date',
         'due_date',
         'payment_type',
+        'discount_total',
+        'discount_total_type',
         'total',
         'status',
         'payment_date',
@@ -45,10 +47,11 @@ class Purchase extends Model
     }
 
     protected $casts = [
-        'total' => 'float',
-        'order_date' => 'datetime',
-        'due_date' => 'datetime',
-        'payment_date' => 'datetime',
+    'total' => 'float',
+    'discount_total' => 'float',
+    'order_date' => 'datetime',
+    'due_date' => 'datetime',
+    'payment_date' => 'datetime',
     ];
 
 }

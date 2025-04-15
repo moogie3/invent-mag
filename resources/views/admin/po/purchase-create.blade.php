@@ -82,7 +82,7 @@
                                                     placeholder="New price" />
                                             </div>
                                             <div class="col-md-2 mb-3">
-                                                <label class="form-label">DISCOUNT</label>
+                                                <label class="form-label">DISCOUNT / UNIT</label>
                                                 <div class="input-group">
                                                     <input type="number" class="form-control" id="discount"
                                                         placeholder="Discount" />
@@ -113,6 +113,8 @@
                                     <table class="table card-table table-vcenter table-responsive">
                                         <thead style="font-size: large">
                                             <tr>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-number">No</button></th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-product">Product
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3"

@@ -637,17 +637,6 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if we're coming back after a successful submission - MOVED INSIDE DOMContentLoaded
-            const justSubmitted = sessionStorage.getItem('poJustSubmitted');
-            if (justSubmitted) {
-                // Clear the stored products in localStorage
-                products = [];
-                localStorage.removeItem('poProducts');
-                localStorage.removeItem('poOrderDiscount');
-                // Clear the flag
-                sessionStorage.removeItem('poJustSubmitted');
-            }
-
             const productSelect = document.getElementById('product_id');
             const priceField = document.getElementById('last_price');
             const quantityField = document.getElementById('quantity');
@@ -660,8 +649,16 @@
             const applyTotalDiscount = document.getElementById('applyTotalDiscount');
             const invoiceField = document.getElementById('invoice');
 
+            if (sessionStorage.getItem('poJustSubmitted') === 'true') {
+                console.log('Detected submission, clearing products');
+                localStorage.removeItem('poProducts');
+                localStorage.removeItem('poOrderDiscount');
+                sessionStorage.removeItem('poJustSubmitted');
+            }
+
+            // Initialize after potentially clearing
             let products = JSON.parse(localStorage.getItem('poProducts')) || [];
-            let orderDiscount = {
+            let orderDiscount = JSON.parse(localStorage.getItem('poOrderDiscount')) || {
                 value: 0,
                 type: 'fixed'
             };
@@ -680,10 +677,18 @@
             }
 
             function calculateTotal(price, quantity, discount, discountType) {
+                // Apply discount per unit instead of per total
+                let discountPerUnit;
+
                 if (discountType === 'percentage') {
-                    return (price * quantity) - ((price * quantity) * discount / 100);
+                    discountPerUnit = price * discount / 100;
+                } else {
+                    // Fixed discount is already per unit
+                    discountPerUnit = discount;
                 }
-                return (price * quantity) - discount;
+
+                // Apply discounted unit price × quantity
+                return (price - discountPerUnit) * quantity;
             }
 
             function calculateOrderDiscount(subtotal, discount, discountType) {
@@ -695,16 +700,9 @@
 
             function updateTotalPrice() {
                 let subtotal = 0;
-                let totalProductDiscount = 0;
 
                 products.forEach(product => {
-                    const productSubtotal = Number(product.price) * Number(product.quantity);
-                    const productDiscount = product.discountType === 'percentage' ?
-                        (productSubtotal * product.discount / 100) :
-                        product.discount;
-
-                    subtotal += productSubtotal - productDiscount;
-                    totalProductDiscount += productDiscount;
+                    subtotal += product.total; // each product.total is already discounted
                 });
 
                 // Calculate order discount
@@ -722,8 +720,8 @@
                 document.getElementById('orderDiscountTotal').innerText = formatCurrency(orderDiscountAmount);
                 document.getElementById('finalTotal').innerText = formatCurrency(finalTotal);
 
-                // Update hidden fields
-                document.getElementById('totalDiscountInput').value = totalProductDiscount;
+                // Optional: You can still track total discount if needed
+                document.getElementById('totalDiscountInput').value = 0;
                 document.getElementById('orderDiscountInput').value = orderDiscount.value;
                 document.getElementById('orderDiscountTypeInput').value = orderDiscount.type;
 
@@ -732,35 +730,36 @@
 
             function renderTable() {
                 productTableBody.innerHTML = '';
-                products.forEach(product => {
+                products.forEach((product, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-            <td>${product.name}</td>
-            <td>
-                <input type="number" class="form-control quantity-input"
-                    value="${product.quantity}" data-id="${product.id}" min="1" style="width:80px;" />
-            </td>
-            <td>
-                <input type="number" class="form-control price-input"
-                    value="${product.price}" data-id="${product.id}" min="0" style="width:100px;" />
-            </td>
-            <td>
-                <div class="input-group" style="width:200px;">
-                    <input type="number" class="form-control discount-input"
-                        value="${product.discount}" data-id="${product.id}" min="0" />
-                    <select class="form-select discount-type" data-id="${product.id}">
-                        <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
-                        <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
-                    </select>
-                </div>
-            </td>
-            <td class="product-total">${formatCurrency(product.total)}</td>
-            <td style="text-align:center">
-                <button class="btn btn-danger btn-icon btn-md removeProduct" data-id="${product.id}" title="Remove">
-                    <i class="ti ti-trash"></i>
-                </button>
-            </td>
-        `;
+                <td>${index + 1}</td>
+                <td>${product.name}</td>
+                <td>
+                    <input type="number" class="form-control quantity-input"
+                        value="${product.quantity}" data-unique-id="${product.uniqueId}" min="1" style="width:80px;" />
+                </td>
+                <td>
+                    <input type="number" class="form-control price-input"
+                        value="${product.price}" data-unique-id="${product.uniqueId}" min="0" style="width:100px;" />
+                </td>
+                <td>
+                    <div class="input-group" style="width:200px;">
+                        <input type="number" class="form-control discount-input"
+                            value="${product.discount}" data-unique-id="${product.uniqueId}" min="0" />
+                        <select class="form-select discount-type" data-unique-id="${product.uniqueId}">
+                            <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
+                            <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
+                        </select>
+                    </div>
+                </td>
+                <td class="product-total">${formatCurrency(product.total)}</td>
+                <td style="text-align:center">
+                    <button class="btn btn-danger btn-icon btn-md removeProduct" data-unique-id="${product.uniqueId}" title="Remove">
+                        <i class="ti ti-trash"></i>
+                    </button>
+                </td>
+            `;
                     productTableBody.appendChild(row);
                 });
 
@@ -778,7 +777,7 @@
                 // Event listeners
                 document.querySelectorAll('.removeProduct').forEach(button => {
                     button.addEventListener('click', function() {
-                        products = products.filter(p => p.id != this.dataset.id);
+                        products = products.filter(p => p.uniqueId != this.dataset.uniqueId);
                         saveToLocalStorage();
                         renderTable();
                     });
@@ -786,9 +785,9 @@
 
                 document.querySelectorAll('.quantity-input').forEach(input => {
                     input.addEventListener('input', function() {
-                        const id = this.dataset.id;
+                        const uniqueId = this.dataset.uniqueId;
                         const value = parseInt(this.value) || 1;
-                        const product = products.find(p => p.id == id);
+                        const product = products.find(p => p.uniqueId == uniqueId);
                         if (product) {
                             product.quantity = value;
                             product.total = calculateTotal(product.price, product.quantity, product
@@ -803,9 +802,9 @@
 
                 document.querySelectorAll('.price-input').forEach(input => {
                     input.addEventListener('input', function() {
-                        const id = this.dataset.id;
+                        const uniqueId = this.dataset.uniqueId;
                         const value = parseFloat(this.value) || 0;
-                        const product = products.find(p => p.id == id);
+                        const product = products.find(p => p.uniqueId == uniqueId);
                         if (product) {
                             product.price = value;
                             product.total = calculateTotal(product.price, product.quantity, product
@@ -820,9 +819,9 @@
 
                 document.querySelectorAll('.discount-input').forEach(input => {
                     input.addEventListener('input', function() {
-                        const id = this.dataset.id;
+                        const uniqueId = this.dataset.uniqueId;
                         const value = parseFloat(this.value) || 0;
-                        const product = products.find(p => p.id == id);
+                        const product = products.find(p => p.uniqueId == uniqueId);
                         if (product) {
                             product.discount = value;
                             product.total = calculateTotal(product.price, product.quantity, product
@@ -837,9 +836,9 @@
 
                 document.querySelectorAll('.discount-type').forEach(select => {
                     select.addEventListener('change', function() {
-                        const id = this.dataset.id;
+                        const uniqueId = this.dataset.uniqueId;
                         const value = this.value;
-                        const product = products.find(p => p.id == id);
+                        const product = products.find(p => p.uniqueId == uniqueId);
                         if (product) {
                             product.discountType = value;
                             product.total = calculateTotal(product.price, product.quantity, product
@@ -864,20 +863,19 @@
                 const quantity = parseInt(quantityField.value);
                 const price = parseFloat(newPriceField.value);
 
-                if (!productId || !quantity || isNaN(price)) {
-                    return alert('Complete all fields!');
-                }
+                // Generate a unique ID for this product instance
+                const uniqueId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
 
-                if (products.some(p => p.id == productId)) {
-                    return alert('Product already added.');
-                }
-
+                // For fixed discount, store it as per-unit value
                 const discount = parseFloat(document.getElementById('discount').value) || 0;
                 const discountType = document.getElementById('discount_type').value;
+
+                // Calculate total with per-unit discount
                 const total = calculateTotal(price, quantity, discount, discountType);
 
                 products.push({
                     id: productId,
+                    uniqueId: uniqueId, // Add the unique ID
                     name: productName,
                     quantity,
                     price,
@@ -889,9 +887,11 @@
                 saveToLocalStorage();
                 renderTable();
 
+                // Clear form fields after adding
                 productSelect.value = '';
                 quantityField.value = '';
                 newPriceField.value = '';
+                document.getElementById('discount').value = '';
             });
 
             // Add event listener for order discount
@@ -926,14 +926,11 @@
                 renderTable();
             });
 
-            document.querySelector('form').addEventListener('submit', function(e) {
-                // Set a flag in sessionStorage to indicate we've just submitted a form
+            document.querySelector('form#invoiceForm').addEventListener('submit', function(e) {
+                console.log('Form submitted, setting flag');
+                // Set a flag in sessionStorage to indicate form submission
                 sessionStorage.setItem('poJustSubmitted', 'true');
-                products = [];
-                // Let the form submission continue normally
-                return true;
             });
-
             renderTable();
         });
     </script>
@@ -950,67 +947,53 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            function calculateOrderDiscount(subtotal, discount, discountType) {
-                if (discountType === 'percentage') {
-                    return subtotal * discount / 100;
-                }
-                return discount;
-            }
-
-            function updateTotals() {
+            function updateDisplayTotals() {
                 let subtotal = 0;
-                let discountTotal = 0;
 
                 document.querySelectorAll("tbody tr").forEach(row => {
-                    let quantity = parseFloat(row.querySelector(".quantity-input")?.value) || 0;
-                    let price = parseFloat(row.querySelector(".price-input")?.value) || 0;
-                    let discount = parseFloat(row.querySelector(".discount-input")?.value) || 0;
-                    let discountType = row.querySelector(".discount-type-input")?.value;
+                    const quantity = parseFloat(row.querySelector(".quantity-input")?.value) || 0;
+                    const price = parseFloat(row.querySelector(".price-input")?.value) || 0;
+                    const discount = parseFloat(row.querySelector(".discount-input")?.value) || 0;
+                    const discountType = row.querySelector(".discount-type-input")?.value || 'percentage';
 
-                    let itemTotal = quantity * price;
-                    let discountAmount = discountType === "percentage" ? (itemTotal * discount / 100) :
+                    const discountPerUnit = discountType === "percentage" ?
+                        (price * discount / 100) :
                         discount;
-                    let finalAmount = itemTotal - discountAmount;
 
-                    // Update amount field
-                    let amountInput = row.querySelector(".amount-input");
+                    const finalAmount = (price - discountPerUnit) * quantity;
+
+                    // Just display amount
+                    const amountInput = row.querySelector(".amount-input");
                     if (amountInput) {
                         amountInput.value = Math.floor(finalAmount);
                     }
 
-                    // Add to subtotal after product discounts
                     subtotal += finalAmount;
-                    discountTotal += discountAmount;
                 });
 
-                // Calculate order discount
                 const discountTotalValue = parseFloat(document.getElementById("discountTotalValue")?.value) || 0;
                 const discountTotalType = document.getElementById("discountTotalType")?.value || 'fixed';
-                const orderDiscountAmount = calculateOrderDiscount(subtotal, discountTotalValue, discountTotalType);
+                const orderDiscountAmount = discountTotalType === 'percentage' ?
+                    (subtotal * discountTotalValue / 100) :
+                    discountTotalValue;
 
-                // Final total after all discounts
                 const finalTotal = subtotal - orderDiscountAmount;
 
-                // Update totals display
                 document.getElementById("subtotal").innerText = formatCurrency(Math.floor(subtotal));
                 document.getElementById("orderDiscountTotal").innerText = formatCurrency(Math.floor(
                     orderDiscountAmount));
                 document.getElementById("finalTotal").innerText = formatCurrency(Math.floor(finalTotal));
-
-                // Removed totalDiscountInput since the field doesn't exist in the database
             }
 
-            // Event listeners for product item changes
             document.querySelectorAll(".quantity-input, .price-input, .discount-input, .discount-type-input")
                 .forEach(input => {
-                    input.addEventListener("input", updateTotals);
+                    input.addEventListener("input", updateDisplayTotals);
                 });
 
-            // Event listeners for order discount changes
-            document.getElementById("discountTotalValue")?.addEventListener("input", updateTotals);
-            document.getElementById("discountTotalType")?.addEventListener("change", updateTotals);
+            document.getElementById("discountTotalValue")?.addEventListener("input", updateDisplayTotals);
+            document.getElementById("discountTotalType")?.addEventListener("change", updateDisplayTotals);
 
-            updateTotals(); // initial calculation
+            updateDisplayTotals();
         });
     </script>
 @endif

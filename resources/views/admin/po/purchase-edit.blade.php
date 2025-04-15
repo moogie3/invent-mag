@@ -111,7 +111,8 @@
                                                                     <th>Product</th>
                                                                     <th class="text-center" style="width: 10%">QTY</th>
                                                                     <th class="text-end" style="width: 15%">Price</th>
-                                                                    <th class="text-end" style="width: 13%">Discount</th>
+                                                                    <th class="text-end" style="width: 13%">Unit Discount
+                                                                    </th>
                                                                     <th class="text-end" style="width: 20%">Amount</th>
                                                                 </tr>
                                                             </thead>

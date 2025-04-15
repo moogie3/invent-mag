@@ -74,33 +74,33 @@
                                                                 <th class="text-end" style="width: 15%">Unit Price</th>
                                                                 <th class="text-end" style="width: 15%">Discount Type
                                                                 </th>
-                                                                <th class="text-end" style="width: 15%">Discount</th>
+                                                                <th class="text-end" style="width: 15%">Unit Discount</th>
                                                                 <th class="text-end" style="width: 15%">Amount</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             @php
                                                                 $subtotal = 0;
-                                                                $totalDiscount = 0;
                                                                 $totalProductDiscount = 0;
                                                             @endphp
 
                                                             @foreach ($pos->items as $index => $item)
                                                                 @php
-                                                                    $discount =
+                                                                    // Calculate discount per unit
+                                                                    $discountPerUnit =
                                                                         $item->discount_type === 'percentage'
-                                                                            ? ($item->price *
-                                                                                    $item->quantity *
-                                                                                    $item->discount) /
-                                                                                100
+                                                                            ? ($item->price * $item->discount) / 100
                                                                             : $item->discount;
 
-                                                                    $productTotal = $item->price * $item->quantity;
-                                                                    $finalAmount = $productTotal - $discount;
+                                                                    // Apply discounted unit price × quantity
+                                                                    $finalAmount =
+                                                                        ($item->price - $discountPerUnit) *
+                                                                        $item->quantity;
 
-                                                                    // Add to subtotal after discount is applied
+                                                                    // Add to subtotal
                                                                     $subtotal += $finalAmount;
-                                                                    $totalProductDiscount += $discount;
+                                                                    $totalProductDiscount +=
+                                                                        $discountPerUnit * $item->quantity;
                                                                 @endphp
 
                                                                 <tr>

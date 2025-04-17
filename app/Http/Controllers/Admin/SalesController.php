@@ -173,58 +173,39 @@ class SalesController extends Controller
         try {
             $sales = Sales::findOrFail($id);
 
-            $request->validate([
-                'payment_type' => 'required',
-                'status' => 'required',
-                'order_date' => 'required|date',
-                'due_date' => 'required|date|after_or_equal:order_date',
-                'products' => 'required|json',
-            ]);
+            // Basic sales fields update
+            $sales->payment_type = $request->payment_type;
+            $sales->status = $request->status;
+            $sales->payment_date = $request->status === 'Paid' ? now() : null;
+            $sales->order_discount_type = $request->order_discount_type_type ?? 'fixed'; // Fixed field name to match form
+            $sales->order_discount = $request->order_discount ?? 0; // Fixed field name to match form
 
-            // Decode products
-            $products = json_decode($request->products, true);
-            if (!$products || !is_array($products)) {
-                return back()
-                    ->withErrors(['products' => 'Invalid product data'])
-                    ->withInput();
-            }
-
-            // Calculate totals
             $subTotal = 0;
-            $totalDiscount = 0;
+            $itemDiscountTotal = 0;
 
-            // Update or create sales items
-            foreach ($products as $product) {
-                $quantity = $product['quantity'];
-                $price = $product['price'];
-                $discount = $product['discount'] ?? 0;
-                $discountType = $product['discountType'] ?? 'fixed';
+            // Process items directly from request
+            if (isset($request->items) && is_array($request->items)) {
+                foreach ($request->items as $itemId => $itemData) {
+                    $salesItem = SalesItem::findOrFail($itemId);
 
-                $productSubtotal = $price * $quantity;
-                $discountAmount = $discountType === 'percentage' ? ($productSubtotal * $discount) / 100 : $discount;
+                    $quantity = (int) $itemData['quantity'];
+                    $price = (float) $itemData['price'];
+                    $discount = (float) $itemData['discount'];
+                    $discountType = $itemData['discount_type'] ?? 'fixed';
 
-                $itemTotal = $productSubtotal - $discountAmount;
-                $totalDiscount += $discountAmount;
-                $subTotal += $productSubtotal;
+                    // Calculate discount amount
+                    $discountAmount = $discountType === 'percentage' ? (($price * $discount) / 100) * $quantity : $discount * $quantity;
 
-                // If the product already exists as a sales item, update it
-                // Otherwise, create a new sales item
-                $salesItem = SalesItem::where('sales_id', $sales->id)->where('product_id', $product['id'])->first();
+                    $productSubtotal = $price * $quantity;
+                    $itemTotal = $productSubtotal - $discountAmount;
 
-                if ($salesItem) {
+                    $itemDiscountTotal += $discountAmount;
+                    $subTotal += $itemTotal;
+
+                    // Update the sales item
                     $salesItem->update([
                         'quantity' => $quantity,
-                        'customer_price' => $price, // Use customer_price column instead of price
-                        'discount' => $discount,
-                        'discount_type' => $discountType,
-                        'total' => $itemTotal,
-                    ]);
-                } else {
-                    SalesItem::create([
-                        'sales_id' => $sales->id,
-                        'product_id' => $product['id'],
-                        'quantity' => $quantity,
-                        'customer_price' => $price, // Use customer_price column instead of price
+                        'customer_price' => $price,
                         'discount' => $discount,
                         'discount_type' => $discountType,
                         'total' => $itemTotal,
@@ -232,29 +213,20 @@ class SalesController extends Controller
                 }
             }
 
-            // Calculate tax
-            $tax = Tax::where('is_active', 1)->first();
-            $taxRate = $tax ? $tax->rate : 0;
-            $taxAmount = ($subTotal - $totalDiscount) * ($taxRate / 100);
-            $grandTotal = $subTotal - $totalDiscount + $taxAmount;
+            // Calculate order discount
+            $orderDiscountAmount = $sales->order_discount_type === 'percentage' ? ($subTotal * $sales->order_discount) / 100 : $sales->order_discount;
 
-            // Update Sales Order
-            $sales->update([
-                'order_date' => $request->order_date,
-                'due_date' => $request->due_date,
-                'payment_type' => $request->payment_type,
-                'status' => $request->status,
-                'tax_rate' => $taxRate,
-                'total_tax' => $taxAmount,
-                'total' => $grandTotal,
-                'payment_date' => $request->status === 'Paid' ? now() : null,
-            ]);
+            // Calculate tax using the EXISTING tax rate from the sales record
+            $taxable = $subTotal - $orderDiscountAmount;
+            $taxRate = $sales->tax_rate; // Use the stored tax rate instead of fetching a new one
+            $taxAmount = $taxable * ($taxRate / 100);
 
-            // Remove any sales items that are no longer in the products array
-            $existingProductIds = collect($products)->pluck('id')->toArray();
-            SalesItem::where('sales_id', $sales->id)->whereNotIn('product_id', $existingProductIds)->delete();
+            // Set final values - don't update the tax_rate field as we're keeping the historical rate
+            $sales->total_tax = $taxAmount;
+            $sales->total = $taxable + $taxAmount;
+            $sales->save();
 
-            return redirect()->route('admin.sales.view', $id)->with('success', 'Sales updated successfully.');
+            return redirect()->route('admin.sales.view', $id)->with('success', 'Sale updated successfully.');
         } catch (\Exception $e) {
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])

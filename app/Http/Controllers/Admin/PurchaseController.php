@@ -175,7 +175,6 @@ class PurchaseController extends Controller
                 ->withInput();
         }
     }
-
     public function update(Request $request, $id)
     {
         try {

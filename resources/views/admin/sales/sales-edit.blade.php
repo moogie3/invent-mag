@@ -62,39 +62,12 @@
                                             </div>
                                         </div>
                                     </fieldset>
-
-                                    <div class="row">
-                                        <div class="col-md-3 mb-3">
-                                            <label class="form-label">CUSTOMER</label>
-                                            <select class="form-control" name="customer_id" id="customer_id">
-                                                @foreach ($customers as $customer)
-                                                    <option value="{{ $customer->id }}"
-                                                        data-payment-terms="{{ $customer->payment_terms }}"
-                                                        {{ $sales->customer_id == $customer->id ? 'selected' : '' }}>
-                                                        {{ $customer->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3 mb-3">
-                                            <label class="form-label">ORDER DATE</label>
-                                            <input type="date" class="form-control" name="order_date" id="order_date"
-                                                value="{{ $sales->order_date->format('Y-m-d') }}" required>
-                                        </div>
-                                        <div class="col-md-3 mb-3">
-                                            <label class="form-label">DUE DATE</label>
-                                            <input type="date" class="form-control" name="due_date" id="due_date"
-                                                value="{{ $sales->due_date->format('Y-m-d') }}" required readonly>
-                                        </div>
-                                    </div>
-
                                     <input type="hidden" id="grandTotalInput" name="total" value="0">
                                     <input type="hidden" id="taxInput" name="tax_amount" value="0">
                                     <input type="hidden" id="totalDiscountInput" name="total_discount" value="0">
                                     <!-- Store the tax rate -->
                                     <input type="hidden" id="taxRateInput" name="tax_rate"
                                         value="{{ $sales->tax_rate ?? 0 }}">
-
                                     <div class="page-wrapper">
                                         <div class="page-body">
                                             <div class="container-xl">
@@ -182,8 +155,8 @@
                                                                                     name="items[{{ $item->id }}][discount]"
                                                                                     value="{{ (float) $item->discount }}"
                                                                                     class="form-control text-end discount-input"
-                                                                                    style="min-width: 80px;"
-                                                                                    step="1" min="0"
+                                                                                    style="min-width: 80px;" step="1"
+                                                                                    min="0"
                                                                                     data-item-id="{{ $item->id }}" />
 
                                                                                 <select

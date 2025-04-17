@@ -30,74 +30,70 @@
                                     action="{{ route('admin.sales.update', $sales->id) }}">
                                     @csrf
                                     @method('PUT')
-                                    <h1 class="text-center">Edit Invoice Information</h1>
-                                    @if ($sales->status !== 'Paid')
-                                        <fieldset class="form-fieldset">
-                                            <div class="row">
-                                                <div class="col-md-2 mb-3">
-                                                    <label class="form-label">PAYMENT TYPE</label>
-                                                    <select class="form-control" name="payment_type" id="payment_type"
-                                                        {{ $sales->status == 'Paid' ? 'disabled' : '' }}>
-                                                        <option value="Cash"
-                                                            {{ $sales->payment_type == 'Cash' ? 'selected' : '' }}>
-                                                            Cash</option>
-                                                        <option value="Transfer"
-                                                            {{ $sales->payment_type == 'Transfer' ? 'selected' : '' }}>
-                                                            Transfer</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-1 mb-3">
-                                                    <label class="form-label">STATUS</label>
-                                                    <select class="form-control" name="status" id="status"
-                                                        {{ $sales->status == 'Paid' ? 'disabled' : '' }}>
-                                                        <option value="Paid"
-                                                            {{ $sales->status == 'Paid' ? 'selected' : '' }}>Paid
-                                                        </option>
-                                                        <option value="Unpaid"
-                                                            {{ $sales->status == 'Unpaid' ? 'selected' : '' }}>
-                                                            Unpaid</option>
-                                                    </select>
-                                                </div>
+                                    <h1 class="text-center">Edit Invoice {{ $sales->invoice }}</h1>
+                                    <fieldset class="form-fieldset">
+                                        <div class="row">
+                                            <div class="col-md-2 mb-3">
+                                                <label class="form-label">PAYMENT TYPE</label>
+                                                <select class="form-control" name="payment_type" id="payment_type"
+                                                    {{ $sales->status == 'Paid' ? 'disabled' : '' }}>
+                                                    <option value="Cash"
+                                                        {{ $sales->payment_type == 'Cash' ? 'selected' : '' }}>
+                                                        Cash</option>
+                                                    <option value="Transfer"
+                                                        {{ $sales->payment_type == 'Transfer' ? 'selected' : '' }}>
+                                                        Transfer</option>
+                                                </select>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-3 mb-3">
-                                                    <label class="form-label">CUSTOMER</label>
-                                                    <select class="form-control" name="customer_id" id="customer_id">
-                                                        @foreach ($customers as $customer)
-                                                            <option value="{{ $customer->id }}"
-                                                                data-payment-terms="{{ $customer->payment_terms }}"
-                                                                {{ $sales->customer_id == $customer->id ? 'selected' : '' }}>
-                                                                {{ $customer->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3 mb-3">
-                                                    <label class="form-label">ORDER DATE</label>
-                                                    <input type="date" class="form-control" name="order_date"
-                                                        id="order_date" value="{{ $sales->order_date->format('Y-m-d') }}"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3 mb-3">
-                                                    <label class="form-label">DUE DATE</label>
-                                                    <input type="date" class="form-control" name="due_date"
-                                                        id="due_date" value="{{ $sales->due_date->format('Y-m-d') }}"
-                                                        required readonly>
-                                                </div>
-                                                <input type="hidden" id="grandTotalInput" name="total" value="0">
-                                                <input type="hidden" id="taxInput" name="tax_amount" value="0">
-                                                <input type="hidden" id="totalDiscountInput" name="total_discount"
-                                                    value="0">
-                                                <!-- Store the tax rate -->
-                                                <input type="hidden" id="taxRateInput" name="tax_rate"
-                                                    value="{{ $sales->tax_rate ?? 0 }}">
+                                            <div class="col-md-1 mb-3">
+                                                <label class="form-label">STATUS</label>
+                                                <select class="form-control" name="status" id="status"
+                                                    {{ $sales->status == 'Paid' ? 'disabled' : '' }}>
+                                                    <option value="Paid" {{ $sales->status == 'Paid' ? 'selected' : '' }}>
+                                                        Paid
+                                                    </option>
+                                                    <option value="Unpaid"
+                                                        {{ $sales->status == 'Unpaid' ? 'selected' : '' }}>
+                                                        Unpaid</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-9 mb-3 mt-4 text-end">
+                                                <button type="submit" class="btn btn-success">Save</button>
+                                            </div>
+                                        </div>
+                                    </fieldset>
 
-                                                <div class="col-md-3 mb-3 mt-4 text-end">
-                                                    <button type="submit" class="btn btn-success">Save</button>
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                    @endif
+                                    <div class="row">
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">CUSTOMER</label>
+                                            <select class="form-control" name="customer_id" id="customer_id">
+                                                @foreach ($customers as $customer)
+                                                    <option value="{{ $customer->id }}"
+                                                        data-payment-terms="{{ $customer->payment_terms }}"
+                                                        {{ $sales->customer_id == $customer->id ? 'selected' : '' }}>
+                                                        {{ $customer->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">ORDER DATE</label>
+                                            <input type="date" class="form-control" name="order_date" id="order_date"
+                                                value="{{ $sales->order_date->format('Y-m-d') }}" required>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">DUE DATE</label>
+                                            <input type="date" class="form-control" name="due_date" id="due_date"
+                                                value="{{ $sales->due_date->format('Y-m-d') }}" required readonly>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" id="grandTotalInput" name="total" value="0">
+                                    <input type="hidden" id="taxInput" name="tax_amount" value="0">
+                                    <input type="hidden" id="totalDiscountInput" name="total_discount" value="0">
+                                    <!-- Store the tax rate -->
+                                    <input type="hidden" id="taxRateInput" name="tax_rate"
+                                        value="{{ $sales->tax_rate ?? 0 }}">
 
                                     <div class="page-wrapper">
                                         <div class="page-body">
@@ -138,6 +134,10 @@
                                                                     Due Date :
                                                                     {{ $sales->due_date->format('d-m-Y') }}
                                                                 </address>
+                                                                <small class="text-muted d-block mb-3 text-end">
+                                                                    Select <strong>%</strong> for percentage or
+                                                                    <strong>Rp</strong> for fixed discount.
+                                                                </small>
                                                             </div>
                                                         </div>
                                                         <table class="table table-transparent table-responsive">
@@ -146,8 +146,8 @@
                                                                     <th class="text-center" style="width: 1%">No</th>
                                                                     <th>Product</th>
                                                                     <th class="text-center" style="width: 10%">QTY</th>
-                                                                    <th class="text-end" style="width: 20%">Price</th>
-                                                                    <th class="text-end" style="width: 20%">Discount
+                                                                    <th class="text-end" style="width: 15%">Price</th>
+                                                                    <th class="text-end" style="width: 13%">Unit Discount
                                                                     </th>
                                                                     <th class="text-end" style="width: 20%">Amount</th>
                                                                 </tr>
@@ -171,34 +171,39 @@
                                                                         <td class="text-end">
                                                                             <input type="number"
                                                                                 name="items[{{ $item->id }}][price]"
-                                                                                value="{{ $item->price }}"
+                                                                                value="{{ intval($item->customer_price) }}"
                                                                                 class="form-control text-end price-input"
                                                                                 data-item-id="{{ $item->id }}"
                                                                                 step="1" min="0" />
                                                                         </td>
-                                                                        <td class="input-group text-end">
-                                                                            <input type="number"
-                                                                                name="items[{{ $item->id }}][discount]"
-                                                                                value="{{ (int) $item->discount }}"
-                                                                                class="form-control discount-input text-end"
-                                                                                data-item-id="{{ $item->id }}"
-                                                                                step="1" min="0" />
-                                                                            <select
-                                                                                name="items[{{ $item->id }}][discount_type]"
-                                                                                class="input-group-text discount-type"
-                                                                                data-item-id="{{ $item->id }}">
-                                                                                <option value="percentage"
-                                                                                    {{ $item->discount_type == 'percentage' ? 'selected' : '' }}>
-                                                                                    %</option>
-                                                                                <option value="fixed"
-                                                                                    {{ $item->discount_type == 'fixed' ? 'selected' : '' }}>
-                                                                                    Rp</option>
-                                                                            </select>
+                                                                        <td>
+                                                                            <div class="input-group">
+                                                                                <input type="number"
+                                                                                    name="items[{{ $item->id }}][discount]"
+                                                                                    value="{{ (float) $item->discount }}"
+                                                                                    class="form-control text-end discount-input"
+                                                                                    style="min-width: 80px;"
+                                                                                    step="1" min="0"
+                                                                                    data-item-id="{{ $item->id }}" />
+
+                                                                                <select
+                                                                                    name="items[{{ $item->id }}][discount_type]"
+                                                                                    class="form-select discount-type-input"
+                                                                                    style="min-width: 70px;"
+                                                                                    data-item-id="{{ $item->id }}">
+                                                                                    <option value="percentage"
+                                                                                        {{ $item->discount_type === 'percentage' ? 'selected' : '' }}>
+                                                                                        %</option>
+                                                                                    <option value="fixed"
+                                                                                        {{ $item->discount_type === 'fixed' ? 'selected' : '' }}>
+                                                                                        Rp</option>
+                                                                                </select>
+                                                                            </div>
                                                                         </td>
                                                                         <td class="text-end">
                                                                             <input type="text"
                                                                                 name="items[{{ $item->id }}][amount]"
-                                                                                value="{{ $item->quantity * $item->price * (1 - $item->discount / 100) }}"
+                                                                                value="{{ intval($item->quantity * $item->price * (1 - $item->discount / 100)) }}"
                                                                                 class="form-control text-end amount-input"
                                                                                 data-item-id="{{ $item->id }}"
                                                                                 readonly />
@@ -206,81 +211,66 @@
                                                                     </tr>
                                                                 @endforeach
                                                             </tbody>
-                                                            @php
-                                                                // Calculate totals manually using the stored tax rate
-                                                                $taxRate = $sales->tax_rate ?? 0;
-
-                                                                // Calculate total discount as a fixed amount
-                                                                $totalDiscount = $sales->items->sum(function ($item) {
-                                                                    return $item->discount_type === 'percentage'
-                                                                        ? $item->customer_price *
-                                                                                $item->quantity *
-                                                                                ($item->discount / 100)
-                                                                        : $item->discount;
-                                                                });
-
-                                                                // Calculate total before discount
-                                                                $totalBeforeDiscount = $sales->items->sum(
-                                                                    fn($item) => $item->customer_price *
-                                                                        $item->quantity,
-                                                                );
-
-                                                                // Apply discount correctly
-                                                                $subTotal = $totalBeforeDiscount - $totalDiscount;
-
-                                                                // Calculate tax amount
-                                                                $taxAmount =
-                                                                    $taxRate > 0 ? $subTotal * ($taxRate / 100) : 0;
-                                                                $grandTotal = $subTotal + $taxAmount;
-                                                            @endphp
                                                             <tfoot>
                                                                 <tr>
-                                                                    <td colspan="4"></td>
-                                                                    <td class="text-end"><strong>Discount:</strong>
+                                                                    <td colspan="5" class="text-end"><strong>Sub
+                                                                            Total:</strong>
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        <span id="totalDiscount">
-                                                                            {{ \App\Helpers\CurrencyHelper::format($totalDiscount) }}
-                                                                        </span>
+                                                                        <span id="subtotal">0</span>
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td colspan="4"></td>
-                                                                    <td class="text-end"><strong>Sub Amount:</strong>
+                                                                    <td colspan="4" class="text-end">
+                                                                        <strong>Order Discount:</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="input-group">
+                                                                            <input type="number" name="order_discount"
+                                                                                value="{{ (float) ($sales->order_discount ?? 0) }}"
+                                                                                class="form-control text-end"
+                                                                                id="discountTotalValue" step="1"
+                                                                                min="0" style="min-width: 80px;" />
+
+                                                                            <select name="order_discount_type_type"
+                                                                                class="form-select" id="discountTotalType"
+                                                                                style="min-width: 70px;">
+                                                                                <option value="percentage"
+                                                                                    {{ ($sales->order_discount_type ?? '') === 'percentage' ? 'selected' : '' }}>
+                                                                                    %</option>
+                                                                                <option value="fixed"
+                                                                                    {{ ($sales->order_discount_type ?? '') === 'fixed' ? 'selected' : '' }}>
+                                                                                    Rp</option>
+                                                                            </select>
+                                                                        </div>
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        <span id="totalPrice">
-                                                                            {{ \App\Helpers\CurrencyHelper::format($subTotal) }}
-                                                                        </span>
+                                                                        <span id="orderDiscountTotal">0</span>
                                                                     </td>
                                                                 </tr>
-                                                                @if ($taxRate > 0)
+                                                                @if (($sales->tax_rate ?? 0) > 0)
                                                                     <tr>
-                                                                        <td colspan="4"></td>
-                                                                        <td class="text-end"><strong>Tax
-                                                                                ({{ $taxRate }}%):</strong></td>
+                                                                        <td colspan="5" class="text-end">
+                                                                            <strong>Tax ({{ $sales->tax_rate }}%):</strong>
+                                                                        </td>
                                                                         <td class="text-end">
-                                                                            <span id="totalTax">
-                                                                                {{ \App\Helpers\CurrencyHelper::format($taxAmount) }}
-                                                                            </span>
+                                                                            <span id="totalTax">0</span>
                                                                             <input type="hidden" name="total_tax"
-                                                                                id="total_tax_input"
-                                                                                value="{{ $taxAmount }}">
+                                                                                id="total_tax_input" value="0">
                                                                         </td>
                                                                     </tr>
                                                                 @endif
                                                                 <tr>
-                                                                    <td colspan="4"></td>
-                                                                    <td class="text-end"><strong>Grand Total:</strong>
+                                                                    <td colspan="5" class="text-end">
+                                                                        <strong>Grand Total:</strong>
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        <span id="grandTotal">
-                                                                            {{ \App\Helpers\CurrencyHelper::format($grandTotal) }}
-                                                                        </span>
+                                                                        <span id="finalTotal">0</span>
                                                                     </td>
                                                                 </tr>
                                                             </tfoot>
                                                         </table>
+                                                        <br>
                                                     </div>
                                                 </div>
                                             </div>

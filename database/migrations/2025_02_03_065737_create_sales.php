@@ -18,6 +18,8 @@ return new class extends Migration
             $table->timestamp('order_date');
             $table->timestamp('due_date')->nullable();
             $table->enum('payment_type', ['Cash','Transfer','-']);
+            $table->decimal('order_discount', 10, 2)->default(0);
+            $table->enum('order_discount_type', ['percentage', 'fixed'])->default('fixed');
             $table->decimal('tax_rate', 5, 2)->nullable();
             $table->decimal('total_tax',10,2)->nullable();
             $table->double('total');

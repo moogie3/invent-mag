@@ -126,7 +126,7 @@
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-total">Amount
                                                 </th>
-                                                <th style="width:100px;text-align:center" class="fs-4 py-3">Action</th>
+                                                <th style="width:50px;text-align:center" class="fs-4 py-3">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="productTableBody">
@@ -171,8 +171,6 @@
                                                     <span id="finalTotal">Rp 0</span>
                                                 </div>
                                             </div>
-
-                                            {{-- Hidden fields --}}
                                             <input type="hidden" id="totalDiscountInput" name="total_discount"
                                                 value="0">
                                             <input type="hidden" id="orderDiscountInput" name="discount_total"
@@ -181,7 +179,6 @@
                                                 value="fixed">
                                         </div>
                                     </div>
-
                                 </form>
                             </div>
                         </div>

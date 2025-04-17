@@ -13,9 +13,18 @@ class Sales extends Model
 
     protected $table = 'sales';
     protected $fillable = [
-        'invoice', 'customer_id', 'order_date', 'due_date',
-        'payment_type', 'total', 'status', 'payment_date',
-        'tax_rate', 'total_tax' // ✅ Include new tax fields
+        'invoice',
+        'customer_id',
+        'order_date',
+        'due_date',
+        'payment_type',
+        'order_discount',
+        'order_discount_type',
+        'total',
+        'status',
+        'payment_date',
+        'tax_rate',
+        'total_tax' // ✅ Include new tax fields
     ];
 
     protected $attributes = [

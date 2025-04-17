@@ -45,17 +45,14 @@
                                                             <address>
                                                                 {{ $sales->customer->address }}<br>
                                                                 {{ $sales->customer->phone_number }}<br>
-                                                                Order Date :
-                                                                {{ $sales->order_date->format('d-m-Y') }}<br>
+                                                                Order Date : {{ $sales->order_date->format('d-m-Y') }}<br>
                                                             </address>
                                                         </div>
                                                         <div class="col-6 text-end">
                                                             <p class="h3">Payment Status</p>
                                                             <h3>
                                                                 @if ($sales->status !== 'Paid')
-                                                                    <span class="badge bg-blue-lt">
-                                                                        Payment Pending
-                                                                    </span>
+                                                                    <span class="badge bg-blue-lt">Payment Pending</span>
                                                                 @else
                                                                     <span class="badge bg-green-lt">
                                                                         Paid on
@@ -65,11 +62,11 @@
                                                                 @endif
                                                             </h3>
                                                             <address>
-                                                                Due Date :
-                                                                {{ $sales->due_date->format('d-m-Y') }}<br>
+                                                                Due Date : {{ $sales->due_date->format('d-m-Y') }}<br>
                                                             </address>
                                                         </div>
                                                     </div>
+
                                                     <table class="table table-transparent table-responsive">
                                                         <thead>
                                                             <tr>
@@ -77,8 +74,7 @@
                                                                 <th>Product</th>
                                                                 <th class="text-center" style="width: 1%">QTY</th>
                                                                 <th class="text-end" style="width: 15%">Unit Price</th>
-                                                                <th class="text-end" style="width: 15%">Discount Type
-                                                                </th>
+                                                                <th class="text-end" style="width: 15%">Discount Type</th>
                                                                 <th class="text-end" style="width: 15%">Discount</th>
                                                                 <th class="text-end" style="width: 15%">Total</th>
                                                             </tr>
@@ -86,32 +82,32 @@
                                                         <tbody>
                                                             @foreach ($sales->items as $index => $item)
                                                                 @php
-                                                                    $discountAmount =
-                                                                        $item->discount_type === 'percentage'
-                                                                            ? $item->customer_price *
-                                                                                $item->quantity *
-                                                                                ($item->discount / 100)
-                                                                            : $item->discount;
-                                                                    $totalAmount =
+                                                                    if ($item->discount_type === 'percentage') {
+                                                                        $discountAmount =
+                                                                            $item->customer_price *
+                                                                            ($item->discount / 100) *
+                                                                            $item->quantity;
+                                                                    } else {
+                                                                        $discountAmount =
+                                                                            $item->discount * $item->quantity;
+                                                                    }
+
+                                                                    $itemTotal =
                                                                         $item->customer_price * $item->quantity -
                                                                         $discountAmount;
                                                                 @endphp
                                                                 <tr>
                                                                     <td class="text-center">{{ $index + 1 }}</td>
                                                                     <td>
-                                                                        <p class="strong mb-1">
-                                                                            {{ $item->product->name }}</p>
+                                                                        <p class="strong mb-1">{{ $item->product->name }}
+                                                                        </p>
                                                                     </td>
                                                                     <td class="text-center">{{ $item->quantity }}</td>
                                                                     <td class="text-end">
                                                                         {{ \App\Helpers\CurrencyHelper::format($item->customer_price) }}
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        @if ($item->discount_type === 'percentage')
-                                                                            Percentage
-                                                                        @else
-                                                                            Fixed
-                                                                        @endif
+                                                                        {{ $item->discount_type === 'percentage' ? 'Percentage' : 'Fixed' }}
                                                                     </td>
                                                                     <td class="text-end">
                                                                         @if ($item->discount_type === 'percentage')
@@ -121,61 +117,62 @@
                                                                         @endif
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        {{ \App\Helpers\CurrencyHelper::format($totalAmount) }}
+                                                                        {{ \App\Helpers\CurrencyHelper::format($itemTotal) }}
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
                                                         </tbody>
-                                                        @php
-                                                            // Calculate total discount as a fixed amount
-                                                            $totalDiscount = $sales->items->sum(function ($item) {
-                                                                return $item->discount_type === 'percentage'
-                                                                    ? $item->customer_price *
-                                                                            $item->quantity *
-                                                                            ($item->discount / 100)
-                                                                    : // Apply percentage discount to total item price
-                                                                    $item->discount; // Fixed discount is applied only once per item, not per unit
-                                                            });
 
-                                                            // Calculate total before discount
+                                                        @php
+                                                            // Sum all item totals and discounts
                                                             $totalBeforeDiscount = $sales->items->sum(
                                                                 fn($item) => $item->customer_price * $item->quantity,
                                                             );
+                                                            $totalItemDiscount = $sales->items->sum(function ($item) {
+                                                                return $item->discount_type === 'percentage'
+                                                                    ? $item->customer_price *
+                                                                            ($item->discount / 100) *
+                                                                            $item->quantity
+                                                                    : $item->discount * $item->quantity;
+                                                            });
+                                                            $subTotal = $totalBeforeDiscount - $totalItemDiscount;
 
-                                                            // Apply discount correctly
-                                                            $subTotal = $totalBeforeDiscount - $totalDiscount;
+                                                            // Order discount
+                                                            $orderDiscount = $sales->order_discount ?? 0;
+                                                            $orderDiscountType = $sales->order_discount_type ?? 'fixed';
+                                                            $orderDiscountAmount =
+                                                                $orderDiscountType === 'percentage'
+                                                                    ? $totalBeforeDiscount * ($orderDiscount / 100)
+                                                                    : $orderDiscount;
 
-                                                            // Use tax_rate stored in the sales record
+                                                            // Tax after order discount
+                                                            $taxableAmount = $subTotal - $orderDiscountAmount;
                                                             $taxRate = $sales->tax_rate ?? 0;
                                                             $taxAmount =
-                                                                $taxRate > 0 ? $subTotal * ($taxRate / 100) : 0;
+                                                                $taxRate > 0 ? $taxableAmount * ($taxRate / 100) : 0;
 
-                                                            // Or use the stored total_tax directly if available
-                                                            // $taxAmount = $sales->total_tax ?? 0;
-
-                                                            $grandTotal = $subTotal + $taxAmount;
+                                                            $grandTotal = $taxableAmount + $taxAmount;
                                                         @endphp
 
                                                         <tfoot>
                                                             <tr>
                                                                 <td colspan="6" class="text-end"><strong>Sub
-                                                                        Total :</strong></td>
+                                                                        Total:</strong></td>
                                                                 <td class="text-end">
                                                                     {{ \App\Helpers\CurrencyHelper::format($subTotal) }}
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td colspan="6" class="text-end">
-                                                                    <strong>Discount :</strong>
-                                                                </td>
+                                                                <td colspan="6" class="text-end"><strong>Order
+                                                                        Discount:</strong></td>
                                                                 <td class="text-end">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($totalDiscount) }}
+                                                                    {{ \App\Helpers\CurrencyHelper::format($orderDiscountAmount) }}
                                                                 </td>
                                                             </tr>
                                                             @if ($taxRate > 0)
                                                                 <tr>
                                                                     <td colspan="6" class="text-end"><strong>Tax
-                                                                            ({{ $taxRate }}%) :</strong></td>
+                                                                            ({{ $taxRate }}%):</strong></td>
                                                                     <td class="text-end">
                                                                         {{ \App\Helpers\CurrencyHelper::format($taxAmount) }}
                                                                     </td>
@@ -183,24 +180,25 @@
                                                             @endif
                                                             <tr>
                                                                 <td colspan="6" class="text-end"><strong>Grand
-                                                                        Total :</strong></td>
+                                                                        Total:</strong></td>
                                                                 <td class="text-end">
                                                                     {{ \App\Helpers\CurrencyHelper::format($grandTotal) }}
                                                                 </td>
                                                             </tr>
                                                         </tfoot>
                                                     </table>
+
                                                     <input type="hidden" id="totalDiscountInput" name="total_discount"
-                                                        value="{{ $totalDiscount }}">
+                                                        value="{{ $orderDiscountAmount }}">
                                                     <input type="hidden" id="taxInput" name="tax_amount"
                                                         value="{{ $taxAmount }}">
-                                                </div> {{-- End of Card Body --}}
-                                            </div> {{-- End of Card --}}
+                                                </div> {{-- End Card Body --}}
+                                            </div> {{-- End Card --}}
                                         </div>
                                     </div>
                                 </div>
-                            </div> {{-- End of Card Body --}}
-                        </div> {{-- End of Card --}}
+                            </div> {{-- End Card Body --}}
+                        </div> {{-- End Card --}}
                     </div>
                 </div>
             </div>

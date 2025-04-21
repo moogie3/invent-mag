@@ -2,14 +2,10 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Admin\NotificationController;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Fortify\Fortify;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
 use App\Models\Purchase;
-use App\Models\User;
-
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,11 +22,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        View::composer(['admin.layouts.*', 'admin.*'], function ($view) {
+            $notificationController = app(NotificationController::class);
+            $notifications = $notificationController->getDueNotifications();
+            $notificationCount = $notifications->count();
+
+            $view->with('notificationCount', $notificationCount);
+            $view->with('notifications', $notifications);
+        });
+
         // customize the login view
-        View::composer('*', function ($view) {
+        View::composer(['admin.purchase.*', 'admin.dashboard'], function ($view) {
             $purchaseOrders = Purchase::where('due_date', '<=', now()->addDays(7))
-                                        ->where('status', '!=', 'Paid')
-                                        ->get();
+                ->where('status', '!=', 'Paid')
+                ->get();
 
             $view->with('purchaseOrders', $purchaseOrders);
         });

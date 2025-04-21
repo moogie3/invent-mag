@@ -16,8 +16,6 @@ Route::prefix('admin')->group(function () {
     // Register
     Route::get('/register', fn() => view('admin.auth.register'))->name('admin.register');
     Route::post('/register', [RegisteredUserController::class, 'store'])->name('admin.register.post');
-
-    // Login
     // Login
     Route::get('/login', function (Request $request) {
         // Check if there's an attempted email in the session
@@ -34,9 +32,9 @@ Route::prefix('admin')->group(function () {
 
         return view('admin.auth.login');
     })->name('admin.login');
+
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('admin.login.post');
 
-    // Logout
     Route::post('/logout', function (Request $request) {
         Auth::logout();
         $request->session()->invalidate();
@@ -83,7 +81,7 @@ Route::prefix('admin')->group(function () {
         Route::get('sales/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('admin.sales.product.details');
         Route::get('/admin/po/view/{id}', [PurchaseController::class, 'view'])->name('admin.po.view');
         Route::get('/admin/sales/view/{id}', [SalesController::class, 'view'])->name('admin.sales.view');
-
+        Route::get('/sales/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
         // Settings
         Route::prefix('setting')->group(function () {
             Route::get('/currency', [CurrencyController::class, 'edit'])->name('admin.setting.currency.edit');
@@ -120,7 +118,15 @@ Route::prefix('admin')->group(function () {
             })->name('admin.setting.tax.get');
         });
 
-        Route::get('/sales/get-past-price', [SalesController::class, 'getPastPrice']);
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
+        Route::get('/admin/notifications/list', [NotificationController::class, 'getNotifications'])
+            ->name('admin.notifications.list');
+        Route::post('/admin/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])
+            ->name('admin.notifications.mark-read');
+        Route::get('/admin/notifications/count', [NotificationController::class, 'count'])
+            ->name('admin.notifications.count');
+        Route::get('/notifications/view/{id}', [NotificationController::class, 'view'])
+            ->name('admin.notifications.view');
     });
 });
 

@@ -1,6 +1,6 @@
 <header class="navbar navbar-expand-md d-print-none nav-container">
     <div class="container-xl d-flex justify-content-between align-items-center">
-        <div class="d-flex" style="width: 225px;">
+        <div class="d-flex flex-shrink-0 nav-left">
             <!-- Hamburger Button for Mobile -->
             <button class="navbar-toggler d-md-none" type="button" id="mobile-menu-toggle">
                 <i class="ti ti-menu fs-2"></i>
@@ -13,9 +13,6 @@
                 <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
             </a>
         </h1>
-
-        <!-- Overlay -->
-        <div class="nav-overlay" id="nav-overlay"></div>
 
         <!-- Navigation Dropdown -->
         <nav class="nav-dropdown d-none d-md-flex" id="nav-dropdown">
@@ -66,62 +63,48 @@
             <a href="?theme=light" class="nav-link px-2 hide-theme-light">
                 <i class="ti ti-sun fs-2"></i>
             </a>
-            <a href="{{ route('admin.setting.notifications') }}" class="nav-link px-2 position-relative">
-                <i class="ti ti-bell fs-2"></i>
-            </a>
+
+            <!-- Single Notification Bell -->
             <div class="nav-item dropdown me-3">
                 <a href="#" class="nav-link px-2 position-relative" data-bs-toggle="dropdown"
                     aria-expanded="false">
-                    @php
-                        $hasDueNotes = false;
-                        $today = now();
-                    @endphp
+                    <i class="ti ti-bell fs-2"></i>
 
-                    @foreach ($purchaseOrders as $po)
-                        @php
-                            $dueDate = $po->due_date;
-                            $diffDays = $today->diffInDays($dueDate, false);
-                        @endphp
-                        @if ($diffDays <= 7 && $po->status !== 'Paid')
-                            @php
-                                $hasDueNotes = true;
-                                break;
-                            @endphp
-                        @endif
-                    @endforeach
-
-                    @if ($hasDueNotes)
+                    @if (isset($notificationCount) && $notificationCount > 0)
                         <span id="notification-dot"
-                            class="position-absolute bg-danger border border-light rounded-circle"
-                            style="bottom:5px; right: 20px; width: 10px; height: 10px;">
+                            class="position-absolute bg-danger border border-light rounded-circle">
                         </span>
                     @endif
-
                 </a>
-                <div class="dropdown-menu dropdown-menu-end">
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown">
                     <h6 class="dropdown-header">Notifications</h6>
-                    @php
-                        $hasNotifications = false;
-                    @endphp
-                    @foreach ($purchaseOrders as $po)
-                        @php
-                            $dueDate = $po->due_date;
-                            $diffDays = now()->diffInDays($dueDate, false);
-                        @endphp
-                        @if ($diffDays <= 7 && $po->status !== 'Paid')
-                            <a href="{{ route('admin.po.edit', ['id' => $po->id]) }}"
-                                class="dropdown-item d-flex align-items-center notification-item">
-                                <span class="badge bg-danger me-2"></span>
-                                Due Note: PO #{{ $po->id }} - {{ $po->due_date->format('M d, Y') }}
+
+                    @if (isset($notifications) && $notifications->count() > 0)
+                        @foreach ($notifications as $notification)
+                            <a href="{{ route('admin.notifications.view', $notification['id']) }}"
+                                class="dropdown-item d-flex align-items-center notification-item"
+                                data-notification-id="{{ $notification['id'] }}">
+                                <span
+                                    class="badge bg-{{ $notification['urgency'] == 'high' ? 'danger' : ($notification['urgency'] == 'medium' ? 'warning' : 'info') }} me-2"></span>
+                                <div>
+                                    <strong>{{ $notification['title'] }}</strong>
+                                    <div class="text-muted small">{{ $notification['description'] }}</div>
+                                </div>
                             </a>
-                            @php $hasNotifications = true; @endphp
-                        @endif
-                    @endforeach
-                    @if (!$hasNotifications)
+                        @endforeach
+                    @else
                         <div class="dropdown-item text-muted text-center">No new notifications</div>
+                    @endif
+
+                    @if (isset($notifications) && $notifications->count() > 0)
+                        <div class="dropdown-divider mb-0 mt-0"></div>
+                        <a href="{{ route('admin.setting.notifications') }}" class="dropdown-item text-center">
+                            View all notifications
+                        </a>
                     @endif
                 </div>
             </div>
+
             <div class="nav-item dropdown ms-2">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
                     @if (Auth::check())
@@ -155,209 +138,5 @@
     </div>
 </header>
 
-<style>
-    /* Parent container */
-    .nav-container {
-        position: relative;
-    }
-
-    /* Dark overlay */
-    .nav-overlay {
-        position: fixed;
-        top: 7.5%;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        visibility: hidden;
-        transition: opacity 0.1s ease-in-out;
-        z-index: 998;
-    }
-
-    /* Navigation dropdown */
-    .nav-dropdown {
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: max-content;
-        background: rgba(20, 20, 20, 0.95);
-        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease-in-out;
-        z-index: 999;
-        border-radius: 8px;
-        padding: 10px 20px;
-    }
-
-    /* Show menu when active */
-    .nav-container.active .nav-overlay {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .nav-container.active .nav-dropdown {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(-50%) translateY(0);
-    }
-
-    /* Horizontal menu */
-    .nav-dropdown ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        gap: 20px;
-        align-items: center;
-    }
-
-    .nav-dropdown li {
-        text-align: center;
-    }
-
-    .nav-dropdown a {
-        color: white;
-        text-decoration: none;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 15px;
-        white-space: nowrap;
-    }
-
-    .nav-dropdown a:hover {
-        text-decoration: underline;
-    }
-
-    /* Ensure icons are visible */
-    .nav-dropdown a i {
-        color: white;
-        font-size: 18px;
-    }
-
-    /* Mobile Nav Styling */
-    .mobile-nav {
-        position: fixed;
-        top: 0;
-        left: -100%;
-        width: 250px;
-        height: 100%;
-        background: rgba(20, 20, 20, 0.95);
-        box-shadow: 5px 0px 10px rgba(0, 0, 0, 0.2);
-        transition: left 0.3s ease-in-out;
-        z-index: 999;
-        padding: 20px;
-    }
-
-    .mobile-nav ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .mobile-nav li {
-        padding: 10px 0;
-    }
-
-    .mobile-nav a {
-        color: white;
-        text-decoration: none;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 15px;
-    }
-
-    .mobile-nav.active {
-        left: 1%;
-    }
-
-    .mobile-nav .avatar {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-    }
-
-    @media (max-width: 768px) {
-        .navbar-brand {
-            position: absolute;
-            left: 2%;
-            transform: translateX(-50%);
-        }
-    }
-</style>
-
-<script>
-    //notification dot
-    document.addEventListener("DOMContentLoaded", function() {
-        const notificationItems = document.querySelectorAll(".notification-item");
-        const notificationDot = document.getElementById("notification-dot");
-
-        notificationItems.forEach(item => {
-            item.addEventListener("click", function() {
-                // mark as read (Remove red dot)
-                if (notificationDot) {
-                    notificationDot.remove();
-                }
-            });
-        });
-    });
-</script>
-
-<script>
-    //navigation hover
-    document.addEventListener("DOMContentLoaded", function() {
-        const brandTrigger = document.getElementById("brand-trigger");
-        const navContainer = document.querySelector(".nav-container");
-        const overlay = document.getElementById("nav-overlay");
-        const dropdown = document.getElementById("nav-dropdown");
-
-        let timeout;
-
-        // show dropdown on hover
-        brandTrigger.addEventListener("mouseenter", function() {
-            clearTimeout(timeout);
-            navContainer.classList.add("active");
-        });
-
-        // hide dropdown when mouse leaves the dropdown or brand
-        navContainer.addEventListener("mouseleave", function() {
-            timeout = setTimeout(() => {
-                navContainer.classList.remove("active");
-            }, 300); // delay closing to prevent accidental closing when moving mouse
-        });
-
-        // prevent dropdown from closing when hovering inside it
-        dropdown.addEventListener("mouseenter", function() {
-            clearTimeout(timeout);
-        });
-
-        dropdown.addEventListener("mouseleave", function() {
-            timeout = setTimeout(() => {
-                navContainer.classList.remove("active");
-            }, 300);
-        });
-    });
-</script>
-<script>
-    //mobile navigation
-    document.addEventListener("DOMContentLoaded", function() {
-        const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
-        const mobileNav = document.getElementById("mobile-nav");
-
-        mobileMenuToggle.addEventListener("click", function() {
-            mobileNav.classList.toggle("active");
-        });
-
-        // close menu when clicking outside
-        document.addEventListener("click", function(event) {
-            if (!mobileNav.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
-                mobileNav.classList.remove("active");
-            }
-        });
-    });
-</script>
+<link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+<script src="{{ asset('js/layouts/navbar.js') }}" defer></script>

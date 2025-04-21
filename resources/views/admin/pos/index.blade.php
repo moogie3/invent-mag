@@ -25,9 +25,29 @@
                                     id="invoiceForm">
                                     @csrf
                                     <input type="hidden" name="products" id="productsField">
+
+                                    <div class="row mb-4">
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">CUSTOMER</label>
+                                            <select class="form-control" name="customer_id">
+                                                <option value="">Select Customer</option>
+                                                @foreach ($customers as $customer)
+                                                    <option value="{{ $customer->id }}">
+                                                        {{ $customer->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">TRANSACTION DATE</label>
+                                            <input type="date" class="form-control" name="transaction_date"
+                                                value="{{ date('Y-m-d') }}" />
+                                        </div>
+                                    </div>
+
                                     <div class="row mt-3">
                                         <div class="col-md-6">
-                                            <h1>Product List</h1>
+                                            <h4 class="mb-3">Product List</h4>
                                             <div class="input-group mb-3">
                                                 <input type="text" class="form-control" id="searchProduct"
                                                     placeholder="Search Product">
@@ -36,7 +56,7 @@
                                                 style="max-height: 500px; overflow-y: auto;">
                                                 @foreach ($products as $product)
                                                     <div class="col-md-4 mb-2">
-                                                        <div class="card text-center">
+                                                        <div class="card text-center product-card">
                                                             <img src="{{ asset($product->image) }}"
                                                                 class="card-img-top product-image"
                                                                 alt="{{ $product->name }}"
@@ -59,16 +79,66 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="card">
+                                                <div class="card-header">
+                                                    <h4 class="card-title">Order Summary</h4>
+                                                </div>
                                                 <div class="card-body" id="invoiceContainer">
-                                                    <h2>Invoice</h2>
-                                                    <div id="productList" class="list-group"></div>
-                                                    <div id="totalPriceContainer" class="text-end">
-                                                        <h1 class="mt-3">Total : <span id="totalPrice">Rp 0</span>
-                                                        </h1>
+                                                    <div id="productList" class="list-group mb-4"></div>
+
+                                                    <div class="row mt-4 align-items-start">
+                                                        <div class="col-md-6 text-center">
+                                                            <label class="form-label">Order Discount</label>
+                                                            <div class="d-flex justify-content-center my-3">
+                                                                <div class="d-flex gap-2 flex-wrap align-items-center">
+                                                                    <input type="number" class="form-control w-auto"
+                                                                        id="discountTotalValue" name="discount_total"
+                                                                        value="0" placeholder="Order Discount"
+                                                                        style="max-width: 100px;">
+                                                                    <select class="form-select w-auto"
+                                                                        id="discountTotalType" name="discount_total_type"
+                                                                        style="max-width: 90px;">
+                                                                        <option value="fixed">Rp</option>
+                                                                        <option value="percentage">%</option>
+                                                                    </select>
+                                                                    <button class="btn btn-secondary" type="button"
+                                                                        id="applyTotalDiscount">Apply</button>
+                                                                </div>
+                                                            </div>
+                                                            <small class="text-muted d-block mt-1 text-center">
+                                                                Select <strong>%</strong> for percentage or
+                                                                <strong>Rp</strong> for fixed discount.
+                                                            </small>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <div class="card p-3">
+                                                                <div class="d-flex justify-content-between">
+                                                                    <strong>Subtotal:</strong>
+                                                                    <span id="subtotal">Rp 0</span>
+                                                                </div>
+                                                                <div class="d-flex justify-content-between">
+                                                                    <strong>Order Discount:</strong>
+                                                                    <span id="orderDiscountTotal">Rp 0</span>
+                                                                </div>
+                                                                <hr class="my-2" />
+                                                                <div
+                                                                    class="d-flex justify-content-between fs-4 fw-bold text-primary">
+                                                                    <strong>Grand Total:</strong>
+                                                                    <span id="finalTotal">Rp 0</span>
+                                                                </div>
+                                                            </div>
+                                                            <input type="hidden" id="totalDiscountInput"
+                                                                name="total_discount" value="0">
+                                                            <input type="hidden" id="orderDiscountInput"
+                                                                name="discount_total" value="0">
+                                                            <input type="hidden" id="orderDiscountTypeInput"
+                                                                name="discount_total_type" value="fixed">
+                                                        </div>
                                                     </div>
-                                                    <div>
+
+                                                    <div class="mt-4">
                                                         <button type="submit"
-                                                            class="btn btn-primary w-100">Payment</button>
+                                                            class="btn btn-primary w-100 btn-lg">Process Payment</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -83,161 +153,3 @@
         </div>
     </div>
 @endsection
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const productList = document.getElementById('productList');
-        const totalPriceElement = document.getElementById('totalPrice');
-        const productGrid = document.getElementById('productGrid');
-        const productsField = document.getElementById('productsField');
-        let products = JSON.parse(localStorage.getItem('cachedProducts')) || [];
-
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(amount);
-        }
-
-        function saveProductsToCache() {
-            localStorage.setItem('cachedProducts', JSON.stringify(products));
-        }
-
-        function renderList() {
-            productList.innerHTML = '';
-            let total = 0;
-
-            products.forEach((product, index) => {
-                const item = document.createElement('div');
-                item.classList.add('list-group-item', 'd-flex', 'justify-content-between',
-                    'align-items-center');
-                item.innerHTML = `
-            <div>
-                <strong>${product.name}</strong><br>
-                ${product.quantity} x ${formatCurrency(product.price)} / ${product.unit}
-            </div>
-            <div class="d-flex justify-content-between align-items-center">
-                <strong>${formatCurrency(product.total)}</strong>
-                <button class="btn btn-sm btn-success increase-product ms-2" data-index="${index}">
-                    <i class="ti ti-plus"></i>
-                </button>
-                <button class="btn btn-sm btn-warning decrease-product ms-3" data-index="${index}">
-                    <i class="ti ti-minus"></i>
-                </button>
-                <button class="btn btn-sm btn-danger remove-product ms-3" data-index="${index}">
-                    <i class="ti ti-trash"></i>
-                </button>
-            </div>
-        `;
-                productList.appendChild(item);
-                total += product.total;
-            });
-
-            // Always show total price, even if it's 0
-            totalPriceElement.innerText = formatCurrency(total);
-            productsField.value = JSON.stringify(products);
-            saveProductsToCache();
-        }
-
-
-        function addToProductList(productId, productName, productPrice, productUnit) {
-            let existingProduct = products.find(p => p.id === productId);
-
-            if (existingProduct) {
-                existingProduct.quantity += 1;
-                existingProduct.total = existingProduct.quantity * existingProduct.price;
-            } else {
-                products.push({
-                    id: productId,
-                    name: productName,
-                    price: parseFloat(productPrice),
-                    quantity: 1,
-                    total: parseFloat(productPrice),
-                    unit: productUnit
-                });
-            }
-
-            renderList();
-        }
-
-        productGrid.addEventListener('click', function(event) {
-            const target = event.target.closest('.product-image');
-            if (!target) return;
-
-            const productId = target.dataset.productId;
-            const productName = target.dataset.productName;
-            const productPrice = target.dataset.productPrice;
-            const productUnit = target.dataset.productUnit;
-
-            addToProductList(productId, productName, productPrice, productUnit);
-        });
-
-        productList.addEventListener('click', function(event) {
-            const target = event.target.closest('.remove-product');
-            if (!target) return;
-
-            const index = target.dataset.index;
-            if (index !== undefined) {
-                products.splice(index, 1);
-                renderList();
-            }
-        });
-
-        productList.addEventListener('click', function(event) {
-            const target = event.target.closest('.decrease-product');
-            if (!target) return;
-
-            const index = target.dataset.index;
-            if (index !== undefined) {
-                if (products[index].quantity > 1) {
-                    products[index].quantity -= 1;
-                    products[index].total = products[index].quantity * products[index].price;
-                } else {
-                    products.splice(index, 1); // Remove product if quantity reaches 0
-                }
-                renderList();
-            }
-        });
-
-        productList.addEventListener('click', function(event) {
-            const target = event.target.closest('.increase-product');
-            if (!target) return;
-
-            const index = target.dataset.index;
-            if (index !== undefined) {
-                products[index].quantity += 1;
-                products[index].total = products[index].quantity * products[index].price;
-                renderList();
-            }
-        });
-
-        // Load Cached Products on Page Load
-        renderList();
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchProduct');
-        const productCards = document.querySelectorAll('#productGrid .col-md-4');
-
-        if (!searchInput) {
-            console.error('Search input not found.');
-            return;
-        }
-
-        searchInput.addEventListener('input', function() {
-            const searchText = this.value.toLowerCase().trim();
-
-            productCards.forEach(card => {
-                const productNameElement = card.querySelector('.card-title');
-                if (!productNameElement) {
-                    console.error('Product name element not found in card:', card);
-                    return;
-                }
-
-                const productName = productNameElement.textContent.toLowerCase().trim();
-                card.style.display = productName.includes(searchText) ? '' : 'none';
-            });
-        });
-    });
-</script>

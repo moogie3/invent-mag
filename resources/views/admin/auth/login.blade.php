@@ -9,7 +9,7 @@
             <form action="{{ route('admin.login.post') }}" method="POST" autocomplete="off" novalidate>
                 @csrf
                 <div class="mb-3">
-                    <label class="form-label">Email address</label>
+                    <label class="form-label">Email</label>
                     <input type="email" name="email" class="form-control" placeholder="Your email" autocomplete="off"
                         required value="{{ old('email') }}">
                 </div>
@@ -17,7 +17,7 @@
                     <label class="form-label">
                         Password
                         <span class="form-label-description">
-                            <a href="{{ route('password.request') }}">I forgot password</a>
+                            <a href="{{ route('password.request') }}">Forgot password</a>
                         </span>
                     </label>
                     <div class="input-group input-group-flat">

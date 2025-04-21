@@ -56,21 +56,6 @@ class Sales extends Model
         return $this->belongsTo(Tax::class, 'tax_id');
     }
 
-    public function getTotalAfterDiscountAttribute()
-    {
-        $total = $this->total;
-
-        // ✅ If the discount is per item, sum all item discounts
-        $totalDiscount = $this->items->sum(function ($item) {
-            if ($item->discount_type === 'percentage') {
-                return ($item->price * $item->quantity) * ($item->discount / 100);
-            }
-            return $item->discount; // Fixed discount
-        });
-
-        return $total - $totalDiscount;
-    }
-
     protected $casts = [
         'total' => 'float',
         'total_tax' => 'float',

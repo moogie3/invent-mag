@@ -80,21 +80,30 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            @php
+                                                                $totalBeforeDiscount = 0;
+                                                                $totalItemDiscount = 0;
+                                                            @endphp
+
                                                             @foreach ($sales->items as $index => $item)
                                                                 @php
-                                                                    if ($item->discount_type === 'percentage') {
-                                                                        $discountAmount =
-                                                                            $item->customer_price *
-                                                                            ($item->discount / 100) *
-                                                                            $item->quantity;
-                                                                    } else {
-                                                                        $discountAmount =
-                                                                            $item->discount * $item->quantity;
-                                                                    }
+                                                                    $discountAmount = \App\Helpers\SalesHelper::calculateItemDiscountAmount(
+                                                                        $item->customer_price,
+                                                                        $item->quantity,
+                                                                        $item->discount,
+                                                                        $item->discount_type,
+                                                                    );
 
-                                                                    $itemTotal =
-                                                                        $item->customer_price * $item->quantity -
-                                                                        $discountAmount;
+                                                                    $itemTotal = \App\Helpers\SalesHelper::calculateItemTotal(
+                                                                        $item->customer_price,
+                                                                        $item->quantity,
+                                                                        $item->discount,
+                                                                        $item->discount_type,
+                                                                    );
+
+                                                                    $totalBeforeDiscount +=
+                                                                        $item->customer_price * $item->quantity;
+                                                                    $totalItemDiscount += $discountAmount;
                                                                 @endphp
                                                                 <tr>
                                                                     <td class="text-center">{{ $index + 1 }}</td>
@@ -124,33 +133,26 @@
                                                         </tbody>
 
                                                         @php
-                                                            // Sum all item totals and discounts
-                                                            $totalBeforeDiscount = $sales->items->sum(
-                                                                fn($item) => $item->customer_price * $item->quantity,
-                                                            );
-                                                            $totalItemDiscount = $sales->items->sum(function ($item) {
-                                                                return $item->discount_type === 'percentage'
-                                                                    ? $item->customer_price *
-                                                                            ($item->discount / 100) *
-                                                                            $item->quantity
-                                                                    : $item->discount * $item->quantity;
-                                                            });
                                                             $subTotal = $totalBeforeDiscount - $totalItemDiscount;
 
                                                             // Order discount
                                                             $orderDiscount = $sales->order_discount ?? 0;
                                                             $orderDiscountType = $sales->order_discount_type ?? 'fixed';
-                                                            $orderDiscountAmount =
-                                                                $orderDiscountType === 'percentage'
-                                                                    ? $totalBeforeDiscount * ($orderDiscount / 100)
-                                                                    : $orderDiscount;
+                                                            $orderDiscountAmount = \App\Helpers\SalesHelper::calculateOrderDiscount(
+                                                                $totalBeforeDiscount,
+                                                                $orderDiscount,
+                                                                $orderDiscountType,
+                                                            );
 
-                                                            // Tax after order discount
+                                                            // Tax calculation
                                                             $taxableAmount = $subTotal - $orderDiscountAmount;
                                                             $taxRate = $sales->tax_rate ?? 0;
-                                                            $taxAmount =
-                                                                $taxRate > 0 ? $taxableAmount * ($taxRate / 100) : 0;
+                                                            $taxAmount = \App\Helpers\SalesHelper::calculateTaxAmount(
+                                                                $taxableAmount,
+                                                                $taxRate,
+                                                            );
 
+                                                            // Grand total
                                                             $grandTotal = $taxableAmount + $taxAmount;
                                                         @endphp
 

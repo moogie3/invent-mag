@@ -14,47 +14,9 @@
     <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css?1692870487') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/demo.min.css?1692870487') }}" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    <style>
-        @import url('https://rsms.me/inter/inter.css');
-
-        :root {
-            --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
-        }
-
-        html,
-        body {
-            height: 100%;
-            font-feature-settings: "cv03", "cv04", "cv11"
-        }
-
-        .page {
-            display: flex;
-            flex-direction: column;
-            min-height: 85vh;
-        }
-
-        .page-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .footer {
-            margin-top: auto;
-            /* Ensures it stays at the bottom */
-        }
-    </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Hide the loader once the page has fully loaded
-            setTimeout(() => {
-                document.querySelector(".page-center").style.display = "none";
-            }, 300); // Smooth transition delay (optional)
-        });
-    </script>
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
+    <script src="{{ asset('js/layouts/page-loader.js') }}"></script>
 </head>
-
-{{-- BODY --}}
 
 <body>
     <div class="page page-center">

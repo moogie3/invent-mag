@@ -1,0 +1,231 @@
+/* Navbar CSS Styles */
+@media (min-width: 768px) {
+    .nav-left {
+        width: 200px;
+    }
+}
+
+/* Parent container */
+.nav-container {
+    position: relative;
+}
+
+/* Dark overlay */
+.nav-overlay {
+    position: fixed;
+    top: 7.5%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+    z-index: 998;
+}
+
+/* Navigation dropdown */
+.nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    background: rgba(20, 20, 20, 0.95);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 999;
+    border-radius: 8px;
+    padding: 10px 20px;
+}
+
+/* Show menu when active */
+.nav-container.active .nav-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+.nav-container.active .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Navigation links styling */
+.nav-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-dropdown li {
+    text-align: center;
+}
+
+.nav-dropdown a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    white-space: nowrap;
+}
+
+.nav-dropdown a:hover {
+    text-decoration: underline;
+}
+
+.nav-dropdown a i {
+    color: white;
+    font-size: 18px;
+}
+
+/* Mobile Nav Styling */
+.mobile-nav {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 250px;
+    height: 100%;
+    background: rgba(20, 20, 20, 0.95);
+    box-shadow: 5px 0px 10px rgba(0, 0, 0, 0.2);
+    transition: left 0.3s ease-in-out;
+    z-index: 999;
+    padding: 20px;
+}
+
+.mobile-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mobile-nav li {
+    padding: 10px 0;
+}
+
+.mobile-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+}
+
+.mobile-nav.active {
+    left: 1%;
+}
+
+.mobile-nav .avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+/* Notification dot styling */
+#notification-dot {
+    position: absolute;
+    background-color: #dc3545;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    bottom: 5px;
+    right: 20px;
+    width: 10px;
+    height: 10px;
+}
+
+@media (max-width: 768px) {
+    .navbar-brand {
+        position: absolute;
+        left: 2%;
+        transform: translateX(-50%);
+    }
+}
+
+/* Previous CSS rules remain unchanged */
+
+/* Notification styling */
+#notification-dot {
+    width: 10px;
+    height: 10px;
+    bottom: 15px;
+    right: 5px;
+    position: absolute;
+    border-radius: 50%;
+    z-index: 1;
+    background-color: red;
+}
+
+#notification-dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: red;
+    animation: wave 1.8s ease-out infinite;
+    opacity: 0.5;
+    z-index: -1;
+}
+
+@keyframes wave {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    70% {
+        transform: scale(2.5);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+.notification-dropdown {
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    border-left: 3px solid transparent;
+    padding: 10px 15px;
+    transition: background-color 0.2s;
+}
+
+.notification-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.notification-item .badge {
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+/* Urgency indicators */
+.notification-item .badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.notification-item .badge.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+.notification-item .badge.bg-info {
+    background-color: #0dcaf0 !important;
+}

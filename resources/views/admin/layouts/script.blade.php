@@ -5,95 +5,223 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 {{-- SCRIPT FOR ADMIN POS  --}}
-@if (request()->is('admin/pos/'))
+@if (request()->is('admin/pos'))
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const productSelect = document.getElementById('product_id');
-            const quantityField = document.getElementById('quantity');
-            const newPriceField = document.getElementById('new_price');
-            const addProductButton = document.getElementById('addProduct');
-            const productTableBody = document.getElementById('productTableBody');
-            const totalPriceElement = document.getElementById('totalPrice');
+            const productList = document.getElementById('productList');
+            const subtotalElement = document.getElementById('subtotal');
+            const orderDiscountTotalElement = document.getElementById('orderDiscountTotal');
+            const finalTotalElement = document.getElementById('finalTotal');
+            const productGrid = document.getElementById('productGrid');
             const productsField = document.getElementById('productsField');
+            const discountTotalValue = document.getElementById('discountTotalValue');
+            const discountTotalType = document.getElementById('discountTotalType');
+            const applyTotalDiscount = document.getElementById('applyTotalDiscount');
+            const orderDiscountInput = document.getElementById('orderDiscountInput');
+            const orderDiscountTypeInput = document.getElementById('orderDiscountTypeInput');
 
-            let products = JSON.parse(localStorage.getItem('poProducts')) || [];
-
-            function saveToLocalStorage() {
-                localStorage.setItem('poProducts', JSON.stringify(products));
-            }
-
-            function renderTable() {
-                productTableBody.innerHTML = '';
-                let total = 0;
-
-                products.forEach((product, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${product.name}</td>
-                        <td>${product.quantity}</td>
-                        <td>${formatCurrency(product.price)}</td>
-                        <td>${formatCurrency(product.total)}</td>
-                        <td><button class="btn btn-danger btn-sm removeProduct" data-index="${index}">Remove</button></td>
-                    `;
-                    productTableBody.appendChild(row);
-                    total += product.total;
-                });
-
-                totalPriceElement.innerText = formatCurrency(total);
-                productsField.value = JSON.stringify(products);
-
-                document.querySelectorAll('.removeProduct').forEach(button => {
-                    button.addEventListener('click', function() {
-                        products.splice(this.dataset.index, 1);
-                        saveToLocalStorage();
-                        renderTable();
-                    });
-                });
-            }
-
-            productSelect.addEventListener('change', function() {
-                const selectedOption = productSelect.options[productSelect.selectedIndex];
-                newPriceField.value = selectedOption.getAttribute('data-price');
-            });
-
-            addProductButton.addEventListener('click', function() {
-                const productId = productSelect.value;
-                const productName = productSelect.options[productSelect.selectedIndex].text;
-                const quantity = parseInt(quantityField.value);
-                const price = parseFloat(newPriceField.value);
-                const total = price * quantity;
-
-                if (!productId || !quantity || !price) return alert('Complete all fields!');
-
-                const existingProduct = products.find(p => p.id == productId);
-                if (existingProduct) {
-                    existingProduct.quantity += quantity;
-                    existingProduct.total += total;
-                } else {
-                    products.push({
-                        id: productId,
-                        name: productName,
-                        quantity,
-                        price,
-                        total
-                    });
-                }
-
-                saveToLocalStorage();
-                renderTable();
-                productSelect.value = '';
-                quantityField.value = '';
-                newPriceField.value = '';
-            });
+            let products = JSON.parse(localStorage.getItem('cachedProducts')) || [];
+            let subtotal = 0;
+            let orderDiscount = 0;
+            let grandTotal = 0;
 
             function formatCurrency(amount) {
                 return new Intl.NumberFormat('id-ID', {
                     style: 'currency',
-                    currency: 'IDR'
+                    currency: 'IDR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
                 }).format(amount);
             }
 
-            renderTable();
+            function saveProductsToCache() {
+                localStorage.setItem('cachedProducts', JSON.stringify(products));
+            }
+
+            function calculateTotals() {
+                // Calculate subtotal
+                subtotal = products.reduce((sum, product) => sum + product.total, 0);
+
+                // Calculate order discount
+                if (discountTotalType.value === 'percentage') {
+                    orderDiscount = (subtotal * parseFloat(discountTotalValue.value || 0)) / 100;
+                } else {
+                    orderDiscount = parseFloat(discountTotalValue.value || 0);
+                }
+
+                // Calculate grand total
+                grandTotal = subtotal - orderDiscount;
+
+                // Update display
+                subtotalElement.innerText = formatCurrency(subtotal);
+                orderDiscountTotalElement.innerText = formatCurrency(orderDiscount);
+                finalTotalElement.innerText = formatCurrency(grandTotal);
+
+                // Update hidden inputs
+                orderDiscountInput.value = orderDiscount;
+                orderDiscountTypeInput.value = discountTotalType.value;
+            }
+
+            function renderList() {
+                productList.innerHTML = '';
+
+                products.forEach((product, index) => {
+                    const item = document.createElement('div');
+                    item.classList.add('list-group-item', 'd-flex', 'justify-content-between',
+                        'align-items-center');
+                    item.innerHTML = `
+                        <div>
+                            <strong>${product.name}</strong><br>
+                            ${product.quantity} x ${formatCurrency(product.price)} / ${product.unit}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>${formatCurrency(product.total)}</strong>
+                            <button class="btn btn-sm btn-success increase-product ms-2" data-index="${index}">
+                                <i class="ti ti-plus"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning decrease-product ms-3" data-index="${index}">
+                                <i class="ti ti-minus"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger remove-product ms-3" data-index="${index}">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    productList.appendChild(item);
+                });
+
+                calculateTotals();
+                productsField.value = JSON.stringify(products);
+                saveProductsToCache();
+            }
+
+            function addToProductList(productId, productName, productPrice, productUnit) {
+                let existingProduct = products.find(p => p.id === productId);
+
+                if (existingProduct) {
+                    existingProduct.quantity += 1;
+                    existingProduct.total = existingProduct.quantity * existingProduct.price;
+                } else {
+                    products.push({
+                        id: productId,
+                        name: productName,
+                        price: parseFloat(productPrice),
+                        quantity: 1,
+                        total: parseFloat(productPrice),
+                        unit: productUnit
+                    });
+                }
+
+                renderList();
+            }
+
+            // Product grid click handler
+            productGrid.addEventListener('click', function(event) {
+                const target = event.target.closest('.product-image');
+                if (!target) return;
+
+                const productId = target.dataset.productId;
+                const productName = target.dataset.productName;
+                const productPrice = target.dataset.productPrice;
+                const productUnit = target.dataset.productUnit;
+
+                addToProductList(productId, productName, productPrice, productUnit);
+            });
+
+            // Product list action handlers
+            productList.addEventListener('click', function(event) {
+                const removeBtn = event.target.closest('.remove-product');
+                const increaseBtn = event.target.closest('.increase-product');
+                const decreaseBtn = event.target.closest('.decrease-product');
+
+                if (removeBtn) {
+                    const index = removeBtn.dataset.index;
+                    if (index !== undefined) {
+                        products.splice(index, 1);
+                        renderList();
+                    }
+                } else if (decreaseBtn) {
+                    const index = decreaseBtn.dataset.index;
+                    if (index !== undefined) {
+                        if (products[index].quantity > 1) {
+                            products[index].quantity -= 1;
+                            products[index].total = products[index].quantity * products[index].price;
+                        } else {
+                            products.splice(index, 1); // Remove product if quantity reaches 0
+                        }
+                        renderList();
+                    }
+                } else if (increaseBtn) {
+                    const index = increaseBtn.dataset.index;
+                    if (index !== undefined) {
+                        products[index].quantity += 1;
+                        products[index].total = products[index].quantity * products[index].price;
+                        renderList();
+                    }
+                }
+            });
+
+            // Apply order discount
+            applyTotalDiscount.addEventListener('click', function() {
+                calculateTotals();
+            });
+
+            // Search functionality
+            const searchInput = document.getElementById('searchProduct');
+            const productCards = document.querySelectorAll('#productGrid .col-md-4');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchText = this.value.toLowerCase().trim();
+
+                    productCards.forEach(card => {
+                        const productNameElement = card.querySelector('.card-title');
+                        if (productNameElement) {
+                            const productName = productNameElement.textContent.toLowerCase().trim();
+                            card.style.display = productName.includes(searchText) ? '' : 'none';
+                        }
+                    });
+                });
+            }
+
+            // Initialize
+            renderList();
+        });
+    </script>
+@endif
+@if (request()->is('admin/login', 'admin/register', 'forgot-password'))
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('tabler/dist/js/demo-theme.min.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Toggle password visibility
+            if (document.getElementById("toggle-password")) {
+                const passwordField = document.getElementById("password");
+                const togglePassword = document.getElementById("toggle-password");
+                const toggleIcon = togglePassword.querySelector("i");
+
+                togglePassword.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    if (passwordField.type === "password") {
+                        passwordField.type = "text";
+                        toggleIcon.classList.remove("ti-eye");
+                        toggleIcon.classList.add("ti-eye-off");
+                    } else {
+                        passwordField.type = "password";
+                        toggleIcon.classList.remove("ti-eye-off");
+                        toggleIcon.classList.add("ti-eye");
+                    }
+                });
+            }
+
+            // Show content after loading
+            setTimeout(function() {
+                const loadingContainer = document.getElementById("loading-container");
+                const authContent = document.getElementById("auth-content");
+
+                if (loadingContainer) loadingContainer.style.display = "none";
+                if (authContent) authContent.style.display = "block";
+            }, 800);
         });
     </script>
 @endif
@@ -145,517 +273,11 @@
         }
     </script>
 @endif
-{{-- SCRIPT FOR ADMIN SALES CREATE --}}
-@if (request()->is('admin/sales/create'))
-    <script>
-        //automatically input the due date
-        document.addEventListener('DOMContentLoaded', function() {
-            const orderDateField = document.getElementById('order_date');
-            const dueDateField = document.getElementById('due_date');
-            const customerSelect = document.getElementById('customer_id');
-
-            // event listener for customer selection change
-            customerSelect.addEventListener('change', function() {
-                calculateDueDate();
-            });
-
-            // event listener for order date selection change
-            orderDateField.addEventListener('change', function() {
-                calculateDueDate();
-            });
-
-            // function to calculate the due date
-            function calculateDueDate() {
-                const orderDateValue = orderDateField.value;
-                const selectedOption = customerSelect.options[customerSelect.selectedIndex];
-
-                if (!orderDateValue || !selectedOption) {
-                    return; // Exit if either field is empty
-                }
-
-                const orderDate = new Date(orderDateValue);
-                const paymentTerms = selectedOption.dataset.paymentTerms;
-
-                if (paymentTerms) {
-                    // calculate the due date by adding payment terms (in days) to the order date
-                    orderDate.setDate(orderDate.getDate() + parseInt(paymentTerms));
-
-                    // format the due date to YYYY-MM-DD
-                    const dueDate = orderDate.toISOString().split('T')[0];
-                    dueDateField.value = dueDate;
-                }
-            }
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const taxRateInput = document.getElementById('taxRateInput');
-            const taxRate = parseFloat(taxRateInput.value) || 0; // Get tax rate from hidden input
-            const customerSelect = document.getElementById('customer_id');
-            const productSelect = document.getElementById('product_id');
-            const customerPriceField = document.getElementById('customer_price');
-            const pastPriceField = document.getElementById('past_price');
-            const priceField = document.getElementById('price');
-            const sellingPriceField = document.getElementById('selling_price');
-            const quantityField = document.getElementById('quantity');
-            const addProductButton = document.getElementById('addProduct');
-            const clearProductsButton = document.getElementById('clearProducts');
-            const productTableBody = document.getElementById('productTableBody');
-            const productsField = document.getElementById('productsField');
-            const discountTotalValue = document.getElementById('discountTotalValue');
-            const discountTotalType = document.getElementById('discountTotalType');
-            const applyTotalDiscount = document.getElementById('applyTotalDiscount');
-            const orderDiscountInput = document.getElementById('orderDiscountInput');
-            const orderDiscountTypeInput = document.getElementById('orderDiscountTypeInput');
-
-            let products = JSON.parse(localStorage.getItem('salesProducts')) || [];
-            let orderDiscount = 0;
-            let orderDiscountType = 'fixed';
-
-            function saveToLocalStorage() {
-                localStorage.setItem('salesProducts', JSON.stringify(products));
-            }
-
-            function formatCurrency(amount) {
-                return new Intl.NumberFormat('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR',
-                    maximumFractionDigits: 0
-                }).format(amount);
-            }
-
-            function calculateDiscountAmount(price, quantity, discount, discountType) {
-                // Calculate the discount amount based on discount type
-                if (discountType === 'percentage') {
-                    return (price * discount / 100) * quantity;
-                }
-                return discount * quantity; // Fixed amount
-            }
-
-            function calculateTotal(price, quantity, discount, discountType) {
-                const discountAmount = calculateDiscountAmount(price, quantity, discount, discountType);
-                return (price * quantity) - discountAmount;
-            }
-
-            function calculateOrderDiscount(subtotal) {
-                if (orderDiscountType === 'percentage') {
-                    return subtotal * orderDiscount / 100;
-                }
-                return orderDiscount;
-            }
-
-            function updateTotalPrice() {
-                let subtotal = 0;
-                let totalBeforeDiscounts = 0;
-                let itemDiscount = 0;
-
-                products.forEach(product => {
-                    // This is the raw subtotal before any discounts
-                    const productSubtotal = Number(product.price) * Number(product.quantity);
-                    totalBeforeDiscounts += productSubtotal;
-
-                    // This is after per-product discounts
-                    subtotal += product.total;
-
-                    const productDiscount = calculateDiscountAmount(
-                        product.price,
-                        product.quantity,
-                        product.discount,
-                        product.discountType
-                    );
-
-                    itemDiscount += productDiscount;
-                });
-
-                const orderDiscountAmount = calculateOrderDiscount(totalBeforeDiscounts);
-                const totalDiscount = itemDiscount + orderDiscountAmount;
-                const taxableAmount = subtotal - orderDiscountAmount;
-                const taxAmount = taxableAmount * (taxRate / 100);
-                const finalTotal = taxableAmount + taxAmount;
-
-                // Update UI
-                document.getElementById('subtotal').innerText = formatCurrency(subtotal);
-                document.getElementById('orderDiscountTotal').innerText = formatCurrency(orderDiscountAmount);
-                document.getElementById('taxTotal').innerText = formatCurrency(taxAmount);
-                document.getElementById('finalTotal').innerText = formatCurrency(finalTotal);
-
-                // Update hidden inputs for form submission
-                document.getElementById('totalDiscountInput').value = itemDiscount;
-                document.getElementById('orderDiscountInput').value = orderDiscount;
-                document.getElementById('orderDiscountTypeInput').value = orderDiscountType;
-                document.getElementById('taxInput').value = taxAmount;
-                productsField.value = JSON.stringify(products);
-            }
-
-            function renderTable() {
-                productTableBody.innerHTML = '';
-
-                products.forEach((product, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${product.name}</td>
-                                <td>
-                                    <input type="number" class="form-control quantity-input"
-                                        value="${product.quantity}" data-id="${product.id}" min="1" style="width:80px;" />
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control price-input"
-                                        value="${product.price}" data-id="${product.id}" min="0" style="width:100px;" />
-                                </td>
-                                <td>
-                                    <div class="input-group" style="width:200px;">
-                                        <input type="number" class="form-control discount-input"
-                                            value="${product.discount}" data-id="${product.id}" min="0" />
-                                        <select class="form-select discount-type" data-id="${product.id}">
-                                            <option value="fixed" ${product.discountType === 'fixed' ? 'selected' : ''}>Rp</option>
-                                            <option value="percentage" ${product.discountType === 'percentage' ? 'selected' : ''}>%</option>
-                                        </select>
-                                    </div>
-                                </td>
-                                <td class="product-total">${formatCurrency(product.total)}</td>
-                                <td style="text-align:center">
-                                    <button class="btn btn-danger btn-sm removeProduct" data-id="${product.id}">Remove</button>
-                                </td>
-                            `;
-                    productTableBody.appendChild(row);
-                });
-
-                updateTotalPrice();
-                productsField.value = JSON.stringify(products);
-
-                // Event listeners
-                document.querySelectorAll('.removeProduct').forEach(button => {
-                    button.addEventListener('click', function() {
-                        products = products.filter(p => p.id != this.dataset.id);
-                        saveToLocalStorage();
-                        renderTable();
-                    });
-                });
-
-                document.querySelectorAll('.quantity-input').forEach(input => {
-                    input.addEventListener('input', function() {
-                        const id = this.dataset.id;
-                        const value = parseInt(this.value) || 1;
-                        const product = products.find(p => p.id == id);
-                        if (product) {
-                            product.quantity = value;
-                            product.total = calculateTotal(product.price, product.quantity, product
-                                .discount, product.discountType);
-                            saveToLocalStorage();
-                            this.closest('tr').querySelector('.product-total').innerText =
-                                formatCurrency(product.total);
-                            updateTotalPrice();
-                        }
-                    });
-                });
-
-                document.querySelectorAll('.price-input').forEach(input => {
-                    input.addEventListener('input', function() {
-                        const id = this.dataset.id;
-                        const value = parseFloat(this.value) || 0;
-                        const product = products.find(p => p.id == id);
-                        if (product) {
-                            product.price = value;
-                            product.total = calculateTotal(product.price, product.quantity, product
-                                .discount, product.discountType);
-                            saveToLocalStorage();
-                            this.closest('tr').querySelector('.product-total').innerText =
-                                formatCurrency(product.total);
-                            updateTotalPrice();
-                        }
-                    });
-                });
-
-                document.querySelectorAll('.discount-input').forEach(input => {
-                    input.addEventListener('input', function() {
-                        const id = this.dataset.id;
-                        const value = parseFloat(this.value) || 0;
-                        const product = products.find(p => p.id == id);
-                        if (product) {
-                            product.discount = value;
-                            product.total = calculateTotal(product.price, product.quantity, product
-                                .discount, product.discountType);
-                            saveToLocalStorage();
-                            this.closest('tr').querySelector('.product-total').innerText =
-                                formatCurrency(product.total);
-                            updateTotalPrice();
-                        }
-                    });
-                });
-
-                document.querySelectorAll('.discount-type').forEach(select => {
-                    select.addEventListener('change', function() {
-                        const id = this.dataset.id;
-                        const value = this.value;
-                        const product = products.find(p => p.id == id);
-                        if (product) {
-                            product.discountType = value;
-                            product.total = calculateTotal(product.price, product.quantity, product
-                                .discount, product.discountType);
-                            saveToLocalStorage();
-                            this.closest('tr').querySelector('.product-total').innerText =
-                                formatCurrency(product.total);
-                            updateTotalPrice();
-                        }
-                    });
-                });
-            }
-
-            // Apply order discount
-            applyTotalDiscount.addEventListener('click', function() {
-                orderDiscount = parseFloat(discountTotalValue.value) || 0;
-                orderDiscountType = discountTotalType.value;
-                updateTotalPrice();
-            });
-
-            // Function to fetch customer's past purchase price for a product
-            function fetchCustomerPastPrice() {
-                const customerId = customerSelect.value;
-                const productId = productSelect.value;
-
-                if (!customerId || !productId) {
-                    pastPriceField.value = '';
-                    return;
-                }
-
-                // Make AJAX request to get past price
-                fetch(`/admin/sales/get-customer-price/${customerId}/${productId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.past_price) {
-                            pastPriceField.value = data.past_price;
-                            // Optionally populate the customer price field with past price
-                            customerPriceField.value = data.past_price;
-                        } else {
-                            pastPriceField.value = '0';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching past price:', error);
-                        pastPriceField.value = '0';
-                    });
-            }
-
-            // When product is selected, populate price fields
-            productSelect.addEventListener('change', function() {
-                const selectedOption = productSelect.options[productSelect.selectedIndex];
-                if (!selectedOption || selectedOption.value === '') {
-                    priceField.value = '';
-                    sellingPriceField.value = '';
-                    customerPriceField.value = '';
-                    return;
-                }
-
-                // Set prices from data attributes
-                priceField.value = selectedOption.getAttribute('data-price');
-                sellingPriceField.value = selectedOption.getAttribute('data-selling-price');
-
-                // Also fetch the customer's past price
-                fetchCustomerPastPrice();
-            });
-
-            // Call fetchCustomerPastPrice when customer changes
-            customerSelect.addEventListener('change', fetchCustomerPastPrice);
-
-            // Add product to the list
-            addProductButton.addEventListener('click', function() {
-                const productId = productSelect.value;
-                const productName = productSelect.options[productSelect.selectedIndex].text;
-                const quantity = parseInt(quantityField.value);
-                const price = parseFloat(customerPriceField.value);
-                const discount = parseFloat(document.getElementById('discount').value) || 0;
-                const discountType = document.getElementById('discount_type').value;
-
-                // Calculate the total using the correct discount type
-                const total = calculateTotal(price, quantity, discount, discountType);
-
-                products.push({
-                    id: productId,
-                    name: productName,
-                    quantity,
-                    price,
-                    discount,
-                    discountType,
-                    total
-                });
-
-                saveToLocalStorage();
-                renderTable();
-
-                // Reset form fields
-                productSelect.value = '';
-                quantityField.value = '';
-                customerPriceField.value = '';
-                document.getElementById('discount').value = '';
-                priceField.value = '';
-                sellingPriceField.value = '';
-                pastPriceField.value = '';
-            });
-
-            // Clear products button
-            clearProductsButton.addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear all products?')) {
-                    products = [];
-                    saveToLocalStorage();
-                    renderTable();
-                }
-            });
-
-            // Clear localStorage when form is submitted
-            document.querySelector('form').addEventListener('submit', function(e) {
-                // Prevent form submission if no products added
-                if (products.length === 0) {
-                    e.preventDefault();
-                    alert('Please add at least one product before submitting.');
-                    return false;
-                }
-
-                localStorage.removeItem('salesProducts');
-            });
-
-            // Initial render
-            renderTable();
-        });
-    </script>
+{{-- SCRIPT FOR ADMIN SALES CREATE & EDIT --}}
+@if (request()->is('admin/sales/create', 'admin/sales/edit/*'))
+    <script src="{{ asset('js/admin/sales-order.js') }}"></script>
 @endif
-{{-- SCRIPT FOR ADMIN SALES EDIT --}}
-@if (request()->is('admin/sales/edit/*'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            function calculateTotals() {
-                let subtotal = 0;
-                let totalUnitDiscount = 0;
-
-                // Calculate per-item amounts
-                document.querySelectorAll("tbody tr").forEach(row => {
-                    let itemId = row.querySelector(".quantity-input").dataset.itemId;
-                    let quantity = parseFloat(row.querySelector(`.quantity-input[data-item-id='${itemId}']`)
-                        .value) || 0;
-                    let price = parseFloat(row.querySelector(`.price-input[data-item-id='${itemId}']`)
-                        .value) || 0;
-                    let discountInput = row.querySelector(`.discount-input[data-item-id='${itemId}']`);
-                    let discountTypeSelect = row.querySelector(
-                        `.discount-type-input[data-item-id='${itemId}']`);
-
-                    let discountValue = parseFloat(discountInput?.value) || 0;
-                    let discountType = discountTypeSelect?.value || "percentage";
-                    let discountAmount = 0;
-                    let netUnitPrice = price;
-
-                    // Apply the correct discount type PER UNIT
-                    if (discountType === "percentage") {
-                        // For percentage, apply to each unit's price
-                        discountAmount = price * (discountValue / 100);
-                        netUnitPrice = price - discountAmount;
-                    } else {
-                        // For fixed, apply the full discount to each unit
-                        discountAmount = discountValue; // Apply full fixed discount to each unit
-                        netUnitPrice = price - discountAmount;
-                    }
-
-                    // Calculate total item amount
-                    let netAmount = netUnitPrice * quantity;
-
-                    // Update the amount field
-                    row.querySelector(`.amount-input[data-item-id='${itemId}']`).value = Math.floor(
-                        netAmount);
-
-                    // Add to running totals
-                    subtotal += netAmount;
-                    totalUnitDiscount += discountAmount * quantity;
-                });
-
-                // Rest of your function remains unchanged
-                const discountTotalValue = parseFloat(document.getElementById("discountTotalValue")?.value) || 0;
-                const discountTotalType = document.getElementById("discountTotalType")?.value || "percentage";
-                let orderDiscountAmount = 0;
-
-                // Calculate order discount
-                if (discountTotalType === "percentage") {
-                    orderDiscountAmount = subtotal * (discountTotalValue / 100);
-                } else {
-                    orderDiscountAmount = discountTotalValue;
-                }
-
-                // Update order discount total display
-                document.getElementById("orderDiscountTotal").innerText = Math.floor(orderDiscountAmount)
-                    .toLocaleString('id-ID');
-
-                // Calculate final amounts - subtotal is already after unit discounts
-                const totalAfterAllDiscounts = subtotal - orderDiscountAmount;
-
-                // Update subtotal display
-                document.getElementById("subtotal").innerText = Math.floor(subtotal).toLocaleString(
-                    'id-ID');
-
-                // Get tax rate from hidden input or fetch from API
-                const taxRateInput = document.getElementById("taxRateInput");
-                const taxRate = parseFloat(taxRateInput?.value) || 0;
-
-                // Calculate tax amount
-                const taxAmount = totalAfterAllDiscounts * (taxRate / 100);
-
-                // Calculate grand total
-                const grandTotal = totalAfterAllDiscounts + taxAmount;
-
-                // Update displays
-                if (document.getElementById("totalTax")) {
-                    document.getElementById("totalTax").innerText = Math.floor(taxAmount).toLocaleString('id-ID');
-                }
-                document.getElementById("finalTotal").innerText = Math.floor(grandTotal).toLocaleString('id-ID');
-
-                // Update hidden inputs
-                document.getElementById("grandTotalInput").value = Math.floor(grandTotal);
-                document.getElementById("totalDiscountInput").value = Math.floor(totalUnitDiscount +
-                    orderDiscountAmount);
-                document.getElementById("taxInput").value = Math.floor(taxAmount);
-
-                // Update total_tax input if it exists
-                const totalTaxInput = document.getElementById("total_tax_input");
-                if (totalTaxInput) {
-                    totalTaxInput.value = Math.floor(taxAmount);
-                }
-            }
-
-            // Use Event Delegation to Handle All Input Events
-            document.addEventListener("input", function(event) {
-                if (event.target.matches(
-                        ".quantity-input, .price-input, .discount-input, .discount-type-input, #discountTotalValue, #discountTotalType"
-                    )) {
-                    calculateTotals();
-                }
-            });
-
-            // Automatically Trigger Calculation on Page Load
-            calculateTotals();
-
-            // Due Date Calculation
-            const orderDateField = document.getElementById('order_date');
-            const dueDateField = document.getElementById('due_date');
-            const customerSelect = document.getElementById('customer_id');
-
-            customerSelect?.addEventListener('change', calculateDueDate);
-            orderDateField?.addEventListener('change', calculateDueDate);
-
-            function calculateDueDate() {
-                const orderDateValue = orderDateField.value;
-                const selectedOption = customerSelect.options[customerSelect.selectedIndex];
-
-                if (!orderDateValue || !selectedOption) return;
-
-                const orderDate = new Date(orderDateValue);
-                const paymentTerms = parseInt(selectedOption.dataset.paymentTerms) || 0;
-
-                if (paymentTerms > 0) {
-                    orderDate.setDate(orderDate.getDate() + paymentTerms);
-                    dueDateField.value = orderDate.toISOString().split('T')[0];
-                }
-            }
-        });
-    </script>
-@endif
-{{-- SCRIPT FOR ADMIN PO CREATE --}}
+{{-- SCRIPT FOR ADMIN PO CREATE & EDIT --}}
 @if (request()->is('admin/po/create', 'admin/po/edit/*'))
     <script src="{{ asset('js/admin/purchase-order.js') }}"></script>
 @endif
@@ -1074,7 +696,23 @@
             if (errorModalElement) {
                 setTimeout(() => showModal(errorModal), 100);
 
+                // Auto-hide after 2 seconds
                 setTimeout(() => hideModal(errorModal), 2000);
+
+                // Add close handlers for buttons with data-bs-dismiss attribute
+                const closeButtons = errorModalElement.querySelectorAll('[data-bs-dismiss="modal"]');
+                closeButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        hideModal(errorModal);
+                    });
+                });
+
+                // Add close handler for Enter key
+                errorModalElement.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        hideModal(errorModal);
+                    }
+                });
 
                 errorModalElement.addEventListener("hidden.bs.modal", () => {
                     removeBackdrop();
@@ -1083,7 +721,6 @@
             }
         });
     </script>
-
 @endif
 {{-- SUCCESS MODAL --}}
 @if (session('success'))
@@ -1134,7 +771,23 @@
             if (successModalElement) {
                 setTimeout(() => showModal(successModal), 100);
 
+                // Auto-hide after 2 seconds
                 setTimeout(() => hideModal(successModal), 2000);
+
+                // Add close handlers for buttons with data-bs-dismiss attribute
+                const closeButtons = successModalElement.querySelectorAll('[data-bs-dismiss="modal"]');
+                closeButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        hideModal(successModal);
+                    });
+                });
+
+                // Add close handler for Enter key
+                successModalElement.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        hideModal(successModal);
+                    }
+                });
 
                 successModalElement.addEventListener("hidden.bs.modal", () => {
                     removeBackdrop();

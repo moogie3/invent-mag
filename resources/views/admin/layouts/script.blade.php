@@ -19,6 +19,7 @@
             const applyTotalDiscount = document.getElementById('applyTotalDiscount');
             const orderDiscountInput = document.getElementById('orderDiscountInput');
             const orderDiscountTypeInput = document.getElementById('orderDiscountTypeInput');
+            const clearCartBtn = document.getElementById('clearCart');
 
             let products = JSON.parse(localStorage.getItem('cachedProducts')) || [];
             let subtotal = 0;
@@ -65,30 +66,40 @@
             function renderList() {
                 productList.innerHTML = '';
 
-                products.forEach((product, index) => {
-                    const item = document.createElement('div');
-                    item.classList.add('list-group-item', 'd-flex', 'justify-content-between',
-                        'align-items-center');
-                    item.innerHTML = `
-                        <div>
-                            <strong>${product.name}</strong><br>
-                            ${product.quantity} x ${formatCurrency(product.price)} / ${product.unit}
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <strong>${formatCurrency(product.total)}</strong>
-                            <button class="btn btn-sm btn-success increase-product ms-2" data-index="${index}">
-                                <i class="ti ti-plus"></i>
-                            </button>
-                            <button class="btn btn-sm btn-warning decrease-product ms-3" data-index="${index}">
-                                <i class="ti ti-minus"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger remove-product ms-3" data-index="${index}">
-                                <i class="ti ti-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    productList.appendChild(item);
-                });
+                if (products.length === 0) {
+                    const emptyMessage = document.createElement('div');
+                    emptyMessage.classList.add('text-center', 'py-4', 'text-muted');
+                    emptyMessage.innerHTML =
+                        '<i class="ti ti-shopping-cart text-muted" style="font-size: 3rem;"></i><p class="mt-2">Your cart is empty</p>';
+                    productList.appendChild(emptyMessage);
+                } else {
+                    products.forEach((product, index) => {
+                        const item = document.createElement('div');
+                        item.classList.add('list-group-item', 'd-flex', 'justify-content-between',
+                            'align-items-center');
+                        item.innerHTML = `
+                            <div>
+                                <strong>${product.name}</strong><br>
+                                ${product.quantity} x ${formatCurrency(product.price)} / ${product.unit}
+                            </div>
+                            <div class="d-flex justify-content-end align-items-center gap-2">
+                                <strong>${formatCurrency(product.total)}</strong>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-success increase-product" data-index="${index}">
+                                        <i class="ti ti-plus"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning decrease-product" data-index="${index}">
+                                        <i class="ti ti-minus"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger remove-product" data-index="${index}">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        productList.appendChild(item);
+                    });
+                }
 
                 calculateTotals();
                 productsField.value = JSON.stringify(products);
@@ -115,6 +126,11 @@
                 renderList();
             }
 
+            function clearCart() {
+                products = [];
+                renderList();
+            }
+
             // Product grid click handler
             productGrid.addEventListener('click', function(event) {
                 const target = event.target.closest('.product-image');
@@ -126,6 +142,11 @@
                 const productUnit = target.dataset.productUnit;
 
                 addToProductList(productId, productName, productPrice, productUnit);
+            });
+
+            // Clear cart button
+            clearCartBtn.addEventListener('click', function() {
+                clearCart();
             });
 
             // Product list action handlers

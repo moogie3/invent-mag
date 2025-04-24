@@ -350,12 +350,27 @@ document.addEventListener("DOMContentLoaded", function () {
             received < grandTotal && paymentMethod.value === "cash";
     }
 
-    // Handle payment method change
+    // Add this new function to set the exact amount
+    function setExactAmount() {
+        amountReceived.value = grandTotal;
+        calculateChange();
+    }
+
+    // Add this to your DOM Elements section
+    const exactAmountBtn = document.getElementById("exactAmountBtn");
+
+    // Add this to your Event Listeners section
+    if (exactAmountBtn) {
+        exactAmountBtn.addEventListener("click", setExactAmount);
+    }
+
+    // Modify the handlePaymentMethodChange function to also handle the exactAmountBtn visibility
     function handlePaymentMethodChange() {
         const isCash = paymentMethod.value === "cash";
 
         cashPaymentDiv.style.display = isCash ? "block" : "none";
         changeRow.style.display = isCash ? "block" : "none";
+        exactAmountBtn.style.display = isCash ? "inline-block" : "none";
 
         // Update button state
         completePaymentBtn.disabled = isCash

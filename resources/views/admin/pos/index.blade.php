@@ -1,3 +1,4 @@
+<!-- First file: pos.blade.php -->
 @extends('admin.layouts.base')
 
 @section('title', 'POS')
@@ -19,7 +20,7 @@
             <div class="container-xl">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="card shadow-sm">
+                        <div class="card">
                             <div class="card-body">
                                 <form enctype="multipart/form-data" method="POST" action="{{ route('admin.po.store') }}"
                                     id="invoiceForm">
@@ -27,12 +28,12 @@
                                     <input type="hidden" name="products" id="productsField">
                                     <input type="hidden" id="taxRateInput" name="tax_rate" value="{{ $tax->rate ?? 0 }}">
 
-                                    <div class="card mb-4 border-0 shadow-sm">
+                                    <div class="card mb-4 border-0">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <div class="d-flex align-items-center">
                                                     <div class="me-3">
-                                                        <label class="form-label text-muted">Transaction Date</label>
+                                                        <label class="form-label">Transaction </label>
                                                         <div class="input-group">
                                                             <span class="input-group-text">
                                                                 <i class="ti ti-calendar"></i>
@@ -42,8 +43,8 @@
                                                         </div>
                                                     </div>
                                                     <div class="me-3">
-                                                        <label class="form-label text-muted">Customer</label>
-                                                        <select class="form-control" name="customer_id" id="customer_id">
+                                                        <label class="form-label">Customer</label>
+                                                        <select class="form-select" name="customer_id" id="customer_id">
                                                             <option value="">Select Customer</option>
                                                             @foreach ($customers as $customer)
                                                                 <option value="{{ $customer->id }}"
@@ -62,11 +63,9 @@
                                     </div>
 
                                     <div class="row">
-                                        <!-- Product Catalog Section -->
                                         <div class="col-md-6">
-                                            <div class="card card-product-catalog shadow-sm mb-4">
-                                                <div
-                                                    class="card-header bg-light d-flex justify-content-between align-items-center">
+                                            <div class="card card-product-catalog mb-4">
+                                                <div class="card-header d-flex justify-content-between align-items-center">
                                                     <h4 class="card-title mb-0">
                                                         <i class="ti ti-box me-2"></i>Product Catalog
                                                     </h4>
@@ -82,8 +81,7 @@
                                                     <div class="row g-2" id="productGrid">
                                                         @foreach ($products as $product)
                                                             <div class="col-md-4 mb-2">
-                                                                <div
-                                                                    class="card product-card h-100 border shadow-sm hover-shadow">
+                                                                <div class="card product-card h-100 border hover-shadow">
                                                                     <div
                                                                         class="card-img-top position-relative product-image-container">
                                                                         <img src="{{ asset($product->image) }}"
@@ -109,22 +107,19 @@
                                             </div>
                                         </div>
 
-                                        <!-- Shopping Cart Section -->
                                         <div class="col-md-6">
-                                            <div class="card shadow-sm mb-4">
-                                                <div
-                                                    class="card-header bg-light d-flex justify-content-between align-items-center">
+                                            <div class="card mb-4">
+                                                <div class="card-header d-flex justify-content-between align-items-center">
                                                     <h4 class="card-title mb-0">
                                                         <i class="ti ti-shopping-cart me-2"></i>Shopping Cart
                                                     </h4>
-                                                    <span id="cartCount">0</span>
+                                                    <span id="cartCount" class="badge bg-green-lt fs-3">0</span>
                                                 </div>
                                                 <div class="card-body">
-                                                    <div id="productList" class="list-group mb-4">
-                                                        <!-- Products will be populated here -->
+                                                    <div id="productList" class="list-group">
                                                     </div>
                                                 </div>
-                                                <div class="card-footer bg-light p-3">
+                                                <div class="card-footer p-3">
                                                     <div class="d-flex justify-content-between mb-2">
                                                         <span>Subtotal:</span>
                                                         <span id="subtotal" class="fw-bold">Rp 0</span>
@@ -135,9 +130,10 @@
                                                         <div class="input-group" style="max-width: 180px;">
                                                             <input type="number" id="orderDiscount" class="form-control"
                                                                 value="0" min="0">
-                                                            <select id="discountType" class="form-select">
+                                                            <select id="discountType" class="form-select"
+                                                                style="max-width: 70px;">
                                                                 <option value="fixed">Rp</option>
-                                                                <option value="percent">%</option>
+                                                                <option value="percentage">%</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -153,12 +149,11 @@
 
                                                     <hr>
 
-                                                    <div class="d-flex justify-content-between fs-4 fw-bold text-primary">
+                                                    <div class="d-flex justify-content-between fs-2 fw-bold text-primary">
                                                         <span>Grand Total:</span>
                                                         <span id="finalTotal">Rp 0</span>
                                                     </div>
 
-                                                    <!-- Hidden Inputs -->
                                                     <input type="hidden" id="totalDiscountInput" name="total_discount"
                                                         value="0">
                                                     <input type="hidden" id="orderDiscountInput" name="discount_total"
@@ -170,7 +165,6 @@
                                                     <input type="hidden" id="grandTotalInput" name="grand_total"
                                                         value="0">
 
-                                                    <!-- Submit -->
                                                     <div class="mt-3">
                                                         <button type="button" id="processPaymentBtn"
                                                             class="btn btn-primary w-100 btn-lg">

@@ -2,16 +2,15 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Payment Processing</h3>
+                <h2 class="modal-title">Order Summary</h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row mb-4">
                     <div class="col-md-12">
-                        <h6 class="mb-3 fs-4">Order Summary</h6>
                         <div class="table-responsive">
-                            <table class="table table-borderless table-vcenter">
-                                <thead class="bg-light">
+                            <table class="table table-secondary table-borderless table-vcenter">
+                                <thead>
                                     <tr>
                                         <th>Product</th>
                                         <th class="text-center">Quantity</th>
@@ -36,9 +35,9 @@
                                         </td>
                                         <td class="text-end" id="modalTax">Rp 0</td>
                                     </tr>
-                                    <tr class="bg-light">
-                                        <td colspan="3" class="text-end fw-bold fs-3">Grand Total:</td>
-                                        <td class="text-end fw-bold fs-3 text-primary" id="modalGrandTotal">Rp 0</td>
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold fs-2">Grand Total:</td>
+                                        <td class="text-end fw-bold fs-2 text-primary" id="modalGrandTotal">Rp 0</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -61,6 +60,10 @@
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
                             <input type="number" class="form-control" id="amountReceived" min="0">
+                            <button type="button" class="btn btn-outline-success" id="exactAmountBtn"
+                                title="Exact Amount">
+                                <i class="ti ti-equal"></i> Exact
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -69,8 +72,8 @@
                     <div class="col-md-12">
                         <div class="alert alert-success mb-0">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold fs-5">Change:</span>
-                                <span class="fw-bold fs-5" id="changeAmount">Rp 0</span>
+                                <span class="fw-bold fs-4">Change:</span>
+                                <span class="fw-bold fs-4" id="changeAmount">Rp 0</span>
                             </div>
                         </div>
                     </div>

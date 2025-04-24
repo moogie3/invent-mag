@@ -42,7 +42,7 @@ body {
 #productList {
     flex-grow: 1;
     overflow-y: hidden;
-    border: 1px solid gray;
+    border: 1px solid gainsboro;
     padding: 10px;
     max-height: 500px;
 }
@@ -129,8 +129,32 @@ body {
 }
 
 .card-product-catalog {
-    height: calc(100vh - 250px);
+    height: 795px;
     overflow-y: auto;
+}
+
+/* Dark mode adjustments */
+.theme-dark .product-card {
+    background-color: var(--tblr-bg-surface);
+    border-color: var(--tblr-border-color);
+}
+
+.theme-dark .product-card .card-title,
+.theme-dark .product-card .card-text {
+    color: var(--tblr-body-color);
+}
+
+.theme-dark .list-group-item {
+    background-color: var(--tblr-bg-surface);
+    border-color: var(--tblr-border-color);
+}
+
+.theme-dark .input-group-text,
+.theme-dark .form-control,
+.theme-dark .form-select {
+    background-color: var(--tblr-bg-forms);
+    border-color: var(--tblr-border-color);
+    color: var(--tblr-body-color);
 }
 
 

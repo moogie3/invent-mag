@@ -22,12 +22,12 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-body">
-                                <form enctype="multipart/form-data" method="POST" action="{{ route('admin.po.store') }}"
+                                <form enctype="multipart/form-data" method="POST" action="{{ route('admin.pos.store') }}"
                                     id="invoiceForm">
                                     @csrf
                                     <input type="hidden" name="products" id="productsField">
                                     <input type="hidden" id="taxRateInput" name="tax_rate" value="{{ $tax->rate ?? 0 }}">
-
+                                    <input type="hidden" name="invoice" value="auto-generated">
                                     <div class="card mb-4 border-0">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-center">

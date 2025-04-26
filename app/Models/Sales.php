@@ -15,20 +15,38 @@ class Sales extends Model
     protected $fillable = [
         'invoice',
         'customer_id',
+        'user_id',           // Added user_id
         'order_date',
         'due_date',
+        'payment_date',
         'payment_type',
         'order_discount',
         'order_discount_type',
         'total',
         'status',
-        'payment_date',
         'tax_rate',
-        'total_tax' // ✅ Include new tax fields
+        'total_tax',
+        'amount_received',   // Added for POS
+        'change_amount',     // Added for POS
+        'is_pos'
     ];
 
     protected $attributes = [
         'status' => 'Unpaid',
+        'is_pos' => 'false',
+    ];
+
+    public static $paymentStatus = [
+        'Paid',
+        'Partial',
+        'Unpaid',
+    ];
+
+    public static $paymentTypes = [
+        'cash',
+        'card',
+        'transfer',
+        'ewallet'
     ];
 
     public function customer(): BelongsTo
@@ -60,8 +78,12 @@ class Sales extends Model
         'total' => 'float',
         'total_tax' => 'float',
         'tax_rate' => 'float',
+        'order_discount' => 'float',
+        'amount_received' => 'float',
+        'change_amount' => 'float',
         'order_date' => 'datetime',
         'due_date' => 'datetime',
         'payment_date' => 'datetime',
+        'is_pos' => 'boolean'
     ];
 }

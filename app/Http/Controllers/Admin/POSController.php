@@ -5,17 +5,21 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Product;
-use App\Models\Purchase;
+use App\Models\Sales;
+use App\Models\SalesItem;
+use App\Models\Tax;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class POSController extends Controller
 {
     public function index()
     {
-        $pos = Purchase::all();
         $products = Product::with('unit')->get();
         $customers = Customer::all();
-        return view('admin.pos.index', compact('pos', 'customers', 'products'));
+        $tax = Tax::where('is_active', 1)->first();
+
+        return view('admin.pos.index', compact('products', 'customers', 'tax'));
     }
 
     public function store(Request $request)
@@ -23,16 +27,16 @@ class POSController extends Controller
         try {
             // Validate the request
             $validatedData = $request->validate([
-                'customer_id' => 'nullable|exists:customers,id',
                 'transaction_date' => 'required|date',
+                'customer_id' => 'nullable|exists:customers,id',
                 'products' => 'required|json',
                 'discount_total' => 'nullable|numeric|min:0',
                 'discount_total_type' => 'nullable|in:fixed,percentage',
-                'tax_rate' => 'required|numeric|min:0|max:100',
-                'tax_amount' => 'required|numeric|min:0',
+                'tax_rate' => 'nullable|numeric|min:0',
+                'tax_amount' => 'nullable|numeric|min:0',
                 'grand_total' => 'required|numeric|min:0',
-                'payment_method' => 'required|string|in:cash,card,transfer,ewallet',
-                'amount_received' => 'nullable|numeric|min:0|required_if:payment_method,cash',
+                'payment_method' => 'required|string|in:Cash,Card,Transfer,eWallet',
+                'amount_received' => 'nullable|numeric|min:0|required_if:payment_method,Cash',
                 'change_amount' => 'nullable|numeric|min:0',
             ]);
 
@@ -44,58 +48,108 @@ class POSController extends Controller
                     ->withInput();
             }
 
-            // Calculate totals (using values already calculated in frontend)
-            $subTotal = array_sum(array_column($products, 'total'));
+            // Calculate totals
+            $subTotal = 0;
+            $totalBeforeDiscounts = 0;
+
+            foreach ($products as $product) {
+                $quantity = $product['quantity'];
+                $price = $product['price'];
+
+                $productSubtotal = $price * $quantity;
+                $totalBeforeDiscounts += $productSubtotal;
+                $subTotal += $productSubtotal;
+            }
+
+            // Calculate order discount
             $orderDiscount = $request->discount_total ?? 0;
-            $orderDiscountType = $request->discount_total_type;
-            $taxAmount = $request->tax_amount;
-            $grandTotal = $request->grand_total;
+            $orderDiscountType = $request->discount_total_type ?? 'fixed';
+            $orderDiscountAmount = $orderDiscountType === 'percentage'
+                ? ($totalBeforeDiscounts * $orderDiscount) / 100
+                : $orderDiscount;
+
+            // Calculate tax on amount after discount is applied
+            $taxable = $subTotal - $orderDiscountAmount;
+            $taxRate = $request->tax_rate ?? 0;
+            $taxAmount = $request->tax_amount ?? ($taxable * ($taxRate / 100));
+            $grandTotal = $request->grand_total ?? ($taxable + $taxAmount);
 
             // Generate invoice number
-            $lastInvoice = POS::latest()->first();
+            $lastInvoice = Sales::latest()->first();
             $invoiceNumber = $lastInvoice ? intval(substr($lastInvoice->invoice, -4)) + 1 : 1;
             $invoice = 'POS-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
 
-            // Create POS transaction
-            $pos = POS::create([
+            // Get the authenticated user's ID
+            $userId = Auth::id();
+
+            // Create Sale with POS transaction
+            $sale = Sales::create([
                 'invoice' => $invoice,
-                'customer_id' => $request->customer_id, // Nullable if guest purchase
-                'transaction_date' => $request->transaction_date,
-                'tax_rate' => $request->tax_rate,
+                'customer_id' => $request->customer_id,
+                'user_id' => $userId, // Using Auth facade directly
+                'order_date' => $request->transaction_date,
+                'due_date' => $request->transaction_date, // Same day for POS
+                'tax_rate' => $taxRate,
                 'total_tax' => $taxAmount,
-                'subtotal' => $subTotal,
                 'total' => $grandTotal,
-                'order_discount' => $orderDiscount,
+                'order_discount' => $orderDiscountAmount,
                 'order_discount_type' => $orderDiscountType,
-                'payment_method' => $request->payment_method,
-                'amount_received' => $request->amount_received,
-                'change_amount' => $request->change_amount,
-                'status' => 'Completed', // Default status for POS is completed
+                'status' => 'Paid', // POS transactions are always paid immediately
+                'payment_type' => $request->payment_method,
+                'amount_received' => $request->amount_received ?? $grandTotal,
+                'change_amount' => $request->change_amount ?? 0,
+                'payment_date' => now(),
+                'is_pos' => true, // Mark as POS transaction
             ]);
 
-            // Insert POS items
+            // Insert sale items
             foreach ($products as $product) {
-                POSItem::create([
-                    'pos_id' => $pos->id,
+                $productSubtotal = $product['price'] * $product['quantity'];
+
+                SalesItem::create([
+                    'sales_id' => $sale->id,
                     'product_id' => $product['id'],
                     'quantity' => $product['quantity'],
-                    'price' => $product['price'],
-                    'total' => $product['total'],
+                    'customer_price' => $product['price'],
+                    'discount' => 0, // No item-level discounts in current POS UI
+                    'discount_type' => 'fixed',
+                    'total' => $productSubtotal,
                 ]);
 
-                // Update inventory
+                // Reduce stock quantity - check if your field is named stock or stock_quantity
                 $productModel = Product::find($product['id']);
                 if ($productModel) {
-                    $productModel->stock = $productModel->stock - $product['quantity'];
-                    $productModel->save();
+                    // Use the correct field name based on your database structure
+                    if (isset($productModel->stock_quantity)) {
+                        $productModel->decrement('stock_quantity', $product['quantity']);
+                    } elseif (isset($productModel->quantity)) {
+                        $productModel->decrement('quantity', $product['quantity']);
+                    } elseif (isset($productModel->stock)) {
+                        $productModel->decrement('stock', $product['quantity']);
+                    }
                 }
             }
 
-            return redirect()->route('admin.pos')->with('success', 'POS transaction completed successfully.');
+            // Prepare receipt data for redirect
+            return redirect()->route('admin.pos.receipt', $sale->id)
+                ->with('success', 'Transaction completed successfully.');
+
         } catch (\Exception $e) {
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
                 ->withInput();
         }
+    }
+
+    public function receipt($id)
+    {
+        $sale = Sales::with(['items.product', 'customer'])->findOrFail($id);
+        return view('admin.pos.receipt', compact('sale'));
+    }
+
+    public function printReceipt($id)
+    {
+        $sale = Sales::with(['items.product', 'customer'])->findOrFail($id);
+        return view('admin.pos.print', compact('sale'));
     }
 }

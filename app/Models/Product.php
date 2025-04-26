@@ -18,7 +18,7 @@ class Product extends Model
         'image',
         'price',
         'selling_price',
-        'quantity',
+        'stock_quantity',
         'category_id',
         'supplier_id',
         'units_id'
@@ -27,7 +27,7 @@ class Product extends Model
     protected $casts = [
         'price' => 'float',
         'selling_price' => 'float',
-        'quantity' => 'float'
+        'stock_quantity' => 'float'
     ];
 
     public function category(): BelongsTo

@@ -118,7 +118,7 @@
                                                     </td>
                                                     <td class="sort-code no-print">{{ $product->code }}</td>
                                                     <td class="sort-name">{{ $product->name }}</td>
-                                                    <td class="sort-quantity no-print">{{ $product->quantity }}</td>
+                                                    <td class="sort-quantity no-print">{{ $product->stock_quantity }}</td>
                                                     <td class="sort-category no-print">{{ $product->category->name }}</td>
                                                     <td class="sort-unit">{{ $product->unit->symbol }}</td>
                                                     <td class="sort-price">

@@ -43,7 +43,7 @@ class ProductController extends Controller
         $request->validate([
             'code' => 'required|string',
             'name' => 'required|string',
-            'quantity' => 'required|integer',
+            'stock_quantity' => 'required|integer',
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
             'category_id' => 'required|integer',
@@ -70,46 +70,46 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $products = Product::findOrFail($id);
+    {
+        $products = Product::findOrFail($id);
 
-    $request->validate([
-        'code' => 'string',
-        'name' => 'string',
-        'quantity' => 'integer',
-        'price' => 'numeric',
-        'selling_price' => 'numeric',
-        'category_id' => 'integer',
-        'units_id' => 'integer',
-        'supplier_id' => 'integer',
-        'description' => 'nullable|string',
-        'image' => 'nullable|image|mimes:jpeg,jpg,png',
-    ]);
+        $request->validate([
+            'code' => 'string',
+            'name' => 'string',
+            'stock_quantity' => 'integer',
+            'price' => 'numeric',
+            'selling_price' => 'numeric',
+            'category_id' => 'integer',
+            'units_id' => 'integer',
+            'supplier_id' => 'integer',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png',
+        ]);
 
-    $data = $request->except(['_token', 'image']);
+        $data = $request->except(['_token', 'image']);
 
-    // Check if a new image is uploaded
-    if ($request->hasFile('image')) {
-    // Delete old image if exists
-    $oldImagePath = 'public/image/' . basename($products->image); // Use only filename
+        // Check if a new image is uploaded
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            $oldImagePath = 'public/image/' . basename($products->image); // Use only filename
 
-    if (!empty($products->image) && Storage::exists($oldImagePath)) {
-        Storage::delete($oldImagePath);
+            if (!empty($products->image) && Storage::exists($oldImagePath)) {
+                Storage::delete($oldImagePath);
+            }
+
+            // Upload new image
+            $image = $request->file('image');
+            $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
+            $image->storeAs('public/image', $imageName);
+
+            // Store only the image filename, NOT the full URL
+            $data['image'] = $imageName;
+        }
+
+        $products->update($data);
+
+        return redirect()->route('admin.product')->with('success', 'Product updated successfully');
     }
-
-    // Upload new image
-    $image = $request->file('image');
-    $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-    $image->storeAs('public/image', $imageName);
-
-    // Store only the image filename, NOT the full URL
-    $data['image'] = $imageName;
-}
-
-    $products->update($data);
-
-    return redirect()->route('admin.product')->with('success', 'Product updated successfully');
-}
 
     public function destroy($id)
     {

@@ -56,8 +56,9 @@
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">QTY</label>
-                                                <input type="text" class="form-control" name="quantity" id="quantity"
-                                                    placeholder="Quantity" value="{{ $products->quantity }}" />
+                                                <input type="text" class="form-control" name="stock_quantity"
+                                                    id="stock_quantity" placeholder="Quantity"
+                                                    value="{{ $products->stock_quantity }}" />
                                             </div>
                                         </div>
 

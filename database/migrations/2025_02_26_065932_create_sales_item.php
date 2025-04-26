@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('sales_id')->constrained('sales')->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->integer('quantity');
-            $table->decimal('price', 10);
             $table->decimal('discount', 10);
             $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage');
             $table->decimal('customer_price', 10);

@@ -380,11 +380,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Complete the payment and submit the form
     function completePayment() {
+        // Map lowercase payment method values to the format expected by the backend
+        const paymentMethodMap = {
+            cash: "Cash",
+            card: "Card",
+            transfer: "Transfer",
+            ewallet: "eWallet",
+        };
+
         // Add payment info to form
         const paymentInfoInput = document.createElement("input");
         paymentInfoInput.type = "hidden";
         paymentInfoInput.name = "payment_method";
-        paymentInfoInput.value = paymentMethod.value;
+        paymentInfoInput.value =
+            paymentMethodMap[paymentMethod.value] || paymentMethod.value;
         invoiceForm.appendChild(paymentInfoInput);
 
         if (paymentMethod.value === "cash") {
@@ -402,6 +411,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 parseFloat(amountReceived.value || 0) - grandTotal
             );
             invoiceForm.appendChild(changeInput);
+        } else {
+            // For non-cash payments, still provide amount_received to satisfy the validation
+            const amountReceivedInput = document.createElement("input");
+            amountReceivedInput.type = "hidden";
+            amountReceivedInput.name = "amount_received";
+            amountReceivedInput.value = grandTotal; // The total amount is considered received
+            invoiceForm.appendChild(amountReceivedInput);
         }
 
         // Submit the form

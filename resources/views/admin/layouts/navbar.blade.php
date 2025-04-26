@@ -9,7 +9,7 @@
 
         <!-- Centered Brand Title -->
         <h1 class="navbar-brand text-center mx-auto position-relative">
-            <a href="{{ route('admin.dashboard') }}" class="nav-link" id="brand-trigger">
+            <a class="nav-link" id="brand-trigger">
                 <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
             </a>
         </h1>

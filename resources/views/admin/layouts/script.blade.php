@@ -5,7 +5,6 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 {{-- SCRIPT FOR ADMIN POS  --}}
-{{-- SCRIPT FOR ADMIN POS  --}}
 @if (request()->is('admin/pos'))
     <script src="{{ asset('js/admin/pos.js') }}"></script>
 @endif

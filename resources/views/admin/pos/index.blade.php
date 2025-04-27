@@ -26,20 +26,20 @@
                                     id="invoiceForm">
                                     @csrf
                                     <input type="hidden" name="products" id="productsField">
-                                    <input type="hidden" id="taxRateInput" name="tax_rate" value="{{ $tax->rate ?? 0 }}">
+                                    <input type="hidden" id="taxRateInput" name="tax_rate" value="0">
                                     <input type="hidden" name="invoice" value="auto-generated">
                                     <div class="card mb-4 border-0">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <div class="d-flex align-items-center">
                                                     <div class="me-3">
-                                                        <label class="form-label">Transaction </label>
+                                                        <label class="form-label">Transaction Date</label>
                                                         <div class="input-group">
                                                             <span class="input-group-text">
                                                                 <i class="ti ti-calendar"></i>
                                                             </span>
-                                                            <input type="date" class="form-control"
-                                                                name="transaction_date" value="{{ date('Y-m-d') }}" />
+                                                            <input type="text" class="form-control" id="transaction_date"
+                                                                name="transaction_date" value="{{ date('d F Y H:i') }}" />
                                                         </div>
                                                     </div>
                                                     <div class="me-3">
@@ -48,7 +48,8 @@
                                                             <option value="">Select Customer</option>
                                                             @foreach ($customers as $customer)
                                                                 <option value="{{ $customer->id }}"
-                                                                    data-payment-terms="{{ $customer->payment_terms }}">
+                                                                    data-payment-terms="{{ $customer->payment_terms }}"
+                                                                    {{ $customer->id === $walkInCustomerId ? 'selected' : '' }}>
                                                                     {{ $customer->name }}
                                                                 </option>
                                                             @endforeach

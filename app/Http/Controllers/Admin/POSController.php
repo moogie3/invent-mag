@@ -17,9 +17,9 @@ class POSController extends Controller
     {
         $products = Product::with('unit')->get();
         $customers = Customer::all();
-        $tax = Tax::where('is_active', 1)->first();
+        $walkInCustomerId = $customers->where('name', 'Walk In Customer')->first()->id ?? null;
 
-        return view('admin.pos.index', compact('products', 'customers', 'tax'));
+        return view('admin.pos.index', compact('products', 'customers', 'walkInCustomerId'));
     }
 
     public function store(Request $request)
@@ -64,15 +64,20 @@ class POSController extends Controller
             // Calculate order discount
             $orderDiscount = $request->discount_total ?? 0;
             $orderDiscountType = $request->discount_total_type ?? 'fixed';
-            $orderDiscountAmount = $orderDiscountType === 'percentage'
-                ? ($totalBeforeDiscounts * $orderDiscount) / 100
-                : $orderDiscount;
+            $orderDiscountAmount = $orderDiscountType === 'percentage' ? ($totalBeforeDiscounts * $orderDiscount) / 100 : $orderDiscount;
 
-            // Calculate tax on amount after discount is applied
+            // Calculate tax using the user-provided tax rate from the UI
             $taxable = $subTotal - $orderDiscountAmount;
-            $taxRate = $request->tax_rate ?? 0;
-            $taxAmount = $request->tax_amount ?? ($taxable * ($taxRate / 100));
-            $grandTotal = $request->grand_total ?? ($taxable + $taxAmount);
+            $taxRate = $request->tax_rate ?? 0; // Use the tax_rate from request
+            $taxAmount = $request->tax_amount ?? $taxable * ($taxRate / 100);
+            $grandTotal = $request->grand_total ?? $taxable + $taxAmount;
+
+            // Get the authenticated user's ID and timezone
+            $userId = Auth::id();
+            $userTimezone = Auth::user()->timezone ?? config('app.timezone');
+
+            $transactionDate = \Carbon\Carbon::parse($request->transaction_date, $userTimezone)->setTimezone('UTC')->format('Y-m-d');
+            $transactionDate = $request->transaction_date;
 
             // Generate invoice number
             $lastInvoice = Sales::latest()->first();
@@ -82,24 +87,24 @@ class POSController extends Controller
             // Get the authenticated user's ID
             $userId = Auth::id();
 
-            // Create Sale with POS transaction
+            // Create Sale with POS transaction - Fix the timezone handling
             $sale = Sales::create([
                 'invoice' => $invoice,
                 'customer_id' => $request->customer_id,
-                'user_id' => $userId, // Using Auth facade directly
-                'order_date' => $request->transaction_date,
-                'due_date' => $request->transaction_date, // Same day for POS
+                'user_id' => Auth::id(),
+                'order_date' => $request->transaction_date, // The model will handle timezone conversion
+                'due_date' => $request->transaction_date, // The model will handle timezone conversion
                 'tax_rate' => $taxRate,
                 'total_tax' => $taxAmount,
                 'total' => $grandTotal,
                 'order_discount' => $orderDiscountAmount,
                 'order_discount_type' => $orderDiscountType,
-                'status' => 'Paid', // POS transactions are always paid immediately
+                'status' => 'Paid',
                 'payment_type' => $request->payment_method,
                 'amount_received' => $request->amount_received ?? $grandTotal,
                 'change_amount' => $request->change_amount ?? 0,
-                'payment_date' => now(),
-                'is_pos' => true, // Mark as POS transaction
+                'payment_date' => now(), // The model will handle timezone conversion
+                'is_pos' => true,
             ]);
 
             // Insert sale items
@@ -131,9 +136,7 @@ class POSController extends Controller
             }
 
             // Prepare receipt data for redirect
-            return redirect()->route('admin.pos.receipt', $sale->id)
-                ->with('success', 'Transaction completed successfully.');
-
+            return redirect()->route('admin.pos.receipt', $sale->id)->with('success', 'Transaction completed successfully.');
         } catch (\Exception $e) {
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
@@ -144,7 +147,40 @@ class POSController extends Controller
     public function receipt($id)
     {
         $sale = Sales::with(['items.product', 'customer'])->findOrFail($id);
-        return view('admin.pos.receipt', compact('sale'));
+
+        // Start calculating totals
+        $totalBeforeDiscount = 0;
+        $totalItemDiscount = 0;
+
+        foreach ($sale->items as $item) {
+            $discountAmount = \App\Helpers\SalesHelper::calculateItemDiscountAmount($item->customer_price, $item->quantity, $item->discount, $item->discount_type);
+
+            $itemTotal = \App\Helpers\SalesHelper::calculateItemTotal($item->customer_price, $item->quantity, $item->discount, $item->discount_type);
+
+            $totalBeforeDiscount += $item->customer_price * $item->quantity;
+            $totalItemDiscount += $discountAmount;
+        }
+
+        $subTotal = $totalBeforeDiscount - $totalItemDiscount;
+
+        // Order Discount
+        $orderDiscount = $sale->order_discount ?? 0;
+        $orderDiscountType = $sale->order_discount_type ?? 'fixed';
+        $orderDiscountAmount = \App\Helpers\SalesHelper::calculateOrderDiscount($totalBeforeDiscount, $orderDiscount, $orderDiscountType);
+
+        // Tax
+        $taxableAmount = $subTotal - $orderDiscountAmount;
+        $taxRate = $sale->tax_rate ?? 0;
+        $taxAmount = \App\Helpers\SalesHelper::calculateTaxAmount($taxableAmount, $taxRate);
+
+        // Grand Total
+        $grandTotal = $taxableAmount + $taxAmount;
+
+        // Payment
+        $amountReceived = $sale->amount_received ?? $grandTotal;
+        $change = $amountReceived - $grandTotal;
+
+        return view('admin.pos.receipt', compact('sale', 'subTotal', 'orderDiscountAmount', 'taxRate', 'taxAmount', 'grandTotal', 'amountReceived', 'change'));
     }
 
     public function printReceipt($id)

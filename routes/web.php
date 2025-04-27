@@ -119,14 +119,12 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
-        Route::get('/admin/notifications/list', [NotificationController::class, 'getNotifications'])
-            ->name('admin.notifications.list');
-        Route::post('/admin/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])
-            ->name('admin.notifications.mark-read');
-        Route::get('/admin/notifications/count', [NotificationController::class, 'count'])
-            ->name('admin.notifications.count');
-        Route::get('/notifications/view/{id}', [NotificationController::class, 'view'])
-            ->name('admin.notifications.view');
+        Route::get('/admin/notifications/list', [NotificationController::class, 'getNotifications'])->name('admin.notifications.list');
+        Route::post('/admin/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
+        Route::get('/admin/notifications/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
+        Route::get('/notifications/view/{id}', [NotificationController::class, 'view'])->name('admin.notifications.view');
+        // Add this inside your admin->middleware('auth')->group() section
+        Route::get('/pos/receipt/{id}', [POSController::class, 'receipt'])->name('admin.pos.receipt');
     });
 });
 

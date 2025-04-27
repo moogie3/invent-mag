@@ -1,0 +1,164 @@
+@import url('https://rsms.me/inter/inter.css');
+
+:root {
+    --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue,
+        sans-serif;
+}
+
+/* Receipt Styling */
+.receipt-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.receipt-container {
+    width: 100%;
+    margin: 0 auto;
+    font-family: var(--tblr-font-sans-serif);
+}
+
+/* Adjust the page-body container width */
+.page-body .container-xl {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Make column full width */
+.page-body .col-md-10 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.receipt-header {
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--tblr-border-color);
+}
+
+.receipt-meta {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    color: var(--tblr-secondary);
+    font-size: 0.875rem;
+}
+
+.section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--tblr-body-color);
+}
+
+.customer-section {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--tblr-border-color-light);
+}
+
+/* Table Styling */
+.table-items {
+    margin-bottom: 0;
+}
+
+.table-items thead th {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border-top: none;
+    border-bottom: 1px solid var(--tblr-border-color);
+    background-color: var(--tblr-bg-surface);
+    padding: 0.5rem;
+}
+
+.table-items tbody td {
+    font-size: 0.8125rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--tblr-border-color-light);
+}
+
+/* Totals Section */
+.totals-section {
+    padding: 15px;
+    border-radius: 4px;
+    background-color: var(--tblr-bg-surface);
+    margin-bottom: 20px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 0.8125rem;
+}
+
+.total-main {
+    margin-top: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    border-top: 1px solid var(--tblr-border-color);
+    padding-top: 10px;
+}
+
+.payment-rows {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--tblr-border-color-light);
+}
+
+.receipt-footer {
+    padding-top: 15px;
+    border-top: 1px solid var(--tblr-border-color);
+    font-size: 0.875rem;
+}
+
+/* Print Styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background-color: white;
+        font-size: 12px;
+    }
+
+    .receipt-card {
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .card-body {
+        padding: 0;
+    }
+
+    .receipt-container {
+        width: 80mm;
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .page-wrapper {
+        padding-top: 0 !important;
+    }
+
+    .table-items thead th {
+        background-color: #f8f9fa !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .totals-section {
+        background-color: #f8f9fa !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* Dark Mode Support */
+.theme-dark .table-items thead th {
+    background-color: var(--tblr-bg-surface);
+}
+
+.theme-dark .totals-section {
+    background-color: var(--tblr-bg-surface);
+}

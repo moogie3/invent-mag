@@ -58,6 +58,14 @@ class SalesController extends Controller
     public function view($id)
     {
         $sales = Sales::with(['items', 'customer'])->find($id);
+
+        // Check if this is a POS invoice
+        if (strpos($sales->invoice, 'POS-') === 0) {
+            // If it's a POS invoice, redirect to the receipt view
+            return redirect()->route('admin.pos.receipt', $id);
+        }
+
+        // For regular invoices, continue with the existing code
         $customer = Customer::all();
         $items = SalesItem::all();
         $tax = Tax::first();
@@ -235,28 +243,28 @@ class SalesController extends Controller
     }
 
     public function getCustomerPrice(Customer $customer, Product $product)
-{
-    // Find the most recent sale for this customer and product
-    $latestSale = Sales::where('customer_id', $customer->id)
-        ->whereHas('items', function ($query) use ($product) {
-            $query->where('product_id', $product->id);
-        })
-        ->latest()
-        ->first();
+    {
+        // Find the most recent sale for this customer and product
+        $latestSale = Sales::where('customer_id', $customer->id)
+            ->whereHas('items', function ($query) use ($product) {
+                $query->where('product_id', $product->id);
+            })
+            ->latest()
+            ->first();
 
-    $pastPrice = 0;
+        $pastPrice = 0;
 
-    if ($latestSale) {
-        $saleItem = $latestSale->items()->where('product_id', $product->id)->first();
+        if ($latestSale) {
+            $saleItem = $latestSale->items()->where('product_id', $product->id)->first();
 
-        if ($saleItem) {
-            // Format the price with no decimal places
-            $pastPrice = floor($saleItem->customer_price);
+            if ($saleItem) {
+                // Format the price with no decimal places
+                $pastPrice = floor($saleItem->customer_price);
+            }
         }
-    }
 
-    return response()->json(['past_price' => $pastPrice]);
-}
+        return response()->json(['past_price' => $pastPrice]);
+    }
 
     public function destroy($id)
     {

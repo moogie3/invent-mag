@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const orderDiscountElement = document.getElementById("orderDiscount");
     const discountTypeElement = document.getElementById("discountType");
     const taxRateElement = document.getElementById("taxRate");
+    taxRateElement.value = "0";
 
     // Payment Modal Elements
     const paymentModal = new bootstrap.Modal(
@@ -38,11 +39,37 @@ document.addEventListener("DOMContentLoaded", function () {
     const completePaymentBtn = document.getElementById("completePaymentBtn");
 
     // State variables
-    let products = JSON.parse(localStorage.getItem("cachedProducts")) || [];
+    let products = [];
     let subtotal = 0;
     let orderDiscount = 0;
     let taxAmount = 0;
     let grandTotal = 0;
+
+    // Check if we're returning from a successful transaction
+    const urlParams = new URLSearchParams(window.location.search);
+    const successParam = urlParams.get("success");
+
+    flatpickr("#transaction_date", {
+        enableTime: true,
+        dateFormat: "d F Y H:i", // What user sees
+        altInput: true,
+        altFormat: "d F Y H:i", // Fancy alternate format
+        time_24hr: true, // 24-hour format
+        defaultDate: new Date(), // Auto-fill with now
+        allowInput: true, // Allow typing manually
+        minuteIncrement: 1, // More precise time picking
+    });
+
+    // If returning with success parameter or no cached products, start fresh
+    // Otherwise load cached products
+    if (successParam === "true") {
+        // Clear cached products when returning from successful transaction
+        localStorage.removeItem("cachedProducts");
+        // Could also show a success message here if desired
+    } else {
+        // Only load cached products if not returning from successful transaction
+        products = JSON.parse(localStorage.getItem("cachedProducts")) || [];
+    }
 
     // Helper functions
     function formatCurrency(amount) {
@@ -100,7 +127,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Render shopping cart list
-    // Find the renderList function in the existing script and replace it with this updated version
     function renderList() {
         productList.innerHTML = "";
 
@@ -175,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
         saveProductsToCache();
     }
 
-    // Add this new function to handle price updates
+    // Update product price
     function updateProductPrice(index, newPrice) {
         if (isNaN(index) || index < 0 || index >= products.length) return;
 
@@ -190,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
         renderList();
     }
 
-    // Add this event listener after your existing productList event listener
+    // Price input event listener
     productList.addEventListener("change", function (event) {
         const priceInput = event.target.closest(".price-input");
 
@@ -204,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Also add this to prevent form submission when pressing Enter in price inputs
+    // Prevent form submission on Enter key in price inputs
     productList.addEventListener("keypress", function (event) {
         if (event.target.closest(".price-input") && event.key === "Enter") {
             event.preventDefault();
@@ -289,7 +315,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Populate payment modal with product details
-    // Modify the populatePaymentModal function
     function populatePaymentModal() {
         // Clear previous data
         modalProductList.innerHTML = "";
@@ -350,7 +375,7 @@ document.addEventListener("DOMContentLoaded", function () {
             received < grandTotal && paymentMethod.value === "cash";
     }
 
-    // Add this new function to set the exact amount
+    // Set exact amount
     function setExactAmount() {
         amountReceived.value = grandTotal;
         calculateChange();
@@ -364,7 +389,7 @@ document.addEventListener("DOMContentLoaded", function () {
         exactAmountBtn.addEventListener("click", setExactAmount);
     }
 
-    // Modify the handlePaymentMethodChange function to also handle the exactAmountBtn visibility
+    // Handle payment method change
     function handlePaymentMethodChange() {
         const isCash = paymentMethod.value === "cash";
 
@@ -396,6 +421,11 @@ document.addEventListener("DOMContentLoaded", function () {
             paymentMethodMap[paymentMethod.value] || paymentMethod.value;
         invoiceForm.appendChild(paymentInfoInput);
 
+        // Ensure we're using the user-inputted tax rate
+        const taxRateInput = document.getElementById("taxRateInput");
+        const taxRateValue = document.getElementById("taxRate").value;
+        taxRateInput.value = taxRateValue;
+
         if (paymentMethod.value === "cash") {
             const amountReceivedInput = document.createElement("input");
             amountReceivedInput.type = "hidden";
@@ -419,6 +449,9 @@ document.addEventListener("DOMContentLoaded", function () {
             amountReceivedInput.value = grandTotal; // The total amount is considered received
             invoiceForm.appendChild(amountReceivedInput);
         }
+
+        // Clear localStorage before submitting to prevent cached items from reappearing
+        localStorage.removeItem("cachedProducts");
 
         // Submit the form
         invoiceForm.submit();

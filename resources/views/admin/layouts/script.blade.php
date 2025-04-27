@@ -622,3 +622,12 @@
         document.getElementById('deleteForm').setAttribute('action', action);
     }
 </script>
+<script>
+    flatpickr("#transaction_date", {
+        dateFormat: "d F Y",   // 27 April 2025
+        altInput: true,
+        altFormat: "d F Y",
+        allowInput: true,
+        defaultDate: "{{ date('Y-m-d') }}"
+    });
+</script>

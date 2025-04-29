@@ -31,46 +31,8 @@
                                 <div class="card-body">
                                     <h2 class="mb-4">Upcoming Notifications</h2>
                                     <div class="list-group mb-5">
-                                        @php $hasNotifications = false; @endphp
-                                        @foreach ($notifications as $item)
-                                            @php
-                                                $dueDate = $item['due_date'];
-                                                $paymentDate = $item['payment_date'] ?? null;
-                                                $today = \Carbon\Carbon::today();
-                                                $diffDays = $today->diffInDays($dueDate, false);
-                                                $statusBadge = 'text-blue';
-                                                $statusText = 'Pending';
-
-                                                if ($item['status'] === 'Paid') {
-                                                    if ($paymentDate && $today->isSameDay($paymentDate)) {
-                                                        $statusBadge = 'text-green';
-                                                        $statusText = 'Paid Today';
-                                                    } else {
-                                                        $statusBadge = 'text-green';
-                                                        $statusText = 'Paid';
-                                                    }
-                                                } elseif ($diffDays == 0) {
-                                                    $statusBadge = 'text-red';
-                                                    $statusText = 'Due Today';
-                                                } elseif ($diffDays > 0 && $diffDays <= 3) {
-                                                    $statusBadge = 'text-red';
-                                                    $statusText = 'Due in 3 Days';
-                                                } elseif ($diffDays > 3 && $diffDays <= 7) {
-                                                    $statusBadge = 'text-yellow';
-                                                    $statusText = 'Due in 1 Week';
-                                                } elseif ($diffDays < 0) {
-                                                    $statusBadge = 'text-black';
-                                                    $statusText = 'Overdue';
-                                                }
-
-                                                $showNotification =
-                                                    $item['status'] !== 'Paid' ||
-                                                    ($item['status'] === 'Paid' &&
-                                                        $paymentDate &&
-                                                        $today->isSameDay($paymentDate));
-                                            @endphp
-
-                                            @if ($showNotification)
+                                        @if ($hasNotifications)
+                                            @foreach ($notifications as $item)
                                                 <a href="{{ $item['route'] }}"
                                                     class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                                     <span>
@@ -78,12 +40,10 @@
                                                         {{ \Carbon\Carbon::parse($item['due_date'])->format('M d, Y') }}
                                                     </span>
                                                     <span
-                                                        class="badge badge-outline {{ $statusBadge }}">{{ $statusText }}</span>
+                                                        class="badge badge-outline {{ $item['status_badge'] }}">{{ $item['status_text'] }}</span>
                                                 </a>
-                                                @php $hasNotifications = true; @endphp
-                                            @endif
-                                        @endforeach
-                                        @if (!$hasNotifications)
+                                            @endforeach
+                                        @else
                                             <div class="list-group-item text-muted text-center">No notifications</div>
                                         @endif
                                     </div>

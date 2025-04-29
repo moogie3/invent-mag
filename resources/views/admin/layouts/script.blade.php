@@ -8,6 +8,7 @@
 @if (request()->is('admin/pos'))
     <script src="{{ asset('js/admin/pos.js') }}"></script>
 @endif
+{{-- SCRIPT FOR ADMIN LOGIN  --}}
 @if (request()->is('admin/login', 'admin/register', 'forgot-password'))
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('tabler/dist/js/demo-theme.min.js') }}"></script>
@@ -621,13 +622,4 @@
     function setDeleteFormAction(action) {
         document.getElementById('deleteForm').setAttribute('action', action);
     }
-</script>
-<script>
-    flatpickr("#transaction_date", {
-        dateFormat: "d F Y",   // 27 April 2025
-        altInput: true,
-        altFormat: "d F Y",
-        allowInput: true,
-        defaultDate: "{{ date('Y-m-d') }}"
-    });
 </script>

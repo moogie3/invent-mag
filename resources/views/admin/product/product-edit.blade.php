@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'Product')
+@section('title', 'Edit Product')
 
 @section('content')
     <div class="page-wrapper">
@@ -8,12 +8,8 @@
             <div class="container-xl">
                 <div class="row align-items-center">
                     <div class="col">
-                        <div class="page-pretitle">
-                            Overview
-                        </div>
-                        <h2 class="page-title">
-                            Edit Product
-                        </h2>
+                        <div class="page-pretitle">Product Management</div>
+                        <h2 class="page-title">Edit Product</h2>
                     </div>
                 </div>
             </div>
@@ -21,111 +17,118 @@
 
         <div class="page-body">
             <div class="container-xl">
-                <div class="row row-deck row-cards">
-                    <div class="col-md-12">
-                        <div class="card card-primary">
-                            <div class="card-body">
-                                <form enctype="multipart/form-data" method="POST"
-                                    action="{{ route('admin.product.update', $products->id) }}">
-                                    @csrf
-                                    @method('PUT')
-                                    <fieldset class="form-fieldset container-xl">
-                                        <div class="row">
-                                            <div class="col-md-1 mb-3">
-                                                <label class="form-label">CODE</label>
-                                                <input type="text" class="form-control" name="code" id="code"
-                                                    placeholder="Code" value="{{ $products->code }}" disabled />
-                                            </div>
-                                            <div class="col-md-2 mb-3">
-                                                <label class="form-label">SUPPLIER</label>
-                                                <select class="form-control" name="supplier_id">
-                                                    <option value="{{ $products->supplier_id }}">
-                                                        {{ $products->supplier->name }}</option>
-                                                    @foreach ($suppliers as $supplier)
-                                                        <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
+                <div class="row row-cards">
+                    <div class="col-12">
+                        <form method="POST" action="{{ route('admin.product.update', $products->id) }}"
+                            enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="ti ti-box fs-4"></i> Product Information</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-2">
+                                            <label class="form-label">Code</label>
+                                            <input type="text" class="form-control" value="{{ $products->code }}"
+                                                disabled>
                                         </div>
 
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">NAME</label>
-                                                <input type="text" class="form-control" name="name" id="name"
-                                                    placeholder="Name" value="{{ $products->name }}" />
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">QTY</label>
-                                                <input type="text" class="form-control" name="stock_quantity"
-                                                    id="stock_quantity" placeholder="Quantity"
-                                                    value="{{ $products->stock_quantity }}" />
-                                            </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Supplier</label>
+                                            <select name="supplier_id" class="form-select">
+                                                <option value="{{ $products->supplier_id }}">{{ $products->supplier->name }}
+                                                </option>
+                                                @foreach ($suppliers as $supplier)
+                                                    <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
 
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">CATEGORY</label>
-                                                <select class="form-control" name="category_id">
-                                                    <option value="{{ $products->category_id }}">
-                                                        {{ $products->category->name }}</option>
-                                                    @foreach ($categories as $category)
-                                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">Buying Price</label>
-                                                <input type="text" class="form-control" name="price" id="price"
-                                                    placeholder="Price" value="{{ $products->price }}" />
-                                            </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Product Name</label>
+                                            <input type="text" name="name" class="form-control"
+                                                value="{{ $products->name }}">
+                                        </div>
+                                    </div>
 
+                                    <hr class="my-4">
+
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Category</label>
+                                            <select name="category_id" class="form-select">
+                                                <option value="{{ $products->category_id }}">{{ $products->category->name }}
+                                                </option>
+                                                @foreach ($categories as $category)
+                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
 
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">UNIT</label>
-                                                <select class="form-control" name="units_id">
-                                                    <option value="{{ $products->units_id }}">{{ $products->unit->name }}
-                                                    </option>
-                                                    @foreach ($units as $unit)
-                                                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">Selling Price</label>
-                                                <input type="text" class="form-control" name="selling_price"
-                                                    id="selling_price" placeholder="Selling Price"
-                                                    value="{{ $products->selling_price }}" />
-                                            </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Unit</label>
+                                            <select name="units_id" class="form-select">
+                                                <option value="{{ $products->units_id }}">{{ $products->unit->name }}
+                                                </option>
+                                                @foreach ($units as $unit)
+                                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-12 mb-3">
-                                                <label class="form-label">DESC</label>
-                                                <input type="text" class="form-control" name="description"
-                                                    id="description" placeholder="Description"
-                                                    value="{{ $products->description }}" />
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">IMAGE</label>
-                                                <div class="d-flex flex-column align-items-start">
-                                                    <div class="mb-2">
-                                                        <img src="{{ asset($products->image) }}" width="200"
-                                                            class="rounded border shadow-sm">
-                                                    </div>
-                                                    <input type="file" class="form-control" name="image">
-                                                    <small class="text-muted mt-1">Upload a new image to replace the current
-                                                        one.</small>
-                                                </div>
-                                            </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label">Stock Quantity</label>
+                                            <input type="text" name="stock_quantity" class="form-control"
+                                                value="{{ $products->stock_quantity }}">
                                         </div>
-                                        <div class="text-end">
-                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                    </div>
+
+                                    <hr class="my-4">
+
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Buying Price</label>
+                                            <input type="text" name="price" class="form-control"
+                                                value="{{ $products->price }}">
                                         </div>
-                                    </fieldset>
-                                </form>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Selling Price</label>
+                                            <input type="text" name="selling_price" class="form-control"
+                                                value="{{ $products->selling_price }}">
+                                        </div>
+                                    </div>
+
+                                    <hr class="my-4">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea name="description" class="form-control" rows="3">{{ $products->description }}</textarea>
+                                    </div>
+
+                                    <hr class="my-4">
+
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Current Image</label>
+                                            <div class="mb-2">
+                                                <img src="{{ asset($products->image) }}" alt="Product Image"
+                                                    class="rounded border shadow-sm" width="200">
+                                            </div>
+                                            <input type="file" name="image" class="form-control">
+                                            <small class="text-muted">Upload a new image to replace the current one.</small>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="card-footer text-end">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>

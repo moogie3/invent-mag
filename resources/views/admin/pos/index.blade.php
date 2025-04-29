@@ -184,5 +184,5 @@
             </div>
         </div>
     </div>
-    @include('admin.layouts.posmodals')
+    @include('admin.layouts.modals.posmodals')
 @endsection

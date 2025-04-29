@@ -16,17 +16,18 @@
                         </h2>
                     </div>
                     <div class="col-auto ms-auto">
-                        <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">
+                        <button type="button" class="btn btn-secondary d-none d-sm-inline-block"
+                            onclick="javascript:window.print();">
+                            <i class="ti ti-printer fs-4"></i>
                             Export PDF
                         </button>
                     </div>
                     <div class="col-auto ms-auto">
-                        <div class="btn-list">
-                            <a href="{{ route('admin.product.create') }}" class="btn btn-primary d-none d-sm-inline-block">
-                                <i class="ti ti-plus fs-4"></i>
-                                Create Product
-                            </a>
-                        </div>
+                        <button type="button" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal"
+                            data-bs-target="#createProductModal">
+                            <i class="ti ti-plus fs-4"></i>
+                            Create Product
+                        </button>
                     </div>
                 </div>
             </div>
@@ -154,33 +155,6 @@
                                 </div>
                             </div>
 
-                            {{-- MODAL --}}
-                            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
-                                aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title text-danger" id="deleteModalLabel">Confirm Delete</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body text-center">
-                                            <i class="ti ti-alert-circle icon text-danger icon-lg mb-10"></i>
-                                            <p class="mt-3">Are you sure you want to delete this product?</p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Cancel</button>
-                                            <form id="deleteForm" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             {{-- PAGINATION --}}
                             <div class="card-footer d-flex align-items-center">
                                 <p class="m-0 text-secondary">
@@ -198,4 +172,5 @@
             </div>
         </div>
     </div>
+    @include('admin.layouts.modals.productmodals')
 @endsection

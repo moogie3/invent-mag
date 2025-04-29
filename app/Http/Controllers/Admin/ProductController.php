@@ -18,7 +18,10 @@ class ProductController extends Controller
         $entries = $request->input('entries', 10); // Pagination
         $products = Product::with(['category', 'supplier', 'unit'])->paginate($entries);
         $totalproduct = Product::count();
-        return view('admin.product.index', compact('products', 'entries', 'totalproduct'));
+        $categories = Categories::all();
+        $units = Unit::all();
+        $suppliers = Supplier::all();
+        return view('admin.product.index', compact('products','categories','units','suppliers', 'entries', 'totalproduct'));
     }
 
     public function create()

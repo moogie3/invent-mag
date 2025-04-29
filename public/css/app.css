@@ -1,8 +1,10 @@
 @import url('https://rsms.me/inter/inter.css');
 
+/* ============================
+   1. ROOT VARIABLES & DEFAULTS
+   ============================ */
 :root {
-    --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue,
-        sans-serif;
+    --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
 }
 
 html,
@@ -11,6 +13,9 @@ body {
     font-feature-settings: "cv03", "cv04", "cv11";
 }
 
+/* ============================
+   2. LAYOUT STRUCTURE
+   ============================ */
 .page {
     display: flex;
     flex-direction: column;
@@ -29,10 +34,11 @@ body {
 
 .footer {
     margin-top: auto;
-    /* Ensures it stays at the bottom */
 }
 
-/* Invoice styles */
+/* ============================
+   3. INVOICE CONTAINER STYLES
+   ============================ */
 #invoiceContainer {
     display: flex;
     flex-direction: column;
@@ -61,37 +67,9 @@ body {
     background: white;
 }
 
-/* Product card styles */
-.product-image {
-    height: 85px;
-    object-fit: cover;
-    cursor: pointer;
-}
-
-.product-card .card-title {
-    font-size: 12px;
-}
-
-.product-card .card-text {
-    font-size: 10px;
-}
-
-/* Discount and tax input groups */
-.discount-input-group,
-.tax-input-group {
-    width: auto;
-    max-width: 200px;
-}
-
-.discount-input-group .form-control,
-.tax-input-group .form-control {
-    max-width: 120px;
-}
-
-.discount-input-group .form-select {
-    max-width: 80px;
-}
-
+/* ============================
+   4. PRODUCT STYLES
+   ============================ */
 .product-card {
     cursor: pointer;
     transition: all 0.2s ease;
@@ -100,6 +78,14 @@ body {
 .product-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.product-card .card-title {
+    font-size: 12px;
+}
+
+.product-card .card-text {
+    font-size: 10px;
 }
 
 .product-image-container {
@@ -111,13 +97,10 @@ body {
 }
 
 .product-image {
+    height: 100%;
     object-fit: cover;
     width: 100%;
-    height: 100%;
-}
-
-.hover-shadow:hover {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    cursor: pointer;
 }
 
 #productList .list-group-item {
@@ -133,11 +116,155 @@ body {
     overflow-y: auto;
 }
 
+.hover-shadow:hover {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+/* ============================
+   5. FORM & INPUT STYLES
+   ============================ */
+.discount-input-group,
+.tax-input-group {
+    width: auto;
+    max-width: 200px;
+}
+
+.discount-input-group .form-control,
+.tax-input-group .form-control {
+    max-width: 120px;
+}
+
+.discount-input-group .form-select {
+    max-width: 80px;
+}
+
+/* ============================
+   6. MODAL STYLES
+   ============================ */
+#viewPoModal .modal-dialog {
+    max-width: 80%;
+    /* Thinner than original */
+    min-width: 70%;
+}
+
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out, opacity 0.2s ease-out;
+    transform: translate(0, -30px);
+    opacity: 0;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+    opacity: 1;
+}
+
+#viewPoModal .modal-header {
+    border-bottom: 0;
+    padding: 1rem 1.2rem;
+}
+
+#viewPoModal .modal-footer {
+    padding: 1rem 1.2rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#viewPoModalContent {
+    padding: 0 !important;
+}
+
+#viewPoModalContent .card {
+    border: none;
+    margin-bottom: 0;
+    border-radius: 0;
+}
+
+#viewPoModalContent .card-header {
+    background: transparent;
+    padding: 1.2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#viewPoModalContent .card-body {
+    padding: 1.2rem;
+}
+
+#viewPoModalContent .bg-light {
+    background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* ============================
+   7. TABLE STYLES
+   ============================ */
+#viewPoModalContent .table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+#viewPoModalContent .table th {
+    font-weight: 600;
+    padding: 0.6rem 0.8rem;
+    border-bottom-width: 1px;
+    font-size: 12px;
+}
+
+#viewPoModalContent .table td {
+    padding: 0.6rem 0.8rem;
+    vertical-align: middle;
+    font-size: 11.5px;
+}
+
+#viewPoModalContent .table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
 #paymentModal thead th {
     font-size: 0.9rem !important;
 }
 
-/* Dark mode adjustments */
+/* ============================
+   8. STATUS & COLORS
+   ============================ */
+.status-indicator {
+    display: inline-block;
+    border-radius: 4px;
+}
+
+#viewPoModalContent .text-primary {
+    color: #206bc4 !important;
+}
+
+#viewPoModalContent .text-danger {
+    color: #d63939 !important;
+}
+
+/* ============================
+   9. ANIMATIONS
+   ============================ */
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.95);
+        opacity: 0.7;
+    }
+}
+
+#viewPoModalContent .spinner-border {
+    animation: pulse 1.5s infinite;
+}
+
+/* ============================
+   10. THEME STYLES
+   ============================ */
 .theme-dark .product-card {
     background-color: var(--tblr-bg-surface);
     border-color: var(--tblr-border-color);
@@ -161,37 +288,154 @@ body {
     color: var(--tblr-body-color);
 }
 
+/* ============================
+   11. RESPONSIVE STYLES
+   ============================ */
+@media (max-width: 767.98px) {
+    #viewPoModal .modal-dialog {
+        max-width: 100%;
+        margin: 0.5rem;
+    }
 
-/* Print styles */
+    #viewPoModalContent .card-body {
+        padding: 1rem;
+    }
+}
+
+/* ============================
+   12. PRINT STYLES
+   ============================ */
 @media print {
-    .purchase-info {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
+    body {
+        font-size: 11px;
+        color: black;
+        background: white;
+        margin: 0;
+        padding: 0;
+        width: 100%;
     }
 
-    .purchase-info>div {
-        break-inside: avoid;
-        page-break-inside: avoid;
+    @page {
+        margin: 0.4cm;
     }
 
-    .sales-info {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
-
-    .sales-info>div {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-
-    .no-print {
+    .no-print,
+    .navbar,
+    .footer,
+    .modal-header,
+    .modal-footer,
+    button,
+    .icon,
+    .status-indicator {
         display: none !important;
     }
 
-    body {
-        font-size: 12px;
-        color: black;
+    #viewPoModal,
+    #viewPoModal .modal-dialog,
+    #viewPoModal .modal-content,
+    #viewPoModalContent,
+    #viewPoModalContent .card {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+    }
+
+    #viewPoModalContent .card-body {
+        padding: 10px !important;
+        width: 100% !important;
+    }
+
+    .table-responsive {
+        overflow: visible !important;
+    }
+
+    .table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        table-layout: fixed !important;
+    }
+
+    .table th,
+    .table td {
+        padding: 6px 8px !important;
+        word-wrap: break-word;
+        border: 1px solid #ccc;
+    }
+
+    .table th:nth-child(1),
+    .table td:nth-child(1) {
+        width: 5% !important;
+    }
+
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+        width: 40% !important;
+    }
+
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        width: 10% !important;
+    }
+
+    .table th:nth-child(4),
+    .table td:nth-child(4),
+    .table th:nth-child(5),
+    .table td:nth-child(5),
+    .table th:nth-child(6),
+    .table td:nth-child(6) {
+        width: 15% !important;
+    }
+
+    .purchase-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        font-size: 11px;
+        margin-bottom: 12px;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .col-md-6 {
+        width: 50% !important;
+        max-width: 50% !important;
+        flex: 0 0 50% !important;
+        padding: 5px !important;
+    }
+
+    .card,
+    .table,
+    tr,
+    td,
+    th,
+    .col-md-6>div {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .d-flex.justify-content-between {
+        display: flex !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
+
+    .text-primary,
+    .text-danger,
+    .strong,
+    .fw-bold {
+        font-weight: bold !important;
     }
 }

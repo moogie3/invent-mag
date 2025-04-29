@@ -152,10 +152,23 @@ class POSController extends Controller
         $totalBeforeDiscount = 0;
         $totalItemDiscount = 0;
 
+        // Calculate and attach item totals to each item
         foreach ($sale->items as $item) {
-            $discountAmount = \App\Helpers\SalesHelper::calculateItemDiscountAmount($item->customer_price, $item->quantity, $item->discount, $item->discount_type);
+            // Calculate item discount amount
+            $discountAmount = \App\Helpers\SalesHelper::calculateItemDiscountAmount(
+                $item->customer_price,
+                $item->quantity,
+                $item->discount,
+                $item->discount_type
+            );
 
-            $itemTotal = \App\Helpers\SalesHelper::calculateItemTotal($item->customer_price, $item->quantity, $item->discount, $item->discount_type);
+            // Calculate item total and attach it to the item object
+            $item->calculated_total = \App\Helpers\SalesHelper::calculateItemTotal(
+                $item->customer_price,
+                $item->quantity,
+                $item->discount,
+                $item->discount_type
+            );
 
             $totalBeforeDiscount += $item->customer_price * $item->quantity;
             $totalItemDiscount += $discountAmount;
@@ -166,7 +179,11 @@ class POSController extends Controller
         // Order Discount
         $orderDiscount = $sale->order_discount ?? 0;
         $orderDiscountType = $sale->order_discount_type ?? 'fixed';
-        $orderDiscountAmount = \App\Helpers\SalesHelper::calculateOrderDiscount($totalBeforeDiscount, $orderDiscount, $orderDiscountType);
+        $orderDiscountAmount = \App\Helpers\SalesHelper::calculateOrderDiscount(
+            $totalBeforeDiscount,
+            $orderDiscount,
+            $orderDiscountType
+        );
 
         // Tax
         $taxableAmount = $subTotal - $orderDiscountAmount;
@@ -180,7 +197,16 @@ class POSController extends Controller
         $amountReceived = $sale->amount_received ?? $grandTotal;
         $change = $amountReceived - $grandTotal;
 
-        return view('admin.pos.receipt', compact('sale', 'subTotal', 'orderDiscountAmount', 'taxRate', 'taxAmount', 'grandTotal', 'amountReceived', 'change'));
+        return view('admin.pos.receipt', compact(
+            'sale',
+            'subTotal',
+            'orderDiscountAmount',
+            'taxRate',
+            'taxAmount',
+            'grandTotal',
+            'amountReceived',
+            'change'
+        ));
     }
 
     public function printReceipt($id)

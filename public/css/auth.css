@@ -1,4 +1,11 @@
 /* Authentication specific styles */
+@import url('https://rsms.me/inter/inter.css');
+
+:root {
+    --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue,
+        sans-serif;
+}
+
 .auth-body {
     background: url('../storage/background/background.jpeg') no-repeat center center;
     background-size: cover;

@@ -83,6 +83,13 @@ class PurchaseController extends Controller
         return view('admin.po.purchase-view', compact('pos', 'suppliers', 'items'));
     }
 
+    public function modalView($id)
+{
+    $pos = Purchase::with(['supplier', 'items.product'])->findOrFail($id);
+
+    return view('admin.po.modal-view', compact('pos'));
+}
+
     public function store(Request $request)
     {
         try {

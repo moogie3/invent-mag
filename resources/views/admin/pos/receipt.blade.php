@@ -72,14 +72,6 @@
                                             </thead>
                                             <tbody>
                                                 @foreach ($sale->items as $item)
-                                                    @php
-                                                        $itemTotal = \App\Helpers\SalesHelper::calculateItemTotal(
-                                                            $item->customer_price,
-                                                            $item->quantity,
-                                                            $item->discount,
-                                                            $item->discount_type,
-                                                        );
-                                                    @endphp
                                                     <tr>
                                                         <td>{{ $item->product->name }}</td>
                                                         <td class="text-center">{{ $item->quantity }}</td>
@@ -87,7 +79,8 @@
                                                             {{ \App\Helpers\CurrencyHelper::format($item->customer_price) }}
                                                         </td>
                                                         <td class="text-end">
-                                                            {{ \App\Helpers\CurrencyHelper::format($itemTotal) }}</td>
+                                                            {{ \App\Helpers\CurrencyHelper::format($item->calculated_total) }}
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

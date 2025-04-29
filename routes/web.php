@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, DailySalesController, SalesController, DashboardController, ProfileController, NotificationController, POSController, WarehouseController, TaxController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, WarehouseController, TaxController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -60,7 +60,6 @@ Route::prefix('admin')->group(function () {
             'customer' => CustomerController::class,
             'po' => PurchaseController::class,
             'sales' => SalesController::class,
-            'ds' => DailySalesController::class,
             'warehouse' => WarehouseController::class,
             'pos' => POSController::class,
         ];
@@ -125,6 +124,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/notifications/view/{id}', [NotificationController::class, 'view'])->name('admin.notifications.view');
         // Add this inside your admin->middleware('auth')->group() section
         Route::get('/pos/receipt/{id}', [POSController::class, 'receipt'])->name('admin.pos.receipt');
+        // Then add this route to your web.php (in the admin group)
+Route::get('/po/{id}/modal-view', [PurchaseController::class, 'modalView'])->name('admin.po.modal-view');
     });
 });
 

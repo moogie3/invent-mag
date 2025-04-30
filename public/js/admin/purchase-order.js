@@ -518,6 +518,323 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
 }
 
 /**
+ * PurchaseOrderEdit - Manages the purchase order edit functionality
+ * Extends core module functionality for edit page
+ */
+class PurchaseOrderEdit extends PurchaseOrderModule {
+    constructor(config = {}) {
+        super(config);
+
+        // Store main DOM elements
+        this.elements = {
+            discountTotalValue: document.getElementById("discountTotalValue"),
+            discountTotalType: document.getElementById("discountTotalType"),
+            subtotalElement: document.getElementById("subtotal"),
+            orderDiscountTotalElement:
+                document.getElementById("orderDiscountTotal"),
+            finalTotalElement: document.getElementById("finalTotal"),
+            totalDiscountInput: document.getElementById("totalDiscountInput"),
+            // All quantity, price and discount inputs (will be selected in init)
+            quantityInputs: [],
+            priceInputs: [],
+            discountInputs: [],
+            discountTypeInputs: [],
+            amountInputs: [],
+        };
+
+        // Initialize
+        this.initElementSelections();
+        this.initEventListeners();
+
+        // Initial calculations
+        this.calculateAllAmounts();
+    }
+
+    initElementSelections() {
+        // Select all item rows and their inputs for calculation
+        this.elements.quantityInputs =
+            document.querySelectorAll(".quantity-input");
+        this.elements.priceInputs = document.querySelectorAll(".price-input");
+        this.elements.discountInputs =
+            document.querySelectorAll(".discount-input");
+        this.elements.discountTypeInputs = document.querySelectorAll(
+            ".discount-type-input"
+        );
+        this.elements.amountInputs = document.querySelectorAll(".amount-input");
+    }
+
+    initEventListeners() {
+        // Add change/input listeners to all item inputs
+        this.elements.quantityInputs.forEach((input) => {
+            input.addEventListener("input", () =>
+                this.updateItemAmount(input.dataset.itemId)
+            );
+        });
+
+        this.elements.priceInputs.forEach((input) => {
+            input.addEventListener("input", () =>
+                this.updateItemAmount(input.dataset.itemId)
+            );
+        });
+
+        this.elements.discountInputs.forEach((input) => {
+            input.addEventListener("input", () =>
+                this.updateItemAmount(input.dataset.itemId)
+            );
+        });
+
+        this.elements.discountTypeInputs.forEach((select) => {
+            select.addEventListener("change", () =>
+                this.updateItemAmount(select.dataset.itemId)
+            );
+        });
+
+        // Add listener for order-level discount
+        this.elements.discountTotalValue.addEventListener("input", () =>
+            this.calculateOrderTotal()
+        );
+        this.elements.discountTotalType.addEventListener("change", () =>
+            this.calculateOrderTotal()
+        );
+    }
+
+    updateItemAmount(itemId) {
+        // Get the related inputs for this item
+        const quantityInput = document.querySelector(
+            `.quantity-input[data-item-id="${itemId}"]`
+        );
+        const priceInput = document.querySelector(
+            `.price-input[data-item-id="${itemId}"]`
+        );
+        const discountInput = document.querySelector(
+            `.discount-input[data-item-id="${itemId}"]`
+        );
+        const discountTypeInput = document.querySelector(
+            `.discount-type-input[data-item-id="${itemId}"]`
+        );
+        const amountInput = document.querySelector(
+            `.amount-input[data-item-id="${itemId}"]`
+        );
+
+        if (
+            !quantityInput ||
+            !priceInput ||
+            !discountInput ||
+            !discountTypeInput ||
+            !amountInput
+        ) {
+            console.error(`Missing input element for item ${itemId}`);
+            return;
+        }
+
+        // Get values
+        const quantity = parseInt(quantityInput.value) || 0;
+        const price = parseFloat(priceInput.value) || 0;
+        const discount = parseFloat(discountInput.value) || 0;
+        const discountType = discountTypeInput.value; // 'percentage' or 'fixed'
+
+        // Calculate total for this item
+        const total = this.calculateTotal(
+            price,
+            quantity,
+            discount,
+            discountType
+        );
+
+        // Update amount input
+        amountInput.value = Math.round(total);
+
+        // Recalculate all totals
+        this.calculateOrderTotal();
+    }
+
+    calculateAllAmounts() {
+        // Calculate amount for each item
+        this.elements.quantityInputs.forEach((input) => {
+            const itemId = input.dataset.itemId;
+            this.updateItemAmount(itemId);
+        });
+
+        // Calculate order total
+        this.calculateOrderTotal();
+    }
+
+    calculateOrderTotal() {
+        // Calculate subtotal from all amount inputs
+        let subtotal = 0;
+        this.elements.amountInputs.forEach((input) => {
+            subtotal += parseFloat(input.value) || 0;
+        });
+
+        // Get order discount values
+        const discountValue =
+            parseFloat(this.elements.discountTotalValue.value) || 0;
+        const discountType = this.elements.discountTotalType.value;
+
+        // Calculate order discount
+        const orderDiscountAmount = this.calculateDiscount(
+            subtotal,
+            discountValue,
+            discountType
+        );
+
+        // Calculate final total
+        const finalTotal = subtotal - orderDiscountAmount;
+
+        // Update UI
+        this.elements.subtotalElement.textContent =
+            this.formatCurrency(subtotal);
+        this.elements.orderDiscountTotalElement.textContent =
+            this.formatCurrency(orderDiscountAmount);
+        this.elements.finalTotalElement.textContent =
+            this.formatCurrency(finalTotal);
+
+        // Update hidden form field for total discount
+        this.elements.totalDiscountInput.value = orderDiscountAmount;
+    }
+}
+
+/**
+ * PurchaseOrderView - Handles the view and modal functionality for purchase orders
+ * Provides read-only display with proper formatting and modal interactions
+ */
+class PurchaseOrderView extends PurchaseOrderModule {
+    constructor(config = {}) {
+        super(config);
+
+        // Initialize elements for the View/Modal functionality
+        this.elements = {
+            deleteForm: document.getElementById("deleteForm"),
+            viewPoModalContent: document.getElementById("viewPoModalContent"),
+            poModalEdit: document.getElementById("poModalEdit"),
+            poModalFullView: document.getElementById("poModalFullView"),
+            poModalPrint: document.getElementById("poModalPrint"),
+        };
+
+        // Format all currency values on page load
+        this.formatAllCurrencyValues();
+
+        // Initialize modal functionality if we're on a page with modals
+        if (this.elements.poModalPrint) {
+            this.initModalListeners();
+        }
+    }
+
+    /**
+     * Format all currency display elements
+     */
+    formatAllCurrencyValues() {
+        // Find all elements with currency class and format them
+        const currencyElements = document.querySelectorAll(".currency-value");
+        currencyElements.forEach((element) => {
+            const value = parseFloat(element.dataset.value) || 0;
+            element.textContent = this.formatCurrency(value);
+        });
+    }
+
+    /**
+     * Initialize event listeners for modal functionality
+     */
+    initModalListeners() {
+        // Attach print button listener
+        if (this.elements.poModalPrint) {
+            this.elements.poModalPrint.addEventListener("click", () =>
+                this.printModalContent()
+            );
+        }
+    }
+
+    /**
+     * Set the action URL for the delete form
+     * @param {string} url - The URL to submit the delete form to
+     */
+    setDeleteFormAction(url) {
+        if (this.elements.deleteForm) {
+            this.elements.deleteForm.action = url;
+        }
+    }
+
+    /**
+     * Load purchase order details into the modal via AJAX
+     * @param {number|string} id - The ID of the purchase order to load
+     */
+    loadPoDetails(id) {
+        if (!this.elements.viewPoModalContent) {
+            console.error("Modal content element not found");
+            return;
+        }
+
+        // Set the edit button URL dynamically
+        if (this.elements.poModalEdit) {
+            this.elements.poModalEdit.href = `/admin/po/edit/${id}`;
+        }
+
+        // Set the full view button URL dynamically
+        if (this.elements.poModalFullView) {
+            this.elements.poModalFullView.href = `/admin/po/view/${id}`;
+        }
+
+        // Show loading spinner
+        this.elements.viewPoModalContent.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3 text-muted">Loading purchase order details...</p>
+            </div>
+        `;
+
+        // Fetch PO details via AJAX
+        fetch(`/admin/po/modal-view/${id}`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.text();
+            })
+            .then((html) => {
+                this.elements.viewPoModalContent.innerHTML = html;
+                // Format any currency values in the loaded content
+                this.formatAllCurrencyValues();
+            })
+            .catch((error) => {
+                this.elements.viewPoModalContent.innerHTML = `
+                    <div class="alert alert-danger m-3">
+                        <i class="ti ti-alert-circle me-2"></i> Error loading PO details: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    /**
+     * Print the content of the modal
+     */
+    printModalContent() {
+        const printContent = this.elements.viewPoModalContent.innerHTML;
+        const originalContent = document.body.innerHTML;
+
+        document.body.innerHTML = `
+            <div class="container print-container">
+                <div class="card">
+                    <div class="card-body">
+                        ${printContent}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        window.print();
+        document.body.innerHTML = originalContent;
+
+        // Reattach event listeners after restoring original content
+        setTimeout(() => {
+            // This is a hack to reload the page after printing
+            window.location.reload();
+        }, 100);
+    }
+}
+
+/**
  * Initialize appropriate module based on the current page
  */
 document.addEventListener("DOMContentLoaded", function () {
@@ -529,17 +846,35 @@ document.addEventListener("DOMContentLoaded", function () {
             // Initialize create page functionality
             window.poApp = new PurchaseOrderCreate();
             console.log("Purchase Order Create App initialized");
-        } else if (pathname.includes("/admin/po/edit")) {
+        } else if (
+            pathname.includes("/admin/po/edit") ||
+            (pathname.includes("/admin/po") && pathname.match(/\/\d+\/edit$/))
+        ) {
             // Initialize edit page functionality
             window.poApp = new PurchaseOrderEdit();
             console.log("Purchase Order Edit App initialized");
         } else if (
-            pathname.includes("/admin/po") &&
-            (pathname.match(/\/\d+$/) || pathname.includes("/show"))
+            pathname.includes("/admin/po/modal") ||
+            (pathname.includes("/admin/po") && pathname.match(/\/\d+$/)) ||
+            pathname.includes("/admin/po/show")
         ) {
-            // For view page, we don't need interactive functionality
-            console.log("Purchase Order View page detected");
+            // Initialize view functionality for modal or show pages
+            window.poApp = new PurchaseOrderView();
+            console.log("Purchase Order View App initialized");
         }
+
+        // Expose global utility functions that might be called from inline handlers
+        window.setDeleteFormAction = function (url) {
+            if (window.poApp && window.poApp.setDeleteFormAction) {
+                window.poApp.setDeleteFormAction(url);
+            }
+        };
+
+        window.loadPoDetails = function (id) {
+            if (window.poApp && window.poApp.loadPoDetails) {
+                window.poApp.loadPoDetails(id);
+            }
+        };
     } catch (error) {
         console.error("Error initializing Purchase Order App:", error);
     }

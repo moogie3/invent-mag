@@ -122,14 +122,11 @@ Route::prefix('admin')->group(function () {
         Route::post('/admin/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
         Route::get('/admin/notifications/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
         Route::get('/notifications/view/{id}', [NotificationController::class, 'view'])->name('admin.notifications.view');
-        // Add this inside your admin->middleware('auth')->group() section
         Route::get('/pos/receipt/{id}', [POSController::class, 'receipt'])->name('admin.pos.receipt');
-        // Then add this route to your web.php (in the admin group)
-Route::get('/po/{id}/modal-view', [PurchaseController::class, 'modalView'])->name('admin.po.modal-view');
+        Route::get('/po/modal-view/{id}', [PurchaseController::class, 'modalView'])->name('admin.po.modal-view');
     });
 });
 
-// Redirect root URL to admin login
 Route::get('/', function () {
     return redirect('/admin/login');
 });

@@ -1,6 +1,3 @@
-<!-- First, add the modal structure to your pomodals.blade.php file -->
-<!-- In admin.layouts.modals.pomodals.blade.php -->
-
 <!-- Delete Modal (keep existing modal) -->
 <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -41,18 +38,18 @@
                     <p class="mt-3 text-muted">Loading purchase order details...</p>
                 </div>
             </div>
-            <div class="modal-footer bg-light">
+            <div class="modal-footer">
                 <div class="text-muted me-auto">
-                    <small><i class="ti ti-info-circle me-1"></i> View complete purchase order details without leaving
-                        the page</small>
+                    <small><i class="ti ti-info-circle me-1"></i> View complete purchase order details and recheck the
+                        invoice</small>
                 </div>
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    <i class="ti ti-x me-1"></i> Close
-                </button>
-                <button type="button" class="btn btn-primary" id="poModalPrint">
+                <a href="#" class="btn btn-info" id="poModalFullView">
+                    <i class="ti ti-zoom-scan me-1"></i> Full View
+                </a>
+                <button type="button" class="btn btn-secondary" id="poModalPrint">
                     <i class="ti ti-printer me-1"></i> Print
                 </button>
-                <a href="#" class="btn btn-success" id="poModalEdit">
+                <a href="#" class="btn btn-primary" id="poModalEdit">
                     <i class="ti ti-edit me-1"></i> Edit
                 </a>
             </div>
@@ -71,21 +68,26 @@
     function loadPoDetails(id) {
         const viewPoModalContent = document.getElementById('viewPoModalContent');
         const poModalEdit = document.getElementById('poModalEdit');
+        const poModalFullView = document.getElementById('poModalFullView');
 
-        // Set the edit button URL
-        poModalEdit.href = `/admin/po/${id}/edit`;
+        // Set the edit button URL dynamically
+        poModalEdit.href = `/admin/po/edit/${id}`;
+
+        // Set the full view button URL dynamically
+        poModalFullView.href = `/admin/po/view/${id}`;
 
         // Show loading spinner
         viewPoModalContent.innerHTML = `
-            <div class="text-center">
-                <div class="spinner-border" role="status">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
+                <p class="mt-3 text-muted">Loading purchase order details...</p>
             </div>
         `;
 
         // Fetch PO details via AJAX
-        fetch(`/admin/po/${id}/modal-view`)
+        fetch(`/admin/po/modal-view/${id}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -97,8 +99,8 @@
             })
             .catch(error => {
                 viewPoModalContent.innerHTML = `
-                    <div class="alert alert-danger">
-                        Error loading PO details: ${error.message}
+                    <div class="alert alert-danger m-3">
+                        <i class="ti ti-alert-circle me-2"></i> Error loading PO details: ${error.message}
                     </div>
                 `;
             });

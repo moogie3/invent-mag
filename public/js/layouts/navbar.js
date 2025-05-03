@@ -37,7 +37,14 @@ document.addEventListener("DOMContentLoaded", function () {
                                 if (data.success && notificationDot) {
                                     // If this was the last notification, remove the dot
                                     fetch("/admin/notifications/count")
-                                        .then((response) => response.json())
+                                        .then((response) => {
+                                            if (!response.ok) {
+                                                throw new Error(
+                                                    `Network response was not ok: ${response.status}`
+                                                );
+                                            }
+                                            return response.json();
+                                        })
                                         .then((data) => {
                                             if (
                                                 data.count === 0 &&
@@ -45,8 +52,20 @@ document.addEventListener("DOMContentLoaded", function () {
                                             ) {
                                                 notificationDot.remove();
                                             }
+                                        })
+                                        .catch((error) => {
+                                            console.error(
+                                                "Error checking notification count:",
+                                                error
+                                            );
                                         });
                                 }
+                            })
+                            .catch((error) => {
+                                console.error(
+                                    "Error marking notification as read:",
+                                    error
+                                );
                             });
                     }
                 });
@@ -57,15 +76,24 @@ document.addEventListener("DOMContentLoaded", function () {
     // Real-time notifications - Check for new notifications every 5 minutes
     const checkForNewNotifications = () => {
         fetch("/admin/notifications/count")
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(
+                        `Network response was not ok: ${response.status}`
+                    );
+                }
+                return response.json();
+            })
             .then((data) => {
                 const notificationContainer = document.querySelector(
                     ".notification-dropdown"
                 );
                 const bellIcon =
-                    document.querySelector("i.ti.ti-bell").parentNode;
+                    document.querySelector("i.ti.ti-bell")?.parentNode;
                 let notificationDot =
                     document.getElementById("notification-dot");
+
+                if (!bellIcon) return; // Exit if bell icon not found
 
                 // If there are notifications but no dot, add the dot
                 if (data.count > 0) {
@@ -80,7 +108,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Optional: Refresh the notification list
                     if (notificationContainer) {
                         fetch("/admin/notifications/list")
-                            .then((response) => response.json())
+                            .then((response) => {
+                                if (!response.ok) {
+                                    throw new Error(
+                                        `Network response was not ok: ${response.status}`
+                                    );
+                                }
+                                return response.json();
+                            })
                             .then((data) => {
                                 // Update notification dropdown content
                                 if (
@@ -91,6 +126,12 @@ document.addEventListener("DOMContentLoaded", function () {
                                         data.notifications
                                     );
                                 }
+                            })
+                            .catch((error) => {
+                                console.error(
+                                    "Error fetching notification list:",
+                                    error
+                                );
                             });
                     }
                 } else if (data.count === 0 && notificationDot) {
@@ -108,27 +149,29 @@ document.addEventListener("DOMContentLoaded", function () {
         const container = document.querySelector(".notification-dropdown");
         if (!container) return;
 
-        // Clear existing notifications (except header and footer)
+        // Find the header, footer and divider elements
         const header = container.querySelector(".dropdown-header");
-        const footer =
-            container.querySelector(".dropdown-divider")?.nextElementSibling;
         const divider = container.querySelector(".dropdown-divider");
+        const footer = divider ? divider.nextElementSibling : null;
 
-        // Remove all children except header and footer
-        while (container.firstChild) {
-            if (
-                container.firstChild !== header &&
-                container.firstChild !== footer &&
-                container.firstChild !== divider
-            ) {
-                container.removeChild(container.firstChild);
-            } else {
-                break;
+        if (!header) return; // Exit if header not found
+
+        // First, remove all existing notification items (but keep header, divider, and footer)
+        const itemsToRemove = [];
+        container.childNodes.forEach((node) => {
+            if (node !== header && node !== divider && node !== footer) {
+                itemsToRemove.push(node);
             }
-        }
+        });
 
-        // Insert new notifications after header
+        // Remove the identified notification items
+        itemsToRemove.forEach((node) => node.remove());
+
+        // Now add the new notifications after the header
         if (notifications.length > 0) {
+            // Create a document fragment to improve performance
+            const fragment = document.createDocumentFragment();
+
             notifications.forEach((notification) => {
                 const item = document.createElement("a");
                 item.href = notification.route;
@@ -151,16 +194,30 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 `;
 
-                // Insert after header
-                header.after(item);
+                fragment.appendChild(item);
             });
+
+            // Insert all notifications after header at once
+            if (divider) {
+                container.insertBefore(fragment, divider);
+            } else {
+                container.appendChild(fragment);
+            }
         } else {
             // No notifications message
             const emptyItem = document.createElement("div");
             emptyItem.className = "dropdown-item text-muted text-center";
             emptyItem.textContent = "No new notifications";
-            header.after(emptyItem);
+
+            if (divider) {
+                container.insertBefore(emptyItem, divider);
+            } else {
+                container.appendChild(emptyItem);
+            }
         }
+
+        // Reinitialize notification click handlers
+        initNotifications();
     };
 
     // Navigation hover functionality

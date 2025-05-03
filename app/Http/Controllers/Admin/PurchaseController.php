@@ -84,12 +84,13 @@ class PurchaseController extends Controller
     }
 
     public function modalView($id)
-{
-    $pos = Purchase::with(['supplier', 'items.product'])->findOrFail($id);
+    {
+        $pos = Purchase::with(['supplier', 'items.product'])->findOrFail($id);
 
-    return view('admin.layouts.modals.modal-view', compact('pos'));
-}
+        return view('admin.layouts.modals.pomodals-view', compact('pos'));
+    }
 
+    // Updated store method for PurchaseController
     public function store(Request $request)
     {
         try {
@@ -117,12 +118,10 @@ class PurchaseController extends Controller
             $totalProductDiscounts = 0;
 
             foreach ($products as $product) {
-                // FIXED: Use the same calculation as in JS
-                $discountPerUnit = $product['discountType'] === 'percentage' ?
-                    ($product['price'] * $product['discount'] / 100) :
-                    $product['discount'];
+                // Use PurchaseHelper to calculate discounts and final amount
+                $discountPerUnit = \App\Helpers\PurchaseHelper::calculateDiscountPerUnit($product['price'], $product['discount'], $product['discountType']);
 
-                $finalAmount = ($product['price'] - $discountPerUnit) * $product['quantity'];
+                $finalAmount = \App\Helpers\PurchaseHelper::calculateTotal($product['price'], $product['quantity'], $product['discount'], $product['discountType']);
 
                 $subtotal += $finalAmount;
                 $totalProductDiscounts += $discountPerUnit * $product['quantity'];
@@ -131,9 +130,7 @@ class PurchaseController extends Controller
             // Apply order discount if present
             $orderDiscountValue = $request->discount_total ?? 0;
             $orderDiscountType = $request->discount_total_type ?? 'fixed';
-            $orderDiscountAmount = $orderDiscountType === 'percentage' ?
-                ($subtotal * $orderDiscountValue / 100) :
-                $orderDiscountValue;
+            $orderDiscountAmount = \App\Helpers\PurchaseHelper::calculateDiscount($subtotal, $orderDiscountValue, $orderDiscountType);
 
             // Final total
             $finalTotal = $subtotal - $orderDiscountAmount;
@@ -152,12 +149,7 @@ class PurchaseController extends Controller
 
             // store PO items
             foreach ($products as $product) {
-                // Use the same calculation as above
-                $discountPerUnit = $product['discountType'] === 'percentage' ?
-                    ($product['price'] * $product['discount'] / 100) :
-                    $product['discount'];
-
-                $finalAmount = ($product['price'] - $discountPerUnit) * $product['quantity'];
+                $finalAmount = \App\Helpers\PurchaseHelper::calculateTotal($product['price'], $product['quantity'], $product['discount'], $product['discountType']);
 
                 POItem::create([
                     'po_id' => $purchase->id,
@@ -168,6 +160,18 @@ class PurchaseController extends Controller
                     'discount_type' => $product['discountType'] ?? 'percentage',
                     'total' => floor($finalAmount),
                 ]);
+
+                $productModel = Product::find($product['id']);
+                if ($productModel) {
+                    // Use the correct field name based on your database
+                    if (isset($productModel->stock_quantity)) {
+                        $productModel->increment('stock_quantity', $product['quantity']);
+                    } elseif (isset($productModel->quantity)) {
+                        $productModel->increment('quantity', $product['quantity']);
+                    } elseif (isset($productModel->stock)) {
+                        $productModel->increment('stock', $product['quantity']);
+                    }
+                }
 
                 // update product price in the products table
                 Product::where('id', $product['id'])->update([
@@ -182,6 +186,8 @@ class PurchaseController extends Controller
                 ->withInput();
         }
     }
+
+    // Updated update method for PurchaseController
     public function update(Request $request, $id)
     {
         try {
@@ -206,12 +212,11 @@ class PurchaseController extends Controller
                 $discount = (float) $itemData['discount'];
                 $discountType = $itemData['discountType'] ?? 'percentage';
 
-                // FIXED: Use the same calculation method as in JS
-                $discountPerUnit = $discountType === 'percentage' ?
-                    ($price * $discount / 100) :
-                    $discount;
+                // Use PurchaseHelper to calculate discounts and final amount
+                $discountPerUnit = \App\Helpers\PurchaseHelper::calculateDiscountPerUnit($price, $discount, $discountType);
 
-                $finalAmount = ($price - $discountPerUnit) * $quantity;
+                $finalAmount = \App\Helpers\PurchaseHelper::calculateTotal($price, $quantity, $discount, $discountType);
+
                 $totalProductDiscounts += $discountPerUnit * $quantity;
 
                 $poItem->update([
@@ -230,9 +235,7 @@ class PurchaseController extends Controller
                 $subtotal += $finalAmount;
             }
 
-            $orderDiscount = $po->discount_total_type === 'percentage' ?
-                ($subtotal * $po->discount_total / 100) :
-                $po->discount_total;
+            $orderDiscount = \App\Helpers\PurchaseHelper::calculateDiscount($subtotal, $po->discount_total, $po->discount_total_type);
 
             $po->total = floor($subtotal - $orderDiscount);
             $po->save();
@@ -244,7 +247,6 @@ class PurchaseController extends Controller
                 ->withInput();
         }
     }
-
     public function destroy($id)
     {
         Purchase::find($id)->delete();

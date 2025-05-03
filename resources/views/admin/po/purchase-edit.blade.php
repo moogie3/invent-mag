@@ -30,14 +30,10 @@
                                 <div class="row align-items-center">
                                     <div class="col">
                                         @php
-                                            $statusClass = 'badge bg-blue-lt';
-                                            if ($pos->status === 'Paid') {
-                                                $statusClass = 'badge bg-green-lt';
-                                            } elseif (now()->isAfter($pos->due_date)) {
-                                                $statusClass = 'badge bg-red-lt';
-                                            } elseif (now()->diffInDays($pos->due_date) <= 7) {
-                                                $statusClass = 'badge bg-orange-lt';
-                                            }
+                                            $statusClass = \App\Helpers\PurchaseHelper::getStatusClass(
+                                                $pos->status,
+                                                $pos->due_date,
+                                            );
                                         @endphp
                                         <div class="d-flex align-items-center">
                                             <div class="status-indicator {{ $statusClass }}"
@@ -53,27 +49,7 @@
                                     </div>
                                     <div class="col-auto">
                                         <span class="badge fs-5 p-2 {{ $statusClass }}">
-                                            @php
-                                                $today = now();
-                                                $dueDate = $pos->due_date;
-                                                $diffDays = $today->diffInDays($dueDate, false);
-
-                                                if ($pos->status === 'Paid') {
-                                                    echo '<i class="ti ti-check me-1"></i> Paid';
-                                                } elseif ($diffDays == 0) {
-                                                    echo '<i class="ti ti-alert-triangle me-1"></i> Due Today';
-                                                } elseif ($diffDays > 0 && $diffDays <= 3) {
-                                                    echo '<i class="ti ti-calendar-event me-1"></i> Due in ' .
-                                                        $diffDays .
-                                                        ' Days';
-                                                } elseif ($diffDays > 3 && $diffDays <= 7) {
-                                                    echo '<i class="ti ti-calendar me-1"></i> Due in 1 Week';
-                                                } elseif ($diffDays < 0) {
-                                                    echo '<i class="ti ti-alert-circle me-1"></i> Overdue';
-                                                } else {
-                                                    echo '<i class="ti ti-clock me-1"></i> Pending';
-                                                }
-                                            @endphp
+                                            {!! \App\Helpers\PurchaseHelper::getStatusText($pos->status, $pos->due_date) !!}
                                         </span>
                                     </div>
                                 </div>
@@ -121,8 +97,7 @@
                                                         <div><strong>Payment Type:</strong></div>
                                                         <div>
                                                             <select class="form-select form-select-sm" name="payment_type"
-                                                                id="payment_type"
-                                                                {{ $pos->status == 'Paid' ? 'disabled' : '' }}>
+                                                                id="payment_type">
                                                                 <option value="Cash"
                                                                     {{ $pos->payment_type == 'Cash' ? 'selected' : '' }}>
                                                                     Cash
@@ -191,6 +166,14 @@
                                                 </thead>
                                                 <tbody>
                                                     @foreach ($pos->items as $index => $item)
+                                                        @php
+                                                            $finalAmount = \App\Helpers\PurchaseHelper::calculateTotal(
+                                                                $item->price,
+                                                                $item->quantity,
+                                                                $item->discount,
+                                                                $item->discount_type,
+                                                            );
+                                                        @endphp
                                                         <tr>
                                                             <td class="text-center">{{ $index + 1 }}</td>
                                                             <td>
@@ -242,7 +225,7 @@
                                                             <td>
                                                                 <input type="text"
                                                                     name="items[{{ $item->id }}][amount]"
-                                                                    value="{{ intval($item->quantity * $item->price - $item->discount) }}"
+                                                                    value="{{ intval($finalAmount) }}"
                                                                     class="form-control text-end amount-input"
                                                                     data-item-id="{{ $item->id }}" readonly />
                                                             </td>
@@ -261,9 +244,19 @@
                                                     <h5 class="card-title mb-3"><i
                                                             class="ti ti-info-circle me-2 text-primary"></i>Order Summary
                                                     </h5>
+
+                                                    @php
+                                                        // Use the helper to calculate summary info
+                                                        $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary(
+                                                            $pos->items,
+                                                            $pos->discount_total,
+                                                            $pos->discount_total_type,
+                                                        );
+                                                    @endphp
+
                                                     <div class="mb-2">
                                                         <i class="ti ti-package me-1"></i> Total Items:
-                                                        <strong>{{ $pos->items->count() }}</strong>
+                                                        <strong>{{ $summary['itemCount'] }}</strong>
                                                     </div>
                                                     <div class="mb-2">
                                                         <i class="ti ti-receipt me-1"></i> Payment Type:
@@ -284,7 +277,9 @@
                                                     <h5 class="mb-3 card-title">Amount Summary</h5>
                                                     <div class="d-flex justify-content-between mb-2">
                                                         <div>Subtotal:</div>
-                                                        <div id="subtotal">0</div>
+                                                        <div id="subtotal">
+                                                            {{ \App\Helpers\CurrencyHelper::format($summary['subtotal']) }}
+                                                        </div>
                                                     </div>
                                                     <div class="d-flex justify-content-between mb-2">
                                                         <div>
@@ -308,16 +303,20 @@
                                                                         Rp</option>
                                                                 </select>
                                                             </div>
-                                                            <div class="text-danger" id="orderDiscountTotal">0</div>
+                                                            <div class="text-danger" id="orderDiscountTotal">
+                                                                {{ \App\Helpers\CurrencyHelper::format($summary['orderDiscount']) }}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <hr>
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <div class="fs-5"><strong>Grand Total:</strong></div>
-                                                        <div class="fs-3 fw-bold text-primary" id="finalTotal">0</div>
+                                                        <div class="fs-3 fw-bold text-primary" id="finalTotal">
+                                                            {{ \App\Helpers\CurrencyHelper::format($summary['finalTotal']) }}
+                                                        </div>
                                                     </div>
                                                     <input type="hidden" id="totalDiscountInput" name="total_discount"
-                                                        value="0">
+                                                        value="{{ $summary['orderDiscount'] }}">
                                                 </div>
                                             </div>
                                         </div>

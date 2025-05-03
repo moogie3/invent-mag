@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Tax;
+use App\Helpers\SalesHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -64,12 +65,12 @@ class POSController extends Controller
             // Calculate order discount
             $orderDiscount = $request->discount_total ?? 0;
             $orderDiscountType = $request->discount_total_type ?? 'fixed';
-            $orderDiscountAmount = $orderDiscountType === 'percentage' ? ($totalBeforeDiscounts * $orderDiscount) / 100 : $orderDiscount;
+            $orderDiscountAmount = SalesHelper::calculateDiscount($totalBeforeDiscounts, $orderDiscount, $orderDiscountType);
 
             // Calculate tax using the user-provided tax rate from the UI
             $taxable = $subTotal - $orderDiscountAmount;
             $taxRate = $request->tax_rate ?? 0; // Use the tax_rate from request
-            $taxAmount = $request->tax_amount ?? $taxable * ($taxRate / 100);
+            $taxAmount = $request->tax_amount ?? SalesHelper::calculateTaxAmount($taxable, $taxRate);
             $grandTotal = $request->grand_total ?? $taxable + $taxAmount;
 
             // Get the authenticated user's ID and timezone
@@ -155,15 +156,14 @@ class POSController extends Controller
         // Calculate and attach item totals to each item
         foreach ($sale->items as $item) {
             // Calculate item discount amount
-            $discountAmount = \App\Helpers\SalesHelper::calculateItemDiscountAmount(
+            $discountAmount = SalesHelper::calculateDiscountPerUnit(
                 $item->customer_price,
-                $item->quantity,
                 $item->discount,
                 $item->discount_type
-            );
+            ) * $item->quantity;
 
             // Calculate item total and attach it to the item object
-            $item->calculated_total = \App\Helpers\SalesHelper::calculateItemTotal(
+            $item->calculated_total = SalesHelper::calculateTotal(
                 $item->customer_price,
                 $item->quantity,
                 $item->discount,
@@ -179,7 +179,7 @@ class POSController extends Controller
         // Order Discount
         $orderDiscount = $sale->order_discount ?? 0;
         $orderDiscountType = $sale->order_discount_type ?? 'fixed';
-        $orderDiscountAmount = \App\Helpers\SalesHelper::calculateOrderDiscount(
+        $orderDiscountAmount = SalesHelper::calculateDiscount(
             $totalBeforeDiscount,
             $orderDiscount,
             $orderDiscountType
@@ -188,7 +188,7 @@ class POSController extends Controller
         // Tax
         $taxableAmount = $subTotal - $orderDiscountAmount;
         $taxRate = $sale->tax_rate ?? 0;
-        $taxAmount = \App\Helpers\SalesHelper::calculateTaxAmount($taxableAmount, $taxRate);
+        $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate);
 
         // Grand Total
         $grandTotal = $taxableAmount + $taxAmount;

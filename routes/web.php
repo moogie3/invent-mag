@@ -78,9 +78,10 @@ Route::prefix('admin')->group(function () {
 
         Route::get('po/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('admin.po.product.details');
         Route::get('sales/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('admin.sales.product.details');
-        Route::get('/admin/po/view/{id}', [PurchaseController::class, 'view'])->name('admin.po.view');
-        Route::get('/admin/sales/view/{id}', [SalesController::class, 'view'])->name('admin.sales.view');
+        Route::get('/po/view/{id}', [PurchaseController::class, 'view'])->name('admin.po.view');
+        Route::get('/sales/view/{id}', [SalesController::class, 'view'])->name('admin.sales.view');
         Route::get('/sales/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
+
         // Settings
         Route::prefix('setting')->group(function () {
             Route::get('/currency', [CurrencyController::class, 'edit'])->name('admin.setting.currency.edit');
@@ -89,7 +90,6 @@ Route::prefix('admin')->group(function () {
             Route::put('/profile/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update');
             Route::delete('/profile/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
             Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.setting.notifications');
-            Route::get('/notifications/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
             Route::get('/tax', [TaxController::class, 'index'])->name('admin.setting.tax');
             Route::post('/tax/update', [TaxController::class, 'update'])->name('admin.setting.tax.update');
 
@@ -110,20 +110,23 @@ Route::prefix('admin')->group(function () {
                 Route::put('/update/{id}', [UnitController::class, 'update'])->name('admin.setting.unit.update');
                 Route::delete('/destroy/{id}', [UnitController::class, 'destroy'])->name('admin.setting.unit.destroy');
             });
-
-            Route::get('/admin/setting/tax/get', function () {
-                $tax = \App\Models\Tax::where('is_active', 1)->first();
-                return response()->json(['tax_rate' => $tax ? $tax->rate : 0]);
-            })->name('admin.setting.tax.get');
         });
 
+        // Fix: Notification Routes - Make sure they are properly defined with correct path
         Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
-        Route::get('/admin/notifications/list', [NotificationController::class, 'getNotifications'])->name('admin.notifications.list');
-        Route::post('/admin/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
-        Route::get('/admin/notifications/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
+        Route::get('/notifications/list', [NotificationController::class, 'getNotifications'])->name('admin.notifications.list');
+        Route::post('/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
+        Route::get('/notifications/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
         Route::get('/notifications/view/{id}', [NotificationController::class, 'view'])->name('admin.notifications.view');
+
         Route::get('/pos/receipt/{id}', [POSController::class, 'receipt'])->name('admin.pos.receipt');
         Route::get('/po/modal-view/{id}', [PurchaseController::class, 'modalView'])->name('admin.po.modal-view');
+        Route::get('sales/modal-view/{id}', [SalesController::class,'modalView'])->name('admin.sales.modal-view');
+        // Define tax API route
+        Route::get('/setting/tax/get', function () {
+            $tax = \App\Models\Tax::where('is_active', 1)->first();
+            return response()->json(['tax_rate' => $tax ? $tax->rate : 0]);
+        })->name('admin.setting.tax.get');
     });
 });
 

@@ -12,10 +12,12 @@
                         <h2 class="page-title no-print">View Sales Invoice</h2>
                     </div>
                     <div class="col text-end">
-                        <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">
-                            Export Invoice
+                        <button type="button" class="btn btn-secondary me-2" onclick="javascript:window.print();">
+                            <i class="ti ti-printer me-1"></i> Print Invoice
                         </button>
-                        <a href="{{ route('admin.sales.edit', $sales->id) }}" class="btn btn-primary">Edit Invoice</a>
+                        <a href="{{ route('admin.sales.edit', $sales->id) }}" class="btn btn-primary">
+                            <i class="ti ti-edit me-1"></i> Edit Invoice
+                        </a>
                     </div>
                 </div>
             </div>
@@ -25,182 +27,233 @@
             <div class="container-xl">
                 <div class="row row-deck row-cards">
                     <div class="col-md-12">
-                        <div class="card card-primary">
-                            <div class="card-body">
-                                <h1 class="text-center mt-3 no-print">Invoice Details {{ $sales->invoice }}
-                                    {{ $sales->customer->name }}</h1>
-                                <div class="page-wrapper">
-                                    <div class="page-body">
-                                        <div class="container-xl">
-                                            <div class="card card-lg">
-                                                <div class="card-body">
-                                                    <div class="col-auto">
-                                                        <h3>SALE / {{ $sales->invoice }} /
-                                                            {{ $sales->customer->address }}
-                                                        </h3>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <p class="h1">{{ $sales->customer->name }}</p>
-                                                            <address>
-                                                                {{ $sales->customer->address }}<br>
-                                                                {{ $sales->customer->phone_number }}<br>
-                                                                Order Date : {{ $sales->order_date->format('d-m-Y') }}<br>
-                                                            </address>
-                                                        </div>
-                                                        <div class="col-6 text-end">
-                                                            <p class="h3">Payment Status</p>
-                                                            <h3>
-                                                                @if ($sales->status !== 'Paid')
-                                                                    <span class="badge bg-blue-lt">Payment Pending</span>
-                                                                @else
-                                                                    <span class="badge bg-green-lt">
-                                                                        Paid on
-                                                                        {{ $sales->payment_date->format('d F Y') }}<br>
-                                                                        {{ $sales->payment_date->format('H:i:s') }}
-                                                                    </span>
-                                                                @endif
-                                                            </h3>
-                                                            <address>
-                                                                Due Date : {{ $sales->due_date->format('d-m-Y') }}<br>
-                                                            </address>
-                                                        </div>
-                                                    </div>
-
-                                                    <table class="table table-transparent table-responsive">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="text-center" style="width: 1%">No</th>
-                                                                <th>Product</th>
-                                                                <th class="text-center" style="width: 1%">QTY</th>
-                                                                <th class="text-end" style="width: 15%">Unit Price</th>
-                                                                <th class="text-end" style="width: 15%">Discount Type</th>
-                                                                <th class="text-end" style="width: 15%">Discount</th>
-                                                                <th class="text-end" style="width: 15%">Total</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @php
-                                                                $totalBeforeDiscount = 0;
-                                                                $totalItemDiscount = 0;
-                                                            @endphp
-
-                                                            @foreach ($sales->items as $index => $item)
-                                                                @php
-                                                                    $discountAmount = \App\Helpers\SalesHelper::calculateItemDiscountAmount(
-                                                                        $item->customer_price,
-                                                                        $item->quantity,
-                                                                        $item->discount,
-                                                                        $item->discount_type,
-                                                                    );
-
-                                                                    $itemTotal = \App\Helpers\SalesHelper::calculateItemTotal(
-                                                                        $item->customer_price,
-                                                                        $item->quantity,
-                                                                        $item->discount,
-                                                                        $item->discount_type,
-                                                                    );
-
-                                                                    $totalBeforeDiscount +=
-                                                                        $item->customer_price * $item->quantity;
-                                                                    $totalItemDiscount += $discountAmount;
-                                                                @endphp
-                                                                <tr>
-                                                                    <td class="text-center">{{ $index + 1 }}</td>
-                                                                    <td>
-                                                                        <p class="strong mb-1">{{ $item->product->name }}
-                                                                        </p>
-                                                                    </td>
-                                                                    <td class="text-center">{{ $item->quantity }}</td>
-                                                                    <td class="text-end">
-                                                                        {{ \App\Helpers\CurrencyHelper::format($item->customer_price) }}
-                                                                    </td>
-                                                                    <td class="text-end">
-                                                                        {{ $item->discount_type === 'percentage' ? 'Percentage' : 'Fixed' }}
-                                                                    </td>
-                                                                    <td class="text-end">
-                                                                        @if ($item->discount_type === 'percentage')
-                                                                            {{ $item->discount }}%
-                                                                        @else
-                                                                            {{ \App\Helpers\CurrencyHelper::format($item->discount) }}
-                                                                        @endif
-                                                                    </td>
-                                                                    <td class="text-end">
-                                                                        {{ \App\Helpers\CurrencyHelper::format($itemTotal) }}
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-
-                                                        @php
-                                                            $subTotal = $totalBeforeDiscount - $totalItemDiscount;
-
-                                                            // Order discount
-                                                            $orderDiscount = $sales->order_discount ?? 0;
-                                                            $orderDiscountType = $sales->order_discount_type ?? 'fixed';
-                                                            $orderDiscountAmount = \App\Helpers\SalesHelper::calculateOrderDiscount(
-                                                                $totalBeforeDiscount,
-                                                                $orderDiscount,
-                                                                $orderDiscountType,
-                                                            );
-
-                                                            // Tax calculation
-                                                            $taxableAmount = $subTotal - $orderDiscountAmount;
-                                                            $taxRate = $sales->tax_rate ?? 0;
-                                                            $taxAmount = \App\Helpers\SalesHelper::calculateTaxAmount(
-                                                                $taxableAmount,
-                                                                $taxRate,
-                                                            );
-
-                                                            // Grand total
-                                                            $grandTotal = $taxableAmount + $taxAmount;
-                                                        @endphp
-
-                                                        <tfoot>
-                                                            <tr>
-                                                                <td colspan="6" class="text-end"><strong>Sub
-                                                                        Total:</strong></td>
-                                                                <td class="text-end">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($subTotal) }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td colspan="6" class="text-end"><strong>Order
-                                                                        Discount:</strong></td>
-                                                                <td class="text-end">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($orderDiscountAmount) }}
-                                                                </td>
-                                                            </tr>
-                                                            @if ($taxRate > 0)
-                                                                <tr>
-                                                                    <td colspan="6" class="text-end"><strong>Tax
-                                                                            ({{ $taxRate }}%):</strong></td>
-                                                                    <td class="text-end">
-                                                                        {{ \App\Helpers\CurrencyHelper::format($taxAmount) }}
-                                                                    </td>
-                                                                </tr>
-                                                            @endif
-                                                            <tr>
-                                                                <td colspan="6" class="text-end"><strong>Grand
-                                                                        Total:</strong></td>
-                                                                <td class="text-end">
-                                                                    {{ \App\Helpers\CurrencyHelper::format($grandTotal) }}
-                                                                </td>
-                                                            </tr>
-                                                        </tfoot>
-                                                    </table>
-
-                                                    <input type="hidden" id="totalDiscountInput" name="total_discount"
-                                                        value="{{ $orderDiscountAmount }}">
-                                                    <input type="hidden" id="taxInput" name="tax_amount"
-                                                        value="{{ $taxAmount }}">
-                                                </div> {{-- End Card Body --}}
-                                            </div> {{-- End Card --}}
+                        <div class="card shadow-sm">
+                            <!-- Sales Header with colored status bar -->
+                            <div class="card-header">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        @php
+                                            $statusClass = \App\Helpers\SalesHelper::getStatusClass(
+                                                $sales->status,
+                                                $sales->due_date,
+                                            );
+                                        @endphp
+                                    </div>
+                                    <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+                                        <div class="d-flex align-items-center">
+                                            <div class="status-indicator {{ $statusClass }}"
+                                                style="width: 6px; height: 36px; border-radius: 3px; margin-right: 15px;">
+                                            </div>
+                                            <div>
+                                                <h2 class="mb-0">Invoice #{{ $sales->invoice }}</h2>
+                                                <div class="text-muted fs-5">
+                                                    {{ $sales->customer->name }} - {{ $sales->customer->address ?? 'N/A' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge fs-6 {{ $statusClass }}">
+                                                {!! \App\Helpers\SalesHelper::getStatusText($sales->status, $sales->due_date) !!}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
-                            </div> {{-- End Card Body --}}
-                        </div> {{-- End Card --}}
+                            </div>
+
+                            <div class="card-body p-4">
+                                <!-- Sales Info Section -->
+                                <div class="row g-4 mb-4">
+                                    <div class="col-md-6">
+                                        <div class="card bg-light border-0 h-100">
+                                            <div class="card-body p-3">
+                                                <h4 class="card-title mb-3"><i
+                                                        class="ti ti-user me-2 text-info"></i>Customer
+                                                </h4>
+                                                <h5 class="mb-2">{{ $sales->customer->name }}</h5>
+                                                <div class="text-muted mb-1"><i class="ti ti-map-pin me-1"></i>
+                                                    {{ $sales->customer->address }}
+                                                </div>
+                                                <div class="text-muted mb-1"><i class="ti ti-phone me-1"></i>
+                                                    {{ $sales->customer->phone_number }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card bg-light border-0 h-100">
+                                            <div class="card-body p-3">
+                                                <h4 class="card-title mb-3"><i
+                                                        class="ti ti-calendar-event me-2 text-info"></i>Order
+                                                    Information</h4>
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <div><strong>Order Date:</strong></div>
+                                                    <div>{{ $sales->order_date->format('d F Y') }}</div>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <div><strong>Due Date:</strong></div>
+                                                    <div>{{ $sales->due_date->format('d F Y') }}</div>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <div><strong>Payment Type:</strong></div>
+                                                    <div>{{ $sales->payment_type ?? 'N/A' }}</div>
+                                                </div>
+                                                @if ($sales->status === 'Paid')
+                                                    <div class="d-flex justify-content-between">
+                                                        <div><strong>Payment Date:</strong></div>
+                                                        <div>
+                                                            {{ $sales->payment_date->setTimezone(auth()->user()->timezone ?? 'UTC')->format('d F Y H:i') }}
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Items Table -->
+                                <div class="card border mb-4">
+                                    <div class="card-header bg-light py-2">
+                                        <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-info"></i>Order Items
+                                        </h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table card-table table-vcenter table-hover">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th class="text-center" style="width: 60px">No</th>
+                                                    <th>Product</th>
+                                                    <th class="text-center" style="width: 100px">QTY</th>
+                                                    <th class="text-end" style="width: 140px">Price</th>
+                                                    <th class="text-end" style="width: 140px">Discount</th>
+                                                    <th class="text-end" style="width: 140px">Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @php
+                                                    // Use the SalesHelper to calculate summary info
+                                                    // Fix the parameter names to match SalesHelper::calculateInvoiceSummary method
+                                                    $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
+                                                        $sales->items,
+                                                        $sales->order_discount ?? 0,
+                                                        $sales->order_discount_type ?? 'percentage',
+                                                        $sales->tax_rate ?? 0,
+                                                    );
+                                                @endphp
+
+                                                @foreach ($sales->items as $index => $item)
+                                                    @php
+                                                        // Fix: Use customer_price instead of price for the calculation
+                                                        $finalAmount = \App\Helpers\SalesHelper::calculateTotal(
+                                                            $item->customer_price,
+                                                            $item->quantity,
+                                                            $item->discount,
+                                                            $item->discount_type,
+                                                        );
+                                                    @endphp
+
+                                                    <tr>
+                                                        <td class="text-center">{{ $index + 1 }}</td>
+                                                        <td>
+                                                            <div class="strong">{{ $item->product->name }}</div>
+                                                            @if (isset($item->product->sku) && $item->product->sku)
+                                                                <small class="text-muted">SKU:
+                                                                    {{ $item->product->sku }}</small>
+                                                            @endif
+                                                        </td>
+                                                        <td class="text-center">{{ $item->quantity }}</td>
+                                                        <td class="text-end">
+                                                            {{ \App\Helpers\CurrencyHelper::format($item->customer_price) }}
+                                                        </td>
+                                                        <td class="text-end">
+                                                            @if ($item->discount > 0)
+                                                                <span class="text-danger">
+                                                                    {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::format($item->discount) }}
+                                                                </span>
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
+                                                        <td class="text-end">
+                                                            {{ \App\Helpers\CurrencyHelper::format($finalAmount) }}
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Summary -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card border-0 bg-light">
+                                            <div class="card-body p-3">
+                                                <h5 class="card-title mb-3"><i
+                                                        class="ti ti-info-circle me-2 text-info"></i>Order Summary
+                                                </h5>
+                                                <div class="mb-2">
+                                                    <i class="ti ti-package me-1"></i> Total Items:
+                                                    <strong>{{ $summary['itemCount'] }}</strong>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <i class="ti ti-receipt me-1"></i> Payment Type:
+                                                    <strong>{{ $sales->payment_type ?? 'N/A' }}</strong>
+                                                </div>
+                                                @if (property_exists($sales, 'notes') && $sales->notes)
+                                                    <div class="mt-3">
+                                                        <h6>Notes:</h6>
+                                                        <p class="text-muted">{{ $sales->notes }}</p>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card border">
+                                            <div class="card-body p-3">
+                                                <h5 class="mb-3 card-title">Amount Summary</h5>
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <div>Subtotal:</div>
+                                                    <div>{{ \App\Helpers\CurrencyHelper::format($summary['subtotal']) }}
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <div>
+                                                        Order Discount
+                                                        <small class="text-muted">
+                                                            ({{ ($sales->order_discount_type ?? 'fixed') === 'percentage' ? ($sales->order_discount ?? 0) . '%' : 'Fixed' }})
+                                                        </small>:
+                                                    </div>
+                                                    <div class="text-danger">-
+                                                        {{ \App\Helpers\CurrencyHelper::format($summary['orderDiscount']) }}
+                                                    </div>
+                                                </div>
+                                                @if (($sales->tax_rate ?? 0) > 0)
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <div>
+                                                            Tax
+                                                            <small class="text-muted">
+                                                                ({{ $sales->tax_rate }}%)
+                                                            </small>:
+                                                        </div>
+                                                        <div>
+                                                            {{ \App\Helpers\CurrencyHelper::format($summary['taxAmount']) }}
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                <hr>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div class="fs-5"><strong>Grand Total:</strong></div>
+                                                    <div class="fs-3 fw-bold text-primary">
+                                                        {{ \App\Helpers\CurrencyHelper::format($summary['finalTotal']) }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

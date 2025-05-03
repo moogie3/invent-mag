@@ -33,12 +33,12 @@
                         <div class="card card-primary">
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex justify-content-between">
-                                    <div class="col-md-6">
+                                    <div class="col-md-8">
                                         <div class="card">
                                             <div class="card-body">
-                                                <div class="card-title">Sales information</div>
+                                                <div class="card-title">Store information</div>
                                                 <div class="sales-info row">
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-4">
                                                         <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
@@ -53,14 +53,22 @@
                                                             </span>
                                                             Store Address : <strong>{{ $address }}</strong>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-md-6">
                                                         <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-file-invoice fs-2"></i>
                                                             </span>
                                                             Total Invoice : <strong>{{ $totalinvoice }}</strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-currency fs-2"></i>
+                                                            </span>
+                                                            This Month Sales:
+                                                            <strong>{{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}</strong>
                                                         </div>
                                                         <div class="mb-2">
                                                             <span
@@ -69,6 +77,14 @@
                                                             </span>
                                                             Unpaid Receivable:
                                                             <strong>{{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}</strong>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-receipt fs-2"></i>
+                                                            </span>
+                                                            Pending Orders:
+                                                            <strong>0</strong>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -132,7 +148,9 @@
                                     <table class="table card-table table-vcenter">
                                         <thead style="font-size: large">
                                             <tr>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-no">No</th>
+                                                <th class="no-print"><button class="table-sort fs-4 py-3 no-print"
+                                                        data-sort="sort-no">No
+                                                </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-invoice">Invoice
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-customer">Customer
@@ -142,19 +160,22 @@
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-duedate">Due Date
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-tax">Tax</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-amount">Amount</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-amount">Amount
+                                                </th>
                                                 <th class="no-print"><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-payment">Payment
                                                         Type</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-status">Status</th>
-                                                <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">Action
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-status">Status
+                                                </th>
+                                                <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">
+                                                    Action
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody id="invoiceTableBody" class="table-tbody">
                                             @foreach ($sales as $index => $sale)
                                                 <tr>
-                                                    <td class="sort-no">{{ $sales->firstItem() + $index }}</td>
+                                                    <td class="sort-no no-print">{{ $sales->firstItem() + $index }}</td>
                                                     <td class="sort-invoice">{{ $sale->invoice }}</td>
                                                     <td class="sort-customer">{{ $sale->customer->name }}</td>
                                                     <td class="sort-orderdate">{{ $sale->order_date->format('d F Y') }}
@@ -178,30 +199,9 @@
                                                     </td>
                                                     <td class="sort-payment no-print">{{ $sale->payment_type }}</td>
                                                     <td class="sort-status">
-                                                        @php
-                                                            $today = now();
-                                                            $dueDate = $sale->due_date;
-                                                            $paymentDate = $sale->payment_date;
-                                                            $diffDays = $today->diffInDays($dueDate, false);
-
-                                                            if ($sale->status === 'Paid') {
-                                                                if ($paymentDate && $today->isSameDay($paymentDate)) {
-                                                                    echo '<span class="badge bg-success me-1"></span>Paid Today';
-                                                                } else {
-                                                                    echo '<span class="badge bg-success me-1"></span>Paid';
-                                                                }
-                                                            } elseif ($diffDays == 0) {
-                                                                echo '<span class="badge bg-danger me-1"></span>Due Today';
-                                                            } elseif ($diffDays > 0 && $diffDays <= 3) {
-                                                                echo '<span class="badge bg-danger me-1"></span>Due in 3 Days';
-                                                            } elseif ($diffDays > 3 && $diffDays <= 7) {
-                                                                echo '<span class="badge bg-warning me-1"></span>Due in 1 Week';
-                                                            } elseif ($diffDays < 0) {
-                                                                echo '<span class="badge bg-secondary me-1"></span>Overdue';
-                                                            } else {
-                                                                echo '<span class="badge bg-info me-1"></span>Pending';
-                                                            }
-                                                        @endphp
+                                                        <span
+                                                            class="{{ \App\Helpers\SalesHelper::getStatusClass($sale->status, $sale->due_date) }}">
+                                                            {!! \App\Helpers\SalesHelper::getStatusText($sale->status, $sale->due_date) !!}</span>
                                                     </td>
                                                     <td class="no-print" style="text-align:center">
                                                         <div class="dropdown">
@@ -210,10 +210,19 @@
                                                                 Actions
                                                             </button>
                                                             <div class="dropdown-menu">
-                                                                <a href="{{ route('admin.sales.view', $sale->id) }}"
+                                                                <a href="javascript:void(0)"
+                                                                    onclick="loadSalesDetails('{{ $sale->id }}')"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#viewSalesModal"
                                                                     class="dropdown-item">
                                                                     <i class="ti ti-zoom-scan me-2"></i> View
                                                                 </a>
+
+                                                                <a href="{{ route('admin.sales.edit', $sale->id) }}"
+                                                                    class="dropdown-item">
+                                                                    <i class="ti ti-edit me-2"></i> Edit
+                                                                </a>
+
                                                                 <button type="button" class="dropdown-item text-danger"
                                                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
                                                                     onclick="setDeleteFormAction('{{ route('admin.sales.destroy', $sale->id) }}')">
@@ -226,33 +235,6 @@
                                             @endforeach
                                         </tbody>
                                     </table>
-                                </div>
-                            </div>
-
-                            {{-- MODAL --}}
-                            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
-                                aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title text-danger" id="deleteModalLabel">Confirm Delete</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body text-center">
-                                            <i class="ti ti-alert-circle icon text-danger icon-lg mb-10"></i>
-                                            <p class="mt-3">Are you sure you want to delete this sales?</p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Cancel</button>
-                                            <form id="deleteForm" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                            </form>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
@@ -273,4 +255,5 @@
             </div>
         </div>
     </div>
+    @include('admin.layouts.modals.salesmodals')
 @endsection

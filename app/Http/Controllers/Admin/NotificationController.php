@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\View;
 class NotificationController extends Controller
 {
     public function index()
-{
-    $notifications = $this->getDueNotifications();
-    $hasNotifications = $notifications->isNotEmpty();
+    {
+        $notifications = $this->getDueNotifications();
+        $hasNotifications = $notifications->isNotEmpty();
 
-    return view('admin.notifications', compact('notifications', 'hasNotifications'));
-}
+        return view('admin.notifications', compact('notifications', 'hasNotifications'));
+    }
 
     public function count()
     {
@@ -38,7 +38,19 @@ class NotificationController extends Controller
     public function getNotifications()
     {
         $notifications = $this->getDueNotifications();
-        return response()->json(['notifications' => $notifications->values()->all()]);
+
+        // Convert to simple array structure for the dropdown
+        $simpleNotifications = $notifications->map(function($item) {
+            return [
+                'id' => $item['id'],
+                'title' => $item['title'],
+                'description' => $item['description'],
+                'urgency' => $item['urgency'],
+                'route' => $item['route']
+            ];
+        });
+
+        return response()->json(['notifications' => $simpleNotifications->values()->all()]);
     }
 
     /**
@@ -77,164 +89,156 @@ class NotificationController extends Controller
     }
 
     /**
+     * Get status information based on status and due date
+     *
+     * @param string $status Current status
+     * @param Carbon $dueDate Due date
+     * @param Carbon|null $paymentDate Payment date
+     * @return array Status information with badge and text
+     */
+    private function getStatusInfo($status, $dueDate, $paymentDate = null)
+    {
+        $today = Carbon::today();
+        $diffDays = $today->diffInDays($dueDate, false); // negative means past due
+
+        if ($status === 'Paid') {
+            if ($paymentDate && $today->isSameDay($paymentDate)) {
+                return [
+                    'badge' => 'text-green',
+                    'text' => 'Paid Today',
+                    'icon' => 'ti ti-check',
+                ];
+            } else {
+                return [
+                    'badge' => 'text-green',
+                    'text' => 'Paid',
+                    'icon' => 'ti ti-check',
+                ];
+            }
+        } elseif ($diffDays == 0) {
+            return [
+                'badge' => 'text-orange',
+                'text' => 'Due Today',
+                'icon' => 'ti ti-alert-triangle',
+            ];
+        } elseif ($diffDays > 0 && $diffDays <= 3) {
+            return [
+                'badge' => 'text-orange',
+                'text' => "Due in {$diffDays} Days",
+                'icon' => 'ti ti-calendar-event',
+            ];
+        } elseif ($diffDays > 3 && $diffDays <= 7) {
+            return [
+                'badge' => 'text-yellow',
+                'text' => 'Due in 1 Week',
+                'icon' => 'ti ti-calendar',
+            ];
+        } elseif ($diffDays < 0) {
+            return [
+                'badge' => 'text-red',
+                'text' => 'Overdue',
+                'icon' => 'ti ti-alert-circle',
+            ];
+        } else {
+            return [
+                'badge' => 'text-blue',
+                'text' => 'Pending',
+                'icon' => 'ti ti-clock',
+            ];
+        }
+    }
+
+    /**
      * Get notifications for use in views
      */
-    /**
- * Get notifications for use in views
- */
-public function getDueNotifications()
-{
-    $today = Carbon::today();
+    public function getDueNotifications()
+    {
+        $today = Carbon::today();
 
-    $poNotifications = Purchase::where('due_date', '<=', Carbon::now()->addDays(7))
-        ->orderBy('due_date', 'asc')
-        ->get()
-        ->map(function ($po) use ($today) {
-            $daysRemaining = $today->diffInDays($po->due_date, false);
-            $diffDays = $today->diffInDays($po->due_date, false);
+        $poNotifications = Purchase::where('due_date', '<=', Carbon::now()->addDays(7))
+            ->orderBy('due_date', 'asc')
+            ->get()
+            ->map(function ($po) use ($today) {
+                $daysRemaining = $today->diffInDays($po->due_date, false);
 
-            // Calculate status badge and text
-            $statusBadge = 'text-blue';
-            $statusText = 'Pending';
+                // Get status info using the shared function
+                $statusInfo = $this->getStatusInfo($po->status, $po->due_date, $po->payment_date);
 
-            if ($po->status === 'Paid') {
-                if ($po->payment_date && $today->isSameDay($po->payment_date)) {
-                    $statusBadge = 'text-green';
-                    $statusText = 'Paid Today';
-                } else {
-                    $statusBadge = 'text-green';
-                    $statusText = 'Paid';
-                }
-            } elseif ($diffDays == 0) {
-                $statusBadge = 'text-red';
-                $statusText = 'Due Today';
-            } elseif ($diffDays > 0 && $diffDays <= 3) {
-                $statusBadge = 'text-red';
-                $statusText = 'Due in 3 Days';
-            } elseif ($diffDays > 3 && $diffDays <= 7) {
-                $statusBadge = 'text-yellow';
-                $statusText = 'Due in 1 Week';
-            } elseif ($diffDays < 0) {
-                $statusBadge = 'text-black';
-                $statusText = 'Overdue';
-            }
+                // Determine if notification should be shown
+                $showNotification = $po->status !== 'Paid' || ($po->status === 'Paid' && $po->payment_date && $today->isSameDay($po->payment_date));
 
-            // Determine if notification should be shown
-            $showNotification =
-                $po->status !== 'Paid' ||
-                ($po->status === 'Paid' && $po->payment_date && $today->isSameDay($po->payment_date));
+                return [
+                    'id' => 'po-' . $po->id,
+                    'title' => "Due Purchase: PO #{$po->id}",
+                    'description' => "Due on {$po->due_date->format('M d, Y')}",
+                    'due_date' => $po->due_date,
+                    'payment_date' => $po->payment_date,
+                    'status' => $po->status,
+                    'urgency' => $daysRemaining <= 2 ? 'high' : ($daysRemaining <= 5 ? 'medium' : 'low'),
+                    'days_remaining' => $daysRemaining,
+                    'route' => route('admin.po.edit', ['id' => $po->id]),
+                    'type' => 'purchase',
+                    'label' => 'PO Invoice #' . $po->id,
+                    'status_badge' => $statusInfo['badge'],
+                    'status_text' => $statusInfo['text'],
+                    'status_icon' => $statusInfo['icon'],
+                    'show_notification' => $showNotification,
+                ];
+            });
 
-            return [
-                'id' => 'po-' . $po->id,
-                'title' => "Due Purchase: PO #{$po->id}",
-                'description' => "Due on {$po->due_date->format('M d, Y')}",
-                'due_date' => $po->due_date,
-                'payment_date' => $po->payment_date,
-                'status' => $po->status,
-                'urgency' => $daysRemaining <= 2 ? 'high' : ($daysRemaining <= 5 ? 'medium' : 'low'),
-                'days_remaining' => $daysRemaining,
-                'route' => route('admin.po.edit', ['id' => $po->id]),
-                'type' => 'purchase',
-                'label' => 'PO Invoice #' . $po->id,
-                'status_badge' => $statusBadge,
-                'status_text' => $statusText,
-                'show_notification' => $showNotification
-            ];
-        });
+        $salesNotifications = Sales::where('due_date', '<=', Carbon::now()->addDays(7))
+            ->orderBy('due_date', 'asc')
+            ->get()
+            ->map(function ($sale) use ($today) {
+                $daysRemaining = $today->diffInDays($sale->due_date, false);
 
-    $salesNotifications = Sales::where('due_date', '<=', Carbon::now()->addDays(7))
-        ->orderBy('due_date', 'asc')
-        ->get()
-        ->map(function ($sale) use ($today) {
-            $daysRemaining = $today->diffInDays($sale->due_date, false);
-            $diffDays = $today->diffInDays($sale->due_date, false);
+                // Get status info using the shared function
+                $statusInfo = $this->getStatusInfo($sale->status, $sale->due_date, $sale->payment_date);
 
-            // Calculate status badge and text
-            $statusBadge = 'text-blue';
-            $statusText = 'Pending';
+                // Determine if notification should be shown
+                $showNotification = $sale->status !== 'Paid' || ($sale->status === 'Paid' && $sale->payment_date && $today->isSameDay($sale->payment_date));
 
-            if ($sale->status === 'Paid') {
-                if ($sale->payment_date && $today->isSameDay($sale->payment_date)) {
-                    $statusBadge = 'text-green';
-                    $statusText = 'Paid Today';
-                } else {
-                    $statusBadge = 'text-green';
-                    $statusText = 'Paid';
-                }
-            } elseif ($diffDays == 0) {
-                $statusBadge = 'text-red';
-                $statusText = 'Due Today';
-            } elseif ($diffDays > 0 && $diffDays <= 3) {
-                $statusBadge = 'text-red';
-                $statusText = 'Due in 3 Days';
-            } elseif ($diffDays > 3 && $diffDays <= 7) {
-                $statusBadge = 'text-yellow';
-                $statusText = 'Due in 1 Week';
-            } elseif ($diffDays < 0) {
-                $statusBadge = 'text-black';
-                $statusText = 'Overdue';
-            }
+                return [
+                    'id' => 'sale-' . $sale->id,
+                    'title' => "Due Invoice: #{$sale->invoice}",
+                    'description' => "Due on {$sale->due_date->format('M d, Y')}",
+                    'due_date' => $sale->due_date,
+                    'payment_date' => $sale->payment_date,
+                    'status' => $sale->status,
+                    'urgency' => $daysRemaining <= 2 ? 'high' : ($daysRemaining <= 5 ? 'medium' : 'low'),
+                    'days_remaining' => $daysRemaining,
+                    'route' => route('admin.sales.edit', ['id' => $sale->id]),
+                    'type' => 'sales',
+                    'label' => 'Invoice #' . $sale->invoice,
+                    'status_badge' => $statusInfo['badge'],
+                    'status_text' => $statusInfo['text'],
+                    'status_icon' => $statusInfo['icon'],
+                    'show_notification' => $showNotification,
+                ];
+            });
 
-            // Determine if notification should be shown
-            $showNotification =
-                $sale->status !== 'Paid' ||
-                ($sale->status === 'Paid' && $sale->payment_date && $today->isSameDay($sale->payment_date));
+        // Combine and filter out notifications that shouldn't be shown
+        $allNotifications = $poNotifications
+            ->concat($salesNotifications)
+            ->filter(function ($item) {
+                return $item['show_notification'];
+            })
+            ->sortBy([['days_remaining', 'asc']]);
 
-            return [
-                'id' => 'sale-' . $sale->id,
-                'title' => "Due Invoice: #{$sale->invoice}",
-                'description' => "Due on {$sale->due_date->format('M d, Y')}",
-                'due_date' => $sale->due_date,
-                'payment_date' => $sale->payment_date,
-                'status' => $sale->status,
-                'urgency' => $daysRemaining <= 2 ? 'high' : ($daysRemaining <= 5 ? 'medium' : 'low'),
-                'days_remaining' => $daysRemaining,
-                'route' => route('admin.sales.edit', ['id' => $sale->id]),
-                'type' => 'sales',
-                'label' => 'Invoice #' . $sale->invoice,
-                'status_badge' => $statusBadge,
-                'status_text' => $statusText,
-                'show_notification' => $showNotification
-            ];
-        });
-
-    // Combine and filter out notifications that shouldn't be shown
-    $allNotifications = $poNotifications->concat($salesNotifications)
-        ->filter(function($item) {
-            return $item['show_notification'];
-        })
-        ->sortBy([['days_remaining', 'asc']]);
-
-    return $allNotifications;
-}
+        return $allNotifications;
+    }
 
     /**
      * Share notifications with all views
+     * This method should only be called once per request
      */
     public function shareNotificationsWithAllViews()
     {
-        $notifications = $this->getDueNotifications()->map(function ($item) {
-            if (str_starts_with($item['id'], 'po-')) {
-                $id = (int) str_replace('po-', '', $item['id']);
-                $model = Purchase::find($id);
-            } elseif (str_starts_with($item['id'], 'sale-')) {
-                $id = (int) str_replace('sale-', '', $item['id']);
-                $model = Sales::find($id);
-            } else {
-                return (object) $item;
-            }
-
-            return (object) array_merge($item, [
-                'due_date' => $model->due_date,
-                'payment_date' => $model->payment_date,
-                'status' => $model->status,
-                'type' => str_starts_with($item['id'], 'po-') ? 'purchase' : 'sale',
-                'label' => $item['label'] ?? ($model instanceof Purchase ? 'PO #' . $model->id : 'Invoice #' . $model->invoice),
-            ]);
-        });
-
+        // Get notifications without any transformations to avoid duplications
+        $notifications = $this->getDueNotifications();
         $notificationCount = $notifications->count();
 
+        // Share directly with view without additional transformations
         View::share('notificationCount', $notificationCount);
         View::share('notifications', $notifications);
 

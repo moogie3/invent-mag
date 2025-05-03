@@ -34,13 +34,28 @@
                                         @if ($hasNotifications)
                                             @foreach ($notifications as $item)
                                                 <a href="{{ $item['route'] }}"
-                                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                                    <span>
-                                                        {{ ucfirst($item['type']) }} - {{ $item['label'] }} - Due on
-                                                        {{ \Carbon\Carbon::parse($item['due_date'])->format('M d, Y') }}
-                                                    </span>
-                                                    <span
-                                                        class="badge badge-outline {{ $item['status_badge'] }}">{{ $item['status_text'] }}</span>
+                                                    class="list-group-item list-group-item-action">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="status-indicator {{ $item['status_badge'] }}"
+                                                                style="width: 4px; height: 24px; border-radius: 2px; margin-right: 12px;">
+                                                            </div>
+                                                            <div>
+                                                                <span class="d-block fw-bold">
+                                                                    {{ ucfirst($item['type']) }} - {{ $item['label'] }}
+                                                                </span>
+                                                                <small class="text-muted">
+                                                                    Due on
+                                                                    {{ \Carbon\Carbon::parse($item['due_date'])->format('d M Y') }}
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                        <span
+                                                            class="badge {{ str_replace('text-', 'bg-', $item['status_badge']) }}-lt">
+                                                            <i class="{{ $item['status_icon'] }} me-1"></i>
+                                                            {{ $item['status_text'] }}
+                                                        </span>
+                                                    </div>
                                                 </a>
                                             @endforeach
                                         @else

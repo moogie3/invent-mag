@@ -212,30 +212,10 @@
                                                     </td>
                                                     <td class="sort-payment no-print">{{ $po->payment_type }}</td>
                                                     <td class="sort-status">
-                                                        @php
-                                                            $today = now();
-                                                            $dueDate = $po->due_date;
-                                                            $paymentDate = $po->payment_date;
-                                                            $diffDays = $today->diffInDays($dueDate, false);
-
-                                                            if ($po->status === 'Paid') {
-                                                                if ($paymentDate && $today->isSameDay($paymentDate)) {
-                                                                    echo '<span class="badge bg-success me-1"></span>Paid Today';
-                                                                } else {
-                                                                    echo '<span class="badge bg-success me-1"></span>Paid';
-                                                                }
-                                                            } elseif ($diffDays == 0) {
-                                                                echo '<span class="badge bg-danger me-1"></span>Due Today';
-                                                            } elseif ($diffDays > 0 && $diffDays <= 3) {
-                                                                echo '<span class="badge bg-danger me-1"></span>Due in 3 Days';
-                                                            } elseif ($diffDays > 3 && $diffDays <= 7) {
-                                                                echo '<span class="badge bg-warning me-1"></span>Due in 1 Week';
-                                                            } elseif ($diffDays < 0) {
-                                                                echo '<span class="badge bg-secondary me-1"></span>Overdue';
-                                                            } else {
-                                                                echo '<span class="badge bg-info me-1"></span>Pending';
-                                                            }
-                                                        @endphp
+                                                        <span
+                                                            class="{{ \App\Helpers\PurchaseHelper::getStatusClass($po->status, $po->due_date) }}">
+                                                            {!! \App\Helpers\PurchaseHelper::getStatusText($po->status, $po->due_date) !!}
+                                                        </span>
                                                     </td>
                                                     <td class="no-print" style="text-align:center">
                                                         <div class="dropdown">

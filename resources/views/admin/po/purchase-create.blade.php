@@ -26,7 +26,7 @@
                         <div class="card-body">
                             <div class="row g-3 mb-4">
                                 <div class="col-md-2">
-                                    <label class="form-label fw-bold">Invoice #</label>
+                                    <label class="form-label fw-bold">Invoice</label>
                                     <input type="text" class="form-control" name="invoice" id="invoice"
                                         placeholder="Invoice Number" />
                                 </div>

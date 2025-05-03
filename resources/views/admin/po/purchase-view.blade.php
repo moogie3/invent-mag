@@ -27,57 +27,36 @@
             <div class="container-xl">
                 <div class="row row-deck row-cards">
                     <div class="col-md-12">
+                        {{-- resources/views/admin/po/modal-view.blade.php --}}
                         <div class="card shadow-sm">
                             <!-- PO Header with colored status bar -->
                             <div class="card-header">
                                 <div class="row align-items-center">
                                     <div class="col">
                                         @php
-                                            $statusClass = 'badge bg-blue-lt';
-                                            if ($pos->status === 'Paid') {
-                                                $statusClass = 'badge bg-green-lt';
-                                            } elseif (now()->isAfter($pos->due_date)) {
-                                                $statusClass = 'badge bg-red-lt';
-                                            } elseif (now()->diffInDays($pos->due_date) <= 7) {
-                                                $statusClass = 'badge bg-orange-lt';
-                                            }
+                                            $statusClass = \App\Helpers\PurchaseHelper::getStatusClass(
+                                                $pos->status,
+                                                $pos->due_date,
+                                            );
                                         @endphp
+                                    </div>
+                                    <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
                                         <div class="d-flex align-items-center">
                                             <div class="status-indicator {{ $statusClass }}"
                                                 style="width: 6px; height: 36px; border-radius: 3px; margin-right: 15px;">
                                             </div>
                                             <div>
                                                 <h2 class="mb-0">PO #{{ $pos->invoice }}</h2>
-                                                <div class="text-muted fs-5">{{ $pos->supplier->code }} -
-                                                    {{ $pos->supplier->location ?? 'N/A' }}
+                                                <div class="text-muted fs-5">
+                                                    {{ $pos->supplier->code }} - {{ $pos->supplier->location ?? 'N/A' }}
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <span class="badge fs-5 p-2 {{ $statusClass }}">
-                                            @php
-                                                $today = now();
-                                                $dueDate = $pos->due_date;
-                                                $diffDays = $today->diffInDays($dueDate, false);
-
-                                                if ($pos->status === 'Paid') {
-                                                    echo '<i class="ti ti-check me-1"></i> Paid';
-                                                } elseif ($diffDays == 0) {
-                                                    echo '<i class="ti ti-alert-triangle me-1"></i> Due Today';
-                                                } elseif ($diffDays > 0 && $diffDays <= 3) {
-                                                    echo '<i class="ti ti-calendar-event me-1"></i> Due in ' .
-                                                        $diffDays .
-                                                        ' Days';
-                                                } elseif ($diffDays > 3 && $diffDays <= 7) {
-                                                    echo '<i class="ti ti-calendar me-1"></i> Due in 1 Week';
-                                                } elseif ($diffDays < 0) {
-                                                    echo '<i class="ti ti-alert-circle me-1"></i> Overdue';
-                                                } else {
-                                                    echo '<i class="ti ti-clock me-1"></i> Pending';
-                                                }
-                                            @endphp
-                                        </span>
+                                        <div class="text-end">
+                                            <span class="badge fs-6 {{ $statusClass }}">
+                                                {!! \App\Helpers\PurchaseHelper::getStatusText($pos->status, $pos->due_date) !!}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -89,7 +68,8 @@
                                         <div class="card bg-light border-0 h-100">
                                             <div class="card-body p-3">
                                                 <h4 class="card-title mb-3"><i
-                                                        class="ti ti-building-store me-2 text-primary"></i>Supplier</h4>
+                                                        class="ti ti-building-store me-2 text-primary"></i>Supplier
+                                                </h4>
                                                 <h5 class="mb-2">{{ $pos->supplier->name }}</h5>
                                                 <div class="text-muted mb-1"><i class="ti ti-map-pin me-1"></i>
                                                     {{ $pos->supplier->address }}
@@ -151,15 +131,23 @@
                                             </thead>
                                             <tbody>
                                                 @php
-                                                    $subtotal = 0;
-                                                    $totalProductDiscount = 0;
-                                                    $itemCount = 0;
+                                                    // Use the helper to calculate all invoice summary figures at once
+                                                    $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary(
+                                                        $pos->items,
+                                                        $pos->discount_total,
+                                                        $pos->discount_total_type,
+                                                    );
+
+                                                    $subtotal = $summary['subtotal'];
+                                                    $itemCount = $summary['itemCount'];
+                                                    $totalProductDiscount = $summary['totalProductDiscount'];
+                                                    $orderDiscount = $summary['orderDiscount'];
+                                                    $finalTotal = $summary['finalTotal'];
                                                 @endphp
 
                                                 @foreach ($pos->items as $index => $item)
                                                     @php
-                                                        $itemCount++;
-                                                        // Use the helper class to calculate the final amount
+                                                        // Calculate the final amount for this item
                                                         $finalAmount = \App\Helpers\PurchaseHelper::calculateTotal(
                                                             $item->price,
                                                             $item->quantity,
@@ -168,14 +156,11 @@
                                                         );
 
                                                         // Calculate the discount per unit for display
-                                                        $discountPerUnit =
-                                                            $item->discount_type === 'percentage'
-                                                                ? ($item->price * $item->discount) / 100
-                                                                : $item->discount;
-
-                                                        // Add to subtotal
-                                                        $subtotal += $finalAmount;
-                                                        $totalProductDiscount += $discountPerUnit * $item->quantity;
+                                                        $discountPerUnit = \App\Helpers\PurchaseHelper::calculateDiscountPerUnit(
+                                                            $item->price,
+                                                            $item->discount,
+                                                            $item->discount_type,
+                                                        );
                                                     @endphp
 
                                                     <tr>
@@ -205,18 +190,6 @@
                                                         </td>
                                                     </tr>
                                                 @endforeach
-
-                                                @php
-                                                    // Use the helper class to calculate order-level discount
-                                                    $orderDiscount = \App\Helpers\PurchaseHelper::calculateDiscount(
-                                                        $subtotal,
-                                                        $pos->discount_total,
-                                                        $pos->discount_total_type,
-                                                    );
-
-                                                    // Final total after order-level discount
-                                                    $finalTotal = $subtotal - $orderDiscount;
-                                                @endphp
                                             </tbody>
                                         </table>
                                     </div>
@@ -263,7 +236,8 @@
                                                         </small>:
                                                     </div>
                                                     <div class="text-danger">-
-                                                        {{ \App\Helpers\CurrencyHelper::format($orderDiscount) }}</div>
+                                                        {{ \App\Helpers\CurrencyHelper::format($orderDiscount) }}
+                                                    </div>
                                                 </div>
                                                 <hr>
                                                 <div class="d-flex justify-content-between align-items-center">

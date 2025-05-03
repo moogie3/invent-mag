@@ -131,18 +131,6 @@
     border-radius: 50%;
 }
 
-/* Notification dot styling */
-#notification-dot {
-    position: absolute;
-    background-color: #dc3545;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    bottom: 5px;
-    right: 20px;
-    width: 10px;
-    height: 10px;
-}
-
 @media (max-width: 768px) {
     .navbar-brand {
         position: absolute;
@@ -228,4 +216,126 @@
 
 .notification-item .badge.bg-info {
     background-color: #0dcaf0 !important;
+}
+
+/* Toast Notification Styles */
+.toast-container {
+    z-index: 1080;
+    max-width: 350px;
+}
+
+.toast {
+    opacity: 1;
+    background-color: #fff;
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 0.375rem;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    display: block;
+    opacity: 1;
+    animation: toast-in 0.3s ease forwards;
+}
+
+.toast.hide {
+    animation: toast-out 0.3s ease forwards;
+}
+
+.toast-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.toast-body {
+    padding: 0.75rem;
+}
+
+.status-indicator {
+    flex-shrink: 0;
+}
+
+/* Background colors */
+.bg-red {
+    background-color: #d63939;
+}
+
+.bg-red-lt {
+    background-color: rgba(214, 57, 57, 0.1);
+    color: #d63939;
+}
+
+.bg-orange {
+    background-color: #f76707;
+}
+
+.bg-orange-lt {
+    background-color: rgba(247, 103, 7, 0.1);
+    color: #f76707;
+}
+
+.bg-yellow {
+    background-color: #f59f00;
+}
+
+.bg-yellow-lt {
+    background-color: rgba(245, 159, 0, 0.1);
+    color: #f59f00;
+}
+
+.bg-green {
+    background-color: #2fb344;
+}
+
+.bg-green-lt {
+    background-color: rgba(47, 179, 68, 0.1);
+    color: #2fb344;
+}
+
+.bg-blue {
+    background-color: #206bc4;
+}
+
+.bg-blue-lt {
+    background-color: rgba(32, 107, 196, 0.1);
+    color: #206bc4;
+}
+
+.bg-black {
+    background-color: #232e3c;
+}
+
+.bg-black-lt {
+    background-color: rgba(35, 46, 60, 0.1);
+    color: #232e3c;
+}
+
+/* Toast animations */
+@keyframes toast-in {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes toast-out {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
 }

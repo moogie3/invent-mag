@@ -72,6 +72,13 @@ class SalesController extends Controller
         return view('admin.sales.sales-view', compact('sales', 'customer', 'items', 'tax'));
     }
 
+    public function modalView($id)
+    {
+        $sales = Sales::with(['customer', 'items.product'])->findOrFail($id);
+
+        return view('admin.layouts.modals.salesmodals-view', compact('sales'));
+    }
+
     public function store(Request $request)
     {
         try {
@@ -94,7 +101,6 @@ class SalesController extends Controller
                     ->withInput();
             }
 
-            // Calculate totals
             // Calculate totals
             $subTotal = 0;
             $itemDiscountTotal = 0;
@@ -147,7 +153,8 @@ class SalesController extends Controller
                 'total' => $grandTotal,
                 'order_discount' => $orderDiscountAmount,
                 'order_discount_type' => $orderDiscountType,
-                'status' => 'Unpaid', // Default status
+                'status' => 'Unpaid',
+                'is_pos' => 0,
             ]);
 
             // Insert sale items
@@ -166,6 +173,17 @@ class SalesController extends Controller
                     'discount_type' => $product['discountType'] ?? 'fixed',
                     'total' => $itemTotal,
                 ]);
+
+                $productModel = Product::find($product['id']);
+                if ($productModel) {
+                    if (isset($productModel->stock_quantity)) {
+                        $productModel->decrement('stock_quantity', $product['quantity']);
+                    } elseif (isset($productModel->quantity)) {
+                        $productModel->decrement('quantity', $product['quantity']);
+                    } elseif (isset($productModel->stock)) {
+                        $productModel->decrement('stock', $product['quantity']);
+                    }
+                }
             }
 
             return redirect()->route('admin.sales')->with('success', 'Sale created successfully.');

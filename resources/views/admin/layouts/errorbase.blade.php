@@ -15,7 +15,7 @@
     <link href="{{ asset('tabler/dist/css/demo.min.css?1692870487') }}" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
-    <script src="{{ asset('js/layouts/page-loader.js') }}"></script>
+    <script src="{{ asset('js/admin/layouts/page-loader.js') }}"></script>
 </head>
 
 <body>

@@ -137,4 +137,4 @@
 </header>
 
 <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
-<script src="{{ asset('js/layouts/navbar.js') }}" defer></script>
+<script src="{{ asset('js/admin/layouts/navbar.js') }}" defer></script>

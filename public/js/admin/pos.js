@@ -571,3 +571,453 @@ document.addEventListener("DOMContentLoaded", function () {
     renderList();
     handlePaymentMethodChange();
 });
+
+/**
+ * Enhanced Quick Create functionality for POS interface
+ * Fixes issues with form submission and AJAX handling
+ */
+
+// Wait for document to be ready
+document.addEventListener("DOMContentLoaded", function () {
+    // Setup quick-create buttons
+    setupQuickCreateCustomerButton();
+    setupQuickCreateProductButton();
+
+    // Setup modal handlers for quick-create forms
+    setupQuickCreateCustomerForm();
+    setupQuickCreateProductForm();
+});
+
+// Add quick-create button for customers
+function setupQuickCreateCustomerButton() {
+    const customerSelectContainer =
+        document.getElementById("customer_id")?.parentElement;
+    if (!customerSelectContainer) return;
+
+    // Create button element
+    const addButton = document.createElement("button");
+    addButton.type = "button";
+    addButton.className = "btn btn-sm btn-primary ms-2";
+    addButton.innerHTML = '<i class="ti ti-plus fs-3"></i>';
+    addButton.title = "Create New Customer";
+    addButton.setAttribute("data-bs-toggle", "modal");
+    addButton.setAttribute("data-bs-target", "#quickCreateCustomerModal");
+
+    // Create wrapper div for select + button
+    const inputGroup = document.createElement("div");
+    inputGroup.className = "d-flex align-items-center";
+
+    // Get the select element
+    const selectElement = customerSelectContainer.querySelector("select");
+    if (!selectElement) return;
+
+    // Remove select from its parent
+    selectElement.parentNode.removeChild(selectElement);
+
+    // Add select and button to wrapper, then wrapper to container
+    inputGroup.appendChild(selectElement);
+    inputGroup.appendChild(addButton);
+    customerSelectContainer.appendChild(inputGroup);
+}
+
+// Add quick-create button for products
+function setupQuickCreateProductButton() {
+    const searchProductContainer =
+        document.getElementById("searchProduct")?.parentElement;
+    if (!searchProductContainer) return;
+
+    // Create button element
+    const addButton = document.createElement("button");
+    addButton.type = "button";
+    addButton.className = "btn btn-primary";
+    addButton.innerHTML = '<i class="ti ti-plus"></i>';
+    addButton.title = "Create New Product";
+    addButton.setAttribute("data-bs-toggle", "modal");
+    addButton.setAttribute("data-bs-target", "#quickCreateProductModal");
+
+    // Add button to search input group
+    searchProductContainer.appendChild(addButton);
+}
+
+// Handle quick-create customer form submission
+function setupQuickCreateCustomerForm() {
+    const customerForm = document.getElementById("quickCreateCustomerForm");
+    if (!customerForm) return;
+
+    customerForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        console.log("Customer form submitted");
+
+        const form = this;
+        const formData = new FormData(form);
+
+        // Get the correct URL from the form's action attribute
+        const url = form.getAttribute("action");
+        if (!url) {
+            console.error("Form action URL is missing");
+            showToast("Error", "Form configuration error", "error");
+            return;
+        }
+
+        // Get CSRF token
+        const csrfToken = document.querySelector(
+            'meta[name="csrf-token"]'
+        )?.content;
+        if (!csrfToken) {
+            console.error("CSRF token not found");
+            showToast("Error", "Security token missing", "error");
+            return;
+        }
+
+        // Submit form via AJAX
+        fetch(url, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": csrfToken,
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data.success) {
+                    // Add new customer to dropdown
+                    const customerSelect =
+                        document.getElementById("customer_id");
+                    if (customerSelect) {
+                        const newOption = new Option(
+                            data.customer.name,
+                            data.customer.id
+                        );
+                        newOption.setAttribute(
+                            "data-payment-terms",
+                            data.customer.payment_terms
+                        );
+                        customerSelect.add(newOption);
+                        customerSelect.value = data.customer.id;
+                    }
+
+                    // Close modal
+                    const modal = document.getElementById(
+                        "quickCreateCustomerModal"
+                    );
+                    if (modal) {
+                        const bsModal = bootstrap.Modal.getInstance(modal);
+                        if (bsModal) bsModal.hide();
+                    }
+
+                    // Reset form
+                    form.reset();
+
+                    // Show success toast
+                    showToast(
+                        "Success",
+                        "Customer created successfully",
+                        "success"
+                    );
+                } else {
+                    // Show errors
+                    showToast(
+                        "Error",
+                        data.message || "Failed to create customer",
+                        "error"
+                    );
+                    console.error("Error response:", data);
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                showToast(
+                    "Error",
+                    "An error occurred while creating the customer",
+                    "error"
+                );
+            });
+    });
+}
+
+// Handle quick-create product form submission
+function setupQuickCreateProductForm() {
+    const productForm = document.getElementById("quickCreateProductForm");
+    if (!productForm) return;
+
+    productForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        console.log("Product form submitted");
+
+        const form = this;
+        const formData = new FormData(form);
+
+        // Get the correct URL from the form's action attribute
+        const url = form.getAttribute("action");
+        if (!url) {
+            console.error("Form action URL is missing");
+            showToast("Error", "Form configuration error", "error");
+            return;
+        }
+
+        // Get CSRF token
+        const csrfToken = document.querySelector(
+            'meta[name="csrf-token"]'
+        )?.content;
+        if (!csrfToken) {
+            console.error("CSRF token not found");
+            showToast("Error", "Security token missing", "error");
+            return;
+        }
+
+        // Submit form via AJAX
+        fetch(url, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": csrfToken,
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data.success) {
+                    // Add new product to the product grid
+                    addProductToGrid(data.product);
+
+                    // Close modal
+                    const modal = document.getElementById(
+                        "quickCreateProductModal"
+                    );
+                    if (modal) {
+                        const bsModal = bootstrap.Modal.getInstance(modal);
+                        if (bsModal) bsModal.hide();
+                    }
+
+                    // Reset form
+                    form.reset();
+
+                    // Show success toast
+                    showToast(
+                        "Success",
+                        "Product created successfully",
+                        "success"
+                    );
+                } else {
+                    // Show errors
+                    showToast(
+                        "Error",
+                        data.message || "Failed to create product",
+                        "error"
+                    );
+                    console.error("Error response:", data);
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                showToast(
+                    "Error",
+                    "An error occurred while creating the product",
+                    "error"
+                );
+            });
+    });
+}
+
+function addProductToGrid(product) {
+    const productGrid = document.getElementById("productGrid");
+    if (!productGrid) return;
+
+    // Create new product column element
+    const productCol = document.createElement("div");
+    productCol.className = "col-md-4 mb-2";
+
+    const productCard = document.createElement("div");
+    productCard.className = "card product-card h-100 border hover-shadow";
+
+    // Determine image source
+    const imageSrc = product.image_url || "/images/default-product.png";
+
+    // Image container
+    const imageContainer = document.createElement("div");
+    imageContainer.className =
+        "card-img-top position-relative product-image-container";
+
+    const img = document.createElement("img");
+    img.src = imageSrc;
+    img.alt = product.name;
+    img.className = "img-fluid product-image";
+    img.setAttribute("data-product-id", product.id);
+    img.setAttribute("data-product-name", product.name);
+    img.setAttribute("data-product-price", product.selling_price);
+    img.setAttribute("data-product-unit", product.unit_name || "pcs");
+
+    imageContainer.appendChild(img);
+
+    // Card body
+    const cardBody = document.createElement("div");
+    cardBody.className = "card-body p-2 text-center";
+
+    const title = document.createElement("h5");
+    title.className = "card-title fs-4 mb-1";
+    title.textContent = product.name;
+
+    const price = document.createElement("p");
+    price.className = "card-text fs-4";
+    price.textContent = formatCurrency(product.selling_price);
+
+    cardBody.appendChild(title);
+    cardBody.appendChild(price);
+
+    productCard.appendChild(imageContainer);
+    productCard.appendChild(cardBody);
+    productCol.appendChild(productCard);
+
+    // Insert the new product at the beginning of the grid instead of appending to the end
+    if (productGrid.firstChild) {
+        productGrid.insertBefore(productCol, productGrid.firstChild);
+    } else {
+        productGrid.appendChild(productCol);
+    }
+
+    // Add a subtle highlight effect to the new product
+    setTimeout(() => {
+        productCol.style.transition = "background-color 1s ease";
+        productCol.style.backgroundColor = "#e8f4ff";
+
+        setTimeout(() => {
+            productCol.style.backgroundColor = "";
+        }, 1500);
+    }, 100);
+}
+
+// Format currency helper function
+function formatCurrency(amount) {
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(amount);
+}
+
+// Show toast notification with smooth animation and clean implementation
+function showToast(title, message, type = "info", duration = 4000) {
+    // Create a toast container if it doesn't exist
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+        toastContainer = document.createElement("div");
+        toastContainer.id = "toast-container";
+        toastContainer.className =
+            "toast-container position-fixed bottom-0 end-0 p-3";
+        toastContainer.style.zIndex = "1050";
+        document.body.appendChild(toastContainer);
+
+        // Add animation styles once
+        if (!document.getElementById("toast-styles")) {
+            const style = document.createElement("style");
+            style.id = "toast-styles";
+            style.textContent = `
+                .toast-enter {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                .toast-show {
+                    transform: translateX(0);
+                    opacity: 1;
+                    transition: transform 0.3s ease, opacity 0.3s ease;
+                }
+                .toast-exit {
+                    transform: translateX(100%);
+                    opacity: 0;
+                    transition: transform 0.3s ease, opacity 0.3s ease;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // Create toast element
+    const toast = document.createElement("div");
+    toast.className = `toast toast-enter align-items-center text-white bg-${getToastColor(
+        type
+    )} border-0`;
+    toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
+
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <strong>${title}</strong>: ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    // Force reflow to ensure animation works
+    void toast.offsetWidth;
+
+    // Show with animation
+    toast.classList.add("toast-show");
+
+    // Initialize Bootstrap toast
+    const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: duration,
+    });
+    bsToast.show();
+
+    // Handle close button clicks
+    const closeButton = toast.querySelector(".btn-close");
+    closeButton.addEventListener("click", () => {
+        hideToast(toast);
+    });
+
+    // Auto hide after duration
+    const hideTimeout = setTimeout(() => {
+        hideToast(toast);
+    }, duration);
+
+    // Store timeout on toast element for cleanup
+    toast._hideTimeout = hideTimeout;
+}
+
+// Helper function to hide toast with animation
+function hideToast(toast) {
+    // Clear any existing timeout
+    if (toast._hideTimeout) {
+        clearTimeout(toast._hideTimeout);
+    }
+
+    // Add exit animation
+    toast.classList.remove("toast-show");
+    toast.classList.add("toast-exit");
+
+    // Remove after animation completes
+    setTimeout(() => {
+        toast.remove();
+    }, 300);
+}
+
+// Helper function to get the appropriate Bootstrap color class
+function getToastColor(type) {
+    switch (type) {
+        case "success":
+            return "success";
+        case "error":
+            return "danger";
+        case "warning":
+            return "warning";
+        default:
+            return "info";
+    }
+}

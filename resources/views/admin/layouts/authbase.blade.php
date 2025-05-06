@@ -29,7 +29,6 @@
             </div>
         </div>
     </div>
-    @include('admin.layouts.modals')
     @include('admin.layouts.script')
 </body>
 

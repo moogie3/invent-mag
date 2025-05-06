@@ -71,18 +71,9 @@ class SalesHelper
             // Important: Use customer_price field instead of price for sales items
             $price = $item->customer_price ?? $item->price; // Fallback to price if customer_price is not available
 
-            $finalAmount = self::calculateTotal(
-                $price,
-                $item->quantity,
-                $item->discount,
-                $item->discount_type
-            );
+            $finalAmount = self::calculateTotal($price, $item->quantity, $item->discount, $item->discount_type);
 
-            $discountPerUnit = self::calculateDiscountPerUnit(
-                $price,
-                $item->discount,
-                $item->discount_type
-            );
+            $discountPerUnit = self::calculateDiscountPerUnit($price, $item->discount, $item->discount_type);
 
             $subtotal += $finalAmount;
             $totalProductDiscount += $discountPerUnit * $item->quantity;
@@ -102,7 +93,6 @@ class SalesHelper
             'finalTotal' => $finalTotal,
         ];
     }
-
 
     /**
      * Get CSS class for status badge based on status and due date

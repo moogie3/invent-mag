@@ -30,7 +30,6 @@ class CustomerController extends Controller
             ->withErrors([
                 'name' => 'This customer already exist'
             ])
-
             ->withInput();
         }
 
@@ -38,7 +37,41 @@ class CustomerController extends Controller
 
         Customer::create($data);
 
-        return redirect()->route('admin.customer', )->with('success', 'Customer created');
+        return redirect()->route('admin.customer')->with('success', 'Customer created');
+    }
+
+    /**
+     * Quick create a customer from POS page
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function quickCreate(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'address' => 'required',
+            'phone_number' => 'required',
+            'payment_terms' => 'required',
+        ]);
+
+        $isCustomerExists = Customer::where('name', $request->name)->exists();
+
+        if ($isCustomerExists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This customer already exists'
+            ], 422);
+        }
+
+        $data = $request->except("_token");
+        $customer = Customer::create($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Customer created successfully',
+            'customer' => $customer
+        ]);
     }
 
     public function update(Request $request, $id){

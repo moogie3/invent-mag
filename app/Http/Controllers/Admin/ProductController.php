@@ -21,7 +21,7 @@ class ProductController extends Controller
         $categories = Categories::all();
         $units = Unit::all();
         $suppliers = Supplier::all();
-        return view('admin.product.index', compact('products','categories','units','suppliers', 'entries', 'totalproduct'));
+        return view('admin.product.index', compact('products', 'categories', 'units', 'suppliers', 'entries', 'totalproduct'));
     }
 
     public function create()
@@ -39,6 +39,48 @@ class ProductController extends Controller
         $units = Unit::all();
         $suppliers = Supplier::all();
         return view('admin.product.product-edit', compact('products', 'categories', 'units', 'suppliers'));
+    }
+
+    public function quickCreate(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string',
+            'name' => 'required|string',
+            'stock_quantity' => 'required|integer',
+            'price' => 'required|numeric',
+            'selling_price' => 'required|numeric',
+            'category_id' => 'required|integer',
+            'units_id' => 'required|integer',
+            'supplier_id' => 'required|integer',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png',
+        ]);
+
+        $data = $request->except('_token', 'image');
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
+            $image->storeAs('public/image', $imageName);
+
+            // Store only the relative path
+            $data['image'] = $imageName;
+        }
+
+        $product = Product::create($data);
+
+        // Load the relationships
+        $product->load(['unit']);
+
+        // Add unit symbol to the product for the frontend
+        $product->unit_symbol = $product->unit->symbol;
+        $product->image_url = $product->image ? asset('storage/image/' . $product->image) : asset('/images/default-product.png');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product created successfully',
+            'product' => $product,
+        ]);
     }
 
     public function store(Request $request)

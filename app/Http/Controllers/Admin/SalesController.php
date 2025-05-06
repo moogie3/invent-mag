@@ -29,10 +29,14 @@ class SalesController extends Controller
         $sales = $query->paginate($entries); // apply pagination on the filtered query
         $totalinvoice = $query->count(); // count the filtered records
         $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
+        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
+
+        // Count pending orders - defining "Pending" status
+        $pendingOrders = Sales::where('status', 'Unpaid')->count();
 
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
-        return view('admin.sales.index', compact('entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt'));
+        return view('admin.sales.index', compact('entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt', 'pendingOrders','totalMonthly'));
     }
 
     public function create()
@@ -52,7 +56,8 @@ class SalesController extends Controller
         $customers = Customer::all();
         $items = SalesItem::all();
         $tax = Tax::where('is_active', 1)->first();
-        return view('admin.sales.sales-edit', compact('sales', 'customers', 'items', 'tax'));
+        $isPaid = $sales->status == 'Paid';
+        return view('admin.sales.sales-edit', compact('sales', 'customers', 'items', 'tax','isPaid'));
     }
 
     public function view($id)

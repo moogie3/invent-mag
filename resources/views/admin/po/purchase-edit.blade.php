@@ -143,13 +143,17 @@
                                     <!-- Items Table -->
                                     <div class="card border mb-4">
                                         <div class="card-header bg-light py-2">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <h4 class="card-title mb-0"><i
-                                                        class="ti ti-list me-2 text-primary"></i>Order Items</h4>
-                                                <small class="text-muted">
-                                                    Select <strong>%</strong> for percentage or <strong>Rp</strong> for
-                                                    fixed discount
-                                                </small>
+                                            <div class="row align-items-center">
+                                                <div class="col">
+                                                    <h4 class="card-title mb-0"><i
+                                                            class="ti ti-list me-2 text-primary"></i>Order Items</h4>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <small class="text-muted">
+                                                        Select <strong>%</strong> for percentage or <strong>Rp</strong> for
+                                                        fixed discount
+                                                    </small>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="table-responsive">
@@ -329,4 +333,5 @@
             </div>
         </div>
     </div>
+    @include('admin.layouts.modals.pomodals')
 @endsection

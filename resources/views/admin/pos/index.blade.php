@@ -82,7 +82,7 @@
                                                     <div class="row g-2" id="productGrid">
                                                         @foreach ($products as $product)
                                                             <div class="col-md-4 mb-2">
-                                                                <div class="card product-card h-100 border hover-shadow">
+                                                                <div class="card product-card border hover-shadow">
                                                                     <div
                                                                         class="card-img-top position-relative product-image-container">
                                                                         <img src="{{ asset($product->image) }}"

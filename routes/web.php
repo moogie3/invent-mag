@@ -81,6 +81,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/po/view/{id}', [PurchaseController::class, 'view'])->name('admin.po.view');
         Route::get('/sales/view/{id}', [SalesController::class, 'view'])->name('admin.sales.view');
         Route::get('/sales/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
+        Route::post('/customer/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate');
+        Route::post('/product/quick-create', [ProductController::class, 'quickCreate'])->name('admin.product.quickCreate');
 
         // Settings
         Route::prefix('setting')->group(function () {

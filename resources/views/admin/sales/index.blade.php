@@ -68,7 +68,7 @@
                                                                 <i class="ti ti-currency fs-2"></i>
                                                             </span>
                                                             This Month Sales:
-                                                            <strong>{{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}</strong>
+                                                            <strong>{{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</strong>
                                                         </div>
                                                         <div class="mb-2">
                                                             <span
@@ -84,7 +84,7 @@
                                                                 <i class="ti ti-receipt fs-2"></i>
                                                             </span>
                                                             Pending Orders:
-                                                            <strong>0</strong>
+                                                            <strong>{{ $pendingOrders }}</strong>
                                                         </div>
                                                     </div>
                                                 </div>

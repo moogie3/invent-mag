@@ -9,6 +9,9 @@ use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Tax;
 use App\Helpers\SalesHelper;
+use App\Models\Categories;
+use App\Models\Supplier;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,8 +22,10 @@ class POSController extends Controller
         $products = Product::with('unit')->get();
         $customers = Customer::all();
         $walkInCustomerId = $customers->where('name', 'Walk In Customer')->first()->id ?? null;
-
-        return view('admin.pos.index', compact('products', 'customers', 'walkInCustomerId'));
+        $categories = Categories::all();
+        $units = Unit::all();
+        $suppliers = Supplier::all();
+        return view('admin.pos.index', compact('products', 'customers', 'walkInCustomerId','categories','units','suppliers'));
     }
 
     public function store(Request $request)

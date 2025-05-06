@@ -37,16 +37,16 @@ class DashboardController extends Controller
         ->whereYear('created_at', now()->year)
         ->sum('total'); //counting total revenue in sales table where month is current month and year is current year
         $countRevenue = Sales::all()->where('status','Unpaid')->sum('total'); //summing total revenue in sales table where status is unpaid
-        $paidDebtMonthly = Sales::whereMonth('created_at',now()->month)
-        ->whereYear('created_at',now()->year)
+        $paidDebtMonthly = Sales::whereMonth('updated_at',now()->month)
+        ->whereYear('updated_at',now()->year)
         ->where('status', 'Paid')
         ->sum('total'); //summing total receivable in sales table where month is current month and year is current year and status is paid
 
         //LIABILITIES
         $countliability = Purchase::where('status', 'Unpaid')->sum('total'); //summing total liability (invoice purchase order) where status is unpaid
         $totalliability = Purchase::all()->sum('total'); //summing total liability
-        $liabilitypaymentMonthly = Purchase::whereMonth('created_at', now()->month)
-        ->whereYear('created_at', now()->year)
+        $liabilitypaymentMonthly = Purchase::whereMonth('updated_at', now()->month)
+        ->whereYear('updated_at', now()->year)
         ->where('status','Paid')
         ->sum('total'); //summing total liability (invoice purchase order) where status is paid in the current month and year
 

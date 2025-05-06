@@ -12,86 +12,11 @@
 @if (request()->is('admin/login', 'admin/register', 'forgot-password'))
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('tabler/dist/js/demo-theme.min.js') }}"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Toggle password visibility
-            if (document.getElementById("toggle-password")) {
-                const passwordField = document.getElementById("password");
-                const togglePassword = document.getElementById("toggle-password");
-                const toggleIcon = togglePassword.querySelector("i");
-
-                togglePassword.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    if (passwordField.type === "password") {
-                        passwordField.type = "text";
-                        toggleIcon.classList.remove("ti-eye");
-                        toggleIcon.classList.add("ti-eye-off");
-                    } else {
-                        passwordField.type = "password";
-                        toggleIcon.classList.remove("ti-eye-off");
-                        toggleIcon.classList.add("ti-eye");
-                    }
-                });
-            }
-
-            // Show content after loading
-            setTimeout(function() {
-                const loadingContainer = document.getElementById("loading-container");
-                const authContent = document.getElementById("auth-content");
-
-                if (loadingContainer) loadingContainer.style.display = "none";
-                if (authContent) authContent.style.display = "block";
-            }, 800);
-        });
-    </script>
+    <script src="{{ asset('js/admin/auth.js') }}"></script>
 @endif
 {{-- SCRIPT FOR SETTING PROFILE --}}
 @if (request()->is('admin/setting/profile'))
-    <script>
-        function togglePasswordModal() {
-            let newPassword = document.getElementById('new_password').value;
-            let confirmPasswordContainer = document.getElementById('confirmPasswordContainer');
-
-            if (newPassword) {
-                confirmPasswordContainer.style.display = 'block';
-            } else {
-                confirmPasswordContainer.style.display = 'none';
-            }
-        }
-
-        document.getElementById('profileForm').addEventListener('submit', function(event) {
-            let newPassword = document.getElementById('new_password').value;
-
-            if (newPassword) {
-                event.preventDefault();
-                openPasswordModal();
-            }
-        });
-
-        function openPasswordModal() {
-            const modal = new bootstrap.Modal(document.getElementById('passwordModal'));
-            modal.show();
-        }
-
-        function submitProfileForm() {
-            let currentPassword = document.getElementById('modal_current_password').value;
-            let newPassword = document.getElementById('new_password').value;
-            let confirmNewPassword = document.getElementById('confirm_new_password').value;
-
-            if (!currentPassword) {
-                alert('Please enter your current password.');
-                return;
-            }
-
-            if (newPassword && newPassword !== confirmNewPassword) {
-                alert('New password and re-entered password do not match.');
-                return;
-            }
-
-            document.getElementById('current_password').value = currentPassword;
-            document.getElementById('profileForm').submit();
-        }
-    </script>
+    <script src="{{ asset('js/admin/profile.js') }}"></script>
 @endif
 {{-- SCRIPT FOR ADMIN SALES CREATE & EDIT --}}
 @if (request()->is('admin/sales/create', 'admin/sales/edit/*'))
@@ -198,424 +123,44 @@
 @endif
 {{-- SCRIPT FOR WAREHOUSE --}}
 @if (request()->is('admin/warehouse'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const editWarehouseModal = document.getElementById("editWarehouseModal");
-
-            editWarehouseModal.addEventListener("show.bs.modal", function(event) {
-                // Get the button that triggered the modal
-                const button = event.relatedTarget;
-
-                // Get warehouse data from the button attributes
-                const warehouseId = button.getAttribute("data-id");
-                const warehouseName = button.getAttribute("data-name");
-                const warehouseAddress = button.getAttribute("data-address");
-                const warehouseDescription = button.getAttribute("data-description");
-
-                // Populate the form fields inside the modal
-                document.getElementById("warehouseId").value = warehouseId;
-                document.getElementById("warehouseNameEdit").value = warehouseName;
-                document.getElementById("warehouseAddressEdit").value = warehouseAddress;
-                document.getElementById("warehouseDescriptionEdit").value = warehouseDescription;
-
-                // Set the form action dynamically
-                document.getElementById("editWarehouseForm").action =
-                    "{{ route('admin.warehouse.update', '') }}/" + warehouseId;
-            });
-        });
-    </script>
+    <script src="{{ asset('js/admin/warehouse.js') }}"></script>
 @endif
 {{-- SCRIPT FOR UNIT --}}
 @if (request()->is('admin/setting/unit'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const editUnitModal = document.getElementById("editUnitModal");
-
-            editUnitModal.addEventListener("show.bs.modal", function(event) {
-                // Get the button that triggered the modal
-                const button = event.relatedTarget;
-
-                // Get unit data from the button attributes
-                const unitId = button.getAttribute("data-id");
-                const unitSymbol = button.getAttribute("data-symbol");
-                const unitName = button.getAttribute("data-name");
-
-                // Populate the form fields inside the modal
-                document.getElementById("unitId").value = unitId;
-                document.getElementById("unitSymbolEdit").value = unitSymbol;
-                document.getElementById("unitNameEdit").value = unitName;
-
-                // Set the form action dynamically
-                document.getElementById("editUnitForm").action =
-                    "{{ route('admin.setting.unit.update', '') }}/" + unitId;
-            });
-        });
-    </script>
+    <script src="{{ asset('js/admin/unit.js') }}"></script>
 @endif
 {{-- SCRIPT FOR CATEGORY --}}
 @if (request()->is('admin/setting/category'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const editCategoryModal = document.getElementById("editCategoryModal");
-
-            editCategoryModal.addEventListener("show.bs.modal", function(event) {
-                // Get the button that triggered the modal
-                const button = event.relatedTarget;
-
-                // Get category data from the button attributes
-                const categoryId = button.getAttribute("data-id");
-                const categoryName = button.getAttribute("data-name");
-                const categoryDescription = button.getAttribute("data-description");
-
-                // Populate the form fields inside the modal
-                document.getElementById("categoryId").value = categoryId;
-                document.getElementById("categoryNameEdit").value = categoryName;
-                document.getElementById("categoryDescriptionEdit").value = categoryDescription;
-
-                // Set the form action dynamically
-                document.getElementById("editCategoryForm").action =
-                    "{{ route('admin.setting.category.update', '') }}/" + categoryId;
-            });
-        });
-    </script>
+    <script src="{{ asset('js/admin/category.js') }}"></script>
 @endif
 {{-- SCRIPT FOR SUPPLIER --}}
 @if (request()->is('admin/supplier'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const editSupplierModal = document.getElementById("editSupplierModal");
-
-            editSupplierModal.addEventListener("show.bs.modal", function(event) {
-                const button = event.relatedTarget;
-
-                if (!button) return; // Prevent errors if button is null
-
-                // Get supplier data from the button attributes
-                const supplierId = button.getAttribute("data-id") || "";
-                const supplierCode = button.getAttribute("data-code") || "";
-                const supplierName = button.getAttribute("data-name") || "";
-                const supplierAddress = button.getAttribute("data-address") || "";
-                const supplierPhone = button.getAttribute("data-phone_number") || "";
-                const supplierLocation = button.getAttribute("data-location") || "";
-                const supplierPayment = button.getAttribute("data-payment_terms") || "";
-
-                // Populate the form fields inside the modal
-                document.getElementById("supplierId").value = supplierId;
-                if (document.getElementById("supplierCodeEdit")) {
-                    document.getElementById("supplierCodeEdit").value = supplierCode;
-                }
-                document.getElementById("supplierNameEdit").value = supplierName;
-                document.getElementById("supplierAddressEdit").value = supplierAddress;
-                document.getElementById("supplierPhoneEdit").value = supplierPhone;
-                document.getElementById("supplierLocationEdit").value = supplierLocation;
-                document.getElementById("supplierPaymentTermsEdit").value = supplierPayment;
-
-                // Set the form action dynamically
-                document.getElementById("editSupplierForm").action =
-                    "{{ route('admin.supplier.update', '') }}/" + supplierId;
-            });
-        });
-    </script>
+    <script src="{{ asset('js/admin/supplier.js') }}"></script>
 @endif
 {{-- SCRIPT FOR CUSTOMER --}}
 @if (request()->is('admin/customer'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const editCustomerModal = document.getElementById("editCustomerModal");
-
-            editCustomerModal.addEventListener("show.bs.modal", function(event) {
-                const button = event.relatedTarget;
-
-                if (!button) return; // Prevent errors if button is null
-
-                // Get supplier data from the button attributes
-                const customerId = button.getAttribute("data-id") || "";
-                const customerCode = button.getAttribute("data-code") || "";
-                const customerName = button.getAttribute("data-name") || "";
-                const customerAddress = button.getAttribute("data-address") || "";
-                const customerPhone = button.getAttribute("data-phone_number") || "";
-                const customerLocation = button.getAttribute("data-location") || "";
-                const customerPayment = button.getAttribute("data-payment_terms") || "";
-
-                // Populate the form fields inside the modal
-                document.getElementById("customerId").value = customerId;
-                document.getElementById("customerNameEdit").value = customerName;
-                document.getElementById("customerAddressEdit").value = customerAddress;
-                document.getElementById("customerPhoneEdit").value = customerPhone;
-                document.getElementById("customerPaymentTermsEdit").value = customerPayment;
-
-                // Set the form action dynamically
-                document.getElementById("editCustomerForm").action =
-                    "{{ route('admin.customer.update', '') }}/" + customerId;
-            });
-        });
-    </script>
+    <script src="{{ asset('js/admin/customer.js') }}"></script>
 @endif
 {{-- SCRIPT FOR SORTING TABLE --}}
 @if (request()->is(
-        'admin/ds',
+        'admin/warehouse',
         'admin/po',
         'admin/sales',
         'admin/product',
         'admin/supplier',
         'admin/customer',
-        'admin/unit',
-        'admin/category'))
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize List.js
-            const list = new List('invoiceTableContainer', {
-                sortClass: 'table-sort',
-                listClass: 'table-tbody',
-                valueNames: [
-                    'sort-no',
-                    'sort-invoice',
-                    'sort-date',
-                    'sort-total',
-                    'sort-supplier',
-                    'sort-orderdate',
-                    'sort-quantity',
-                    'sort-name',
-                    'sort-description',
-                    'sort-phonenumber',
-                    'sort-code',
-                    'sort-address',
-                    'sort-location',
-                    'sort-paymentterms',
-                    'sort-category',
-                    'sort-price',
-                    'sort-sellingprice',
-                    'sort-unit',
-                    {
-                        name: 'sort-duedate',
-                        attr: 'data-date'
-                    },
-                    {
-                        name: 'sort-amount',
-                        attr: 'data-amount'
-                    },
-                    'sort-amount',
-                    'sort-payment',
-                    'sort-status',
-                ],
-            });
-
-            // Enhanced search for formatted and raw amounts
-            const searchInput = document.getElementById('searchInput');
-            const tableRows = document.querySelectorAll('#invoiceTableBody tr');
-
-            searchInput.addEventListener('keyup', function() {
-                const searchTerm = searchInput.value.toLowerCase();
-
-                tableRows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    const rawAmount = row.querySelector('.raw-amount')?.textContent.toLowerCase() ||
-                        '';
-
-                    // Match either formatted text OR raw amount
-                    row.style.display = (text.includes(searchTerm) || rawAmount.includes(
-                        searchTerm)) ? '' : 'none';
-                });
-            });
-        });
-    </script>
+        'admin/setting/unit',
+        'admin/setting/category'))
+    <script src="{{ asset('js/admin/sorting.js') }}"></script>
 @endif
 {{-- SCRIPT FOR CURRENCY SETTING --}}
 @if (request()->is('admin/setting/currency'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const showModalButton = document.getElementById("showModalButton");
-            const confirmSubmitButton = document.getElementById("confirmSubmit");
-            const currencySettingsForm = document.getElementById("currencySettingsForm");
-
-            showModalButton.addEventListener("click", function() {
-                const confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
-                confirmModal.show();
-            });
-
-            confirmSubmitButton.addEventListener("click", function() {
-                currencySettingsForm.submit();
-            });
-        });
-    </script>
+    <script src="{{ asset('js/admin/currency.js') }}"></script>
 @endif
-{{-- SCRIPT FOR PROFILE SETTING --}}
-@if (request()->is('admin/setting/profile'))
-    <script>
-        function togglePasswordModal() {
-            let newPassword = document.getElementById('new_password').value;
-            let confirmContainer = document.getElementById('confirmPasswordContainer');
-            confirmContainer.style.display = newPassword ? 'block' : 'none';
-        }
-
-        function showPasswordModal() {
-            let newPassword = document.getElementById('new_password').value;
-            if (newPassword) {
-                let modal = new bootstrap.Modal(document.getElementById('passwordModal'));
-                modal.show();
-            } else {
-                document.getElementById('profileForm').submit();
-            }
-        }
-
-        function submitProfileForm() {
-            let currentPasswordInput = document.getElementById('modal_current_password').value;
-            document.getElementById('current_password').value = currentPasswordInput;
-            document.getElementById('profileForm').submit();
-        }
-    </script>
-@endif
-{{-- ERROR MODAL --}}
-@if ($errors->any())
-    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-centered">
-            <div class="modal-content">
-                <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="modal-body text-center py-4">
-                    <i class="ti ti-alert-triangle icon text-danger icon-lg mb-4"></i>
-                    <h3 class="mb-3">Error!</h3>
-                    <div class="text-secondary">
-                        <div class="text-danger text-start text-center">
-                            @foreach ($errors->all() as $error)
-                                {{ $error }}<br>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var errorModalElement = document.getElementById("errorModal");
-            var errorModal = new bootstrap.Modal(errorModalElement);
-            var backdropSelector = ".modal-backdrop-custom";
-
-            function removeBackdrop() {
-                document.querySelector(backdropSelector)?.remove();
-            }
-
-            function showModal(modal) {
-                document.body.style.overflow = "hidden"; // Prevent scrollbar flicker
-                modal.show();
-                document.body.insertAdjacentHTML("beforeend",
-                    '<div class="modal-backdrop fade show modal-backdrop-custom"></div>');
-            }
-
-            function hideModal(modal) {
-                modal.hide();
-                removeBackdrop();
-                document.body.style.overflow = ""; // Restore scrollbar
-            }
-
-            // Show error modal if it exists
-            if (errorModalElement) {
-                setTimeout(() => showModal(errorModal), 100);
-
-                // Auto-hide after 2 seconds
-                setTimeout(() => hideModal(errorModal), 2000);
-
-                // Add close handlers for buttons with data-bs-dismiss attribute
-                const closeButtons = errorModalElement.querySelectorAll('[data-bs-dismiss="modal"]');
-                closeButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        hideModal(errorModal);
-                    });
-                });
-
-                // Add close handler for Enter key
-                errorModalElement.addEventListener('keydown', function(event) {
-                    if (event.key === 'Enter') {
-                        hideModal(errorModal);
-                    }
-                });
-
-                errorModalElement.addEventListener("hidden.bs.modal", () => {
-                    removeBackdrop();
-                    document.body.style.overflow = "";
-                });
-            }
-        });
-    </script>
-@endif
-{{-- SUCCESS MODAL --}}
-@if (session('success'))
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-centered">
-            <div class="modal-content">
-                <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="modal-body text-center py-4">
-                    <i class="ti ti-circle-check icon text-success icon-lg mb-4"></i>
-                    <h3 class="mb-3">Success!</h3>
-                    <div class="text-secondary">
-                        <div class="text-success text-start text-center">
-                            {{ session('success') }}
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success w-100" data-bs-dismiss="modal">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var successModalElement = document.getElementById("successModal");
-            var successModal = new bootstrap.Modal(successModalElement);
-            var backdropSelector = ".modal-backdrop-custom";
-
-            function removeBackdrop() {
-                document.querySelector(backdropSelector)?.remove();
-            }
-
-            function showModal(modal) {
-                document.body.style.overflow = "hidden"; // Prevent scrollbar flicker
-                modal.show();
-                document.body.insertAdjacentHTML("beforeend",
-                    '<div class="modal-backdrop fade show modal-backdrop-custom"></div>');
-            }
-
-            function hideModal(modal) {
-                modal.hide();
-                removeBackdrop();
-                document.body.style.overflow = ""; // Restore scrollbar
-            }
-
-            // Show success modal if it exists
-            if (successModalElement) {
-                setTimeout(() => showModal(successModal), 100);
-
-                // Auto-hide after 2 seconds
-                setTimeout(() => hideModal(successModal), 2000);
-
-                // Add close handlers for buttons with data-bs-dismiss attribute
-                const closeButtons = successModalElement.querySelectorAll('[data-bs-dismiss="modal"]');
-                closeButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        hideModal(successModal);
-                    });
-                });
-
-                // Add close handler for Enter key
-                successModalElement.addEventListener('keydown', function(event) {
-                    if (event.key === 'Enter') {
-                        hideModal(successModal);
-                    }
-                });
-
-                successModalElement.addEventListener("hidden.bs.modal", () => {
-                    removeBackdrop();
-                    document.body.style.overflow = "";
-                });
-            }
-        });
-    </script>
+{{--  MODAL --}}
+@if ($errors->any() || session('success'))
+    @include('admin.layouts.modals')
+    <script src="{{ asset('js/admin/layouts/modal.js') }}"></script>
 @endif
 {{-- DELETE MODAL --}}
 <script>

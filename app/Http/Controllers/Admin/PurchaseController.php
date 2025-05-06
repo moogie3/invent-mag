@@ -51,7 +51,7 @@ class PurchaseController extends Controller
         $totalMonthly = Purchase::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
 
         //SUMMING TOTAL PAYMENT MONTHLY
-        $paymentMonthly = Purchase::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->where('status', 'Paid')->sum('total');
+        $paymentMonthly = Purchase::whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->where('status', 'Paid')->sum('total');
 
         //USER INFORMATION
         $shopname = User::whereNotNull('shopname')->value('shopname');
@@ -72,7 +72,11 @@ class PurchaseController extends Controller
         $pos = Purchase::with(['items', 'supplier'])->find($id);
         $suppliers = Supplier::all();
         $items = POItem::all();
-        return view('admin.po.purchase-edit', compact('pos', 'suppliers', 'items'));
+
+        // Instead of redirecting, we'll pass a flag to the view
+        $isPaid = $pos->status == 'Paid';
+
+        return view('admin.po.purchase-edit', compact('pos', 'suppliers', 'items', 'isPaid'));
     }
 
     public function view($id)
@@ -90,7 +94,6 @@ class PurchaseController extends Controller
         return view('admin.layouts.modals.pomodals-view', compact('pos'));
     }
 
-    // Updated store method for PurchaseController
     public function store(Request $request)
     {
         try {
@@ -187,7 +190,6 @@ class PurchaseController extends Controller
         }
     }
 
-    // Updated update method for PurchaseController
     public function update(Request $request, $id)
     {
         try {

@@ -97,13 +97,16 @@
                                                         data-sort="sort-quantity">QTY
                                                 </th>
                                                 <th class="no-print"><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-category">Category
+                                                        data-sort="sort-category">CAT
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-unit">Unit</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-price">Price</th>
                                                 <th><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-sellingprice">Selling Price</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-supplier">Supplier
+                                                </th>
+                                                <th class="text-center"><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-expiry">Expiry Date
                                                 </th>
                                                 <th style="width:100px;text-align:center" class="fs-4 py-3 no-print">Action
                                                 </th>
@@ -122,12 +125,32 @@
                                                     <td class="sort-quantity no-print">{{ $product->stock_quantity }}</td>
                                                     <td class="sort-category no-print">{{ $product->category->name }}</td>
                                                     <td class="sort-unit">{{ $product->unit->symbol }}</td>
-                                                    <td class="sort-price">
+                                                    <td class="sort-price text-center">
                                                         {{ \App\Helpers\CurrencyHelper::format($product->price) }}</td>
-                                                    <td class="sort-sellingprice">
+                                                    <td class="sort-sellingprice text-center">
                                                         {{ \App\Helpers\CurrencyHelper::format($product->selling_price) }}
                                                     </td>
-                                                    <td class="sort-supplier">{{ $product->supplier->name }}</td>
+                                                    <td class="sort-supplier text-center">{{ $product->supplier->name }}
+                                                    </td>
+                                                    <td class="sort-expiry text-center">
+                                                        @if ($product->has_expiry && $product->expiry_date)
+                                                            {{ $product->expiry_date->format('d-m-Y') }}
+                                                            @php
+                                                                [
+                                                                    $badgeClass,
+                                                                    $badgeText,
+                                                                ] = \App\Helpers\ProductHelper::getExpiryClassAndText(
+                                                                    $product->expiry_date,
+                                                                );
+                                                            @endphp
+                                                            @if ($badgeClass)
+                                                                <span
+                                                                    class="{{ $badgeClass }}">{{ $badgeText }}</span>
+                                                            @endif
+                                                        @else
+                                                            <span class="text-muted">N/A</span>
+                                                        @endif
+                                                    </td>
                                                     <td class="no-print" style="text-align:center">
                                                         <div class="dropdown">
                                                             <button class="btn dropdown-toggle align-text-top"

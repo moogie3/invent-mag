@@ -21,13 +21,17 @@ class Product extends Model
         'stock_quantity',
         'category_id',
         'supplier_id',
-        'units_id'
+        'units_id',
+        'has_expiry',
+        'expiry_date'
     ];
 
     protected $casts = [
         'price' => 'float',
         'selling_price' => 'float',
-        'stock_quantity' => 'float'
+        'stock_quantity' => 'float',
+        'has_expiry' => 'boolean',
+        'expiry_date' => 'date'
     ];
 
     public function category(): BelongsTo

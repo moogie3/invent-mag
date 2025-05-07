@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "sort-price",
             "sort-sellingprice",
             "sort-unit",
+            "sort-expiry",
             {
                 name: "sort-duedate",
                 attr: "data-date",

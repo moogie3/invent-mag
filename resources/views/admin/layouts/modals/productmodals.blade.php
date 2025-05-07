@@ -81,18 +81,40 @@
                                 <label class="form-label">Product Image</label>
                                 <input type="file" class="form-control" name="image">
                             </div>
-                        </div>
 
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mt-3">
+                                    <input class="form-check-input" type="checkbox" id="has_expiry" name="has_expiry"
+                                        value="1">
+                                    <label class="form-check-label" for="has_expiry">Product has expiration date</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 expiry-date-field" style="display: none;">
+                                <label class="form-label">Expiry Date</label>
+                                <input type="date" class="form-control" name="expiry_date">
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Create Product</button>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hasExpiryCheckbox = document.getElementById('has_expiry');
+            const expiryDateField = document.querySelector('.expiry-date-field');
+
+            hasExpiryCheckbox.addEventListener('change', function() {
+                expiryDateField.style.display = this.checked ? 'block' : 'none';
+            });
+        });
+    </script>
 
 
     {{-- MODAL --}}

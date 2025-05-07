@@ -1021,3 +1021,12 @@ function getToastColor(type) {
             return "info";
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const hasExpiryCheckbox = document.getElementById("has_expiry");
+    const expiryDateField = document.querySelector(".expiry-date-field");
+
+    hasExpiryCheckbox.addEventListener("change", function () {
+        expiryDateField.style.display = this.checked ? "block" : "none";
+    });
+});

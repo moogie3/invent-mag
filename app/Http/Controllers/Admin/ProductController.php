@@ -54,9 +54,19 @@ class ProductController extends Controller
             'supplier_id' => 'required|integer',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
+            'has_expiry' => 'sometimes|boolean',
+            'expiry_date' => 'nullable|date|required_if:has_expiry,1',
         ]);
 
         $data = $request->except('_token', 'image');
+
+        // Set has_expiry to false if not provided
+        $data['has_expiry'] = $request->boolean('has_expiry');
+
+        // Clear expiry_date if has_expiry is false
+        if (!$data['has_expiry']) {
+        $data['expiry_date'] = null;
+        }
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -96,9 +106,14 @@ class ProductController extends Controller
             'supplier_id' => 'required|integer',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
+            'has_expiry' => 'sometimes|boolean',
+            'expiry_date' => 'nullable|date|required_if:has_expiry,1',
         ]);
 
         $data = $request->except('_token', 'image');
+
+        $data['has_expiry'] = $request->boolean('has_expiry');
+
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -129,10 +144,18 @@ class ProductController extends Controller
             'supplier_id' => 'integer',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
+            'has_expiry' => 'sometimes|boolean',
+            'expiry_date' => 'nullable|date|required_if:has_expiry,1',
         ]);
 
         $data = $request->except(['_token', 'image']);
 
+        $data['has_expiry'] = $request->boolean('has_expiry');
+
+        // Clear expiry_date if has_expiry is false
+        if (!$data['has_expiry']) {
+            $data['expiry_date'] = null;
+        }
         // Check if a new image is uploaded
         if ($request->hasFile('image')) {
             // Delete old image if exists

@@ -186,6 +186,13 @@
                         </div>
 
                         <div class="col-md-6">
+                            <label class="form-label">Low Stock Threshold</label>
+                            <input type="number" class="form-control" name="low_stock_threshold"
+                                placeholder="Default (10)" min="1">
+                            <small class="form-text text-muted">Leave empty to use system default (10)</small>
+                        </div>
+
+                        <div class="col-md-6">
                             <label class="form-label">Unit</label>
                             <select class="form-select" name="units_id" required>
                                 <option value="">Select Unit</option>

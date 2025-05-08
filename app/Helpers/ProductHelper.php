@@ -1,11 +1,17 @@
 <?php
-
 namespace App\Helpers;
 
+use App\Models\Product;
 use Carbon\Carbon;
 
 class ProductHelper
 {
+    /**
+     * Get appropriate class and text for expiry date badges
+     *
+     * @param \Carbon\Carbon|string|null $expiryDate
+     * @return array [badgeClass, badgeText]
+     */
     public static function getExpiryClassAndText($expiryDate)
     {
         if (!$expiryDate) {
@@ -28,4 +34,24 @@ class ProductHelper
 
         return [null, null]; // No badge if it's far away
     }
+
+    /**
+     * Get low stock badge and text
+     *
+     * @param int $quantity
+     * @param int|null $threshold
+     * @return array [badgeClass, badgeText]
+     */
+    public static function getLowStockBadge($quantity, $threshold = null)
+    {
+        // Use provided threshold or fall back to default
+        $effectiveThreshold = $threshold ?? Product::DEFAULT_LOW_STOCK_THRESHOLD;
+
+        if ($quantity <= $effectiveThreshold) {
+            return ['badge bg-red-lt', 'Low Stock'];
+        }
+
+        return [null, null];
+    }
+
 }

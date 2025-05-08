@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('code');
             $table->string('name');
             $table->integer('stock_quantity');
+            $table->integer('low_stock_threshold')->nullable();
             $table->double('price');
             $table->double('selling_price');
             $table->integer('category_id');

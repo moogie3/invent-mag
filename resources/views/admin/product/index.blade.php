@@ -55,6 +55,51 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i
+                                                                    class="ti ti-alert-triangle fs-2 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}"></i>
+                                                            </span>
+                                                            Low Stock :
+                                                            <strong
+                                                                class="{{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}">
+                                                                {{ $lowStockCount }}
+                                                            </strong>
+                                                            @if ($lowStockCount > 0)
+                                                                <a href="#" class="ms-2 btn btn-sm btn-outline-danger"
+                                                                    id="viewLowStock">
+                                                                    View
+                                                                </a>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i
+                                                                    class="ti ti-calendar-time fs-2 {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}"></i>
+                                                            </span>
+                                                            Expiring Soon :
+                                                            <strong
+                                                                class="{{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}">
+                                                                {{ $expiringSoonCount }}
+                                                            </strong>
+                                                            @if ($expiringSoonCount > 0)
+                                                                <a href="#"
+                                                                    class="ms-2 btn btn-sm btn-outline-warning"
+                                                                    id="viewExpiringSoon">
+                                                                    View
+                                                                </a>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -122,7 +167,16 @@
                                                     </td>
                                                     <td class="sort-code no-print">{{ $product->code }}</td>
                                                     <td class="sort-name">{{ $product->name }}</td>
-                                                    <td class="sort-quantity no-print">{{ $product->stock_quantity }}</td>
+                                                    <td class="sort-quantity no-print text-center">
+                                                        {{ $product->stock_quantity }}
+                                                        @if ($product->hasLowStock())
+                                                            <span class="badge bg-red-lt">Low Stock</span>
+                                                            @if ($product->low_stock_threshold)
+                                                                <small class="d-block text-muted">Threshold:
+                                                                    {{ $product->low_stock_threshold }}</small>
+                                                            @endif
+                                                        @endif
+                                                    </td>
                                                     <td class="sort-category no-print">{{ $product->category->name }}</td>
                                                     <td class="sort-unit">{{ $product->unit->symbol }}</td>
                                                     <td class="sort-price text-center">

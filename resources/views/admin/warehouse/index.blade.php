@@ -54,13 +54,21 @@
                                                             Store Address : <strong>{{ $address }}</strong>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-5">
                                                         <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-file-invoice fs-2"></i>
                                                             </span>
                                                             Total Warehouse : <strong>{{ $totalwarehouse }}</strong>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-container fs-2"></i>
+                                                            </span>
+                                                            Main Warehouse :
+                                                            <strong>{{ isset($mainWarehouse) ? $mainWarehouse->name : 'Not set' }}</strong>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -107,6 +115,7 @@
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-description">Description</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-is-main">Main</th>
                                                 <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">
                                                     Action
                                                 </th>
@@ -119,6 +128,13 @@
                                                     <td class="sort-name">{{ $wo->name }}</td>
                                                     <td class="sort-address">{{ $wo->address }}</td>
                                                     <td class="sort-description">{{ $wo->description }}</td>
+                                                    <td class="sort-is-main">
+                                                        @if ($wo->is_main)
+                                                            <span class="badge bg-green-lt">Main</span>
+                                                        @else
+                                                            <span class="badge bg-secondary-lt">Sub</span>
+                                                        @endif
+                                                    </td>
                                                     <td class="no-print" style="text-align:center">
                                                         <div class="dropdown">
                                                             <button class="btn dropdown-toggle align-text-top"
@@ -132,9 +148,22 @@
                                                                     data-id="{{ $wo->id }}"
                                                                     data-name="{{ $wo->name }}"
                                                                     data-address="{{ $wo->address }}"
-                                                                    data-description="{{ $wo->description }}">
+                                                                    data-description="{{ $wo->description }}"
+                                                                    data-is-main="{{ $wo->is_main }}">
                                                                     <i class="ti ti-edit me-2"></i> Edit
                                                                 </a>
+
+                                                                @if (!$wo->is_main)
+                                                                    <a href="{{ route('admin.warehouse.set-main', $wo->id) }}"
+                                                                        class="dropdown-item">
+                                                                        <i class="ti ti-star me-2"></i> Set as Main
+                                                                    </a>
+                                                                @else
+                                                                    <a href="{{ route('admin.warehouse.unset-main', $wo->id) }}"
+                                                                        class="dropdown-item">
+                                                                        <i class="ti ti-star-off me-2"></i> Unset Main
+                                                                    </a>
+                                                                @endif
 
                                                                 <button type="button" class="dropdown-item text-danger"
                                                                     data-bs-toggle="modal" data-bs-target="#deleteModal"

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('address');
             $table->string('description');
+            $table->boolean('is_main')->default(false);
             $table->timestamps();
         });
     }

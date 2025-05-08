@@ -83,6 +83,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/sales/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
         Route::post('/customer/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate');
         Route::post('/product/quick-create', [ProductController::class, 'quickCreate'])->name('admin.product.quickCreate');
+        Route::get('/warehouse/{id}/set-main', [WarehouseController::class, 'setMain'])->name('admin.warehouse.set-main');
+        Route::get('/warehouse/{id}/unset-main', [WarehouseController::class, 'unsetMain'])->name('admin.warehouse.unset-main');
 
         // Settings
         Route::prefix('setting')->group(function () {

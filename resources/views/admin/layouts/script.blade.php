@@ -26,6 +26,10 @@
 @if (request()->is('admin/po/create', 'admin/po/edit/*'))
     <script src="{{ asset('js/admin/purchase-order.js') }}"></script>
 @endif
+{{-- SCRIPT FOR PRODUCT --}}
+@if (request()->is('admin/product', 'admin/product/edit/*'))
+    <script src="{{ asset('js/admin/product.js') }}"></script>
+@endif
 {{-- SCRIPT FOR ADMIN DASHBOARD --}}
 @if (request()->is('admin/dashboard'))
     <script src="{{ asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js') }}" defer></script>

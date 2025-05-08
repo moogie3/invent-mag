@@ -57,7 +57,7 @@
                                     <hr class="my-4">
 
                                     <div class="row g-3">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Category</label>
                                             <select name="category_id" class="form-select">
                                                 <option value="{{ $products->category_id }}">{{ $products->category->name }}
@@ -68,7 +68,7 @@
                                             </select>
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Unit</label>
                                             <select name="units_id" class="form-select">
                                                 <option value="{{ $products->units_id }}">{{ $products->unit->name }}
@@ -79,10 +79,19 @@
                                             </select>
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Stock Quantity</label>
                                             <input type="text" name="stock_quantity" class="form-control"
                                                 value="{{ $products->stock_quantity }}">
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label">Low Stock Threshold</label>
+                                            <input type="number" class="form-control" name="low_stock_threshold"
+                                                value="{{ $products->low_stock_threshold }}" placeholder="Default (10)"
+                                                min="1">
+                                            <small class="form-text text-muted">Leave empty to use system default
+                                                (10)</small>
                                         </div>
                                     </div>
 
@@ -140,21 +149,10 @@
                                             style="{{ $products->has_expiry ? '' : 'display: none;' }}">
                                             <label class="form-label">Expiry Date</label>
                                             <input type="date" class="form-control" name="expiry_date"
+                                                id="expiry_date"
                                                 value="{{ $products->expiry_date ? $products->expiry_date->format('Y-m-d') : '' }}">
                                         </div>
                                     </div>
-
-                                    <script>
-                                        document.addEventListener('DOMContentLoaded', function() {
-                                            const hasExpiryCheckbox = document.getElementById('has_expiry');
-                                            const expiryDateField = document.querySelector('.expiry-date-field');
-
-                                            hasExpiryCheckbox.addEventListener('change', function() {
-                                                expiryDateField.style.display = this.checked ? 'block' : 'none';
-                                            });
-                                        });
-                                    </script>
-
                                 </div>
                                 <div class="card-footer text-end">
                                     <button type="submit" class="btn btn-primary">Save Changes</button>

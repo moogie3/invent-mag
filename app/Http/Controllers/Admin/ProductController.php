@@ -18,10 +18,15 @@ class ProductController extends Controller
         $entries = $request->input('entries', 10); // Pagination
         $products = Product::with(['category', 'supplier', 'unit'])->paginate($entries);
         $totalproduct = Product::count();
+        $lowStockCount = Product::lowStockCount(); // Get count of low stock products
+        $expiringSoonCount = Product::expiringSoonCount(); // Get count of expiring soon products
         $categories = Categories::all();
         $units = Unit::all();
         $suppliers = Supplier::all();
-        return view('admin.product.index', compact('products', 'categories', 'units', 'suppliers', 'entries', 'totalproduct'));
+        $lowStockProducts = Product::getLowStockProducts();
+        $expiringSoonProducts = Product::getExpiringSoonProducts(); // Get expiring soon products
+
+        return view('admin.product.index', compact('products', 'categories', 'units', 'suppliers', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts'));
     }
 
     public function create()
@@ -47,6 +52,7 @@ class ProductController extends Controller
             'code' => 'required|string',
             'name' => 'required|string',
             'stock_quantity' => 'required|integer',
+            'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
             'category_id' => 'required|integer',
@@ -65,7 +71,7 @@ class ProductController extends Controller
 
         // Clear expiry_date if has_expiry is false
         if (!$data['has_expiry']) {
-        $data['expiry_date'] = null;
+            $data['expiry_date'] = null;
         }
 
         if ($request->hasFile('image')) {
@@ -99,6 +105,7 @@ class ProductController extends Controller
             'code' => 'required|string',
             'name' => 'required|string',
             'stock_quantity' => 'required|integer',
+            'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
             'category_id' => 'required|integer',
@@ -113,7 +120,6 @@ class ProductController extends Controller
         $data = $request->except('_token', 'image');
 
         $data['has_expiry'] = $request->boolean('has_expiry');
-
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -137,6 +143,7 @@ class ProductController extends Controller
             'code' => 'string',
             'name' => 'string',
             'stock_quantity' => 'integer',
+            'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'numeric',
             'selling_price' => 'numeric',
             'category_id' => 'integer',

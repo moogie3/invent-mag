@@ -23,11 +23,10 @@
                         </button>
                     </div>
                     <div class="col-auto ms-auto">
-                        <button type="button" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal"
-                            data-bs-target="#createProductModal">
+                        <a href="{{ route('admin.product.create') }}" class="btn btn-primary d-none d-sm-inline-block">
                             <i class="ti ti-plus fs-4"></i>
                             Create Product
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -49,17 +48,6 @@
                                                         <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                                                <i class="ti ti-box fs-2"></i>
-                                                            </span>
-                                                            Total Product : <strong>{{ $totalproduct }}</strong>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="mb-2">
-                                                            <span
-                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i
                                                                     class="ti ti-alert-triangle fs-2 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}"></i>
                                                             </span>
@@ -74,6 +62,15 @@
                                                                     View
                                                                 </a>
                                                             @endif
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-box fs-2"></i>
+                                                            </span>
+                                                            Total Product : <strong>{{ $totalproduct }}</strong>
                                                         </div>
                                                     </div>
                                                 </div>

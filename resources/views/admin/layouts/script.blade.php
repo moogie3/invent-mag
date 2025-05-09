@@ -27,7 +27,7 @@
     <script src="{{ asset('js/admin/purchase-order.js') }}"></script>
 @endif
 {{-- SCRIPT FOR PRODUCT --}}
-@if (request()->is('admin/product', 'admin/product/edit/*'))
+@if (request()->is('admin/product', 'admin/product/edit/*', 'admin/product/create'))
     <script src="{{ asset('js/admin/product.js') }}"></script>
 @endif
 {{-- SCRIPT FOR ADMIN DASHBOARD --}}

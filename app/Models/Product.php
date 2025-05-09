@@ -24,7 +24,8 @@ class Product extends Model
         'units_id',
         'has_expiry',
         'expiry_date',
-        'low_stock_threshold', // Add this field to fillable
+        'low_stock_threshold',
+        'warehouse_id', // Add this field to fillable
     ];
 
     protected $casts = [
@@ -33,8 +34,21 @@ class Product extends Model
         'stock_quantity' => 'float',
         'has_expiry' => 'boolean',
         'expiry_date' => 'date',
-        'low_stock_threshold' => 'integer', // Add casting
+        'low_stock_threshold' => 'integer',
+        'warehouse_id => integer', // Add casting
     ];
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'warehouse_id');
+    }
+
+    // Add this method to get the main warehouse ID or null if none set
+    public static function getMainWarehouseId()
+    {
+        $mainWarehouse = Warehouse::where('is_main', true)->first();
+        return $mainWarehouse ? $mainWarehouse->id : null;
+    }
 
     // Define global default low stock threshold
     const DEFAULT_LOW_STOCK_THRESHOLD = 10;

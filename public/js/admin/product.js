@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Initialize modals
+    // Initialize modals (if present)
     initModals();
 
     // Initialize expiry checkbox toggle functionality
@@ -37,47 +37,37 @@ function initModals() {
 }
 
 function initExpiryCheckbox() {
-    // Handle multiple forms - both in edit and create modals
-    const hasExpiryCheckboxes = document.querySelectorAll(
-        "input[name='has_expiry']"
+    // Grab the single checkbox + container by their IDs
+    const hasExpiryCheckbox = document.getElementById("has_expiry");
+    const expiryDateContainer = document.getElementById(
+        "expiry_date_container"
     );
 
-    hasExpiryCheckboxes.forEach((checkbox) => {
-        if (checkbox) {
-            // Find the closest form to this checkbox
-            const form = checkbox.closest("form");
-            // Find the expiry date field in this specific form
-            const expiryDateField = form.querySelector(".expiry-date-field");
+    if (hasExpiryCheckbox && expiryDateContainer) {
+        // Set initial visibility on page load
+        expiryDateContainer.style.display = hasExpiryCheckbox.checked
+            ? "block"
+            : "none";
 
-            if (expiryDateField) {
-                // Set initial state
-                expiryDateField.style.display = checkbox.checked
-                    ? "block"
-                    : "none";
+        // Toggle visibility on checkbox change
+        hasExpiryCheckbox.addEventListener("change", function () {
+            expiryDateContainer.style.display = this.checked ? "block" : "none";
 
-                // Add change event
-                checkbox.addEventListener("change", function () {
-                    expiryDateField.style.display = this.checked
-                        ? "block"
-                        : "none";
-
-                    // If showing the field, ensure flatpickr is initialized properly
-                    if (this.checked) {
-                        const dateInput = expiryDateField.querySelector(
-                            "input[name='expiry_date']"
-                        );
-                        if (dateInput && dateInput._flatpickr) {
-                            dateInput._flatpickr.redraw();
-                        }
-                    }
-                });
+            // Redraw flatpickr if visible
+            if (this.checked) {
+                const dateInput = expiryDateContainer.querySelector(
+                    "input[name='expiry_date']"
+                );
+                if (dateInput && dateInput._flatpickr) {
+                    dateInput._flatpickr.redraw();
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 function initFlatpickr() {
-    // Check if flatpickr is available
+    // Check if flatpickr is loaded
     if (typeof flatpickr !== "function") {
         console.error(
             "Flatpickr is not loaded. Please include the Flatpickr library."
@@ -85,21 +75,15 @@ function initFlatpickr() {
         return;
     }
 
-    // Get all expiry date inputs
-    const expiryDateInputs = document.querySelectorAll(
-        "input[name='expiry_date']"
-    );
+    const expiryDateInput = document.querySelector("input[name='expiry_date']");
 
-    expiryDateInputs.forEach((input) => {
-        if (input) {
-            // Initialize flatpickr on this input
-            flatpickr(input, {
-                dateFormat: "Y-m-d", // Database format
-                altInput: true, // Use an alternate input for friendly display
-                altFormat: "d-m-Y", // Display format (day-month-year)
-                allowInput: true, // Allow manual input
-                defaultDate: input.value || null, // Use existing value if present
-            });
-        }
-    });
+    if (expiryDateInput) {
+        flatpickr(expiryDateInput, {
+            dateFormat: "Y-m-d", // Database format
+            altInput: true, // Friendly display format
+            altFormat: "d-m-Y",
+            allowInput: true,
+            defaultDate: expiryDateInput.value || null,
+        });
+    }
 }

@@ -56,7 +56,6 @@
 </div>
 
 @if (isset($isPaid) && $isPaid)
-    <!-- Paid Invoice Warning Modal -->
     <div class="modal fade" id="paidInvoiceModal" tabindex="-1" aria-labelledby="paidInvoiceModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-sm modal-dialog-centered">

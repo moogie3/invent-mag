@@ -113,6 +113,21 @@
 
                                     <hr class="my-4">
 
+                                    <div class="form-group">
+                                        <label class="form-label">Warehouse</label>
+                                        <select name="warehouse_id" class="form-select" id="edit_warehouse_id">
+                                            <option value="">Select Warehouse</option>
+                                            @foreach ($warehouses as $warehouse)
+                                                <option value="{{ $warehouse->id }}"
+                                                    {{ isset($products) && $products->warehouse_id == $warehouse->id ? 'selected' : '' }}>
+                                                    {{ $warehouse->name }} {{ $warehouse->is_main ? '(Main)' : '' }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <hr class="my-4">
+
                                     <div class="mb-3">
                                         <label class="form-label">Description</label>
                                         <textarea name="description" class="form-control" rows="3">{{ $products->description }}</textarea>
@@ -128,7 +143,8 @@
                                                     class="rounded border shadow-sm" width="200">
                                             </div>
                                             <input type="file" name="image" class="form-control">
-                                            <small class="text-muted">Upload a new image to replace the current one.</small>
+                                            <small class="text-muted">Upload a new image to replace the current
+                                                one.</small>
                                         </div>
                                     </div>
 

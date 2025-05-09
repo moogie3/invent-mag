@@ -1,6 +1,4 @@
-{{-- Create this file at resources/views/admin/po/modal-view.blade.php --}}
 <div class="card shadow-sm">
-    <!-- PO Header with colored status bar -->
     <div class="card-header">
         <div class="row align-items-center">
             <div class="col">
@@ -29,7 +27,6 @@
     </div>
 
     <div class="card-body p-4">
-        <!-- PO Info Section -->
         <div class="row g-4 mb-4">
             <div class="col-md-6">
                 <div class="card bg-light border-0 h-100">
@@ -76,7 +73,6 @@
             </div>
         </div>
 
-        <!-- Items Table -->
         <div class="card border mb-4">
             <div class="card-header bg-light py-2">
                 <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-primary"></i>Order Items</h4>
@@ -95,7 +91,6 @@
                     </thead>
                     <tbody>
                         @php
-                            // Calculate invoice summary
                             $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary(
                                 $pos->items,
                                 $pos->discount_total,
@@ -111,7 +106,6 @@
 
                         @foreach ($pos->items as $index => $item)
                             @php
-                                // Calculate the final amount for this item
                                 $finalAmount = \App\Helpers\PurchaseHelper::calculateTotal(
                                     $item->price,
                                     $item->quantity,
@@ -119,7 +113,6 @@
                                     $item->discount_type,
                                 );
 
-                                // Calculate the discount per unit for display
                                 $discountPerUnit = \App\Helpers\PurchaseHelper::calculateDiscountPerUnit(
                                     $item->price,
                                     $item->discount,
@@ -158,7 +151,6 @@
             </div>
         </div>
 
-        <!-- Summary -->
         <div class="row">
             <div class="col-md-6">
                 <div class="card border-0 bg-light">

@@ -162,22 +162,25 @@
                                             <div class="col-md-2"></div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Expiration Settings</label>
-                                                <div class="d-flex flex-column gap-2">
-                                                    <div class="form-check form-switch ps-0">
-                                                        <div class="d-flex align-items-center">
-                                                            <input class="form-check-input me-2" type="checkbox"
+                                                <div class="row g-2 align-items-center">
+                                                    <div class="col-auto d-flex align-items-center">
+                                                        <div class="form-check form-switch m-0">
+                                                            <input class="form-check-input" type="checkbox"
                                                                 id="has_expiry" name="has_expiry" value="1">
-                                                            <label class="form-check-label" for="has_expiry">Product has
-                                                                expiration date</label>
+                                                            <label class="form-check-label ms-2" for="has_expiry">Has
+                                                                expiry</label>
                                                         </div>
                                                     </div>
-                                                    <div class="expiry-date-field" id="expiry_date_container">
-                                                        <input type="date" class="form-control" name="expiry_date"
-                                                            id="expiry_date" placeholder="Select expiry date">
+                                                    <div class="col">
+                                                        <div id="expiry_date_container" style="display: none;">
+                                                            <input type="date" class="form-control" name="expiry_date"
+                                                                id="expiry_date" placeholder="Select expiry date">
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
 
                                     {{-- Form Footer --}}

@@ -54,53 +54,6 @@
         </div>
     </div>
 </div>
-
-@if (isset($isPaid) && $isPaid)
-    <div class="modal fade" id="paidInvoiceModal" tabindex="-1" aria-labelledby="paidInvoiceModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-centered">
-            <div class="modal-content">
-                <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="modal-body text-center py-4">
-                    <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4"></i>
-                    <h3 class="mb-3">Warning!</h3>
-                    <div class="text-secondary">
-                        <div class="text-warning text-center">
-                            Paid invoices cannot be edited.<br>View mode only.
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <a href="{{ route('admin.po.view', $pos->id) }}" class="btn btn-primary w-100">View Invoice</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Show the modal automatically when the page loads
-            var paidInvoiceModal = new bootstrap.Modal(document.getElementById('paidInvoiceModal'));
-            paidInvoiceModal.show();
-
-            // Make form fields readonly if invoice is paid
-            const formElements = document.querySelectorAll('input, select, textarea');
-            formElements.forEach(element => {
-                element.setAttribute('readonly', true);
-                if (element.tagName === 'SELECT') {
-                    element.setAttribute('disabled', true);
-                }
-            });
-
-            // Hide any submit buttons
-            const submitButtons = document.querySelectorAll('button[type="submit"], input[type="submit"]');
-            submitButtons.forEach(button => {
-                button.style.display = 'none';
-            });
-        });
-    </script>
-@endif
-
 <script>
     // Function to load PO details into modal
     function loadPoDetails(id) {
@@ -169,3 +122,50 @@
         }, 100);
     });
 </script>
+
+
+@if (isset($isPaid) && $isPaid)
+    <div class="modal fade" id="paidInvoiceModal" tabindex="-1" aria-labelledby="paidInvoiceModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body text-center py-4">
+                    <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4"></i>
+                    <h3 class="mb-3">Warning!</h3>
+                    <div class="text-secondary">
+                        <div class="text-warning text-center">
+                            Paid invoices cannot be edited.<br>View mode only.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ route('admin.po.view', $pos->id) }}" class="btn btn-primary w-100">View Invoice</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Show the modal automatically when the page loads
+            var paidInvoiceModal = new bootstrap.Modal(document.getElementById('paidInvoiceModal'));
+            paidInvoiceModal.show();
+
+            // Make form fields readonly if invoice is paid
+            const formElements = document.querySelectorAll('input, select, textarea');
+            formElements.forEach(element => {
+                element.setAttribute('readonly', true);
+                if (element.tagName === 'SELECT') {
+                    element.setAttribute('disabled', true);
+                }
+            });
+
+            // Hide any submit buttons
+            const submitButtons = document.querySelectorAll('button[type="submit"], input[type="submit"]');
+            submitButtons.forEach(button => {
+                button.style.display = 'none';
+            });
+        });
+    </script>
+@endif

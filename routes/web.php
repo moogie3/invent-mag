@@ -125,7 +125,9 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/pos/receipt/{id}', [POSController::class, 'receipt'])->name('admin.pos.receipt');
         Route::get('/po/modal-view/{id}', [PurchaseController::class, 'modalView'])->name('admin.po.modal-view');
-        Route::get('sales/modal-view/{id}', [SalesController::class,'modalView'])->name('admin.sales.modal-view');
+        Route::get('/sales/modal-view/{id}', [SalesController::class,'modalView'])->name('admin.sales.modal-view');
+        Route::get('/product/modal-view/{id}', [ProductController::class, 'modalView'])->name('admin.product.modal-view');
+
         // Define tax API route
         Route::get('/setting/tax/get', function () {
             $tax = \App\Models\Tax::where('is_active', 1)->first();

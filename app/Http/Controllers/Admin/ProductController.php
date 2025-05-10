@@ -42,6 +42,31 @@ class ProductController extends Controller
         return view('admin.product.product-create', compact('categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
     }
 
+    public function modalView($id)
+    {
+        try {
+            $product = Product::with(['category', 'supplier', 'unit', 'warehouse'])->findOrFail($id);
+
+            $product->formatted_price = \App\Helpers\CurrencyHelper::format($product->price);
+            $product->formatted_selling_price = \App\Helpers\CurrencyHelper::format($product->selling_price);
+
+            // Format dates if needed
+            if ($product->has_expiry && $product->expiry_date) {
+                $product->expiry_date = $product->expiry_date->format('Y-m-d');
+            }
+
+            return response()->json($product);
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'error' => 'Product not found',
+                    'message' => $e->getMessage(),
+                ],
+                404,
+            );
+        }
+    }
+
     public function edit($id)
     {
         $products = Product::findOrFail($id);

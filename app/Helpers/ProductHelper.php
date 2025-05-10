@@ -42,16 +42,15 @@ class ProductHelper
      * @param int|null $threshold
      * @return array [badgeClass, badgeText]
      */
-    public static function getLowStockBadge($quantity, $threshold = null)
+    public static function getStockClassAndText(Product $product)
     {
-        // Use provided threshold or fall back to default
-        $effectiveThreshold = $threshold ?? Product::DEFAULT_LOW_STOCK_THRESHOLD;
+        $threshold = $product->low_stock_threshold ?? 10;
+        $stockQty = $product->stock_quantity;
 
-        if ($quantity <= $effectiveThreshold) {
+        if ($stockQty <= $threshold) {
             return ['badge bg-red-lt', 'Low Stock'];
         }
 
-        return [null, null];
+        return ['badge bg-green-lt', 'In Stock'];
     }
-
 }

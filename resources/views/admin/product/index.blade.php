@@ -209,9 +209,17 @@
                                                                 Actions
                                                             </button>
                                                             <div class="dropdown-menu">
-                                                                <a href="{{ route('admin.product.edit', $product->id) }}"
+                                                                <a href="javascript:void(0)"
+                                                                    onclick="loadProductDetails('{{ $product->id }}')"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#viewProductModal"
                                                                     class="dropdown-item">
                                                                     <i class="ti ti-zoom-scan me-2"></i> View
+                                                                </a>
+
+                                                                <a href="{{ route('admin.product.edit', $product->id) }}"
+                                                                    class="dropdown-item">
+                                                                    <i class="ti ti-edit me-2"></i> Edit
                                                                 </a>
 
                                                                 <button type="button" class="dropdown-item text-danger"

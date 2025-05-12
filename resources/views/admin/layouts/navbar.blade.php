@@ -62,10 +62,10 @@
                 <i class="ti ti-sun fs-2"></i>
             </a>
 
-            <!-- Single Notification Bell -->
+            <!-- Modified Notification Bell Section -->
             <div class="nav-item dropdown me-3">
                 <a href="#" class="nav-link px-2 position-relative" data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                    aria-expanded="false" id="notification-bell">
                     <i class="ti ti-bell fs-2"></i>
 
                     @if (isset($notificationCount) && $notificationCount > 0)
@@ -74,32 +74,228 @@
                         </span>
                     @endif
                 </a>
-                <div class="dropdown-menu dropdown-menu-end notification-dropdown">
-                    <h6 class="dropdown-header">Notifications</h6>
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0"
+                    style="width: 380px; max-height: 500px;">
 
-                    @if (isset($notifications) && $notifications->count() > 0)
-                        @foreach ($notifications as $notification)
-                            <a href="{{ route('admin.notifications.view', $notification['id']) }}"
-                                class="dropdown-item d-flex align-items-center notification-item"
-                                data-notification-id="{{ $notification['id'] }}">
-                                <span
-                                    class="badge bg-{{ $notification['urgency'] == 'high' ? 'danger' : ($notification['urgency'] == 'medium' ? 'warning' : 'info') }} me-2"></span>
-                                <div>
-                                    <strong>{{ $notification['title'] }}</strong>
-                                    <div class="text-muted small">{{ $notification['description'] }}</div>
+                    <!-- Notification Header -->
+                    <div class="border-bottom d-flex justify-content-between align-items-center p-3">
+                        <h3 class="mb-0 fw-bold">Notifications</h3>
+                        @if (isset($notificationCount) && $notificationCount > 0)
+                            <span class="badge bg-primary-lt rounded-pill">{{ $notificationCount }}</span>
+                        @endif
+                    </div>
+
+                    <!-- Notification Tabs -->
+                    <div class="notification-tabs">
+                        <ul class="nav nav-tabs nav-fill border-bottom" id="notificationTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active py-2" id="financial-tab" data-bs-toggle="tab"
+                                    data-bs-target="#financial" type="button" role="tab">
+                                    <i class="ti ti-receipt me-1"></i>PO & Sales
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link py-2" id="inventory-tab" data-bs-toggle="tab"
+                                    data-bs-target="#inventory" type="button" role="tab">
+                                    <i class="ti ti-package me-1"></i>Inventory
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link py-2" id="system-tab" data-bs-toggle="tab"
+                                    data-bs-target="#system" type="button" role="tab">
+                                    <i class="ti ti-adjustments me-1"></i>System
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content p-0" style="max-height: 350px; overflow-y: auto;">
+                            <!-- Financial Tab Content -->
+                            <div class="tab-pane fade show active" id="financial" role="tabpanel">
+                                <div class="notification-group py-2">
+                                    <div class="small fw-medium text-muted px-3 py-1">Purchase Orders</div>
+
+                                    @if (isset($notifications) &&
+                                            $notifications->filter(function ($n) {
+                                                    return $n['type'] == 'purchase';
+                                                })->count() > 0)
+                                        @php
+                                            $purchaseNotifications = $notifications->filter(function ($n) {
+                                                return $n['type'] == 'purchase';
+                                            });
+                                            $purchaseCount = $purchaseNotifications->count();
+                                        @endphp
+
+                                        @foreach ($purchaseNotifications->take(3) as $notification)
+                                            <a href="{{ $notification['route'] }}"
+                                                class="dropdown-item d-flex p-2 border-bottom notification-item">
+                                                <div class="flex-shrink-0 me-2 mt-1">
+                                                    <span
+                                                        class="avatar avatar-sm bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
+                                                        <i class="{{ $notification['status_icon'] }}"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="flex-grow-1 overflow-hidden">
+                                                    <p class="mb-0 text-truncate fw-medium">
+                                                        {{ $notification['title'] }}</p>
+                                                    <div class="text-muted small text-truncate">
+                                                        {{ $notification['description'] }}</div>
+                                                </div>
+                                            </a>
+                                        @endforeach
+
+                                        @if ($purchaseCount > 3)
+                                            <div class="text-center py-2 text-muted small">
+                                                + {{ $purchaseCount - 3 }} more purchase notifications
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="text-center py-3 text-muted">No purchase notifications</div>
+                                    @endif
+
+                                    <div class="small fw-medium text-muted px-3 py-1 mt-1">Sales</div>
+
+                                    @if (isset($notifications) &&
+                                            $notifications->filter(function ($n) {
+                                                    return $n['type'] == 'sales';
+                                                })->count() > 0)
+                                        @php
+                                            $salesNotifications = $notifications->filter(function ($n) {
+                                                return $n['type'] == 'sales';
+                                            });
+                                            $salesCount = $salesNotifications->count();
+                                        @endphp
+
+                                        @foreach ($salesNotifications->take(3) as $notification)
+                                            <a href="{{ $notification['route'] }}"
+                                                class="dropdown-item d-flex p-2 border-bottom notification-item">
+                                                <div class="flex-shrink-0 me-2 mt-1">
+                                                    <span
+                                                        class="avatar avatar-sm bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
+                                                        <i class="{{ $notification['status_icon'] }}"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="flex-grow-1 overflow-hidden">
+                                                    <p class="mb-0 text-truncate fw-medium">
+                                                        {{ $notification['title'] }}</p>
+                                                    <div class="text-muted small text-truncate">
+                                                        {{ $notification['description'] }}</div>
+                                                </div>
+                                            </a>
+                                        @endforeach
+
+                                        @if ($salesCount > 3)
+                                            <div class="text-center py-2 text-muted small">
+                                                + {{ $salesCount - 3 }} more sales notifications
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="text-center py-3 text-muted">No sales notifications</div>
+                                    @endif
                                 </div>
-                            </a>
-                        @endforeach
-                    @else
-                        <div class="dropdown-item text-muted text-center">No new notifications</div>
-                    @endif
+                            </div>
 
-                    @if (isset($notifications) && $notifications->count() > 0)
-                        <div class="dropdown-divider mb-0 mt-0"></div>
-                        <a href="{{ route('admin.setting.notifications') }}" class="dropdown-item text-center">
+                            <!-- Inventory Tab Content -->
+                            <div class="tab-pane fade" id="inventory" role="tabpanel">
+                                <div class="notification-group py-2">
+                                    <div class="small fw-medium text-muted px-3 py-1">Low Stock Alerts</div>
+
+                                    @if (isset($notifications) &&
+                                            $notifications->filter(function ($n) {
+                                                    return $n['type'] == 'product' && $n['status'] == 'Low Stock';
+                                                })->count() > 0)
+                                        @php
+                                            $lowStockNotifications = $notifications->filter(function ($n) {
+                                                return $n['type'] == 'product' && $n['status'] == 'Low Stock';
+                                            });
+                                            $lowStockCount = $lowStockNotifications->count();
+                                        @endphp
+
+                                        @foreach ($lowStockNotifications->take(3) as $notification)
+                                            <a href="{{ $notification['route'] }}"
+                                                class="dropdown-item d-flex p-2 border-bottom notification-item">
+                                                <div class="flex-shrink-0 me-2 mt-1">
+                                                    <span
+                                                        class="avatar avatar-sm bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
+                                                        <i class="{{ $notification['status_icon'] }}"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="flex-grow-1 overflow-hidden">
+                                                    <p class="mb-0 text-truncate fw-medium">
+                                                        {{ $notification['title'] }}</p>
+                                                    <div class="text-muted small text-truncate">
+                                                        {{ $notification['description'] }}</div>
+                                                </div>
+                                            </a>
+                                        @endforeach
+
+                                        @if ($lowStockCount > 3)
+                                            <div class="text-center py-2 text-muted small">
+                                                + {{ $lowStockCount - 3 }} more low stock alerts
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="text-center py-3 text-muted">No low stock alerts</div>
+                                    @endif
+
+                                    <div class="small fw-medium text-muted px-3 py-1 mt-1">Expiring Products</div>
+
+                                    @if (isset($notifications) &&
+                                            $notifications->filter(function ($n) {
+                                                    return $n['type'] == 'product' && $n['status'] == 'Expiring Soon';
+                                                })->count() > 0)
+                                        @php
+                                            $expiringNotifications = $notifications->filter(function ($n) {
+                                                return $n['type'] == 'product' && $n['status'] == 'Expiring Soon';
+                                            });
+                                            $expiringCount = $expiringNotifications->count();
+                                        @endphp
+
+                                        @foreach ($expiringNotifications->take(3) as $notification)
+                                            <a href="{{ $notification['route'] }}"
+                                                class="dropdown-item d-flex p-2 border-bottom notification-item">
+                                                <div class="flex-shrink-0 me-2 mt-1">
+                                                    <span
+                                                        class="avatar avatar-sm bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
+                                                        <i class="{{ $notification['status_icon'] }}"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="flex-grow-1 overflow-hidden">
+                                                    <p class="mb-0 text-truncate fw-medium">
+                                                        {{ $notification['title'] }}</p>
+                                                    <div class="text-muted small text-truncate">
+                                                        {{ $notification['description'] }}</div>
+                                                </div>
+                                            </a>
+                                        @endforeach
+
+                                        @if ($expiringCount > 3)
+                                            <div class="text-center py-2 text-muted small">
+                                                + {{ $expiringCount - 3 }} more expiring product alerts
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="text-center py-3 text-muted">No expiring products</div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- System Tab Content -->
+                            <div class="tab-pane fade" id="system" role="tabpanel">
+                                <div class="notification-group py-2">
+                                    <div class="small fw-medium text-muted px-3 py-1">System Updates</div>
+
+                                    <div class="text-center py-3 text-muted">No system notifications</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer with View All Link -->
+                    <div class="border-top p-2 text-center">
+                        <a href="{{ route('admin.notifications') }}" class="text-primary fw-medium">
                             View all notifications
                         </a>
-                    @endif
+                    </div>
                 </div>
             </div>
 
@@ -138,3 +334,26 @@
 
 <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 <script src="{{ asset('js/admin/layouts/navbar.js') }}" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fix for dropdown disappearing when clicking tabs
+        const notificationTabs = document.querySelectorAll('.notification-tabs .nav-link');
+        notificationTabs.forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent event from bubbling up
+            });
+        });
+
+        // Original navbar.js functionality (keeping other JS functionality)
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileNav = document.getElementById('mobile-nav');
+
+        if (mobileMenuToggle && mobileNav) {
+            mobileMenuToggle.addEventListener('click', function() {
+                mobileNav.classList.toggle('active');
+            });
+        }
+
+        // Add any other original JS functionality from navbar.js here
+    });
+</script>

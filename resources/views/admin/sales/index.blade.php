@@ -73,18 +73,36 @@
                                                         <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-cash fs-2"></i>
+                                                            </span>
+                                                            Total POS Sales:
+                                                            <strong>{{ \App\Helpers\CurrencyHelper::format($posTotal) }}</strong>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
                                                                 <i class="ti ti-moneybag fs-2"></i>
                                                             </span>
                                                             Unpaid Receivable:
                                                             <strong>{{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}</strong>
                                                         </div>
+                                                    </div>
+                                                    <div class="col-md-3">
                                                         <div class="mb-2">
                                                             <span
                                                                 class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                                                <i class="ti ti-receipt fs-2"></i>
+                                                                <i class="ti ti-loader fs-2"></i>
                                                             </span>
                                                             Pending Orders:
                                                             <strong>{{ $pendingOrders }}</strong>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-reload fs-2"></i>
+                                                            </span>
+                                                            Due Soon Invoices:
+                                                            <strong>{{ $dueInvoices }}</strong>
                                                         </div>
                                                     </div>
                                                 </div>

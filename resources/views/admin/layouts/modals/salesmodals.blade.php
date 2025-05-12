@@ -11,7 +11,7 @@
                 <p class="mt-3">Are you sure you want to delete this sales?</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">Cancel</button>
                 <form id="deleteForm" method="POST">
                     @csrf
                     @method('DELETE')

@@ -33,10 +33,14 @@ class SalesController extends Controller
 
         // Count pending orders - defining "Pending" status
         $pendingOrders = Sales::where('status', 'Unpaid')->count();
-
+        $dueInvoices = Sales::where('status', 'Unpaid')
+            ->whereDate('due_date', '>=', now()) // Due date is today or later
+            ->whereDate('due_date', '<=', now()->addDays(7)) // Due date is within 30 days
+            ->count();
+        $posTotal = Sales::where('is_pos', true)->sum('total');
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
-        return view('admin.sales.index', compact('entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt', 'pendingOrders','totalMonthly'));
+        return view('admin.sales.index', compact('posTotal','dueInvoices','entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt', 'pendingOrders','totalMonthly'));
     }
 
     public function create()

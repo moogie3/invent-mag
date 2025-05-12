@@ -96,6 +96,15 @@
                                                             @endif
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
+                                                                <i class="ti ti-category fs-2"></i>
+                                                            </span>
+                                                            Total Category : <strong>{{ $totalcategory }}</strong>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

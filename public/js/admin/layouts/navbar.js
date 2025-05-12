@@ -3,6 +3,47 @@
  * Handles notifications, navigation hover effects, and mobile menu
  */
 document.addEventListener("DOMContentLoaded", function () {
+    // Initialize Bootstrap components
+    var tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Remember the active notification tab
+    function handleTabClick(e) {
+        const tabId = e.target.id;
+        localStorage.setItem("activeNotificationTab", tabId);
+    }
+
+    // Apply click handlers to all notification tabs
+    const notificationTabs = document.querySelectorAll(
+        "#notificationTabs .nav-link"
+    );
+    notificationTabs.forEach((tab) => {
+        tab.addEventListener("click", handleTabClick);
+    });
+
+    // Set the active tab when dropdown is shown
+    const notificationBell = document.getElementById("notification-bell");
+    if (notificationBell) {
+        notificationBell.addEventListener("click", function () {
+            // Delay slightly to ensure dropdown is rendered
+            setTimeout(() => {
+                const savedTab = localStorage.getItem("activeNotificationTab");
+                if (savedTab) {
+                    const tabToActivate = document.getElementById(savedTab);
+                    if (tabToActivate) {
+                        // Create and dispatch a click event
+                        const clickEvent = new Event("click");
+                        tabToActivate.dispatchEvent(clickEvent);
+                    }
+                }
+            }, 100);
+        });
+    }
+
     // Notification dot handling
     const initNotifications = () => {
         const notificationItems =
@@ -16,10 +57,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         "data-notification-id"
                     );
 
-                    // Optional: Mark notification as read via AJAX
+                    // Mark notification as read via AJAX
                     if (notificationId) {
                         fetch(
-                            `/admin/notifications/mark-read/${notificationId}`,
+                            `/admin/notifications/mark-as-read/${notificationId}`,
                             {
                                 method: "POST",
                                 headers: {
@@ -50,7 +91,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                                 data.count === 0 &&
                                                 notificationDot
                                             ) {
-                                                notificationDot.remove();
+                                                notificationDot.style.display =
+                                                    "none";
                                             }
                                         })
                                         .catch((error) => {
@@ -103,6 +145,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         dot.className =
                             "position-absolute bg-danger border border-light rounded-circle";
                         bellIcon.appendChild(dot);
+                    } else {
+                        notificationDot.style.display = "block";
                     }
 
                     // Optional: Refresh the notification list
@@ -136,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 } else if (data.count === 0 && notificationDot) {
                     // Remove the dot if no notifications
-                    notificationDot.remove();
+                    notificationDot.style.display = "none";
                 }
             })
             .catch((error) => {
@@ -285,6 +329,36 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
+    // Optional: Update notification count via AJAX periodically
+    function updateNotificationCount() {
+        fetch("/admin/notifications/count")
+            .then((response) => response.json())
+            .then((data) => {
+                const notificationDot =
+                    document.getElementById("notification-dot");
+                if (data.count > 0) {
+                    if (notificationDot) {
+                        notificationDot.style.display = "block";
+                    } else {
+                        const bellIcon =
+                            document.querySelector("i.ti.ti-bell")?.parentNode;
+                        if (bellIcon) {
+                            const newDot = document.createElement("span");
+                            newDot.id = "notification-dot";
+                            newDot.className =
+                                "position-absolute bg-danger border border-light rounded-circle";
+                            bellIcon.appendChild(newDot);
+                        }
+                    }
+                } else if (notificationDot) {
+                    notificationDot.style.display = "none";
+                }
+            })
+            .catch((error) =>
+                console.error("Error updating notification count:", error)
+            );
+    }
+
     // Initialize all navbar functionality
     initNotifications();
     initNavHover();
@@ -295,4 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Check for new notifications every 5 minutes
     setInterval(checkForNewNotifications, 5 * 60 * 1000);
+
+    // Optional: Uncomment to enable more frequent notification count updates
+    // setInterval(updateNotificationCount, 60000); // Check every minute
 });

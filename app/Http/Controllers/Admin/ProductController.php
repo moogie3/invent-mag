@@ -28,8 +28,8 @@ class ProductController extends Controller
         $mainWarehouse = Warehouse::where('is_main', true)->first();
         $lowStockProducts = Product::getLowStockProducts();
         $expiringSoonProducts = Product::getExpiringSoonProducts(); // Get expiring soon products
-
-        return view('admin.product.index', compact('products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts'));
+        $totalcategory = Categories::count();
+        return view('admin.product.index', compact('totalcategory','products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts'));
     }
 
     public function create()

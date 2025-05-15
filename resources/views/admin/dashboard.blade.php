@@ -76,9 +76,13 @@
                                         @endif
                                     </div>
                                     <div class="text-muted text-end">
-                                        @if (isset($metric['total']))
+                                        @if (isset($metric['total']) && $metric['total'] > 0)
                                             <span class="badge bg-{{ $metric['color'] }}-light">
                                                 {{ round(($metric['value'] / $metric['total']) * 100) }}% of total
+                                            </span>
+                                        @elseif (isset($metric['total']))
+                                            <span class="badge bg-{{ $metric['color'] }}-light">
+                                                0% of total
                                             </span>
                                         @elseif (isset($metric['badge']))
                                             <span

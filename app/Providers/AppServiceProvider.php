@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\NotificationController;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Purchase;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,5 +40,9 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('purchaseOrders', $purchaseOrders);
         });
+
+        if (app()->environment('production')) {
+        URL::forceScheme('https');
+        }
     }
 }

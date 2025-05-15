@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('units_id');
             $table->integer('supplier_id');
             $table->text('description');
+            $table->integer('warehouse_id');
             $table->string('image')->nullable();
             $table->boolean('has_expiry')->nullable();
             $table->date('expiry_date');

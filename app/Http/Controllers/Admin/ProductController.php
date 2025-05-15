@@ -90,7 +90,7 @@ class ProductController extends Controller
             'category_id' => 'required|integer',
             'units_id' => 'required|integer',
             'supplier_id' => 'required|integer',
-            'warehouse_id' => 'nullable|integer|exists:warehouses,id',
+            'warehouse_id' => 'nullable|integer',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'has_expiry' => 'sometimes|boolean',
@@ -139,7 +139,7 @@ class ProductController extends Controller
             'warehouse_id' => 'nullable|integer|exists:warehouses,id',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
-            'has_expiry' => 'sometimes|boolean',
+            'has_expiry' => 'nullable|sometimes|boolean',
             'expiry_date' => 'nullable|date|required_if:has_expiry,1',
         ]);
 

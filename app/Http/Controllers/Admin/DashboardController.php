@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\DailySales;
+use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Sales;
+use App\Models\SalesItem;
+use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -14,74 +18,162 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        //INVOICE STATUS
-        $outCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'OUT');
-        })->count(); //counting invoice in supplier table where location is out
+        return view('admin.dashboard', [
+            'topSellingProducts' => $this->getTopSellingProducts(),
+            'topCustomers' => $this->getTopCustomers(),
+            'topSuppliers' => $this->getTopSuppliers(),
+            'recentActivity' => $this->getRecentActivity(),
+            'lowStockCount' => Product::lowStockCount(),
+            'totalDailySales' => DailySales::sum('total'),
+            'totalliability' => Purchase::sum('total'),
+            'countliability' => Purchase::where('status', 'Unpaid')->sum('total'),
+            'paidDebtMonthly' => $this->getPaidDebtMonthly(),
+            'countRevenue' => Sales::where('status', 'Unpaid')->sum('total'),
+            'liabilitypaymentMonthly' => $this->getLiabilityPaymentsMonthly(),
+            'inCount' => $this->getPurchaseCountByLocation('IN'),
+            'outCount' => $this->getPurchaseCountByLocation('OUT'),
+            'inCountUnpaid' => $this->getPurchaseCountByLocation('IN', 'Unpaid'),
+            'outCountUnpaid' => $this->getPurchaseCountByLocation('OUT', 'Unpaid'),
+            'totalRevenue' => $this->getMonthlyRevenue(),
+        ]);
+    }
 
-        $outCountUnpaid = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'OUT');
-        })->where('status', 'Unpaid')->count(); //counting invoice in supplier table where location is out and status is unpaid
+    private function getMonthlyRevenue()
+    {
+        return Sales::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('total');
+    }
 
+    private function getPaidDebtMonthly()
+    {
+        return Sales::whereMonth('updated_at', now()->month)
+            ->whereYear('updated_at', now()->year)
+            ->where('status', 'Paid')
+            ->sum('total');
+    }
 
-        $inCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })->count(); //counting invoice in supplier table where location is in
+    private function getLiabilityPaymentsMonthly()
+    {
+        return Purchase::whereMonth('updated_at', now()->month)
+            ->whereYear('updated_at', now()->year)
+            ->where('status', 'Paid')
+            ->sum('total');
+    }
 
-        $inCountUnpaid = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })->where('status', 'Unpaid')->count(); //counting invoice in supplier table where location is out and status is unpaid
+    private function getPurchaseCountByLocation($location, $status = null)
+    {
+        $query = Purchase::whereHas('supplier', fn($q) => $q->where('location', $location));
+        if ($status) {
+            $query->where('status', $status);
+        }
+        return $query->count();
+    }
 
-        //CUSTOMER STATUS
-        $totalRevenue = Sales::whereMonth('created_at', now()->month)
-        ->whereYear('created_at', now()->year)
-        ->sum('total'); //counting total revenue in sales table where month is current month and year is current year
-        $countRevenue = Sales::all()->where('status','Unpaid')->sum('total'); //summing total revenue in sales table where status is unpaid
-        $paidDebtMonthly = Sales::whereMonth('updated_at',now()->month)
-        ->whereYear('updated_at',now()->year)
-        ->where('status', 'Paid')
-        ->sum('total'); //summing total receivable in sales table where month is current month and year is current year and status is paid
-
-        //LIABILITIES
-        $countliability = Purchase::where('status', 'Unpaid')->sum('total'); //summing total liability (invoice purchase order) where status is unpaid
-        $totalliability = Purchase::all()->sum('total'); //summing total liability
-        $liabilitypaymentMonthly = Purchase::whereMonth('updated_at', now()->month)
-        ->whereYear('updated_at', now()->year)
-        ->where('status','Paid')
-        ->sum('total'); //summing total liability (invoice purchase order) where status is paid in the current month and year
-
-
-        // CHART
-        $chartData = Purchase::selectRaw('DATE(created_at) as date, COUNT(id) as invoice_count, SUM(total) as total_amount')
-            ->groupByRaw('DATE(created_at)')
-            ->orderBy('date','asc')
+    private function getTopSellingProducts()
+    {
+        return SalesItem::select('product_id', DB::raw('SUM(quantity) as units_sold'), DB::raw('SUM(total) as revenue'))
+            ->with('product')
+            ->whereHas('product')
+            ->groupBy('product_id')
+            ->orderByDesc('units_sold')
+            ->limit(5)
             ->get()
-            ->map(function ($item) {
-                return [
-                    'date' => Carbon::parse($item->date)->format('d-M-y'),
-                    'invoice_count' => $item->invoice_count,
-                    'total_amount' => CurrencyHelper::format($item->total_amount), // format currency
-                    'total_amount_raw' => $item->total_amount // raw value for JavaScript
-                ];
-            })
-            ->toArray();
+            ->map(fn($item) => (object)[
+                'id' => $item->product_id,
+                'name' => $item->product->name ?? 'Unknown Product',
+                'code' => $item->product->code ?? 'N/A',
+                'image' => $item->product->image ?? null,
+                'category' => $item->product->category ?? null,
+                'units_sold' => $item->units_sold,
+                'revenue' => $item->revenue
+            ]);
+    }
 
-        $chartDataEarning = DailySales::selectRaw('DATE(created_at) as date, SUM(total) as total_amount')
-            ->groupByRaw('DATE(created_at)')
-            ->orderBy('date','asc')
+    private function getTopCustomers()
+    {
+        return Sales::select('customer_id', DB::raw('SUM(total) as total_sales'))
+            ->with('customer')
+            ->whereHas('customer')
+            ->groupBy('customer_id')
+            ->orderByDesc('total_sales')
+            ->limit(5)
             ->get()
-            ->map(function ($item) {
-                return [
-                    'date' =>  Carbon::parse($item->date)->format('d-M-y'),
-                    'total_amount' => CurrencyHelper::format($item->total_amount), // format currency
-                    'total_amount_raw' => $item->total_amount // raw value for JavaScript
-                ];
-            })
+            ->map(fn($item) => (object)[
+                'id' => $item->customer_id,
+                'name' => $item->customer->name ?? 'Unknown Customer',
+                'total_sales' => $item->total_sales
+            ]);
+    }
+
+    private function getTopSuppliers()
+    {
+        return Purchase::select('supplier_id', DB::raw('SUM(total) as total_purchases'))
+            ->with('supplier')
+            ->whereHas('supplier')
+            ->groupBy('supplier_id')
+            ->orderByDesc('total_purchases')
+            ->limit(5)
+            ->get()
+            ->map(fn($item) => (object)[
+                'id' => $item->supplier_id,
+                'name' => $item->supplier->name ?? 'Unknown Supplier',
+                'location' => $item->supplier->location ?? 'N/A',
+                'total_purchases' => $item->total_purchases
+            ]);
+    }
+
+    private function getRecentActivity()
+    {
+        $recentSales = Sales::with('customer')
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(fn($sale) => [
+                'type' => 'sale',
+                'title' => 'New Sale: ' . $sale->invoice,
+                'description' => 'To ' . ($sale->customer->name ?? 'Unknown Customer'),
+                'amount' => $sale->total,
+                'time' => $sale->created_at->diffForHumans(),
+                'icon' => 'ti ti-shopping-cart',
+                'color' => 'bg-green text-white'
+            ]);
+
+        $recentPurchases = Purchase::with('supplier')
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(fn($purchase) => [
+                'type' => 'purchase',
+                'title' => 'New Purchase: ' . $purchase->invoice,
+                'description' => 'From ' . ($purchase->supplier->name ?? 'Unknown Supplier'),
+                'amount' => $purchase->total,
+                'time' => $purchase->created_at->diffForHumans(),
+                'icon' => 'ti ti-truck-delivery',
+                'color' => 'bg-blue text-white'
+            ]);
+
+        $recentPayments = Purchase::where('status', 'Paid')
+            ->whereNotNull('payment_date')
+            ->orderByDesc('payment_date')
+            ->limit(3)
+            ->get()
+            ->map(fn($payment) => [
+                'type' => 'payment',
+                'title' => 'Payment Made: ' . $payment->invoice,
+                'description' => 'Amount: ' . CurrencyHelper::format($payment->total),
+                'amount' => $payment->total,
+                'time' => Carbon::parse($payment->payment_date)->diffForHumans(),
+                'icon' => 'ti ti-currency-dollar',
+                'color' => 'bg-purple text-white'
+            ]);
+
+        return $recentSales
+            ->concat($recentPurchases)
+            ->concat($recentPayments)
+            ->sortByDesc(fn($item) => strtotime($item['time']))
+            ->take(8)
+            ->values()
             ->toArray();
-
-        //DAILY SALES
-        $totalDailySales = DailySales::all()->sum('total');
-
-        return view('admin.dashboard', compact('chartDataEarning','totalDailySales','totalliability','paidDebtMonthly','countRevenue','liabilitypaymentMonthly','inCount', 'outCount', 'inCountUnpaid', 'outCountUnpaid', 'totalRevenue', 'countliability', 'chartData'));
     }
 }

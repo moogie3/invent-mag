@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('invoice')->unique();
             $table->string('customer_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->timestamp('order_date');
+            $table->timestamp('order_date')->useCurrent();
             $table->timestamp('due_date')->nullable();
             $table->enum('payment_type', ['Cash', 'Card', 'Transfer', 'eWallet', '-'])->default('-');
             $table->decimal('order_discount', 10, 2)->default(0);

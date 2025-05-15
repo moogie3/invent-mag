@@ -338,7 +338,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="d-flex align-items-baseline">
-                                    <div class="h1 mb-0 me-2">{{ $outCount + $inCount }}</div>
+                                    <div class="h1 mb-0 me-2">{{ ($outCount ?? 0) + ($inCount ?? 0) }}</div>
                                     <div class="me-auto">
                                         <span class="text-muted">Total Invoices</span>
                                     </div>
@@ -348,22 +348,25 @@
                                     <div class="d-flex mb-2">
                                         <div>Outgoing Invoices</div>
                                         <div class="ms-auto">
-                                            <span class="text-muted">{{ $outCount }}</span>
+                                            <span class="text-muted">{{ $outCount ?? 0 }}</span>
                                         </div>
                                     </div>
                                     <div class="progress progress-sm">
-                                        <div class="progress-bar bg-primary"
-                                            style="width: {{ ($outCountUnpaid / max($outCount, 1)) * 100 }}%"
+                                        @php
+                                            $outPercentage =
+                                                ($outCount ?? 0) > 0 ? (($outCountUnpaid ?? 0) / $outCount) * 100 : 0;
+                                        @endphp
+                                        <div class="progress-bar bg-primary" style="width: {{ $outPercentage }}%"
                                             role="progressbar">
                                         </div>
                                     </div>
                                     <div class="d-flex mt-2 mb-3">
                                         <div class="text-muted"><i class="ti ti-clock me-1"></i>
-                                            {{ $outCountUnpaid }}
+                                            {{ $outCountUnpaid ?? 0 }}
                                             awaiting payment</div>
                                         <div class="ms-auto">
                                             <span class="text-success"><i class="ti ti-check me-1"></i>
-                                                {{ $outCount - $outCountUnpaid }} paid</span>
+                                                {{ ($outCount ?? 0) - ($outCountUnpaid ?? 0) }} paid</span>
                                         </div>
                                     </div>
                                 </div>
@@ -372,21 +375,25 @@
                                     <div class="d-flex mb-2">
                                         <div>Incoming Invoices</div>
                                         <div class="ms-auto">
-                                            <span class="text-muted">{{ $inCount }}</span>
+                                            <span class="text-muted">{{ $inCount ?? 0 }}</span>
                                         </div>
                                     </div>
                                     <div class="progress progress-sm">
-                                        <div class="progress-bar bg-green"
-                                            style="width: {{ ($inCountUnpaid / max($inCount, 1)) * 100 }}%"
+                                        @php
+                                            $inPercentage =
+                                                ($inCount ?? 0) > 0 ? (($inCountUnpaid ?? 0) / $inCount) * 100 : 0;
+                                        @endphp
+                                        <div class="progress-bar bg-green" style="width: {{ $inPercentage }}%"
                                             role="progressbar">
                                         </div>
                                     </div>
                                     <div class="d-flex mt-2">
-                                        <div class="text-muted"><i class="ti ti-clock me-1"></i> {{ $inCountUnpaid }}
+                                        <div class="text-muted"><i class="ti ti-clock me-1"></i>
+                                            {{ $inCountUnpaid ?? 0 }}
                                             awaiting payment</div>
                                         <div class="ms-auto">
                                             <span class="text-success"><i class="ti ti-check me-1"></i>
-                                                {{ $inCount - $inCountUnpaid }} paid</span>
+                                                {{ ($inCount ?? 0) - ($inCountUnpaid ?? 0) }} paid</span>
                                         </div>
                                     </div>
                                 </div>

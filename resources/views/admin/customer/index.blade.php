@@ -12,7 +12,7 @@
                             Overview
                         </div>
                         <h2 class="page-title">
-                            Customer
+                            <i class="ti ti-users me-2"></i> Customer
                         </h2>
                     </div>
                     <div class="col-auto ms-auto">

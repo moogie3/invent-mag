@@ -28,6 +28,10 @@
             </ul>
         </nav>
 
+        <!-- Mobile Menu Overlay -->
+        <div class="nav-overlay" id="nav-overlay"></div>
+
+        <!-- Mobile Navigation Menu -->
         <div class="mobile-nav d-md-none" id="mobile-nav">
             <ul>
                 <li><a href="{{ route('admin.dashboard') }}"><i class="ti ti-home"></i>Dashboard</a></li>
@@ -334,26 +338,3 @@
 
 <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 <script src="{{ asset('js/admin/layouts/navbar.js') }}" defer></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Fix for dropdown disappearing when clicking tabs
-        const notificationTabs = document.querySelectorAll('.notification-tabs .nav-link');
-        notificationTabs.forEach(tab => {
-            tab.addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent event from bubbling up
-            });
-        });
-
-        // Original navbar.js functionality (keeping other JS functionality)
-        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-        const mobileNav = document.getElementById('mobile-nav');
-
-        if (mobileMenuToggle && mobileNav) {
-            mobileMenuToggle.addEventListener('click', function() {
-                mobileNav.classList.toggle('active');
-            });
-        }
-
-        // Add any other original JS functionality from navbar.js here
-    });
-</script>

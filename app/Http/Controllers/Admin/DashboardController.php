@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use App\Models\DailySales;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Sales;
 use App\Models\SalesItem;
-use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -24,11 +21,14 @@ class DashboardController extends Controller
             'topSuppliers' => $this->getTopSuppliers(),
             'recentActivity' => $this->getRecentActivity(),
             'lowStockCount' => Product::lowStockCount(),
-            'totalDailySales' => DailySales::sum('total'),
             'totalliability' => Purchase::sum('total'),
             'countliability' => Purchase::where('status', 'Unpaid')->sum('total'),
             'paidDebtMonthly' => $this->getPaidDebtMonthly(),
             'countRevenue' => Sales::where('status', 'Unpaid')->sum('total'),
+            'countSales' => Sales::where('status', 'Paid')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('total'),
             'liabilitypaymentMonthly' => $this->getLiabilityPaymentsMonthly(),
             'inCount' => $this->getPurchaseCountByLocation('IN'),
             'outCount' => $this->getPurchaseCountByLocation('OUT'),

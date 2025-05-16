@@ -12,7 +12,7 @@
                             Overview
                         </div>
                         <h2 class="page-title">
-                            Product
+                            <i class="ti ti-box me-2"></i> Product
                         </h2>
                     </div>
                     <div class="col-auto ms-auto">

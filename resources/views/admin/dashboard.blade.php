@@ -10,7 +10,7 @@
                     <div class="col">
                         <div class="page-pretitle">Overview</div>
                         <h2 class="page-title">
-                            <i class="ti ti-layout-dashboard me-2 text-primary"></i> Dashboard
+                            <i class="ti ti-dashboard    me-2"></i> Dashboard
                         </h2>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                             [
                                 'icon' => 'ti-chart-pie',
                                 'label' => 'Monthly Earnings',
-                                'value' => $totalDailySales,
+                                'value' => $countSales,
                                 'badge' => 'This month',
                                 'color' => 'azure',
                                 'format' => true,
@@ -105,7 +105,7 @@
                         <div class="card mb-4 shadow-sm border-0">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    <i class="ti ti-star me-2"></i> Top Selling Products
+                                    <i class="ti ti-shopping-cart-star me-2"></i> Top Selling Products
                                 </h3>
                             </div>
                             <div class="table-responsive">
@@ -255,7 +255,6 @@
                             </div>
                             <div class="card-body">
                                 @php
-                                    $netProfit = $totalDailySales - ($countliability ?? 0);
                                     $operatingExpenses = $totalliability - $countliability;
 
                                     $financials = [
@@ -263,7 +262,6 @@
                                         ['label' => 'This Month Paid Liabilities', 'value' => $liabilitypaymentMonthly],
                                         ['label' => 'Total Account Receivable', 'value' => $totalRevenue],
                                         ['label' => 'This Month Receivable Paid', 'value' => $paidDebtMonthly],
-                                        ['label' => 'Net Profit', 'value' => $netProfit],
                                         ['label' => 'Operating Expenses', 'value' => $operatingExpenses],
                                     ];
                                 @endphp

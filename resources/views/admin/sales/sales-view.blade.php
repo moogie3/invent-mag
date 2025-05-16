@@ -64,7 +64,7 @@
                                 <!-- Sales Info Section -->
                                 <div class="row g-4 mb-4">
                                     <div class="col-md-6">
-                                        <div class="card bg-light border-0 h-100">
+                                        <div class="card border-0 h-100">
                                             <div class="card-body p-3">
                                                 <h4 class="card-title mb-3"><i
                                                         class="ti ti-user me-2 text-info"></i>Customer
@@ -80,7 +80,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="card bg-light border-0 h-100">
+                                        <div class="card border-0 h-100">
                                             <div class="card-body p-3">
                                                 <h4 class="card-title mb-3"><i
                                                         class="ti ti-calendar-event me-2 text-info"></i>Order
@@ -112,13 +112,13 @@
 
                                 <!-- Items Table -->
                                 <div class="card border mb-4">
-                                    <div class="card-header bg-light py-2">
+                                    <div class="card-header py-2">
                                         <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-info"></i>Order Items
                                         </h4>
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table card-table table-vcenter table-hover">
-                                            <thead class="bg-light">
+                                            <thead>
                                                 <tr>
                                                     <th class="text-center" style="width: 60px">No</th>
                                                     <th>Product</th>
@@ -186,7 +186,7 @@
                                 <!-- Summary -->
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <div class="card border-0 bg-light">
+                                        <div class="card border-0">
                                             <div class="card-body p-3">
                                                 <h5 class="card-title mb-3"><i
                                                         class="ti ti-info-circle me-2 text-info"></i>Order Summary

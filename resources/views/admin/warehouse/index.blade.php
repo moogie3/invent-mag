@@ -9,7 +9,7 @@
                 <div class="row align-items-center">
                     <div class="col">
                         <div class="page-pretitle">Overview</div>
-                        <h2 class="page-title">Warehouse</h2>
+                        <h2 class="page-title"><i class="ti ti-building-warehouse me-2"></i>Warehouse</h2>
                     </div>
                     <div class="col-auto ms-auto">
                         <button type="button" class="btn btn-secondary d-none d-sm-inline-block"

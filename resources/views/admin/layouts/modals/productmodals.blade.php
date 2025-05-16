@@ -178,7 +178,7 @@
 <div id="productModalViewTemplate" style="display: none;">
     <div class="card shadow">
         <!-- Header Section -->
-        <div class="card-header bg-light py-3">
+        <div class="card-header py-3">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <h2 class="mb-0 fw-bold" id="productName"></h2>
@@ -204,7 +204,7 @@
                     <div class="row g-3">
                         <!-- Basic Information -->
                         <div class="col-md-6">
-                            <div class="card h-100 border-0 bg-light">
+                            <div class="card h-100 border-0">
                                 <div class="card-body">
                                     <h5 class="card-title mb-3">
                                         <i class="ti ti-info-circle me-2 text-primary"></i>Basic Information
@@ -234,7 +234,7 @@
 
                         <!-- Supplier & Storage -->
                         <div class="col-md-6">
-                            <div class="card h-100 border-0 bg-light">
+                            <div class="card h-100 border-0">
                                 <div class="card-body">
                                     <h5 class="card-title mb-3">
                                         <i class="ti ti-building-store me-2 text-primary"></i>Supplier & Storage
@@ -257,7 +257,7 @@
 
                         <!-- Pricing Information -->
                         <div class="col-md-6">
-                            <div class="card h-100 border-0 bg-light">
+                            <div class="card h-100 border-0">
                                 <div class="card-body">
                                     <h5 class="card-title mb-3">
                                         <i class="ti ti-currency me-2 text-primary"></i>Pricing Information
@@ -280,7 +280,7 @@
 
                         <!-- Additional Information -->
                         <div class="col-md-6">
-                            <div class="card h-100 border-0 bg-light">
+                            <div class="card h-100 border-0">
                                 <div class="card-body">
                                     <h5 class="card-title mb-3">
                                         <i class="ti ti-notes me-2 text-primary"></i>Additional Information

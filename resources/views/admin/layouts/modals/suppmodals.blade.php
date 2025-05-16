@@ -121,6 +121,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
+                <input type="hidden" id="updateRouteBase" value="{{ route('admin.supplier.update', '') }}">
             </form>
         </div>
     </div>

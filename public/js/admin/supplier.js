@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("supplierPaymentTermsEdit").value =
             supplierPayment;
 
-        // Set the form action dynamically
+        const routeBase = document.getElementById("updateRouteBase").value;
         document.getElementById("editSupplierForm").action =
-            "{{ route('admin.supplier.update', '') }}/" + supplierId;
+            routeBase + "/" + supplierId;
     });
 });

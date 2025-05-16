@@ -25,8 +25,8 @@ return new class extends Migration
             $table->text('description');
             $table->integer('warehouse_id');
             $table->string('image')->nullable();
-            $table->boolean('has_expiry')->nullable();
-            $table->date('expiry_date');
+            $table->boolean('has_expiry');
+            $table->date('expiry_date')->nullable();
             $table->timestamps();
         });
     }

@@ -16,8 +16,8 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("categoryDescriptionEdit").value =
             categoryDescription;
 
-        // Set the form action dynamically
+        const routeBase = document.getElementById("updateRouteBase").value;
         document.getElementById("editCategoryForm").action =
-            "{{ route('admin.setting.category.update', '') }}/" + categoryId;
+            routeBase + "/" + categoryId;
     });
 });

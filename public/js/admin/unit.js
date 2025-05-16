@@ -15,8 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("unitSymbolEdit").value = unitSymbol;
         document.getElementById("unitNameEdit").value = unitName;
 
-        // Set the form action dynamically
+        const routeBase = document.getElementById("updateRouteBase").value;
         document.getElementById("editUnitForm").action =
-            "{{ route('admin.setting.unit.update', '') }}/" + unitId;
+            routeBase + "/" + unitId;
     });
 });

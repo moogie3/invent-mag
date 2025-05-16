@@ -81,7 +81,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Update</button>
                 </div>
-                <input type="hidden" id="updateRouteBase" value="{{ route('admin.category.update', '') }}">
+                <input type="hidden" id="updateRouteBase" value="{{ route('admin.setting.category.update', '') }}">
             </form>
         </div>
     </div>

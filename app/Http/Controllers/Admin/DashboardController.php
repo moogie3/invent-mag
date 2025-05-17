@@ -15,27 +15,73 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Get recent activities in the format expected by the view
+        $recentSales = Sales::with('customer')
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get();
+
+        $recentPurchases = Purchase::with('supplier')
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get();
+
         return view('admin.dashboard', [
             'topSellingProducts' => $this->getTopSellingProducts(),
             'topCustomers' => $this->getTopCustomers(),
             'topSuppliers' => $this->getTopSuppliers(),
-            'recentActivity' => $this->getRecentActivity(),
-            'lowStockCount' => Product::lowStockCount(),
+            'recentSales' => $recentSales,
+            'recentPurchases' => $recentPurchases,
+            'lowStockCount' => $this->getLowStockCount(),
+            'expiringSoonCount' => $this->getExpiringSoonCount(),
             'totalliability' => Purchase::sum('total'),
             'countliability' => Purchase::where('status', 'Unpaid')->sum('total'),
             'paidDebtMonthly' => $this->getPaidDebtMonthly(),
             'countRevenue' => Sales::where('status', 'Unpaid')->sum('total'),
             'countSales' => Sales::where('status', 'Paid')
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->sum('total'),
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->sum('total'),
             'liabilitypaymentMonthly' => $this->getLiabilityPaymentsMonthly(),
             'inCount' => $this->getPurchaseCountByLocation('IN'),
             'outCount' => $this->getPurchaseCountByLocation('OUT'),
             'inCountUnpaid' => $this->getPurchaseCountByLocation('IN', 'Unpaid'),
             'outCountUnpaid' => $this->getPurchaseCountByLocation('OUT', 'Unpaid'),
             'totalRevenue' => $this->getMonthlyRevenue(),
+            'avgDueDays' => $this->getAverageDueDays(),
+            'collectionRate' => $this->getCollectionRate(),
         ]);
+    }
+
+    /**
+     * Get count of products with low stock
+     */
+    private function getLowStockCount()
+    {
+        // Fallback implementation in case Product::lowStockCount() doesn't exist
+        if (method_exists(Product::class, 'lowStockCount')) {
+            return Product::lowStockCount();
+        }
+
+        // Basic implementation - adjust thresholds as needed
+        return Product::whereRaw('quantity <= min_stock')->count();
+    }
+
+    /**
+     * Get count of products expiring soon
+     */
+    private function getExpiringSoonCount()
+    {
+        // Fallback implementation in case Product::expiringSoonCount() doesn't exist
+        if (method_exists(Product::class, 'expiringSoonCount')) {
+            return Product::expiringSoonCount();
+        }
+
+        // Basic implementation - products expiring in the next 30 days
+        return Product::whereNotNull('expiry_date')
+            ->where('expiry_date', '<=', now()->addDays(30))
+            ->where('expiry_date', '>=', now())
+            ->count();
     }
 
     private function getMonthlyRevenue()
@@ -123,6 +169,7 @@ class DashboardController extends Controller
             ]);
     }
 
+    // This method is kept for completeness but not directly used in the adjusted view
     private function getRecentActivity()
     {
         $recentSales = Sales::with('customer')
@@ -175,5 +222,36 @@ class DashboardController extends Controller
             ->take(8)
             ->values()
             ->toArray();
+    }
+
+    /**
+     * Calculate average days between due_date and payment_date for paid invoices
+     *
+     * @return int
+     */
+    private function getAverageDueDays()
+    {
+        $avgDays = Sales::where('status', 'Paid')
+            ->whereNotNull('payment_date')
+            ->whereNotNull('due_date')
+            ->get()
+            ->avg(function ($sale) {
+                return $sale->payment_date->diffInDays($sale->due_date);
+            });
+
+        return round($avgDays) ?? 0;
+    }
+
+    /**
+     * Calculate percentage of paid invoices vs total
+     *
+     * @return int
+     */
+    private function getCollectionRate()
+    {
+        $totalInvoices = Sales::count();
+        $paidInvoices = Sales::where('status', 'Paid')->count();
+
+        return $totalInvoices > 0 ? round(($paidInvoices / $totalInvoices) * 100) : 0;
     }
 }

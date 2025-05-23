@@ -128,7 +128,7 @@ class DashboardController extends Controller
                 'route' => null,
                 'percentage' => 0,
                 'trend' => $monthlySales > 0 ? 'positive' : 'neutral',
-                'trend_label' => 'This month',
+                'trend_label' => 'This Month',
                 'trend_icon' => '',
                 'badge_class' => $monthlySales > 0 ? 'bg-success-lt' : 'bg-muted-lt',
             ],

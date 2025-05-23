@@ -46,14 +46,6 @@
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="fw-semibold">{{ $metric['title'] }}</div>
-                                            <div class="text-muted">
-                                                <span class="badge {{ $metric['badge_class'] }}">
-                                                    @if ($metric['trend_icon'])
-                                                        <i class="{{ $metric['trend_icon'] }} me-1"></i>
-                                                    @endif
-                                                    {{ $metric['trend_label'] }}
-                                                </span>
-                                            </div>
                                         </div>
                                     </div>
 
@@ -70,23 +62,48 @@
                                             <div class="progress-bar {{ $metric['bar_color'] }}"
                                                 style="width: {{ $metric['percentage'] }}%;"></div>
                                         </div>
-                                        <div class="text-muted">
-                                            of
-                                            @if ($metric['format'] === 'currency')
-                                                {{ \App\Helpers\CurrencyHelper::format($metric['total']) }}
-                                            @else
-                                                {{ $metric['total'] }}
+                                        <div class="text-muted d-flex justify-content-between align-items-center">
+                                            <span>
+                                                of
+                                                @if ($metric['format'] === 'currency')
+                                                    {{ \App\Helpers\CurrencyHelper::format($metric['total']) }}
+                                                @else
+                                                    {{ $metric['total'] }}
+                                                @endif
+                                            </span>
+                                            @if (!$metric['route'])
+                                                <span class="badge {{ $metric['badge_class'] }}">
+                                                    @if ($metric['trend_icon'])
+                                                        <i class="{{ $metric['trend_icon'] }} me-1"></i>
+                                                    @endif
+                                                    {{ $metric['trend_label'] }}
+                                                </span>
                                             @endif
                                         </div>
-                                    @elseif ($metric['trend_type'] === 'simple')
-                                        <div class="text-muted mt-auto">This month</div>
+                                    @else
+                                        @if (!$metric['route'])
+                                            <div class="text-muted d-flex justify-content-between align-items-center mt-2">
+                                                <span class="badge {{ $metric['badge_class'] }}">
+                                                    @if ($metric['trend_icon'])
+                                                        <i class="{{ $metric['trend_icon'] }} me-1"></i>
+                                                    @endif
+                                                    {{ $metric['trend_label'] }}
+                                                </span>
+                                            </div>
+                                        @endif
                                     @endif
 
                                     @if ($metric['route'])
-                                        <div class="pt-2 mt-auto">
+                                        <div class="pt-2 mt-auto d-flex justify-content-between align-items-center">
                                             <a href="{{ $metric['route'] }}" class="text-secondary text-decoration-none">
                                                 View details <i class="ti ti-arrow-right ms-1"></i>
                                             </a>
+                                            <span class="badge {{ $metric['badge_class'] }}">
+                                                @if ($metric['trend_icon'])
+                                                    <i class="{{ $metric['trend_icon'] }} me-1"></i>
+                                                @endif
+                                                {{ $metric['trend_label'] }}
+                                            </span>
                                         </div>
                                     @endif
                                 </div>

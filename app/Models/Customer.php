@@ -17,4 +17,9 @@ class Customer extends Model
         'phone_number',
         'payment_terms'
     ];
+
+    public function sales()
+    {
+        return $this->hasMany(Sales::class);
+    }
 }

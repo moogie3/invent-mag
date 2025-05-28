@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, WarehouseController, TaxController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -127,6 +127,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/po/modal-view/{id}', [PurchaseController::class, 'modalView'])->name('admin.po.modal-view');
         Route::get('/sales/modal-view/{id}', [SalesController::class,'modalView'])->name('admin.sales.modal-view');
         Route::get('/product/modal-view/{id}', [ProductController::class, 'modalView'])->name('admin.product.modal-view');
+        Route::get('/reports', [ReportController::class, 'index'])->name('admin.reports');
 
         // Define tax API route
         Route::get('/setting/tax/get', function () {

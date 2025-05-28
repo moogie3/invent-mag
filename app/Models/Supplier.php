@@ -17,4 +17,9 @@ class Supplier extends Model
         'location',
         'payment_terms'
     ];
+
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class);
+    }
 }

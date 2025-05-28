@@ -4,41 +4,41 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Categories;
+use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Sales;
 use App\Models\SalesItem;
+use App\Models\Supplier;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Get metrics for dashboard
+        $reportType = $request->get('report_type', 'all');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $dateRange = $request->get('date_range', 'this_month');
+        $dates = $this->calculateDateRange($dateRange, $startDate, $endDate);
         $totalLiability = Purchase::sum('total');
         $unpaidLiability = Purchase::where('status', 'Unpaid')->sum('total');
         $totalRevenue = $this->getMonthlyRevenue();
         $unpaidRevenue = Sales::where('status', 'Unpaid')->sum('total');
-        $monthlySales = Sales::where('status', 'Paid')
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->sum('total');
+        $monthlySales = Sales::where('status', 'Paid')->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
         $outCountUnpaid = $this->getPurchaseCountByLocation('OUT', 'Unpaid');
-
+        $inCountUnpaid = $this->getPurchaseCountbyLocation('IN', 'Unpaid');
         // Get recent activities in the format expected by the view
-        $recentSales = Sales::with('customer')
-            ->orderBy('created_at', 'desc')
-            ->limit(3)
-            ->get();
+        $recentSales = Sales::with('customer')->orderBy('created_at', 'desc')->limit(3)->get();
 
-        $recentPurchases = Purchase::with('supplier')
-            ->orderBy('created_at', 'desc')
-            ->limit(3)
-            ->get();
+        $recentPurchases = Purchase::with('supplier')->orderBy('created_at', 'desc')->limit(3)->get();
 
         // Format all data for key metrics
-        $keyMetrics = $this->formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid);
+        $keyMetrics = $this->formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid, $inCountUnpaid);
 
         // Prepare financial summary items
         $financialItems = $this->prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue);
@@ -49,16 +49,63 @@ class DashboardController extends Controller
         // Prepare customer insights data
         $customerInsights = $this->prepareCustomerInsights();
 
-        // Format recent activities
-        $recentActivities = $this->formatRecentActivities($recentSales, $recentPurchases);
+        $customerAnalytics = $this->getCustomerAnalytics($dates);
+
+        // Get supplier analytics
+        $supplierAnalytics = $this->getSupplierAnalytics($dates);
+
+        $recentTransactions = $this->getRecentTransactions($dates, $reportType);
+
+        $categoryId = $request->get('category_id');
+
+        $topCategories = $this->getTopCategories($dates);
+
+        $salesData = Sales::selectRaw(
+            '
+            DATE_FORMAT(order_date, "%b") as month,
+            MONTH(order_date) as month_num,
+            SUM(total) as total
+        ',
+        )
+            ->whereYear('order_date', now()->year)
+            ->groupBy(DB::raw('MONTH(order_date)'), DB::raw('DATE_FORMAT(order_date, "%b")'))
+            ->orderBy('month_num')
+            ->get();
+
+        $chartLabels = $salesData->pluck('month')->toArray();
+        $chartData = $salesData->pluck('total')->toArray();
+
+        // Purchase chart data
+        $purchaseData = Purchase::selectRaw(
+            '
+            DATE_FORMAT(order_date, "%b") as month,
+            MONTH(order_date) as month_num,
+            SUM(total) as total
+        ',
+        )
+            ->whereYear('order_date', now()->year)
+            ->groupBy(DB::raw('MONTH(order_date)'), DB::raw('DATE_FORMAT(order_date, "%b")'))
+            ->orderBy('month_num')
+            ->get();
+
+        $purchaseChartLabels = $purchaseData->pluck('month')->toArray();
+        $purchaseChartData = $purchaseData->pluck('total')->toArray();
+
+        $monthlyData = $this->getMonthlyData($dates, $categoryId);
 
         return view('admin.dashboard', [
+            'topCategories' => $topCategories,
+            'monthlyData' => $monthlyData,
+            'chartLabels' => $chartLabels,
+            'chartData' => $chartData,
+            'purchaseChartLabels' => $purchaseChartLabels,
+            'purchaseChartData' => $purchaseChartData,
+            'customerAnalytics' => $customerAnalytics,
+            'supplierAnalytics' => $supplierAnalytics,
+            'recentTransactions' => $recentTransactions,
             'topSellingProducts' => $this->getTopSellingProducts(),
-            'topCustomers' => $this->getTopCustomers(),
-            'topSuppliers' => $this->getTopSuppliers(),
             'recentSales' => $recentSales,
             'recentPurchases' => $recentPurchases,
-            'recentActivities' => $recentActivities,
             'lowStockCount' => $this->getLowStockCount(),
             'expiringSoonCount' => $this->getExpiringSoonCount(),
             'totalliability' => $totalLiability,
@@ -77,14 +124,111 @@ class DashboardController extends Controller
             'keyMetrics' => $keyMetrics,
             'financialItems' => $financialItems,
             'invoiceStatusData' => $invoiceStatusData,
-            'customerInsights' => $customerInsights
+            'customerInsights' => $customerInsights,
         ]);
+    }
+
+    private function getTopCategories($dates)
+    {
+        // First get category revenue data
+        $categoryRevenue = DB::table('sales_items')
+            ->join('sales', 'sales_items.sales_id', '=', 'sales.id')
+            ->join('products', 'sales_items.product_id', '=', 'products.id')
+            ->select(['products.category_id', DB::raw('COUNT(DISTINCT products.id) as products_count'), DB::raw('SUM(sales_items.quantity * sales_items.customer_price) as revenue')])
+            ->whereBetween('sales.order_date', [$dates['start'], $dates['end']])
+            ->groupBy('products.category_id')
+            ->orderBy('revenue', 'desc')
+            ->limit(5)
+            ->get()
+            ->keyBy('category_id');
+
+        // Get categories and merge with revenue data
+        $categoryIds = $categoryRevenue->pluck('category_id');
+        $categories = Categories::whereIn('id', $categoryIds)->get();
+
+        $totalRevenue = $this->getTotalRevenue($dates);
+
+        return $categories
+            ->map(function ($category) use ($categoryRevenue, $totalRevenue) {
+                $revenueData = $categoryRevenue->get($category->id);
+                $revenue = $revenueData ? $revenueData->revenue : 0;
+                $productsCount = $revenueData ? $revenueData->products_count : 0;
+                $percentage = $totalRevenue > 0 ? ($revenue / $totalRevenue) * 100 : 0;
+
+                return [
+                    'name' => $category->name,
+                    'products_count' => $productsCount,
+                    'revenue' => $revenue,
+                    'percentage' => round($percentage, 1),
+                ];
+            })
+            ->sortByDesc('revenue')
+            ->values();
+    }
+
+    private function getMonthlyData($dates, $categoryId = null)
+    {
+        $months = [];
+        $current = $dates['start']->copy()->startOfMonth();
+        $end = $dates['end']->copy()->endOfMonth();
+
+        while ($current->lte($end)) {
+            $monthStart = $current->copy()->startOfMonth();
+            $monthEnd = $current->copy()->endOfMonth();
+
+            $revenue = $this->getTotalRevenue(['start' => $monthStart, 'end' => $monthEnd], $categoryId);
+            $expenses = $this->getTotalPurchases(['start' => $monthStart, 'end' => $monthEnd], $categoryId);
+            $profit = $revenue - $expenses;
+            $margin = $revenue > 0 ? ($profit / $revenue) * 100 : 0;
+
+            $months[] = [
+                'month' => $current->format('M Y'),
+                'revenue' => $revenue,
+                'expenses' => $expenses,
+                'profit' => $profit,
+                'margin' => $margin,
+            ];
+
+            $current->addMonth();
+        }
+
+        return $months;
+    }
+
+    private function getTotalRevenue($dates, $categoryId = null, $paymentStatus = null)
+    {
+        $query = Sales::whereBetween('order_date', [$dates['start'], $dates['end']]);
+
+        if ($paymentStatus) {
+            $query->where('status', $paymentStatus);
+        }
+
+        if ($categoryId) {
+            $query->whereHas('items.product', function ($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+
+        return $query->sum('total') ?? 0;
+    }
+
+    private function getTotalPurchases($dates, $categoryId = null)
+    {
+        $query = Purchase::whereBetween('order_date', [$dates['start'], $dates['end']]);
+
+        if ($categoryId) {
+            $query->whereHas('items.product', function ($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+
+        return $query->sum('total') ?? 0;
     }
 
     /**
      * Format key metrics data for the dashboard
      */
-    private function formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid)
+    private function formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid, $inCountUnpaid)
     {
         return [
             [
@@ -140,12 +284,12 @@ class DashboardController extends Controller
                 'format' => 'numeric',
                 'bar_color' => null,
                 'trend_type' => 'threshold',
-                'route' => route('admin.sales', ['status' => 'Unpaid']),
+                'route' => route('admin.po', ['status' => 'Unpaid']),
                 'percentage' => 0,
-                'trend' => $outCountUnpaid <= 5 ? 'positive' : 'negative',
-                'trend_label' => $outCountUnpaid <= 5 ? 'All good' : 'Action needed',
-                'trend_icon' => $outCountUnpaid <= 5 ? 'ti ti-trending-up' : 'ti ti-alert-circle',
-                'badge_class' => $outCountUnpaid <= 5 ? 'bg-success-lt' : 'bg-danger-lt',
+                'trend' => $outCountUnpaid + $inCountUnpaid <= 5 ? 'positive' : 'negative',
+                'trend_label' => $outCountUnpaid + $inCountUnpaid <= 5 ? 'All good' : 'Action needed',
+                'trend_icon' => $outCountUnpaid + $inCountUnpaid <= 5 ? 'ti ti-trending-up' : 'ti ti-alert-circle',
+                'badge_class' => $outCountUnpaid + $inCountUnpaid <= 5 ? 'bg-success-lt' : 'bg-danger-lt',
             ],
         ];
     }
@@ -199,13 +343,9 @@ class DashboardController extends Controller
         $collectionRate = $this->getCollectionRate();
         $avgDueDays = $this->getAverageDueDays();
 
-        $outPercentage = ($outCount ?? 0) > 0
-            ? ((($outCount ?? 0) - ($outCountUnpaid ?? 0)) / ($outCount ?? 1)) * 100
-            : 0;
+        $outPercentage = ($outCount ?? 0) > 0 ? ((($outCount ?? 0) - ($outCountUnpaid ?? 0)) / ($outCount ?? 1)) * 100 : 0;
 
-        $inPercentage = ($inCount ?? 0) > 0
-            ? ((($inCount ?? 0) - ($inCountUnpaid ?? 0)) / ($inCount ?? 1)) * 100
-            : 0;
+        $inPercentage = ($inCount ?? 0) > 0 ? ((($inCount ?? 0) - ($inCountUnpaid ?? 0)) / ($inCount ?? 1)) * 100 : 0;
 
         return [
             'totalInvoices' => $totalInvoices,
@@ -217,7 +357,7 @@ class DashboardController extends Controller
             'inCountUnpaid' => $inCountUnpaid ?? 0,
             'outPercentage' => $outPercentage,
             'inPercentage' => $inPercentage,
-            'avgDueDays' => $avgDueDays
+            'avgDueDays' => $avgDueDays,
         ];
     }
 
@@ -226,61 +366,41 @@ class DashboardController extends Controller
      */
     private function prepareCustomerInsights()
     {
-        $avgDueDays = $this->getAverageDueDays();
-        $collectionRate = $this->getCollectionRate();
+        // Average due days based on difference between due_date and payment_date (if paid)
+        $avgDueDays = Sales::whereNotNull('payment_date')->whereNotNull('due_date')->select(DB::raw('AVG(DATEDIFF(payment_date, due_date)) as avg_days'))->value('avg_days') ?? 0;
 
-        // Payment terms distribution (sample data)
-        $paymentTerms = [
-            ['term' => 'Net 15', 'count' => 24],
-            ['term' => 'Net 30', 'count' => 38],
-            ['term' => 'Net 60', 'count' => 16],
-            ['term' => 'Direct Payment', 'count' => 12],
-        ];
+        // Collection rate: % of total invoices that have been paid
+        $totalInvoices = Sales::count();
+        $paidInvoices = Sales::whereNotNull('payment_date')->count();
+        $collectionRate = $totalInvoices > 0 ? ($paidInvoices / $totalInvoices) * 100 : 0;
+
+        // Group customers by payment terms
+        $paymentTermsRaw = Customer::select('payment_terms', DB::raw('count(*) as count'))->groupBy('payment_terms')->get();
+
+        $paymentTerms = $paymentTermsRaw
+            ->map(function ($row) {
+                return [
+                    'term' => $row->payment_terms ?? 'Unknown',
+                    'count' => $row->count,
+                ];
+            })
+            ->toArray();
+
         $totalCustomers = array_sum(array_column($paymentTerms, 'count'));
 
-        $bgColor = $avgDueDays <= 15
-            ? 'bg-success'
-            : ($avgDueDays <= 30
-                ? 'bg-warning'
-                : 'bg-danger');
+        $bgColor = $avgDueDays <= 15 ? 'bg-success' : ($avgDueDays <= 30 ? 'bg-warning' : 'bg-danger');
 
         $percentage = min(100, max(0, ($avgDueDays / 45) * 100));
 
         return [
-            'avgDueDays' => $avgDueDays,
+            'avgDueDays' => round($avgDueDays),
             'collectionRate' => round($collectionRate),
             'paymentTerms' => $paymentTerms,
             'totalCustomers' => $totalCustomers,
-            'activeCustomers' => round($totalCustomers * 0.75),
+            'activeCustomers' => $totalCustomers,
             'bgColor' => $bgColor,
-            'percentage' => $percentage
+            'percentage' => $percentage,
         ];
-    }
-
-    /**
-     * Format recent activities
-     */
-    private function formatRecentActivities($recentSales, $recentPurchases)
-    {
-        $recentActivities = collect();
-
-        foreach ($recentSales as $sale) {
-            $recentActivities->push([
-                'type' => 'sale',
-                'data' => $sale,
-                'date' => $sale->created_at,
-            ]);
-        }
-
-        foreach ($recentPurchases as $purchase) {
-            $recentActivities->push([
-                'type' => 'purchase',
-                'data' => $purchase,
-                'date' => $purchase->created_at,
-            ]);
-        }
-
-        return $recentActivities->sortByDesc('date')->take(5);
     }
 
     /**
@@ -316,25 +436,17 @@ class DashboardController extends Controller
 
     private function getMonthlyRevenue()
     {
-        return Sales::whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->sum('total');
+        return Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
     }
 
     private function getPaidDebtMonthly()
     {
-        return Sales::whereMonth('updated_at', now()->month)
-            ->whereYear('updated_at', now()->year)
-            ->where('status', 'Paid')
-            ->sum('total');
+        return Sales::whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->where('status', 'Paid')->sum('total');
     }
 
     private function getLiabilityPaymentsMonthly()
     {
-        return Purchase::whereMonth('updated_at', now()->month)
-            ->whereYear('updated_at', now()->year)
-            ->where('status', 'Paid')
-            ->sum('total');
+        return Purchase::whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->where('status', 'Paid')->sum('total');
     }
 
     private function getPurchaseCountByLocation($location, $status = null)
@@ -348,109 +460,110 @@ class DashboardController extends Controller
 
     private function getTopSellingProducts()
     {
-        return SalesItem::select('product_id', DB::raw('SUM(quantity) as units_sold'), DB::raw('SUM(total) as revenue'))
-            ->with('product')
-            ->whereHas('product')
-            ->groupBy('product_id')
-            ->orderByDesc('units_sold')
-            ->limit(5)
-            ->get()
-            ->map(fn($item) => (object)[
+        return SalesItem::select('product_id', DB::raw('SUM(quantity) as units_sold'), DB::raw('SUM(total) as revenue'))->with('product')->whereHas('product')->groupBy('product_id')->orderByDesc('units_sold')->limit(5)->get()->map(
+            fn($item) => (object) [
                 'id' => $item->product_id,
                 'name' => $item->product->name ?? 'Unknown Product',
                 'code' => $item->product->code ?? 'N/A',
                 'image' => $item->product->image ?? null,
                 'category' => $item->product->category ?? null,
                 'units_sold' => $item->units_sold,
-                'revenue' => $item->revenue
-            ]);
+                'revenue' => $item->revenue,
+            ],
+        );
     }
 
-    private function getTopCustomers()
+    private function getCustomerAnalytics($dates)
     {
-        return Sales::select('customer_id', DB::raw('SUM(total) as total_sales'))
-            ->with('customer')
-            ->whereHas('customer')
-            ->groupBy('customer_id')
-            ->orderByDesc('total_sales')
-            ->limit(5)
-            ->get()
-            ->map(fn($item) => (object)[
+        $totalCustomers = Customer::count();
+
+        $activeCustomers = Customer::whereHas('sales', function ($query) use ($dates) {
+            $query->whereBetween('order_date', [$dates['start'], $dates['end']]);
+        })->count();
+
+        // Calculate retention rate (customers who made purchases in both current and previous period)
+        $previousPeriodStart = $dates['start']->copy()->subMonths(1);
+        $previousPeriodEnd = $dates['end']->copy()->subMonths(1);
+
+        $currentPeriodCustomers = Customer::whereHas('sales', function ($query) use ($dates) {
+            $query->whereBetween('order_date', [$dates['start'], $dates['end']]);
+        })->pluck('id');
+
+        $previousPeriodCustomers = Customer::whereHas('sales', function ($query) use ($previousPeriodStart, $previousPeriodEnd) {
+            $query->whereBetween('order_date', [$previousPeriodStart, $previousPeriodEnd]);
+        })->pluck('id');
+
+        $retainedCustomers = $currentPeriodCustomers->intersect($previousPeriodCustomers)->count();
+        $retentionRate = $previousPeriodCustomers->count() > 0 ? ($retainedCustomers / $previousPeriodCustomers->count()) * 100 : 0;
+
+        // Average order value
+        $avgOrderValue = Sales::whereBetween('order_date', [$dates['start'], $dates['end']])->avg('total') ?? 0;
+
+        // Customer lifetime value (simplified calculation)
+        $customerLifetimeValue = $totalCustomers > 0 ? Sales::sum('total') / $totalCustomers : 0;
+
+        // Get top customers
+        $topCustomers = Sales::select('customer_id', DB::raw('SUM(total) as total_sales'))->with('customer')->whereHas('customer')->groupBy('customer_id')->orderByDesc('total_sales')->limit(5)->get()->map(
+            fn($item) => (object) [
                 'id' => $item->customer_id,
                 'name' => $item->customer->name ?? 'Unknown Customer',
-                'total_sales' => $item->total_sales
-            ]);
+                'total_sales' => $item->total_sales,
+            ],
+        );
+
+        return [
+            'totalCustomers' => $totalCustomers,
+            'activeCustomers' => $activeCustomers,
+            'retentionRate' => round($retentionRate, 1),
+            'avgOrderValue' => $avgOrderValue,
+            'customerLifetimeValue' => $customerLifetimeValue,
+            'topCustomers' => $topCustomers,
+        ];
     }
 
-    private function getTopSuppliers()
+    private function getSupplierAnalytics($dates)
     {
-        return Purchase::select('supplier_id', DB::raw('SUM(total) as total_purchases'))
-            ->with('supplier')
-            ->whereHas('supplier')
-            ->groupBy('supplier_id')
-            ->orderByDesc('total_purchases')
-            ->limit(5)
-            ->get()
-            ->map(fn($item) => (object)[
+        $totalSuppliers = Supplier::count();
+
+        $activeSuppliers = Supplier::whereHas('purchases', function ($query) use ($dates) {
+            $query->whereBetween('order_date', [$dates['start'], $dates['end']]);
+        })->count();
+
+        // Payment performance (percentage of paid purchases)
+        $totalPurchases = Purchase::whereBetween('order_date', [$dates['start'], $dates['end']])->count();
+        $paidPurchases = Purchase::whereBetween('order_date', [$dates['start'], $dates['end']])
+            ->where('status', 'Paid')
+            ->count();
+
+        $supplierPaymentPerformance = $totalPurchases > 0 ? ($paidPurchases / $totalPurchases) * 100 : 0;
+
+        // Average purchase value
+        $avgPurchaseValue = Purchase::whereBetween('order_date', [$dates['start'], $dates['end']])->avg('total') ?? 0;
+
+        // Total outstanding (unpaid + partial)
+        $totalOutstanding =
+            Purchase::whereBetween('order_date', [$dates['start'], $dates['end']])
+                ->whereIn('status', ['Unpaid', 'Partial'])
+                ->sum('total') ?? 0;
+
+        // Get top suppliers
+        $topSuppliers = Purchase::select('supplier_id', DB::raw('SUM(total) as total_purchases'))->with('supplier')->whereHas('supplier')->groupBy('supplier_id')->orderByDesc('total_purchases')->limit(5)->get()->map(
+            fn($item) => (object) [
                 'id' => $item->supplier_id,
                 'name' => $item->supplier->name ?? 'Unknown Supplier',
                 'location' => $item->supplier->location ?? 'N/A',
-                'total_purchases' => $item->total_purchases
-            ]);
-    }
+                'total_purchases' => $item->total_purchases,
+            ],
+        );
 
-    private function getRecentActivity()
-    {
-        $recentSales = Sales::with('customer')
-            ->latest()
-            ->limit(5)
-            ->get()
-            ->map(fn($sale) => [
-                'type' => 'sale',
-                'title' => 'New Sale: ' . $sale->invoice,
-                'description' => 'To ' . ($sale->customer->name ?? 'Unknown Customer'),
-                'amount' => $sale->total,
-                'time' => $sale->created_at->diffForHumans(),
-                'icon' => 'ti ti-shopping-cart',
-                'color' => 'bg-green text-white'
-            ]);
-
-        $recentPurchases = Purchase::with('supplier')
-            ->latest()
-            ->limit(5)
-            ->get()
-            ->map(fn($purchase) => [
-                'type' => 'purchase',
-                'title' => 'New Purchase: ' . $purchase->invoice,
-                'description' => 'From ' . ($purchase->supplier->name ?? 'Unknown Supplier'),
-                'amount' => $purchase->total,
-                'time' => $purchase->created_at->diffForHumans(),
-                'icon' => 'ti ti-truck-delivery',
-                'color' => 'bg-blue text-white'
-            ]);
-
-        $recentPayments = Purchase::where('status', 'Paid')
-            ->whereNotNull('payment_date')
-            ->orderByDesc('payment_date')
-            ->limit(3)
-            ->get()
-            ->map(fn($payment) => [
-                'type' => 'payment',
-                'title' => 'Payment Made: ' . $payment->invoice,
-                'description' => 'Amount: ' . CurrencyHelper::format($payment->total),
-                'amount' => $payment->total,
-                'time' => Carbon::parse($payment->payment_date)->diffForHumans(),
-                'icon' => 'ti ti-currency-dollar',
-                'color' => 'bg-purple text-white'
-            ]);
-
-        return $recentSales
-            ->concat($recentPurchases)
-            ->concat($recentPayments)
-            ->sortByDesc(fn($item) => strtotime($item['time']))
-            ->take(8)
-            ->values()
-            ->toArray();
+        return [
+            'totalSuppliers' => $totalSuppliers,
+            'activeSuppliers' => $activeSuppliers,
+            'supplierPaymentPerformance' => round($supplierPaymentPerformance, 1),
+            'avgPurchaseValue' => $avgPurchaseValue,
+            'totalOutstanding' => $totalOutstanding,
+            'topSuppliers' => $topSuppliers,
+        ];
     }
 
     /**
@@ -465,7 +578,7 @@ class DashboardController extends Controller
             ->whereNotNull('due_date')
             ->get()
             ->avg(function ($sale) {
-                return $sale->payment_date->diffInDays($sale->due_date);
+                return $sale->payment_date->diffInDays($sale->payment_date);
             });
 
         return round($avgDays) ?? 0;
@@ -482,5 +595,101 @@ class DashboardController extends Controller
         $paidInvoices = Sales::where('status', 'Paid')->count();
 
         return $totalInvoices > 0 ? round(($paidInvoices / $totalInvoices) * 100) : 0;
+    }
+
+    private function getRecentTransactions($dates, $reportType = 'all')
+    {
+        $transactions = collect();
+
+        if ($reportType === 'all' || $reportType === 'sales') {
+            $sales = Sales::with('customer')
+                ->whereBetween('order_date', [$dates['start'], $dates['end']])
+                ->orderBy('order_date', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function ($sale) {
+                    return [
+                        'type' => 'sale',
+                        'invoice' => $sale->invoice,
+                        'customer_supplier' => $sale->customer->name ?? 'Walk-in Customer',
+                        'date' => $sale->order_date,
+                        'amount' => $sale->total,
+                        'status' => $sale->status,
+                    ];
+                });
+
+            $transactions = $transactions->merge($sales);
+        }
+
+        if ($reportType === 'all' || $reportType === 'purchases') {
+            $purchases = Purchase::with('supplier')
+                ->whereBetween('order_date', [$dates['start'], $dates['end']])
+                ->orderBy('order_date', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function ($purchase) {
+                    return [
+                        'type' => 'Purchase',
+                        'invoice' => $purchase->invoice,
+                        'customer_supplier' => $purchase->supplier->name ?? 'Unknown Supplier',
+                        'date' => $purchase->order_date,
+                        'amount' => $purchase->total,
+                        'status' => $purchase->status,
+                    ];
+                });
+
+            $transactions = $transactions->merge($purchases);
+        }
+
+        return $transactions->sortByDesc('date')->take(20)->values();
+    }
+
+    private function calculateDateRange($dateRange, $startDate = null, $endDate = null)
+    {
+        $now = Carbon::now();
+
+        switch ($dateRange) {
+            case 'today':
+                $start = $now->copy()->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
+            case 'yesterday':
+                $start = $now->copy()->subDay()->startOfDay();
+                $end = $now->copy()->subDay()->endOfDay();
+                break;
+            case 'this_week':
+                $start = $now->copy()->startOfWeek();
+                $end = $now->copy()->endOfWeek();
+                break;
+            case 'last_week':
+                $start = $now->copy()->subWeek()->startOfWeek();
+                $end = $now->copy()->subWeek()->endOfWeek();
+                break;
+            case 'this_month':
+                $start = $now->copy()->startOfMonth();
+                $end = $now->copy()->endOfMonth();
+                break;
+            case 'last_month':
+                $start = $now->copy()->subMonth()->startOfMonth();
+                $end = $now->copy()->subMonth()->endOfMonth();
+                break;
+            case 'this_quarter':
+                $start = $now->copy()->startOfQuarter();
+                $end = $now->copy()->endOfQuarter();
+                break;
+            case 'this_year':
+                $start = $now->copy()->startOfYear();
+                $end = $now->copy()->endOfYear();
+                break;
+            case 'custom':
+                $start = $startDate ? Carbon::parse($startDate)->startOfDay() : $now->copy()->startOfMonth();
+                $end = $endDate ? Carbon::parse($endDate)->endOfDay() : $now->copy()->endOfMonth();
+                break;
+            default:
+                $start = $now->copy()->startOfMonth();
+                $end = $now->copy()->endOfMonth();
+        }
+
+        return ['start' => $start, 'end' => $end];
     }
 }

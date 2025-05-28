@@ -1,3 +1,4 @@
+<!-- Updated HTML structure for the card -->
 <div class="card shadow-sm border-1 mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title mb-0">
@@ -5,19 +6,23 @@
         </h3>
         <div class="card-actions">
             <div class="dropdown">
-                <a href="#" class="btn btn-sm btn-icon" data-bs-toggle="dropdown">
-                    <i class="ti ti-dots-vertical"></i>
-                </a>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#" onclick="updateChart('7days')">Last 7
-                        days</a>
-                    <a class="dropdown-item" href="#" onclick="updateChart('30days')">Last 30
-                        days</a>
-                    <a class="dropdown-item" href="#" onclick="updateChart('3months')">Last 3
-                        months</a>
-                    <a class="dropdown-item" href="#" onclick="updateChart('year')">Last
-                        year</a>
-                </div>
+                <button class="btn btn-sm btn-icon dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#" onclick="updateChart('7days'); return false;">
+                            <i class="ti ti-calendar-week me-2"></i>Last 7 days
+                        </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="updateChart('30days'); return false;">
+                            <i class="ti ti-calendar-month me-2"></i>Last 30 days
+                        </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="updateChart('3months'); return false;">
+                            <i class="ti ti-calendar me-2"></i>Last 3 months
+                        </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="updateChart('year'); return false;">
+                            <i class="ti ti-calendar me-2"></i>Last year
+                        </a></li>
+                </ul>
             </div>
         </div>
     </div>

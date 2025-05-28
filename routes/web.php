@@ -127,7 +127,6 @@ Route::prefix('admin')->group(function () {
         Route::get('/po/modal-view/{id}', [PurchaseController::class, 'modalView'])->name('admin.po.modal-view');
         Route::get('/sales/modal-view/{id}', [SalesController::class,'modalView'])->name('admin.sales.modal-view');
         Route::get('/product/modal-view/{id}', [ProductController::class, 'modalView'])->name('admin.product.modal-view');
-        Route::get('/reports', [ReportController::class, 'index'])->name('admin.reports');
 
         // Define tax API route
         Route::get('/setting/tax/get', function () {

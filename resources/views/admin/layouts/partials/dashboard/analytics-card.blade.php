@@ -11,8 +11,8 @@
 
     <!-- Analytics Section -->
     <div class="card-body p-3 border-bottom">
-        @include('admin.partials.dashboard.analytics-stats', compact('analytics', 'type'))
-        @include('admin.partials.dashboard.analytics-metrics', compact('analytics', 'type'))
+        @include('admin.layouts.partials.dashboard.analytics-stats', compact('analytics', 'type'))
+        @include('admin.layouts.partials.dashboard.analytics-metrics', compact('analytics', 'type'))
     </div>
 
     <!-- Top Items Table Section -->
@@ -20,6 +20,6 @@
         <div class="text-center py-2">
             <h5 class="text-muted">Top {{ ucfirst($type) }}s</h5>
         </div>
-        @include('admin.partials.dashboard.analytics-table', compact('analytics', 'type'))
+        @include('admin.layouts.partials.dashboard.analytics-table', compact('analytics', 'type'))
     </div>
 </div>

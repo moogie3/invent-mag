@@ -2,5 +2,5 @@
     <a href="{{ $metric['route'] }}" class="text-secondary text-decoration-none">
         View details <i class="ti ti-arrow-right ms-1"></i>
     </a>
-    @include('admin.partials.dashboard.trend-badge', ['metric' => $metric])
+    @include('admin.layouts.partials.dashboard.trend-badge', ['metric' => $metric])
 </div>

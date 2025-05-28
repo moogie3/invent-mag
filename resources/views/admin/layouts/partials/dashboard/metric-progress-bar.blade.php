@@ -7,6 +7,6 @@
         {{ $metric['format'] === 'currency' ? \App\Helpers\CurrencyHelper::format($metric['total']) : $metric['total'] }}
     </span>
     @unless ($metric['route'])
-        @include('admin.partials.dashboard.trend-badge', ['metric' => $metric])
+        @include('admin.layouts.partials.dashboard.trend-badge', ['metric' => $metric])
     @endunless
 </div>

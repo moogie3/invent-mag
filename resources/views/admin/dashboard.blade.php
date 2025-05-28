@@ -5,7 +5,7 @@
 @section('content')
     <div class="page-wrapper">
         <!-- Page Header -->
-        @include('admin.partials.dashboard.dashboard-header')
+        @include('admin.layouts.partials.dashboard.dashboard-header')
 
         <!-- Page Body -->
         <div class="page-body">
@@ -13,7 +13,7 @@
                 <!-- Key Metrics Cards -->
                 <div class="row g-4 mb-4">
                     @foreach ($keyMetrics as $metric)
-                        @include('admin.partials.dashboard.metric-card', compact('metric'))
+                        @include('admin.layouts.partials.dashboard.metric-card', compact('metric'))
                     @endforeach
                 </div>
 
@@ -21,17 +21,17 @@
                 <div class="row mb-4">
                     <!-- Left Column (8/12) -->
                     <div class="col-lg-8">
-                        @include('admin.partials.dashboard.performance-chart')
-                        @include('admin.partials.dashboard.top-products-table')
-                        @include('admin.partials.dashboard.top-categories-card')
-                        @include('admin.partials.dashboard.recent-transactions')
+                        @include('admin.layouts.partials.dashboard.performance-chart')
+                        @include('admin.layouts.partials.dashboard.top-products-table')
+                        @include('admin.layouts.partials.dashboard.top-categories-card')
+                        @include('admin.layouts.partials.dashboard.recent-transactions')
                     </div>
 
                     <!-- Right Column (4/12) -->
                     <div class="col-lg-4">
-                        @include('admin.partials.dashboard.system-alerts')
-                        @include('admin.partials.dashboard.quick-actions')
-                        @include('admin.partials.dashboard.analytics-card', [
+                        @include('admin.layouts.partials.dashboard.system-alerts')
+                        @include('admin.layouts.partials.dashboard.quick-actions')
+                        @include('admin.layouts.partials.dashboard.analytics-card', [
                             'title' => 'Customer Analysis',
                             'icon' => 'ti-users',
                             'color' => 'azure',
@@ -39,7 +39,7 @@
                             'analytics' => $customerAnalytics,
                             'type' => 'customer',
                         ])
-                        @include('admin.partials.dashboard.analytics-card', [
+                        @include('admin.layouts.partials.dashboard.analytics-card', [
                             'title' => 'Supplier Analysis',
                             'icon' => 'ti-truck',
                             'color' => 'purple',
@@ -52,15 +52,13 @@
 
                 <!-- Lower Section -->
                 <div class="row mb-4">
-                    @include('admin.partials.dashboard.financial-summary')
-                    @include('admin.partials.dashboard.invoice-status')
-                    @include('admin.partials.dashboard.customer-insights')
-                    @include('admin.partials.dashboard.revenue-expenses-table')
+                    @include('admin.layouts.partials.dashboard.financial-summary')
+                    @include('admin.layouts.partials.dashboard.invoice-status')
+                    @include('admin.layouts.partials.dashboard.customer-insights')
+                    @include('admin.layouts.partials.dashboard.revenue-expenses-table')
                 </div>
             </div>
         </div>
     </div>
-
-    @include('admin.partials.dashboard.filter-modal')
-    @include('admin.partials.dashboard.dashboard-scripts')
+    @include('admin.layouts.partials.dashboard.dashboard-scripts')
 @endsection

@@ -91,6 +91,26 @@ class DashboardController extends Controller
         $purchaseChartLabels = $purchaseData->pluck('month')->toArray();
         $purchaseChartData = $purchaseData->pluck('total')->toArray();
 
+        if ($request->ajax()) {
+            $period = $request->get('period', '30days');
+            $type = $request->get('type', 'sales');
+
+            // Convert period to date range
+            $dates = $this->convertPeriodToDates($period);
+
+            if ($type === 'sales') {
+                $data = $this->getSalesChartData($dates);
+            } else {
+                $data = $this->getPurchaseChartData($dates);
+            }
+
+            return response()->json([
+                'labels' => $data['labels'],
+                'data' => $data['data'],
+                'formatted' => $data['formatted'],
+            ]);
+        }
+
         $monthlyData = $this->getMonthlyData($dates, $categoryId);
 
         return view('admin.dashboard', [
@@ -400,6 +420,53 @@ class DashboardController extends Controller
             'activeCustomers' => $totalCustomers,
             'bgColor' => $bgColor,
             'percentage' => $percentage,
+        ];
+    }
+
+    private function convertPeriodToDates($period)
+    {
+        $now = Carbon::now();
+        switch ($period) {
+            case '7days':
+                return ['start' => $now->copy()->subDays(7), 'end' => $now];
+            case '30days':
+                return ['start' => $now->copy()->subDays(30), 'end' => $now];
+            case '3months':
+                return ['start' => $now->copy()->subMonths(3), 'end' => $now];
+            case 'year':
+                return ['start' => $now->copy()->subYear(), 'end' => $now];
+            default:
+                return ['start' => $now->copy()->subDays(30), 'end' => $now];
+        }
+    }
+
+    private function getSalesChartData($dates)
+    {
+        $salesData = Sales::selectRaw('DATE(order_date) as date, SUM(total) as total')
+            ->whereBetween('order_date', [$dates['start'], $dates['end']])
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        return [
+            'labels' => $salesData->pluck('date')->toArray(),
+            'data' => $salesData->pluck('total')->toArray(),
+            'formatted' => $salesData->pluck('total')->map(fn($val) => number_format($val))->toArray(),
+        ];
+    }
+
+    private function getPurchaseChartData($dates)
+    {
+        $purchaseData = Purchase::selectRaw('DATE(order_date) as date, SUM(total) as total')
+            ->whereBetween('order_date', [$dates['start'], $dates['end']])
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        return [
+            'labels' => $purchaseData->pluck('date')->toArray(),
+            'data' => $purchaseData->pluck('total')->toArray(),
+            'formatted' => $purchaseData->pluck('total')->map(fn($val) => number_format($val))->toArray(),
         ];
     }
 

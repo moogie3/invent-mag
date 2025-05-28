@@ -14,13 +14,13 @@
             </div>
 
             @if ($metric['total'] !== null && $metric['bar_color'])
-                @include('admin.partials.dashboard.metric-progress-bar', compact('metric'))
+                @include('admin.layouts.partials.dashboard.metric-progress-bar', compact('metric'))
             @else
-                @include('admin.partials.dashboard.metric-trend-badge', compact('metric'))
+                @include('admin.layouts.partials.dashboard.metric-trend-badge', compact('metric'))
             @endif
 
             @if ($metric['route'])
-                @include('admin.partials.dashboard.metric-view-details', compact('metric'))
+                @include('admin.layouts.partials.dashboard.metric-view-details', compact('metric'))
             @endif
         </div>
     </div>

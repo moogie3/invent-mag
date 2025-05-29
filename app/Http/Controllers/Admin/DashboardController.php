@@ -136,7 +136,7 @@ class DashboardController extends Controller
             'liabilitypaymentMonthly' => $this->getLiabilityPaymentsMonthly(),
             'inCount' => $this->getPurchaseCountByLocation('IN'),
             'outCount' => $this->getPurchaseCountByLocation('OUT'),
-            'inCountUnpaid' => $this->getPurchaseCountByLocation('IN', 'Unpaid'),
+            'inCountUnpaid' => $inCountUnpaid,
             'outCountUnpaid' => $outCountUnpaid,
             'totalRevenue' => $totalRevenue,
             'avgDueDays' => $this->getAverageDueDays(),
@@ -299,7 +299,7 @@ class DashboardController extends Controller
             [
                 'title' => 'Payment Overdue',
                 'icon' => 'ti-alert-triangle',
-                'value' => $outCountUnpaid,
+                'value' => $outCountUnpaid + $inCountUnpaid,
                 'total' => 5,
                 'format' => 'numeric',
                 'bar_color' => null,

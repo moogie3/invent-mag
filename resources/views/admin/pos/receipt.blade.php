@@ -27,7 +27,7 @@
             <div class="container-xl">
                 <div class="row row-deck row-cards">
                     <div class="col-md-10 mx-auto">
-                        <div class="card card-primary receipt-card">
+                        <div class="card card-primary receipt-card receipt-preview">
                             <div class="card-body">
                                 <div class="receipt-container">
 
@@ -35,10 +35,10 @@
                                     <div class="text-center mb-3 receipt-header">
                                         <h3 class="mb-1">{{ Auth::user()->shopname ?? 'No Shop Name' }}</h3>
                                         <div class="receipt-meta">
-                                            <span class="receipt-number">#{{ $sale->invoice }}</span>
-                                            <span class="receipt-date">
+                                            <div class="receipt-number">Invoice: #{{ $sale->invoice }}</div>
+                                            <div class="receipt-date">
                                                 {{ optional($sale->order_date)->format('d M Y, H:i:s') ?? now()->format('d M Y, H:i:s') }}
-                                            </span>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -52,9 +52,9 @@
                                                     <p class="mb-0 text-muted small">{{ $sale->customer->phone_number }}</p>
                                                 @endif
                                             </div>
-                                            <div class="col-md-6 text-md-end">
+                                            <div class="col-md-6">
                                                 <h5 class="section-title">Payment</h5>
-                                                <p class="mb-0 text-muted small">Method: {{ $sale->payment_type }}</p>
+                                                <p class="mb-0 text-muted small">{{ $sale->payment_type }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -107,7 +107,7 @@
                                         </div>
 
                                         <div class="total-row total-main">
-                                            <span>Total</span>
+                                            <span>TOTAL</span>
                                             <span>{{ \App\Helpers\CurrencyHelper::format($grandTotal) }}</span>
                                         </div>
 
@@ -127,6 +127,7 @@
                                     <div class="text-center mt-3 receipt-footer">
                                         <p class="mb-1">Thank you for your purchase!</p>
                                         <p class="small text-muted mb-0">{{ Auth::user()->shopname ?? 'No Shop Name' }}</p>
+                                        <p class="small text-muted mb-0">Please come again!</p>
                                     </div>
 
                                 </div>

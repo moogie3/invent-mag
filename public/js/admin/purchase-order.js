@@ -51,6 +51,97 @@ class PurchaseOrderModule {
             ? (subtotal * discountValue) / 100
             : discountValue;
     }
+
+    // Add this to your PurchaseOrderView class constructor
+    initBulkSelection() {
+        // Use a slight delay to ensure DOM is fully loaded
+        setTimeout(() => {
+            // Bulk selection handling
+            this.elements.selectAll = document.getElementById("selectAll");
+            this.elements.rowCheckboxes =
+                document.querySelectorAll(".row-checkbox");
+            this.elements.bulkActionsBar =
+                document.getElementById("bulkActionsBar");
+            this.elements.selectedCount =
+                document.getElementById("selectedCount");
+
+            console.log(
+                "Found checkboxes:",
+                this.elements.rowCheckboxes.length
+            ); // Debug log
+
+            if (this.elements.selectAll) {
+                // Remove any existing event listeners first
+                this.elements.selectAll.removeEventListener(
+                    "change",
+                    this.handleSelectAll
+                );
+
+                // Bind the method to maintain context
+                this.handleSelectAll = (e) => {
+                    console.log("Select all clicked:", e.target.checked); // Debug log
+                    this.elements.rowCheckboxes.forEach((checkbox) => {
+                        checkbox.checked = e.target.checked;
+                    });
+                    this.updateBulkActions();
+                };
+
+                this.elements.selectAll.addEventListener(
+                    "change",
+                    this.handleSelectAll
+                );
+            }
+
+            // Add event listeners to individual checkboxes
+            this.elements.rowCheckboxes.forEach((checkbox, index) => {
+                console.log(`Adding listener to checkbox ${index}`); // Debug log
+                checkbox.addEventListener("change", () => {
+                    console.log(`Checkbox ${index} changed:`, checkbox.checked); // Debug log
+                    this.updateBulkActions();
+                });
+            });
+
+            // Initial update
+            this.updateBulkActions();
+        }, 100);
+    }
+
+    // Updated updateBulkActions method
+    updateBulkActions() {
+        // Re-query to get current state
+        const currentCheckboxes = document.querySelectorAll(".row-checkbox");
+        const checkedBoxes = document.querySelectorAll(".row-checkbox:checked");
+        const count = checkedBoxes.length;
+
+        console.log(
+            `Total checkboxes: ${currentCheckboxes.length}, Checked: ${count}`
+        ); // Debug log
+
+        if (this.elements.selectedCount) {
+            this.elements.selectedCount.textContent = count;
+        }
+
+        if (this.elements.bulkActionsBar) {
+            if (count === 0) {
+                this.elements.bulkActionsBar.classList.add("d-none");
+            } else {
+                this.elements.bulkActionsBar.classList.remove("d-none");
+            }
+        }
+
+        if (this.elements.selectAll) {
+            if (count === 0) {
+                this.elements.selectAll.indeterminate = false;
+                this.elements.selectAll.checked = false;
+            } else if (count === currentCheckboxes.length) {
+                this.elements.selectAll.indeterminate = false;
+                this.elements.selectAll.checked = true;
+            } else {
+                this.elements.selectAll.indeterminate = true;
+                this.elements.selectAll.checked = false;
+            }
+        }
+    }
 }
 
 /**
@@ -714,10 +805,54 @@ class PurchaseOrderView extends PurchaseOrderModule {
         // Format all currency values on page load
         this.formatAllCurrencyValues();
 
+        this.initBulkSelection();
         // Initialize modal functionality if we're on a page with modals
         if (this.elements.poModalPrint) {
             this.initModalListeners();
         }
+    }
+
+    /**
+     * Initialize bulk selection with retry mechanism
+     */
+    initBulkSelectionWithRetry() {
+        // Try immediately
+        if (this.tryInitBulkSelection()) {
+            return;
+        }
+
+        // If immediate attempt fails, try again after DOM is fully loaded
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", () => {
+                setTimeout(() => this.tryInitBulkSelection(), 100);
+            });
+        } else {
+            // DOM is already loaded, try after a short delay
+            setTimeout(() => this.tryInitBulkSelection(), 100);
+        }
+    }
+
+    /**
+     * Try to initialize bulk selection
+     * @returns {boolean} Success status
+     */
+    tryInitBulkSelection() {
+        const selectAll = document.getElementById("selectAll");
+        const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+        const bulkActionsBar = document.getElementById("bulkActionsBar");
+
+        console.log("Trying to init bulk selection...");
+        console.log("SelectAll found:", !!selectAll);
+        console.log("Row checkboxes found:", rowCheckboxes.length);
+        console.log("Bulk actions bar found:", !!bulkActionsBar);
+
+        if (!selectAll || rowCheckboxes.length === 0 || !bulkActionsBar) {
+            console.warn("Required elements not found for bulk selection");
+            return false;
+        }
+
+        this.initBulkSelection();
+        return true;
     }
 
     /**
@@ -877,7 +1012,175 @@ document.addEventListener("DOMContentLoaded", function () {
                 window.poApp.loadPoDetails(id);
             }
         };
+
+        window.clearSelection = function () {
+            document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+                checkbox.checked = false;
+            });
+            const selectAll = document.getElementById("selectAll");
+            if (selectAll) selectAll.checked = false;
+
+            const bulkActionsBar = document.getElementById("bulkActionsBar");
+            if (bulkActionsBar) bulkActionsBar.style.display = "none";
+        };
+
+        window.bulkMarkAsPaid = function () {
+            const selected = Array.from(
+                document.querySelectorAll(".row-checkbox:checked")
+            ).map((cb) => cb.value);
+
+            if (selected.length === 0) return;
+
+            if (
+                confirm(
+                    "Are you sure you want to mark " +
+                        selected.length +
+                        " purchase orders as paid?"
+                )
+            ) {
+                // Show loading state
+                const bulkBtn = document.querySelector(
+                    '[onclick="bulkMarkAsPaid()"]'
+                );
+                const originalText = bulkBtn.innerHTML;
+                bulkBtn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-1"></span>Processing...';
+                bulkBtn.disabled = true;
+
+                fetch("/admin/po/bulk-mark-paid", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                    },
+                    body: JSON.stringify({
+                        ids: selected,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            showToast(
+                                "Success",
+                                data.message ||
+                                    "Purchase orders marked as paid successfully!",
+                                "success"
+                            );
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showToast(
+                                "Error",
+                                data.message || "An error occurred",
+                                "error"
+                            );
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        showToast(
+                            "Error",
+                            "An error occurred while updating purchase orders.",
+                            "error"
+                        );
+                    })
+                    .finally(() => {
+                        bulkBtn.innerHTML = originalText;
+                        bulkBtn.disabled = false;
+                    });
+            }
+        };
+
+        window.bulkExport = function () {
+            const selected = Array.from(
+                document.querySelectorAll(".row-checkbox:checked")
+            ).map((cb) => cb.value);
+
+            if (selected.length === 0) return;
+
+            const params = new URLSearchParams(window.location.search);
+            params.set("export", "excel");
+            params.set("selected", selected.join(","));
+            window.location.href = "/admin/po?" + params.toString();
+        };
     } catch (error) {
         console.error("Error initializing Purchase Order App:", error);
     }
 });
+
+// Toast notification function
+function showToast(title, message, type = "info", duration = 4000) {
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+        toastContainer = document.createElement("div");
+        toastContainer.id = "toast-container";
+        toastContainer.className =
+            "toast-container position-fixed bottom-0 end-0 p-3";
+        toastContainer.style.zIndex = "1050";
+        document.body.appendChild(toastContainer);
+
+        if (!document.getElementById("toast-styles")) {
+            const style = document.createElement("style");
+            style.id = "toast-styles";
+            style.textContent = `
+                .toast-enter { transform: translateX(100%); opacity: 0; }
+                .toast-show { transform: translateX(0); opacity: 1; transition: transform 0.3s ease, opacity 0.3s ease; }
+                .toast-exit { transform: translateX(100%); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    const toast = document.createElement("div");
+    toast.className =
+        "toast toast-enter align-items-center text-white bg-" +
+        getToastColor(type) +
+        " border-0";
+    toast.setAttribute("role", "alert");
+
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <strong>${title}</strong>: ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+
+    toastContainer.appendChild(toast);
+    void toast.offsetWidth;
+    toast.classList.add("toast-show");
+
+    const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: duration,
+    });
+    bsToast.show();
+
+    const closeButton = toast.querySelector(".btn-close");
+    closeButton.addEventListener("click", () => hideToast(toast));
+
+    const hideTimeout = setTimeout(() => hideToast(toast), duration);
+    toast._hideTimeout = hideTimeout;
+}
+
+function hideToast(toast) {
+    if (toast._hideTimeout) clearTimeout(toast._hideTimeout);
+    toast.classList.remove("toast-show");
+    toast.classList.add("toast-exit");
+    setTimeout(() => toast.remove(), 300);
+}
+
+function getToastColor(type) {
+    switch (type) {
+        case "success":
+            return "success";
+        case "error":
+            return "danger";
+        case "warning":
+            return "warning";
+        default:
+            return "info";
+    }
+}

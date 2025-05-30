@@ -18,7 +18,7 @@
                 </div>
 
                 <!-- Main Content Section -->
-                <div class="row mb-4">
+                <div class="row mb-2">
                     <!-- Left Column (8/12) -->
                     <div class="col-lg-8">
                         @include('admin.layouts.partials.dashboard.performance-chart')
@@ -52,10 +52,10 @@
 
                 <!-- Lower Section -->
                 <div class="row mb-4">
+                    @include('admin.layouts.partials.dashboard.revenue-expenses-table')
                     @include('admin.layouts.partials.dashboard.financial-summary')
                     @include('admin.layouts.partials.dashboard.invoice-status')
                     @include('admin.layouts.partials.dashboard.customer-insights')
-                    @include('admin.layouts.partials.dashboard.revenue-expenses-table')
                 </div>
             </div>
         </div>

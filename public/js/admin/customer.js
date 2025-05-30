@@ -24,7 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
             customerPayment;
 
         // Set the form action dynamically
+        const routeBase = document.getElementById("updateRouteBase").value;
         document.getElementById("editCustomerForm").action =
-            "{{ route('admin.customer.update', '') }}/" + customerId;
+            routeBase + "/" + customerId;
     });
 });

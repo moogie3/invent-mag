@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -85,6 +85,12 @@ Route::prefix('admin')->group(function () {
         Route::post('/product/quick-create', [ProductController::class, 'quickCreate'])->name('admin.product.quickCreate');
         Route::get('/warehouse/{id}/set-main', [WarehouseController::class, 'setMain'])->name('admin.warehouse.set-main');
         Route::get('/warehouse/{id}/unset-main', [WarehouseController::class, 'unsetMain'])->name('admin.warehouse.unset-main');
+
+        // Transaction Routes
+        Route::prefix('transactions')->group(function () {
+            Route::get('/', [TransactionController::class, 'index'])->name('admin.transactions');
+            Route::post('/{id}/mark-paid', [TransactionController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');
+        });
 
         // Settings
         Route::prefix('setting')->group(function () {

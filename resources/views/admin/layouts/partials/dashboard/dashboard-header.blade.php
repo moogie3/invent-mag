@@ -9,12 +9,6 @@
             </div>
             <div class="col-auto ms-auto">
                 <div class="btn-list">
-                    <div class="col-auto ms-auto">
-                        <button type="button" class="btn btn-secondary d-none d-sm-inline-block"
-                            onclick="javascript:window.print();">
-                            <i class="ti ti-printer fs-4"></i> Export PDF
-                        </button>
-                    </div>
                     <div class="dropdown">
                         <button class="btn btn-primary dropdown-toggle d-flex align-items-center" type="button"
                             data-bs-toggle="dropdown">

@@ -759,7 +759,7 @@ body {
 /* ============================
    18. PRINT STYLES - STANDARD A4
    ============================ */
-@media print and (min-width: 79mm) {
+@media print and (min-width: 80mm) {
 
     .btn,
     .dropdown,

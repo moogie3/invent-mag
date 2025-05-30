@@ -82,7 +82,7 @@
 
     @if ($hasMore)
         <div class="card-footer text-center py-3">
-            <a href="" class="btn btn-link text-decoration-none">
+            <a href="{{ route('admin.transactions') }}" class="btn btn-link text-decoration-none">
                 <i class="ti ti-eye me-1"></i>
                 View other recent activities
             </a>

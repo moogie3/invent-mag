@@ -115,6 +115,14 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div id="bulkActionsBar" class="alert alert-info d-none">
+                                        <span id="selectedCount">0</span> items selected
+                                        <button onclick="bulkMarkAsPaid()" class="btn btn-sm btn-success ms-2">Mark as
+                                            Paid</button>
+                                        <button onclick="bulkExport()" class="btn btn-sm btn-primary ms-2">Export</button>
+                                        <button onclick="clearSelection()"
+                                            class="btn btn-sm btn-secondary ms-2">Clear</button>
+                                    </div>
                                     <div class="ms-auto text-secondary no-print">
                                         <div class="ms-2 mb-2 text-end">
                                             Search :
@@ -172,12 +180,16 @@
                                     <table class="table card-table table-vcenter">
                                         <thead style="font-size: large">
                                             <tr>
+                                                <th class="w-1">
+                                                    <input class="form-check-input" type="checkbox" id="selectAll">
+                                                </th>
                                                 <th class="no-print"><button class="table-sort fs-4 py-3 no-print"
                                                         data-sort="sort-no">No
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-invoice">Invoice
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-supplier">Supplier
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-supplier">Supplier
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-orderdate">Order
                                                         Date</th>
@@ -198,6 +210,10 @@
                                         <tbody id="invoiceTableBody" class="table-tbody">
                                             @foreach ($pos as $index => $po)
                                                 <tr>
+                                                    <td>
+                                                        <input class="form-check-input row-checkbox" type="checkbox"
+                                                            value="{{ $po->id }}">
+                                                    </td>
                                                     <td class="sort-no no-print">{{ $pos->firstItem() + $index }}</td>
                                                     <td class="sort-invoice">{{ $po->invoice }}</td>
                                                     <td class="sort-supplier">{{ $po->supplier->name }}</td>

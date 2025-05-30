@@ -299,21 +299,25 @@ class DashboardController extends Controller
             [
                 'title' => 'Payment Overdue',
                 'icon' => 'ti-alert-triangle',
-                'value' => $outCountUnpaid + $inCountUnpaid,
-                'total' => 5,
+                'value' => $this->getOverdueInvoicesCount(),
+                'total' => null,
                 'format' => 'numeric',
                 'bar_color' => null,
                 'trend_type' => 'threshold',
-                'route' => route('admin.po', ['status' => 'Unpaid']),
+                'route' => route('admin.po', ['status' => 'Overdue']),
                 'percentage' => 0,
-                'trend' => $outCountUnpaid + $inCountUnpaid <= 5 ? 'positive' : 'negative',
-                'trend_label' => $outCountUnpaid + $inCountUnpaid <= 5 ? 'All good' : 'Action needed',
-                'trend_icon' => $outCountUnpaid + $inCountUnpaid <= 5 ? 'ti ti-trending-up' : 'ti ti-alert-circle',
-                'badge_class' => $outCountUnpaid + $inCountUnpaid <= 5 ? 'bg-success-lt' : 'bg-danger-lt',
+                'trend' => $this->getOverdueInvoicesCount() == 0 ? 'positive' : 'negative',
+                'trend_label' => $this->getOverdueInvoicesCount() == 0 ? 'No overdue payments' : 'Action required',
+                'trend_icon' => $this->getOverdueInvoicesCount() == 0 ? 'ti ti-check' : 'ti ti-alert-circle',
+                'badge_class' => $this->getOverdueInvoicesCount() == 0 ? 'bg-success-lt' : 'bg-danger-lt',
             ],
         ];
     }
 
+    private function getOverdueInvoicesCount()
+    {
+        return Purchase::where('status', 'Unpaid')->where('due_date', '<', now())->count();
+    }
     /**
      * Prepare financial summary items
      */

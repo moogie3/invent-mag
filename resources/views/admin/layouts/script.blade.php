@@ -15,6 +15,11 @@
     <script src="{{ asset('js/admin/pos.js') }}"></script>
 @endif
 
+{{-- SCRIPT FOR RECENT TRANSACTIONS  --}}
+@if (request()->is('admin/transactions'))
+    <script src="{{ asset('js/admin/recentts.js') }}"></script>
+@endif
+
 {{-- SCRIPT FOR ADMIN LOGIN (Remove Bootstrap CDN since Tabler includes it) --}}
 @if (request()->is('admin/login', 'admin/register', 'forgot-password'))
     <script src="{{ asset('js/admin/auth.js') }}"></script>

@@ -115,14 +115,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="bulkActionsBar" class="alert alert-info d-none">
-                                        <span id="selectedCount">0</span> items selected
-                                        <button onclick="bulkMarkAsPaid()" class="btn btn-sm btn-success ms-2">Mark as
-                                            Paid</button>
-                                        <button onclick="bulkExport()" class="btn btn-sm btn-primary ms-2">Export</button>
-                                        <button onclick="clearSelection()"
-                                            class="btn btn-sm btn-secondary ms-2">Clear</button>
-                                    </div>
                                     <div class="ms-auto text-secondary no-print">
                                         <div class="ms-2 mb-2 text-end">
                                             Search :
@@ -173,15 +165,38 @@
                                     </div>
                                 </div>
                             </div>
-
+                            <div id="bulkActionsBar" class="card mt-3" style="display: none;">
+                                <div class="card-body py-2">
+                                    <div class="d-flex align-items-center">
+                                        <span class="text-muted me-3">
+                                            <span id="selectedCount">0</span> transactions selected
+                                        </span>
+                                        <div class="btn-list">
+                                            <button onclick="bulkMarkAsPaidPO()" class="btn btn-sm btn-success me-1">
+                                                <i class="ti ti-check"></i> Mark as Paid
+                                            </button>
+                                            <button onclick="bulkDeletePO()" class="btn btn-sm btn-danger me-1">
+                                                <i class="ti ti-trash"></i> Delete Selected
+                                            </button>
+                                            <button onclick="bulkExportPO()" class="btn btn-sm btn-primary me-1">
+                                                <i class="ti ti-download"></i> Export Selected
+                                            </button>
+                                            <button onclick="clearPOSelection()"
+                                                class="btn btn-sm btn-outline-secondary me-1">
+                                                <i class="ti ti-x"></i> Clear Selection
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             {{-- TABLE --}}
                             <div id="invoiceTableContainer">
                                 <div class="table-responsive">
                                     <table class="table card-table table-vcenter">
                                         <thead style="font-size: large">
                                             <tr>
-                                                <th class="w-1">
-                                                    <input class="form-check-input" type="checkbox" id="selectAll">
+                                                <th>
+                                                    <input type="checkbox" id="selectAll" class="form-check-input">
                                                 </th>
                                                 <th class="no-print"><button class="table-sort fs-4 py-3 no-print"
                                                         data-sort="sort-no">No
@@ -211,7 +226,7 @@
                                             @foreach ($pos as $index => $po)
                                                 <tr>
                                                     <td>
-                                                        <input class="form-check-input row-checkbox" type="checkbox"
+                                                        <input type="checkbox" class="form-check-input row-checkbox"
                                                             value="{{ $po->id }}">
                                                     </td>
                                                     <td class="sort-no no-print">{{ $pos->firstItem() + $index }}</td>
@@ -279,6 +294,81 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal modal-blur fade" id="bulkMarkAsPaidModal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Mark as Paid</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to mark <strong id="bulkPaidCount">0</strong> purchase orders as paid?</p>
+                    <div class="text-muted small">This action cannot be undone.</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="confirmBulkPaidBtn">
+                        <i class="ti ti-check"></i> Mark as Paid
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="bulkDeleteModalLabel">
+                        <i class="ti ti-trash me-2"></i>
+                        Confirm Bulk Delete
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="alert alert-warning d-flex align-items-center w-100 mb-0">
+                            <i class="ti ti-alert-circle me-2 fs-4"></i>
+                            <div>
+                                <strong>Warning!</strong> This action cannot be undone.
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="mb-3">
+                        You are about to permanently delete
+                        <strong id="bulkDeleteCount">0</strong>
+                        purchase order(s) and all associated data.
+                    </p>
+
+                    <div class="bg-light p-3 rounded">
+                        <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be deleted:</h6>
+                        <ul class="list-unstyled mb-0 small">
+                            <li><i class="ti ti-check text-danger me-1"></i> Purchase order records</li>
+                            <li><i class="ti ti-check text-danger me-1"></i> Associated purchase order items</li>
+                            <li><i class="ti ti-check text-danger me-1"></i> Related transaction history</li>
+                        </ul>
+                    </div>
+
+                    <p class="mt-3 mb-1 text-muted small">
+                        <i class="ti ti-info-circle me-1"></i>
+                        Product stock levels will be adjusted accordingly.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ti ti-x me-1"></i>
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmBulkDeleteBtn">
+                        <i class="ti ti-trash me-1"></i>
+                        Delete Selected
+                    </button>
                 </div>
             </div>
         </div>

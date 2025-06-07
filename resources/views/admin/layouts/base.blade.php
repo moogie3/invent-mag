@@ -9,12 +9,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Invent-MAG | @yield('title')</title>
 
-    <!-- Force consistent font loading to prevent FOUT/FOIT -->
-    <link rel="preconnect" href="https://rsms.me" crossorigin>
-    <link rel="preload" href="https://rsms.me/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="https://rsms.me/inter/Inter-Medium.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="https://rsms.me/inter/Inter-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
-
     <!-- Load Inter font with font-display for consistent rendering -->
     <style>
         @import url('https://rsms.me/inter/inter.css');

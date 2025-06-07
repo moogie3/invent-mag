@@ -25,7 +25,7 @@ class PurchaseOrderModule {
     }
 
     /**
-     * Calculate total price for a product
+     * Calculate total price for a product with proper rounding to avoid floating-point issues
      * @param {number} price - Unit price
      * @param {number} quantity - Quantity
      * @param {number} discount - Discount amount/percentage
@@ -33,10 +33,18 @@ class PurchaseOrderModule {
      * @returns {number} Total price after discount
      */
     calculateTotal(price, quantity, discount, discountType) {
-        // IMPORTANT: This is the central calculation logic that should match in PHP
-        const discountPerUnit =
-            discountType === "percentage" ? (price * discount) / 100 : discount;
-        return (price - discountPerUnit) * quantity;
+        // Convert to integers to avoid floating-point issues (multiply by 100 for cents)
+        const priceInCents = Math.round(price * 100);
+        const discountInCents =
+            discountType === "percentage"
+                ? Math.round((priceInCents * discount) / 100)
+                : Math.round(discount * 100);
+
+        const totalPerUnitInCents = priceInCents - discountInCents;
+        const totalInCents = totalPerUnitInCents * quantity;
+
+        // Convert back to currency units
+        return Math.round(totalInCents / 100);
     }
 
     /**
@@ -47,274 +55,208 @@ class PurchaseOrderModule {
      * @returns {number} Calculated discount amount
      */
     calculateDiscount(subtotal, discountValue, discountType) {
-        return discountType === "percentage"
-            ? (subtotal * discountValue) / 100
-            : discountValue;
+        if (discountType === "percentage") {
+            return Math.round((subtotal * discountValue) / 100);
+        }
+        return discountValue;
     }
 
-    // Add this to your PurchaseOrderView class constructor
-    initBulkSelection() {
-        // Use a slight delay to ensure DOM is fully loaded
-        setTimeout(() => {
-            // Bulk selection handling
-            this.elements.selectAll = document.getElementById("selectAll");
-            this.elements.rowCheckboxes =
-                document.querySelectorAll(".row-checkbox");
-            this.elements.bulkActionsBar =
-                document.getElementById("bulkActionsBar");
-            this.elements.selectedCount =
-                document.getElementById("selectedCount");
-
-            console.log(
-                "Found checkboxes:",
-                this.elements.rowCheckboxes.length
-            ); // Debug log
-
-            if (this.elements.selectAll) {
-                // Remove any existing event listeners first
-                this.elements.selectAll.removeEventListener(
-                    "change",
-                    this.handleSelectAll
-                );
-
-                // Bind the method to maintain context
-                this.handleSelectAll = (e) => {
-                    console.log("Select all clicked:", e.target.checked); // Debug log
-                    this.elements.rowCheckboxes.forEach((checkbox) => {
-                        checkbox.checked = e.target.checked;
-                    });
-                    this.updateBulkActions();
-                };
-
-                this.elements.selectAll.addEventListener(
-                    "change",
-                    this.handleSelectAll
-                );
-            }
-
-            // Add event listeners to individual checkboxes
-            this.elements.rowCheckboxes.forEach((checkbox, index) => {
-                console.log(`Adding listener to checkbox ${index}`); // Debug log
-                checkbox.addEventListener("change", () => {
-                    console.log(`Checkbox ${index} changed:`, checkbox.checked); // Debug log
-                    this.updateBulkActions();
-                });
-            });
-
-            // Initial update
-            this.updateBulkActions();
-        }, 100);
-    }
-
-    // Updated updateBulkActions method
-    updateBulkActions() {
-        // Re-query to get current state
-        const currentCheckboxes = document.querySelectorAll(".row-checkbox");
-        const checkedBoxes = document.querySelectorAll(".row-checkbox:checked");
-        const count = checkedBoxes.length;
-
-        console.log(
-            `Total checkboxes: ${currentCheckboxes.length}, Checked: ${count}`
-        ); // Debug log
-
-        if (this.elements.selectedCount) {
-            this.elements.selectedCount.textContent = count;
-        }
-
-        if (this.elements.bulkActionsBar) {
-            if (count === 0) {
-                this.elements.bulkActionsBar.classList.add("d-none");
-            } else {
-                this.elements.bulkActionsBar.classList.remove("d-none");
-            }
-        }
-
-        if (this.elements.selectAll) {
-            if (count === 0) {
-                this.elements.selectAll.indeterminate = false;
-                this.elements.selectAll.checked = false;
-            } else if (count === currentCheckboxes.length) {
-                this.elements.selectAll.indeterminate = false;
-                this.elements.selectAll.checked = true;
-            } else {
-                this.elements.selectAll.indeterminate = true;
-                this.elements.selectAll.checked = false;
-            }
+    /**
+     * Safe element getter with error handling
+     * @param {string} id - Element ID
+     * @returns {HTMLElement|null} Element or null
+     */
+    safeGetElement(id) {
+        try {
+            return document.getElementById(id);
+        } catch (error) {
+            console.warn(`Element with ID '${id}' not found:`, error);
+            return null;
         }
     }
 }
 
 /**
  * PurchaseOrderCreate - Manages the purchase order creation functionality
- * Extends core module functionality for create page
+ * Uses in-memory storage instead of localStorage/sessionStorage
  */
 class PurchaseOrderCreate extends PurchaseOrderModule {
     constructor(config = {}) {
         super(config);
 
-        // Store DOM elements
-        this.elements = {
-            orderDate: document.getElementById("order_date"),
-            dueDate: document.getElementById("due_date"),
-            supplierSelect: document.getElementById("supplier_id"),
-            productSelect: document.getElementById("product_id"),
-            lastPrice: document.getElementById("last_price"),
-            quantity: document.getElementById("quantity"),
-            newPrice: document.getElementById("new_price"),
-            discount: document.getElementById("discount"),
-            discountType: document.getElementById("discount_type"),
-            addProductBtn: document.getElementById("addProduct"),
-            clearProductsBtn: document.getElementById("clearProducts"),
-            productTableBody: document.getElementById("productTableBody"),
-            productsField: document.getElementById("productsField"),
-            discountTotalValue: document.getElementById("discountTotalValue"),
-            discountTotalType: document.getElementById("discountTotalType"),
-            applyTotalDiscount: document.getElementById("applyTotalDiscount"),
-            invoice: document.getElementById("invoice"),
-            form: document.getElementById("invoiceForm"),
-        };
+        // Store DOM elements with safe getter
+        this.elements = this.initializeElements();
 
-        // Data storage
+        // In-memory data storage (replaces localStorage)
         this.products = [];
         this.orderDiscount = { value: 0, type: "fixed" };
+        this.sessionJustSubmitted = false;
 
         // Check if we need to clear storage after submission
         this.checkSessionState();
 
-        // Initialize flatpickr for date fields
+        // Initialize components
         this.initFlatpickr();
-
-        // Initialize event listeners
         this.initEventListeners();
-
-        // Load data from storage
-        this.loadFromStorage();
-
-        // Initial render
         this.renderTable();
     }
 
+    initializeElements() {
+        const elementIds = [
+            "order_date",
+            "due_date",
+            "supplier_id",
+            "product_id",
+            "last_price",
+            "quantity",
+            "new_price",
+            "discount",
+            "discount_type",
+            "addProduct",
+            "clearProducts",
+            "productTableBody",
+            "productsField",
+            "discountTotalValue",
+            "discountTotalType",
+            "applyTotalDiscount",
+            "invoice",
+            "invoiceForm",
+        ];
+
+        const elements = {};
+        elementIds.forEach((id) => {
+            elements[id] = this.safeGetElement(id);
+        });
+
+        return elements;
+    }
+
     initFlatpickr() {
-        // Initialize flatpickr for order date with our preferred format
-        if (this.elements.orderDate) {
-            flatpickr(this.elements.orderDate, {
-                dateFormat: "Y-m-d", // Database format
-                altInput: true,
-                altFormat: "d-m-Y", // Fancy alternate format
-                defaultDate: new Date(), // Auto-fill with now
-                allowInput: true, // Allow typing manually
-            });
+        // Check if flatpickr is available
+        if (typeof flatpickr === "undefined") {
+            console.warn("Flatpickr library not loaded");
+            return;
         }
 
-        // Initialize flatpickr for due date with the same format
-        if (this.elements.dueDate) {
-            flatpickr(this.elements.dueDate, {
-                dateFormat: "Y-m-d", // Database format
-                altInput: true,
-                altFormat: "d-m-Y", // Fancy alternate format
-                allowInput: true, // Allow typing manually
-            });
+        const flatpickrConfig = {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "d-m-Y",
+            allowInput: true,
+        };
+
+        // Initialize order date
+        if (this.elements.order_date) {
+            try {
+                this.elements.order_date._flatpickr = flatpickr(
+                    this.elements.order_date,
+                    {
+                        ...flatpickrConfig,
+                        defaultDate: new Date(),
+                        onChange: () => this.calculateDueDate(),
+                    }
+                );
+            } catch (error) {
+                console.warn(
+                    "Failed to initialize order date flatpickr:",
+                    error
+                );
+            }
+        }
+
+        // Initialize due date
+        if (this.elements.due_date) {
+            try {
+                this.elements.due_date._flatpickr = flatpickr(
+                    this.elements.due_date,
+                    flatpickrConfig
+                );
+            } catch (error) {
+                console.warn("Failed to initialize due date flatpickr:", error);
+            }
         }
     }
 
     checkSessionState() {
-        if (sessionStorage.getItem("poJustSubmitted") === "true") {
-            localStorage.removeItem("poProducts");
-            localStorage.removeItem("poOrderDiscount");
-            sessionStorage.removeItem("poJustSubmitted");
+        // Use in-memory flag instead of sessionStorage
+        if (this.sessionJustSubmitted) {
+            this.products = [];
+            this.orderDiscount = { value: 0, type: "fixed" };
+            this.sessionJustSubmitted = false;
         }
     }
 
     initEventListeners() {
-        // Due date calculation - modified to work with flatpickr
-        this.elements.supplierSelect.addEventListener("change", () =>
-            this.calculateDueDate()
-        );
-
-        // Modified to work with flatpickr's change event
-        if (this.elements.orderDate && this.elements.orderDate._flatpickr) {
-            this.elements.orderDate._flatpickr.config.onChange.push(() =>
+        // Due date calculation
+        if (this.elements.supplier_id) {
+            this.elements.supplier_id.addEventListener("change", () =>
                 this.calculateDueDate()
             );
         }
 
         // Product selection
-        this.elements.productSelect.addEventListener("change", () =>
-            this.updateProductPrice()
-        );
+        if (this.elements.product_id) {
+            this.elements.product_id.addEventListener("change", () =>
+                this.updateProductPrice()
+            );
+        }
 
         // Add product button
-        this.elements.addProductBtn.addEventListener("click", () =>
-            this.addProduct()
-        );
+        if (this.elements.addProduct) {
+            this.elements.addProduct.addEventListener("click", () =>
+                this.addProduct()
+            );
+        }
 
         // Clear products
-        this.elements.clearProductsBtn.addEventListener("click", () =>
-            this.clearProducts()
-        );
+        if (this.elements.clearProducts) {
+            this.elements.clearProducts.addEventListener("click", () =>
+                this.clearProducts()
+            );
+        }
 
         // Apply order discount
-        this.elements.applyTotalDiscount.addEventListener("click", () =>
-            this.applyOrderDiscount()
-        );
+        if (this.elements.applyTotalDiscount) {
+            this.elements.applyTotalDiscount.addEventListener("click", () =>
+                this.applyOrderDiscount()
+            );
+        }
 
         // Form submission
-        this.elements.form.addEventListener("submit", (e) => {
-            // Ensure all products are included in the form submission
-            this.elements.productsField.value = JSON.stringify(this.products);
-            sessionStorage.setItem("poJustSubmitted", "true");
-        });
-    }
-
-    loadFromStorage() {
-        // Load products from localStorage
-        const savedProducts = localStorage.getItem("poProducts");
-        if (savedProducts) {
-            try {
-                this.products = JSON.parse(savedProducts);
-            } catch (e) {
-                console.error("Error parsing saved products:", e);
-                this.products = [];
-            }
+        if (this.elements.invoiceForm) {
+            this.elements.invoiceForm.addEventListener("submit", (e) => {
+                if (this.elements.productsField) {
+                    this.elements.productsField.value = JSON.stringify(
+                        this.products
+                    );
+                }
+                this.sessionJustSubmitted = true;
+            });
         }
-
-        // Load order discount from localStorage
-        const savedOrderDiscount = localStorage.getItem("poOrderDiscount");
-        if (savedOrderDiscount) {
-            try {
-                this.orderDiscount = JSON.parse(savedOrderDiscount);
-                this.elements.discountTotalValue.value =
-                    this.orderDiscount.value;
-                this.elements.discountTotalType.value = this.orderDiscount.type;
-            } catch (e) {
-                console.error("Error parsing saved order discount:", e);
-                this.orderDiscount = { value: 0, type: "fixed" };
-            }
-        }
-    }
-
-    saveToStorage() {
-        localStorage.setItem("poProducts", JSON.stringify(this.products));
-        localStorage.setItem(
-            "poOrderDiscount",
-            JSON.stringify(this.orderDiscount)
-        );
     }
 
     calculateDueDate() {
-        // Get date from flatpickr instance if available
+        if (
+            !this.elements.order_date ||
+            !this.elements.supplier_id ||
+            !this.elements.due_date
+        ) {
+            return;
+        }
+
+        // Get date from flatpickr or input value
         let orderDateValue;
-        if (this.elements.orderDate._flatpickr) {
+        if (this.elements.order_date._flatpickr) {
             const selectedDates =
-                this.elements.orderDate._flatpickr.selectedDates;
+                this.elements.order_date._flatpickr.selectedDates;
             orderDateValue = selectedDates.length > 0 ? selectedDates[0] : null;
         } else {
-            orderDateValue = this.elements.orderDate.value;
+            orderDateValue = this.elements.order_date.value;
         }
 
         const selectedOption =
-            this.elements.supplierSelect.options[
-                this.elements.supplierSelect.selectedIndex
+            this.elements.supplier_id.options[
+                this.elements.supplier_id.selectedIndex
             ];
 
         if (!orderDateValue || !selectedOption) return;
@@ -325,11 +267,11 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         if (paymentTerms) {
             orderDate.setDate(orderDate.getDate() + parseInt(paymentTerms));
 
-            // Update flatpickr instance if available
-            if (this.elements.dueDate._flatpickr) {
-                this.elements.dueDate._flatpickr.setDate(orderDate);
+            // Update due date
+            if (this.elements.due_date._flatpickr) {
+                this.elements.due_date._flatpickr.setDate(orderDate);
             } else {
-                this.elements.dueDate.value = orderDate
+                this.elements.due_date.value = orderDate
                     .toISOString()
                     .split("T")[0];
             }
@@ -337,17 +279,23 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
     }
 
     updateProductPrice() {
+        if (
+            !this.elements.product_id ||
+            !this.elements.last_price ||
+            !this.elements.new_price
+        ) {
+            return;
+        }
+
         const selectedOption =
-            this.elements.productSelect.options[
-                this.elements.productSelect.selectedIndex
+            this.elements.product_id.options[
+                this.elements.product_id.selectedIndex
             ];
 
         if (selectedOption && selectedOption.getAttribute("data-price")) {
-            this.elements.lastPrice.value =
-                selectedOption.getAttribute("data-price") || "";
-
-            // Auto-fill the new price with the last price
-            this.elements.newPrice.value = this.elements.lastPrice.value;
+            const price = selectedOption.getAttribute("data-price") || "";
+            this.elements.last_price.value = price;
+            this.elements.new_price.value = price;
         }
     }
 
@@ -369,31 +317,52 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         const finalTotal = subtotal - orderDiscountAmount;
 
         // Update UI displays
-        document.getElementById("subtotal").innerText =
-            this.formatCurrency(subtotal);
-        document.getElementById("orderDiscountTotal").innerText =
-            this.formatCurrency(orderDiscountAmount);
-        document.getElementById("finalTotal").innerText =
-            this.formatCurrency(finalTotal);
+        const subtotalEl = document.getElementById("subtotal");
+        const orderDiscountTotalEl =
+            document.getElementById("orderDiscountTotal");
+        const finalTotalEl = document.getElementById("finalTotal");
+        const totalDiscountInputEl =
+            document.getElementById("totalDiscountInput");
 
-        // Update hidden form field for total discount
-        document.getElementById("totalDiscountInput").value =
-            orderDiscountAmount;
+        if (subtotalEl) subtotalEl.innerText = this.formatCurrency(subtotal);
+        if (orderDiscountTotalEl)
+            orderDiscountTotalEl.innerText =
+                this.formatCurrency(orderDiscountAmount);
+        if (finalTotalEl)
+            finalTotalEl.innerText = this.formatCurrency(finalTotal);
+        if (totalDiscountInputEl)
+            totalDiscountInputEl.value = orderDiscountAmount;
 
         // Update JSON of products for form submission
-        this.elements.productsField.value = JSON.stringify(this.products);
+        if (this.elements.productsField) {
+            this.elements.productsField.value = JSON.stringify(this.products);
+        }
     }
 
     addProduct() {
-        const productId = this.elements.productSelect.value;
+        if (
+            !this.elements.product_id ||
+            !this.elements.quantity ||
+            !this.elements.new_price
+        ) {
+            console.warn("Required form elements not found for adding product");
+            return;
+        }
+
+        const productId = this.elements.product_id.value;
         const productName =
-            this.elements.productSelect.options[
-                this.elements.productSelect.selectedIndex
+            this.elements.product_id.options[
+                this.elements.product_id.selectedIndex
             ].text;
-        const quantity = parseInt(this.elements.quantity.value);
-        const price = parseFloat(this.elements.newPrice.value);
-        const discount = parseFloat(this.elements.discount.value) || 0;
-        const discountType = this.elements.discountType.value;
+        const quantity = parseInt(this.elements.quantity.value) || 0;
+        const price = parseFloat(this.elements.new_price.value) || 0;
+        const discount = parseFloat(this.elements.discount?.value) || 0;
+        const discountType = this.elements.discount_type?.value || "fixed";
+
+        if (!productId || quantity <= 0 || price <= 0) {
+            alert("Please fill in all required fields with valid values");
+            return;
+        }
 
         // Generate unique ID and calculate total
         const uniqueId = `${Date.now()}-${Math.random()
@@ -418,131 +387,143 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
             total,
         });
 
-        // Save and update UI
-        this.saveToStorage();
+        // Update UI
         this.renderTable();
         this.clearProductForm();
     }
 
     clearProductForm() {
-        this.elements.productSelect.value = "";
-        this.elements.quantity.value = "";
-        this.elements.newPrice.value = "";
-        this.elements.discount.value = "";
-        this.elements.lastPrice.value = "";
+        const formFields = [
+            "product_id",
+            "quantity",
+            "new_price",
+            "discount",
+            "last_price",
+        ];
+        formFields.forEach((fieldName) => {
+            if (this.elements[fieldName]) {
+                this.elements[fieldName].value = "";
+            }
+        });
     }
 
     clearProducts() {
-        // Clear all products
         this.products = [];
         this.orderDiscount = { value: 0, type: "fixed" };
 
-        // Clear localStorage
-        localStorage.removeItem("poProducts");
-        localStorage.removeItem("poOrderDiscount");
-
         // Reset discount UI
-        this.elements.discountTotalValue.value = 0;
-        this.elements.discountTotalType.value = "fixed";
+        if (this.elements.discountTotalValue)
+            this.elements.discountTotalValue.value = 0;
+        if (this.elements.discountTotalType)
+            this.elements.discountTotalType.value = "fixed";
 
-        // Update UI
         this.renderTable();
     }
 
     applyOrderDiscount() {
-        // Get discount values from UI
+        if (
+            !this.elements.discountTotalValue ||
+            !this.elements.discountTotalType
+        ) {
+            return;
+        }
+
         this.orderDiscount = {
             value: parseFloat(this.elements.discountTotalValue.value) || 0,
             type: this.elements.discountTotalType.value,
         };
 
-        // Save to storage and update totals
-        this.saveToStorage();
         this.updateTotalPrice();
     }
 
     attachTableEventListeners() {
+        if (!this.elements.productTableBody) return;
+
+        // Remove existing listeners to prevent duplicates
+        const newTableBody = this.elements.productTableBody.cloneNode(true);
+        this.elements.productTableBody.parentNode.replaceChild(
+            newTableBody,
+            this.elements.productTableBody
+        );
+        this.elements.productTableBody = newTableBody;
+
         // Event delegation for table rows
         this.elements.productTableBody.addEventListener("input", (event) => {
-            const target = event.target;
-            const uniqueId = target.dataset.uniqueId;
-            if (!uniqueId) return;
-
-            const product = this.products.find((p) => p.uniqueId === uniqueId);
-            if (!product) return;
-
-            if (target.classList.contains("quantity-input")) {
-                product.quantity = parseInt(target.value) || 1;
-            } else if (target.classList.contains("price-input")) {
-                product.price = parseFloat(target.value) || 0;
-            } else if (target.classList.contains("discount-input")) {
-                product.discount = parseFloat(target.value) || 0;
-            }
-
-            // Recalculate the product total
-            product.total = this.calculateTotal(
-                product.price,
-                product.quantity,
-                product.discount,
-                product.discountType
-            );
-
-            // Update the row's total display
-            target.closest("tr").querySelector(".product-total").innerText =
-                this.formatCurrency(product.total);
-
-            // Save and update totals
-            this.saveToStorage();
-            this.updateTotalPrice();
+            this.handleTableInput(event);
         });
 
-        // Handle discount type changes
         this.elements.productTableBody.addEventListener("change", (event) => {
-            const target = event.target;
-            if (!target.classList.contains("discount-type")) return;
-
-            const uniqueId = target.dataset.uniqueId;
-            const product = this.products.find((p) => p.uniqueId === uniqueId);
-            if (!product) return;
-
-            product.discountType = target.value;
-
-            // Recalculate the product total
-            product.total = this.calculateTotal(
-                product.price,
-                product.quantity,
-                product.discount,
-                product.discountType
-            );
-
-            // Update the row's total display
-            target.closest("tr").querySelector(".product-total").innerText =
-                this.formatCurrency(product.total);
-
-            // Save and update totals
-            this.saveToStorage();
-            this.updateTotalPrice();
+            this.handleTableChange(event);
         });
 
-        // Handle remove buttons
         this.elements.productTableBody.addEventListener("click", (event) => {
-            const target = event.target.closest(".removeProduct");
-            if (!target) return;
-
-            const uniqueId = target.dataset.uniqueId;
-
-            // Remove the product from the array
-            this.products = this.products.filter(
-                (p) => p.uniqueId !== uniqueId
-            );
-
-            // Save and update UI
-            this.saveToStorage();
-            this.renderTable();
+            this.handleTableClick(event);
         });
     }
 
+    handleTableInput(event) {
+        const target = event.target;
+        const uniqueId = target.dataset.uniqueId;
+        if (!uniqueId) return;
+
+        const product = this.products.find((p) => p.uniqueId === uniqueId);
+        if (!product) return;
+
+        if (target.classList.contains("quantity-input")) {
+            product.quantity = parseInt(target.value) || 1;
+        } else if (target.classList.contains("price-input")) {
+            product.price = parseFloat(target.value) || 0;
+        } else if (target.classList.contains("discount-input")) {
+            product.discount = parseFloat(target.value) || 0;
+        }
+
+        this.updateProductInTable(product, target);
+    }
+
+    handleTableChange(event) {
+        const target = event.target;
+        if (!target.classList.contains("discount-type")) return;
+
+        const uniqueId = target.dataset.uniqueId;
+        const product = this.products.find((p) => p.uniqueId === uniqueId);
+        if (!product) return;
+
+        product.discountType = target.value;
+        this.updateProductInTable(product, target);
+    }
+
+    handleTableClick(event) {
+        const target = event.target.closest(".removeProduct");
+        if (!target) return;
+
+        const uniqueId = target.dataset.uniqueId;
+        this.products = this.products.filter((p) => p.uniqueId !== uniqueId);
+        this.renderTable();
+    }
+
+    updateProductInTable(product, targetElement) {
+        // Recalculate the product total
+        product.total = this.calculateTotal(
+            product.price,
+            product.quantity,
+            product.discount,
+            product.discountType
+        );
+
+        // Update the row's total display
+        const totalElement = targetElement
+            .closest("tr")
+            .querySelector(".product-total");
+        if (totalElement) {
+            totalElement.innerText = this.formatCurrency(product.total);
+        }
+
+        this.updateTotalPrice();
+    }
+
     renderTable() {
+        if (!this.elements.productTableBody) return;
+
         // Clear table body
         this.elements.productTableBody.innerHTML = "";
 
@@ -556,13 +537,15 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
                     <input type="number" class="form-control quantity-input"
                         value="${product.quantity}" data-unique-id="${
                 product.uniqueId
-            }" min="1" style="width:80px;" />
+            }"
+                        min="1" style="width:80px;" />
                 </td>
                 <td>
                     <input type="number" class="form-control price-input"
                         value="${product.price}" data-unique-id="${
                 product.uniqueId
-            }" min="0" style="width:100px;" />
+            }"
+                        min="0" style="width:100px;" />
                 </td>
                 <td>
                     <div class="input-group" style="width:200px;">
@@ -590,9 +573,8 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
                     product.total
                 )}</td>
                 <td style="text-align:center">
-                    <button type="button" class="btn btn-danger btn-icon removeProduct" data-unique-id="${
-                        product.uniqueId
-                    }" title="Remove">
+                    <button type="button" class="btn btn-danger btn-icon removeProduct"
+                        data-unique-id="${product.uniqueId}" title="Remove">
                         <i class="ti ti-trash"></i>
                     </button>
                 </td>
@@ -600,158 +582,136 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
             this.elements.productTableBody.appendChild(row);
         });
 
-        // Update totals
         this.updateTotalPrice();
-
-        // Attach event listeners to the table rows
         this.attachTableEventListeners();
     }
 }
 
 /**
  * PurchaseOrderEdit - Manages the purchase order edit functionality
- * Extends core module functionality for edit page
  */
 class PurchaseOrderEdit extends PurchaseOrderModule {
     constructor(config = {}) {
         super(config);
 
-        // Store main DOM elements
-        this.elements = {
-            discountTotalValue: document.getElementById("discountTotalValue"),
-            discountTotalType: document.getElementById("discountTotalType"),
-            subtotalElement: document.getElementById("subtotal"),
-            orderDiscountTotalElement:
-                document.getElementById("orderDiscountTotal"),
-            finalTotalElement: document.getElementById("finalTotal"),
-            totalDiscountInput: document.getElementById("totalDiscountInput"),
-            // All quantity, price and discount inputs (will be selected in init)
-            quantityInputs: [],
-            priceInputs: [],
-            discountInputs: [],
-            discountTypeInputs: [],
-            amountInputs: [],
-        };
-
-        // Initialize
-        this.initElementSelections();
+        this.elements = this.initializeEditElements();
         this.initEventListeners();
-
-        // Initial calculations
         this.calculateAllAmounts();
     }
 
-    initElementSelections() {
-        // Select all item rows and their inputs for calculation
-        this.elements.quantityInputs =
-            document.querySelectorAll(".quantity-input");
-        this.elements.priceInputs = document.querySelectorAll(".price-input");
-        this.elements.discountInputs =
-            document.querySelectorAll(".discount-input");
-        this.elements.discountTypeInputs = document.querySelectorAll(
-            ".discount-type-input"
-        );
-        this.elements.amountInputs = document.querySelectorAll(".amount-input");
+    initializeEditElements() {
+        return {
+            discountTotalValue: this.safeGetElement("discountTotalValue"),
+            discountTotalType: this.safeGetElement("discountTotalType"),
+            subtotalElement: this.safeGetElement("subtotal"),
+            orderDiscountTotalElement:
+                this.safeGetElement("orderDiscountTotal"),
+            finalTotalElement: this.safeGetElement("finalTotal"),
+            totalDiscountInput: this.safeGetElement("totalDiscountInput"),
+            quantityInputs: document.querySelectorAll(".quantity-input"),
+            priceInputs: document.querySelectorAll(".price-input"),
+            discountInputs: document.querySelectorAll(".discount-input"),
+            discountTypeInputs: document.querySelectorAll(
+                ".discount-type-input"
+            ),
+            amountInputs: document.querySelectorAll(".amount-input"),
+        };
     }
 
     initEventListeners() {
-        // Add change/input listeners to all item inputs
-        this.elements.quantityInputs.forEach((input) => {
-            input.addEventListener("input", () =>
-                this.updateItemAmount(input.dataset.itemId)
-            );
-        });
-
-        this.elements.priceInputs.forEach((input) => {
-            input.addEventListener("input", () =>
-                this.updateItemAmount(input.dataset.itemId)
-            );
-        });
-
-        this.elements.discountInputs.forEach((input) => {
-            input.addEventListener("input", () =>
-                this.updateItemAmount(input.dataset.itemId)
-            );
-        });
+        // Add listeners for item inputs
+        ["quantityInputs", "priceInputs", "discountInputs"].forEach(
+            (inputType) => {
+                this.elements[inputType].forEach((input) => {
+                    const eventType =
+                        inputType === "discountTypeInputs" ? "change" : "input";
+                    input.addEventListener(eventType, () => {
+                        this.updateItemAmount(input.dataset.itemId);
+                    });
+                });
+            }
+        );
 
         this.elements.discountTypeInputs.forEach((select) => {
-            select.addEventListener("change", () =>
-                this.updateItemAmount(select.dataset.itemId)
-            );
+            select.addEventListener("change", () => {
+                this.updateItemAmount(select.dataset.itemId);
+            });
         });
 
-        // Add listener for order-level discount
-        this.elements.discountTotalValue.addEventListener("input", () =>
-            this.calculateOrderTotal()
-        );
-        this.elements.discountTotalType.addEventListener("change", () =>
-            this.calculateOrderTotal()
-        );
+        // Order-level discount listeners
+        if (this.elements.discountTotalValue) {
+            this.elements.discountTotalValue.addEventListener("input", () =>
+                this.calculateOrderTotal()
+            );
+        }
+        if (this.elements.discountTotalType) {
+            this.elements.discountTotalType.addEventListener("change", () =>
+                this.calculateOrderTotal()
+            );
+        }
     }
 
     updateItemAmount(itemId) {
-        // Get the related inputs for this item
-        const quantityInput = document.querySelector(
-            `.quantity-input[data-item-id="${itemId}"]`
-        );
-        const priceInput = document.querySelector(
-            `.price-input[data-item-id="${itemId}"]`
-        );
-        const discountInput = document.querySelector(
-            `.discount-input[data-item-id="${itemId}"]`
-        );
-        const discountTypeInput = document.querySelector(
-            `.discount-type-input[data-item-id="${itemId}"]`
-        );
-        const amountInput = document.querySelector(
-            `.amount-input[data-item-id="${itemId}"]`
-        );
+        const elements = {
+            quantity: document.querySelector(
+                `.quantity-input[data-item-id="${itemId}"]`
+            ),
+            price: document.querySelector(
+                `.price-input[data-item-id="${itemId}"]`
+            ),
+            discount: document.querySelector(
+                `.discount-input[data-item-id="${itemId}"]`
+            ),
+            discountType: document.querySelector(
+                `.discount-type-input[data-item-id="${itemId}"]`
+            ),
+            amount: document.querySelector(
+                `.amount-input[data-item-id="${itemId}"]`
+            ),
+        };
 
-        if (
-            !quantityInput ||
-            !priceInput ||
-            !discountInput ||
-            !discountTypeInput ||
-            !amountInput
-        ) {
-            console.error(`Missing input element for item ${itemId}`);
+        // Check if all elements exist
+        const missingElements = Object.keys(elements).filter(
+            (key) => !elements[key]
+        );
+        if (missingElements.length > 0) {
+            console.error(
+                `Missing elements for item ${itemId}:`,
+                missingElements
+            );
             return;
         }
 
         // Get values
-        const quantity = parseInt(quantityInput.value) || 0;
-        const price = parseFloat(priceInput.value) || 0;
-        const discount = parseFloat(discountInput.value) || 0;
-        const discountType = discountTypeInput.value; // 'percentage' or 'fixed'
+        const quantity = parseInt(elements.quantity.value) || 0;
+        const price = parseFloat(elements.price.value) || 0;
+        const discount = parseFloat(elements.discount.value) || 0;
+        const discountType = elements.discountType.value;
 
-        // Calculate total for this item
+        // Calculate total
         const total = this.calculateTotal(
             price,
             quantity,
             discount,
             discountType
         );
+        elements.amount.value = Math.round(total);
 
-        // Update amount input
-        amountInput.value = Math.round(total);
-
-        // Recalculate all totals
         this.calculateOrderTotal();
     }
 
     calculateAllAmounts() {
-        // Calculate amount for each item
         this.elements.quantityInputs.forEach((input) => {
             const itemId = input.dataset.itemId;
-            this.updateItemAmount(itemId);
+            if (itemId) {
+                this.updateItemAmount(itemId);
+            }
         });
-
-        // Calculate order total
         this.calculateOrderTotal();
     }
 
     calculateOrderTotal() {
-        // Calculate subtotal from all amount inputs
+        // Calculate subtotal
         let subtotal = 0;
         this.elements.amountInputs.forEach((input) => {
             subtotal += parseFloat(input.value) || 0;
@@ -759,107 +719,56 @@ class PurchaseOrderEdit extends PurchaseOrderModule {
 
         // Get order discount values
         const discountValue =
-            parseFloat(this.elements.discountTotalValue.value) || 0;
-        const discountType = this.elements.discountTotalType.value;
+            parseFloat(this.elements.discountTotalValue?.value) || 0;
+        const discountType = this.elements.discountTotalType?.value || "fixed";
 
-        // Calculate order discount
+        // Calculate order discount and final total
         const orderDiscountAmount = this.calculateDiscount(
             subtotal,
             discountValue,
             discountType
         );
-
-        // Calculate final total
         const finalTotal = subtotal - orderDiscountAmount;
 
-        // Update UI
-        this.elements.subtotalElement.textContent =
-            this.formatCurrency(subtotal);
-        this.elements.orderDiscountTotalElement.textContent =
-            this.formatCurrency(orderDiscountAmount);
-        this.elements.finalTotalElement.textContent =
-            this.formatCurrency(finalTotal);
-
-        // Update hidden form field for total discount
-        this.elements.totalDiscountInput.value = orderDiscountAmount;
+        // Update UI elements safely
+        if (this.elements.subtotalElement) {
+            this.elements.subtotalElement.textContent =
+                this.formatCurrency(subtotal);
+        }
+        if (this.elements.orderDiscountTotalElement) {
+            this.elements.orderDiscountTotalElement.textContent =
+                this.formatCurrency(orderDiscountAmount);
+        }
+        if (this.elements.finalTotalElement) {
+            this.elements.finalTotalElement.textContent =
+                this.formatCurrency(finalTotal);
+        }
+        if (this.elements.totalDiscountInput) {
+            this.elements.totalDiscountInput.value = orderDiscountAmount;
+        }
     }
 }
 
 /**
- * PurchaseOrderView - Handles the view and modal functionality for purchase orders
- * Provides read-only display with proper formatting and modal interactions
+ * PurchaseOrderView - Handles the view and modal functionality
  */
 class PurchaseOrderView extends PurchaseOrderModule {
     constructor(config = {}) {
         super(config);
 
-        // Initialize elements for the View/Modal functionality
         this.elements = {
-            deleteForm: document.getElementById("deleteForm"),
-            viewPoModalContent: document.getElementById("viewPoModalContent"),
-            poModalEdit: document.getElementById("poModalEdit"),
-            poModalFullView: document.getElementById("poModalFullView"),
-            poModalPrint: document.getElementById("poModalPrint"),
+            deleteForm: this.safeGetElement("deleteForm"),
+            viewPoModalContent: this.safeGetElement("viewPoModalContent"),
+            poModalEdit: this.safeGetElement("poModalEdit"),
+            poModalFullView: this.safeGetElement("poModalFullView"),
+            poModalPrint: this.safeGetElement("poModalPrint"),
         };
 
-        // Format all currency values on page load
         this.formatAllCurrencyValues();
-
-        this.initBulkSelection();
-        // Initialize modal functionality if we're on a page with modals
-        if (this.elements.poModalPrint) {
-            this.initModalListeners();
-        }
+        this.initModalListeners();
     }
 
-    /**
-     * Initialize bulk selection with retry mechanism
-     */
-    initBulkSelectionWithRetry() {
-        // Try immediately
-        if (this.tryInitBulkSelection()) {
-            return;
-        }
-
-        // If immediate attempt fails, try again after DOM is fully loaded
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", () => {
-                setTimeout(() => this.tryInitBulkSelection(), 100);
-            });
-        } else {
-            // DOM is already loaded, try after a short delay
-            setTimeout(() => this.tryInitBulkSelection(), 100);
-        }
-    }
-
-    /**
-     * Try to initialize bulk selection
-     * @returns {boolean} Success status
-     */
-    tryInitBulkSelection() {
-        const selectAll = document.getElementById("selectAll");
-        const rowCheckboxes = document.querySelectorAll(".row-checkbox");
-        const bulkActionsBar = document.getElementById("bulkActionsBar");
-
-        console.log("Trying to init bulk selection...");
-        console.log("SelectAll found:", !!selectAll);
-        console.log("Row checkboxes found:", rowCheckboxes.length);
-        console.log("Bulk actions bar found:", !!bulkActionsBar);
-
-        if (!selectAll || rowCheckboxes.length === 0 || !bulkActionsBar) {
-            console.warn("Required elements not found for bulk selection");
-            return false;
-        }
-
-        this.initBulkSelection();
-        return true;
-    }
-
-    /**
-     * Format all currency display elements
-     */
     formatAllCurrencyValues() {
-        // Find all elements with currency class and format them
         const currencyElements = document.querySelectorAll(".currency-value");
         currencyElements.forEach((element) => {
             const value = parseFloat(element.dataset.value) || 0;
@@ -867,11 +776,7 @@ class PurchaseOrderView extends PurchaseOrderModule {
         });
     }
 
-    /**
-     * Initialize event listeners for modal functionality
-     */
     initModalListeners() {
-        // Attach print button listener
         if (this.elements.poModalPrint) {
             this.elements.poModalPrint.addEventListener("click", () =>
                 this.printModalContent()
@@ -879,37 +784,27 @@ class PurchaseOrderView extends PurchaseOrderModule {
         }
     }
 
-    /**
-     * Set the action URL for the delete form
-     * @param {string} url - The URL to submit the delete form to
-     */
     setDeleteFormAction(url) {
         if (this.elements.deleteForm) {
             this.elements.deleteForm.action = url;
         }
     }
 
-    /**
-     * Load purchase order details into the modal via AJAX
-     * @param {number|string} id - The ID of the purchase order to load
-     */
     loadPoDetails(id) {
         if (!this.elements.viewPoModalContent) {
             console.error("Modal content element not found");
             return;
         }
 
-        // Set the edit button URL dynamically
+        // Set URLs for modal buttons
         if (this.elements.poModalEdit) {
             this.elements.poModalEdit.href = `/admin/po/edit/${id}`;
         }
-
-        // Set the full view button URL dynamically
         if (this.elements.poModalFullView) {
             this.elements.poModalFullView.href = `/admin/po/view/${id}`;
         }
 
-        // Show loading spinner
+        // Show loading
         this.elements.viewPoModalContent.innerHTML = `
             <div class="text-center py-5">
                 <div class="spinner-border text-primary" role="status">
@@ -919,17 +814,15 @@ class PurchaseOrderView extends PurchaseOrderModule {
             </div>
         `;
 
-        // Fetch PO details via AJAX
+        // Fetch details
         fetch(`/admin/po/modal-view/${id}`)
             .then((response) => {
-                if (!response.ok) {
+                if (!response.ok)
                     throw new Error("Network response was not ok");
-                }
                 return response.text();
             })
             .then((html) => {
                 this.elements.viewPoModalContent.innerHTML = html;
-                // Format any currency values in the loaded content
                 this.formatAllCurrencyValues();
             })
             .catch((error) => {
@@ -941,19 +834,16 @@ class PurchaseOrderView extends PurchaseOrderModule {
             });
     }
 
-    /**
-     * Print the content of the modal
-     */
     printModalContent() {
+        if (!this.elements.viewPoModalContent) return;
+
         const printContent = this.elements.viewPoModalContent.innerHTML;
         const originalContent = document.body.innerHTML;
 
         document.body.innerHTML = `
             <div class="container print-container">
                 <div class="card">
-                    <div class="card-body">
-                        ${printContent}
-                    </div>
+                    <div class="card-body">${printContent}</div>
                 </div>
             </div>
         `;
@@ -961,218 +851,610 @@ class PurchaseOrderView extends PurchaseOrderModule {
         window.print();
         document.body.innerHTML = originalContent;
 
-        // Reattach event listeners after restoring original content
-        setTimeout(() => {
-            // This is a hack to reload the page after printing
-            window.location.reload();
-        }, 100);
+        setTimeout(() => window.location.reload(), 100);
     }
 }
 
 /**
- * Initialize appropriate module based on the current page
+ * Bulk Selection Functionality - Consolidated and improved
  */
-document.addEventListener("DOMContentLoaded", function () {
-    // Determine current page
-    const pathname = window.location.pathname;
+class PurchaseOrderBulkSelection {
+    constructor() {
+        this.selectAllCheckbox = null;
+        this.rowCheckboxes = null;
+        this.bulkActionsBar = null;
+        this.selectedCount = null;
+        this.isInitialized = false;
 
-    try {
-        if (pathname.includes("/admin/po/create")) {
-            // Initialize create page functionality
-            window.poApp = new PurchaseOrderCreate();
-            console.log("Purchase Order Create App initialized");
-        } else if (
-            pathname.includes("/admin/po/edit") ||
-            (pathname.includes("/admin/po") && pathname.match(/\/\d+\/edit$/))
-        ) {
-            // Initialize edit page functionality
-            window.poApp = new PurchaseOrderEdit();
-            console.log("Purchase Order Edit App initialized");
-        } else if (
-            pathname.includes("/admin/po/modal") ||
-            (pathname.includes("/admin/po") && pathname.match(/\/\d+$/)) ||
-            pathname.includes("/admin/po/show")
-        ) {
-            // For view page, we don't need interactive functionality
-            console.log("Purchase Order View page detected");
-            // Initialize view functionality for modal or show pages
-            window.poApp = new PurchaseOrderView();
-            console.log("Purchase Order View App initialized");
+        this.init();
+    }
+
+    init() {
+        if (this.isInitialized) {
+            console.log("Bulk selection already initialized");
+            return;
         }
 
-        // Expose global utility functions that might be called from inline handlers
-        window.setDeleteFormAction = function (url) {
-            if (window.poApp && window.poApp.setDeleteFormAction) {
-                window.poApp.setDeleteFormAction(url);
-            }
-        };
+        const maxAttempts = 5;
+        let attempts = 0;
 
-        window.loadPoDetails = function (id) {
-            if (window.poApp && window.poApp.loadPoDetails) {
-                window.poApp.loadPoDetails(id);
-            }
-        };
+        const tryInit = () => {
+            attempts++;
 
-        window.clearSelection = function () {
-            document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
-                checkbox.checked = false;
-            });
-            const selectAll = document.getElementById("selectAll");
-            if (selectAll) selectAll.checked = false;
-
-            const bulkActionsBar = document.getElementById("bulkActionsBar");
-            if (bulkActionsBar) bulkActionsBar.style.display = "none";
-        };
-
-        window.bulkMarkAsPaid = function () {
-            const selected = Array.from(
-                document.querySelectorAll(".row-checkbox:checked")
-            ).map((cb) => cb.value);
-
-            if (selected.length === 0) return;
+            this.selectAllCheckbox = document.getElementById("selectAll");
+            this.rowCheckboxes = document.querySelectorAll(".row-checkbox");
+            this.bulkActionsBar = document.getElementById("bulkActionsBar");
+            this.selectedCount = document.getElementById("selectedCount");
 
             if (
-                confirm(
-                    "Are you sure you want to mark " +
-                        selected.length +
-                        " purchase orders as paid?"
-                )
+                !this.selectAllCheckbox ||
+                this.rowCheckboxes.length === 0 ||
+                !this.bulkActionsBar ||
+                !this.selectedCount
             ) {
-                // Show loading state
-                const bulkBtn = document.querySelector(
-                    '[onclick="bulkMarkAsPaid()"]'
+                if (attempts < maxAttempts) {
+                    console.log(
+                        `Bulk selection init attempt ${attempts}/${maxAttempts} - retrying...`
+                    );
+                    setTimeout(tryInit, 300);
+                    return;
+                }
+
+                console.warn(
+                    "Bulk selection elements not found after",
+                    maxAttempts,
+                    "attempts"
                 );
-                const originalText = bulkBtn.innerHTML;
-                bulkBtn.innerHTML =
-                    '<span class="spinner-border spinner-border-sm me-1"></span>Processing...';
-                bulkBtn.disabled = true;
-
-                fetch("/admin/po/bulk-mark-paid", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document
-                            .querySelector('meta[name="csrf-token"]')
-                            .getAttribute("content"),
-                    },
-                    body: JSON.stringify({
-                        ids: selected,
-                    }),
-                })
-                    .then((response) => response.json())
-                    .then((data) => {
-                        if (data.success) {
-                            showToast(
-                                "Success",
-                                data.message ||
-                                    "Purchase orders marked as paid successfully!",
-                                "success"
-                            );
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            showToast(
-                                "Error",
-                                data.message || "An error occurred",
-                                "error"
-                            );
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Error:", error);
-                        showToast(
-                            "Error",
-                            "An error occurred while updating purchase orders.",
-                            "error"
-                        );
-                    })
-                    .finally(() => {
-                        bulkBtn.innerHTML = originalText;
-                        bulkBtn.disabled = false;
-                    });
+                return;
             }
+
+            this.setupEventListeners();
+            this.updateUI();
+            this.isInitialized = true;
+            console.log("Bulk selection initialized successfully");
         };
 
-        window.bulkExport = function () {
-            const selected = Array.from(
-                document.querySelectorAll(".row-checkbox:checked")
-            ).map((cb) => cb.value);
-
-            if (selected.length === 0) return;
-
-            const params = new URLSearchParams(window.location.search);
-            params.set("export", "excel");
-            params.set("selected", selected.join(","));
-            window.location.href = "/admin/po?" + params.toString();
-        };
-    } catch (error) {
-        console.error("Error initializing Purchase Order App:", error);
+        tryInit();
     }
-});
 
-// Toast notification function
-function showToast(title, message, type = "info", duration = 4000) {
-    let toastContainer = document.getElementById("toast-container");
+    setupEventListeners() {
+        // Select all functionality
+        this.selectAllCheckbox.addEventListener("change", (e) => {
+            const isChecked = e.target.checked;
+            this.rowCheckboxes.forEach((checkbox) => {
+                checkbox.checked = isChecked;
+            });
+            this.updateUI();
+        });
+
+        // Individual checkbox changes
+        this.rowCheckboxes.forEach((checkbox) => {
+            checkbox.addEventListener("change", () => {
+                this.updateSelectAllState();
+                this.updateBulkActionsBar();
+            });
+        });
+    }
+
+    updateSelectAllState() {
+        const totalCheckboxes = this.rowCheckboxes.length;
+        const checkedCheckboxes = document.querySelectorAll(
+            ".row-checkbox:checked"
+        ).length;
+
+        if (checkedCheckboxes === 0) {
+            this.selectAllCheckbox.indeterminate = false;
+            this.selectAllCheckbox.checked = false;
+        } else if (checkedCheckboxes === totalCheckboxes) {
+            this.selectAllCheckbox.indeterminate = false;
+            this.selectAllCheckbox.checked = true;
+        } else {
+            this.selectAllCheckbox.indeterminate = true;
+            this.selectAllCheckbox.checked = false;
+        }
+    }
+
+    updateBulkActionsBar() {
+        const checkedCount = document.querySelectorAll(
+            ".row-checkbox:checked"
+        ).length;
+
+        if (checkedCount > 0) {
+            this.bulkActionsBar.style.display = "block";
+            this.selectedCount.textContent = checkedCount;
+        } else {
+            this.bulkActionsBar.style.display = "none";
+        }
+    }
+
+    updateUI() {
+        this.updateSelectAllState();
+        this.updateBulkActionsBar();
+    }
+
+    clearSelection() {
+        this.selectAllCheckbox.checked = false;
+        this.selectAllCheckbox.indeterminate = false;
+        this.rowCheckboxes.forEach((checkbox) => {
+            checkbox.checked = false;
+        });
+        this.updateUI();
+    }
+
+    getSelectedIds() {
+        return Array.from(
+            document.querySelectorAll(".row-checkbox:checked")
+        ).map((cb) => cb.value);
+    }
+}
+
+// Global bulk selection instance
+let bulkSelection = null;
+
+// Bulk action functions
+window.clearPOSelection = function () {
+    if (bulkSelection) {
+        bulkSelection.clearSelection();
+    }
+};
+
+window.getSelectedIds = function () {
+    return bulkSelection ? bulkSelection.getSelectedIds() : [];
+};
+
+/**
+ * Enhanced bulk delete function with better error handling and debugging
+ */
+window.bulkDeletePO = function () {
+    console.log("bulkDeletePO function called");
+
+    const selected = getSelectedIds();
+    console.log("Selected IDs:", selected);
+
+    // Validate selection
+    if (!selected || selected.length === 0) {
+        showPOToast(
+            "Warning",
+            "Please select at least one purchase order to delete.",
+            "warning"
+        );
+        return;
+    }
+
+    // Update modal with selection count
+    const bulkDeleteCount = document.getElementById("bulkDeleteCount");
+    if (bulkDeleteCount) {
+        bulkDeleteCount.textContent = selected.length;
+    }
+
+    // Show confirmation modal
+    const bulkDeleteModal = new bootstrap.Modal(
+        document.getElementById("bulkDeleteModal")
+    );
+    bulkDeleteModal.show();
+
+    // Handle confirmation button
+    const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
+    if (confirmBtn) {
+        // Remove any existing event listeners by cloning the button
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+        newConfirmBtn.addEventListener("click", function () {
+            console.log("Confirm button clicked");
+            performBulkDelete(selected, this, bulkDeleteModal);
+        });
+    }
+};
+
+window.bulkExportPO = function () {
+    const selected = Array.from(
+        document.querySelectorAll(".row-checkbox:checked")
+    ).map((cb) => cb.value);
+
+    if (selected.length === 0) {
+        showPOToast(
+            "Warning",
+            "Please select at least one purchase order to export.",
+            "warning"
+        );
+        return;
+    }
+
+    const submitBtn = document.querySelector('[onclick="bulkExportPO()"]');
+    const originalText = submitBtn ? submitBtn.innerHTML : "";
+
+    if (submitBtn) {
+        submitBtn.innerHTML =
+            '<span class="spinner-border spinner-border-sm me-2"></span>Exporting...';
+        submitBtn.disabled = true;
+    }
+
+    // Create form and submit for export
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/admin/po/bulk-export";
+    form.style.display = "none";
+
+    // Add CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const csrfInput = document.createElement("input");
+        csrfInput.type = "hidden";
+        csrfInput.name = "_token";
+        csrfInput.value = csrfToken.getAttribute("content");
+        form.appendChild(csrfInput);
+    }
+
+    // Add selected IDs
+    selected.forEach((id) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "ids[]";
+        input.value = id;
+        form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+
+    // Reset button after a delay
+    setTimeout(() => {
+        if (submitBtn) {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+        document.body.removeChild(form);
+    }, 2000);
+};
+
+window.bulkMarkAsPaidPO = function () {
+    const selected = Array.from(
+        document.querySelectorAll(".row-checkbox:checked")
+    ).map((cb) => cb.value);
+
+    if (selected.length === 0) {
+        showPOToast(
+            "Warning",
+            "Please select at least one purchase order to mark as paid.",
+            "warning"
+        );
+        return;
+    }
+
+    if (
+        confirm(
+            `Are you sure you want to mark ${selected.length} purchase order(s) as paid?`
+        )
+    ) {
+        const submitBtn = document.querySelector(
+            '[onclick="bulkMarkAsPaidPO()"]'
+        );
+        const originalText = submitBtn ? submitBtn.innerHTML : "";
+
+        if (submitBtn) {
+            submitBtn.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+            submitBtn.disabled = true;
+        }
+
+        fetch("/admin/po/bulk-mark-paid", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+            body: JSON.stringify({
+                ids: selected,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    showPOToast(
+                        "Success",
+                        `${data.updated_count} purchase order(s) marked as paid successfully!`,
+                        "success"
+                    );
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    showPOToast(
+                        "Error",
+                        data.message || "Failed to update purchase orders.",
+                        "error"
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                showPOToast(
+                    "Error",
+                    "An error occurred while updating purchase orders.",
+                    "error"
+                );
+            })
+            .finally(() => {
+                if (submitBtn) {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
+    }
+};
+
+/**
+ * Perform the actual bulk delete operation with enhanced debugging
+ */
+function performBulkDelete(selectedIds, confirmButton, modal) {
+    console.log("performBulkDelete called with IDs:", selectedIds);
+
+    // Show loading state
+    const originalText = confirmButton.innerHTML;
+    confirmButton.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        Deleting...
+    `;
+    confirmButton.disabled = true;
+
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        console.error("CSRF token not found");
+        showPOToast(
+            "Error",
+            "Security token not found. Please refresh the page.",
+            "error"
+        );
+        resetButton(confirmButton, originalText);
+        return;
+    }
+
+    console.log("CSRF token found:", csrfToken.getAttribute("content"));
+
+    // Prepare request data
+    const requestData = {
+        ids: selectedIds,
+        _token: csrfToken.getAttribute("content"),
+    };
+
+    console.log("Request data:", requestData);
+
+    // Make the API request
+    fetch("/admin/po/bulk-delete", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
+            Accept: "application/json",
+        },
+        body: JSON.stringify(requestData),
+    })
+        .then(async (response) => {
+            console.log("Response status:", response.status);
+            console.log("Response headers:", response.headers);
+
+            const data = await response.json();
+            console.log("Response data:", data);
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || `HTTP error! status: ${response.status}`
+                );
+            }
+
+            return data;
+        })
+        .then((data) => {
+            console.log("Success response:", data);
+
+            if (data.success) {
+                // Success feedback
+                showPOToast(
+                    "Success",
+                    `${data.deleted_count} purchase order(s) deleted successfully!`,
+                    "success",
+                    3000
+                );
+
+                // Hide modal
+                modal.hide();
+
+                // Clear selection
+                if (bulkSelection) {
+                    bulkSelection.clearSelection();
+                }
+
+                // Reload page after short delay to show success message
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                throw new Error(data.message || "Unknown error occurred");
+            }
+        })
+        .catch((error) => {
+            console.error("Bulk delete error:", error);
+
+            // Error feedback
+            showPOToast(
+                "Error",
+                error.message ||
+                    "An error occurred while deleting purchase orders.",
+                "error",
+                5000
+            );
+
+            // Reset button state
+            resetButton(confirmButton, originalText);
+        });
+}
+
+/**
+ * Enhanced error handling for network issues
+ */
+function handleNetworkError(error) {
+    let errorMessage = "An unexpected error occurred.";
+
+    if (error.name === "TypeError" && error.message.includes("fetch")) {
+        errorMessage =
+            "Network error. Please check your connection and try again.";
+    } else if (error.message.includes("422")) {
+        errorMessage =
+            "Invalid data provided. Please refresh the page and try again.";
+    } else if (error.message.includes("500")) {
+        errorMessage = "Server error. Please try again later.";
+    } else if (error.message) {
+        errorMessage = error.message;
+    }
+
+    return errorMessage;
+}
+
+/**
+ * Validate selection before operations
+ */
+function validateSelection() {
+    const selected = getSelectedIds();
+
+    if (!selected || !Array.isArray(selected) || selected.length === 0) {
+        return {
+            valid: false,
+            message: "Please select at least one purchase order.",
+        };
+    }
+
+    // Check if all selected IDs are valid numbers
+    const invalidIds = selected.filter((id) => !id || isNaN(parseInt(id)));
+    if (invalidIds.length > 0) {
+        return {
+            valid: false,
+            message:
+                "Invalid selection detected. Please refresh the page and try again.",
+        };
+    }
+
+    return {
+        valid: true,
+        ids: selected.map((id) => parseInt(id)),
+    };
+}
+
+/**
+ * Reset button to original state
+ */
+function resetButton(button, originalText) {
+    if (button) {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }
+}
+
+/**
+ * Enhanced toast notification function for debugging
+ */
+function showPOToast(title, message, type = "info", duration = 4000) {
+    console.log(`Toast: ${title} - ${message} (${type})`);
+
+    // Create a toast container if it doesn't exist
+    let toastContainer = document.getElementById("po-toast-container");
     if (!toastContainer) {
         toastContainer = document.createElement("div");
-        toastContainer.id = "toast-container";
+        toastContainer.id = "po-toast-container";
         toastContainer.className =
             "toast-container position-fixed bottom-0 end-0 p-3";
         toastContainer.style.zIndex = "1050";
         document.body.appendChild(toastContainer);
 
-        if (!document.getElementById("toast-styles")) {
+        // Add animation styles once
+        if (!document.getElementById("po-toast-styles")) {
             const style = document.createElement("style");
-            style.id = "toast-styles";
+            style.id = "po-toast-styles";
             style.textContent = `
-                .toast-enter { transform: translateX(100%); opacity: 0; }
-                .toast-show { transform: translateX(0); opacity: 1; transition: transform 0.3s ease, opacity 0.3s ease; }
-                .toast-exit { transform: translateX(100%); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; }
+                .toast-enter {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                .toast-show {
+                    transform: translateX(0);
+                    opacity: 1;
+                    transition: transform 0.3s ease, opacity 0.3s ease;
+                }
+                .toast-exit {
+                    transform: translateX(100%);
+                    opacity: 0;
+                    transition: transform 0.3s ease, opacity 0.3s ease;
+                }
             `;
             document.head.appendChild(style);
         }
     }
 
+    // Create toast element
     const toast = document.createElement("div");
     toast.className =
         "toast toast-enter align-items-center text-white bg-" +
-        getToastColor(type) +
+        getPOToastColor(type) +
         " border-0";
     toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
 
     toast.innerHTML = `
         <div class="d-flex">
             <div class="toast-body">
                 <strong>${title}</strong>: ${message}
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     `;
 
     toastContainer.appendChild(toast);
+
+    // Force reflow to ensure animation works
     void toast.offsetWidth;
+
+    // Show with animation
     toast.classList.add("toast-show");
 
-    const bsToast = new bootstrap.Toast(toast, {
-        autohide: true,
-        delay: duration,
-    });
-    bsToast.show();
-
+    // Handle close button clicks
     const closeButton = toast.querySelector(".btn-close");
-    closeButton.addEventListener("click", () => hideToast(toast));
+    if (closeButton) {
+        closeButton.addEventListener("click", () => {
+            hidePOToast(toast);
+        });
+    }
 
-    const hideTimeout = setTimeout(() => hideToast(toast), duration);
+    // Auto hide after duration
+    const hideTimeout = setTimeout(() => {
+        hidePOToast(toast);
+    }, duration);
+
+    // Store timeout on toast element for cleanup
     toast._hideTimeout = hideTimeout;
 }
 
-function hideToast(toast) {
-    if (toast._hideTimeout) clearTimeout(toast._hideTimeout);
+// Helper function to hide toast with animation
+function hidePOToast(toast) {
+    if (toast._hideTimeout) {
+        clearTimeout(toast._hideTimeout);
+    }
+
     toast.classList.remove("toast-show");
     toast.classList.add("toast-exit");
-    setTimeout(() => toast.remove(), 300);
+
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 300);
 }
 
-function getToastColor(type) {
+// Helper function to get the appropriate Bootstrap color class
+function getPOToastColor(type) {
     switch (type) {
         case "success":
             return "success";
@@ -1184,3 +1466,54 @@ function getToastColor(type) {
             return "info";
     }
 }
+
+// Initialize application based on current page
+document.addEventListener("DOMContentLoaded", function () {
+    // Add a small delay to ensure all elements are loaded
+    setTimeout(() => {
+        // Determine current page
+        const pathname = window.location.pathname;
+
+        try {
+            if (pathname.includes("/admin/po/create")) {
+                // Initialize create page functionality
+                window.poApp = new PurchaseOrderCreate();
+                console.log("Purchase Order Create App initialized");
+            } else if (
+                pathname.includes("/admin/po/edit") ||
+                (pathname.includes("/admin/po") &&
+                    pathname.match(/\/\d+\/edit$/))
+            ) {
+                // Initialize edit page functionality
+                window.poApp = new PurchaseOrderEdit();
+                console.log("Purchase Order Edit App initialized");
+            } else if (
+                pathname.includes("/admin/po/modal") ||
+                (pathname.includes("/admin/po") && pathname.match(/\/\d+$/)) ||
+                pathname.includes("/admin/po/show")
+            ) {
+                // Initialize view functionality for modal or show pages
+                window.poApp = new PurchaseOrderView();
+                console.log("Purchase Order View App initialized");
+            } else if (
+                pathname === "/admin/po" ||
+                pathname.includes("/admin/po?") ||
+                pathname.includes("/admin/po/")
+            ) {
+                // Initialize bulk selection for index page
+                console.log("Initializing Purchase Order Index page...");
+                bulkSelection = new PurchaseOrderBulkSelection();
+                console.log("Purchase Order Index bulk selection initialized");
+            }
+
+            // Expose global utility functions that might be called from inline handlers
+            window.setDeleteFormAction = function (url) {
+                if (window.poApp && window.poApp.setDeleteFormAction) {
+                    window.poApp.setDeleteFormAction(url);
+                }
+            };
+        } catch (error) {
+            console.error("Error initializing Purchase Order App:", error);
+        }
+    }, 250); // Increased delay to ensure DOM is fully ready
+});

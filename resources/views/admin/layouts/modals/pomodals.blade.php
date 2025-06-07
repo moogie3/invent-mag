@@ -54,6 +54,7 @@
         </div>
     </div>
 </div>
+
 <script>
     // Function to load PO details into modal
     function loadPoDetails(id) {
@@ -122,7 +123,6 @@
         }, 100);
     });
 </script>
-
 
 @if (isset($isPaid) && $isPaid)
     <div class="modal fade" id="paidInvoiceModal" tabindex="-1" aria-labelledby="paidInvoiceModalLabel"

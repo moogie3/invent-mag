@@ -452,63 +452,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Mark as Paid Modal -->
-        <div class="modal fade" id="markAsPaidModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="ti ti-check me-2 text-success"></i>
-                            Mark Transaction as Paid
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="alert alert-info">
-                            <i class="ti ti-info-circle me-2"></i>
-                            You are about to mark this transaction as fully paid.
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-4"><strong>Invoice:</strong></div>
-                            <div class="col-sm-8" id="modalInvoice"></div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-sm-4"><strong>Type:</strong></div>
-                            <div class="col-sm-8" id="modalType"></div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-sm-4"><strong>Customer/Supplier:</strong></div>
-                            <div class="col-sm-8" id="modalCustomerSupplier"></div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-sm-4"><strong>Amount:</strong></div>
-                            <div class="col-sm-8 fw-bold" id="modalAmount"></div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-success" id="confirmMarkPaidBtn"
-                            onclick="confirmMarkAsPaid()">
-                            <i class="ti ti-check me-1"></i>
-                            Mark as Paid
-                            <div class="modal fade" id="markAsPaidModal" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">
-                                                <i class="ti ti-check me-2 text-success"></i>
-                                                Mark Transaction as Paid
-                                            </h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
+    @include('admin.layouts.modals.recentmodals')
 @endsection

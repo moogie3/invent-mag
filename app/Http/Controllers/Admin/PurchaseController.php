@@ -9,13 +9,16 @@ use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth; // Add this import
 
 class PurchaseController extends Controller
 {
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10); // pagination
-        $query = Purchase::with(['product', 'supplier', 'user']);
+        $query = Purchase::with(['items', 'supplier', 'user']);
         // apply filters
         if ($request->has('month') && $request->month) {
             $query->whereMonth('order_date', $request->month);
@@ -92,6 +95,212 @@ class PurchaseController extends Controller
         $pos = Purchase::with(['supplier', 'items.product'])->findOrFail($id);
 
         return view('admin.layouts.modals.pomodals-view', compact('pos'));
+    }
+
+    /**
+     * Bulk delete purchase orders with enhanced error handling and debugging
+     */
+    public function bulkDelete(Request $request)
+    {
+        try {
+            // Log the incoming request for debugging
+            Log::info('Bulk delete request received', [
+                'request_data' => $request->all(),
+                'user_id' => Auth::id(),
+            ]);
+
+            // Validate the incoming request
+            $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'required|integer|exists:purchases,id',
+            ]);
+
+            $ids = $request->ids;
+            $deletedCount = 0;
+
+            Log::info('Validation passed, proceeding with deletion', [
+                'ids' => $ids,
+                'count' => count($ids),
+            ]);
+
+            // Use database transaction for data integrity
+            DB::transaction(function () use ($ids, &$deletedCount) {
+                // First, get all purchase orders to be deleted for logging
+                $purchaseOrders = Purchase::whereIn('id', $ids)->with('items')->get();
+
+                if ($purchaseOrders->isEmpty()) {
+                    throw new \Exception('No purchase orders found with the provided IDs');
+                }
+
+                Log::info('Found purchase orders to delete', [
+                    'found_count' => $purchaseOrders->count(),
+                    'po_invoices' => $purchaseOrders->pluck('invoice')->toArray(),
+                ]);
+
+                // Log the deletion attempt
+                Log::info('Bulk delete purchase orders initiated', [
+                    'user_id' => Auth::id(),
+                    'po_ids' => $ids,
+                    'po_count' => count($ids),
+                ]);
+
+                // Delete related POItems first (if not using CASCADE foreign key)
+                $deletedItems = POItem::whereIn('po_id', $ids)->delete();
+                Log::info("Deleted {$deletedItems} PO items");
+
+                // Update product stock before deleting (reverse the stock additions)
+                foreach ($purchaseOrders as $po) {
+                    foreach ($po->items as $item) {
+                        $product = Product::find($item->product_id);
+                        if ($product) {
+                            try {
+                                // Determine which stock field to use
+                                if (isset($product->stock_quantity)) {
+                                    $newStock = max(0, $product->stock_quantity - $item->quantity);
+                                    $product->update(['stock_quantity' => $newStock]);
+                                } elseif (isset($product->quantity)) {
+                                    $newStock = max(0, $product->quantity - $item->quantity);
+                                    $product->update(['quantity' => $newStock]);
+                                } elseif (isset($product->stock)) {
+                                    $newStock = max(0, $product->stock - $item->quantity);
+                                    $product->update(['stock' => $newStock]);
+                                }
+
+                                Log::info("Updated stock for product {$item->product_id}, reduced by {$item->quantity}");
+                            } catch (\Exception $e) {
+                                Log::warning("Failed to update stock for product {$item->product_id}: " . $e->getMessage());
+                            }
+                        }
+                    }
+                }
+
+                // Delete the purchase orders
+                $deletedCount = Purchase::whereIn('id', $ids)->delete();
+                Log::info("Successfully deleted {$deletedCount} purchase orders");
+            });
+
+            // Return success response
+            $response = [
+                'success' => true,
+                'message' => "Successfully deleted {$deletedCount} purchase order(s)",
+                'deleted_count' => $deletedCount,
+            ];
+
+            Log::info('Bulk delete completed successfully', $response);
+
+            return response()->json($response);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Bulk delete validation failed', [
+                'errors' => $e->errors(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Invalid data provided',
+                    'errors' => $e->errors(),
+                ],
+                422,
+            );
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Bulk delete purchase orders failed', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error deleting purchase orders. Please try again.',
+                    'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+                ],
+                500,
+            );
+        }
+    }
+
+    public function bulkMarkPaid(Request $request)
+    {
+        try {
+            $request->validate([
+                'ids' => 'required|array',
+                'ids.*' => 'exists:purchases,id', // Fixed: was 'po,id'
+            ]);
+
+            $ids = $request->ids;
+
+            // Update purchase orders to paid status
+            $updatedCount = Purchase::whereIn('id', $ids)
+                ->where('status', '!=', 'Paid') // Only update unpaid orders
+                ->update([
+                    'status' => 'Paid',
+                    'payment_date' => now(),
+                    'updated_at' => now(),
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Purchase orders marked as paid successfully',
+                'updated_count' => $updatedCount,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error updating purchase orders: ' . $e->getMessage(),
+                ],
+                500,
+            );
+        }
+    }
+
+    /**
+     * Bulk export purchase orders
+     */
+    public function bulkExport(Request $request)
+    {
+        try {
+            $request->validate([
+                'ids' => 'required|array',
+                'ids.*' => 'exists:purchases,id', // Fixed: was 'po,id'
+            ]);
+
+            $ids = $request->ids;
+
+            // Get purchase orders with related data
+            $pos = Purchase::with(['supplier', 'items.product'])
+                ->whereIn('id', $ids)
+                ->get();
+
+            // Create CSV content
+            $filename = 'purchase_orders_' . date('Y-m-d_H-i-s') . '.csv';
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ];
+
+            $callback = function () use ($pos) {
+                $file = fopen('php://output', 'w');
+
+                // CSV Headers
+                fputcsv($file, ['Invoice', 'Supplier', 'Order Date', 'Due Date', 'Status', 'Payment Date', 'Total', 'Items Count']);
+
+                // CSV Data
+                foreach ($pos as $po) {
+                    fputcsv($file, [$po->invoice, $po->supplier->name ?? 'N/A', $po->order_date, $po->due_date, $po->status, $po->payment_date ?? 'N/A', $po->total, $po->items->count()]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Error exporting purchase orders: ' . $e->getMessage()]);
+        }
     }
 
     public function store(Request $request)
@@ -249,10 +458,26 @@ class PurchaseController extends Controller
                 ->withInput();
         }
     }
+
     public function destroy($id)
     {
-        Purchase::find($id)->delete();
+        try {
+            // Use the same logic as bulk delete for consistency
+            $request = new Request(['ids' => [$id]]);
+            $response = $this->bulkDelete($request);
 
-        return redirect()->route('admin.po')->with('success', 'Purchase order deleted');
+            if ($response->getData()->success) {
+                return redirect()->route('admin.po')->with('success', 'Purchase order deleted successfully');
+            } else {
+                return redirect()->route('admin.po')->with('error', 'Failed to delete purchase order');
+            }
+        } catch (\Exception $e) {
+            Log::error('Single purchase order delete failed', [
+                'po_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('admin.po')->with('error', 'Error deleting purchase order');
+        }
     }
 }

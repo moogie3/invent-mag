@@ -20,7 +20,7 @@
     <script src="{{ asset('js/admin/recentts.js') }}"></script>
 @endif
 
-{{-- SCRIPT FOR ADMIN LOGIN (Remove Bootstrap CDN since Tabler includes it) --}}
+{{-- SCRIPT FOR ADMIN LOGIN --}}
 @if (request()->is('admin/login', 'admin/register', 'forgot-password'))
     <script src="{{ asset('js/admin/auth.js') }}"></script>
 @endif
@@ -36,7 +36,7 @@
 @endif
 
 {{-- SCRIPT FOR ADMIN PO CREATE & EDIT --}}
-@if (request()->is('admin/po/create', 'admin/po/edit/*'))
+@if (request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*'))
     <script src="{{ asset('js/admin/purchase-order.js') }}"></script>
 @endif
 

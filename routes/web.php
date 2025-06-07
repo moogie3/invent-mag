@@ -11,14 +11,14 @@ use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 
-// Admin Authentication Routes (Move Inside "admin" Prefix)
+// Admin Authentication Routes
 Route::prefix('admin')->group(function () {
     // Register
     Route::get('/register', fn() => view('admin.auth.register'))->name('admin.register');
     Route::post('/register', [RegisteredUserController::class, 'store'])->name('admin.register.post');
+
     // Login
     Route::get('/login', function (Request $request) {
-        // Check if there's an attempted email in the session
         $email = $request->session()->get('attempted_email');
 
         if ($email) {
@@ -50,60 +50,145 @@ Route::prefix('admin')->group(function () {
     Route::get('/reset-password/{token}', fn($token) => view('admin.auth.reset-password', ['token' => $token]))->name('admin.password.reset');
     Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('admin.password.update');
 
-    // Protected Admin Routes (Require Authentication)
+    // Protected Admin Routes
     Route::middleware('auth')->group(function () {
+        // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-        $resources = [
-            'product' => ProductController::class,
-            'supplier' => SupplierController::class,
-            'customer' => CustomerController::class,
-            'po' => PurchaseController::class,
-            'sales' => SalesController::class,
-            'warehouse' => WarehouseController::class,
-            'pos' => POSController::class,
-        ];
+        // Product Routes
+        Route::prefix('products')->group(function () {
+            Route::get('/', [ProductController::class, 'index'])->name('admin.product');
+            Route::get('/create', [ProductController::class, 'create'])->name('admin.product.create');
+            Route::post('/store', [ProductController::class, 'store'])->name('admin.product.store');
+            Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('admin.product.edit');
+            Route::get('/view/{id}', [ProductController::class, 'view'])->name('admin.product.view');
+            Route::put('/update/{id}', [ProductController::class, 'update'])->name('admin.product.update');
+            Route::delete('/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
+            Route::get('/modal-view/{id}', [ProductController::class, 'modalView'])->name('admin.product.modal-view');
+            Route::post('/quick-create', [ProductController::class, 'quickCreate'])->name('admin.product.quickCreate');
+        });
 
-        foreach ($resources as $route => $controller) {
-            Route::prefix($route)->group(function () use ($route, $controller) {
-                Route::get('/', [$controller, 'index'])->name("admin.$route");
-                Route::get('/create', [$controller, 'create'])->name("admin.$route.create");
-                Route::post('/store', [$controller, 'store'])->name("admin.$route.store");
-                Route::get('/edit/{id}', [$controller, 'edit'])->name("admin.$route.edit");
-                Route::get('/view/{id}', [$controller, 'view'])->name("admin.$route.view");
-                Route::put('/update/{id}', [$controller, 'update'])->name("admin.$route.update");
-                Route::delete('/destroy/{id}', [$controller, 'destroy'])->name("admin.$route.destroy");
-            });
-        }
+        // Supplier Routes
+        Route::prefix('suppliers')->group(function () {
+            Route::get('/', [SupplierController::class, 'index'])->name('admin.supplier');
+            Route::get('/create', [SupplierController::class, 'create'])->name('admin.supplier.create');
+            Route::post('/store', [SupplierController::class, 'store'])->name('admin.supplier.store');
+            Route::get('/edit/{id}', [SupplierController::class, 'edit'])->name('admin.supplier.edit');
+            Route::get('/view/{id}', [SupplierController::class, 'view'])->name('admin.supplier.view');
+            Route::put('/update/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update');
+            Route::delete('/destroy/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
+        });
 
-        Route::get('po/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('admin.po.product.details');
-        Route::get('sales/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('admin.sales.product.details');
-        Route::get('/po/view/{id}', [PurchaseController::class, 'view'])->name('admin.po.view');
-        Route::get('/sales/view/{id}', [SalesController::class, 'view'])->name('admin.sales.view');
-        Route::get('/sales/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
-        Route::post('/customer/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate');
-        Route::post('/product/quick-create', [ProductController::class, 'quickCreate'])->name('admin.product.quickCreate');
-        Route::get('/warehouse/{id}/set-main', [WarehouseController::class, 'setMain'])->name('admin.warehouse.set-main');
-        Route::get('/warehouse/{id}/unset-main', [WarehouseController::class, 'unsetMain'])->name('admin.warehouse.unset-main');
+        // Customer Routes
+        Route::prefix('customers')->group(function () {
+            Route::get('/', [CustomerController::class, 'index'])->name('admin.customer');
+            Route::get('/create', [CustomerController::class, 'create'])->name('admin.customer.create');
+            Route::post('/store', [CustomerController::class, 'store'])->name('admin.customer.store');
+            Route::get('/edit/{id}', [CustomerController::class, 'edit'])->name('admin.customer.edit');
+            Route::get('/view/{id}', [CustomerController::class, 'view'])->name('admin.customer.view');
+            Route::put('/update/{id}', [CustomerController::class, 'update'])->name('admin.customer.update');
+            Route::delete('/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.customer.destroy');
+            Route::post('/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate');
+        });
+
+        // Purchase Order Routes
+        Route::prefix('po')->group(function () {
+            Route::get('/', [PurchaseController::class, 'index'])->name('admin.po');
+            Route::get('/create', [PurchaseController::class, 'create'])->name('admin.po.create');
+            Route::post('/store', [PurchaseController::class, 'store'])->name('admin.po.store');
+            Route::get('/edit/{id}', [PurchaseController::class, 'edit'])->name('admin.po.edit');
+            Route::get('/view/{id}', [PurchaseController::class, 'view'])->name('admin.po.view');
+            Route::put('/update/{id}', [PurchaseController::class, 'update'])->name('admin.po.update');
+            Route::delete('/destroy/{id}', [PurchaseController::class, 'destroy'])->name('admin.po.destroy');
+            Route::get('/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('admin.po.product.details');
+            Route::get('/modal-view/{id}', [PurchaseController::class, 'modalView'])->name('admin.po.modal-view');
+            Route::post('/bulk-delete', [PurchaseController::class, 'bulkDelete'])->name('po.bulk-delete');
+            Route::post('/bulk-mark-paid', [PurchaseController::class, 'bulkMarkPaid'])->name('po.bulk-mark-paid');
+            Route::post('/bulk-export', [PurchaseController::class, 'bulkExport'])->name('po.bulk-export');
+        });
+
+        // Sales Routes
+        Route::prefix('sales')->group(function () {
+            Route::get('/', [SalesController::class, 'index'])->name('admin.sales');
+            Route::get('/create', [SalesController::class, 'create'])->name('admin.sales.create');
+            Route::post('/store', [SalesController::class, 'store'])->name('admin.sales.store');
+            Route::get('/edit/{id}', [SalesController::class, 'edit'])->name('admin.sales.edit');
+            Route::get('/view/{id}', [SalesController::class, 'view'])->name('admin.sales.view');
+            Route::put('/update/{id}', [SalesController::class, 'update'])->name('admin.sales.update');
+            Route::delete('/destroy/{id}', [SalesController::class, 'destroy'])->name('admin.sales.destroy');
+            Route::get('/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('admin.sales.product.details');
+            Route::get('/modal-view/{id}', [SalesController::class, 'modalView'])->name('admin.sales.modal-view');
+            Route::get('/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
+        });
+
+        // Warehouse Routes
+        Route::prefix('warehouses')->group(function () {
+            Route::get('/', [WarehouseController::class, 'index'])->name('admin.warehouse');
+            Route::get('/create', [WarehouseController::class, 'create'])->name('admin.warehouse.create');
+            Route::post('/store', [WarehouseController::class, 'store'])->name('admin.warehouse.store');
+            Route::get('/edit/{id}', [WarehouseController::class, 'edit'])->name('admin.warehouse.edit');
+            Route::get('/view/{id}', [WarehouseController::class, 'view'])->name('admin.warehouse.view');
+            Route::put('/update/{id}', [WarehouseController::class, 'update'])->name('admin.warehouse.update');
+            Route::delete('/destroy/{id}', [WarehouseController::class, 'destroy'])->name('admin.warehouse.destroy');
+            Route::get('/{id}/set-main', [WarehouseController::class, 'setMain'])->name('admin.warehouse.set-main');
+            Route::get('/{id}/unset-main', [WarehouseController::class, 'unsetMain'])->name('admin.warehouse.unset-main');
+        });
+
+        // POS Routes
+        Route::prefix('pos')->group(function () {
+            Route::get('/', [POSController::class, 'index'])->name('admin.pos');
+            Route::get('/create', [POSController::class, 'create'])->name('admin.pos.create');
+            Route::post('/store', [POSController::class, 'store'])->name('admin.pos.store');
+            Route::get('/edit/{id}', [POSController::class, 'edit'])->name('admin.pos.edit');
+            Route::get('/view/{id}', [POSController::class, 'view'])->name('admin.pos.view');
+            Route::put('/update/{id}', [POSController::class, 'update'])->name('admin.pos.update');
+            Route::delete('/destroy/{id}', [POSController::class, 'destroy'])->name('admin.pos.destroy');
+            Route::get('/receipt/{id}', [POSController::class, 'receipt'])->name('admin.pos.receipt');
+        });
 
         // Transaction Routes
         Route::prefix('transactions')->group(function () {
             Route::get('/', [TransactionController::class, 'index'])->name('admin.transactions');
             Route::post('/{id}/mark-paid', [TransactionController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');
+            Route::post('/bulk-mark-paid', [TransactionController::class, 'bulkMarkAsPaid']);
         });
 
-        // Settings
-        Route::prefix('setting')->group(function () {
-            Route::get('/currency', [CurrencyController::class, 'edit'])->name('admin.setting.currency.edit');
-            Route::post('/currency/update', [CurrencyController::class, 'update'])->name('admin.setting.currency.update');
-            Route::get('/profile', [ProfileController::class, 'edit'])->name('admin.setting.profile.edit');
-            Route::put('/profile/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update');
-            Route::delete('/profile/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
-            Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.setting.notifications');
-            Route::get('/tax', [TaxController::class, 'index'])->name('admin.setting.tax');
-            Route::post('/tax/update', [TaxController::class, 'update'])->name('admin.setting.tax.update');
+        // Notification Routes
+        Route::prefix('notifications')->group(function () {
+            Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
+            Route::get('/list', [NotificationController::class, 'getNotifications'])->name('admin.notifications.list');
+            Route::post('/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
+            Route::get('/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
+            Route::get('/view/{id}', [NotificationController::class, 'view'])->name('admin.notifications.view');
+        });
 
-            Route::prefix('category')->group(function () {
+        // Settings Routes
+        Route::prefix('settings')->group(function () {
+            // Currency Settings
+            Route::prefix('currency')->group(function () {
+                Route::get('/', [CurrencyController::class, 'edit'])->name('admin.setting.currency.edit');
+                Route::post('/update', [CurrencyController::class, 'update'])->name('admin.setting.currency.update');
+            });
+
+            // Profile Settings
+            Route::prefix('profile')->group(function () {
+                Route::get('/', [ProfileController::class, 'edit'])->name('admin.setting.profile.edit');
+                Route::put('/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update');
+                Route::delete('/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
+            });
+
+            // Tax Settings
+            Route::prefix('tax')->group(function () {
+                Route::get('/', [TaxController::class, 'index'])->name('admin.setting.tax');
+                Route::post('/update', [TaxController::class, 'update'])->name('admin.setting.tax.update');
+                Route::get('/get', function () {
+                    $tax = \App\Models\Tax::where('is_active', 1)->first();
+                    return response()->json(['tax_rate' => $tax ? $tax->rate : 0]);
+                })->name('admin.setting.tax.get');
+            });
+
+            // Category Settings
+            Route::prefix('categories')->group(function () {
                 Route::get('/', [CategoryController::class, 'index'])->name('admin.setting.category');
                 Route::get('/create', [CategoryController::class, 'create'])->name('admin.setting.category.create');
                 Route::post('/store', [CategoryController::class, 'store'])->name('admin.setting.category.store');
@@ -112,7 +197,8 @@ Route::prefix('admin')->group(function () {
                 Route::delete('/destroy/{id}', [CategoryController::class, 'destroy'])->name('admin.setting.category.destroy');
             });
 
-            Route::prefix('unit')->group(function () {
+            // Unit Settings
+            Route::prefix('units')->group(function () {
                 Route::get('/', [UnitController::class, 'index'])->name('admin.setting.unit');
                 Route::get('/create', [UnitController::class, 'create'])->name('admin.setting.unit.create');
                 Route::post('/store', [UnitController::class, 'store'])->name('admin.setting.unit.store');
@@ -120,25 +206,9 @@ Route::prefix('admin')->group(function () {
                 Route::put('/update/{id}', [UnitController::class, 'update'])->name('admin.setting.unit.update');
                 Route::delete('/destroy/{id}', [UnitController::class, 'destroy'])->name('admin.setting.unit.destroy');
             });
+
+            Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.setting.notifications');
         });
-
-        // Fix: Notification Routes - Make sure they are properly defined with correct path
-        Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
-        Route::get('/notifications/list', [NotificationController::class, 'getNotifications'])->name('admin.notifications.list');
-        Route::post('/notifications/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
-        Route::get('/notifications/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
-        Route::get('/notifications/view/{id}', [NotificationController::class, 'view'])->name('admin.notifications.view');
-
-        Route::get('/pos/receipt/{id}', [POSController::class, 'receipt'])->name('admin.pos.receipt');
-        Route::get('/po/modal-view/{id}', [PurchaseController::class, 'modalView'])->name('admin.po.modal-view');
-        Route::get('/sales/modal-view/{id}', [SalesController::class,'modalView'])->name('admin.sales.modal-view');
-        Route::get('/product/modal-view/{id}', [ProductController::class, 'modalView'])->name('admin.product.modal-view');
-
-        // Define tax API route
-        Route::get('/setting/tax/get', function () {
-            $tax = \App\Models\Tax::where('is_active', 1)->first();
-            return response()->json(['tax_rate' => $tax ? $tax->rate : 0]);
-        })->name('admin.setting.tax.get');
     });
 });
 

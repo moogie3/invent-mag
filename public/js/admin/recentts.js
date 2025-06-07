@@ -42,6 +42,13 @@ document.addEventListener("DOMContentLoaded", function () {
             selectAll.checked = count === rowCheckboxes.length && count > 0;
         }
     }
+
+    const confirmBulkMarkPaidBtn = document.getElementById(
+        "confirmBulkMarkPaidBtn"
+    );
+    if (confirmBulkMarkPaidBtn) {
+        confirmBulkMarkPaidBtn.addEventListener("click", confirmBulkMarkAsPaid);
+    }
 });
 
 function searchTransactions() {
@@ -273,22 +280,105 @@ function clearSelection() {
     document.getElementById("bulkActionsBar").style.display = "none";
 }
 
+// Update the existing bulkMarkAsPaid function
 function bulkMarkAsPaid() {
     const selected = Array.from(
         document.querySelectorAll(".row-checkbox:checked")
     ).map((cb) => cb.value);
+
+    if (selected.length === 0) {
+        showToast(
+            "Warning",
+            "Please select at least one transaction.",
+            "warning"
+        );
+        return;
+    }
+
+    // Update the count in the modal
+    document.getElementById("bulkMarkPaidCount").textContent = selected.length;
+
+    // Show the modal
+    const modal = new bootstrap.Modal(
+        document.getElementById("bulkMarkAsPaidModal")
+    );
+    modal.show();
+}
+
+// Add the confirm bulk mark as paid function
+function confirmBulkMarkAsPaid() {
+    const selected = Array.from(
+        document.querySelectorAll(".row-checkbox:checked")
+    ).map((cb) => cb.value);
+
     if (selected.length === 0) return;
 
-    if (
-        confirm(
-            "Are you sure you want to mark " +
-                selected.length +
-                " transactions as paid?"
-        )
-    ) {
-        // Add your bulk update logic here
-        console.log("Bulk mark as paid:", selected);
-    }
+    const submitBtn = document.getElementById("confirmBulkMarkPaidBtn");
+    const originalText = submitBtn.innerHTML;
+
+    // Show loading state
+    submitBtn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+    submitBtn.disabled = true;
+
+    fetch("/admin/transactions/bulk-mark-paid", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content"),
+        },
+        body: JSON.stringify({
+            transaction_ids: selected,
+        }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(
+                    document.getElementById("bulkMarkAsPaidModal")
+                );
+                modal.hide();
+
+                // Show success message
+                showToast(
+                    "Success",
+                    `${
+                        data.updated_count || selected.length
+                    } transaction(s) marked as paid successfully!`,
+                    "success"
+                );
+
+                // Clear selection
+                clearSelection();
+
+                // Reload page after short delay
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                showToast(
+                    "Error",
+                    data.message || "Failed to update transactions.",
+                    "error"
+                );
+            }
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            showToast(
+                "Error",
+                "An error occurred while updating the transactions.",
+                "error"
+            );
+        })
+        .finally(() => {
+            // Reset button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
 }
 
 function bulkExport() {

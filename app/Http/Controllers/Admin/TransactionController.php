@@ -1,15 +1,53 @@
 <?php
 namespace App\Http\Controllers\Admin;
 
-use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase;
 use App\Models\Sales;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Log;
+
+// Create a simple Transaction DTO class to replace anonymous classes
+class TransactionDTO
+{
+    public $id;
+    public $type;
+    public $invoice;
+    public $customer_supplier;
+    public $contact_info;
+    public $date;
+    public $amount;
+    public $paid_amount;
+    public $due_amount;
+    public $status;
+    public $view_url;
+    public $edit_url;
+
+    public function __construct(array $data)
+    {
+        foreach ($data as $key => $value) {
+            $this->$key = $value;
+        }
+    }
+
+    public function getKey()
+    {
+        return $this->id;
+    }
+
+    public function toArray()
+    {
+        return get_object_vars($this);
+    }
+
+    public function __toString()
+    {
+        return (string) $this->id;
+    }
+}
 
 class TransactionController extends Controller
 {
@@ -42,180 +80,217 @@ class TransactionController extends Controller
         return view('admin.recentts', compact('transactions', 'summary', 'type', 'status', 'dateRange', 'startDate', 'endDate', 'search'));
     }
 
+    public function bulkMarkAsPaid(Request $request)
+    {
+        try {
+            $transactionIds = $request->input('transaction_ids', []);
+
+            if (empty($transactionIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No transactions selected.'
+                ], 400);
+            }
+
+            $updatedCount = 0;
+            $transactions = $this->getTransactionsByIds($transactionIds);
+
+            foreach ($transactions as $transaction) {
+                // Skip if already paid
+                if ($transaction->status === 'Paid') {
+                    continue;
+                }
+
+                if ($transaction->type === 'sale') {
+                    $sale = Sales::find($transaction->sale_id);
+                    if ($sale) {
+                        $sale->update([
+                            'status' => 'Paid',
+                            'payment_date' => now(),
+                            'amount_received' => $sale->total,
+                            'change_amount' => 0
+                        ]);
+                        $updatedCount++;
+                    }
+                } elseif ($transaction->type === 'purchase') {
+                    $purchase = Purchase::find($transaction->purchase_id);
+                    if ($purchase) {
+                        $purchase->update([
+                            'status' => 'Paid',
+                            'payment_date' => now()
+                        ]);
+                        $updatedCount++;
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully marked {$updatedCount} transaction(s) as paid.",
+                'updated_count' => $updatedCount
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Bulk mark as paid error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating transactions.'
+            ], 500);
+        }
+    }
+
+    private function getTransactionsByIds($ids)
+    {
+        $salesTransactions = Sales::whereIn('id', $ids)
+            ->with('customer')
+            ->get()
+            ->map(function ($sale) {
+                return (object) [
+                    'id' => $sale->id,
+                    'type' => 'sale',
+                    'status' => $sale->status,
+                    'sale_id' => $sale->id,
+                    'purchase_id' => null
+                ];
+            });
+
+        $purchaseTransactions = Purchase::whereIn('id', $ids)
+            ->with('supplier')
+            ->get()
+            ->map(function ($purchase) {
+                return (object) [
+                    'id' => $purchase->id,
+                    'type' => 'purchase',
+                    'status' => $purchase->status,
+                    'sale_id' => null,
+                    'purchase_id' => $purchase->id
+                ];
+            });
+
+        return $salesTransactions->concat($purchaseTransactions);
+    }
+
     private function getTransactions($dates, $type = null, $status = null, $search = null, $sort = 'date', $direction = 'desc', $perPage = 25)
     {
-        $salesQuery = Sales::with('customer')
-            ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
-            ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
-            ->when($status, function ($q) use ($status) {
-                if ($status === 'Paid') {
-                    $q->where('status', 'Paid');
-                } elseif ($status === 'Partial') {
-                    $q->where('status', 'Partial');
-                } elseif ($status === 'Unpaid') {
-                    $q->where('status', 'Unpaid');
-                }
-            })
-            ->when($search, function ($q) use ($search) {
-                $q->where(function ($query) use ($search) {
-                    $query->where('invoice', 'LIKE', "%{$search}%")->orWhereHas('customer', function ($customerQuery) use ($search) {
-                        $customerQuery
-                            ->where('name', 'LIKE', "%{$search}%")
-                            ->orWhere('address', 'LIKE', "%{$search}%")
-                            ->orWhere('payment_terms', 'LIKE', "%{$search}%")
-                            ->orWhere('phone_number', 'LIKE', "%{$search}%");
-                    });
-                });
-            });
+        // Build base queries
+        $salesQuery = $this->buildSalesQuery($dates, $status, $search);
+        $purchaseQuery = $this->buildPurchaseQuery($dates, $status, $search);
 
-        $purchaseQuery = Purchase::with('supplier')
-            ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
-            ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
-            ->when($status, function ($q) use ($status) {
-                if ($status === 'Paid') {
-                    $q->where('status', 'Paid');
-                } elseif ($status === 'Partial') {
-                    $q->where('status', 'Partial');
-                } elseif ($status === 'Unpaid') {
-                    $q->where('status', 'Unpaid');
-                }
-            })
-            ->when($search, function ($q) use ($search) {
-                $q->where(function ($query) use ($search) {
-                    $query->where('invoice', 'LIKE', "%{$search}%")->orWhereHas('supplier', function ($supplierQuery) use ($search) {
-                        $supplierQuery
-                            ->where('name', 'LIKE', "%{$search}%")
-                            ->orWhere('code', 'LIKE', "%{$search}%")
-                            ->orWhere('location', 'LIKE', "%{$search}%")
-                            ->orWhere('payment_terms', 'LIKE', "%{$search}%")
-                            ->orWhere('address', 'LIKE', "%{$search}%")
-                            ->orWhere('phone_number', 'LIKE', "%{$search}%");
-                    });
-                });
-            });
-
-        // Get collections and transform them to objects with proper keys
+        // Get collections and transform them
         $sales = collect();
         $purchases = collect();
 
         if (!$type || $type === 'sale') {
             $sales = $salesQuery->get()->map(function ($sale) {
-                $paidAmount = $this->calculatePaidAmount($sale);
-                $dueAmount = max(0, $sale->total - $paidAmount);
-
-                // Create a custom object that implements the required methods
-                return new class ($sale->id, [
-                    'id' => $sale->id,
-                    'type' => 'sale',
-                    'invoice' => $sale->invoice,
-                    'customer_supplier' => $sale->customer->name ?? 'Unknown Customer',
-                    'contact_info' => $sale->customer->email ?? ($sale->customer->phone ?? null),
-                    'date' => $sale->order_date,
-                    'amount' => $sale->total,
-                    'paid_amount' => $paidAmount,
-                    'due_amount' => $dueAmount,
-                    'status' => $this->getPaymentStatus($sale->status, $paidAmount, $sale->total),
-                    'view_url' => route('admin.sales.view', $sale->id),
-                    'edit_url' => route('admin.sales.edit', $sale->id),
-                ]) {
-                    private $key;
-                    private $attributes;
-
-                    public function __construct($key, $attributes)
-                    {
-                        $this->key = $key;
-                        $this->attributes = $attributes;
-                    }
-
-                    public function __get($name)
-                    {
-                        return $this->attributes[$name] ?? null;
-                    }
-
-                    public function __isset($name)
-                    {
-                        return isset($this->attributes[$name]);
-                    }
-
-                    public function getKey()
-                    {
-                        return $this->key;
-                    }
-
-                    public function toArray()
-                    {
-                        return $this->attributes;
-                    }
-
-                    public function __toString()
-                    {
-                        return (string) $this->key;
-                    }
-                };
+                return $this->transformSaleToTransaction($sale);
             });
         }
 
         if (!$type || $type === 'purchase') {
             $purchases = $purchaseQuery->get()->map(function ($purchase) {
-                $paidAmount = $this->calculatePaidAmount($purchase);
-                $dueAmount = max(0, $purchase->total - $paidAmount);
-
-                // Create a custom object that implements the required methods
-                return new class ($purchase->id, [
-                    'id' => $purchase->id,
-                    'type' => 'purchase',
-                    'invoice' => $purchase->invoice,
-                    'customer_supplier' => $purchase->supplier->name ?? 'Unknown Supplier',
-                    'contact_info' => $purchase->supplier->email ?? ($purchase->supplier->phone ?? null),
-                    'date' => $purchase->order_date,
-                    'amount' => $purchase->total,
-                    'paid_amount' => $paidAmount,
-                    'due_amount' => $dueAmount,
-                    'status' => $this->getPaymentStatus($purchase->status, $paidAmount, $purchase->total),
-                    'view_url' => route('admin.po.view', $purchase->id),
-                    'edit_url' => route('admin.po.edit', $purchase->id),
-                ]) {
-                    private $key;
-                    private $attributes;
-
-                    public function __construct($key, $attributes)
-                    {
-                        $this->key = $key;
-                        $this->attributes = $attributes;
-                    }
-
-                    public function __get($name)
-                    {
-                        return $this->attributes[$name] ?? null;
-                    }
-
-                    public function __isset($name)
-                    {
-                        return isset($this->attributes[$name]);
-                    }
-
-                    public function getKey()
-                    {
-                        return $this->key;
-                    }
-
-                    public function toArray()
-                    {
-                        return $this->attributes;
-                    }
-
-                    public function __toString()
-                    {
-                        return (string) $this->key;
-                    }
-                };
+                return $this->transformPurchaseToTransaction($purchase);
             });
         }
 
         // Combine and sort
         $transactions = $sales->merge($purchases);
+        $transactions = $this->sortTransactions($transactions, $sort, $direction);
 
-        // Sort transactions
+        // Paginate
+        return $this->paginateTransactions($transactions, $perPage);
+    }
+
+    private function buildSalesQuery($dates, $status, $search)
+    {
+        return Sales::with('customer')
+            ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
+            ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
+            ->when($status, function ($q) use ($status) {
+                $q->where('status', $status);
+            })
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('invoice', 'LIKE', "%{$search}%")
+                        ->orWhereHas('customer', function ($customerQuery) use ($search) {
+                            $customerQuery
+                                ->where('name', 'LIKE', "%{$search}%")
+                                ->orWhere('address', 'LIKE', "%{$search}%")
+                                ->orWhere('payment_terms', 'LIKE', "%{$search}%")
+                                ->orWhere('phone_number', 'LIKE', "%{$search}%");
+                        });
+                });
+            });
+    }
+
+    private function buildPurchaseQuery($dates, $status, $search)
+    {
+        return Purchase::with('supplier')
+            ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
+            ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
+            ->when($status, function ($q) use ($status) {
+                $q->where('status', $status);
+            })
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('invoice', 'LIKE', "%{$search}%")
+                        ->orWhereHas('supplier', function ($supplierQuery) use ($search) {
+                            $supplierQuery
+                                ->where('name', 'LIKE', "%{$search}%")
+                                ->orWhere('code', 'LIKE', "%{$search}%")
+                                ->orWhere('location', 'LIKE', "%{$search}%")
+                                ->orWhere('payment_terms', 'LIKE', "%{$search}%")
+                                ->orWhere('address', 'LIKE', "%{$search}%")
+                                ->orWhere('phone_number', 'LIKE', "%{$search}%");
+                        });
+                });
+            });
+    }
+
+    private function transformSaleToTransaction($sale): TransactionDTO
+    {
+        $paidAmount = $this->calculatePaidAmount($sale);
+        $dueAmount = max(0, $sale->total - $paidAmount);
+
+        return new TransactionDTO([
+            'id' => $sale->id,
+            'type' => 'sale',
+            'invoice' => $sale->invoice,
+            'customer_supplier' => $sale->customer->name ?? 'Unknown Customer',
+            'contact_info' => $sale->customer->email ?? ($sale->customer->phone ?? null),
+            'date' => $sale->order_date,
+            'amount' => $sale->total,
+            'paid_amount' => $paidAmount,
+            'due_amount' => $dueAmount,
+            'status' => $this->getPaymentStatus($sale->status, $paidAmount, $sale->total),
+            'view_url' => route('admin.sales.view', $sale->id),
+            'edit_url' => route('admin.sales.edit', $sale->id),
+        ]);
+    }
+
+    private function transformPurchaseToTransaction($purchase): TransactionDTO
+    {
+        $paidAmount = $this->calculatePaidAmount($purchase);
+        $dueAmount = max(0, $purchase->total - $paidAmount);
+
+        return new TransactionDTO([
+            'id' => $purchase->id,
+            'type' => 'purchase',
+            'invoice' => $purchase->invoice,
+            'customer_supplier' => $purchase->supplier->name ?? 'Unknown Supplier',
+            'contact_info' => $purchase->supplier->email ?? ($purchase->supplier->phone ?? null),
+            'date' => $purchase->order_date,
+            'amount' => $purchase->total,
+            'paid_amount' => $paidAmount,
+            'due_amount' => $dueAmount,
+            'status' => $this->getPaymentStatus($purchase->status, $paidAmount, $purchase->total),
+            'view_url' => route('admin.po.view', $purchase->id),
+            'edit_url' => route('admin.po.edit', $purchase->id),
+        ]);
+    }
+
+    private function sortTransactions($transactions, $sort, $direction)
+    {
         $transactions = $transactions->sortBy(function ($transaction) use ($sort) {
             switch ($sort) {
                 case 'type':
@@ -238,14 +313,24 @@ class TransactionController extends Controller
             $transactions = $transactions->reverse();
         }
 
-        // Paginate
+        return $transactions;
+    }
+
+    private function paginateTransactions($transactions, $perPage)
+    {
         $currentPage = Paginator::resolveCurrentPage();
         $transactionsForPage = $transactions->forPage($currentPage, $perPage);
 
-        return new LengthAwarePaginator($transactionsForPage->values()->all(), $transactions->count(), $perPage, $currentPage, [
-            'path' => request()->url(),
-            'pageName' => 'page',
-        ]);
+        return new LengthAwarePaginator(
+            $transactionsForPage->values()->all(),
+            $transactions->count(),
+            $perPage,
+            $currentPage,
+            [
+                'path' => request()->url(),
+                'pageName' => 'page',
+            ]
+        );
     }
 
     private function getTransactionsSummary($dates, $type = null, $status = null, $search = null)
@@ -254,19 +339,14 @@ class TransactionController extends Controller
             ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
             ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
             ->when($status, function ($q) use ($status) {
-                if ($status === 'Paid') {
-                    $q->where('status', 'Paid');
-                } elseif ($status === 'Partial') {
-                    $q->where('status', 'Partial');
-                } elseif ($status === 'Unpaid') {
-                    $q->where('status', 'Unpaid');
-                }
+                $q->where('status', $status);
             })
             ->when($search && (!$type || $type === 'sale'), function ($q) use ($search) {
                 $q->where(function ($query) use ($search) {
-                    $query->where('invoice', 'LIKE', "%{$search}%")->orWhereHas('customer', function ($customerQuery) use ($search) {
-                        $customerQuery->where('name', 'LIKE', "%{$search}%");
-                    });
+                    $query->where('invoice', 'LIKE', "%{$search}%")
+                        ->orWhereHas('customer', function ($customerQuery) use ($search) {
+                            $customerQuery->where('name', 'LIKE', "%{$search}%");
+                        });
                 });
             });
 
@@ -274,19 +354,14 @@ class TransactionController extends Controller
             ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
             ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
             ->when($status, function ($q) use ($status) {
-                if ($status === 'Paid') {
-                    $q->where('status', 'Paid');
-                } elseif ($status === 'Partial') {
-                    $q->where('status', 'Partial');
-                } elseif ($status === 'Unpaid') {
-                    $q->where('status', 'Unpaid');
-                }
+                $q->where('status', $status);
             })
             ->when($search && (!$type || $type === 'purchase'), function ($q) use ($search) {
                 $q->where(function ($query) use ($search) {
-                    $query->where('invoice', 'LIKE', "%{$search}%")->orWhereHas('supplier', function ($supplierQuery) use ($search) {
-                        $supplierQuery->where('name', 'LIKE', "%{$search}%");
-                    });
+                    $query->where('invoice', 'LIKE', "%{$search}%")
+                        ->orWhereHas('supplier', function ($supplierQuery) use ($search) {
+                            $supplierQuery->where('name', 'LIKE', "%{$search}%");
+                        });
                 });
             });
 
@@ -294,33 +369,25 @@ class TransactionController extends Controller
         $purchaseStats = null;
 
         if (!$type || $type === 'sale') {
-            $salesStats = $salesQuery
-                ->selectRaw(
-                    '
+            $salesStats = $salesQuery->selectRaw('
                 COUNT(*) as count,
                 SUM(total) as amount,
                 SUM(CASE WHEN status = "Paid" THEN 1 ELSE 0 END) as paid_count,
                 SUM(CASE WHEN status = "Paid" THEN total ELSE 0 END) as paid_amount,
                 SUM(CASE WHEN status IN ("Unpaid", "Partial") THEN 1 ELSE 0 END) as unpaid_count,
                 SUM(CASE WHEN status IN ("Unpaid", "Partial") THEN total ELSE 0 END) as unpaid_amount
-            ',
-                )
-                ->first();
+            ')->first();
         }
 
         if (!$type || $type === 'purchase') {
-            $purchaseStats = $purchaseQuery
-                ->selectRaw(
-                    '
+            $purchaseStats = $purchaseQuery->selectRaw('
                 COUNT(*) as count,
                 SUM(total) as amount,
                 SUM(CASE WHEN status = "Paid" THEN 1 ELSE 0 END) as paid_count,
                 SUM(CASE WHEN status = "Paid" THEN total ELSE 0 END) as paid_amount,
                 SUM(CASE WHEN status IN ("Unpaid", "Partial") THEN 1 ELSE 0 END) as unpaid_count,
                 SUM(CASE WHEN status IN ("Unpaid", "Partial") THEN total ELSE 0 END) as unpaid_amount
-            ',
-                )
-                ->first();
+            ')->first();
         }
 
         return [
@@ -373,24 +440,19 @@ class TransactionController extends Controller
 
     private function calculatePaidAmount($transaction)
     {
-        // For Sales model
         if ($transaction instanceof Sales) {
             if ($transaction->status === 'Paid') {
                 return $transaction->total;
             } elseif ($transaction->status === 'Partial') {
-                // If you have amount_received field for partial payments
                 return $transaction->amount_received ?? 0;
             }
             return 0;
         }
 
-        // For Purchase model
         if ($transaction instanceof Purchase) {
             if ($transaction->status === 'Paid') {
                 return $transaction->total;
             } elseif ($transaction->status === 'Partial') {
-                // You might need to add a paid_amount field to Purchase model
-                // or calculate from payment records
                 return 0; // Adjust based on your payment tracking logic
             }
             return 0;
@@ -401,12 +463,10 @@ class TransactionController extends Controller
 
     private function getPaymentStatus($status, $paidAmount = null, $totalAmount = null)
     {
-        // If status is already set correctly in the model
         if (in_array($status, ['Paid', 'Partial', 'Unpaid'])) {
             return $status;
         }
 
-        // Fallback logic if needed
         if ($paidAmount !== null && $totalAmount !== null) {
             if ($paidAmount >= $totalAmount) {
                 return 'Paid';
@@ -435,7 +495,6 @@ class TransactionController extends Controller
                 'updated_at' => now(),
             ]);
 
-            // For sales, also update amount_received if it exists
             if ($type === 'sale') {
                 $transaction->update([
                     'amount_received' => $transaction->total,
@@ -447,19 +506,15 @@ class TransactionController extends Controller
                 'message' => 'Transaction marked as paid successfully.',
             ]);
         } catch (\Exception $e) {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Error updating transaction: ' . $e->getMessage(),
-                ],
-                500,
-            );
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating transaction: ' . $e->getMessage(),
+            ], 500);
         }
     }
 
     private function exportTransactions(Request $request, $dates, $type = null, $status = null, $search = null)
     {
-        // Get all transactions without pagination for export
         $transactions = $this->getTransactionsForExport($dates, $type, $status, $search);
 
         $selectedIds = $request->get('selected');
@@ -478,12 +533,19 @@ class TransactionController extends Controller
         $callback = function () use ($transactions) {
             $file = fopen('php://output', 'w');
 
-            // Add CSV headers
             fputcsv($file, ['Type', 'Invoice', 'Customer/Supplier', 'Date', 'Amount', 'Paid Amount', 'Due Amount', 'Status']);
 
-            // Add data rows
             foreach ($transactions as $transaction) {
-                fputcsv($file, [ucfirst($transaction['type']), $transaction['invoice'], $transaction['customer_supplier'], Carbon::parse($transaction['date'])->format('Y-m-d'), $transaction['amount'], $transaction['paid_amount'], $transaction['due_amount'], $transaction['status']]);
+                fputcsv($file, [
+                    ucfirst($transaction['type']),
+                    $transaction['invoice'],
+                    $transaction['customer_supplier'],
+                    Carbon::parse($transaction['date'])->format('Y-m-d'),
+                    $transaction['amount'],
+                    $transaction['paid_amount'],
+                    $transaction['due_amount'],
+                    $transaction['status']
+                ]);
             }
 
             fclose($file);
@@ -494,46 +556,8 @@ class TransactionController extends Controller
 
     private function getTransactionsForExport($dates, $type = null, $status = null, $search = null)
     {
-        // Similar to getTransactions but returns all results without pagination
-        $salesQuery = Sales::with('customer')
-            ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
-            ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
-            ->when($status, function ($q) use ($status) {
-                if ($status === 'Paid') {
-                    $q->where('status', 'Paid');
-                } elseif ($status === 'Partial') {
-                    $q->where('status', 'Partial');
-                } elseif ($status === 'Unpaid') {
-                    $q->where('status', 'Unpaid');
-                }
-            })
-            ->when($search, function ($q) use ($search) {
-                $q->where(function ($query) use ($search) {
-                    $query->where('invoice', 'LIKE', "%{$search}%")->orWhereHas('customer', function ($customerQuery) use ($search) {
-                        $customerQuery->where('name', 'LIKE', "%{$search}%");
-                    });
-                });
-            });
-
-        $purchaseQuery = Purchase::with('supplier')
-            ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
-            ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
-            ->when($status, function ($q) use ($status) {
-                if ($status === 'Paid') {
-                    $q->where('status', 'Paid');
-                } elseif ($status === 'Partial') {
-                    $q->where('status', 'Partial');
-                } elseif ($status === 'Unpaid') {
-                    $q->where('status', 'Unpaid');
-                }
-            })
-            ->when($search, function ($q) use ($search) {
-                $q->where(function ($query) use ($search) {
-                    $query->where('invoice', 'LIKE', "%{$search}%")->orWhereHas('supplier', function ($supplierQuery) use ($search) {
-                        $supplierQuery->where('name', 'LIKE', "%{$search}%");
-                    });
-                });
-            });
+        $salesQuery = $this->buildSalesQuery($dates, $status, $search);
+        $purchaseQuery = $this->buildPurchaseQuery($dates, $status, $search);
 
         $sales = collect();
         $purchases = collect();

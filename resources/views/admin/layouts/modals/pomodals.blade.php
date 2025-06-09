@@ -1,20 +1,184 @@
 <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Delete Purchase Order</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="ti ti-trash me-2"></i>
+                    Delete Purchase Order
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this Purchase Order?
+                <div class="d-flex align-items-center mb-3">
+                    <div class="alert alert-warning d-flex align-items-center w-100 mb-0">
+                        <i class="ti ti-alert-circle me-2 fs-4"></i>
+                        <div>
+                            <strong>Warning!</strong> This action cannot be undone.
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mb-3">
+                    You are about to permanently delete this purchase order and all associated data.
+                </p>
+
+                <div class="bg-light p-3 rounded">
+                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be deleted:</h6>
+                    <ul class="list-unstyled mb-0 small">
+                        <li><i class="ti ti-check text-danger me-1"></i> Purchase order record</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> Associated purchase order items</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> Related transaction history</li>
+                    </ul>
+                </div>
+
+                <div class="mt-3">
+                    <div class="alert alert-info d-flex align-items-start">
+                        <i class="ti ti-info-circle me-2 fs-4 mt-1"></i>
+                        <div>
+                            <strong>Stock Level Impact:</strong>
+                            <ul class="mb-0 mt-1 small">
+                                <li><strong>Unpaid invoices:</strong> Stock levels will be adjusted (reduced)</li>
+                                <li><strong>Paid invoices:</strong> Stock levels will remain unchanged</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <form id="deleteForm" method="POST" action="">
                     @csrf
                     @method('DELETE')
-                    <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ti ti-x me-1"></i>
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="ti ti-trash me-1"></i>
+                        Delete Purchase Order
+                    </button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="bulkDeleteModalLabel">
+                    <i class="ti ti-trash me-2"></i>
+                    Confirm Bulk Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="alert alert-warning d-flex align-items-center w-100 mb-0">
+                        <i class="ti ti-alert-circle me-2 fs-4"></i>
+                        <div>
+                            <strong>Warning!</strong> This action cannot be undone.
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mb-3">
+                    You are about to permanently delete
+                    <strong id="bulkDeleteCount">0</strong>
+                    purchase order(s) and all associated data.
+                </p>
+
+                <div class="bg-light p-3 rounded">
+                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be deleted:</h6>
+                    <ul class="list-unstyled mb-0 small">
+                        <li><i class="ti ti-check text-danger me-1"></i> Purchase order records</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> Associated purchase order items</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> Related transaction history</li>
+                    </ul>
+                </div>
+
+                <div class="mt-3">
+                    <div class="alert alert-info d-flex align-items-start">
+                        <i class="ti ti-info-circle me-2 fs-4 mt-1"></i>
+                        <div>
+                            <strong>Stock Level Impact:</strong>
+                            <ul class="mb-0 mt-1 small">
+                                <li><strong>Unpaid invoices:</strong> Stock levels will be adjusted (reduced)</li>
+                                <li><strong>Paid invoices:</strong> Stock levels will remain unchanged</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="ti ti-x me-1"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmBulkDeleteBtn">
+                    <i class="ti ti-trash me-1"></i>
+                    Delete Selected
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="bulkMarkAsPaidModal" tabindex="-1" aria-labelledby="bulkMarkAsPaidModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="bulkMarkAsPaidModalLabel">
+                    <i class="ti ti-check me-2"></i>
+                    Confirm Bulk Mark as Paid
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="alert alert-info d-flex align-items-center w-100 mb-0">
+                        <i class="ti ti-info-circle me-2 fs-4"></i>
+                        <div>
+                            <strong>Info!</strong> This will update the payment status of selected purchase orders.
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mb-3">
+                    You are about to mark
+                    <strong id="bulkPaidCount">0</strong>
+                    purchase order(s) as fully paid.
+                </p>
+
+                <div class="bg-light p-3 rounded">
+                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be updated:</h6>
+                    <ul class="list-unstyled mb-0 small">
+                        <li><i class="ti ti-check text-success me-1"></i> Payment status will be set to "Paid"</li>
+                        <li><i class="ti ti-check text-success me-1"></i> Outstanding amounts will be cleared</li>
+                        <li><i class="ti ti-check text-success me-1"></i> Payment completion date will be recorded</li>
+                        <li><i class="ti ti-check text-success me-1"></i> Purchase order status will be updated</li>
+                    </ul>
+                </div>
+
+                <p class="mt-3 mb-1 text-muted small">
+                    <i class="ti ti-info-circle me-1"></i>
+                    Only unpaid and partially paid purchase orders will be affected.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="ti ti-x me-1"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-success" id="confirmBulkPaidBtn">
+                    <i class="ti ti-check me-1"></i>
+                    Mark as Paid
+                </button>
             </div>
         </div>
     </div>

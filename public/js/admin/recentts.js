@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const bulkActionsBar = document.getElementById("bulkActionsBar");
     const selectedCount = document.getElementById("selectedCount");
 
+    // Simple select all - no smart filtering
     selectAll?.addEventListener("change", function () {
         rowCheckboxes.forEach((checkbox) => {
             checkbox.checked = this.checked;
@@ -38,8 +39,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (selectAll) {
-            selectAll.indeterminate = count > 0 && count < rowCheckboxes.length;
-            selectAll.checked = count === rowCheckboxes.length && count > 0;
+            const totalCheckboxes = rowCheckboxes.length;
+            const checkedCount = checkedBoxes.length;
+
+            selectAll.indeterminate =
+                checkedCount > 0 && checkedCount < totalCheckboxes;
+            selectAll.checked =
+                totalCheckboxes > 0 && checkedCount === totalCheckboxes;
         }
     }
 
@@ -280,29 +286,148 @@ function clearSelection() {
     document.getElementById("bulkActionsBar").style.display = "none";
 }
 
-// Update the existing bulkMarkAsPaid function
+// Smart selection function - only called when bulk mark as paid is clicked
+function smartSelectUnpaidOnly() {
+    const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+    const selectAll = document.getElementById("selectAll");
+    let excludedCount = 0;
+
+    rowCheckboxes.forEach((checkbox) => {
+        // Get the transaction status from the row
+        const row = checkbox.closest("tr");
+        const statusBadge = row.querySelector(".badge");
+        const status = statusBadge ? statusBadge.textContent.trim() : "";
+
+        // Only select if status is not 'Paid'
+        if (status === "Paid") {
+            checkbox.checked = false;
+            // Add visual feedback for excluded items
+            row.classList.add("table-warning");
+            setTimeout(() => {
+                row.classList.remove("table-warning");
+            }, 2000);
+            excludedCount++;
+        } else {
+            checkbox.checked = true;
+        }
+    });
+
+    // Update bulk actions
+    updateBulkActions();
+
+    // Show notification if some items were excluded
+    if (excludedCount > 0) {
+        showToast(
+            "Info",
+            `${excludedCount} paid transaction(s) were excluded from selection.`,
+            "info",
+            3000
+        );
+    }
+}
+
+// Updated bulkMarkAsPaid function with smart selection
 function bulkMarkAsPaid() {
     const selected = Array.from(
         document.querySelectorAll(".row-checkbox:checked")
-    ).map((cb) => cb.value);
+    );
 
+    // If no items are selected, perform smart selection first
     if (selected.length === 0) {
-        showToast(
-            "Warning",
-            "Please select at least one transaction.",
-            "warning"
+        smartSelectUnpaidOnly();
+
+        // Recheck selected items after smart selection
+        const newSelected = Array.from(
+            document.querySelectorAll(".row-checkbox:checked")
         );
-        return;
+
+        if (newSelected.length === 0) {
+            showToast(
+                "Info",
+                "No unpaid transactions available to mark as paid.",
+                "info"
+            );
+            return;
+        }
+    } else {
+        // Check if any selected transactions are already paid
+        const selectedPaidTransactions = selected.filter((checkbox) => {
+            const row = checkbox.closest("tr");
+            const statusBadge = row.querySelector(".badge");
+            const status = statusBadge ? statusBadge.textContent.trim() : "";
+            return status === "Paid";
+        });
+
+        if (selectedPaidTransactions.length > 0) {
+            // Uncheck paid transactions and show warning
+            selectedPaidTransactions.forEach((checkbox) => {
+                checkbox.checked = false;
+                const row = checkbox.closest("tr");
+                row.classList.add("table-warning");
+                setTimeout(() => {
+                    row.classList.remove("table-warning");
+                }, 2000);
+            });
+
+            updateBulkActions();
+
+            showToast(
+                "Warning",
+                `${selectedPaidTransactions.length} paid transaction(s) were excluded from selection.`,
+                "warning"
+            );
+
+            // Check if any unpaid transactions remain selected
+            const remainingSelected = Array.from(
+                document.querySelectorAll(".row-checkbox:checked")
+            );
+
+            if (remainingSelected.length === 0) {
+                return;
+            }
+        }
     }
 
+    // Get final selected count
+    const finalSelected = Array.from(
+        document.querySelectorAll(".row-checkbox:checked")
+    ).map((cb) => cb.value);
+
     // Update the count in the modal
-    document.getElementById("bulkMarkPaidCount").textContent = selected.length;
+    document.getElementById("bulkMarkPaidCount").textContent =
+        finalSelected.length;
 
     // Show the modal
     const modal = new bootstrap.Modal(
         document.getElementById("bulkMarkAsPaidModal")
     );
     modal.show();
+}
+
+// Helper function to update bulk actions (moved outside DOMContentLoaded for global access)
+function updateBulkActions() {
+    const checkedBoxes = document.querySelectorAll(".row-checkbox:checked");
+    const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+    const bulkActionsBar = document.getElementById("bulkActionsBar");
+    const selectedCount = document.getElementById("selectedCount");
+    const selectAll = document.getElementById("selectAll");
+    const count = checkedBoxes.length;
+
+    if (selectedCount) selectedCount.textContent = count;
+
+    if (bulkActionsBar) {
+        bulkActionsBar.style.display = count > 0 ? "block" : "none";
+    }
+
+    if (selectAll) {
+        const totalCheckboxes = rowCheckboxes.length;
+        const checkedCount = checkedBoxes.length;
+
+        selectAll.indeterminate =
+            checkedCount > 0 && checkedCount < totalCheckboxes;
+        selectAll.checked =
+            totalCheckboxes > 0 && checkedCount === totalCheckboxes;
+    }
 }
 
 // Add the confirm bulk mark as paid function

@@ -165,66 +165,101 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="bulkActionsBar" class="card mt-3" style="display: none;">
-                                <div class="card-body py-2">
-                                    <div class="d-flex align-items-center">
-                                        <span class="text-muted me-3">
-                                            <span id="selectedCount">0</span> transactions selected
-                                        </span>
-                                        <div class="btn-list">
-                                            <button onclick="bulkMarkAsPaidPO()" class="btn btn-sm btn-success me-1">
-                                                <i class="ti ti-check"></i> Mark as Paid
-                                            </button>
-                                            <button onclick="bulkDeletePO()" class="btn btn-sm btn-danger me-1">
-                                                <i class="ti ti-trash"></i> Delete Selected
-                                            </button>
-                                            <button onclick="bulkExportPO()" class="btn btn-sm btn-primary me-1">
-                                                <i class="ti ti-download"></i> Export Selected
-                                            </button>
-                                            <button onclick="clearPOSelection()"
-                                                class="btn btn-sm btn-outline-secondary me-1">
-                                                <i class="ti ti-x"></i> Clear Selection
-                                            </button>
+
+                            <div id="bulkActionsBar" class="border-bottom sticky-top" style="display: none;">
+                                <div class="px-4 py-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-lg-6 col-md-12">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                                                    style="width: 36px; height: 36px;">
+                                                    <i class="ti ti-check text-white"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="fw-medium fs-5">
+                                                        <span id="selectedCount" class="text-primary">0</span>
+                                                        <span class="text-muted">purchase orders selected</span>
+                                                    </span>
+                                                    <div class="text-muted small">Choose an action to apply to selected
+                                                        items</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-12">
+                                            <div
+                                                class="d-flex flex-wrap justify-content-lg-end justify-content-center gap-2 mt-lg-0 mt-2">
+                                                <button onclick="bulkMarkAsPaidPO()"
+                                                    class="btn btn-success d-flex align-items-center">
+                                                    <i class="ti ti-check me-2"></i> Mark as Paid
+                                                </button>
+                                                <button onclick="bulkExportPO()"
+                                                    class="btn btn-info d-flex align-items-center">
+                                                    <i class="ti ti-download me-2"></i> Export
+                                                </button>
+                                                <button onclick="bulkDeletePO()"
+                                                    class="btn btn-danger d-flex align-items-center">
+                                                    <i class="ti ti-trash me-2"></i> Delete
+                                                </button>
+                                                <button onclick="clearPOSelection()"
+                                                    class="btn btn-outline-secondary d-flex align-items-center">
+                                                    <i class="ti ti-x me-2"></i> Clear Selection
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                             {{-- TABLE --}}
-                            <div id="invoiceTableContainer">
+                            <div id="invoiceTableContainer" class="position-relative">
                                 <div class="table-responsive">
                                     <table class="table card-table table-vcenter">
-                                        <thead style="font-size: large">
+                                        <thead class="bg-light" style="font-size: large">
                                             <tr>
-                                                <th>
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
                                                     <input type="checkbox" id="selectAll" class="form-check-input">
                                                 </th>
-                                                <th class="no-print"><button class="table-sort fs-4 py-3 no-print"
-                                                        data-sort="sort-no">No
+                                                <th class="no-print sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3 no-print"
+                                                        data-sort="sort-no">No</button>
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-invoice">Invoice
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-invoice">Invoice</button>
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-supplier">Supplier
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-supplier">Supplier</button>
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-orderdate">Order
-                                                        Date</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-duedate">Due Date
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3" data-sort="sort-orderdate">Order
+                                                        Date</button>
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-amount">Amount
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3" data-sort="sort-duedate">Due
+                                                        Date</button>
                                                 </th>
-                                                <th class="no-print"><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-payment">Payment
-                                                        Type</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-status">Status
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-amount">Amount</button>
                                                 </th>
-                                                <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">
+                                                <th class="no-print sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3" data-sort="sort-payment">Payment
+                                                        Type</button>
+                                                </th>
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-status">Status</button>
+                                                </th>
+                                                <th style="width:180px;text-align:center"
+                                                    class="fs-4 py-3 no-print sticky-top bg-light" style="z-index: 1020;">
                                                     Action
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody id="invoiceTableBody" class="table-tbody">
                                             @foreach ($pos as $index => $po)
-                                                <tr>
+                                                <tr class="table-row" data-id="{{ $po->id }}">
                                                     <td>
                                                         <input type="checkbox" class="form-check-input row-checkbox"
                                                             value="{{ $po->id }}">
@@ -294,81 +329,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal modal-blur fade" id="bulkMarkAsPaidModal" tabindex="-1">
-        <div class="modal-dialog modal-sm modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Mark as Paid</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to mark <strong id="bulkPaidCount">0</strong> purchase orders as paid?</p>
-                    <div class="text-muted small">This action cannot be undone.</div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" id="confirmBulkPaidBtn">
-                        <i class="ti ti-check"></i> Mark as Paid
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="bulkDeleteModalLabel">
-                        <i class="ti ti-trash me-2"></i>
-                        Confirm Bulk Delete
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="alert alert-warning d-flex align-items-center w-100 mb-0">
-                            <i class="ti ti-alert-circle me-2 fs-4"></i>
-                            <div>
-                                <strong>Warning!</strong> This action cannot be undone.
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="mb-3">
-                        You are about to permanently delete
-                        <strong id="bulkDeleteCount">0</strong>
-                        purchase order(s) and all associated data.
-                    </p>
-
-                    <div class="bg-light p-3 rounded">
-                        <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be deleted:</h6>
-                        <ul class="list-unstyled mb-0 small">
-                            <li><i class="ti ti-check text-danger me-1"></i> Purchase order records</li>
-                            <li><i class="ti ti-check text-danger me-1"></i> Associated purchase order items</li>
-                            <li><i class="ti ti-check text-danger me-1"></i> Related transaction history</li>
-                        </ul>
-                    </div>
-
-                    <p class="mt-3 mb-1 text-muted small">
-                        <i class="ti ti-info-circle me-1"></i>
-                        Product stock levels will be adjusted accordingly.
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="ti ti-x me-1"></i>
-                        Cancel
-                    </button>
-                    <button type="button" class="btn btn-danger" id="confirmBulkDeleteBtn">
-                        <i class="ti ti-trash me-1"></i>
-                        Delete Selected
-                    </button>
                 </div>
             </div>
         </div>

@@ -354,7 +354,47 @@ body {
 }
 
 /* ============================
-   11. STATUS & COLORS
+   11. TABLE INTERACTIONS & BULK ACTIONS
+   ============================ */
+.table-row-hover:hover {
+    background-color: var(--tblr-gray-50);
+}
+
+.form-check-input:checked {
+    background-color: var(--tblr-primary);
+    border-color: var(--tblr-primary);
+}
+
+.table-sort:hover {
+    color: var(--tblr-primary) !important;
+}
+
+.table-sort i {
+    transition: transform 0.2s ease;
+}
+
+.table-sort.desc i {
+    transform: rotate(180deg);
+}
+
+#bulkActionsBar {
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================
+   12. STATUS & COLORS
    ============================ */
 .status-indicator {
     display: inline-block;
@@ -370,7 +410,15 @@ body {
 }
 
 /* ============================
-   12. LOADING & ANIMATIONS
+   13. DROPDOWN & NAVIGATION
+   ============================ */
+.dropdown-menu {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    z-index: 1030 !important;
+}
+
+/* ============================
+   14. LOADING & ANIMATIONS
    ============================ */
 /* Loading spinner styles */
 .spinner-border {
@@ -400,7 +448,7 @@ body {
 }
 
 /* ============================
-   13. TAB STYLING
+   15. TAB STYLING
    ============================ */
 /* Tab styling improvements */
 .nav-tabs .nav-link {
@@ -421,7 +469,7 @@ body {
 }
 
 /* ============================
-   14. THEME STYLES
+   16. THEME STYLES
    ============================ */
 .theme-dark .product-card {
     background-color: var(--tblr-bg-surface);
@@ -447,7 +495,7 @@ body {
 }
 
 /* ============================
-   15. RESPONSIVE STYLES
+   17. RESPONSIVE STYLES
    ============================ */
 @media (max-width: 767.98px) {
     #viewPoModal .modal-dialog {
@@ -461,7 +509,7 @@ body {
 }
 
 /* ============================
-   16. SCREEN STYLES FOR RECEIPT PREVIEW
+   18. SCREEN STYLES FOR RECEIPT PREVIEW
    ============================ */
 @media screen {
     .receipt-preview {
@@ -527,7 +575,7 @@ body {
 }
 
 /* ============================
-   17. PRINT STYLES - THERMAL RECEIPT (78mm)
+   19. PRINT STYLES - THERMAL RECEIPT (78mm)
    ============================ */
 @media print and (max-width: 78mm) {
     @page {
@@ -757,7 +805,7 @@ body {
 }
 
 /* ============================
-   18. PRINT STYLES - STANDARD A4
+   20. PRINT STYLES - STANDARD A4
    ============================ */
 @media print and (min-width: 80mm) {
 

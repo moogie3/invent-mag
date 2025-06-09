@@ -193,33 +193,47 @@
                     </div>
                 </div>
 
-                <!-- Bulk Actions Bar (hidden by default) -->
-                <div id="bulkActionsBar" class="card mt-3" style="display: none;">
-                    <div class="card-body py-2">
-                        <div class="d-flex align-items-center">
-                            <span class="text-muted me-3">
-                                <span id="selectedCount">0</span> transactions selected
-                            </span>
-                            <div class="btn-list">
-                                <button class="btn btn-sm btn-success" onclick="bulkMarkAsPaid()">
-                                    <i class="ti ti-check me-1"></i>
-                                    Mark as Paid
-                                </button>
-                                <button class="btn btn-sm btn-primary" onclick="bulkExport()">
-                                    <i class="ti ti-download me-1"></i>
-                                    Export Selected
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="clearSelection()">
-                                    <i class="ti ti-x me-1"></i>
-                                    Clear Selection
-                                </button>
+                <!-- Transactions Table -->
+                <div class="card">
+                    <div id="bulkActionsBar" class="border-bottom sticky-top" style="display: none;">
+                        <div class="px-4 py-3">
+                            <div class="row align-items-center">
+                                <div class="col-lg-6 col-md-12">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                                            style="width: 36px; height: 36px;">
+                                            <i class="ti ti-check text-white"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium fs-5">
+                                                <span id="selectedCount" class="text-primary">0</span>
+                                                <span class="text-muted">transactions selected</span>
+                                            </span>
+                                            <div class="text-muted small">Choose an action to apply to selected items</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12">
+                                    <div class="d-flex flex-wrap justify-content-lg-end justify-content-center gap-2">
+                                        <button onclick="bulkMarkAsPaid()"
+                                            class="btn btn-success d-flex align-items-center">
+                                            <i class="ti ti-check me-2"></i> Mark as Paid
+                                        </button>
+                                        <button onclick="bulkExport()" class="btn btn-info d-flex align-items-center">
+                                            <i class="ti ti-download me-2"></i> Export
+                                        </button>
+                                        <button onclick="bulkDelete()" class="btn btn-danger d-flex align-items-center">
+                                            <i class="ti ti-trash me-2"></i> Delete
+                                        </button>
+                                        <button onclick="clearSelection()"
+                                            class="btn btn-outline-secondary d-flex align-items-center">
+                                            <i class="ti ti-x me-2"></i> Clear Selection
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Transactions Table -->
-                <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="ti ti-list me-2"></i>

@@ -766,6 +766,7 @@ class PurchaseOrderView extends PurchaseOrderModule {
 
         this.formatAllCurrencyValues();
         this.initModalListeners();
+        this.initGlobalFunctions(); // Add this line
     }
 
     formatAllCurrencyValues() {
@@ -784,9 +785,20 @@ class PurchaseOrderView extends PurchaseOrderModule {
         }
     }
 
+    // Add this method to ensure global functions are available
+    initGlobalFunctions() {
+        // Make sure loadPoDetails is available globally
+        window.loadPoDetails = (id) => this.loadPoDetails(id);
+        window.setDeleteFormAction = (url) => this.setDeleteFormAction(url);
+    }
+
     setDeleteFormAction(url) {
+        console.log("Setting delete form action to:", url); // Debug log
         if (this.elements.deleteForm) {
             this.elements.deleteForm.action = url;
+            console.log("Form action set successfully"); // Debug log
+        } else {
+            console.error("Delete form element not found");
         }
     }
 
@@ -1002,9 +1014,6 @@ window.getSelectedIds = function () {
     return bulkSelection ? bulkSelection.getSelectedIds() : [];
 };
 
-/**
- * Enhanced bulk delete function with better error handling and debugging
- */
 window.bulkDeletePO = function () {
     console.log("bulkDeletePO function called");
 
@@ -1013,7 +1022,7 @@ window.bulkDeletePO = function () {
 
     // Validate selection
     if (!selected || selected.length === 0) {
-        showPOToast(
+        showToast(
             "Warning",
             "Please select at least one purchase order to delete.",
             "warning"
@@ -1053,7 +1062,7 @@ window.bulkExportPO = function () {
     ).map((cb) => cb.value);
 
     if (selected.length === 0) {
-        showPOToast(
+        showToast(
             "Warning",
             "Please select at least one purchase order to export.",
             "warning"
@@ -1108,95 +1117,161 @@ window.bulkExportPO = function () {
     }, 2000);
 };
 
+// Updated bulkMarkAsPaidPO function with smart selection (same pattern as transactions)
 window.bulkMarkAsPaidPO = function () {
+    console.log("bulkMarkAsPaidPO function called");
+
     const selected = Array.from(
+        document.querySelectorAll(".row-checkbox:checked")
+    );
+
+    // If no items are selected, perform smart selection first
+    if (selected.length === 0) {
+        smartSelectUnpaidOnlyPO();
+
+        // Recheck selected items after smart selection
+        const newSelected = Array.from(
+            document.querySelectorAll(".row-checkbox:checked")
+        );
+
+        if (newSelected.length === 0) {
+            showToast(
+                "Info",
+                "No unpaid purchase orders available to mark as paid.",
+                "info"
+            );
+            return;
+        }
+    } else {
+        // Check if any selected purchase orders are already paid
+        const selectedPaidPOs = selected.filter((checkbox) => {
+            const row = checkbox.closest("tr");
+            const statusBadge = row.querySelector(".badge");
+            const status = statusBadge ? statusBadge.textContent.trim() : "";
+            return status === "Paid";
+        });
+
+        if (selectedPaidPOs.length > 0) {
+            // Uncheck paid purchase orders and show warning
+            selectedPaidPOs.forEach((checkbox) => {
+                checkbox.checked = false;
+                const row = checkbox.closest("tr");
+                row.classList.add("table-warning");
+                setTimeout(() => {
+                    row.classList.remove("table-warning");
+                }, 2000);
+            });
+
+            // Update bulk actions if function exists
+            if (typeof updateBulkActions === "function") {
+                updateBulkActions();
+            }
+
+            showToast(
+                "Warning",
+                `${selectedPaidPOs.length} paid purchase order(s) were excluded from selection.`,
+                "warning"
+            );
+
+            // Check if any unpaid purchase orders remain selected
+            const remainingSelected = Array.from(
+                document.querySelectorAll(".row-checkbox:checked")
+            );
+
+            if (remainingSelected.length === 0) {
+                return;
+            }
+        }
+    }
+
+    // Get final selected count and IDs
+    const finalSelected = Array.from(
         document.querySelectorAll(".row-checkbox:checked")
     ).map((cb) => cb.value);
 
-    if (selected.length === 0) {
-        showPOToast(
-            "Warning",
-            "Please select at least one purchase order to mark as paid.",
-            "warning"
-        );
-        return;
+    console.log("Final selected IDs:", finalSelected);
+
+    // Update the count in the modal
+    const bulkPaidCount = document.getElementById("bulkPaidCount");
+    if (bulkPaidCount) {
+        bulkPaidCount.textContent = finalSelected.length;
     }
 
-    if (
-        confirm(
-            `Are you sure you want to mark ${selected.length} purchase order(s) as paid?`
-        )
-    ) {
-        const submitBtn = document.querySelector(
-            '[onclick="bulkMarkAsPaidPO()"]'
-        );
-        const originalText = submitBtn ? submitBtn.innerHTML : "";
+    // Show confirmation modal
+    const bulkMarkAsPaidModal = new bootstrap.Modal(
+        document.getElementById("bulkMarkAsPaidModal")
+    );
+    bulkMarkAsPaidModal.show();
 
-        if (submitBtn) {
-            submitBtn.innerHTML =
-                '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
-            submitBtn.disabled = true;
-        }
+    // Handle confirmation button
+    const confirmBtn = document.getElementById("confirmBulkPaidBtn");
+    if (confirmBtn) {
+        // Remove any existing event listeners by cloning the button
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
-        fetch("/admin/po/bulk-mark-paid", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-            body: JSON.stringify({
-                ids: selected,
-            }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    showPOToast(
-                        "Success",
-                        `${data.updated_count} purchase order(s) marked as paid successfully!`,
-                        "success"
-                    );
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    showPOToast(
-                        "Error",
-                        data.message || "Failed to update purchase orders.",
-                        "error"
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                showPOToast(
-                    "Error",
-                    "An error occurred while updating purchase orders.",
-                    "error"
-                );
-            })
-            .finally(() => {
-                if (submitBtn) {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                }
-            });
+        newConfirmBtn.addEventListener("click", function () {
+            console.log("Confirm bulk mark as paid button clicked");
+            confirmBulkMarkAsPaidPO(finalSelected, this, bulkMarkAsPaidModal);
+        });
     }
 };
 
+// Smart selection function - only called when bulk mark as paid is clicked
+function smartSelectUnpaidOnlyPO() {
+    const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+    const selectAll = document.getElementById("selectAll");
+    let excludedCount = 0;
+
+    rowCheckboxes.forEach((checkbox) => {
+        // Get the purchase order status from the row
+        const row = checkbox.closest("tr");
+        const statusBadge = row.querySelector(".badge");
+        const status = statusBadge ? statusBadge.textContent.trim() : "";
+
+        // Only select if status is not 'Paid'
+        if (status === "Paid") {
+            checkbox.checked = false;
+            // Add visual feedback for excluded items
+            row.classList.add("table-warning");
+            setTimeout(() => {
+                row.classList.remove("table-warning");
+            }, 2000);
+            excludedCount++;
+        } else {
+            checkbox.checked = true;
+        }
+    });
+
+    // Update bulk actions (assuming you have this function available)
+    if (typeof updateBulkActions === "function") {
+        updateBulkActions();
+    }
+
+    // Show notification if some items were excluded
+    if (excludedCount > 0) {
+        showToast(
+            "Info",
+            `${excludedCount} paid purchase order(s) were excluded from selection.`,
+            "info",
+            3000
+        );
+    }
+}
+
 /**
- * Perform the actual bulk delete operation with enhanced debugging
+ * Confirm bulk mark as paid function (similar to transactions)
  */
-function performBulkDelete(selectedIds, confirmButton, modal) {
-    console.log("performBulkDelete called with IDs:", selectedIds);
+function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
+    console.log("confirmBulkMarkAsPaidPO called with IDs:", selectedIds);
+
+    if (!selectedIds || selectedIds.length === 0) return;
 
     // Show loading state
     const originalText = confirmButton.innerHTML;
     confirmButton.innerHTML = `
         <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        Deleting...
+        Processing...
     `;
     confirmButton.disabled = true;
 
@@ -1204,7 +1279,7 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     if (!csrfToken) {
         console.error("CSRF token not found");
-        showPOToast(
+        showToast(
             "Error",
             "Security token not found. Please refresh the page.",
             "error"
@@ -1215,132 +1290,94 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
 
     console.log("CSRF token found:", csrfToken.getAttribute("content"));
 
-    // Prepare request data
-    const requestData = {
-        ids: selectedIds,
-        _token: csrfToken.getAttribute("content"),
-    };
-
-    console.log("Request data:", requestData);
-
     // Make the API request
-    fetch("/admin/po/bulk-delete", {
+    fetch("/admin/po/bulk-mark-paid", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
             Accept: "application/json",
         },
-        body: JSON.stringify(requestData),
+        body: JSON.stringify({
+            ids: selectedIds,
+        }),
     })
-        .then(async (response) => {
-            console.log("Response status:", response.status);
-            console.log("Response headers:", response.headers);
-
-            const data = await response.json();
-            console.log("Response data:", data);
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message || `HTTP error! status: ${response.status}`
-                );
-            }
-
-            return data;
-        })
+        .then((response) => response.json())
         .then((data) => {
-            console.log("Success response:", data);
-
             if (data.success) {
-                // Success feedback
-                showPOToast(
-                    "Success",
-                    `${data.deleted_count} purchase order(s) deleted successfully!`,
-                    "success",
-                    3000
-                );
-
-                // Hide modal
+                // Close modal
                 modal.hide();
 
+                // Show success message
+                showToast(
+                    "Success",
+                    `${
+                        data.updated_count || selectedIds.length
+                    } purchase order(s) marked as paid successfully!`,
+                    "success"
+                );
+
                 // Clear selection
-                if (bulkSelection) {
+                if (typeof clearSelection === "function") {
+                    clearSelection();
+                } else if (
+                    bulkSelection &&
+                    typeof bulkSelection.clearSelection === "function"
+                ) {
                     bulkSelection.clearSelection();
                 }
 
-                // Reload page after short delay to show success message
+                // Reload page after short delay
                 setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
+                    location.reload();
+                }, 1000);
             } else {
-                throw new Error(data.message || "Unknown error occurred");
+                showToast(
+                    "Error",
+                    data.message || "Failed to update purchase orders.",
+                    "error"
+                );
             }
         })
         .catch((error) => {
-            console.error("Bulk delete error:", error);
-
-            // Error feedback
-            showPOToast(
+            console.error("Error:", error);
+            showToast(
                 "Error",
-                error.message ||
-                    "An error occurred while deleting purchase orders.",
-                "error",
-                5000
+                "An error occurred while updating purchase orders.",
+                "error"
             );
-
+        })
+        .finally(() => {
             // Reset button state
-            resetButton(confirmButton, originalText);
+            confirmButton.innerHTML = originalText;
+            confirmButton.disabled = false;
         });
 }
 
 /**
- * Enhanced error handling for network issues
+ * Clear selection function for purchase orders
  */
-function handleNetworkError(error) {
-    let errorMessage = "An unexpected error occurred.";
-
-    if (error.name === "TypeError" && error.message.includes("fetch")) {
-        errorMessage =
-            "Network error. Please check your connection and try again.";
-    } else if (error.message.includes("422")) {
-        errorMessage =
-            "Invalid data provided. Please refresh the page and try again.";
-    } else if (error.message.includes("500")) {
-        errorMessage = "Server error. Please try again later.";
-    } else if (error.message) {
-        errorMessage = error.message;
+function clearSelectionPO() {
+    document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+        checkbox.checked = false;
+    });
+    const selectAll = document.getElementById("selectAll");
+    if (selectAll) {
+        selectAll.checked = false;
     }
-
-    return errorMessage;
+    const bulkActionsBar = document.getElementById("bulkActionsBar");
+    if (bulkActionsBar) {
+        bulkActionsBar.style.display = "none";
+    }
 }
 
 /**
- * Validate selection before operations
+ * Get selected IDs helper function
  */
-function validateSelection() {
-    const selected = getSelectedIds();
-
-    if (!selected || !Array.isArray(selected) || selected.length === 0) {
-        return {
-            valid: false,
-            message: "Please select at least one purchase order.",
-        };
-    }
-
-    // Check if all selected IDs are valid numbers
-    const invalidIds = selected.filter((id) => !id || isNaN(parseInt(id)));
-    if (invalidIds.length > 0) {
-        return {
-            valid: false,
-            message:
-                "Invalid selection detected. Please refresh the page and try again.",
-        };
-    }
-
-    return {
-        valid: true,
-        ids: selected.map((id) => parseInt(id)),
-    };
+function getSelectedIds() {
+    return Array.from(document.querySelectorAll(".row-checkbox:checked")).map(
+        (cb) => cb.value
+    );
 }
 
 /**
@@ -1353,26 +1390,27 @@ function resetButton(button, originalText) {
     }
 }
 
-/**
- * Enhanced toast notification function for debugging
- */
-function showPOToast(title, message, type = "info", duration = 4000) {
-    console.log(`Toast: ${title} - ${message} (${type})`);
+// Keep the existing performBulkMarkAsPaid function for backward compatibility
+function performBulkMarkAsPaid(selectedIds, confirmButton, modal) {
+    confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal);
+}
 
+// Use the same toast function as transactions (from paste-1.txt)
+function showToast(title, message, type = "info", duration = 4000) {
     // Create a toast container if it doesn't exist
-    let toastContainer = document.getElementById("po-toast-container");
+    let toastContainer = document.getElementById("toast-container");
     if (!toastContainer) {
         toastContainer = document.createElement("div");
-        toastContainer.id = "po-toast-container";
+        toastContainer.id = "toast-container";
         toastContainer.className =
             "toast-container position-fixed bottom-0 end-0 p-3";
         toastContainer.style.zIndex = "1050";
         document.body.appendChild(toastContainer);
 
         // Add animation styles once
-        if (!document.getElementById("po-toast-styles")) {
+        if (!document.getElementById("toast-styles")) {
             const style = document.createElement("style");
-            style.id = "po-toast-styles";
+            style.id = "toast-styles";
             style.textContent = `
                 .toast-enter {
                     transform: translateX(100%);
@@ -1397,7 +1435,7 @@ function showPOToast(title, message, type = "info", duration = 4000) {
     const toast = document.createElement("div");
     toast.className =
         "toast toast-enter align-items-center text-white bg-" +
-        getPOToastColor(type) +
+        getToastColor(type) +
         " border-0";
     toast.setAttribute("role", "alert");
     toast.setAttribute("aria-live", "assertive");
@@ -1420,17 +1458,22 @@ function showPOToast(title, message, type = "info", duration = 4000) {
     // Show with animation
     toast.classList.add("toast-show");
 
+    // Initialize Bootstrap toast
+    const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: duration,
+    });
+    bsToast.show();
+
     // Handle close button clicks
     const closeButton = toast.querySelector(".btn-close");
-    if (closeButton) {
-        closeButton.addEventListener("click", () => {
-            hidePOToast(toast);
-        });
-    }
+    closeButton.addEventListener("click", () => {
+        hideToast(toast);
+    });
 
     // Auto hide after duration
     const hideTimeout = setTimeout(() => {
-        hidePOToast(toast);
+        hideToast(toast);
     }, duration);
 
     // Store timeout on toast element for cleanup
@@ -1438,23 +1481,24 @@ function showPOToast(title, message, type = "info", duration = 4000) {
 }
 
 // Helper function to hide toast with animation
-function hidePOToast(toast) {
+function hideToast(toast) {
+    // Clear any existing timeout
     if (toast._hideTimeout) {
         clearTimeout(toast._hideTimeout);
     }
 
+    // Add exit animation
     toast.classList.remove("toast-show");
     toast.classList.add("toast-exit");
 
+    // Remove after animation completes
     setTimeout(() => {
-        if (toast.parentNode) {
-            toast.remove();
-        }
+        toast.remove();
     }, 300);
 }
 
 // Helper function to get the appropriate Bootstrap color class
-function getPOToastColor(type) {
+function getToastColor(type) {
     switch (type) {
         case "success":
             return "success";
@@ -1467,7 +1511,7 @@ function getPOToastColor(type) {
     }
 }
 
-// Initialize application based on current page
+// Keep the existing DOMContentLoaded initialization
 document.addEventListener("DOMContentLoaded", function () {
     // Add a small delay to ensure all elements are loaded
     setTimeout(() => {
@@ -1502,18 +1546,40 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
                 // Initialize bulk selection for index page
                 console.log("Initializing Purchase Order Index page...");
-                bulkSelection = new PurchaseOrderBulkSelection();
-                console.log("Purchase Order Index bulk selection initialized");
+
+                // Initialize view functionality even on index page for modals
+                window.poApp = new PurchaseOrderView();
+
+                // Also initialize bulk selection if the class exists
+                if (typeof PurchaseOrderBulkSelection !== "undefined") {
+                    bulkSelection = new PurchaseOrderBulkSelection();
+                    console.log(
+                        "Purchase Order Index bulk selection initialized"
+                    );
+                }
+
+                console.log("Purchase Order Index page initialized");
             }
 
             // Expose global utility functions that might be called from inline handlers
-            window.setDeleteFormAction = function (url) {
-                if (window.poApp && window.poApp.setDeleteFormAction) {
-                    window.poApp.setDeleteFormAction(url);
-                }
-            };
+            // These are now handled by the initGlobalFunctions method in each class
         } catch (error) {
             console.error("Error initializing Purchase Order App:", error);
+            // Fallback: ensure global functions are available even if class initialization fails
+            window.setDeleteFormAction = function (url) {
+                const deleteForm = document.getElementById("deleteForm");
+                if (deleteForm) {
+                    deleteForm.action = url;
+                    console.log("Fallback: Delete form action set to:", url);
+                } else {
+                    console.error("Fallback: Delete form not found");
+                }
+            };
+
+            window.loadPoDetails = function (id) {
+                console.log("Fallback loadPoDetails called for ID:", id);
+                // You can implement a fallback version here if needed
+            };
         }
-    }, 250); // Increased delay to ensure DOM is fully ready
+    }, 250);
 });

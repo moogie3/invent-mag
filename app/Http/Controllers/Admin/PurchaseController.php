@@ -11,7 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth; // Add this import
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
 {
@@ -112,11 +112,13 @@ class PurchaseController extends Controller
             // Validate the incoming request
             $request->validate([
                 'ids' => 'required|array|min:1',
-                'ids.*' => 'required|integer|exists:purchases,id',
+                'ids.*' => 'required|integer|exists:po,id',
             ]);
 
             $ids = $request->ids;
             $deletedCount = 0;
+            $stockAdjustedCount = 0;
+            $paidInvoicesCount = 0;
 
             Log::info('Validation passed, proceeding with deletion', [
                 'ids' => $ids,
@@ -124,7 +126,7 @@ class PurchaseController extends Controller
             ]);
 
             // Use database transaction for data integrity
-            DB::transaction(function () use ($ids, &$deletedCount) {
+            DB::transaction(function () use ($ids, &$deletedCount, &$stockAdjustedCount, &$paidInvoicesCount) {
                 // First, get all purchase orders to be deleted for logging
                 $purchaseOrders = Purchase::whereIn('id', $ids)->with('items')->get();
 
@@ -137,53 +139,107 @@ class PurchaseController extends Controller
                     'po_invoices' => $purchaseOrders->pluck('invoice')->toArray(),
                 ]);
 
+                // Separate paid and unpaid purchase orders
+                $paidPurchaseOrders = $purchaseOrders->where('status', 'Paid');
+                $unpaidPurchaseOrders = $purchaseOrders->where('status', '!=', 'Paid');
+
+                $paidInvoicesCount = $paidPurchaseOrders->count();
+                $unpaidInvoicesCount = $unpaidPurchaseOrders->count();
+
+                Log::info('Purchase orders categorized', [
+                    'paid_count' => $paidInvoicesCount,
+                    'unpaid_count' => $unpaidInvoicesCount,
+                    'paid_invoices' => $paidPurchaseOrders->pluck('invoice')->toArray(),
+                    'unpaid_invoices' => $unpaidPurchaseOrders->pluck('invoice')->toArray(),
+                ]);
+
                 // Log the deletion attempt
                 Log::info('Bulk delete purchase orders initiated', [
                     'user_id' => Auth::id(),
                     'po_ids' => $ids,
                     'po_count' => count($ids),
+                    'paid_count' => $paidInvoicesCount,
+                    'unpaid_count' => $unpaidInvoicesCount,
                 ]);
 
                 // Delete related POItems first (if not using CASCADE foreign key)
                 $deletedItems = POItem::whereIn('po_id', $ids)->delete();
                 Log::info("Deleted {$deletedItems} PO items");
 
-                // Update product stock before deleting (reverse the stock additions)
-                foreach ($purchaseOrders as $po) {
+                // Update product stock ONLY for UNPAID purchase orders
+                foreach ($unpaidPurchaseOrders as $po) {
+                    Log::info('Processing unpaid PO for stock adjustment', [
+                        'po_id' => $po->id,
+                        'invoice' => $po->invoice,
+                        'status' => $po->status,
+                    ]);
+
                     foreach ($po->items as $item) {
                         $product = Product::find($item->product_id);
                         if ($product) {
                             try {
-                                // Determine which stock field to use
+                                $originalStock = null;
+                                $newStock = null;
+
+                                // Determine which stock field to use and calculate new stock
                                 if (isset($product->stock_quantity)) {
+                                    $originalStock = $product->stock_quantity;
                                     $newStock = max(0, $product->stock_quantity - $item->quantity);
                                     $product->update(['stock_quantity' => $newStock]);
                                 } elseif (isset($product->quantity)) {
+                                    $originalStock = $product->quantity;
                                     $newStock = max(0, $product->quantity - $item->quantity);
                                     $product->update(['quantity' => $newStock]);
                                 } elseif (isset($product->stock)) {
+                                    $originalStock = $product->stock;
                                     $newStock = max(0, $product->stock - $item->quantity);
                                     $product->update(['stock' => $newStock]);
                                 }
 
-                                Log::info("Updated stock for product {$item->product_id}, reduced by {$item->quantity}");
+                                Log::info('Stock adjusted for unpaid PO', [
+                                    'product_id' => $item->product_id,
+                                    'po_id' => $po->id,
+                                    'invoice' => $po->invoice,
+                                    'original_stock' => $originalStock,
+                                    'quantity_reduced' => $item->quantity,
+                                    'new_stock' => $newStock,
+                                ]);
+
+                                $stockAdjustedCount++;
                             } catch (\Exception $e) {
-                                Log::warning("Failed to update stock for product {$item->product_id}: " . $e->getMessage());
+                                Log::warning("Failed to update stock for product {$item->product_id} in unpaid PO {$po->id}: " . $e->getMessage());
                             }
                         }
                     }
                 }
 
-                // Delete the purchase orders
+                // Log paid purchase orders (stock NOT adjusted)
+                foreach ($paidPurchaseOrders as $po) {
+                    Log::info('Skipping stock adjustment for paid PO', [
+                        'po_id' => $po->id,
+                        'invoice' => $po->invoice,
+                        'status' => $po->status,
+                        'reason' => 'Invoice already paid - stock adjustment not needed',
+                    ]);
+                }
+
+                // Delete the purchase orders (both paid and unpaid)
                 $deletedCount = Purchase::whereIn('id', $ids)->delete();
                 Log::info("Successfully deleted {$deletedCount} purchase orders");
             });
 
-            // Return success response
+            // Return success response with detailed information
             $response = [
                 'success' => true,
                 'message' => "Successfully deleted {$deletedCount} purchase order(s)",
                 'deleted_count' => $deletedCount,
+                'stock_adjusted_count' => $stockAdjustedCount,
+                'paid_invoices_count' => $paidInvoicesCount,
+                'details' => [
+                    'paid_invoices' => $paidInvoicesCount,
+                    'unpaid_invoices' => $deletedCount - $paidInvoicesCount,
+                    'stock_adjustments_made' => $stockAdjustedCount > 0,
+                ],
             ];
 
             Log::info('Bulk delete completed successfully', $response);
@@ -226,35 +282,62 @@ class PurchaseController extends Controller
     public function bulkMarkPaid(Request $request)
     {
         try {
+            // Validate the request - similar to transaction pattern
+            $purchaseIds = $request->input('ids', []);
+
+            if (empty($purchaseIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No purchase orders selected.'
+                ], 400);
+            }
+
+            // Additional validation to ensure all IDs exist
             $request->validate([
                 'ids' => 'required|array',
-                'ids.*' => 'exists:purchases,id', // Fixed: was 'po,id'
+                'ids.*' => 'exists:purchases,id',
             ]);
 
-            $ids = $request->ids;
+            $updatedCount = 0;
 
-            // Update purchase orders to paid status
-            $updatedCount = Purchase::whereIn('id', $ids)
-                ->where('status', '!=', 'Paid') // Only update unpaid orders
-                ->update([
+            // Get purchase orders by IDs and process them individually
+            $purchaseOrders = Purchase::whereIn('id', $purchaseIds)->get();
+
+            foreach ($purchaseOrders as $purchaseOrder) {
+                // Skip if already paid - same logic as transactions
+                if ($purchaseOrder->status === 'Paid') {
+                    continue;
+                }
+
+                // Update the purchase order to paid status
+                $purchaseOrder->update([
                     'status' => 'Paid',
                     'payment_date' => now(),
                     'updated_at' => now(),
                 ]);
 
+                $updatedCount++;
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Purchase orders marked as paid successfully',
+                'message' => "Successfully marked {$updatedCount} purchase order(s) as paid.",
                 'updated_count' => $updatedCount,
             ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed: ' . implode(', ', $e->errors()['ids'] ?? ['Invalid purchase order IDs']),
+            ], 422);
         } catch (\Exception $e) {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Error updating purchase orders: ' . $e->getMessage(),
-                ],
-                500,
-            );
+            // Log the error for debugging
+            Log::error('Bulk mark as paid error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating purchase orders.'
+            ], 500);
         }
     }
 
@@ -462,22 +545,129 @@ class PurchaseController extends Controller
     public function destroy($id)
     {
         try {
-            // Use the same logic as bulk delete for consistency
-            $request = new Request(['ids' => [$id]]);
-            $response = $this->bulkDelete($request);
-
-            if ($response->getData()->success) {
-                return redirect()->route('admin.po')->with('success', 'Purchase order deleted successfully');
-            } else {
-                return redirect()->route('admin.po')->with('error', 'Failed to delete purchase order');
-            }
-        } catch (\Exception $e) {
-            Log::error('Single purchase order delete failed', [
+            // Log the incoming request for debugging
+            Log::info('Single delete request received', [
                 'po_id' => $id,
-                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
             ]);
 
-            return redirect()->route('admin.po')->with('error', 'Error deleting purchase order');
+            // Find the purchase order
+            $purchase = Purchase::with(['items', 'supplier'])->find($id);
+
+            if (!$purchase) {
+                Log::error('Purchase order not found', ['po_id' => $id]);
+                return redirect()->route('admin.po')->with('error', 'Purchase order not found');
+            }
+
+            $deletedCount = 0;
+            $stockAdjustedCount = 0;
+            $isPaid = $purchase->status === 'Paid';
+
+            Log::info('Found purchase order to delete', [
+                'po_id' => $id,
+                'invoice' => $purchase->invoice,
+                'status' => $purchase->status,
+                'is_paid' => $isPaid,
+            ]);
+
+            // Use database transaction for data integrity
+            DB::transaction(function () use ($purchase, &$deletedCount, &$stockAdjustedCount, $isPaid) {
+                Log::info('Single delete purchase order initiated', [
+                    'user_id' => Auth::id(),
+                    'po_id' => $purchase->id,
+                    'invoice' => $purchase->invoice,
+                    'status' => $purchase->status,
+                ]);
+
+                // Delete related POItems first (if not using CASCADE foreign key)
+                $deletedItems = POItem::where('po_id', $purchase->id)->delete();
+                Log::info("Deleted {$deletedItems} PO items for purchase order {$purchase->id}");
+
+                // Update product stock ONLY for UNPAID purchase orders
+                if (!$isPaid) {
+                    Log::info('Processing unpaid PO for stock adjustment', [
+                        'po_id' => $purchase->id,
+                        'invoice' => $purchase->invoice,
+                        'status' => $purchase->status,
+                    ]);
+
+                    foreach ($purchase->items as $item) {
+                        $product = Product::find($item->product_id);
+                        if ($product) {
+                            try {
+                                $originalStock = null;
+                                $newStock = null;
+
+                                // Determine which stock field to use and calculate new stock
+                                if (isset($product->stock_quantity)) {
+                                    $originalStock = $product->stock_quantity;
+                                    $newStock = max(0, $product->stock_quantity - $item->quantity);
+                                    $product->update(['stock_quantity' => $newStock]);
+                                } elseif (isset($product->quantity)) {
+                                    $originalStock = $product->quantity;
+                                    $newStock = max(0, $product->quantity - $item->quantity);
+                                    $product->update(['quantity' => $newStock]);
+                                } elseif (isset($product->stock)) {
+                                    $originalStock = $product->stock;
+                                    $newStock = max(0, $product->stock - $item->quantity);
+                                    $product->update(['stock' => $newStock]);
+                                }
+
+                                Log::info('Stock adjusted for unpaid PO', [
+                                    'product_id' => $item->product_id,
+                                    'po_id' => $purchase->id,
+                                    'invoice' => $purchase->invoice,
+                                    'original_stock' => $originalStock,
+                                    'quantity_reduced' => $item->quantity,
+                                    'new_stock' => $newStock,
+                                ]);
+
+                                $stockAdjustedCount++;
+                            } catch (\Exception $e) {
+                                Log::warning("Failed to update stock for product {$item->product_id} in unpaid PO {$purchase->id}: " . $e->getMessage());
+                            }
+                        }
+                    }
+                } else {
+                    Log::info('Skipping stock adjustment for paid PO', [
+                        'po_id' => $purchase->id,
+                        'invoice' => $purchase->invoice,
+                        'status' => $purchase->status,
+                        'reason' => 'Invoice already paid - stock adjustment not needed',
+                    ]);
+                }
+
+                // Delete the purchase order
+                $deletedCount = $purchase->delete() ? 1 : 0;
+                Log::info("Successfully deleted purchase order {$purchase->id}");
+            });
+
+            // Prepare success message with details
+            $message = "Purchase order deleted successfully";
+            if (!$isPaid && $stockAdjustedCount > 0) {
+                $message .= " (Stock levels adjusted for {$stockAdjustedCount} products)";
+            } elseif ($isPaid) {
+                $message .= " (Stock levels unchanged - invoice was paid)";
+            }
+
+            Log::info('Single delete completed successfully', [
+                'po_id' => $id,
+                'deleted_count' => $deletedCount,
+                'stock_adjusted_count' => $stockAdjustedCount,
+                'was_paid' => $isPaid,
+            ]);
+
+            return redirect()->route('admin.po')->with('success', $message);
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Single purchase order delete failed', [
+                'po_id' => $id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('admin.po')->with('error', 'Error deleting purchase order. Please try again.');
         }
     }
 }

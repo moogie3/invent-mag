@@ -102,6 +102,14 @@ class SalesOrderModule {
             });
         }
     }
+
+    safeGetElement(id) {
+        const element = document.getElementById(id);
+        if (!element) {
+            console.warn(`Element with ID '${id}' not found`);
+        }
+        return element;
+    }
 }
 
 /**
@@ -135,10 +143,14 @@ class SalesOrderCreate extends SalesOrderModule {
             form: document.querySelector("form"),
         };
 
-        // Data storage
-        this.products = JSON.parse(localStorage.getItem("salesProducts")) || [];
+        // In-memory data storage (replaces localStorage)
+        this.products = [];
         this.orderDiscount = 0;
         this.orderDiscountType = "fixed";
+        this.sessionJustSubmitted = false;
+
+        // Check if we need to clear storage after submission
+        this.checkSessionState();
 
         // Initialize flatpickr for date fields
         this.initFlatpickr(this.elements.orderDate, this.elements.dueDate);
@@ -148,6 +160,16 @@ class SalesOrderCreate extends SalesOrderModule {
 
         // Initial render
         this.renderTable();
+    }
+
+    checkSessionState() {
+        // Use in-memory flag instead of localStorage/sessionStorage
+        if (this.sessionJustSubmitted) {
+            this.products = [];
+            this.orderDiscount = 0;
+            this.orderDiscountType = "fixed";
+            this.sessionJustSubmitted = false;
+        }
     }
 
     initEventListeners() {
@@ -335,10 +357,6 @@ class SalesOrderCreate extends SalesOrderModule {
         this.elements.productsField.value = JSON.stringify(this.products);
     }
 
-    saveToLocalStorage() {
-        localStorage.setItem("salesProducts", JSON.stringify(this.products));
-    }
-
     addProduct() {
         const productId = this.elements.productSelect.value;
         const productName =
@@ -350,6 +368,11 @@ class SalesOrderCreate extends SalesOrderModule {
         const discount = parseFloat(this.elements.discount.value) || 0;
         const discountType = this.elements.discountType.value;
 
+        // Generate unique ID for better product tracking
+        const uniqueId = `${Date.now()}-${Math.random()
+            .toString(36)
+            .substring(2, 7)}`;
+
         // Calculate the total using the correct discount type
         const total = this.calculateTotal(
             price,
@@ -360,6 +383,7 @@ class SalesOrderCreate extends SalesOrderModule {
 
         this.products.push({
             id: productId,
+            uniqueId,
             name: productName,
             quantity,
             price,
@@ -368,7 +392,6 @@ class SalesOrderCreate extends SalesOrderModule {
             total,
         });
 
-        this.saveToLocalStorage();
         this.renderTable();
 
         // Reset form fields
@@ -383,7 +406,15 @@ class SalesOrderCreate extends SalesOrderModule {
 
     clearProducts() {
         this.products = [];
-        this.saveToLocalStorage();
+        this.orderDiscount = 0;
+        this.orderDiscountType = "fixed";
+
+        // Reset discount UI
+        if (this.elements.discountTotalValue)
+            this.elements.discountTotalValue.value = 0;
+        if (this.elements.discountTotalType)
+            this.elements.discountTotalType.value = "fixed";
+
         this.renderTable();
     }
 
@@ -402,7 +433,8 @@ class SalesOrderCreate extends SalesOrderModule {
             return false;
         }
 
-        localStorage.removeItem("salesProducts");
+        // Set flag to clear data after submission (similar to PurchaseOrderCreate)
+        this.sessionJustSubmitted = true;
     }
 
     renderTable() {
@@ -415,24 +447,24 @@ class SalesOrderCreate extends SalesOrderModule {
                 <td>${product.name}</td>
                 <td>
                     <input type="number" class="form-control quantity-input"
-                        value="${product.quantity}" data-id="${
-                product.id
+                        value="${product.quantity}" data-unique-id="${
+                product.uniqueId
             }" min="1" style="width:80px;" />
                 </td>
                 <td>
                     <input type="number" class="form-control price-input"
-                        value="${product.price}" data-id="${
-                product.id
+                        value="${product.price}" data-unique-id="${
+                product.uniqueId
             }" min="0" style="width:100px;" />
                 </td>
                 <td>
                     <div class="input-group" style="width:200px;">
                         <input type="number" class="form-control discount-input"
-                            value="${product.discount}" data-id="${
-                product.id
+                            value="${product.discount}" data-unique-id="${
+                product.uniqueId
             }" min="0" />
-                        <select class="form-select discount-type" data-id="${
-                            product.id
+                        <select class="form-select discount-type" data-unique-id="${
+                            product.uniqueId
                         }">
                             <option value="fixed" ${
                                 product.discountType === "fixed"
@@ -451,8 +483,8 @@ class SalesOrderCreate extends SalesOrderModule {
                     product.total
                 )}</td>
                 <td style="text-align:center">
-                    <button type="button" class="btn btn-danger btn-sm removeProduct" data-id="${
-                        product.id
+                    <button type="button" class="btn btn-danger btn-sm removeProduct" data-unique-id="${
+                        product.uniqueId
                     }">Remove</button>
                 </td>
             `;
@@ -464,119 +496,86 @@ class SalesOrderCreate extends SalesOrderModule {
     }
 
     attachTableEventListeners() {
-        // Remove product
-        document.querySelectorAll(".removeProduct").forEach((button) => {
-            button.addEventListener("click", (e) => {
-                const id = e.target.dataset.id;
-                this.products = this.products.filter((p) => p.id != id);
-                this.saveToLocalStorage();
-                this.renderTable();
-            });
+        // Event delegation approach (similar to PurchaseOrderCreate)
+        const newTableBody = this.elements.productTableBody.cloneNode(true);
+        this.elements.productTableBody.parentNode.replaceChild(
+            newTableBody,
+            this.elements.productTableBody
+        );
+        this.elements.productTableBody = newTableBody;
+
+        // Event delegation for table interactions
+        this.elements.productTableBody.addEventListener("input", (event) => {
+            this.handleTableInput(event);
         });
 
-        // Quantity change
-        document.querySelectorAll(".quantity-input").forEach((input) => {
-            input.addEventListener("input", (e) => {
-                const id = e.target.dataset.id;
-                const value = parseInt(e.target.value) || 1;
-                const product = this.products.find((p) => p.id == id);
-
-                if (product) {
-                    product.quantity = value;
-                    product.total = this.calculateTotal(
-                        product.price,
-                        product.quantity,
-                        product.discount,
-                        product.discountType
-                    );
-
-                    this.saveToLocalStorage();
-                    e.target
-                        .closest("tr")
-                        .querySelector(".product-total").innerText =
-                        this.formatCurrency(product.total);
-                    this.updateTotalPrice();
-                }
-            });
+        this.elements.productTableBody.addEventListener("change", (event) => {
+            this.handleTableChange(event);
         });
 
-        // Price change
-        document.querySelectorAll(".price-input").forEach((input) => {
-            input.addEventListener("input", (e) => {
-                const id = e.target.dataset.id;
-                const value = parseFloat(e.target.value) || 0;
-                const product = this.products.find((p) => p.id == id);
-
-                if (product) {
-                    product.price = value;
-                    product.total = this.calculateTotal(
-                        product.price,
-                        product.quantity,
-                        product.discount,
-                        product.discountType
-                    );
-
-                    this.saveToLocalStorage();
-                    e.target
-                        .closest("tr")
-                        .querySelector(".product-total").innerText =
-                        this.formatCurrency(product.total);
-                    this.updateTotalPrice();
-                }
-            });
+        this.elements.productTableBody.addEventListener("click", (event) => {
+            this.handleTableClick(event);
         });
+    }
 
-        // Discount change
-        document.querySelectorAll(".discount-input").forEach((input) => {
-            input.addEventListener("input", (e) => {
-                const id = e.target.dataset.id;
-                const value = parseFloat(e.target.value) || 0;
-                const product = this.products.find((p) => p.id == id);
+    handleTableInput(event) {
+        const target = event.target;
+        const uniqueId = target.dataset.uniqueId;
+        if (!uniqueId) return;
 
-                if (product) {
-                    product.discount = value;
-                    product.total = this.calculateTotal(
-                        product.price,
-                        product.quantity,
-                        product.discount,
-                        product.discountType
-                    );
+        const product = this.products.find((p) => p.uniqueId === uniqueId);
+        if (!product) return;
 
-                    this.saveToLocalStorage();
-                    e.target
-                        .closest("tr")
-                        .querySelector(".product-total").innerText =
-                        this.formatCurrency(product.total);
-                    this.updateTotalPrice();
-                }
-            });
-        });
+        if (target.classList.contains("quantity-input")) {
+            product.quantity = parseInt(target.value) || 1;
+        } else if (target.classList.contains("price-input")) {
+            product.price = parseFloat(target.value) || 0;
+        } else if (target.classList.contains("discount-input")) {
+            product.discount = parseFloat(target.value) || 0;
+        }
 
-        // Discount type change
-        document.querySelectorAll(".discount-type").forEach((select) => {
-            select.addEventListener("change", (e) => {
-                const id = e.target.dataset.id;
-                const value = e.target.value;
-                const product = this.products.find((p) => p.id == id);
+        this.updateProductInTable(product, target);
+    }
 
-                if (product) {
-                    product.discountType = value;
-                    product.total = this.calculateTotal(
-                        product.price,
-                        product.quantity,
-                        product.discount,
-                        product.discountType
-                    );
+    handleTableChange(event) {
+        const target = event.target;
+        if (!target.classList.contains("discount-type")) return;
 
-                    this.saveToLocalStorage();
-                    e.target
-                        .closest("tr")
-                        .querySelector(".product-total").innerText =
-                        this.formatCurrency(product.total);
-                    this.updateTotalPrice();
-                }
-            });
-        });
+        const uniqueId = target.dataset.uniqueId;
+        const product = this.products.find((p) => p.uniqueId === uniqueId);
+        if (!product) return;
+
+        product.discountType = target.value;
+        this.updateProductInTable(product, target);
+    }
+
+    handleTableClick(event) {
+        const target = event.target.closest(".removeProduct");
+        if (!target) return;
+
+        const uniqueId = target.dataset.uniqueId;
+        this.products = this.products.filter((p) => p.uniqueId !== uniqueId);
+        this.renderTable();
+    }
+
+    updateProductInTable(product, targetElement) {
+        // Recalculate the product total
+        product.total = this.calculateTotal(
+            product.price,
+            product.quantity,
+            product.discount,
+            product.discountType
+        );
+
+        // Update the row's total display
+        const totalElement = targetElement
+            .closest("tr")
+            .querySelector(".product-total");
+        if (totalElement) {
+            totalElement.innerText = this.formatCurrency(product.total);
+        }
+
+        this.updateTotalPrice();
     }
 }
 
@@ -789,29 +788,883 @@ class SalesOrderEdit extends SalesOrderModule {
 }
 
 /**
+ * SalesOrderView - Manages the sales order view functionality and modals
+ * Extends core module for view/modal pages
+ */
+class SalesOrderView extends SalesOrderModule {
+    constructor(config = {}) {
+        super(config);
+
+        this.elements = {
+            deleteForm: this.safeGetElement("deleteForm"),
+            viewSalesModalContent: this.safeGetElement("viewSalesModalContent"),
+            salesModalEdit: this.safeGetElement("salesModalEdit"),
+            salesModalFullView: this.safeGetElement("salesModalFullView"),
+            salesModalPrint: this.safeGetElement("salesModalPrint"),
+        };
+
+        this.formatAllCurrencyValues();
+        this.initModalListeners();
+        this.initGlobalFunctions();
+    }
+
+    formatAllCurrencyValues() {
+        const currencyElements = document.querySelectorAll(".currency-value");
+        currencyElements.forEach((element) => {
+            const value = parseFloat(element.dataset.value) || 0;
+            element.textContent = this.formatCurrency(value);
+        });
+    }
+
+    initModalListeners() {
+        if (this.elements.salesModalPrint) {
+            this.elements.salesModalPrint.addEventListener("click", () =>
+                this.printModalContent()
+            );
+        }
+    }
+
+    // Add this method to ensure global functions are available
+    initGlobalFunctions() {
+        // Make sure loadSalesDetails is available globally
+        window.loadSalesDetails = (id) => this.loadSalesDetails(id);
+        window.setDeleteFormAction = (url) => this.setDeleteFormAction(url);
+    }
+
+    setDeleteFormAction(url) {
+        console.log("Setting delete form action to:", url); // Debug log
+        if (this.elements.deleteForm) {
+            this.elements.deleteForm.action = url;
+            console.log("Form action set successfully"); // Debug log
+        } else {
+            console.error("Delete form element not found");
+        }
+    }
+
+    loadSalesDetails(id) {
+        if (!this.elements.viewSalesModalContent) {
+            console.error("Modal content element not found");
+            return;
+        }
+
+        // Set URLs for modal buttons
+        if (this.elements.salesModalEdit) {
+            this.elements.salesModalEdit.href = `/admin/sales/edit/${id}`;
+        }
+        if (this.elements.salesModalFullView) {
+            this.elements.salesModalFullView.href = `/admin/sales/view/${id}`;
+        }
+
+        // Show loading
+        this.elements.viewSalesModalContent.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3 text-muted">Loading sales order details...</p>
+            </div>
+        `;
+
+        // Fetch details
+        fetch(`/admin/sales/modal-view/${id}`)
+            .then((response) => {
+                if (!response.ok)
+                    throw new Error("Network response was not ok");
+                return response.text();
+            })
+            .then((html) => {
+                this.elements.viewSalesModalContent.innerHTML = html;
+                this.formatAllCurrencyValues();
+            })
+            .catch((error) => {
+                this.elements.viewSalesModalContent.innerHTML = `
+                    <div class="alert alert-danger m-3">
+                        <i class="ti ti-alert-circle me-2"></i> Error loading Sales details: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    printModalContent() {
+        if (!this.elements.viewSalesModalContent) return;
+
+        const printContent = this.elements.viewSalesModalContent.innerHTML;
+        const originalContent = document.body.innerHTML;
+
+        document.body.innerHTML = `
+            <div class="container print-container">
+                <div class="card">
+                    <div class="card-body">${printContent}</div>
+                </div>
+            </div>
+        `;
+
+        window.print();
+        document.body.innerHTML = originalContent;
+
+        setTimeout(() => window.location.reload(), 100);
+    }
+}
+
+/**
+ * Bulk Selection Functionality for Sales Orders - Adapted from Purchase Orders
+ */
+class SalesOrderBulkSelection {
+    constructor() {
+        this.selectAllCheckbox = null;
+        this.rowCheckboxes = null;
+        this.bulkActionsBar = null;
+        this.selectedCount = null;
+        this.isInitialized = false;
+
+        this.init();
+    }
+
+    init() {
+        if (this.isInitialized) {
+            console.log("Sales bulk selection already initialized");
+            return;
+        }
+
+        const maxAttempts = 5;
+        let attempts = 0;
+
+        const tryInit = () => {
+            attempts++;
+
+            this.selectAllCheckbox = document.getElementById("selectAll");
+            this.rowCheckboxes = document.querySelectorAll(".row-checkbox");
+            this.bulkActionsBar = document.getElementById("bulkActionsBar");
+            this.selectedCount = document.getElementById("selectedCount");
+
+            if (
+                !this.selectAllCheckbox ||
+                this.rowCheckboxes.length === 0 ||
+                !this.bulkActionsBar ||
+                !this.selectedCount
+            ) {
+                if (attempts < maxAttempts) {
+                    console.log(
+                        `Sales bulk selection init attempt ${attempts}/${maxAttempts} - retrying...`
+                    );
+                    setTimeout(tryInit, 300);
+                    return;
+                }
+
+                console.warn(
+                    "Sales bulk selection elements not found after",
+                    maxAttempts,
+                    "attempts"
+                );
+                return;
+            }
+
+            this.setupEventListeners();
+            this.updateUI();
+            this.isInitialized = true;
+            console.log("Sales bulk selection initialized successfully");
+        };
+
+        tryInit();
+    }
+
+    setupEventListeners() {
+        // Select all functionality
+        this.selectAllCheckbox.addEventListener("change", (e) => {
+            const isChecked = e.target.checked;
+            this.rowCheckboxes.forEach((checkbox) => {
+                checkbox.checked = isChecked;
+            });
+            this.updateUI();
+        });
+
+        // Individual checkbox changes
+        this.rowCheckboxes.forEach((checkbox) => {
+            checkbox.addEventListener("change", () => {
+                this.updateSelectAllState();
+                this.updateBulkActionsBar();
+            });
+        });
+    }
+
+    updateSelectAllState() {
+        const totalCheckboxes = this.rowCheckboxes.length;
+        const checkedCheckboxes = document.querySelectorAll(
+            ".row-checkbox:checked"
+        ).length;
+
+        if (checkedCheckboxes === 0) {
+            this.selectAllCheckbox.indeterminate = false;
+            this.selectAllCheckbox.checked = false;
+        } else if (checkedCheckboxes === totalCheckboxes) {
+            this.selectAllCheckbox.indeterminate = false;
+            this.selectAllCheckbox.checked = true;
+        } else {
+            this.selectAllCheckbox.indeterminate = true;
+            this.selectAllCheckbox.checked = false;
+        }
+    }
+
+    updateBulkActionsBar() {
+        const checkedCount = document.querySelectorAll(
+            ".row-checkbox:checked"
+        ).length;
+
+        if (checkedCount > 0) {
+            this.bulkActionsBar.style.display = "block";
+            this.selectedCount.textContent = checkedCount;
+        } else {
+            this.bulkActionsBar.style.display = "none";
+        }
+    }
+
+    updateUI() {
+        this.updateSelectAllState();
+        this.updateBulkActionsBar();
+    }
+
+    clearSelection() {
+        this.selectAllCheckbox.checked = false;
+        this.selectAllCheckbox.indeterminate = false;
+        this.rowCheckboxes.forEach((checkbox) => {
+            checkbox.checked = false;
+        });
+        this.updateUI();
+    }
+
+    getSelectedIds() {
+        return Array.from(
+            document.querySelectorAll(".row-checkbox:checked")
+        ).map((cb) => cb.value);
+    }
+}
+
+// Global bulk selection instance for sales orders
+let salesBulkSelection = null;
+
+// Sales Order Bulk action functions
+window.clearSalesSelection = function () {
+    if (salesBulkSelection) {
+        salesBulkSelection.clearSelection();
+    }
+};
+
+window.getSalesSelectedIds = function () {
+    return salesBulkSelection ? salesBulkSelection.getSelectedIds() : [];
+};
+
+window.bulkDeleteSales = function () {
+    console.log("bulkDeleteSales function called");
+
+    const selected = getSalesSelectedIds();
+    console.log("Selected Sales IDs:", selected);
+
+    // Validate selection
+    if (!selected || selected.length === 0) {
+        showToast(
+            "Warning",
+            "Please select at least one sales order to delete.",
+            "warning"
+        );
+        return;
+    }
+
+    // Update modal with selection count
+    const bulkDeleteCount = document.getElementById("bulkDeleteCount");
+    if (bulkDeleteCount) {
+        bulkDeleteCount.textContent = selected.length;
+    }
+
+    // Show confirmation modal
+    const bulkDeleteModal = new bootstrap.Modal(
+        document.getElementById("bulkDeleteModal")
+    );
+    bulkDeleteModal.show();
+
+    // Handle confirmation button
+    const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
+    if (confirmBtn) {
+        // Remove any existing event listeners by cloning the button
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+        newConfirmBtn.addEventListener("click", function () {
+            console.log("Confirm button clicked");
+            performBulkDeleteSales(selected, this, bulkDeleteModal);
+        });
+    }
+};
+
+window.bulkExportSales = function () {
+    const selected = Array.from(
+        document.querySelectorAll(".row-checkbox:checked")
+    ).map((cb) => cb.value);
+
+    if (selected.length === 0) {
+        showToast(
+            "Warning",
+            "Please select at least one sales order to export.",
+            "warning"
+        );
+        return;
+    }
+
+    const submitBtn = document.querySelector('[onclick="bulkExportSales()"]');
+    const originalText = submitBtn ? submitBtn.innerHTML : "";
+
+    if (submitBtn) {
+        submitBtn.innerHTML =
+            '<span class="spinner-border spinner-border-sm me-2"></span>Exporting...';
+        submitBtn.disabled = true;
+    }
+
+    // Create form and submit for export
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/admin/sales/bulk-export";
+    form.style.display = "none";
+
+    // Add CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const csrfInput = document.createElement("input");
+        csrfInput.type = "hidden";
+        csrfInput.name = "_token";
+        csrfInput.value = csrfToken.getAttribute("content");
+        form.appendChild(csrfInput);
+    }
+
+    // Add selected IDs
+    selected.forEach((id) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "ids[]";
+        input.value = id;
+        form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+
+    // Reset button after a delay
+    setTimeout(() => {
+        if (submitBtn) {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+        document.body.removeChild(form);
+    }, 2000);
+};
+
+window.bulkMarkAsPaidSales = function () {
+    console.log("bulkMarkAsPaidSales function called");
+
+    const selected = Array.from(
+        document.querySelectorAll(".row-checkbox:checked")
+    );
+
+    console.log("Initially selected items:", selected.length);
+
+    // If no items are selected, perform smart selection first
+    if (selected.length === 0) {
+        smartSelectUnpaidOnlySales();
+
+        // Recheck selected items after smart selection
+        const newSelected = Array.from(
+            document.querySelectorAll(".row-checkbox:checked")
+        );
+
+        if (newSelected.length === 0) {
+            showToast(
+                "Info",
+                "No unpaid sales orders available to mark as paid.",
+                "info"
+            );
+            return;
+        }
+    } else {
+        // Check if any selected sales orders are already paid using improved detection
+        const selectedPaidSales = selected.filter((checkbox) => {
+            const row = checkbox.closest("tr");
+
+            // Try multiple selectors to find the status element
+            let statusElement = row.querySelector(".sort-status span");
+
+            if (!statusElement) {
+                const statusCell = row.querySelector(".sort-status");
+                if (statusCell) {
+                    statusElement = statusCell.querySelector("span");
+                }
+            }
+
+            if (!statusElement) {
+                statusElement = row.querySelector(".badge");
+            }
+
+            const status = statusElement
+                ? statusElement.textContent.trim()
+                : "";
+
+            // Check for various "paid" status indicators
+            return (
+                status === "Paid" ||
+                status.toLowerCase().includes("paid") ||
+                statusElement?.classList.contains("badge-success") ||
+                statusElement?.classList.contains("bg-success") ||
+                statusElement?.innerHTML.toLowerCase().includes("paid")
+            );
+        });
+
+        console.log("Found paid items in selection:", selectedPaidSales.length);
+
+        if (selectedPaidSales.length > 0) {
+            // Uncheck paid sales orders and show warning
+            selectedPaidSales.forEach((checkbox) => {
+                checkbox.checked = false;
+                const row = checkbox.closest("tr");
+                row.classList.add("table-warning");
+                setTimeout(() => {
+                    row.classList.remove("table-warning");
+                }, 2000);
+            });
+
+            showToast(
+                "Warning",
+                `${selectedPaidSales.length} paid sales order(s) were excluded from selection.`,
+                "warning"
+            );
+
+            // Check if any unpaid sales orders remain selected
+            const remainingSelected = Array.from(
+                document.querySelectorAll(".row-checkbox:checked")
+            );
+
+            console.log(
+                "Remaining selected after filtering:",
+                remainingSelected.length
+            );
+
+            if (remainingSelected.length === 0) {
+                return;
+            }
+        }
+    }
+
+    // Get final selected count and IDs
+    const finalSelected = Array.from(
+        document.querySelectorAll(".row-checkbox:checked")
+    ).map((cb) => cb.value);
+
+    console.log("Final selected IDs:", finalSelected);
+
+    if (finalSelected.length === 0) {
+        showToast("Info", "No unpaid sales orders selected.", "info");
+        return;
+    }
+
+    // Update the count in the modal
+    const bulkPaidCount = document.getElementById("bulkPaidCount");
+    if (bulkPaidCount) {
+        bulkPaidCount.textContent = finalSelected.length;
+    }
+
+    // Show confirmation modal
+    const bulkMarkAsPaidModal = new bootstrap.Modal(
+        document.getElementById("bulkMarkAsPaidModal")
+    );
+    bulkMarkAsPaidModal.show();
+
+    // Handle confirmation button
+    const confirmBtn = document.getElementById("confirmBulkPaidBtn");
+    if (confirmBtn) {
+        // Remove any existing event listeners by cloning the button
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+        newConfirmBtn.addEventListener("click", function () {
+            console.log("Confirm bulk mark as paid button clicked");
+            confirmBulkMarkAsPaidSales(
+                finalSelected,
+                this,
+                bulkMarkAsPaidModal
+            );
+        });
+    }
+};
+
+function smartSelectUnpaidOnlySales() {
+    const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+    let excludedCount = 0;
+
+    rowCheckboxes.forEach((checkbox) => {
+        // Get the sales order status from the row
+        const row = checkbox.closest("tr");
+
+        // Try multiple selectors to find the status element
+        let statusElement = row.querySelector(".sort-status span");
+
+        if (!statusElement) {
+            // Fallback: look for any span in the status column
+            const statusCell = row.querySelector(".sort-status");
+            if (statusCell) {
+                statusElement = statusCell.querySelector("span");
+            }
+        }
+
+        if (!statusElement) {
+            // Another fallback: look for badge class
+            statusElement = row.querySelector(".badge");
+        }
+
+        const status = statusElement ? statusElement.textContent.trim() : "";
+
+        // Check for various "paid" status indicators
+        const isPaid =
+            status === "Paid" ||
+            status.toLowerCase().includes("paid") ||
+            statusElement?.classList.contains("badge-success") ||
+            statusElement?.classList.contains("bg-success") ||
+            statusElement?.innerHTML.toLowerCase().includes("paid");
+
+        // Only select if status is not 'Paid'
+        if (isPaid) {
+            checkbox.checked = false;
+            // Add visual feedback for excluded items
+            row.classList.add("table-warning");
+            setTimeout(() => {
+                row.classList.remove("table-warning");
+            }, 2000);
+            excludedCount++;
+        } else {
+            checkbox.checked = true;
+        }
+    });
+
+    // Update bulk actions bar only (don't update select-all state)
+    if (salesBulkSelection) {
+        salesBulkSelection.updateBulkActionsBar();
+    }
+
+    // Show notification if some items were excluded
+    if (excludedCount > 0) {
+        showToast(
+            "Info",
+            `${excludedCount} paid sales order(s) were excluded from selection.`,
+            "info",
+            3000
+        );
+    }
+}
+
+function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
+    console.log("confirmBulkMarkAsPaidSales called with IDs:", selectedIds);
+
+    if (!selectedIds || selectedIds.length === 0) return;
+
+    // Show loading state
+    const originalText = confirmButton.innerHTML;
+    confirmButton.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        Processing...
+    `;
+    confirmButton.disabled = true;
+
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        console.error("CSRF token not found");
+        showToast(
+            "Error",
+            "Security token not found. Please refresh the page.",
+            "error"
+        );
+        resetButton(confirmButton, originalText);
+        return;
+    }
+
+    console.log("CSRF token found:", csrfToken.getAttribute("content"));
+
+    // Make the API request
+    fetch("/admin/sales/bulk-mark-paid", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
+            Accept: "application/json",
+        },
+        body: JSON.stringify({
+            ids: selectedIds,
+        }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                // Close modal
+                modal.hide();
+
+                // Show success message
+                showToast(
+                    "Success",
+                    `${
+                        data.updated_count || selectedIds.length
+                    } sales order(s) marked as paid successfully!`,
+                    "success"
+                );
+
+                // Clear selection
+                if (typeof clearSelection === "function") {
+                    clearSelection();
+                } else if (
+                    salesBulkSelection &&
+                    typeof salesBulkSelection.clearSelection === "function"
+                ) {
+                    salesBulkSelection.clearSelection();
+                }
+
+                // Reload page after short delay
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                showToast(
+                    "Error",
+                    data.message || "Failed to update sales orders.",
+                    "error"
+                );
+            }
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            showToast(
+                "Error",
+                "An error occurred while updating sales orders.",
+                "error"
+            );
+        })
+        .finally(() => {
+            // Reset button state
+            confirmButton.innerHTML = originalText;
+            confirmButton.disabled = false;
+        });
+}
+
+function clearSelectionSales() {
+    document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+        checkbox.checked = false;
+    });
+    const selectAll = document.getElementById("selectAll");
+    if (selectAll) {
+        selectAll.checked = false;
+    }
+    const bulkActionsBar = document.getElementById("bulkActionsBar");
+    if (bulkActionsBar) {
+        bulkActionsBar.style.display = "none";
+    }
+}
+
+function getSalesSelectedIds() {
+    return Array.from(document.querySelectorAll(".row-checkbox:checked")).map(
+        (cb) => cb.value
+    );
+}
+
+function resetButton(button, originalText) {
+    if (button) {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }
+}
+
+// Keep the existing performBulkMarkAsPaid function for backward compatibility
+function performBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
+    confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal);
+}
+
+function showToast(title, message, type = "info", duration = 4000) {
+    // Create a toast container if it doesn't exist
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+        toastContainer = document.createElement("div");
+        toastContainer.id = "toast-container";
+        toastContainer.className =
+            "toast-container position-fixed bottom-0 end-0 p-3";
+        toastContainer.style.zIndex = "1050";
+        document.body.appendChild(toastContainer);
+
+        // Add animation styles once
+        if (!document.getElementById("toast-styles")) {
+            const style = document.createElement("style");
+            style.id = "toast-styles";
+            style.textContent = `
+                .toast-enter {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                .toast-show {
+                    transform: translateX(0);
+                    opacity: 1;
+                    transition: transform 0.3s ease, opacity 0.3s ease;
+                }
+                .toast-exit {
+                    transform: translateX(100%);
+                    opacity: 0;
+                    transition: transform 0.3s ease, opacity 0.3s ease;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // Create toast element
+    const toast = document.createElement("div");
+    toast.className =
+        "toast toast-enter align-items-center text-white bg-" +
+        getToastColor(type) +
+        " border-0";
+    toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
+
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <strong>${title}</strong>: ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    // Force reflow to ensure animation works
+    void toast.offsetWidth;
+
+    // Show with animation
+    toast.classList.add("toast-show");
+
+    // Initialize Bootstrap toast
+    const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: duration,
+    });
+    bsToast.show();
+
+    // Handle close button clicks
+    const closeButton = toast.querySelector(".btn-close");
+    closeButton.addEventListener("click", () => {
+        hideToast(toast);
+    });
+
+    // Auto hide after duration
+    const hideTimeout = setTimeout(() => {
+        hideToast(toast);
+    }, duration);
+
+    // Store timeout on toast element for cleanup
+    toast._hideTimeout = hideTimeout;
+}
+
+// Helper function to hide toast with animation
+function hideToast(toast) {
+    // Clear any existing timeout
+    if (toast._hideTimeout) {
+        clearTimeout(toast._hideTimeout);
+    }
+
+    // Add exit animation
+    toast.classList.remove("toast-show");
+    toast.classList.add("toast-exit");
+
+    // Remove after animation completes
+    setTimeout(() => {
+        toast.remove();
+    }, 300);
+}
+
+// Helper function to get the appropriate Bootstrap color class
+function getToastColor(type) {
+    switch (type) {
+        case "success":
+            return "success";
+        case "error":
+            return "danger";
+        case "warning":
+            return "warning";
+        default:
+            return "info";
+    }
+}
+
+/**
  * Initialize appropriate module based on the current page
  */
 document.addEventListener("DOMContentLoaded", function () {
-    // Determine current page
-    const pathname = window.location.pathname;
+    // Add a small delay to ensure all elements are loaded
+    setTimeout(() => {
+        // Determine current page
+        const pathname = window.location.pathname;
 
-    try {
-        if (pathname.includes("/admin/sales/create")) {
-            // Initialize create page functionality
-            window.salesApp = new SalesOrderCreate();
-            console.log("Sales Order Create App initialized");
-        } else if (pathname.includes("/admin/sales/edit")) {
-            // Initialize edit page functionality
-            window.salesApp = new SalesOrderEdit();
-            console.log("Sales Order Edit App initialized");
-        } else if (
-            pathname.includes("/admin/sales") &&
-            (pathname.match(/\/\d+$/) || pathname.includes("/show"))
-        ) {
-            // For view page, we don't need interactive functionality
-            console.log("Sales Order View page detected");
+        try {
+            if (pathname.includes("/admin/sales/create")) {
+                // Initialize create page functionality
+                window.salesApp = new SalesOrderCreate();
+                console.log("Sales Order Create App initialized");
+            } else if (
+                pathname.includes("/admin/sales/edit") ||
+                (pathname.includes("/admin/sales") &&
+                    pathname.match(/\/\d+\/edit$/))
+            ) {
+                // Initialize edit page functionality
+                window.salesApp = new SalesOrderEdit();
+                console.log("Sales Order Edit App initialized");
+            } else if (
+                pathname.includes("/admin/sales/modal") ||
+                (pathname.includes("/admin/sales") &&
+                    pathname.match(/\/\d+$/)) ||
+                pathname.includes("/admin/sales/show")
+            ) {
+                // Initialize view functionality for modal or show pages
+                window.salesApp = new SalesOrderView();
+                console.log("Sales Order View App initialized");
+            } else if (
+                pathname === "/admin/sales" ||
+                pathname.includes("/admin/sales?") ||
+                pathname.includes("/admin/sales/")
+            ) {
+                // Initialize bulk selection for index page
+                console.log("Initializing Sales Order Index page...");
+
+                // Initialize view functionality even on index page for modals
+                window.salesApp = new SalesOrderView();
+
+                // Also initialize bulk selection if the class exists
+                if (typeof SalesOrderBulkSelection !== "undefined") {
+                    salesBulkSelection = new SalesOrderBulkSelection();
+                    console.log("Sales Order Index bulk selection initialized");
+                }
+
+                console.log("Sales Order Index page initialized");
+            }
+
+            // Expose global utility functions that might be called from inline handlers
+            // These are now handled by the initGlobalFunctions method in each class
+        } catch (error) {
+            console.error("Error initializing Sales Order App:", error);
+            // Fallback: ensure global functions are available even if class initialization fails
+            window.setDeleteFormAction = function (url) {
+                const deleteForm = document.getElementById("deleteForm");
+                if (deleteForm) {
+                    deleteForm.action = url;
+                    console.log("Fallback: Delete form action set to:", url);
+                } else {
+                    console.error("Fallback: Delete form not found");
+                }
+            };
+
+            window.loadSalesDetails = function (id) {
+                console.log("Fallback loadSalesDetails called for ID:", id);
+                // You can implement a fallback version here if needed
+            };
         }
-    } catch (error) {
-        console.error("Error initializing Sales Order App:", error);
-    }
+    }, 250);
 });

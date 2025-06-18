@@ -31,7 +31,7 @@
 @endif
 
 {{-- SCRIPT FOR ADMIN SALES CREATE & EDIT --}}
-@if (request()->is('admin/sales/create', 'admin/sales/edit/*'))
+@if (request()->is('admin/sales', 'admin/sales/create', 'admin/sales/edit/*'))
     <script src="{{ asset('js/admin/sales-order.js') }}"></script>
 @endif
 
@@ -41,7 +41,7 @@
 @endif
 
 {{-- SCRIPT FOR PRODUCT --}}
-@if (request()->is('admin/product', 'admin/product/edit/*', 'admin/product/create'))
+@if (request()->is('admin/product', 'admin/product/edit/*', 'admin/products/create'))
     <script src="{{ asset('js/admin/product.js') }}"></script>
 @endif
 

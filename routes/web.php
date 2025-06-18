@@ -56,7 +56,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
         // Product Routes
-        Route::prefix('products')->group(function () {
+        Route::prefix('product')->group(function () {
             Route::get('/', [ProductController::class, 'index'])->name('admin.product');
             Route::get('/create', [ProductController::class, 'create'])->name('admin.product.create');
             Route::post('/store', [ProductController::class, 'store'])->name('admin.product.store');
@@ -66,10 +66,14 @@ Route::prefix('admin')->group(function () {
             Route::delete('/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
             Route::get('/modal-view/{id}', [ProductController::class, 'modalView'])->name('admin.product.modal-view');
             Route::post('/quick-create', [ProductController::class, 'quickCreate'])->name('admin.product.quickCreate');
+            Route::post('/bulk-delete', [ProductController::class, 'bulkDelete'])->name('product.bulk-delete');
+            Route::post('/bulk-export', [ProductController::class, 'bulkExport'])->name('product.bulk-export');
+            Route::post('/bulk-stock-details', [ProductController::class, 'bulkStockDetails'])->name('product.bulk-stock-details');
+            Route::post('/bulk-update-stock', [ProductController::class, 'bulkUpdateStock'])->name('product.bulk-update-stock');
         });
 
         // Supplier Routes
-        Route::prefix('suppliers')->group(function () {
+        Route::prefix('supplier')->group(function () {
             Route::get('/', [SupplierController::class, 'index'])->name('admin.supplier');
             Route::get('/create', [SupplierController::class, 'create'])->name('admin.supplier.create');
             Route::post('/store', [SupplierController::class, 'store'])->name('admin.supplier.store');
@@ -80,7 +84,7 @@ Route::prefix('admin')->group(function () {
         });
 
         // Customer Routes
-        Route::prefix('customers')->group(function () {
+        Route::prefix('customer')->group(function () {
             Route::get('/', [CustomerController::class, 'index'])->name('admin.customer');
             Route::get('/create', [CustomerController::class, 'create'])->name('admin.customer.create');
             Route::post('/store', [CustomerController::class, 'store'])->name('admin.customer.store');
@@ -118,6 +122,9 @@ Route::prefix('admin')->group(function () {
             Route::delete('/destroy/{id}', [SalesController::class, 'destroy'])->name('admin.sales.destroy');
             Route::get('/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('admin.sales.product.details');
             Route::get('/modal-view/{id}', [SalesController::class, 'modalView'])->name('admin.sales.modal-view');
+            Route::post('/bulk-delete', [SalesController::class, 'bulkDelete'])->name('sales.bulk-delete');
+            Route::post('/bulk-mark-paid', [SalesController::class, 'bulkMarkPaid'])->name('sales.bulk-mark-paid');
+            Route::post('/bulk-export', [SalesController::class, 'bulkExport'])->name('sales.bulk-export');
             Route::get('/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
         });
 

@@ -359,11 +359,6 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         const discount = parseFloat(this.elements.discount?.value) || 0;
         const discountType = this.elements.discount_type?.value || "fixed";
 
-        if (!productId || quantity <= 0 || price <= 0) {
-            alert("Please fill in all required fields with valid values");
-            return;
-        }
-
         // Generate unique ID and calculate total
         const uniqueId = `${Date.now()}-${Math.random()
             .toString(36)
@@ -531,54 +526,54 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         this.products.forEach((product, index) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${product.name}</td>
-                <td>
-                    <input type="number" class="form-control quantity-input"
-                        value="${product.quantity}" data-unique-id="${
+                    <td>${index + 1}</td>
+                    <td>${product.name}</td>
+                    <td>
+                        <input type="number" class="form-control quantity-input"
+                            value="${product.quantity}" data-unique-id="${
                 product.uniqueId
             }"
-                        min="1" style="width:80px;" />
-                </td>
-                <td>
-                    <input type="number" class="form-control price-input"
-                        value="${product.price}" data-unique-id="${
+                            min="1" style="width:80px;" />
+                    </td>
+                    <td>
+                        <input type="number" class="form-control price-input"
+                            value="${product.price}" data-unique-id="${
                 product.uniqueId
             }"
-                        min="0" style="width:100px;" />
-                </td>
-                <td>
-                    <div class="input-group" style="width:200px;">
-                        <input type="number" class="form-control discount-input"
-                            value="${product.discount}" data-unique-id="${
+                            min="0" style="width:100px;" />
+                    </td>
+                    <td>
+                        <div class="input-group" style="width:200px;">
+                            <input type="number" class="form-control discount-input"
+                                value="${product.discount}" data-unique-id="${
                 product.uniqueId
             }" min="0" />
-                        <select class="form-select discount-type" data-unique-id="${
-                            product.uniqueId
-                        }">
-                            <option value="fixed" ${
-                                product.discountType === "fixed"
-                                    ? "selected"
-                                    : ""
-                            }>Rp</option>
-                            <option value="percentage" ${
-                                product.discountType === "percentage"
-                                    ? "selected"
-                                    : ""
-                            }>%</option>
-                        </select>
-                    </div>
-                </td>
-                <td class="product-total">${this.formatCurrency(
-                    product.total
-                )}</td>
-                <td style="text-align:center">
-                    <button type="button" class="btn btn-danger btn-icon removeProduct"
-                        data-unique-id="${product.uniqueId}" title="Remove">
-                        <i class="ti ti-trash"></i>
-                    </button>
-                </td>
-            `;
+                            <select class="form-select discount-type" data-unique-id="${
+                                product.uniqueId
+                            }">
+                                <option value="fixed" ${
+                                    product.discountType === "fixed"
+                                        ? "selected"
+                                        : ""
+                                }>Rp</option>
+                                <option value="percentage" ${
+                                    product.discountType === "percentage"
+                                        ? "selected"
+                                        : ""
+                                }>%</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td class="product-total">${this.formatCurrency(
+                        product.total
+                    )}</td>
+                    <td style="text-align:center">
+                        <button type="button" class="btn btn-danger btn-icon removeProduct"
+                            data-unique-id="${product.uniqueId}" title="Remove">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </td>
+                `;
             this.elements.productTableBody.appendChild(row);
         });
 
@@ -818,13 +813,13 @@ class PurchaseOrderView extends PurchaseOrderModule {
 
         // Show loading
         this.elements.viewPoModalContent.innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Loading purchase order details...</p>
                 </div>
-                <p class="mt-3 text-muted">Loading purchase order details...</p>
-            </div>
-        `;
+            `;
 
         // Fetch details
         fetch(`/admin/po/modal-view/${id}`)
@@ -839,10 +834,10 @@ class PurchaseOrderView extends PurchaseOrderModule {
             })
             .catch((error) => {
                 this.elements.viewPoModalContent.innerHTML = `
-                    <div class="alert alert-danger m-3">
-                        <i class="ti ti-alert-circle me-2"></i> Error loading PO details: ${error.message}
-                    </div>
-                `;
+                        <div class="alert alert-danger m-3">
+                            <i class="ti ti-alert-circle me-2"></i> Error loading PO details: ${error.message}
+                        </div>
+                    `;
             });
     }
 
@@ -853,12 +848,12 @@ class PurchaseOrderView extends PurchaseOrderModule {
         const originalContent = document.body.innerHTML;
 
         document.body.innerHTML = `
-            <div class="container print-container">
-                <div class="card">
-                    <div class="card-body">${printContent}</div>
+                <div class="container print-container">
+                    <div class="card">
+                        <div class="card-body">${printContent}</div>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
 
         window.print();
         document.body.innerHTML = originalContent;
@@ -1220,7 +1215,6 @@ window.bulkMarkAsPaidPO = function () {
 // Smart selection function - only called when bulk mark as paid is clicked
 function smartSelectUnpaidOnlyPO() {
     const rowCheckboxes = document.querySelectorAll(".row-checkbox");
-    const selectAll = document.getElementById("selectAll");
     let excludedCount = 0;
 
     rowCheckboxes.forEach((checkbox) => {
@@ -1243,9 +1237,9 @@ function smartSelectUnpaidOnlyPO() {
         }
     });
 
-    // Update bulk actions (assuming you have this function available)
-    if (typeof updateBulkActions === "function") {
-        updateBulkActions();
+    // Update bulk actions bar only (don't update select-all state)
+    if (bulkSelection) {
+        bulkSelection.updateBulkActionsBar();
     }
 
     // Show notification if some items were excluded
@@ -1270,9 +1264,9 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
     // Show loading state
     const originalText = confirmButton.innerHTML;
     confirmButton.innerHTML = `
-        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        Processing...
-    `;
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Processing...
+        `;
     confirmButton.disabled = true;
 
     // Get CSRF token
@@ -1412,21 +1406,21 @@ function showToast(title, message, type = "info", duration = 4000) {
             const style = document.createElement("style");
             style.id = "toast-styles";
             style.textContent = `
-                .toast-enter {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                .toast-show {
-                    transform: translateX(0);
-                    opacity: 1;
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                }
-                .toast-exit {
-                    transform: translateX(100%);
-                    opacity: 0;
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                }
-            `;
+                    .toast-enter {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    .toast-show {
+                        transform: translateX(0);
+                        opacity: 1;
+                        transition: transform 0.3s ease, opacity 0.3s ease;
+                    }
+                    .toast-exit {
+                        transform: translateX(100%);
+                        opacity: 0;
+                        transition: transform 0.3s ease, opacity 0.3s ease;
+                    }
+                `;
             document.head.appendChild(style);
         }
     }
@@ -1442,13 +1436,13 @@ function showToast(title, message, type = "info", duration = 4000) {
     toast.setAttribute("aria-atomic", "true");
 
     toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                <strong>${title}</strong>: ${message}
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>${title}</strong>: ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    `;
+        `;
 
     toastContainer.appendChild(toast);
 

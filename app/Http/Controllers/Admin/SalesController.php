@@ -10,6 +10,9 @@ use App\Models\SalesItem;
 use App\Models\Tax;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SalesController extends Controller
 {
@@ -40,9 +43,8 @@ class SalesController extends Controller
         $posTotal = Sales::where('is_pos', true)->sum('total');
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
-        return view('admin.sales.index', compact('posTotal','dueInvoices','entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt', 'pendingOrders','totalMonthly'));
+        return view('admin.sales.index', compact('posTotal', 'dueInvoices', 'entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt', 'pendingOrders', 'totalMonthly'));
     }
-
     public function create()
     {
         $sales = Sales::all();
@@ -53,7 +55,6 @@ class SalesController extends Controller
         $tax = Tax::where('is_active', 1)->first();
         return view('admin.sales.sales-create', compact('sales', 'customers', 'products', 'items', 'tax'));
     }
-
     public function edit($id)
     {
         $sales = Sales::with(['items', 'customer'])->find($id);
@@ -61,7 +62,7 @@ class SalesController extends Controller
         $items = SalesItem::all();
         $tax = Tax::where('is_active', 1)->first();
         $isPaid = $sales->status == 'Paid';
-        return view('admin.sales.sales-edit', compact('sales', 'customers', 'items', 'tax','isPaid'));
+        return view('admin.sales.sales-edit', compact('sales', 'customers', 'items', 'tax', 'isPaid'));
     }
 
     public function view($id)
@@ -83,9 +84,28 @@ class SalesController extends Controller
 
     public function modalView($id)
     {
-        $sales = Sales::with(['customer', 'items.product'])->findOrFail($id);
+        try {
+            // Find the sales record with relationships
+            $sales = Sales::with(['customer', 'items.product'])->findOrFail($id);
 
-        return view('admin.layouts.modals.salesmodals-view', compact('sales'));
+            // Return the modal view
+            return view('admin.layouts.modals.salesmodals-view', compact('sales'));
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Sales Modal View Error: ' . $e->getMessage(), [
+                'sales_id' => $id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Return error response
+            return response()->view(
+                'admin.layouts.modals.error',
+                [
+                    'message' => 'Unable to load sales details: ' . $e->getMessage(),
+                ],
+                500,
+            );
+        }
     }
 
     public function store(Request $request)
@@ -293,10 +313,419 @@ class SalesController extends Controller
         return response()->json(['past_price' => $pastPrice]);
     }
 
+    public function bulkDelete(Request $request)
+    {
+        try {
+            // Log the incoming request for debugging
+            Log::info('Bulk delete sales request received', [
+                'request_data' => $request->all(),
+                'user_id' => Auth::id(),
+            ]);
+
+            // Validate the incoming request
+            $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'required|integer|exists:sales,id',
+            ]);
+
+            $ids = $request->ids;
+            $deletedCount = 0;
+            $stockAdjustedCount = 0;
+            $paidInvoicesCount = 0;
+
+            Log::info('Validation passed, proceeding with deletion', [
+                'ids' => $ids,
+                'count' => count($ids),
+            ]);
+
+            // Use database transaction for data integrity
+            DB::transaction(function () use ($ids, &$deletedCount, &$stockAdjustedCount, &$paidInvoicesCount) {
+                // First, get all sales orders to be deleted for logging
+                $salesOrders = Sales::whereIn('id', $ids)->with('items')->get();
+
+                if ($salesOrders->isEmpty()) {
+                    throw new \Exception('No sales orders found with the provided IDs');
+                }
+
+                Log::info('Found sales orders to delete', [
+                    'found_count' => $salesOrders->count(),
+                    'sales_invoices' => $salesOrders->pluck('invoice')->toArray(),
+                ]);
+
+                // Separate paid and unpaid sales orders
+                $paidSalesOrders = $salesOrders->where('status', 'Paid');
+                $unpaidSalesOrders = $salesOrders->where('status', '!=', 'Paid');
+
+                $paidInvoicesCount = $paidSalesOrders->count();
+                $unpaidInvoicesCount = $unpaidSalesOrders->count();
+
+                Log::info('Sales orders categorized', [
+                    'paid_count' => $paidInvoicesCount,
+                    'unpaid_count' => $unpaidInvoicesCount,
+                    'paid_invoices' => $paidSalesOrders->pluck('invoice')->toArray(),
+                    'unpaid_invoices' => $unpaidSalesOrders->pluck('invoice')->toArray(),
+                ]);
+
+                // Log the deletion attempt
+                Log::info('Bulk delete sales orders initiated', [
+                    'user_id' => Auth::id(),
+                    'sales_ids' => $ids,
+                    'sales_count' => count($ids),
+                    'paid_count' => $paidInvoicesCount,
+                    'unpaid_count' => $unpaidInvoicesCount,
+                ]);
+
+                // Delete related SalesItems first (if not using CASCADE foreign key)
+                $deletedItems = SalesItem::whereIn('sales_id', $ids)->delete();
+                Log::info("Deleted {$deletedItems} sales items");
+
+                // Update product stock ONLY for UNPAID sales orders
+                foreach ($unpaidSalesOrders as $sale) {
+                    Log::info('Processing unpaid sale for stock adjustment', [
+                        'sale_id' => $sale->id,
+                        'invoice' => $sale->invoice,
+                        'status' => $sale->status,
+                    ]);
+
+                    foreach ($sale->items as $item) {
+                        $product = Product::find($item->product_id);
+                        if ($product) {
+                            try {
+                                $originalStock = null;
+                                $newStock = null;
+
+                                // Determine which stock field to use and calculate new stock
+                                // For sales, we ADD back the quantity (reverse the sale)
+                                if (isset($product->stock_quantity)) {
+                                    $originalStock = $product->stock_quantity;
+                                    $newStock = $product->stock_quantity + $item->quantity;
+                                    $product->update(['stock_quantity' => $newStock]);
+                                } elseif (isset($product->quantity)) {
+                                    $originalStock = $product->quantity;
+                                    $newStock = $product->quantity + $item->quantity;
+                                    $product->update(['quantity' => $newStock]);
+                                } elseif (isset($product->stock)) {
+                                    $originalStock = $product->stock;
+                                    $newStock = $product->stock + $item->quantity;
+                                    $product->update(['stock' => $newStock]);
+                                }
+
+                                Log::info('Stock adjusted for unpaid sale', [
+                                    'product_id' => $item->product_id,
+                                    'sale_id' => $sale->id,
+                                    'invoice' => $sale->invoice,
+                                    'original_stock' => $originalStock,
+                                    'quantity_restored' => $item->quantity,
+                                    'new_stock' => $newStock,
+                                ]);
+
+                                $stockAdjustedCount++;
+                            } catch (\Exception $e) {
+                                Log::warning("Failed to update stock for product {$item->product_id} in unpaid sale {$sale->id}: " . $e->getMessage());
+                            }
+                        }
+                    }
+                }
+
+                // Log paid sales orders (stock NOT adjusted)
+                foreach ($paidSalesOrders as $sale) {
+                    Log::info('Skipping stock adjustment for paid sale', [
+                        'sale_id' => $sale->id,
+                        'invoice' => $sale->invoice,
+                        'status' => $sale->status,
+                        'reason' => 'Invoice already paid - stock adjustment not needed',
+                    ]);
+                }
+
+                // Delete the sales orders (both paid and unpaid)
+                $deletedCount = Sales::whereIn('id', $ids)->delete();
+                Log::info("Successfully deleted {$deletedCount} sales orders");
+            });
+
+            // Return success response with detailed information
+            $response = [
+                'success' => true,
+                'message' => "Successfully deleted {$deletedCount} sales order(s)",
+                'deleted_count' => $deletedCount,
+                'stock_adjusted_count' => $stockAdjustedCount,
+                'paid_invoices_count' => $paidInvoicesCount,
+                'details' => [
+                    'paid_invoices' => $paidInvoicesCount,
+                    'unpaid_invoices' => $deletedCount - $paidInvoicesCount,
+                    'stock_adjustments_made' => $stockAdjustedCount > 0,
+                ],
+            ];
+
+            Log::info('Bulk delete completed successfully', $response);
+
+            return response()->json($response);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Bulk delete validation failed', [
+                'errors' => $e->errors(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Invalid data provided',
+                    'errors' => $e->errors(),
+                ],
+                422,
+            );
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Bulk delete sales orders failed', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error deleting sales orders. Please try again.',
+                    'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+                ],
+                500,
+            );
+        }
+    }
+
+    public function bulkMarkPaid(Request $request)
+    {
+        try {
+            // Validate the request - similar to transaction pattern
+            $salesIds = $request->input('ids', []);
+
+            if (empty($salesIds)) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'No sales orders selected.',
+                    ],
+                    400,
+                );
+            }
+
+            // Additional validation to ensure all IDs exist
+            $request->validate([
+                'ids' => 'required|array',
+                'ids.*' => 'exists:sales,id',
+            ]);
+
+            $updatedCount = 0;
+
+            // Get sales orders by IDs and process them individually
+            $salesOrders = Sales::whereIn('id', $salesIds)->get();
+
+            foreach ($salesOrders as $salesOrder) {
+                // Skip if already paid - same logic as transactions
+                if ($salesOrder->status === 'Paid') {
+                    continue;
+                }
+
+                // Update the sales order to paid status
+                $salesOrder->update([
+                    'status' => 'Paid',
+                    'payment_date' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                $updatedCount++;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully marked {$updatedCount} sales order(s) as paid.",
+                'updated_count' => $updatedCount,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Validation failed: ' . implode(', ', $e->errors()['ids'] ?? ['Invalid sales order IDs']),
+                ],
+                422,
+            );
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Bulk mark as paid error: ' . $e->getMessage());
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'An error occurred while updating sales orders.',
+                ],
+                500,
+            );
+        }
+    }
+
+    public function bulkExport(Request $request)
+    {
+        try {
+            $request->validate([
+                'ids' => 'required|array',
+                'ids.*' => 'exists:sales,id',
+            ]);
+
+            $ids = $request->ids;
+
+            // Get sales orders with related data
+            $sales = Sales::with(['customer', 'items.product'])
+                ->whereIn('id', $ids)
+                ->get();
+
+            // Create CSV content
+            $filename = 'sales_orders_' . date('Y-m-d_H-i-s') . '.csv';
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ];
+
+            $callback = function () use ($sales) {
+                $file = fopen('php://output', 'w');
+
+                // CSV Headers
+                fputcsv($file, ['Invoice', 'Customer', 'Order Date', 'Due Date', 'Status', 'Payment Date', 'Total', 'Items Count']);
+
+                // CSV Data
+                foreach ($sales as $sale) {
+                    fputcsv($file, [$sale->invoice, $sale->customer->name ?? 'N/A', $sale->order_date, $sale->due_date, $sale->status, $sale->payment_date ?? 'N/A', $sale->total, $sale->items->count()]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Error exporting sales orders: ' . $e->getMessage()]);
+        }
+    }
+
     public function destroy($id)
     {
-        Sales::find($id)->delete();
+        try {
+            // Log the incoming request for debugging
+            Log::info('Single delete sales request received', [
+                'sales_id' => $id,
+                'user_id' => Auth::id(),
+            ]);
 
-        return redirect()->route('admin.sales')->with('success', 'Sales order deleted');
+            // Use database transaction for data integrity
+            DB::transaction(function () use ($id) {
+                // Get the sales order to be deleted
+                $salesOrder = Sales::with('items')->find($id);
+
+                if (!$salesOrder) {
+                    throw new \Exception("Sales order with ID {$id} not found");
+                }
+
+                Log::info('Found sales order to delete', [
+                    'sales_id' => $salesOrder->id,
+                    'invoice' => $salesOrder->invoice,
+                    'status' => $salesOrder->status,
+                ]);
+
+                // Check if the sales order is paid or unpaid
+                $isPaid = $salesOrder->status === 'Paid';
+
+                Log::info('Sales order categorized', [
+                    'sales_id' => $salesOrder->id,
+                    'invoice' => $salesOrder->invoice,
+                    'status' => $salesOrder->status,
+                    'is_paid' => $isPaid,
+                ]);
+
+                // Log the deletion attempt
+                Log::info('Delete sales order initiated', [
+                    'user_id' => Auth::id(),
+                    'sales_id' => $id,
+                    'invoice' => $salesOrder->invoice,
+                    'is_paid' => $isPaid,
+                ]);
+
+                // Delete related SalesItems first (if not using CASCADE foreign key)
+                $deletedItems = SalesItem::where('sales_id', $id)->delete();
+                Log::info("Deleted {$deletedItems} sales items for sales order {$id}");
+
+                // Update product stock ONLY for UNPAID sales orders
+                if (!$isPaid) {
+                    Log::info('Processing unpaid sale for stock adjustment', [
+                        'sale_id' => $salesOrder->id,
+                        'invoice' => $salesOrder->invoice,
+                        'status' => $salesOrder->status,
+                    ]);
+
+                    foreach ($salesOrder->items as $item) {
+                        $product = Product::find($item->product_id);
+                        if ($product) {
+                            try {
+                                $originalStock = null;
+                                $newStock = null;
+
+                                // Determine which stock field to use and calculate new stock
+                                // For sales, we ADD back the quantity (reverse the sale)
+                                if (isset($product->stock_quantity)) {
+                                    $originalStock = $product->stock_quantity;
+                                    $newStock = $product->stock_quantity + $item->quantity;
+                                    $product->update(['stock_quantity' => $newStock]);
+                                } elseif (isset($product->quantity)) {
+                                    $originalStock = $product->quantity;
+                                    $newStock = $product->quantity + $item->quantity;
+                                    $product->update(['quantity' => $newStock]);
+                                } elseif (isset($product->stock)) {
+                                    $originalStock = $product->stock;
+                                    $newStock = $product->stock + $item->quantity;
+                                    $product->update(['stock' => $newStock]);
+                                }
+
+                                Log::info('Stock adjusted for unpaid sale', [
+                                    'product_id' => $item->product_id,
+                                    'sale_id' => $salesOrder->id,
+                                    'invoice' => $salesOrder->invoice,
+                                    'original_stock' => $originalStock,
+                                    'quantity_restored' => $item->quantity,
+                                    'new_stock' => $newStock,
+                                ]);
+                            } catch (\Exception $e) {
+                                Log::warning("Failed to update stock for product {$item->product_id} in unpaid sale {$salesOrder->id}: " . $e->getMessage());
+                            }
+                        }
+                    }
+                } else {
+                    // Log paid sales order (stock NOT adjusted)
+                    Log::info('Skipping stock adjustment for paid sale', [
+                        'sale_id' => $salesOrder->id,
+                        'invoice' => $salesOrder->invoice,
+                        'status' => $salesOrder->status,
+                        'reason' => 'Invoice already paid - stock adjustment not needed',
+                    ]);
+                }
+
+                // Delete the sales order
+                $salesOrder->delete();
+                Log::info("Successfully deleted sales order {$id}");
+            });
+
+            Log::info('Single delete completed successfully', [
+                'sales_id' => $id,
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->route('admin.sales')->with('success', 'Sales order deleted successfully');
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Delete sales order failed', [
+                'sales_id' => $id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('admin.sales')->with('error', 'Error deleting sales order. Please try again.');
+        }
     }
 }

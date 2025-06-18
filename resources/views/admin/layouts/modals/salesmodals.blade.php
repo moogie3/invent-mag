@@ -1,5 +1,4 @@
-{{-- MODAL --}}
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+<div class="modal modal-blur fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -22,7 +21,127 @@
     </div>
 </div>
 
-{{-- View Sales Modal --}}
+<div class="modal modal-blur fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="bulkDeleteModalLabel">
+                    <i class="ti ti-trash me-2"></i>
+                    Confirm Bulk Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="alert alert-warning d-flex align-items-center w-100 mb-0">
+                        <i class="ti ti-alert-circle me-2 fs-4"></i>
+                        <div>
+                            <strong>Warning!</strong> This action cannot be undone.
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mb-3">
+                    You are about to permanently delete
+                    <strong id="bulkDeleteCount">0</strong>
+                    sales order(s) and all associated data.
+                </p>
+
+                <div class="bg-light p-3 rounded">
+                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be deleted:</h6>
+                    <ul class="list-unstyled mb-0 small">
+                        <li><i class="ti ti-check text-danger me-1"></i> Sales order records</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> Associated sales order items</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> Related transaction history</li>
+                    </ul>
+                </div>
+
+                <div class="mt-3">
+                    <div class="alert alert-info d-flex align-items-start">
+                        <i class="ti ti-info-circle me-2 fs-4 mt-1"></i>
+                        <div>
+                            <strong>Stock Level Impact:</strong>
+                            <ul class="mb-0 mt-1 small">
+                                <li><strong>Unpaid invoices:</strong> Stock levels will be adjusted (increased)</li>
+                                <li><strong>Paid invoices:</strong> Stock levels will remain unchanged</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="ti ti-x me-1"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmBulkDeleteBtn">
+                    <i class="ti ti-trash me-1"></i>
+                    Delete Selected
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="bulkMarkAsPaidModal" tabindex="-1" aria-labelledby="bulkMarkAsPaidModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="bulkMarkAsPaidModalLabel">
+                    <i class="ti ti-check me-2"></i>
+                    Confirm Bulk Mark as Paid
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="alert alert-info d-flex align-items-center w-100 mb-0">
+                        <i class="ti ti-info-circle me-2 fs-4"></i>
+                        <div>
+                            <strong>Info!</strong> This will update the payment status of selected sales orders.
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mb-3">
+                    You are about to mark
+                    <strong id="bulkPaidCount">0</strong>
+                    sales order(s) as fully paid.
+                </p>
+
+                <div class="bg-light p-3 rounded">
+                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be updated:</h6>
+                    <ul class="list-unstyled mb-0 small">
+                        <li><i class="ti ti-check text-success me-1"></i> Payment status will be set to "Paid"</li>
+                        <li><i class="ti ti-check text-success me-1"></i> Outstanding amounts will be cleared</li>
+                        <li><i class="ti ti-check text-success me-1"></i> Payment completion date will be recorded</li>
+                        <li><i class="ti ti-check text-success me-1"></i> Sales order status will be updated</li>
+                    </ul>
+                </div>
+
+                <p class="mt-3 mb-1 text-muted small">
+                    <i class="ti ti-info-circle me-1"></i>
+                    Only unpaid and partially paid sales orders will be affected.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="ti ti-x me-1"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-success" id="confirmBulkPaidBtn">
+                    <i class="ti ti-check me-1"></i>
+                    Mark as Paid
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal modal-blur fade" id="viewSalesModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -75,7 +194,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="{{ route('admin.sales.view', $sales->id) }}" class="btn btn-primary w-100">View Invoice</a>
+                    <a href="{{ route('admin.sales.view', $sales->id) }}" class="btn btn-primary w-100">View
+                        Invoice</a>
                 </div>
             </div>
         </div>
@@ -104,72 +224,3 @@
         });
     </script>
 @endif
-
-<script>
-    // Function to load Sales details into modal
-    function loadSalesDetails(id) {
-        const viewSalesModalContent = document.getElementById('viewSalesModalContent');
-        const salesModalEdit = document.getElementById('salesModalEdit');
-        const salesModalFullView = document.getElementById('salesModalFullView');
-
-        // Set the edit button URL dynamically
-        salesModalEdit.href = `/admin/sales/edit/${id}`;
-
-        // Set the full view button URL dynamically
-        salesModalFullView.href = `/admin/sales/view/${id}`;
-
-        // Show loading spinner
-        viewSalesModalContent.innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-3 text-muted">Loading sales order details...</p>
-            </div>
-        `;
-
-        // Fetch Sales details via AJAX
-        fetch(`/admin/sales/modal-view/${id}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
-            })
-            .then(html => {
-                viewSalesModalContent.innerHTML = html;
-            })
-            .catch(error => {
-                viewSalesModalContent.innerHTML = `
-                    <div class="alert alert-danger m-3">
-                        <i class="ti ti-alert-circle me-2"></i> Error loading Sales details: ${error.message}
-                    </div>
-                `;
-            });
-    }
-
-    // Print modal content
-    document.getElementById('salesModalPrint').addEventListener('click', function() {
-        const printContent = document.getElementById('viewSalesModalContent').innerHTML;
-        const originalContent = document.body.innerHTML;
-
-        document.body.innerHTML = `
-            <div class="container print-container">
-                <div class="card">
-                    <div class="card-body">
-                        ${printContent}
-                    </div>
-                </div>
-            </div>
-        `;
-
-        window.print();
-        document.body.innerHTML = originalContent;
-
-        // Reattach event listeners after restoring original content
-        setTimeout(() => {
-            // This is a hack to reload the page after printing
-            window.location.reload();
-        }, 100);
-    });
-</script>

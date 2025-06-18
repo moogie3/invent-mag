@@ -21,33 +21,69 @@
     </div>
 </div>
 
-<!-- View Product Details Modal -->
-<div class="modal modal-blur fade" id="viewProductModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+<!-- Bulk Delete Products Modal -->
+<div class="modal modal-blur fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h4 class="modal-title"><i class="ti ti-box me-2"></i>Product Details</h4>
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="bulkDeleteModalLabel">
+                    <i class="ti ti-trash me-2"></i>
+                    Confirm Bulk Delete
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
-            <div class="modal-body p-0" id="viewProductModalContent">
-                <div class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="alert alert-warning d-flex align-items-center w-100 mb-0">
+                        <i class="ti ti-alert-circle me-2 fs-4"></i>
+                        <div>
+                            <strong>Warning!</strong> This action cannot be undone.
+                        </div>
                     </div>
-                    <p class="mt-3 text-muted">Loading product details...</p>
+                </div>
+
+                <p class="mb-3">
+                    You are about to permanently delete
+                    <strong id="bulkDeleteCount">0</strong>
+                    product(s) and all associated data.
+                </p>
+
+                <div class="bg-light p-3 rounded">
+                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be deleted:</h6>
+                    <ul class="list-unstyled mb-0 small">
+                        <li><i class="ti ti-check text-danger me-1"></i> Product records</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> Product images and attachments</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> Stock quantity data</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> Related purchase history</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> Associated sales records</li>
+                    </ul>
+                </div>
+
+                <div class="mt-3">
+                    <div class="alert alert-info d-flex align-items-start">
+                        <i class="ti ti-info-circle me-2 fs-4 mt-1"></i>
+                        <div>
+                            <strong>Impact on System:</strong>
+                            <ul class="mb-0 mt-1 small">
+                                <li><strong>Inventory:</strong> Stock levels will be permanently removed</li>
+                                <li><strong>Reports:</strong> Historical data may be affected</li>
+                                <li><strong>Categories:</strong> Empty categories will remain unchanged</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <div class="text-muted me-auto">
-                    <small><i class="ti ti-info-circle me-1"></i> View complete product details</small>
-                </div>
-                <button type="button" class="btn btn-secondary" id="productModalPrint">
-                    <i class="ti ti-printer me-1"></i> Print
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="ti ti-x me-1"></i>
+                    Cancel
                 </button>
-                <a href="#" class="btn btn-primary" id="productModalEdit">
-                    <i class="ti ti-edit me-1"></i> Edit
-                </a>
+                <button type="button" class="btn btn-danger" id="confirmBulkDeleteBtn">
+                    <i class="ti ti-trash me-1"></i>
+                    Delete Selected Products
+                </button>
             </div>
         </div>
     </div>
@@ -174,6 +210,38 @@
     </div>
 </div>
 
+<!-- View Product Details Modal -->
+<div class="modal modal-blur fade" id="viewProductModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h4 class="modal-title"><i class="ti ti-box me-2"></i>Product Details</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0" id="viewProductModalContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Loading product details...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="text-muted me-auto">
+                    <small><i class="ti ti-info-circle me-1"></i> View complete product details</small>
+                </div>
+                <button type="button" class="btn btn-secondary" id="productModalPrint">
+                    <i class="ti ti-printer me-1"></i> Print
+                </button>
+                <a href="#" class="btn btn-primary" id="productModalEdit">
+                    <i class="ti ti-edit me-1"></i> Edit
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Product Details View Modal Content -->
 <div id="productModalViewTemplate" style="display: none;">
     <div class="card shadow">
@@ -292,6 +360,133 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Update Stock Modal -->
+<div class="modal modal-blur fade" id="bulkUpdateStockModal" tabindex="-1"
+    aria-labelledby="bulkUpdateStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="bulkUpdateStockModalLabel">
+                    <i class="ti ti-packages me-2"></i>
+                    Bulk Update Stock
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="alert alert-info m-3 mb-0">
+                    <i class="ti ti-info-circle me-2"></i>
+                    <strong>Update stock quantities for selected products.</strong>
+                    You can adjust each product's stock individually or apply the same change to all products.
+                </div>
+
+                <!-- Bulk Actions Section -->
+                <div class="border-bottom p-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h6 class="mb-2">Quick Actions</h6>
+                            <div class="input-group input-group-sm">
+                                <input type="number" id="bulkStockValue" class="form-control"
+                                    placeholder="Enter value" min="0">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown">
+                                    <span id="bulkActionText">Add to all</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#"
+                                            onclick="setBulkAction('add', 'Add to all')">Add to all</a></li>
+                                    <li><a class="dropdown-item" href="#"
+                                            onclick="setBulkAction('subtract', 'Subtract from all')">Subtract from
+                                            all</a></li>
+                                    <li><a class="dropdown-item" href="#"
+                                            onclick="setBulkAction('set', 'Set all to')">Set all to</a></li>
+                                </ul>
+                                <button class="btn btn-info" type="button" onclick="applyBulkStockAction()">
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                <i class="ti ti-clock me-1"></i>
+                                Changes will be saved when you click "Update Stock"
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products List -->
+                <div id="bulkUpdateStockContent" class="p-3">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Loading selected products...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="me-auto">
+                    <small class="text-muted">
+                        <i class="ti ti-info-circle me-1"></i>
+                        <span id="updateStockCount">0</span> products selected for update
+                    </small>
+                </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="ti ti-x me-1"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-info" id="confirmBulkUpdateBtn">
+                    <i class="ti ti-packages me-1"></i>
+                    Update Stock
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="stockUpdateRowTemplate" class="stock-update-row" style="display: none;">
+    <div class="card mb-3">
+        <div class="card-body p-3">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <img class="product-image rounded" src="" alt="Product"
+                        style="width: 60px; height: 60px; object-fit: cover;">
+                </div>
+                <div class="col-md-3">
+                    <h6 class="mb-1 product-name"></h6>
+                    <small class="text-muted product-code"></small>
+                </div>
+                <div class="col-md-2">
+                    <div class="text-center">
+                        <div class="fw-semibold current-stock text-primary"></div>
+                        <small class="text-muted">Current Stock</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group input-group-sm">
+                        <button class="btn btn-outline-secondary decrease-btn" type="button">
+                            <i class="ti ti-minus"></i>
+                        </button>
+                        <input type="number" class="form-control text-center new-stock-input" min="0"
+                            value="" data-original-stock="">
+                        <button class="btn btn-outline-secondary increase-btn" type="button">
+                            <i class="ti ti-plus"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted">New Stock</small>
+                </div>
+                <div class="col-md-2">
+                    <div class="text-center">
+                        <span class="badge stock-change-badge bg-secondary-lt">No change</span>
+                        <small class="text-muted d-block">Change</small>
                     </div>
                 </div>
             </div>

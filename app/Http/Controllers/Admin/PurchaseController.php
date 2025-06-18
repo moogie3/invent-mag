@@ -97,9 +97,6 @@ class PurchaseController extends Controller
         return view('admin.layouts.modals.pomodals-view', compact('pos'));
     }
 
-    /**
-     * Bulk delete purchase orders with enhanced error handling and debugging
-     */
     public function bulkDelete(Request $request)
     {
         try {
@@ -341,9 +338,6 @@ class PurchaseController extends Controller
         }
     }
 
-    /**
-     * Bulk export purchase orders
-     */
     public function bulkExport(Request $request)
     {
         try {

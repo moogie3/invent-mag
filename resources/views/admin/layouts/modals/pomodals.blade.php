@@ -1,62 +1,20 @@
-<div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal modal-blur fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">
-                    <i class="ti ti-trash me-2"></i>
-                    Delete Purchase Order
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="alert alert-warning d-flex align-items-center w-100 mb-0">
-                        <i class="ti ti-alert-circle me-2 fs-4"></i>
-                        <div>
-                            <strong>Warning!</strong> This action cannot be undone.
-                        </div>
-                    </div>
-                </div>
-
-                <p class="mb-3">
-                    You are about to permanently delete this purchase order and all associated data.
-                </p>
-
-                <div class="bg-light p-3 rounded">
-                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be deleted:</h6>
-                    <ul class="list-unstyled mb-0 small">
-                        <li><i class="ti ti-check text-danger me-1"></i> Purchase order record</li>
-                        <li><i class="ti ti-check text-danger me-1"></i> Associated purchase order items</li>
-                        <li><i class="ti ti-check text-danger me-1"></i> Related transaction history</li>
-                    </ul>
-                </div>
-
-                <div class="mt-3">
-                    <div class="alert alert-info d-flex align-items-start">
-                        <i class="ti ti-info-circle me-2 fs-4 mt-1"></i>
-                        <div>
-                            <strong>Stock Level Impact:</strong>
-                            <ul class="mb-0 mt-1 small">
-                                <li><strong>Unpaid invoices:</strong> Stock levels will be adjusted (reduced)</li>
-                                <li><strong>Paid invoices:</strong> Stock levels will remain unchanged</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            <div class="modal-body text-center">
+                <i class="ti ti-alert-circle icon text-danger icon-lg mb-10"></i>
+                <p class="mt-3">Are you sure you want to delete this purchase order?</p>
             </div>
             <div class="modal-footer">
-                <form id="deleteForm" method="POST" action="">
+                <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="ti ti-x me-1"></i>
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-danger">
-                        <i class="ti ti-trash me-1"></i>
-                        Delete Purchase Order
-                    </button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </div>
         </div>
@@ -218,75 +176,6 @@
         </div>
     </div>
 </div>
-
-<script>
-    // Function to load PO details into modal
-    function loadPoDetails(id) {
-        const viewPoModalContent = document.getElementById('viewPoModalContent');
-        const poModalEdit = document.getElementById('poModalEdit');
-        const poModalFullView = document.getElementById('poModalFullView');
-
-        // Set the edit button URL dynamically
-        poModalEdit.href = `/admin/po/edit/${id}`;
-
-        // Set the full view button URL dynamically
-        poModalFullView.href = `/admin/po/view/${id}`;
-
-        // Show loading spinner
-        viewPoModalContent.innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-3 text-muted">Loading purchase order details...</p>
-            </div>
-        `;
-
-        // Fetch PO details via AJAX
-        fetch(`/admin/po/modal-view/${id}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
-            })
-            .then(html => {
-                viewPoModalContent.innerHTML = html;
-            })
-            .catch(error => {
-                viewPoModalContent.innerHTML = `
-                    <div class="alert alert-danger m-3">
-                        <i class="ti ti-alert-circle me-2"></i> Error loading PO details: ${error.message}
-                    </div>
-                `;
-            });
-    }
-
-    // Print modal content
-    document.getElementById('poModalPrint').addEventListener('click', function() {
-        const printContent = document.getElementById('viewPoModalContent').innerHTML;
-        const originalContent = document.body.innerHTML;
-
-        document.body.innerHTML = `
-            <div class="container print-container">
-                <div class="card">
-                    <div class="card-body">
-                        ${printContent}
-                    </div>
-                </div>
-            </div>
-        `;
-
-        window.print();
-        document.body.innerHTML = originalContent;
-
-        // Reattach event listeners after restoring original content
-        setTimeout(() => {
-            // This is a hack to reload the page after printing
-            window.location.reload();
-        }, 100);
-    });
-</script>
 
 @if (isset($isPaid) && $isPaid)
     <div class="modal fade" id="paidInvoiceModal" tabindex="-1" aria-labelledby="paidInvoiceModalLabel"

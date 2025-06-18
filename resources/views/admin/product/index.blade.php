@@ -132,40 +132,115 @@
                                 </div>
                             </div>
 
+                            {{-- BULK ACTIONS BAR --}}
+                            <div id="bulkActionsBar" class="bulk-actions-bar border-bottom sticky-top">
+                                <div class="px-4 py-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-lg-6 col-md-12">
+                                            <div class="d-flex align-items-center">
+                                                <div
+                                                    class="selection-indicator rounded-circle d-flex align-items-center justify-content-center me-3">
+                                                    <i class="ti ti-checklist text-white" style="font-size: 16px;"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="selection-text">
+                                                        <span id="selectedCount" class="text-primary">0</span>
+                                                        <span class="text-muted">products selected</span>
+                                                    </div>
+                                                    <div class="selection-subtext">Choose an action to apply to selected
+                                                        items</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-12">
+                                            <div
+                                                class="d-flex flex-wrap justify-content-lg-end justify-content-center gap-2 mt-lg-0 mt-2">
+                                                <button onclick="bulkUpdateStock()"
+                                                    class="btn btn-info action-btn d-flex align-items-center">
+                                                    <i class="ti ti-packages me-2"></i> Update Stock
+                                                </button>
+                                                <button onclick="bulkExportProducts()"
+                                                    class="btn btn-secondary action-btn d-flex align-items-center">
+                                                    <i class="ti ti-download me-2"></i> Export
+                                                </button>
+                                                <button onclick="bulkDeleteProducts()"
+                                                    class="btn btn-danger action-btn d-flex align-items-center">
+                                                    <i class="ti ti-trash me-2"></i> Delete
+                                                </button>
+                                                <button onclick="clearProductSelection()"
+                                                    class="btn btn-outline-secondary action-btn d-flex align-items-center">
+                                                    <i class="ti ti-x me-2"></i> Clear Selection
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {{-- TABLE --}}
-                            <div id="invoiceTableContainer">
+                            <div id="invoiceTableContainer" class="position-relative">
                                 <div class="table-responsive">
                                     <table class="table card-table table-vcenter">
-                                        <thead style="font-size: large">
+                                        <thead class="bg-light" style="font-size: large">
                                             <tr>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-no">No</th>
-                                                <th><button class="table-sort fs-4 py-3">Picture</th>
-                                                <th class="no-print"><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-code">Code
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <input type="checkbox" id="selectAll" class="form-check-input">
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-name">Name</th>
-                                                <th class="no-print"><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-quantity">QTY
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3" data-sort="sort-no">No</button>
                                                 </th>
-                                                <th class="no-print"><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-category">CAT
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3">Picture</button>
                                                 </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-unit">Unit</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-price">Price</th>
-                                                <th><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-sellingprice">Selling Price</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-supplier">Supplier
+                                                <th class="no-print sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-code">Code</button>
                                                 </th>
-                                                <th class="text-center"><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-expiry">Expiry Date
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-name">Name</button>
                                                 </th>
-                                                <th style="width:100px;text-align:center" class="fs-4 py-3 no-print">Action
+                                                <th class="no-print sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-quantity">QTY</button>
+                                                </th>
+                                                <th class="no-print sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-category">CAT</button>
+                                                </th>
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-unit">Unit</button>
+                                                </th>
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-price">Price</button>
+                                                </th>
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-sellingprice">Selling Price</button>
+                                                </th>
+                                                <th class="sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-supplier">Supplier</button>
+                                                </th>
+                                                <th class="text-center sticky-top bg-light" style="z-index: 1020;">
+                                                    <button class="table-sort fs-4 py-3" data-sort="sort-expiry">Expiry
+                                                        Date</button>
+                                                </th>
+                                                <th style="width:100px;text-align:center"
+                                                    class="fs-4 py-3 no-print sticky-top bg-light" style="z-index: 1020;">
+                                                    Action
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody id="invoiceTableBody" class="table-tbody">
                                             @foreach ($products as $index => $product)
-                                                <tr>
+                                                <tr class="table-row" data-id="{{ $product->id }}">
+                                                    <td>
+                                                        <input type="checkbox" class="form-check-input row-checkbox"
+                                                            value="{{ $product->id }}">
+                                                    </td>
                                                     <td class="sort-no">{{ $products->firstItem() + $index }}</td>
                                                     <td class="sort-image" style="width:120px">
                                                         <img src="{{ asset($product->image) }}" width="80px"

@@ -166,21 +166,21 @@
                                 </div>
                             </div>
 
-                            <div id="bulkActionsBar" class="border-bottom sticky-top" style="display: none;">
+                            <div id="bulkActionsBar" class="bulk-actions-bar border-bottom sticky-top">
                                 <div class="px-4 py-3">
                                     <div class="row align-items-center">
                                         <div class="col-lg-6 col-md-12">
                                             <div class="d-flex align-items-center">
-                                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
-                                                    style="width: 36px; height: 36px;">
-                                                    <i class="ti ti-check text-white"></i>
+                                                <div
+                                                    class="selection-indicator rounded-circle d-flex align-items-center justify-content-center me-3">
+                                                    <i class="ti ti-checklist text-white" style="font-size: 16px;"></i>
                                                 </div>
                                                 <div>
-                                                    <span class="fw-medium fs-5">
+                                                    <div class="selection-text">
                                                         <span id="selectedCount" class="text-primary">0</span>
                                                         <span class="text-muted">purchase orders selected</span>
-                                                    </span>
-                                                    <div class="text-muted small">Choose an action to apply to selected
+                                                    </div>
+                                                    <div class="selection-subtext">Choose an action to apply to selected
                                                         items</div>
                                                 </div>
                                             </div>
@@ -189,19 +189,19 @@
                                             <div
                                                 class="d-flex flex-wrap justify-content-lg-end justify-content-center gap-2 mt-lg-0 mt-2">
                                                 <button onclick="bulkMarkAsPaidPO()"
-                                                    class="btn btn-success d-flex align-items-center">
+                                                    class="btn btn-success action-btn d-flex align-items-center">
                                                     <i class="ti ti-check me-2"></i> Mark as Paid
                                                 </button>
                                                 <button onclick="bulkExportPO()"
-                                                    class="btn btn-info d-flex align-items-center">
+                                                    class="btn btn-secondary action-btn d-flex align-items-center">
                                                     <i class="ti ti-download me-2"></i> Export
                                                 </button>
                                                 <button onclick="bulkDeletePO()"
-                                                    class="btn btn-danger d-flex align-items-center">
+                                                    class="btn btn-danger action-btn d-flex align-items-center">
                                                     <i class="ti ti-trash me-2"></i> Delete
                                                 </button>
                                                 <button onclick="clearPOSelection()"
-                                                    class="btn btn-outline-secondary d-flex align-items-center">
+                                                    class="btn btn-outline-secondary action-btn d-flex align-items-center">
                                                     <i class="ti ti-x me-2"></i> Clear Selection
                                                 </button>
                                             </div>

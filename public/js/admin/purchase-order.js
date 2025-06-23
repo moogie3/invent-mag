@@ -91,6 +91,7 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         this.products = [];
         this.orderDiscount = { value: 0, type: "fixed" };
         this.sessionJustSubmitted = false;
+        this.currentStock = 0; // Track current selected product stock
 
         // Check if we need to clear storage after submission
         this.checkSessionState();
@@ -121,6 +122,8 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
             "applyTotalDiscount",
             "invoice",
             "invoiceForm",
+            "stock_available",
+            "quantity_warning",
         ];
 
         const elements = {};
@@ -196,8 +199,19 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
 
         // Product selection
         if (this.elements.product_id) {
-            this.elements.product_id.addEventListener("change", () =>
-                this.updateProductPrice()
+            this.elements.product_id.addEventListener("change", () => {
+                this.updateProductPrice();
+                this.updateStockDisplay();
+            });
+        }
+
+        // Quantity validation
+        if (this.elements.quantity) {
+            this.elements.quantity.addEventListener("input", () =>
+                this.validateQuantity()
+            );
+            this.elements.quantity.addEventListener("change", () =>
+                this.validateQuantity()
             );
         }
 
@@ -299,6 +313,138 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         }
     }
 
+    updateStockDisplay() {
+        if (!this.elements.product_id || !this.elements.stock_available) {
+            return;
+        }
+
+        const selectedOption =
+            this.elements.product_id.options[
+                this.elements.product_id.selectedIndex
+            ];
+
+        if (selectedOption && selectedOption.value) {
+            const stock =
+                parseInt(selectedOption.getAttribute("data-stock")) || 0;
+            this.currentStock = stock;
+
+            // Calculate remaining stock (available stock minus already ordered quantity)
+            const orderedQuantity = this.getOrderedQuantityForProduct(
+                selectedOption.value
+            );
+            const remainingStock = Math.max(0, stock - orderedQuantity);
+
+            this.elements.stock_available.textContent = remainingStock;
+
+            // Update stock display styling based on availability
+            this.updateStockStyling(remainingStock);
+
+            // Reset quantity field and warning
+            if (this.elements.quantity) {
+                this.elements.quantity.max = remainingStock;
+                this.elements.quantity.value = "";
+            }
+            this.hideQuantityWarning();
+        } else {
+            this.elements.stock_available.textContent = "-";
+            this.currentStock = 0;
+            if (this.elements.quantity) {
+                this.elements.quantity.removeAttribute("max");
+            }
+            this.hideQuantityWarning();
+        }
+    }
+
+    getOrderedQuantityForProduct(productId) {
+        return this.products
+            .filter((product) => product.id === productId)
+            .reduce((total, product) => total + product.quantity, 0);
+    }
+
+    updateStockStyling(remainingStock) {
+        if (!this.elements.stock_available) return;
+
+        // Remove existing classes
+        this.elements.stock_available.classList.remove(
+            "text-primary",
+            "text-warning",
+            "text-danger"
+        );
+
+        // Apply styling based on stock level
+        if (remainingStock === 0) {
+            this.elements.stock_available.classList.add("text-danger");
+        } else if (remainingStock <= 5) {
+            this.elements.stock_available.classList.add("text-warning");
+        } else {
+            this.elements.stock_available.classList.add("text-primary");
+        }
+    }
+
+    validateQuantity() {
+        if (!this.elements.quantity || !this.elements.product_id) {
+            return true;
+        }
+
+        const quantity = parseInt(this.elements.quantity.value) || 0;
+        const selectedOption =
+            this.elements.product_id.options[
+                this.elements.product_id.selectedIndex
+            ];
+
+        if (!selectedOption || !selectedOption.value) {
+            this.hideQuantityWarning();
+            return true;
+        }
+
+        const productId = selectedOption.value;
+        const stock = parseInt(selectedOption.getAttribute("data-stock")) || 0;
+        const orderedQuantity = this.getOrderedQuantityForProduct(productId);
+        const remainingStock = Math.max(0, stock - orderedQuantity);
+
+        if (quantity > remainingStock) {
+            this.showQuantityWarning();
+            this.disableAddButton();
+            return false;
+        } else {
+            this.hideQuantityWarning();
+            this.enableAddButton();
+            return true;
+        }
+    }
+
+    showQuantityWarning() {
+        if (this.elements.quantity_warning) {
+            this.elements.quantity_warning.classList.remove("d-none");
+        }
+        if (this.elements.quantity) {
+            this.elements.quantity.classList.add("is-invalid");
+        }
+    }
+
+    hideQuantityWarning() {
+        if (this.elements.quantity_warning) {
+            this.elements.quantity_warning.classList.add("d-none");
+        }
+        if (this.elements.quantity) {
+            this.elements.quantity.classList.remove("is-invalid");
+        }
+    }
+
+    disableAddButton() {
+        if (this.elements.addProduct) {
+            this.elements.addProduct.disabled = true;
+            this.elements.addProduct.classList.add("disabled");
+        }
+    }
+
+    enableAddButton() {
+        if (this.elements.addProduct) {
+            this.elements.addProduct.disabled = false;
+            this.elements.addProduct.classList.remove("disabled");
+        }
+    }
+
     updateTotalPrice() {
         // Calculate subtotal from all products
         let subtotal = this.products.reduce(
@@ -349,6 +495,11 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
             return;
         }
 
+        // Validate quantity first
+        if (!this.validateQuantity()) {
+            return;
+        }
+
         const productId = this.elements.product_id.value;
         const productName =
             this.elements.product_id.options[
@@ -358,6 +509,13 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         const price = parseFloat(this.elements.new_price.value) || 0;
         const discount = parseFloat(this.elements.discount?.value) || 0;
         const discountType = this.elements.discount_type?.value || "fixed";
+
+        // Get stock for the product
+        const selectedOption =
+            this.elements.product_id.options[
+                this.elements.product_id.selectedIndex
+            ];
+        const stock = parseInt(selectedOption.getAttribute("data-stock")) || 0;
 
         // Generate unique ID and calculate total
         const uniqueId = `${Date.now()}-${Math.random()
@@ -380,11 +538,13 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
             discount,
             discountType,
             total,
+            stock,
         });
 
         // Update UI
         this.renderTable();
         this.clearProductForm();
+        this.updateStockDisplay(); // Refresh stock display after adding
     }
 
     clearProductForm() {
@@ -400,6 +560,13 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
                 this.elements[fieldName].value = "";
             }
         });
+
+        // Reset stock display
+        if (this.elements.stock_available) {
+            this.elements.stock_available.textContent = "-";
+        }
+        this.hideQuantityWarning();
+        this.enableAddButton();
     }
 
     clearProducts() {
@@ -413,6 +580,7 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
             this.elements.discountTotalType.value = "fixed";
 
         this.renderTable();
+        this.updateStockDisplay(); // Refresh stock display after clearing
     }
 
     applyOrderDiscount() {
@@ -465,7 +633,22 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         if (!product) return;
 
         if (target.classList.contains("quantity-input")) {
-            product.quantity = parseInt(target.value) || 1;
+            const newQuantity = parseInt(target.value) || 1;
+
+            // Validate quantity against stock for this specific product
+            const totalOrderedForProduct = this.products
+                .filter((p) => p.id === product.id && p.uniqueId !== uniqueId)
+                .reduce((sum, p) => sum + p.quantity, 0);
+
+            if (newQuantity + totalOrderedForProduct > product.stock) {
+                target.classList.add("is-invalid");
+                // Revert to previous valid value
+                target.value = product.quantity;
+                return;
+            } else {
+                target.classList.remove("is-invalid");
+                product.quantity = newQuantity;
+            }
         } else if (target.classList.contains("price-input")) {
             product.price = parseFloat(target.value) || 0;
         } else if (target.classList.contains("discount-input")) {
@@ -473,6 +656,7 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         }
 
         this.updateProductInTable(product, target);
+        this.updateStockDisplay(); // Refresh stock display after any change
     }
 
     handleTableChange(event) {
@@ -494,6 +678,7 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         const uniqueId = target.dataset.uniqueId;
         this.products = this.products.filter((p) => p.uniqueId !== uniqueId);
         this.renderTable();
+        this.updateStockDisplay(); // Refresh stock display after removal
     }
 
     updateProductInTable(product, targetElement) {
@@ -524,56 +709,79 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
 
         // Add rows for each product
         this.products.forEach((product, index) => {
+            // Calculate remaining stock for this product
+            const totalOrderedForProduct = this.products
+                .filter((p) => p.id === product.id)
+                .reduce((sum, p) => sum + p.quantity, 0);
+            const remainingStock = Math.max(
+                0,
+                product.stock - totalOrderedForProduct + product.quantity
+            );
+
             const row = document.createElement("tr");
             row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${product.name}</td>
-                    <td>
-                        <input type="number" class="form-control quantity-input"
-                            value="${product.quantity}" data-unique-id="${
+                <td class="text-center">${index + 1}</td>
+                <td>${product.name}</td>
+                <td class="text-center">
+                    <span class="badge ${
+                        remainingStock === 0
+                            ? "bg-danger"
+                            : remainingStock <= 5
+                            ? "bg-warning"
+                            : "bg-success"
+                    }">
+                        ${remainingStock}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <input type="number" class="form-control quantity-input text-center"
+                        value="${product.quantity}" data-unique-id="${
                 product.uniqueId
             }"
-                            min="1" style="width:80px;" />
-                    </td>
-                    <td>
-                        <input type="number" class="form-control price-input"
-                            value="${product.price}" data-unique-id="${
+                        min="1" max="${product.stock}" style="width:80px;" />
+                </td>
+                <td class="text-center">
+                    <input type="number" class="form-control price-input text-center"
+                        value="${product.price}" data-unique-id="${
                 product.uniqueId
             }"
-                            min="0" style="width:100px;" />
-                    </td>
-                    <td>
-                        <div class="input-group" style="width:200px;">
-                            <input type="number" class="form-control discount-input"
-                                value="${product.discount}" data-unique-id="${
+                        min="0" step="0.01" style="width:100px;" />
+                </td>
+                <td class="text-center">
+                    <div class="input-group" style="width:200px;">
+                        <input type="number" class="form-control discount-input text-center"
+                            value="${product.discount}" data-unique-id="${
                 product.uniqueId
-            }" min="0" />
-                            <select class="form-select discount-type" data-unique-id="${
-                                product.uniqueId
-                            }">
-                                <option value="fixed" ${
-                                    product.discountType === "fixed"
-                                        ? "selected"
-                                        : ""
-                                }>Rp</option>
-                                <option value="percentage" ${
-                                    product.discountType === "percentage"
-                                        ? "selected"
-                                        : ""
-                                }>%</option>
-                            </select>
-                        </div>
-                    </td>
-                    <td class="product-total">${this.formatCurrency(
-                        product.total
-                    )}</td>
-                    <td style="text-align:center">
-                        <button type="button" class="btn btn-danger btn-icon removeProduct"
-                            data-unique-id="${product.uniqueId}" title="Remove">
-                            <i class="ti ti-trash"></i>
-                        </button>
-                    </td>
-                `;
+            }"
+                            min="0" step="0.01" />
+                        <select class="form-select discount-type" data-unique-id="${
+                            product.uniqueId
+                        }">
+                            <option value="fixed" ${
+                                product.discountType === "fixed"
+                                    ? "selected"
+                                    : ""
+                            }>Rp</option>
+                            <option value="percentage" ${
+                                product.discountType === "percentage"
+                                    ? "selected"
+                                    : ""
+                            }>%</option>
+                        </select>
+                    </div>
+                </td>
+                <td class="text-end product-total fw-bold">${this.formatCurrency(
+                    product.total
+                )}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-danger btn-sm removeProduct"
+                        data-unique-id="${
+                            product.uniqueId
+                        }" title="Remove Product">
+                        <i class="ti ti-trash"></i>
+                    </button>
+                </td>
+            `;
             this.elements.productTableBody.appendChild(row);
         });
 

@@ -490,30 +490,170 @@ class ProductController extends Controller
                 'updated_count' => $updatedCount,
                 'changes' => $stockChanges,
             ]);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Bulk stock update validation failed', [
                 'errors' => $e->errors(),
                 'user_id' => Auth::id(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid data provided',
-                'errors' => $e->errors(),
-            ], 422);
-
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Invalid data provided',
+                    'errors' => $e->errors(),
+                ],
+                422,
+            );
         } catch (\Exception $e) {
             Log::error('Bulk stock update failed', [
                 'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating stock quantities. Please try again.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error updating stock quantities. Please try again.',
+                    'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+                ],
+                500,
+            );
         }
     }
+
+    public function search(Request $request)
+{
+    try {
+        // Log the incoming request for debugging
+        Log::info('Product search request', [
+            'query' => $request->get('q'),
+            'method' => $request->method(),
+            'user_id' => Auth::id()
+        ]);
+
+        $query = trim($request->get('q', ''));
+
+        if (empty($query)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Search query is required',
+                'products' => [],
+                'count' => 0
+            ]);
+        }
+
+        // Build the search query with proper error handling
+        $productsQuery = Product::query();
+
+        // Add eager loading with null checks
+        $productsQuery->with([
+            'category' => function($q) {
+                $q->select('id', 'name');
+            },
+            'unit' => function($q) {
+                $q->select('id', 'name', 'symbol');
+            },
+            'supplier' => function($q) {
+                $q->select('id', 'name');
+            }
+        ]);
+
+        // Apply search filters
+        $productsQuery->where(function ($q) use ($query) {
+            $q->where('name', 'LIKE', "%{$query}%")
+              ->orWhere('code', 'LIKE', "%{$query}%");
+
+            // Search in category name with existence check
+            $q->orWhereHas('category', function ($cat) use ($query) {
+                $cat->where('name', 'LIKE', "%{$query}%");
+            });
+
+            // Search in supplier name with existence check
+            $q->orWhereHas('supplier', function ($sup) use ($query) {
+                $sup->where('name', 'LIKE', "%{$query}%");
+            });
+        });
+
+        // Order and limit results
+        $products = $productsQuery
+            ->orderBy('name', 'asc')
+            ->limit(50)
+            ->get();
+
+        Log::info('Product search results', [
+            'query' => $query,
+            'count' => $products->count()
+        ]);
+
+        // Format products for frontend with proper null handling
+        $formattedProducts = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name ?? 'Unknown Product',
+                'code' => $product->code ?? null,
+                'stock_quantity' => $product->stock_quantity ?? 0,
+                'low_stock_threshold' => $product->low_stock_threshold ?? 0,
+                'image' => $product->image ? asset($product->image) : null,
+                'price' => $product->price ?? 0,
+                'selling_price' => $product->selling_price ?? 0,
+                'has_expiry' => $product->has_expiry ?? false,
+                'expiry_date' => $product->expiry_date ? $product->expiry_date->format('Y-m-d') : null,
+                'category' => $product->category ? [
+                    'id' => $product->category->id,
+                    'name' => $product->category->name
+                ] : null,
+                'unit' => $product->unit ? [
+                    'id' => $product->unit->id,
+                    'name' => $product->unit->name,
+                    'symbol' => $product->unit->symbol
+                ] : null,
+                'supplier' => $product->supplier ? [
+                    'id' => $product->supplier->id,
+                    'name' => $product->supplier->name
+                ] : null,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'products' => $formattedProducts,
+            'count' => $products->count(),
+            'query' => $query,
+            'message' => $products->count() > 0 ? 'Products found' : 'No products found'
+        ]);
+
+    } catch (\Illuminate\Database\QueryException $e) {
+        Log::error('Database error in product search', [
+            'error' => $e->getMessage(),
+            'sql' => $e->getSql() ?? 'N/A',
+            'bindings' => $e->getBindings() ?? [],
+            'query' => $request->get('q')
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Database error occurred while searching',
+            'error' => config('app.debug') ? $e->getMessage() : 'Database query failed',
+            'products' => [],
+            'count' => 0
+        ], 500);
+
+    } catch (\Exception $e) {
+        Log::error('General error in product search', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+            'query' => $request->get('q')
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'An unexpected error occurred while searching',
+            'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            'products' => [],
+            'count' => 0
+        ], 500);
+    }
+}
 }

@@ -120,34 +120,15 @@ class SalesOrderCreate extends SalesOrderModule {
     constructor(config = {}) {
         super(config);
 
-        // Store DOM elements
-        this.elements = {
-            orderDate: document.getElementById("order_date"),
-            dueDate: document.getElementById("due_date"),
-            customerSelect: document.getElementById("customer_id"),
-            productSelect: document.getElementById("product_id"),
-            customerPriceField: document.getElementById("customer_price"),
-            pastPriceField: document.getElementById("past_price"),
-            priceField: document.getElementById("price"),
-            sellingPriceField: document.getElementById("selling_price"),
-            quantity: document.getElementById("quantity"),
-            discount: document.getElementById("discount"),
-            discountType: document.getElementById("discount_type"),
-            addProductBtn: document.getElementById("addProduct"),
-            clearProductsBtn: document.getElementById("clearProducts"),
-            productTableBody: document.getElementById("productTableBody"),
-            productsField: document.getElementById("productsField"),
-            discountTotalValue: document.getElementById("discountTotalValue"),
-            discountTotalType: document.getElementById("discountTotalType"),
-            applyTotalDiscount: document.getElementById("applyTotalDiscount"),
-            form: document.querySelector("form"),
-        };
+        // Store DOM elements with safe getter
+        this.elements = this.initializeElements();
 
         // In-memory data storage (replaces localStorage)
         this.products = [];
         this.orderDiscount = 0;
         this.orderDiscountType = "fixed";
         this.sessionJustSubmitted = false;
+        this.currentStock = 0; // Track current selected product stock
 
         // Check if we need to clear storage after submission
         this.checkSessionState();
@@ -160,6 +141,51 @@ class SalesOrderCreate extends SalesOrderModule {
 
         // Initial render
         this.renderTable();
+    }
+
+    initializeElements() {
+        const elementIds = [
+            "order_date",
+            "due_date",
+            "customer_id",
+            "product_id",
+            "customer_price",
+            "past_price",
+            "price",
+            "selling_price",
+            "quantity",
+            "discount",
+            "discount_type",
+            "addProduct",
+            "clearProducts",
+            "productTableBody",
+            "productsField",
+            "discountTotalValue",
+            "discountTotalType",
+            "applyTotalDiscount",
+            "stock_available",
+            "quantity_warning",
+        ];
+
+        const elements = {};
+        elementIds.forEach((id) => {
+            elements[id] = this.safeGetElement(id);
+        });
+
+        // Map some elements to match the existing code structure
+        elements.orderDate = elements.order_date;
+        elements.dueDate = elements.due_date;
+        elements.customerSelect = elements.customer_id;
+        elements.productSelect = elements.product_id;
+        elements.customerPriceField = elements.customer_price;
+        elements.pastPriceField = elements.past_price;
+        elements.priceField = elements.price;
+        elements.sellingPriceField = elements.selling_price;
+        elements.addProductBtn = elements.addProduct;
+        elements.clearProductsBtn = elements.clearProducts;
+        elements.form = document.querySelector("form");
+
+        return elements;
     }
 
     checkSessionState() {
@@ -191,12 +217,23 @@ class SalesOrderCreate extends SalesOrderModule {
         }
 
         // Product selection events
-        this.elements.productSelect.addEventListener("change", () =>
-            this.updateProductPrices()
-        );
+        this.elements.productSelect.addEventListener("change", () => {
+            this.updateProductPrices();
+            this.updateStockDisplay();
+        });
         this.elements.customerSelect.addEventListener("change", () =>
             this.fetchCustomerPastPrice()
         );
+
+        // Quantity validation
+        if (this.elements.quantity) {
+            this.elements.quantity.addEventListener("input", () =>
+                this.validateQuantity()
+            );
+            this.elements.quantity.addEventListener("change", () =>
+                this.validateQuantity()
+            );
+        }
 
         // Add product button
         this.elements.addProductBtn.addEventListener("click", () =>
@@ -275,6 +312,138 @@ class SalesOrderCreate extends SalesOrderModule {
 
         // Also fetch the customer's past price
         this.fetchCustomerPastPrice();
+    }
+
+    updateStockDisplay() {
+        if (!this.elements.productSelect || !this.elements.stock_available) {
+            return;
+        }
+
+        const selectedOption =
+            this.elements.productSelect.options[
+                this.elements.productSelect.selectedIndex
+            ];
+
+        if (selectedOption && selectedOption.value) {
+            const stock =
+                parseInt(selectedOption.getAttribute("data-stock")) || 0;
+            this.currentStock = stock;
+
+            // Calculate remaining stock (available stock minus already ordered quantity)
+            const orderedQuantity = this.getOrderedQuantityForProduct(
+                selectedOption.value
+            );
+            const remainingStock = Math.max(0, stock - orderedQuantity);
+
+            this.elements.stock_available.textContent = remainingStock;
+
+            // Update stock display styling based on availability
+            this.updateStockStyling(remainingStock);
+
+            // Reset quantity field and warning
+            if (this.elements.quantity) {
+                this.elements.quantity.max = remainingStock;
+                this.elements.quantity.value = "";
+            }
+            this.hideQuantityWarning();
+        } else {
+            this.elements.stock_available.textContent = "-";
+            this.currentStock = 0;
+            if (this.elements.quantity) {
+                this.elements.quantity.removeAttribute("max");
+            }
+            this.hideQuantityWarning();
+        }
+    }
+
+    getOrderedQuantityForProduct(productId) {
+        return this.products
+            .filter((product) => product.id === productId)
+            .reduce((total, product) => total + product.quantity, 0);
+    }
+
+    updateStockStyling(remainingStock) {
+        if (!this.elements.stock_available) return;
+
+        // Remove existing classes
+        this.elements.stock_available.classList.remove(
+            "text-primary",
+            "text-warning",
+            "text-danger"
+        );
+
+        // Apply styling based on stock level
+        if (remainingStock === 0) {
+            this.elements.stock_available.classList.add("text-danger");
+        } else if (remainingStock <= 5) {
+            this.elements.stock_available.classList.add("text-warning");
+        } else {
+            this.elements.stock_available.classList.add("text-primary");
+        }
+    }
+
+    validateQuantity() {
+        if (!this.elements.quantity || !this.elements.productSelect) {
+            return true;
+        }
+
+        const quantity = parseInt(this.elements.quantity.value) || 0;
+        const selectedOption =
+            this.elements.productSelect.options[
+                this.elements.productSelect.selectedIndex
+            ];
+
+        if (!selectedOption || !selectedOption.value) {
+            this.hideQuantityWarning();
+            return true;
+        }
+
+        const productId = selectedOption.value;
+        const stock = parseInt(selectedOption.getAttribute("data-stock")) || 0;
+        const orderedQuantity = this.getOrderedQuantityForProduct(productId);
+        const remainingStock = Math.max(0, stock - orderedQuantity);
+
+        if (quantity > remainingStock) {
+            this.showQuantityWarning();
+            this.disableAddButton();
+            return false;
+        } else {
+            this.hideQuantityWarning();
+            this.enableAddButton();
+            return true;
+        }
+    }
+
+    showQuantityWarning() {
+        if (this.elements.quantity_warning) {
+            this.elements.quantity_warning.classList.remove("d-none");
+        }
+        if (this.elements.quantity) {
+            this.elements.quantity.classList.add("is-invalid");
+        }
+    }
+
+    hideQuantityWarning() {
+        if (this.elements.quantity_warning) {
+            this.elements.quantity_warning.classList.add("d-none");
+        }
+        if (this.elements.quantity) {
+            this.elements.quantity.classList.remove("is-invalid");
+        }
+    }
+
+    disableAddButton() {
+        if (this.elements.addProductBtn) {
+            this.elements.addProductBtn.disabled = true;
+            this.elements.addProductBtn.classList.add("disabled");
+        }
+    }
+
+    enableAddButton() {
+        if (this.elements.addProductBtn) {
+            this.elements.addProductBtn.disabled = false;
+            this.elements.addProductBtn.classList.remove("disabled");
+        }
     }
 
     fetchCustomerPastPrice() {
@@ -358,15 +527,36 @@ class SalesOrderCreate extends SalesOrderModule {
     }
 
     addProduct() {
+        if (
+            !this.elements.productSelect ||
+            !this.elements.quantity ||
+            !this.elements.customerPriceField
+        ) {
+            console.warn("Required form elements not found for adding product");
+            return;
+        }
+
+        // Validate quantity first
+        if (!this.validateQuantity()) {
+            return;
+        }
+
         const productId = this.elements.productSelect.value;
         const productName =
             this.elements.productSelect.options[
                 this.elements.productSelect.selectedIndex
             ].text;
-        const quantity = parseInt(this.elements.quantity.value);
-        const price = parseFloat(this.elements.customerPriceField.value);
-        const discount = parseFloat(this.elements.discount.value) || 0;
-        const discountType = this.elements.discountType.value;
+        const quantity = parseInt(this.elements.quantity.value) || 0;
+        const price = parseFloat(this.elements.customerPriceField.value) || 0;
+        const discount = parseFloat(this.elements.discount?.value) || 0;
+        const discountType = this.elements.discount_type?.value || "fixed";
+
+        // Get stock for the product
+        const selectedOption =
+            this.elements.productSelect.options[
+                this.elements.productSelect.selectedIndex
+            ];
+        const stock = parseInt(selectedOption.getAttribute("data-stock")) || 0;
 
         // Generate unique ID for better product tracking
         const uniqueId = `${Date.now()}-${Math.random()
@@ -390,18 +580,37 @@ class SalesOrderCreate extends SalesOrderModule {
             discount,
             discountType,
             total,
+            stock,
         });
 
         this.renderTable();
+        this.clearProductForm();
+        this.updateStockDisplay(); // Refresh stock display after adding
+    }
 
-        // Reset form fields
-        this.elements.productSelect.value = "";
-        this.elements.quantity.value = "";
-        this.elements.customerPriceField.value = "";
-        this.elements.discount.value = "";
-        this.elements.priceField.value = "";
-        this.elements.sellingPriceField.value = "";
-        this.elements.pastPriceField.value = "";
+    clearProductForm() {
+        const formFields = [
+            "productSelect",
+            "quantity",
+            "customerPriceField",
+            "discount",
+            "priceField",
+            "sellingPriceField",
+            "pastPriceField",
+        ];
+
+        formFields.forEach((fieldName) => {
+            if (this.elements[fieldName]) {
+                this.elements[fieldName].value = "";
+            }
+        });
+
+        // Reset stock display
+        if (this.elements.stock_available) {
+            this.elements.stock_available.textContent = "-";
+        }
+        this.hideQuantityWarning();
+        this.enableAddButton();
     }
 
     clearProducts() {
@@ -416,6 +625,7 @@ class SalesOrderCreate extends SalesOrderModule {
             this.elements.discountTotalType.value = "fixed";
 
         this.renderTable();
+        this.updateStockDisplay(); // Refresh stock display after clearing
     }
 
     applyOrderDiscount() {
@@ -441,28 +651,51 @@ class SalesOrderCreate extends SalesOrderModule {
         this.elements.productTableBody.innerHTML = "";
 
         this.products.forEach((product, index) => {
+            // Calculate remaining stock for this product
+            const totalOrderedForProduct = this.products
+                .filter((p) => p.id === product.id)
+                .reduce((sum, p) => sum + p.quantity, 0);
+            const remainingStock = Math.max(
+                0,
+                product.stock - totalOrderedForProduct + product.quantity
+            );
+
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${index + 1}</td>
+                <td class="text-center">${index + 1}</td>
                 <td>${product.name}</td>
-                <td>
-                    <input type="number" class="form-control quantity-input"
+                <td class="text-center">
+                    <span class="badge ${
+                        remainingStock === 0
+                            ? "bg-danger"
+                            : remainingStock <= 5
+                            ? "bg-warning"
+                            : "bg-success"
+                    }">
+                        ${remainingStock}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <input type="number" class="form-control quantity-input text-center"
                         value="${product.quantity}" data-unique-id="${
                 product.uniqueId
-            }" min="1" style="width:80px;" />
+            }"
+                        min="1" max="${product.stock}" style="width:80px;" />
                 </td>
-                <td>
-                    <input type="number" class="form-control price-input"
+                <td class="text-center">
+                    <input type="number" class="form-control price-input text-center"
                         value="${product.price}" data-unique-id="${
                 product.uniqueId
-            }" min="0" style="width:100px;" />
+            }"
+                        min="0" step="0.01" style="width:100px;" />
                 </td>
-                <td>
+                <td class="text-center">
                     <div class="input-group" style="width:200px;">
-                        <input type="number" class="form-control discount-input"
+                        <input type="number" class="form-control discount-input text-center"
                             value="${product.discount}" data-unique-id="${
                 product.uniqueId
-            }" min="0" />
+            }"
+                            min="0" step="0.01" />
                         <select class="form-select discount-type" data-unique-id="${
                             product.uniqueId
                         }">
@@ -479,13 +712,16 @@ class SalesOrderCreate extends SalesOrderModule {
                         </select>
                     </div>
                 </td>
-                <td class="product-total">${this.formatCurrency(
+                <td class="text-end product-total fw-bold">${this.formatCurrency(
                     product.total
                 )}</td>
-                <td style="text-align:center">
-                    <button type="button" class="btn btn-danger btn-sm removeProduct" data-unique-id="${
-                        product.uniqueId
-                    }">Remove</button>
+                <td class="text-center">
+                    <button type="button" class="btn btn-danger btn-sm removeProduct"
+                        data-unique-id="${
+                            product.uniqueId
+                        }" title="Remove Product">
+                        <i class="ti ti-trash"></i>
+                    </button>
                 </td>
             `;
             this.elements.productTableBody.appendChild(row);
@@ -496,7 +732,7 @@ class SalesOrderCreate extends SalesOrderModule {
     }
 
     attachTableEventListeners() {
-        // Event delegation approach (similar to PurchaseOrderCreate)
+        // Remove existing listeners to prevent duplicates
         const newTableBody = this.elements.productTableBody.cloneNode(true);
         this.elements.productTableBody.parentNode.replaceChild(
             newTableBody,
@@ -527,7 +763,22 @@ class SalesOrderCreate extends SalesOrderModule {
         if (!product) return;
 
         if (target.classList.contains("quantity-input")) {
-            product.quantity = parseInt(target.value) || 1;
+            const newQuantity = parseInt(target.value) || 1;
+
+            // Validate quantity against stock for this specific product
+            const totalOrderedForProduct = this.products
+                .filter((p) => p.id === product.id && p.uniqueId !== uniqueId)
+                .reduce((sum, p) => sum + p.quantity, 0);
+
+            if (newQuantity + totalOrderedForProduct > product.stock) {
+                target.classList.add("is-invalid");
+                // Revert to previous valid value
+                target.value = product.quantity;
+                return;
+            } else {
+                target.classList.remove("is-invalid");
+                product.quantity = newQuantity;
+            }
         } else if (target.classList.contains("price-input")) {
             product.price = parseFloat(target.value) || 0;
         } else if (target.classList.contains("discount-input")) {
@@ -535,6 +786,7 @@ class SalesOrderCreate extends SalesOrderModule {
         }
 
         this.updateProductInTable(product, target);
+        this.updateStockDisplay(); // Refresh stock display after any change
     }
 
     handleTableChange(event) {
@@ -556,6 +808,7 @@ class SalesOrderCreate extends SalesOrderModule {
         const uniqueId = target.dataset.uniqueId;
         this.products = this.products.filter((p) => p.uniqueId !== uniqueId);
         this.renderTable();
+        this.updateStockDisplay(); // Refresh stock display after removal
     }
 
     updateProductInTable(product, targetElement) {

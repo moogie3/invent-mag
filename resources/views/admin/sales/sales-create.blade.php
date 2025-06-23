@@ -56,22 +56,32 @@
 
                             <h5 class="text-muted fw-bold mt-2 mb-3">Add Product to Order</h5>
                             <div class="row g-3">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label fw-bold">Product</label>
                                     <select class="form-select" name="product_id" id="product_id">
                                         <option value="">Select Product</option>
                                         @foreach ($products as $product)
                                             <option value="{{ $product->id }}" data-price="{{ $product->price }}"
-                                                data-selling-price="{{ $product->selling_price }}">
+                                                data-selling-price="{{ $product->selling_price }}"
+                                                data-stock="{{ $product->stock_quantity ?? 0 }}">
                                                 {{ $product->name }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-1">
-                                    <label class="form-label fw-bold">Quantity</label>
-                                    <input type="text" class="form-control" name="quantity" id="quantity"
-                                        placeholder="0" />
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Stock & Quantity</label>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <div class="form-control bg-light d-flex align-items-center" style="width: 50%;">
+                                            <i class="ti ti-package me-2 text-muted"></i>
+                                            <span id="stock_available" class="fw-bold text-primary">-</span>
+                                        </div>
+                                        <input type="number" min="1" class="form-control" name="quantity"
+                                            id="quantity" placeholder="0" />
+                                    </div>
+                                    <small id="quantity_warning" class="text-danger d-none mt-1">
+                                        <i class="ti ti-alert-triangle"></i> Exceeds available stock!
+                                    </small>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold">Customer Price</label>
@@ -137,6 +147,7 @@
                                         <tr>
                                             <th>NO</th>
                                             <th>Product</th>
+                                            <th>Available Stock</th>
                                             <th>Quantity</th>
                                             <th>Price</th>
                                             <th>Discount</th>

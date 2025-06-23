@@ -41,7 +41,7 @@
 @endif
 
 {{-- SCRIPT FOR PRODUCT --}}
-@if (request()->is('admin/product', 'admin/product/edit/*', 'admin/products/create'))
+@if (request()->is('admin/product', 'admin/product/edit/*', 'admin/product/create'))
     <script src="{{ asset('js/admin/product.js') }}"></script>
 @endif
 

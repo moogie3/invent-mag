@@ -1,377 +1,1189 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Initialize modals (if present)
     initModals();
-
-    // Initialize expiry checkbox toggle functionality
     initExpiryCheckbox();
-
-    // Initialize flatpickr
     initFlatpickr();
-
-    // Initialize product modal details + print
     initProductModal();
-
-    // Initialize bulk selection functionality
     initBulkSelection();
+    initializeSearch();
+    initExpiryDateToggle();
+    initializeEntriesSelector();
 });
 
+// Store selected checkbox states globally
+let selectedProductIds = new Set();
+
+// MODAL INITIALIZATION
 function initModals() {
-    // Low stock modal initialization
-    const viewLowStockBtn = document.getElementById("viewLowStock");
-    if (viewLowStockBtn) {
-        const lowStockModalEl = document.getElementById("lowStockModal");
-        const lowStockModal = new bootstrap.Modal(lowStockModalEl);
+    const modals = [
+        { btnId: "viewLowStock", modalId: "lowStockModal" },
+        { btnId: "viewExpiringSoon", modalId: "expiringSoonModal" },
+    ];
 
-        viewLowStockBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            lowStockModal.show();
-        });
-    }
-
-    // Expiring soon modal initialization
-    const viewExpiringSoonBtn = document.getElementById("viewExpiringSoon");
-    if (viewExpiringSoonBtn) {
-        const expiringSoonModalEl =
-            document.getElementById("expiringSoonModal");
-        const expiringSoonModal = new bootstrap.Modal(expiringSoonModalEl);
-
-        viewExpiringSoonBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            expiringSoonModal.show();
-        });
-    }
+    modals.forEach(({ btnId, modalId }) => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            const modal = new bootstrap.Modal(document.getElementById(modalId));
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                modal.show();
+            });
+        }
+    });
 }
 
+// EXPIRY CHECKBOX TOGGLE
 function initExpiryCheckbox() {
-    const hasExpiryCheckbox = document.getElementById("has_expiry");
-    const expiryDateContainer = document.getElementById(
-        "expiry_date_container"
-    );
+    const checkbox = document.getElementById("has_expiry");
+    const container = document.getElementById("expiry_date_container");
 
-    if (hasExpiryCheckbox && expiryDateContainer) {
-        expiryDateContainer.style.display = hasExpiryCheckbox.checked
-            ? "block"
-            : "none";
+    if (checkbox && container) {
+        container.style.display = checkbox.checked ? "block" : "none";
 
-        hasExpiryCheckbox.addEventListener("change", function () {
-            expiryDateContainer.style.display = this.checked ? "block" : "none";
-
+        checkbox.addEventListener("change", function () {
+            container.style.display = this.checked ? "block" : "none";
             if (this.checked) {
-                const dateInput = expiryDateContainer.querySelector(
+                const dateInput = container.querySelector(
                     "input[name='expiry_date']"
                 );
-                if (dateInput && dateInput._flatpickr) {
-                    dateInput._flatpickr.redraw();
-                }
+                dateInput?._flatpickr?.redraw();
             }
         });
     }
 }
 
+// FLATPICKR INITIALIZATION
 function initFlatpickr() {
     if (typeof flatpickr !== "function") {
-        console.error(
-            "Flatpickr is not loaded. Please include the Flatpickr library."
-        );
+        console.error("Flatpickr is not loaded");
         return;
     }
 
-    const expiryDateInput = document.querySelector("input[name='expiry_date']");
-
-    if (expiryDateInput) {
-        flatpickr(expiryDateInput, {
+    const expiryInput = document.querySelector("input[name='expiry_date']");
+    if (expiryInput) {
+        flatpickr(expiryInput, {
             dateFormat: "Y-m-d",
             altInput: true,
             altFormat: "d-m-Y",
             allowInput: true,
-            defaultDate: expiryDateInput.value || null,
+            defaultDate: expiryInput.value || null,
         });
     }
 }
 
-// NEW: Initializes the product modal loading + print button
+// PRODUCT MODAL
 function initProductModal() {
-    const printButton = document.getElementById("productModalPrint");
-
-    if (printButton) {
-        printButton.addEventListener("click", handleProductModalPrint);
-    }
+    const printBtn = document.getElementById("productModalPrint");
+    if (printBtn) printBtn.addEventListener("click", handleProductModalPrint);
 }
 
-// NEW: Initialize bulk selection functionality
+// BULK SELECTION WITH PERSISTENT STATE
 function initBulkSelection() {
-    const maxAttempts = 5;
     let attempts = 0;
+    const maxAttempts = 5;
 
     const tryInit = () => {
         attempts++;
-
-        const selectAllCheckbox = document.getElementById("selectAll");
-        const rowCheckboxes = document.querySelectorAll(".row-checkbox");
-        const bulkActionsBar = document.getElementById("bulkActionsBar");
-        const selectedCount = document.getElementById("selectedCount");
+        const elements = {
+            selectAll: document.getElementById("selectAll"),
+            rowCheckboxes: document.querySelectorAll(".row-checkbox"),
+            bulkBar: document.getElementById("bulkActionsBar"),
+            selectedCount: document.getElementById("selectedCount"),
+        };
 
         if (
-            !selectAllCheckbox ||
-            rowCheckboxes.length === 0 ||
-            !bulkActionsBar ||
-            !selectedCount
+            !elements.selectAll ||
+            !elements.bulkBar ||
+            elements.rowCheckboxes.length === 0
         ) {
             if (attempts < maxAttempts) {
-                console.log(
-                    `Bulk selection init attempt ${attempts}/${maxAttempts} - retrying...`
-                );
                 setTimeout(tryInit, 300);
                 return;
             }
-
-            console.warn(
-                "Bulk selection elements not found after",
-                maxAttempts,
-                "attempts"
-            );
+            console.warn("Bulk selection elements not found");
             return;
         }
 
-        setupBulkSelectionListeners(
-            selectAllCheckbox,
-            rowCheckboxes,
-            bulkActionsBar,
-            selectedCount
-        );
-        updateBulkUI(
-            selectAllCheckbox,
-            rowCheckboxes,
-            bulkActionsBar,
-            selectedCount
-        );
-        console.log("Bulk selection initialized successfully");
+        setupBulkSelectionListeners(elements);
+        updateBulkUI(elements);
+        // Restore checkbox states after initialization
+        restoreCheckboxStates();
     };
 
     tryInit();
 }
 
-function setupBulkSelectionListeners(
-    selectAllCheckbox,
+function setupBulkSelectionListeners({
+    selectAll,
     rowCheckboxes,
-    bulkActionsBar,
-    selectedCount
-) {
-    // Select all functionality
-    selectAllCheckbox.addEventListener("change", (e) => {
-        const isChecked = e.target.checked;
-        rowCheckboxes.forEach((checkbox) => {
-            checkbox.checked = isChecked;
+    bulkBar,
+    selectedCount,
+}) {
+    selectAll.addEventListener("change", (e) => {
+        rowCheckboxes.forEach((cb) => {
+            cb.checked = e.target.checked;
+            if (e.target.checked) {
+                selectedProductIds.add(cb.value);
+            } else {
+                selectedProductIds.delete(cb.value);
+            }
         });
-        updateBulkUI(
-            selectAllCheckbox,
-            rowCheckboxes,
-            bulkActionsBar,
-            selectedCount
-        );
+        updateBulkUI({ selectAll, rowCheckboxes, bulkBar, selectedCount });
     });
 
-    // Individual checkbox changes
-    rowCheckboxes.forEach((checkbox) => {
-        checkbox.addEventListener("change", () => {
-            updateSelectAllState(selectAllCheckbox, rowCheckboxes);
-            updateBulkActionsBar(rowCheckboxes, bulkActionsBar, selectedCount);
+    rowCheckboxes.forEach((cb) => {
+        cb.addEventListener("change", () => {
+            if (cb.checked) {
+                selectedProductIds.add(cb.value);
+            } else {
+                selectedProductIds.delete(cb.value);
+            }
+            updateSelectAllState(selectAll, rowCheckboxes);
+            updateBulkActionsBar(rowCheckboxes, bulkBar, selectedCount);
         });
     });
 }
 
-function updateSelectAllState(selectAllCheckbox, rowCheckboxes) {
-    const totalCheckboxes = rowCheckboxes.length;
-    const checkedCheckboxes = document.querySelectorAll(
-        ".row-checkbox:checked"
-    ).length;
+function restoreCheckboxStates() {
+    document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+        if (selectedProductIds.has(checkbox.value)) {
+            checkbox.checked = true;
+        }
+    });
+}
 
-    if (checkedCheckboxes === 0) {
-        selectAllCheckbox.indeterminate = false;
-        selectAllCheckbox.checked = false;
-    } else if (checkedCheckboxes === totalCheckboxes) {
-        selectAllCheckbox.indeterminate = false;
-        selectAllCheckbox.checked = true;
+function updateSelectAllState(selectAll, rowCheckboxes) {
+    const checked = document.querySelectorAll(".row-checkbox:checked").length;
+    const total = rowCheckboxes.length;
+
+    if (checked === 0) {
+        selectAll.indeterminate = false;
+        selectAll.checked = false;
+    } else if (checked === total) {
+        selectAll.indeterminate = false;
+        selectAll.checked = true;
     } else {
-        selectAllCheckbox.indeterminate = true;
-        selectAllCheckbox.checked = false;
+        selectAll.indeterminate = true;
+        selectAll.checked = false;
     }
 }
 
-function updateBulkActionsBar(rowCheckboxes, bulkActionsBar, selectedCount) {
-    const checkedCount = document.querySelectorAll(
-        ".row-checkbox:checked"
-    ).length;
-
-    if (checkedCount > 0) {
-        bulkActionsBar.style.display = "block";
-        selectedCount.textContent = checkedCount;
-    } else {
-        bulkActionsBar.style.display = "none";
-    }
+function updateBulkActionsBar(rowCheckboxes, bulkBar, selectedCount) {
+    const checked = document.querySelectorAll(".row-checkbox:checked").length;
+    bulkBar.style.display = checked > 0 ? "block" : "none";
+    selectedCount.textContent = checked;
 }
 
-function updateBulkUI(
-    selectAllCheckbox,
-    rowCheckboxes,
-    bulkActionsBar,
-    selectedCount
-) {
-    updateSelectAllState(selectAllCheckbox, rowCheckboxes);
-    updateBulkActionsBar(rowCheckboxes, bulkActionsBar, selectedCount);
-}
-
-// Function to load product details into modal
-function loadProductDetails(id) {
-    const viewProductModalContent = document.getElementById(
-        "viewProductModalContent"
+function updateBulkUI(elements) {
+    updateSelectAllState(elements.selectAll, elements.rowCheckboxes);
+    updateBulkActionsBar(
+        elements.rowCheckboxes,
+        elements.bulkBar,
+        elements.selectedCount
     );
-    const productModalEdit = document.getElementById("productModalEdit");
+}
 
-    if (!viewProductModalContent || !productModalEdit) {
-        console.error("Modal content or edit button not found!");
+// PRODUCT DETAILS LOADING
+function loadProductDetails(id) {
+    const content = document.getElementById("viewProductModalContent");
+    const editBtn = document.getElementById("productModalEdit");
+
+    if (!content || !editBtn) {
+        console.error("Modal elements not found");
         return;
     }
 
-    productModalEdit.href = `/admin/product/edit/${id}`;
-
-    viewProductModalContent.innerHTML = `
+    editBtn.href = `/admin/product/edit/${id}`;
+    content.innerHTML = `
         <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-3 text-muted">Loading product details...</p>
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-3 text-muted">Loading...</p>
         </div>
     `;
 
     fetch(`/admin/product/modal-view/${id}`)
         .then((response) => {
-            if (!response.ok) throw new Error("Network response was not ok");
+            if (!response.ok) throw new Error("Network error");
             return response.json();
         })
-        .then((data) => {
-            const template = document.getElementById(
-                "productModalViewTemplate"
-            ).innerHTML;
-            viewProductModalContent.innerHTML = template;
-
-            // Fill in product details
-            setText("productName", data.name);
-            setText("productCode", `Code: ${data.code}`);
-
-            // Stock status
-            const stockStatusElement = document.getElementById("stockStatus");
-            const threshold = data.low_stock_threshold || 10;
-            if (data.stock_quantity <= threshold) {
-                setBadge(stockStatusElement, "Low Stock", "bg-danger-lt");
-            } else {
-                setBadge(stockStatusElement, "In Stock", "bg-success-lt");
-            }
-
-            // Image
-            document.getElementById("productImage").src =
-                data.image || "/images/default-product.png";
-
-            // Basic info
-            setText("productCategory", data.category?.name || "N/A");
-            setText("productUnit", data.unit?.symbol || "N/A");
-            setText("productQuantity", data.stock_quantity);
-
-            // Threshold + note
-            const thresholdElement =
-                document.getElementById("productThreshold");
-            const thresholdNoteElement = document.getElementById(
-                "thresholdDefaultNote"
-            );
-
-            if (data.low_stock_threshold) {
-                setText("productThreshold", data.low_stock_threshold);
-                if (thresholdNoteElement)
-                    thresholdNoteElement.style.display = "none";
-            } else {
-                setText("productThreshold", "10");
-                if (thresholdNoteElement)
-                    thresholdNoteElement.textContent = " (default)";
-            }
-
-            // Supplier & warehouse
-            setText("productSupplier", data.supplier?.name || "N/A");
-            setText("productWarehouse", data.warehouse?.name || "N/A");
-
-            // Expiry date
-            if (data.has_expiry && data.expiry_date) {
-                const expiryDate = new Date(data.expiry_date);
-                const formattedDate = expiryDate.toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                });
-                const badge = getExpiryBadge(data.expiry_date);
-                document.getElementById("productExpiry").innerHTML =
-                    formattedDate + badge;
-            } else {
-                setText("productExpiry", "N/A");
-            }
-
-            // Pricing
-            setText("productPrice", data.formatted_price || data.price);
-            setText(
-                "productSellingPrice",
-                data.formatted_selling_price || data.selling_price
-            );
-
-            // Margin
-            const margin = (
-                ((data.selling_price - data.price) / data.price) *
-                100
-            ).toFixed(2);
-            setText("productMargin", margin + "%");
-
-            // Description
-            const descContainer = document.getElementById(
-                "productDescriptionContainer"
-            );
-            const descElement = document.getElementById("productDescription");
-            if (data.description) {
-                setText("productDescription", data.description);
-            } else if (descContainer) {
-                descContainer.style.display = "none";
-            }
-        })
+        .then((data) => renderProductDetails(data))
         .catch((error) => {
-            viewProductModalContent.innerHTML = `
-                <div class="alert alert-danger m-3">
-                    <i class="ti ti-alert-circle me-2"></i> Error loading product details: ${error.message}
-                </div>
-            `;
-            console.error("Error loading product details:", error);
+            content.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
         });
 }
 
+function renderProductDetails(data) {
+    const content = document.getElementById("viewProductModalContent");
+    const template = document.getElementById(
+        "productModalViewTemplate"
+    ).innerHTML;
+    content.innerHTML = template;
+
+    // Fill basic info
+    setText("productName", data.name);
+    setText("productCode", `Code: ${data.code}`);
+    setText("productCategory", data.category?.name || "N/A");
+    setText("productUnit", data.unit?.symbol || "N/A");
+    setText("productQuantity", data.stock_quantity);
+    setText("productSupplier", data.supplier?.name || "N/A");
+    setText("productWarehouse", data.warehouse?.name || "N/A");
+
+    // Stock status
+    const threshold = data.low_stock_threshold || 10;
+    const stockElement = document.getElementById("stockStatus");
+    const isLowStock = data.stock_quantity <= threshold;
+    setBadge(
+        stockElement,
+        isLowStock ? "Low Stock" : "In Stock",
+        isLowStock ? "bg-danger-lt" : "bg-success-lt"
+    );
+
+    // Image
+    document.getElementById("productImage").src =
+        data.image || "/images/default-product.png";
+
+    // Threshold
+    const thresholdElement = document.getElementById("productThreshold");
+    const thresholdNote = document.getElementById("thresholdDefaultNote");
+    setText("productThreshold", data.low_stock_threshold || "10");
+    if (thresholdNote) {
+        thresholdNote.style.display = data.low_stock_threshold
+            ? "none"
+            : "inline";
+    }
+
+    // Expiry date
+    if (data.has_expiry && data.expiry_date) {
+        const date = new Date(data.expiry_date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+        });
+        document.getElementById("productExpiry").innerHTML =
+            date + getExpiryBadge(data.expiry_date);
+    } else {
+        setText("productExpiry", "N/A");
+    }
+
+    // Pricing
+    setText("productPrice", data.formatted_price || data.price);
+    setText(
+        "productSellingPrice",
+        data.formatted_selling_price || data.selling_price
+    );
+
+    const margin = (
+        ((data.selling_price - data.price) / data.price) *
+        100
+    ).toFixed(2);
+    setText("productMargin", margin + "%");
+
+    // Description
+    const descContainer = document.getElementById(
+        "productDescriptionContainer"
+    );
+    if (data.description) {
+        setText("productDescription", data.description);
+    } else if (descContainer) {
+        descContainer.style.display = "none";
+    }
+}
+
+// PRINT FUNCTIONALITY
 function handleProductModalPrint() {
-    const printContent = document.getElementById(
+    const content = document.getElementById(
         "viewProductModalContent"
     ).innerHTML;
-    const originalContent = document.body.innerHTML;
+    const original = document.body.innerHTML;
 
     document.body.innerHTML = `
         <div class="container print-container">
-            <div class="card">
-                <div class="card-body">
-                    ${printContent}
-                </div>
-            </div>
+            <div class="card"><div class="card-body">${content}</div></div>
         </div>
     `;
 
     window.print();
-    document.body.innerHTML = originalContent;
-
-    // Optional: reload to re-initialize everything
+    document.body.innerHTML = original;
     setTimeout(() => window.location.reload(), 100);
 }
 
-// Helper functions
+// BULK ACTIONS
+window.clearProductSelection = function () {
+    const selectAll = document.getElementById("selectAll");
+    const checkboxes = document.querySelectorAll(".row-checkbox");
+    const bulkBar = document.getElementById("bulkActionsBar");
+
+    selectedProductIds.clear(); // Clear the global state
+
+    if (selectAll) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+    }
+    checkboxes.forEach((cb) => (cb.checked = false));
+    if (bulkBar) bulkBar.style.display = "none";
+};
+
+window.getSelectedProductIds = function () {
+    return Array.from(selectedProductIds);
+};
+
+window.bulkDeleteProducts = function () {
+    const selected = getSelectedProductIds();
+    if (!selected.length) {
+        showToast("Warning", "Please select products to delete.", "warning");
+        return;
+    }
+
+    document.getElementById("bulkDeleteCount").textContent = selected.length;
+    const modal = new bootstrap.Modal(
+        document.getElementById("bulkDeleteModal")
+    );
+    modal.show();
+
+    const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
+    const newBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+    newBtn.addEventListener("click", () =>
+        performBulkDelete(selected, newBtn, modal)
+    );
+};
+
+window.bulkExportProducts = function () {
+    const selected = getSelectedProductIds();
+    if (!selected.length) {
+        showToast("Warning", "Please select products to export.", "warning");
+        return;
+    }
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/admin/product/bulk-export";
+    form.style.display = "none";
+
+    // CSRF token
+    const csrf = document.querySelector('meta[name="csrf-token"]');
+    if (csrf) {
+        const token = document.createElement("input");
+        token.type = "hidden";
+        token.name = "_token";
+        token.value = csrf.getAttribute("content");
+        form.appendChild(token);
+    }
+
+    // Selected IDs
+    selected.forEach((id) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "ids[]";
+        input.value = id;
+        form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => document.body.removeChild(form), 2000);
+};
+
+window.bulkUpdateStock = function () {
+    const selected = getSelectedProductIds();
+    if (!selected.length) {
+        showToast("Warning", "Please select products to update.", "warning");
+        return;
+    }
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("bulkUpdateStockModal")
+    );
+    modal.show();
+    loadBulkUpdateProductsFromTable(selected);
+};
+
+// BULK DELETE
+function performBulkDelete(ids, button, modal) {
+    const original = button.innerHTML;
+    button.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Deleting...';
+    button.disabled = true;
+
+    const csrf = document.querySelector('meta[name="csrf-token"]');
+    if (!csrf) {
+        showToast("Error", "Security token not found.", "error");
+        resetButton(button, original);
+        return;
+    }
+
+    fetch("/admin/product/bulk-delete", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrf.getAttribute("content"),
+            Accept: "application/json",
+        },
+        body: JSON.stringify({ ids }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                modal.hide();
+                showToast(
+                    "Success",
+                    `${
+                        data.deleted_count || ids.length
+                    } products deleted successfully!`,
+                    "success"
+                );
+                clearProductSelection();
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast("Error", data.message || "Delete failed.", "error");
+            }
+        })
+        .catch((error) => {
+            console.error("Delete error:", error);
+            showToast(
+                "Error",
+                "An error occurred while deleting products.",
+                "error"
+            );
+        })
+        .finally(() => {
+            resetButton(button, original);
+        });
+}
+
+// BULK STOCK UPDATE
+function loadBulkUpdateProductsFromTable(ids) {
+    const content = document.getElementById("bulkUpdateStockContent");
+    const countElement = document.getElementById("updateStockCount");
+
+    const validIds = ids
+        .map((id) => parseInt(id))
+        .filter((id) => !isNaN(id) && id > 0);
+
+    if (!validIds.length) {
+        content.innerHTML =
+            '<div class="alert alert-danger">No valid products selected.</div>';
+        return;
+    }
+
+    countElement.textContent = validIds.length;
+
+    // Use stored product data instead of DOM extraction
+    const products = validIds
+        .map((id) => {
+            const idStr = id.toString();
+
+            // First try to get from stored original data
+            if (originalProductData.has(idStr)) {
+                return originalProductData.get(idStr);
+            }
+
+            // Fallback to DOM extraction if not in stored data
+            const row = document.querySelector(`tr[data-id="${id}"]`);
+            if (row) {
+                return extractProductDataFromRow(row);
+            }
+
+            return null;
+        })
+        .filter(Boolean);
+
+    if (!products.length) {
+        content.innerHTML =
+            '<div class="alert alert-danger">Could not find product data for selected items.</div>';
+        return;
+    }
+
+    renderBulkUpdateProducts(products);
+    initializeBulkUpdateHandlers();
+}
+
+function renderBulkUpdateProducts(products) {
+    const content = document.getElementById("bulkUpdateStockContent");
+    const template = document.getElementById("stockUpdateRowTemplate");
+
+    if (!template) return;
+
+    content.innerHTML = "";
+
+    products.forEach((product) => {
+        const row = template.cloneNode(true);
+        row.style.display = "block";
+        row.dataset.productId = product.id.toString();
+        row.classList.add("stock-update-row");
+
+        // Fill product data
+        const elements = {
+            img: row.querySelector(".product-image"),
+            name: row.querySelector(".product-name"),
+            code: row.querySelector(".product-code"),
+            currentStock: row.querySelector(".current-stock"),
+            newStockInput: row.querySelector(".new-stock-input"),
+        };
+
+        if (elements.img) {
+            elements.img.src = product.image_src;
+            elements.img.onerror = () =>
+                (elements.img.src = "/images/default-product.png");
+        }
+        if (elements.name) elements.name.textContent = product.name;
+        if (elements.code) elements.code.textContent = `Code: ${product.code}`;
+        if (elements.currentStock)
+            elements.currentStock.textContent = product.stock_quantity;
+        if (elements.newStockInput) {
+            elements.newStockInput.value = product.stock_quantity;
+            elements.newStockInput.dataset.originalStock =
+                product.stock_quantity.toString();
+        }
+
+        content.appendChild(row);
+    });
+
+    initializeStockRowHandlers();
+}
+
+function initializeStockRowHandlers() {
+    document.querySelectorAll(".stock-update-row").forEach((row) => {
+        const decrease = row.querySelector(".decrease-btn");
+        const increase = row.querySelector(".increase-btn");
+        const input = row.querySelector(".new-stock-input");
+
+        if (decrease) {
+            decrease.addEventListener("click", () => {
+                const current = parseInt(input.value) || 0;
+                if (current > 0) {
+                    input.value = current - 1;
+                    updateStockChangeDisplay(row);
+                }
+            });
+        }
+
+        if (increase) {
+            increase.addEventListener("click", () => {
+                const current = parseInt(input.value) || 0;
+                input.value = current + 1;
+                updateStockChangeDisplay(row);
+            });
+        }
+
+        if (input) {
+            input.addEventListener("input", () =>
+                updateStockChangeDisplay(row)
+            );
+        }
+    });
+}
+
+function updateStockChangeDisplay(row) {
+    const input = row.querySelector(".new-stock-input");
+    const badge = row.querySelector(".stock-change-badge");
+    if (!input || !badge) return;
+
+    const original = parseInt(input.dataset.originalStock) || 0;
+    const current = parseInt(input.value) || 0;
+    const change = current - original;
+
+    if (change === 0) {
+        badge.textContent = "No change";
+        badge.className = "badge stock-change-badge bg-secondary-lt";
+    } else if (change > 0) {
+        badge.textContent = `+${change}`;
+        badge.className = "badge stock-change-badge bg-success-lt";
+    } else {
+        badge.textContent = change.toString();
+        badge.className = "badge stock-change-badge bg-danger-lt";
+    }
+}
+
+function initializeBulkUpdateHandlers() {
+    const confirmBtn = document.getElementById("confirmBulkUpdateBtn");
+    if (confirmBtn) {
+        const newBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+        newBtn.addEventListener("click", handleBulkStockUpdate);
+    }
+}
+
+function handleBulkStockUpdate() {
+    const rows = document.querySelectorAll(".stock-update-row");
+    const updates = [];
+
+    rows.forEach((row) => {
+        const id = parseInt(row.dataset.productId);
+        const input = row.querySelector(".new-stock-input");
+        if (!input || isNaN(id)) return;
+
+        const newStock = parseInt(input.value);
+        const originalStock = parseInt(input.dataset.originalStock) || 0;
+
+        if (!isNaN(newStock) && newStock >= 0) {
+            updates.push({
+                id,
+                stock_quantity: newStock,
+                original_stock: originalStock,
+            });
+        }
+    });
+
+    if (!updates.length) {
+        showToast("Error", "No valid updates found.", "error");
+        return;
+    }
+
+    const hasChanges = updates.some(
+        (u) => u.original_stock !== u.stock_quantity
+    );
+    if (!hasChanges) {
+        showToast("Info", "No changes detected.", "info");
+        return;
+    }
+
+    const confirmBtn = document.getElementById("confirmBulkUpdateBtn");
+    const original = confirmBtn.innerHTML;
+    confirmBtn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+    confirmBtn.disabled = true;
+
+    const csrf = document.querySelector('meta[name="csrf-token"]');
+    if (!csrf) {
+        showToast("Error", "Security token not found.", "error");
+        resetButton(confirmBtn, original);
+        return;
+    }
+
+    fetch("/admin/product/bulk-update-stock", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrf.getAttribute("content"),
+            Accept: "application/json",
+        },
+        body: JSON.stringify({ updates }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                const modal = bootstrap.Modal.getInstance(
+                    document.getElementById("bulkUpdateStockModal")
+                );
+                if (modal) modal.hide();
+                showToast(
+                    "Success",
+                    `Stock updated successfully for ${
+                        data.updated_count || updates.length
+                    } products!`,
+                    "success"
+                );
+                clearProductSelection();
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast("Error", data.message || "Update failed.", "error");
+            }
+        })
+        .catch((error) => {
+            console.error("Update error:", error);
+            showToast(
+                "Error",
+                "An error occurred while updating stock.",
+                "error"
+            );
+        })
+        .finally(() => {
+            resetButton(confirmBtn, original);
+        });
+}
+
+// FIXED SEARCH FUNCTIONALITY - NO AUTO REFRESH
+let searchTimeout;
+let currentRequest = null;
+let isSearchActive = false;
+let originalTableContent = null;
+let originalProductData = new Map();
+
+if (typeof selectedProductIds === "undefined") {
+    window.selectedProductIds = new Set();
+}
+
+function initializeSearch() {
+    const searchInput = document.getElementById("searchInput");
+    if (!searchInput) return;
+
+    // Store original table content immediately
+    storeOriginalTable();
+
+    searchInput.addEventListener("input", function () {
+        clearTimeout(searchTimeout);
+        if (currentRequest) {
+            currentRequest.abort();
+            currentRequest = null;
+        }
+
+        const query = this.value.trim();
+
+        // Clear search timeout
+        searchTimeout = setTimeout(() => {
+            if (query.length === 0) {
+                // Restore original table when search is cleared
+                if (isSearchActive) {
+                    restoreOriginalTable();
+                }
+                isSearchActive = false;
+            } else {
+                performSearch(query);
+                isSearchActive = true;
+            }
+        }, 500);
+    });
+}
+
+function storeOriginalTable() {
+    if (!originalTableContent) {
+        const tableBody = document.querySelector("table tbody");
+        if (tableBody) {
+            originalTableContent = tableBody.innerHTML;
+
+            // Extract and store product data from existing rows
+            const rows = tableBody.querySelectorAll("tr[data-id]");
+            rows.forEach((row) => {
+                const productId = row.dataset.id;
+                const productData = extractProductDataFromRow(row);
+                if (productData) {
+                    originalProductData.set(productId, productData);
+                }
+            });
+        }
+    }
+}
+
+function extractProductDataFromRow(row) {
+    try {
+        const img = row.querySelector(".sort-image img");
+        const nameElement = row.querySelector(".sort-name");
+        const codeElement = row.querySelector(".sort-code");
+        const quantityElement = row.querySelector(".sort-quantity");
+        const categoryElement = row.querySelector(".sort-category");
+        const unitElement = row.querySelector(".sort-unit");
+        const priceElement = row.querySelector(".sort-price");
+        const sellingPriceElement = row.querySelector(".sort-sellingprice");
+        const supplierElement = row.querySelector(".sort-supplier");
+        const expiryElement = row.querySelector(".sort-expiry");
+
+        if (!nameElement) return null;
+
+        // Extract stock quantity (remove any badges)
+        const quantityText = quantityElement?.textContent?.trim() || "0";
+        const stockMatch = quantityText.match(/^\d+/);
+        const stock = stockMatch ? parseInt(stockMatch[0]) : 0;
+
+        return {
+            id: parseInt(row.dataset.id),
+            name: nameElement.textContent.trim(),
+            code: codeElement?.textContent?.trim() || "N/A",
+            stock_quantity: stock,
+            category: { name: categoryElement?.textContent?.trim() || "N/A" },
+            unit: { symbol: unitElement?.textContent?.trim() || "N/A" },
+            price: extractPriceFromText(priceElement?.textContent || "0"),
+            selling_price: extractPriceFromText(
+                sellingPriceElement?.textContent || "0"
+            ),
+            supplier: { name: supplierElement?.textContent?.trim() || "N/A" },
+            expiry_date: extractExpiryFromText(
+                expiryElement?.textContent || ""
+            ),
+            has_expiry: expiryElement?.textContent?.trim() !== "N/A",
+            image: img?.src || "/images/default-product.png",
+        };
+    } catch (error) {
+        console.error("Error extracting product data:", error);
+        return null;
+    }
+}
+
+// Helper function to extract price from formatted text
+function extractPriceFromText(priceText) {
+    if (!priceText || priceText === "N/A") return 0;
+    // Remove currency symbols and formatting, extract numbers
+    const matches = priceText.match(/[\d,]+/g);
+    if (matches) {
+        return parseInt(matches.join("").replace(/,/g, "")) || 0;
+    }
+    return 0;
+}
+
+// Helper function to extract expiry date
+function extractExpiryFromText(expiryText) {
+    if (!expiryText || expiryText.trim() === "N/A") return null;
+    // Try to extract date from text (assuming format like "21/06/2025")
+    const dateMatch = expiryText.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+    if (dateMatch) {
+        // Convert to YYYY-MM-DD format
+        return `${dateMatch[3]}-${dateMatch[2].padStart(
+            2,
+            "0"
+        )}-${dateMatch[1].padStart(2, "0")}`;
+    }
+    return null;
+}
+
+function restoreOriginalTable() {
+    if (originalTableContent) {
+        const tableBody = document.querySelector("table tbody");
+        if (tableBody) {
+            tableBody.innerHTML = originalTableContent;
+            // Reinitialize bulk selection and restore states
+            setTimeout(() => {
+                initBulkSelection();
+                restoreCheckboxStates();
+                updateBulkActionsBarVisibility();
+            }, 100);
+        }
+    }
+}
+
+function restoreCheckboxStates() {
+    document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+        if (selectedProductIds.has(checkbox.value)) {
+            checkbox.checked = true;
+        }
+    });
+
+    // Update select all checkbox
+    updateSelectAllCheckbox();
+}
+
+function updateSelectAllCheckbox() {
+    const selectAllCheckbox = document.getElementById("selectAll");
+    const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+    const checkedCount = document.querySelectorAll(
+        ".row-checkbox:checked"
+    ).length;
+
+    if (selectAllCheckbox) {
+        if (checkedCount === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else if (checkedCount === rowCheckboxes.length) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        }
+    }
+}
+
+function updateBulkActionsBarVisibility() {
+    const bulkActionsBar = document.getElementById("bulkActionsBar");
+    const selectedCount = document.getElementById("selectedCount");
+
+    if (bulkActionsBar && selectedCount) {
+        const count = selectedProductIds.size;
+        selectedCount.textContent = count;
+
+        if (count > 0) {
+            bulkActionsBar.style.display = "block";
+        } else {
+            bulkActionsBar.style.display = "none";
+        }
+    }
+}
+
+function performSearch(query) {
+    // Store original table on first search
+    storeOriginalTable();
+
+    const tableBody = document.querySelector("table tbody");
+
+    if (!query) {
+        restoreOriginalTable();
+        return;
+    }
+
+    tableBody.innerHTML = `
+        <tr><td colspan="100%" class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-3 text-muted">Searching...</p>
+        </td></tr>
+    `;
+
+    const controller = new AbortController();
+    currentRequest = controller;
+
+    fetch(`/admin/product/search?q=${encodeURIComponent(query)}`, {
+        signal: controller.signal,
+        headers: {
+            Accept: "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            currentRequest = null;
+            if (data.success) {
+                renderSearchResults(data.products);
+            } else {
+                showNoResults(data.message);
+            }
+        })
+        .catch((error) => {
+            currentRequest = null;
+            if (error.name !== "AbortError") {
+                showSearchError(error.message);
+            }
+        });
+}
+
+function renderSearchResults(products) {
+    const tableBody = document.querySelector("table tbody");
+    if (!products.length) {
+        showNoResults();
+        return;
+    }
+
+    // Store search results in originalProductData for bulk operations
+    products.forEach((product) => {
+        originalProductData.set(product.id.toString(), product);
+    });
+
+    const formatCurrency = (amount) => {
+        if (!amount) return "N/A";
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+        }).format(amount);
+    };
+
+    const html = products
+        .map((product, index) => {
+            const isLowStock =
+                product.stock_quantity <= (product.low_stock_threshold || 10);
+            const isSelected = selectedProductIds.has(product.id.toString());
+
+            return `
+            <tr data-id="${product.id}">
+                <td><input type="checkbox" class="form-check-input row-checkbox" value="${
+                    product.id
+                }" ${isSelected ? "checked" : ""}></td>
+                <td class="sort-no">${index + 1}</td>
+                <td class="sort-image" style="width:120px">
+                    <img src="${product.image || "/images/default-product.png"}"
+                         width="80px" height="80px" alt="${product.name}"
+                         onerror="this.src='/images/default-product.png'">
+                </td>
+                <td class="sort-code no-print">${product.code || "N/A"}</td>
+                <td class="sort-name">${product.name}</td>
+                <td class="sort-quantity no-print text-center">
+                    ${product.stock_quantity}
+                    ${
+                        isLowStock
+                            ? '<span class="badge bg-red-lt">Low Stock</span>'
+                            : ""
+                    }
+                </td>
+                <td class="sort-category no-print">${
+                    product.category?.name || "N/A"
+                }</td>
+                <td class="sort-unit">${product.unit?.symbol || "N/A"}</td>
+                <td class="sort-price text-center">${formatCurrency(
+                    product.price
+                )}</td>
+                <td class="sort-sellingprice text-center">${formatCurrency(
+                    product.selling_price
+                )}</td>
+                <td class="sort-supplier text-center">${
+                    product.supplier?.name || "N/A"
+                }</td>
+                <td class="sort-expiry text-center">
+                    ${
+                        product.has_expiry && product.expiry_date
+                            ? new Date(product.expiry_date).toLocaleDateString(
+                                  "id-ID"
+                              )
+                            : '<span class="text-muted">N/A</span>'
+                    }
+                </td>
+                <td class="no-print" style="text-align:center">
+                    <div class="dropdown">
+                        <button class="btn dropdown-toggle" data-bs-toggle="dropdown">Actions</button>
+                        <div class="dropdown-menu">
+                            <a href="javascript:void(0)" onclick="loadProductDetails('${
+                                product.id
+                            }')"
+                               data-bs-toggle="modal" data-bs-target="#viewProductModal" class="dropdown-item">
+                                <i class="ti ti-zoom-scan me-2"></i> View
+                            </a>
+                            <a href="/admin/product/edit/${
+                                product.id
+                            }" class="dropdown-item">
+                                <i class="ti ti-edit me-2"></i> Edit
+                            </a>
+                            <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal" onclick="setDeleteFormAction('/admin/product/destroy/${
+                                        product.id
+                                    }')">
+                                <i class="ti ti-trash me-2"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+        })
+        .join("");
+
+    tableBody.innerHTML = html;
+
+    // Reinitialize bulk selection with preserved states
+    setTimeout(() => {
+        initBulkSelection();
+        updateSelectAllCheckbox();
+        updateBulkActionsBarVisibility();
+    }, 100);
+}
+
+function showNoResults(message = "No products found matching your search.") {
+    document.querySelector("table tbody").innerHTML = `
+        <tr><td colspan="100%" class="text-center py-5">
+            <i class="ti ti-search-off fs-1 text-muted"></i>
+            <p class="mt-3 text-muted">${message}</p>
+        </td></tr>
+    `;
+
+    // Hide bulk actions bar when no results
+    const bulkActionsBar = document.getElementById("bulkActionsBar");
+    if (bulkActionsBar && selectedProductIds.size === 0) {
+        bulkActionsBar.style.display = "none";
+    }
+}
+
+function showSearchError(errorMessage = "Search error occurred.") {
+    document.querySelector("table tbody").innerHTML = `
+        <tr><td colspan="100%" class="text-center py-5">
+            <i class="ti ti-alert-circle fs-1 text-danger"></i>
+            <p class="mt-3 text-danger">${errorMessage}</p>
+            <button class="btn btn-outline-primary mt-2" onclick="window.location.reload()">
+                <i class="ti ti-refresh me-2"></i> Refresh
+            </button>
+        </td></tr>
+    `;
+}
+
+// Enhanced bulk selection initialization
+function initBulkSelection() {
+    const selectAllCheckbox = document.getElementById("selectAll");
+    const bulkActionsBar = document.getElementById("bulkActionsBar");
+
+    if (!selectAllCheckbox) return;
+
+    // Remove existing event listeners to avoid duplicates
+    const newSelectAll = selectAllCheckbox.cloneNode(true);
+    selectAllCheckbox.parentNode.replaceChild(newSelectAll, selectAllCheckbox);
+
+    // Add select all functionality
+    newSelectAll.addEventListener("change", handleSelectAllChange);
+
+    // Add event listeners to row checkboxes using event delegation
+    document.addEventListener("change", function (e) {
+        if (e.target.classList.contains("row-checkbox")) {
+            handleRowCheckboxChange(e.target);
+        }
+    });
+
+    // Restore checkbox states
+    restoreCheckboxStates();
+
+    // Initialize bulk actions bar state
+    updateBulkActionsBarVisibility();
+}
+
+function handleSelectAllChange(e) {
+    const isChecked = e.target.checked;
+    const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+
+    rowCheckboxes.forEach((checkbox) => {
+        checkbox.checked = isChecked;
+        if (isChecked) {
+            selectedProductIds.add(checkbox.value);
+        } else {
+            selectedProductIds.delete(checkbox.value);
+        }
+    });
+
+    updateBulkActionsBarVisibility();
+}
+
+function handleRowCheckboxChange(checkbox) {
+    if (checkbox.checked) {
+        selectedProductIds.add(checkbox.value);
+    } else {
+        selectedProductIds.delete(checkbox.value);
+    }
+
+    updateSelectAllCheckbox();
+    updateBulkActionsBarVisibility();
+}
+
+// Clear selection function
+window.clearProductSelection = function () {
+    selectedProductIds.clear();
+    document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+        checkbox.checked = false;
+    });
+    updateSelectAllCheckbox();
+    updateBulkActionsBarVisibility();
+};
+
+window.setBulkAction = function (action, text) {
+    const element = document.getElementById("bulkActionText");
+    if (element) {
+        element.textContent = text;
+        element.dataset.action = action;
+    }
+};
+
+window.applyBulkStockAction = function () {
+    const actionElement = document.getElementById("bulkActionText");
+    const valueInput = document.getElementById("bulkStockValue");
+    const action = actionElement?.dataset.action || "add";
+    const value = parseInt(valueInput?.value) || 0;
+
+    if (!value) {
+        showToast("Warning", "Please enter a valid value.", "warning");
+        return;
+    }
+
+    document.querySelectorAll(".stock-update-row").forEach((row) => {
+        const input = row.querySelector(".new-stock-input");
+        if (!input) return;
+
+        const current = parseInt(input.value) || 0;
+        let newValue;
+
+        switch (action) {
+            case "add":
+                newValue = current + value;
+                break;
+            case "subtract":
+                newValue = Math.max(0, current - value);
+                break;
+            case "set":
+                newValue = value;
+                break;
+            default:
+                newValue = current;
+        }
+
+        input.value = newValue;
+        if (typeof updateStockChangeDisplay === "function") {
+            updateStockChangeDisplay(row);
+        }
+    });
+
+    if (valueInput) valueInput.value = "";
+    showToast("Success", "Bulk action applied to all products.", "success");
+};
+
+// UTILITY FUNCTIONS
 function setText(id, text) {
     const el = document.getElementById(id);
     if (el) el.textContent = text;
@@ -387,257 +1199,14 @@ function setBadge(el, text, badgeClass) {
 function getExpiryBadge(expiryDateStr) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const expiryDate = new Date(expiryDateStr);
     expiryDate.setHours(0, 0, 0, 0);
+    const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
 
-    const diffTime = expiryDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) {
-        return ' <span class="badge bg-danger">Expired</span>';
-    } else if (diffDays <= 7) {
+    if (diffDays < 0) return ' <span class="badge bg-danger">Expired</span>';
+    if (diffDays <= 7)
         return ` <span class="badge bg-warning">Expiring Soon - ${diffDays}d</span>`;
-    }
     return "";
-}
-
-// BULK ACTION FUNCTIONS
-window.clearProductSelection = function () {
-    const selectAllCheckbox = document.getElementById("selectAll");
-    const rowCheckboxes = document.querySelectorAll(".row-checkbox");
-    const bulkActionsBar = document.getElementById("bulkActionsBar");
-    const selectedCount = document.getElementById("selectedCount");
-
-    if (selectAllCheckbox) {
-        selectAllCheckbox.checked = false;
-        selectAllCheckbox.indeterminate = false;
-    }
-
-    rowCheckboxes.forEach((checkbox) => {
-        checkbox.checked = false;
-    });
-
-    if (bulkActionsBar) {
-        bulkActionsBar.style.display = "none";
-    }
-};
-
-window.getSelectedProductIds = function () {
-    return Array.from(document.querySelectorAll(".row-checkbox:checked")).map(
-        (cb) => cb.value
-    );
-};
-
-window.bulkDeleteProducts = function () {
-    console.log("bulkDeleteProducts function called");
-
-    const selected = getSelectedProductIds();
-    console.log("Selected IDs:", selected);
-
-    // Validate selection
-    if (!selected || selected.length === 0) {
-        showToast(
-            "Warning",
-            "Please select at least one product to delete.",
-            "warning"
-        );
-        return;
-    }
-
-    // Update modal with selection count
-    const bulkDeleteCount = document.getElementById("bulkDeleteCount");
-    if (bulkDeleteCount) {
-        bulkDeleteCount.textContent = selected.length;
-    }
-
-    // Show confirmation modal
-    const bulkDeleteModal = new bootstrap.Modal(
-        document.getElementById("bulkDeleteModal")
-    );
-    bulkDeleteModal.show();
-
-    // Handle confirmation button
-    const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
-    if (confirmBtn) {
-        // Remove any existing event listeners by cloning the button
-        const newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-        newConfirmBtn.addEventListener("click", function () {
-            console.log("Confirm button clicked");
-            performBulkDelete(selected, this, bulkDeleteModal);
-        });
-    }
-};
-
-window.bulkExportProducts = function () {
-    const selected = getSelectedProductIds();
-
-    if (selected.length === 0) {
-        showToast(
-            "Warning",
-            "Please select at least one product to export.",
-            "warning"
-        );
-        return;
-    }
-
-    const submitBtn = document.querySelector(
-        '[onclick="bulkExportProducts()"]'
-    );
-    const originalText = submitBtn ? submitBtn.innerHTML : "";
-
-    if (submitBtn) {
-        submitBtn.innerHTML =
-            '<span class="spinner-border spinner-border-sm me-2"></span>Exporting...';
-        submitBtn.disabled = true;
-    }
-
-    // Create form and submit for export
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = "/admin/product/bulk-export";
-    form.style.display = "none";
-
-    // Add CSRF token
-    const csrfToken = document.querySelector('meta[name="csrf-token"]');
-    if (csrfToken) {
-        const csrfInput = document.createElement("input");
-        csrfInput.type = "hidden";
-        csrfInput.name = "_token";
-        csrfInput.value = csrfToken.getAttribute("content");
-        form.appendChild(csrfInput);
-    }
-
-    // Add selected IDs
-    selected.forEach((id) => {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "ids[]";
-        input.value = id;
-        form.appendChild(input);
-    });
-
-    document.body.appendChild(form);
-    form.submit();
-
-    // Reset button after a delay
-    setTimeout(() => {
-        if (submitBtn) {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-        document.body.removeChild(form);
-    }, 2000);
-};
-
-// Placeholder for bulk update stock function
-window.bulkUpdateStock = function () {
-    const selected = getSelectedProductIds();
-
-    if (selected.length === 0) {
-        showToast(
-            "Warning",
-            "Please select at least one product to update stock.",
-            "warning"
-        );
-        return;
-    }
-
-    // Show the bulk update modal
-    const bulkUpdateModal = new bootstrap.Modal(
-        document.getElementById("bulkUpdateStockModal")
-    );
-    bulkUpdateModal.show();
-
-    // Load selected products from the existing table
-    loadBulkUpdateProductsFromTable(selected);
-};
-
-function performBulkDelete(selectedIds, confirmButton, modal) {
-    console.log("performBulkDelete called with IDs:", selectedIds);
-
-    if (!selectedIds || selectedIds.length === 0) return;
-
-    // Show loading state
-    const originalText = confirmButton.innerHTML;
-    confirmButton.innerHTML = `
-        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        Deleting...
-    `;
-    confirmButton.disabled = true;
-
-    // Get CSRF token
-    const csrfToken = document.querySelector('meta[name="csrf-token"]');
-    if (!csrfToken) {
-        console.error("CSRF token not found");
-        showToast(
-            "Error",
-            "Security token not found. Please refresh the page.",
-            "error"
-        );
-        resetButton(confirmButton, originalText);
-        return;
-    }
-
-    console.log("CSRF token found:", csrfToken.getAttribute("content"));
-
-    // Make the API request
-    fetch("/admin/product/bulk-delete", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
-            Accept: "application/json",
-        },
-        body: JSON.stringify({
-            ids: selectedIds,
-        }),
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.success) {
-                // Close modal
-                modal.hide();
-
-                // Show success message
-                showToast(
-                    "Success",
-                    `${
-                        data.deleted_count || selectedIds.length
-                    } product(s) deleted successfully!`,
-                    "success"
-                );
-
-                // Clear selection
-                clearProductSelection();
-
-                // Reload page after short delay
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            } else {
-                showToast(
-                    "Error",
-                    data.message || "Failed to delete products.",
-                    "error"
-                );
-            }
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-            showToast(
-                "Error",
-                "An error occurred while deleting products.",
-                "error"
-            );
-        })
-        .finally(() => {
-            // Reset button state
-            confirmButton.innerHTML = originalText;
-            confirmButton.disabled = false;
-        });
 }
 
 function resetButton(button, originalText) {
@@ -647,760 +1216,247 @@ function resetButton(button, originalText) {
     }
 }
 
-// Toast notification function
+// TOAST NOTIFICATIONS
 function showToast(title, message, type = "info", duration = 4000) {
-    // Create a toast container if it doesn't exist
-    let toastContainer = document.getElementById("toast-container");
-    if (!toastContainer) {
-        toastContainer = document.createElement("div");
-        toastContainer.id = "toast-container";
-        toastContainer.className =
+    let container = document.getElementById("toast-container");
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        container.className =
             "toast-container position-fixed bottom-0 end-0 p-3";
-        // Set higher z-index to appear above Bootstrap modals (which use 1055)
-        toastContainer.style.zIndex = "1060";
-        document.body.appendChild(toastContainer);
+        container.style.zIndex = "1060";
+        document.body.appendChild(container);
 
-        // Add animation styles once
-        if (!document.getElementById("toast-styles")) {
-            const style = document.createElement("style");
-            style.id = "toast-styles";
-            style.textContent = `
-                .toast-enter {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                .toast-show {
-                    transform: translateX(0);
-                    opacity: 1;
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                }
-                .toast-exit {
-                    transform: translateX(100%);
-                    opacity: 0;
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                }
-                /* Ensure toast container is above modal backdrop */
-                #toast-container {
-                    z-index: 1060 !important;
-                }
-                /* Individual toast z-index */
-                .toast {
-                    z-index: 1061 !important;
-                }
-            `;
-            document.head.appendChild(style);
-        }
+        const style = document.createElement("style");
+        style.textContent = `
+            .toast-enter { transform: translateX(100%); opacity: 0; }
+            .toast-show { transform: translateX(0); opacity: 1; transition: transform 0.3s ease, opacity 0.3s ease; }
+            .toast-exit { transform: translateX(100%); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; }
+            #toast-container { z-index: 1060 !important; }
+            .toast { z-index: 1061 !important; }
+        `;
+        document.head.appendChild(style);
     }
 
-    // Create toast element
     const toast = document.createElement("div");
-    toast.className =
-        "toast toast-enter align-items-center text-white bg-" +
-        getToastColor(type) +
-        " border-0";
+    toast.className = `toast toast-enter`;
     toast.setAttribute("role", "alert");
     toast.setAttribute("aria-live", "assertive");
     toast.setAttribute("aria-atomic", "true");
-    // Ensure individual toast has high z-index
-    toast.style.zIndex = "1061";
+
+    const typeColors = {
+        success: "bg-success",
+        error: "bg-danger",
+        warning: "bg-warning",
+        info: "bg-info",
+    };
+
+    const typeIcons = {
+        success: "ti ti-check",
+        error: "ti ti-x",
+        warning: "ti ti-alert-triangle",
+        info: "ti ti-info-circle",
+    };
 
     toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                <strong>${title}</strong>: ${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        <div class="toast-header ${
+            typeColors[type] || typeColors.info
+        } text-white">
+            <i class="${typeIcons[type] || typeIcons.info} me-2"></i>
+            <strong class="me-auto">${title}</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
         </div>
+        <div class="toast-body">${message}</div>
     `;
 
-    toastContainer.appendChild(toast);
+    container.appendChild(toast);
 
-    // Force reflow to ensure animation works
-    void toast.offsetWidth;
+    // Trigger animation
+    setTimeout(() => {
+        toast.classList.remove("toast-enter");
+        toast.classList.add("toast-show");
+    }, 10);
 
-    // Show with animation
-    toast.classList.add("toast-show");
-
-    // Initialize Bootstrap toast
-    const bsToast = new bootstrap.Toast(toast, {
-        autohide: true,
-        delay: duration,
-    });
-    bsToast.show();
-
-    // Handle close button clicks
-    const closeButton = toast.querySelector(".btn-close");
-    closeButton.addEventListener("click", () => {
-        hideToast(toast);
-    });
-
-    // Auto hide after duration
-    const hideTimeout = setTimeout(() => {
-        hideToast(toast);
+    // Auto dismiss
+    setTimeout(() => {
+        dismissToast(toast);
     }, duration);
 
-    // Store timeout on toast element for cleanup
-    toast._hideTimeout = hideTimeout;
+    // Handle manual dismiss
+    const closeBtn = toast.querySelector(".btn-close");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => dismissToast(toast));
+    }
 }
 
-// Helper function to hide toast with animation
-function hideToast(toast) {
-    // Clear any existing timeout
-    if (toast._hideTimeout) {
-        clearTimeout(toast._hideTimeout);
-    }
-
-    // Add exit animation
+function dismissToast(toast) {
     toast.classList.remove("toast-show");
     toast.classList.add("toast-exit");
 
-    // Remove after animation completes
     setTimeout(() => {
-        toast.remove();
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
     }, 300);
 }
 
-// Helper function to get the appropriate Bootstrap color class
-function getToastColor(type) {
-    switch (type) {
-        case "success":
-            return "success";
-        case "error":
-            return "danger";
-        case "warning":
-            return "warning";
-        default:
-            return "info";
+// DELETE MODAL FUNCTIONALITY
+window.setDeleteFormAction = function (action) {
+    const deleteForm = document.getElementById("deleteForm");
+    if (deleteForm) {
+        deleteForm.action = action;
     }
-}
-
-// Expose globally if needed
-window.loadProductDetails = loadProductDetails;
-
-window.bulkUpdateStock = function () {
-    const selected = getSelectedProductIds();
-
-    if (selected.length === 0) {
-        showToast(
-            "Warning",
-            "Please select at least one product to update stock.",
-            "warning"
-        );
-        return;
-    }
-
-    // Show the bulk update modal
-    const bulkUpdateModal = new bootstrap.Modal(
-        document.getElementById("bulkUpdateStockModal")
-    );
-    bulkUpdateModal.show();
-
-    // Load selected products from the existing table instead of API call
-    loadBulkUpdateProductsFromTable(selected);
 };
 
-function loadBulkUpdateProductsFromTable(productIds) {
-    console.log("=== DEBUG: loadBulkUpdateProductsFromTable ===");
-    console.log("Raw productIds:", productIds);
-
-    const contentContainer = document.getElementById("bulkUpdateStockContent");
-    const updateCountElement = document.getElementById("updateStockCount");
-
-    if (!contentContainer || !updateCountElement) {
-        console.error("Bulk update modal elements not found");
-        return;
+// PRODUCT STATS UPDATE
+function updateProductStats(stats) {
+    if (stats.total_products !== undefined) {
+        const totalElement = document.getElementById("totalProducts");
+        if (totalElement) totalElement.textContent = stats.total_products;
     }
 
-    // Ensure productIds are valid integers
-    const validProductIds = productIds
-        .map((id) => {
-            const parsed = parseInt(id);
-            console.log(`Converting ID: "${id}" -> ${parsed}`);
-            return parsed;
-        })
-        .filter((id) => {
-            const isValid = !isNaN(id) && id > 0;
-            if (!isValid) {
-                console.warn(`Filtered out invalid ID: ${id}`);
-            }
-            return isValid;
-        });
-
-    console.log("Valid product IDs:", validProductIds);
-
-    if (validProductIds.length === 0) {
-        console.error("No valid product IDs found");
-        contentContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="ti ti-alert-circle me-2"></i>
-                No valid products selected. Please try again.
-            </div>
-        `;
-        return;
+    if (stats.low_stock_count !== undefined) {
+        const lowStockElement = document.getElementById("lowStockCount");
+        if (lowStockElement)
+            lowStockElement.textContent = stats.low_stock_count;
     }
 
-    // Update count
-    updateCountElement.textContent = validProductIds.length;
-
-    // Extract product data from existing table rows
-    const products = [];
-    validProductIds.forEach((productId) => {
-        console.log(`Looking for row with data-id="${productId}"`);
-
-        const tableRow = document.querySelector(`tr[data-id="${productId}"]`);
-        console.log(`Row found for product ${productId}:`, !!tableRow);
-
-        if (tableRow) {
-            // Debug each selector
-            const nameElement = tableRow.querySelector(".sort-name");
-            const codeElement = tableRow.querySelector(".sort-code");
-            const quantityElement = tableRow.querySelector(".sort-quantity");
-            const imageElement = tableRow.querySelector(".sort-image img");
-
-            // Extract text content more carefully
-            const name = nameElement?.textContent?.trim() || "Unknown Product";
-            const code = codeElement?.textContent?.trim() || "N/A";
-            const quantityText = quantityElement?.textContent?.trim() || "0";
-
-            // Parse stock quantity from text (might contain additional text like "Low Stock")
-            const stockMatch = quantityText.match(/^\d+/);
-            const stockQuantity = stockMatch ? parseInt(stockMatch[0]) : 0;
-
-            console.log(`Product ${productId} extracted data:`, {
-                name: name,
-                code: code,
-                quantityText: quantityText,
-                stockQuantity: stockQuantity,
-                imageSrc: imageElement?.src,
-            });
-
-            const product = {
-                id: productId, // Keep as integer
-                name: name,
-                code: code,
-                stock_quantity: stockQuantity,
-                image_src: imageElement?.src || "/images/default-product.png",
-            };
-
-            console.log(`Product ${productId} final data:`, product);
-            products.push(product);
-        } else {
-            console.error(`No table row found for product ID: ${productId}`);
-            // Debug: show what rows actually exist
-            const allRows = document.querySelectorAll("tr[data-id]");
-            console.log(
-                "All table rows with data-id:",
-                Array.from(allRows).map((row) => ({
-                    id: row.dataset.id,
-                    element: row,
-                }))
-            );
-        }
-    });
-
-    console.log("Final products array:", products);
-
-    if (products.length === 0) {
-        console.error("No products extracted from table");
-        contentContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="ti ti-alert-circle me-2"></i>
-                Could not find product data in the table. Please refresh the page and try again.
-                <br><small>Debug: Looking for IDs: ${validProductIds.join(
-                    ", "
-                )}</small>
-            </div>
-        `;
-        return;
+    if (stats.expiring_soon_count !== undefined) {
+        const expiringSoonElement =
+            document.getElementById("expiringSoonCount");
+        if (expiringSoonElement)
+            expiringSoonElement.textContent = stats.expiring_soon_count;
     }
-
-    // Render products using the extracted data
-    renderBulkUpdateProducts(products);
-    initializeBulkUpdateHandlers();
 }
 
-// Improved function to ensure original stock is properly set
-function renderBulkUpdateProducts(products) {
-    const contentContainer = document.getElementById("bulkUpdateStockContent");
-    const template = document.getElementById("stockUpdateRowTemplate");
-
-    console.log("=== DEBUG: renderBulkUpdateProducts ===");
-    console.log("Products to render:", products);
-    console.log("Template found:", !!template);
-    console.log("Container found:", !!contentContainer);
-
-    if (!template) {
-        console.error("Stock update row template not found");
-        return;
-    }
-
-    contentContainer.innerHTML = "";
-
-    products.forEach((product, index) => {
-        console.log(`Rendering product ${index}:`, product);
-
-        const row = template.cloneNode(true);
-        row.style.display = "block";
-        row.id = `stock-row-${product.id}`; // Give unique ID
-
-        // IMPORTANT: Ensure product ID is properly set as string
-        row.dataset.productId = product.id.toString();
-
-        // Add the stock-update-row class if it's not already there
-        if (!row.classList.contains("stock-update-row")) {
-            row.classList.add("stock-update-row");
-        }
-
-        // Fill product data
-        const img = row.querySelector(".product-image");
-        const name = row.querySelector(".product-name");
-        const code = row.querySelector(".product-code");
-        const currentStock = row.querySelector(".current-stock");
-        const newStockInput = row.querySelector(".new-stock-input");
-
-        console.log(`Product ${product.id} elements found:`, {
-            img: !!img,
-            name: !!name,
-            code: !!code,
-            currentStock: !!currentStock,
-            newStockInput: !!newStockInput,
+// ENTRIES PER PAGE FUNCTIONALITY
+function initializeEntriesSelector() {
+    const entriesSelect = document.getElementById("entriesSelect");
+    if (entriesSelect) {
+        entriesSelect.addEventListener("change", function () {
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set("entries", this.value);
+            currentUrl.searchParams.delete("page"); // Reset to first page
+            window.location.href = currentUrl.toString();
         });
+    }
+}
 
-        // Use the same image source as in the table
-        if (img) {
-            img.src = product.image_src;
-            img.alt = product.name || "Product Image";
+// EXPIRY DATE TOGGLE FUNCTIONALITY
+function initExpiryDateToggle() {
+    const expiryCheckbox = document.getElementById("has_expiry");
+    const expiryDateField = document.querySelector(".expiry-date-field");
+    const expiryDateInput = document.getElementById("expiry_date");
 
-            // Simple error handling - just use default if image fails
-            img.onerror = function () {
-                if (this.src !== "/images/default-product.png") {
-                    this.src = "/images/default-product.png";
+    if (expiryCheckbox && expiryDateField) {
+        // Set initial state
+        expiryDateField.style.display = expiryCheckbox.checked
+            ? "block"
+            : "none";
+
+        // Add event listener for checkbox change
+        expiryCheckbox.addEventListener("change", function () {
+            if (this.checked) {
+                expiryDateField.style.display = "block";
+                // Focus on the date input when enabled
+                if (expiryDateInput) {
+                    setTimeout(() => expiryDateInput.focus(), 100);
                 }
-            };
-        }
-
-        // Fill other product data with validation
-        if (name) name.textContent = product.name || "Unknown Product";
-        if (code) code.textContent = `Code: ${product.code || "N/A"}`;
-        if (currentStock)
-            currentStock.textContent = product.stock_quantity || 0;
-
-        if (newStockInput) {
-            const stockQty = parseInt(product.stock_quantity) || 0;
-            newStockInput.value = stockQty;
-            // IMPORTANT: Ensure original stock is properly set as string
-            newStockInput.dataset.originalStock = stockQty.toString();
-
-            console.log(`Set data for product ${product.id}:`, {
-                value: newStockInput.value,
-                originalStock: newStockInput.dataset.originalStock,
-                productId: row.dataset.productId,
-            });
-        }
-
-        contentContainer.appendChild(row);
-    });
-
-    console.log(
-        "Finished rendering. Total rows in container:",
-        contentContainer.querySelectorAll(".stock-update-row").length
-    );
-
-    // Verify all rows have proper data attributes
-    const renderedRows = contentContainer.querySelectorAll(".stock-update-row");
-    renderedRows.forEach((row, index) => {
-        console.log(`Rendered row ${index} verification:`, {
-            productId: row.dataset.productId,
-            stockInput: row.querySelector(".new-stock-input"),
-            stockValue: row.querySelector(".new-stock-input")?.value,
-            originalStock:
-                row.querySelector(".new-stock-input")?.dataset.originalStock,
-        });
-    });
-
-    // Initialize row-specific handlers after rendering
-    initializeStockRowHandlers();
-}
-
-// Initialize handlers for individual stock update rows
-function initializeStockRowHandlers() {
-    const rows = document.querySelectorAll(".stock-update-row");
-
-    rows.forEach((row) => {
-        const decreaseBtn = row.querySelector(".decrease-btn");
-        const increaseBtn = row.querySelector(".increase-btn");
-        const stockInput = row.querySelector(".new-stock-input");
-
-        if (decreaseBtn) {
-            decreaseBtn.addEventListener("click", () => {
-                const currentValue = parseInt(stockInput.value) || 0;
-                if (currentValue > 0) {
-                    stockInput.value = currentValue - 1;
-                    updateStockChangeDisplay(row);
-                }
-            });
-        }
-
-        if (increaseBtn) {
-            increaseBtn.addEventListener("click", () => {
-                const currentValue = parseInt(stockInput.value) || 0;
-                stockInput.value = currentValue + 1;
-                updateStockChangeDisplay(row);
-            });
-        }
-
-        if (stockInput) {
-            stockInput.addEventListener("input", () => {
-                updateStockChangeDisplay(row);
-            });
-        }
-    });
-}
-
-// Enhanced function to ensure stock change detection works properly
-function updateStockChangeDisplay(row) {
-    const stockInput = row.querySelector(".new-stock-input");
-    const changeBadge = row.querySelector(".stock-change-badge");
-
-    if (!stockInput || !changeBadge) return;
-
-    const originalStock = parseInt(stockInput.dataset.originalStock) || 0;
-    const newStock = parseInt(stockInput.value) || 0;
-    const change = newStock - originalStock;
-
-    console.log(
-        `Stock change for row: Original=${originalStock}, New=${newStock}, Change=${change}`
-    ); // Debug log
-
-    if (change === 0) {
-        changeBadge.textContent = "No change";
-        changeBadge.className = "badge stock-change-badge bg-secondary-lt";
-    } else if (change > 0) {
-        changeBadge.textContent = `+${change}`;
-        changeBadge.className = "badge stock-change-badge bg-success-lt";
-    } else {
-        changeBadge.textContent = change.toString();
-        changeBadge.className = "badge stock-change-badge bg-danger-lt";
-    }
-}
-
-// Initialize bulk update modal handlers
-function initializeBulkUpdateHandlers() {
-    const confirmBtn = document.getElementById("confirmBulkUpdateBtn");
-
-    if (confirmBtn) {
-        // Remove existing listeners by cloning
-        const newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-        newConfirmBtn.addEventListener("click", handleBulkStockUpdate);
-    }
-}
-
-// Handle bulk stock update confirmation - FIXED VERSION
-function handleBulkStockUpdate() {
-    const confirmBtn = document.getElementById("confirmBulkUpdateBtn");
-    const rows = document.querySelectorAll(".stock-update-row");
-
-    console.log("=== DEBUG: handleBulkStockUpdate ===");
-    console.log("Found rows:", rows.length);
-
-    // Collect update data with better validation
-    const updates = [];
-
-    rows.forEach((row, index) => {
-        console.log(`Processing row ${index}:`, row);
-
-        // Get product ID from data attribute
-        const productIdStr = row.dataset.productId;
-        const productId = parseInt(productIdStr);
-
-        // Get stock input element
-        const stockInput = row.querySelector(".new-stock-input");
-
-        console.log(`Row ${index} - Product ID String:`, productIdStr);
-        console.log(`Row ${index} - Product ID Parsed:`, productId);
-        console.log(`Row ${index} - Stock Input:`, stockInput);
-        console.log(`Row ${index} - Stock Input Value:`, stockInput?.value);
-
-        // Enhanced validation
-        if (!stockInput) {
-            console.error(`Row ${index}: Stock input not found`);
-            return;
-        }
-
-        if (!productIdStr || productIdStr.trim() === "") {
-            console.error(`Row ${index}: Product ID is empty or missing`);
-            return;
-        }
-
-        if (isNaN(productId) || productId <= 0) {
-            console.error(
-                `Row ${index}: Invalid product ID - ${productIdStr} -> ${productId}`
-            );
-            return;
-        }
-
-        // Validate stock input value
-        const stockValueStr = stockInput.value;
-        const newStock = parseInt(stockValueStr);
-
-        if (stockValueStr === "" || isNaN(newStock) || newStock < 0) {
-            console.error(
-                `Row ${index}: Invalid stock value - ${stockValueStr} -> ${newStock}`
-            );
-            return;
-        }
-
-        // Get original stock with better validation
-        const originalStockStr = stockInput.dataset.originalStock;
-        const originalStock = parseInt(originalStockStr) || 0;
-
-        console.log(
-            `Product ${productId}: Original=${originalStock}, New=${newStock}`
-        );
-
-        // Create update object with all required fields
-        const updateData = {
-            id: productId,
-            stock_quantity: newStock,
-            original_stock: originalStock,
-        };
-
-        // Validate the update object before adding
-        if (
-            updateData.id &&
-            typeof updateData.stock_quantity === "number" &&
-            updateData.stock_quantity >= 0 &&
-            typeof updateData.original_stock === "number" &&
-            updateData.original_stock >= 0
-        ) {
-            updates.push(updateData);
-            console.log(
-                `Added valid update for product ${productId}:`,
-                updateData
-            );
-        } else {
-            console.error(
-                `Invalid update data for product ${productId}:`,
-                updateData
-            );
-        }
-    });
-
-    console.log("All updates to send:", updates);
-    console.log("Updates count:", updates.length);
-
-    // Validate we have updates
-    if (updates.length === 0) {
-        console.error("No valid updates found - debugging info:");
-        console.log(
-            "Rows found:",
-            document.querySelectorAll(".stock-update-row")
-        );
-        console.log(
-            "Stock inputs found:",
-            document.querySelectorAll(".new-stock-input")
-        );
-
-        // Debug each row individually
-        rows.forEach((row, index) => {
-            console.log(`Row ${index} debug:`, {
-                element: row,
-                productId: row.dataset.productId,
-                stockInput: row.querySelector(".new-stock-input"),
-                stockValue: row.querySelector(".new-stock-input")?.value,
-                originalStock:
-                    row.querySelector(".new-stock-input")?.dataset
-                        .originalStock,
-            });
-        });
-
-        showToast(
-            "Error",
-            "No valid products found to update. Please check the data and try again.",
-            "error"
-        );
-        return;
-    }
-
-    // Check if there are any actual changes
-    const hasChanges = updates.some((update) => {
-        const originalStock = parseInt(update.original_stock) || 0;
-        const newStock = parseInt(update.stock_quantity) || 0;
-        return originalStock !== newStock;
-    });
-
-    console.log("Has changes:", hasChanges);
-
-    if (!hasChanges) {
-        showToast(
-            "Info",
-            "No changes detected. Please adjust the stock quantities before updating.",
-            "info"
-        );
-        return;
-    }
-
-    // Show loading state
-    const originalText = confirmBtn.innerHTML;
-    confirmBtn.innerHTML = `
-        <span class="spinner-border spinner-border-sm me-2"></span>
-        Updating Stock...
-    `;
-    confirmBtn.disabled = true;
-
-    // Get CSRF token
-    const csrfToken = document.querySelector('meta[name="csrf-token"]');
-    if (!csrfToken) {
-        showToast(
-            "Error",
-            "Security token not found. Please refresh the page.",
-            "error"
-        );
-        resetButton(confirmBtn, originalText);
-        return;
-    }
-
-    // Prepare request payload
-    const requestPayload = {
-        updates: updates,
-    };
-
-    console.log(
-        "Final request payload:",
-        JSON.stringify(requestPayload, null, 2)
-    );
-
-    // Submit updates
-    fetch("/admin/product/bulk-update-stock", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
-            Accept: "application/json",
-        },
-        body: JSON.stringify(requestPayload),
-    })
-        .then(async (response) => {
-            const responseText = await response.text();
-            console.log("Raw server response:", responseText);
-
-            let data;
-            try {
-                data = JSON.parse(responseText);
-            } catch (e) {
-                console.error("Failed to parse response as JSON:", e);
-                throw new Error("Invalid server response format");
-            }
-
-            console.log("Parsed server response:", data);
-
-            if (!response.ok) {
-                // Log validation errors if they exist
-                if (data.errors) {
-                    console.error("Validation errors:", data.errors);
-                }
-                throw new Error(
-                    data.message || `HTTP error! status: ${response.status}`
-                );
-            }
-
-            return data;
-        })
-        .then((data) => {
-            if (data.success) {
-                // Close modal
-                const modal = bootstrap.Modal.getInstance(
-                    document.getElementById("bulkUpdateStockModal")
-                );
-                if (modal) modal.hide();
-
-                // Show success message
-                showToast(
-                    "Success",
-                    `Stock updated for ${
-                        data.updated_count || updates.length
-                    } product(s)!`,
-                    "success"
-                );
-
-                // Clear selection and reload
-                clearProductSelection();
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
             } else {
-                showToast(
-                    "Error",
-                    data.message || "Failed to update stock quantities.",
-                    "error"
-                );
+                expiryDateField.style.display = "none";
+                // Clear the date input when disabled
+                if (expiryDateInput) {
+                    expiryDateInput.value = "";
+                }
             }
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-            showToast(
-                "Error",
-                error.message ||
-                    "An error occurred while updating stock quantities.",
-                "error"
-            );
-        })
-        .finally(() => {
-            // Reset button
-            confirmBtn.innerHTML = originalText;
-            confirmBtn.disabled = false;
         });
+    }
 }
 
-// Bulk action functions for the modal
-window.setBulkAction = function (action, text) {
-    document.getElementById("bulkActionText").textContent = text;
-    document.getElementById("bulkActionText").dataset.action = action;
-};
+// EXPORT FUNCTIONALITY
+window.exportProducts = function (format = "csv") {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = `/admin/product/export/${format}`;
+    form.style.display = "none";
 
-window.applyBulkStockAction = function () {
-    const actionElement = document.getElementById("bulkActionText");
-    const valueInput = document.getElementById("bulkStockValue");
-
-    const action = actionElement.dataset.action || "add";
-    const value = parseInt(valueInput.value) || 0;
-
-    if (value === 0) {
-        showToast("Warning", "Please enter a valid value.", "warning");
-        return;
+    // Add CSRF token
+    const csrf = document.querySelector('meta[name="csrf-token"]');
+    if (csrf) {
+        const token = document.createElement("input");
+        token.type = "hidden";
+        token.name = "_token";
+        token.value = csrf.getAttribute("content");
+        form.appendChild(token);
     }
 
-    const rows = document.querySelectorAll(".stock-update-row");
+    // Add current search query if exists
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput && searchInput.value.trim()) {
+        const searchQuery = document.createElement("input");
+        searchQuery.type = "hidden";
+        searchQuery.name = "search";
+        searchQuery.value = searchInput.value.trim();
+        form.appendChild(searchQuery);
+    }
 
-    rows.forEach((row) => {
-        const stockInput = row.querySelector(".new-stock-input");
-        if (!stockInput) return;
+    document.body.appendChild(form);
+    form.submit();
 
-        const currentValue = parseInt(stockInput.value) || 0;
-        let newValue;
-
-        switch (action) {
-            case "add":
-                newValue = currentValue + value;
-                break;
-            case "subtract":
-                newValue = Math.max(0, currentValue - value);
-                break;
-            case "set":
-                newValue = value;
-                break;
-            default:
-                newValue = currentValue;
+    setTimeout(() => {
+        if (document.body.contains(form)) {
+            document.body.removeChild(form);
         }
-
-        stockInput.value = newValue;
-        updateStockChangeDisplay(row);
-    });
-
-    // Clear the input
-    valueInput.value = "";
-
-    showToast("Success", `Bulk action applied to all products.`, "success");
+    }, 2000);
 };
+
+// KEYBOARD SHORTCUTS
+document.addEventListener("keydown", function (e) {
+    // Ctrl/Cmd + K for search focus
+    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) {
+            searchInput.focus();
+            searchInput.select();
+        }
+    }
+
+    // Escape to clear search
+    if (e.key === "Escape") {
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput && document.activeElement === searchInput) {
+            searchInput.value = "";
+            const event = new Event("input", { bubbles: true });
+            searchInput.dispatchEvent(event);
+            searchInput.blur();
+        }
+    }
+});
+
+// BACKUP INITIALIZATION ON WINDOW LOAD
+window.addEventListener("load", function () {
+    console.log("Window loaded, ensuring all functions are initialized");
+
+    // Double-check search initialization
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput && !searchInput.hasAttribute("data-search-initialized")) {
+        initializeSearch();
+        searchInput.setAttribute("data-search-initialized", "true");
+    }
+
+    // Ensure bulk selection is working
+    const selectAllCheckbox = document.getElementById("selectAll");
+    if (
+        selectAllCheckbox &&
+        !selectAllCheckbox.hasAttribute("data-bulk-initialized")
+    ) {
+        initBulkSelection();
+        selectAllCheckbox.setAttribute("data-bulk-initialized", "true");
+    }
+
+    // Initialize selectedProductIds if not already defined
+    if (typeof selectedProductIds === "undefined") {
+        window.selectedProductIds = new Set();
+    }
+});

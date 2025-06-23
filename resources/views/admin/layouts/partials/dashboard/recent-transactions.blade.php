@@ -9,10 +9,7 @@
                     <i class="ti ti-dots-vertical"></i>
                 </a>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#">View All Sales</a>
-                    <a class="dropdown-item" href="#">View All Purchases</a>
                     <a class="dropdown-item" href="{{ route('admin.transactions') }}">View Transactions</a>
-                    <a class="dropdown-item" href="#">Export Transactions</a>
                 </div>
             </div>
         </div>

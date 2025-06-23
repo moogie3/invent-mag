@@ -70,6 +70,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/bulk-export', [ProductController::class, 'bulkExport'])->name('product.bulk-export');
             Route::post('/bulk-stock-details', [ProductController::class, 'bulkStockDetails'])->name('product.bulk-stock-details');
             Route::post('/bulk-update-stock', [ProductController::class, 'bulkUpdateStock'])->name('product.bulk-update-stock');
+            Route::get('/search', [ProductController::class, 'search'])->name('admin.product.search');
         });
 
         // Supplier Routes

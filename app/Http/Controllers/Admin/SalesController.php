@@ -66,46 +66,84 @@ class SalesController extends Controller
     }
 
     public function view($id)
-    {
-        $sales = Sales::with(['items', 'customer'])->find($id);
+{
+    $sales = Sales::with(['items', 'customer'])->find($id);
 
-        // Check if this is a POS invoice
-        if (strpos($sales->invoice, 'POS-') === 0) {
-            // If it's a POS invoice, redirect to the receipt view
-            return redirect()->route('admin.pos.receipt', $id);
-        }
-
-        // For regular invoices, continue with the existing code
-        $customer = Customer::all();
-        $items = SalesItem::all();
-        $tax = Tax::first();
-        return view('admin.sales.sales-view', compact('sales', 'customer', 'items', 'tax'));
+    // Check if this is a POS invoice
+    if (strpos($sales->invoice, 'POS-') === 0) {
+        // If it's a POS invoice, redirect to the receipt view
+        return redirect()->route('admin.pos.receipt', $id);
     }
 
-    public function modalView($id)
-    {
-        try {
-            // Find the sales record with relationships
-            $sales = Sales::with(['customer', 'items.product'])->findOrFail($id);
+    // For regular invoices, continue with the existing code
+    $customer = Customer::all();
+    $items = SalesItem::all();
+    $tax = Tax::first();
 
+    // Calculate summary data similar to PurchaseController
+    $itemCount = $sales->items->count();
+    $subtotal = 0;
+    $totalItemDiscount = 0;
+
+    // Calculate subtotal and item discounts
+    foreach ($sales->items as $item) {
+        $itemSubtotal = $item->customer_price * $item->quantity;
+
+        // Calculate item discount
+        if ($item->discount_type === 'percentage') {
+            $itemDiscountAmount = ($itemSubtotal * $item->discount) / 100;
+        } else {
+            $itemDiscountAmount = $item->discount * $item->quantity;
+        }
+
+        $totalItemDiscount += $itemDiscountAmount;
+        $subtotal += ($itemSubtotal - $itemDiscountAmount);
+    }
+
+    // Calculate order discount
+    $orderDiscount = 0;
+    if ($sales->order_discount > 0) {
+        if ($sales->order_discount_type === 'percentage') {
+            $orderDiscount = ($subtotal * $sales->order_discount) / 100;
+        } else {
+            $orderDiscount = $sales->order_discount;
+        }
+    }
+
+    // Calculate tax (already stored in sales record)
+    $taxAmount = $sales->total_tax;
+    $finalTotal = $sales->total;
+
+    // Create summary array like PurchaseController
+    $summary = [
+        'itemCount' => $itemCount,
+        'subtotal' => $subtotal,
+        'totalItemDiscount' => $totalItemDiscount,
+        'orderDiscount' => $orderDiscount,
+        'taxAmount' => $taxAmount,
+        'finalTotal' => $finalTotal
+    ];
+
+    return view('admin.sales.sales-view', compact(
+        'sales',
+        'customer',
+        'items',
+        'tax',
+        'summary',
+        'itemCount',
+        'subtotal',
+        'orderDiscount',
+        'finalTotal',
+        'totalItemDiscount',
+        'taxAmount'
+    ));
+}
+
+    public function modalViews($id)
+    {
+            $sales = Sales::with(['customer', 'items.product'])->findOrFail($id);
             // Return the modal view
             return view('admin.layouts.modals.salesmodals-view', compact('sales'));
-        } catch (\Exception $e) {
-            // Log the error
-            Log::error('Sales Modal View Error: ' . $e->getMessage(), [
-                'sales_id' => $id,
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            // Return error response
-            return response()->view(
-                'admin.layouts.modals.error',
-                [
-                    'message' => 'Unable to load sales details: ' . $e->getMessage(),
-                ],
-                500,
-            );
-        }
     }
 
     public function store(Request $request)
@@ -130,10 +168,8 @@ class SalesController extends Controller
                     ->withInput();
             }
 
-            // Calculate totals
             $subTotal = 0;
-            $itemDiscountTotal = 0;
-            $totalBeforeDiscounts = 0;
+            $itemsData = [];
 
             foreach ($products as $product) {
                 $quantity = $product['quantity'];
@@ -142,25 +178,44 @@ class SalesController extends Controller
                 $discountType = $product['discountType'] ?? 'fixed';
 
                 $productSubtotal = $price * $quantity;
-                $totalBeforeDiscounts += $productSubtotal;
 
-                $discountAmount = $discountType === 'percentage' ? (($price * $discount) / 100) * $quantity : $discount * $quantity;
+                // Calculate item discount consistently
+                if ($discountType === 'percentage') {
+                    $itemDiscountAmount = ($productSubtotal * $discount) / 100;
+                } else {
+                    // For fixed discount, apply per unit then multiply by quantity
+                    $itemDiscountAmount = $discount * $quantity;
+                }
 
-                $itemDiscountTotal += $discountAmount;
-                $subTotal += $productSubtotal - $discountAmount;
+                $itemTotal = $productSubtotal - $itemDiscountAmount;
+                $subTotal += $itemTotal;
+
+                $itemsData[] = [
+                    'product' => $product,
+                    'productSubtotal' => $productSubtotal,
+                    'itemDiscountAmount' => $itemDiscountAmount,
+                    'itemTotal' => $itemTotal,
+                ];
             }
 
-            // Calculate order discount based on totalBeforeDiscounts to match frontend
+            // Step 2: Calculate order discount (apply to subtotal after item discounts)
             $orderDiscount = $request->discount_total ?? 0;
             $orderDiscountType = $request->discount_total_type ?? 'fixed';
-            $orderDiscountAmount = $orderDiscountType === 'percentage' ? ($totalBeforeDiscounts * $orderDiscount) / 100 : $orderDiscount;
 
-            // Calculate tax on amount after both discounts are applied
-            $taxable = $subTotal - $orderDiscountAmount;
+            if ($orderDiscountType === 'percentage') {
+                $orderDiscountAmount = ($subTotal * $orderDiscount) / 100;
+            } else {
+                $orderDiscountAmount = $orderDiscount;
+            }
+
+            // Step 3: Calculate tax on amount after all discounts
+            $taxableAmount = $subTotal - $orderDiscountAmount;
             $tax = Tax::where('is_active', 1)->first();
             $taxRate = $tax ? $tax->rate : 0;
-            $taxAmount = $taxable * ($taxRate / 100);
-            $grandTotal = $taxable + $taxAmount;
+            $taxAmount = $taxableAmount * ($taxRate / 100);
+
+            // Step 4: Calculate grand total
+            $grandTotal = $taxableAmount + $taxAmount;
 
             // Generate invoice number if not provided
             if (empty($request->invoice)) {
@@ -180,29 +235,27 @@ class SalesController extends Controller
                 'tax_rate' => $taxRate,
                 'total_tax' => $taxAmount,
                 'total' => $grandTotal,
-                'order_discount' => $orderDiscountAmount,
+                'order_discount' => $orderDiscount, // Store the original discount value
                 'order_discount_type' => $orderDiscountType,
                 'status' => 'Unpaid',
                 'is_pos' => 0,
             ]);
 
-            // Insert sale items
-            foreach ($products as $product) {
-                $productSubtotal = $product['price'] * $product['quantity'];
-                $discountAmount = $product['discountType'] === 'percentage' ? ($productSubtotal * $product['discount']) / 100 : $product['discount'];
-
-                $itemTotal = $productSubtotal - $discountAmount;
+            // Insert sale items using the calculated data
+            foreach ($itemsData as $index => $itemData) {
+                $product = $itemData['product'];
 
                 SalesItem::create([
                     'sales_id' => $sale->id,
                     'product_id' => $product['id'],
                     'quantity' => $product['quantity'],
-                    'customer_price' => $product['price'], // Use customer_price column instead of price
+                    'customer_price' => $product['price'],
                     'discount' => $product['discount'] ?? 0,
                     'discount_type' => $product['discountType'] ?? 'fixed',
-                    'total' => $itemTotal,
+                    'total' => $itemData['itemTotal'],
                 ]);
 
+                // Update product stock
                 $productModel = Product::find($product['id']);
                 if ($productModel) {
                     if (isset($productModel->stock_quantity)) {
@@ -232,8 +285,8 @@ class SalesController extends Controller
             $sales->payment_type = $request->payment_type;
             $sales->status = $request->status;
             $sales->payment_date = $request->status === 'Paid' ? now() : null;
-            $sales->order_discount_type = $request->order_discount_type_type ?? 'fixed'; // Fixed field name to match form
-            $sales->order_discount = $request->order_discount ?? 0; // Fixed field name to match form
+            $sales->order_discount_type = $request->order_discount_type ?? 'fixed'; // FIXED: removed extra '_type'
+            $sales->order_discount = $request->order_discount ?? 0;
 
             $subTotal = 0;
             $itemDiscountTotal = 0;

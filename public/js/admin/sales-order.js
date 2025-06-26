@@ -1856,6 +1856,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => {
         // Determine current page
         const pathname = window.location.pathname;
+        console.log("Current pathname:", pathname); // Debug log
 
         try {
             if (pathname.includes("/admin/sales/create")) {
@@ -1863,9 +1864,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 window.salesApp = new SalesOrderCreate();
                 console.log("Sales Order Create App initialized");
             } else if (
-                pathname.includes("/admin/sales/edit") ||
-                (pathname.includes("/admin/sales") &&
-                    pathname.match(/\/\d+\/edit$/))
+                // Fix the route matching for edit pages - matches /admin/sales/edit/46
+                pathname.includes("/admin/sales/edit/") ||
+                pathname.match(/\/admin\/sales\/edit\/\d+$/)
             ) {
                 // Initialize edit page functionality
                 window.salesApp = new SalesOrderEdit();
@@ -1899,25 +1900,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log("Sales Order Index page initialized");
             }
 
-            // Expose global utility functions that might be called from inline handlers
-            // These are now handled by the initGlobalFunctions method in each class
+            // Debug: Force initialize SalesOrderEdit if we're on any edit page
+            if (pathname.includes("edit") && pathname.includes("sales")) {
+                console.log(
+                    "Force initializing SalesOrderEdit due to edit page detection"
+                );
+                window.salesApp = new SalesOrderEdit();
+            }
         } catch (error) {
             console.error("Error initializing Sales Order App:", error);
-            // Fallback: ensure global functions are available even if class initialization fails
-            window.setDeleteFormAction = function (url) {
-                const deleteForm = document.getElementById("deleteForm");
-                if (deleteForm) {
-                    deleteForm.action = url;
-                    console.log("Fallback: Delete form action set to:", url);
-                } else {
-                    console.error("Fallback: Delete form not found");
-                }
-            };
 
-            window.loadSalesDetails = function (id) {
-                console.log("Fallback loadSalesDetails called for ID:", id);
-                // You can implement a fallback version here if needed
-            };
+            // Emergency fallback - try to initialize SalesOrderEdit if on edit page
+            if (pathname.includes("edit") && pathname.includes("sales")) {
+                try {
+                    console.log(
+                        "Emergency fallback: Attempting to initialize SalesOrderEdit"
+                    );
+                    window.salesApp = new SalesOrderEdit();
+                } catch (fallbackError) {
+                    console.error(
+                        "Fallback initialization also failed:",
+                        fallbackError
+                    );
+                }
+            }
         }
     }, 250);
 });

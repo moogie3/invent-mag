@@ -1,6 +1,4 @@
-{{-- Create this file at resources/views/admin/layouts/modals/salesmodals-view.blade.php --}}
 <div class="card shadow-sm">
-    <!-- Sales Header with colored status bar -->
     <div class="card-header">
         <div class="row align-items-center">
             <div class="col">

@@ -29,7 +29,7 @@ class PurchaseController extends Controller
         }
         $pos = $query->paginate($entries);
         $totalinvoice = Purchase::count();
-
+        $items = POItem::all();
         //COUNTING IN INVOICE
         $inCount = Purchase::whereHas('supplier', function ($query) {
             $query->where('location', 'IN');
@@ -59,7 +59,7 @@ class PurchaseController extends Controller
         //USER INFORMATION
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
-        return view('admin.po.index', compact('inCountamount', 'outCountamount', 'pos', 'inCount', 'outCount', 'shopname', 'address', 'entries', 'totalinvoice', 'totalMonthly', 'paymentMonthly'));
+        return view('admin.po.index', compact('inCountamount', 'outCountamount', 'pos', 'inCount', 'outCount', 'shopname', 'address', 'entries', 'totalinvoice', 'totalMonthly', 'paymentMonthly', 'items'));
     }
 
     public function create()
@@ -87,7 +87,17 @@ class PurchaseController extends Controller
         $pos = Purchase::with(['items', 'supplier'])->find($id);
         $suppliers = Supplier::all();
         $items = POItem::all();
-        return view('admin.po.purchase-view', compact('pos', 'suppliers', 'items'));
+
+        // Use the helper to calculate all invoice summary figures at once
+        $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary($pos->items, $pos->discount_total, $pos->discount_total_type);
+
+        $subtotal = $summary['subtotal'];
+        $itemCount = $summary['itemCount'];
+        $totalProductDiscount = $summary['totalProductDiscount'];
+        $orderDiscount = $summary['orderDiscount'];
+        $finalTotal = $summary['finalTotal'];
+
+        return view('admin.po.purchase-view', compact('pos', 'suppliers', 'items', 'itemCount', 'subtotal', 'orderDiscount', 'finalTotal', 'totalProductDiscount'));
     }
 
     public function modalView($id)
@@ -283,10 +293,13 @@ class PurchaseController extends Controller
             $purchaseIds = $request->input('ids', []);
 
             if (empty($purchaseIds)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No purchase orders selected.'
-                ], 400);
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'No purchase orders selected.',
+                    ],
+                    400,
+                );
             }
 
             // Additional validation to ensure all IDs exist
@@ -321,20 +334,25 @@ class PurchaseController extends Controller
                 'message' => "Successfully marked {$updatedCount} purchase order(s) as paid.",
                 'updated_count' => $updatedCount,
             ]);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed: ' . implode(', ', $e->errors()['ids'] ?? ['Invalid purchase order IDs']),
-            ], 422);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Validation failed: ' . implode(', ', $e->errors()['ids'] ?? ['Invalid purchase order IDs']),
+                ],
+                422,
+            );
         } catch (\Exception $e) {
             // Log the error for debugging
             Log::error('Bulk mark as paid error: ' . $e->getMessage());
 
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while updating purchase orders.'
-            ], 500);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'An error occurred while updating purchase orders.',
+                ],
+                500,
+            );
         }
     }
 
@@ -637,11 +655,11 @@ class PurchaseController extends Controller
             });
 
             // Prepare success message with details
-            $message = "Purchase order deleted successfully";
+            $message = 'Purchase order deleted successfully';
             if (!$isPaid && $stockAdjustedCount > 0) {
                 $message .= " (Stock levels adjusted for {$stockAdjustedCount} products)";
             } elseif ($isPaid) {
-                $message .= " (Stock levels unchanged - invoice was paid)";
+                $message .= ' (Stock levels unchanged - invoice was paid)';
             }
 
             Log::info('Single delete completed successfully', [

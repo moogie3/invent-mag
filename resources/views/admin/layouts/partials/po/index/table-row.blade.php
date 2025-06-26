@@ -20,6 +20,6 @@
         </span>
     </td>
     <td class="no-print" style="text-align:center">
-        @include('admin.layouts.partials.po.table-actions', ['po' => $po])
+        @include('admin.layouts.partials.po.index.table-actions', ['po' => $po])
     </td>
 </tr>

@@ -205,16 +205,6 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
             });
         }
 
-        // Quantity validation
-        if (this.elements.quantity) {
-            this.elements.quantity.addEventListener("input", () =>
-                this.validateQuantity()
-            );
-            this.elements.quantity.addEventListener("change", () =>
-                this.validateQuantity()
-            );
-        }
-
         // Add product button
         if (this.elements.addProduct) {
             this.elements.addProduct.addEventListener("click", () =>
@@ -328,40 +318,27 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
                 parseInt(selectedOption.getAttribute("data-stock")) || 0;
             this.currentStock = stock;
 
-            // Calculate remaining stock (available stock minus already ordered quantity)
-            const orderedQuantity = this.getOrderedQuantityForProduct(
-                selectedOption.value
-            );
-            const remainingStock = Math.max(0, stock - orderedQuantity);
+            // Just display the current stock without any restrictions
+            this.elements.stock_available.textContent = stock;
 
-            this.elements.stock_available.textContent = remainingStock;
+            // Update stock display styling based on current stock level
+            this.updateStockStyling(stock);
 
-            // Update stock display styling based on availability
-            this.updateStockStyling(remainingStock);
-
-            // Reset quantity field and warning
+            // Reset quantity field without any max limit
             if (this.elements.quantity) {
-                this.elements.quantity.max = remainingStock;
+                this.elements.quantity.removeAttribute("max");
                 this.elements.quantity.value = "";
             }
-            this.hideQuantityWarning();
         } else {
             this.elements.stock_available.textContent = "-";
             this.currentStock = 0;
             if (this.elements.quantity) {
                 this.elements.quantity.removeAttribute("max");
             }
-            this.hideQuantityWarning();
         }
     }
 
-    getOrderedQuantityForProduct(productId) {
-        return this.products
-            .filter((product) => product.id === productId)
-            .reduce((total, product) => total + product.quantity, 0);
-    }
-
-    updateStockStyling(remainingStock) {
+    updateStockStyling(stock) {
         if (!this.elements.stock_available) return;
 
         // Remove existing classes
@@ -372,76 +349,12 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         );
 
         // Apply styling based on stock level
-        if (remainingStock === 0) {
+        if (stock === 0) {
             this.elements.stock_available.classList.add("text-danger");
-        } else if (remainingStock <= 5) {
+        } else if (stock <= 5) {
             this.elements.stock_available.classList.add("text-warning");
         } else {
             this.elements.stock_available.classList.add("text-primary");
-        }
-    }
-
-    validateQuantity() {
-        if (!this.elements.quantity || !this.elements.product_id) {
-            return true;
-        }
-
-        const quantity = parseInt(this.elements.quantity.value) || 0;
-        const selectedOption =
-            this.elements.product_id.options[
-                this.elements.product_id.selectedIndex
-            ];
-
-        if (!selectedOption || !selectedOption.value) {
-            this.hideQuantityWarning();
-            return true;
-        }
-
-        const productId = selectedOption.value;
-        const stock = parseInt(selectedOption.getAttribute("data-stock")) || 0;
-        const orderedQuantity = this.getOrderedQuantityForProduct(productId);
-        const remainingStock = Math.max(0, stock - orderedQuantity);
-
-        if (quantity > remainingStock) {
-            this.showQuantityWarning();
-            this.disableAddButton();
-            return false;
-        } else {
-            this.hideQuantityWarning();
-            this.enableAddButton();
-            return true;
-        }
-    }
-
-    showQuantityWarning() {
-        if (this.elements.quantity_warning) {
-            this.elements.quantity_warning.classList.remove("d-none");
-        }
-        if (this.elements.quantity) {
-            this.elements.quantity.classList.add("is-invalid");
-        }
-    }
-
-    hideQuantityWarning() {
-        if (this.elements.quantity_warning) {
-            this.elements.quantity_warning.classList.add("d-none");
-        }
-        if (this.elements.quantity) {
-            this.elements.quantity.classList.remove("is-invalid");
-        }
-    }
-
-    disableAddButton() {
-        if (this.elements.addProduct) {
-            this.elements.addProduct.disabled = true;
-            this.elements.addProduct.classList.add("disabled");
-        }
-    }
-
-    enableAddButton() {
-        if (this.elements.addProduct) {
-            this.elements.addProduct.disabled = false;
-            this.elements.addProduct.classList.remove("disabled");
         }
     }
 
@@ -495,11 +408,6 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
             return;
         }
 
-        // Validate quantity first
-        if (!this.validateQuantity()) {
-            return;
-        }
-
         const productId = this.elements.product_id.value;
         const productName =
             this.elements.product_id.options[
@@ -509,6 +417,12 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         const price = parseFloat(this.elements.new_price.value) || 0;
         const discount = parseFloat(this.elements.discount?.value) || 0;
         const discountType = this.elements.discount_type?.value || "fixed";
+
+        // Basic validation - just check if quantity is greater than 0
+        if (quantity <= 0) {
+            alert("Please enter a valid quantity greater than 0.");
+            return;
+        }
 
         // Get stock for the product
         const selectedOption =
@@ -565,8 +479,6 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         if (this.elements.stock_available) {
             this.elements.stock_available.textContent = "-";
         }
-        this.hideQuantityWarning();
-        this.enableAddButton();
     }
 
     clearProducts() {
@@ -635,20 +547,9 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
         if (target.classList.contains("quantity-input")) {
             const newQuantity = parseInt(target.value) || 1;
 
-            // Validate quantity against stock for this specific product
-            const totalOrderedForProduct = this.products
-                .filter((p) => p.id === product.id && p.uniqueId !== uniqueId)
-                .reduce((sum, p) => sum + p.quantity, 0);
-
-            if (newQuantity + totalOrderedForProduct > product.stock) {
-                target.classList.add("is-invalid");
-                // Revert to previous valid value
-                target.value = product.quantity;
-                return;
-            } else {
-                target.classList.remove("is-invalid");
-                product.quantity = newQuantity;
-            }
+            // Remove any validation styling and just update the quantity
+            target.classList.remove("is-invalid");
+            product.quantity = newQuantity;
         } else if (target.classList.contains("price-input")) {
             product.price = parseFloat(target.value) || 0;
         } else if (target.classList.contains("discount-input")) {
@@ -709,28 +610,19 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
 
         // Add rows for each product
         this.products.forEach((product, index) => {
-            // Calculate remaining stock for this product
-            const totalOrderedForProduct = this.products
-                .filter((p) => p.id === product.id)
-                .reduce((sum, p) => sum + p.quantity, 0);
-            const remainingStock = Math.max(
-                0,
-                product.stock - totalOrderedForProduct + product.quantity
-            );
-
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td class="text-center">${index + 1}</td>
                 <td>${product.name}</td>
                 <td class="text-center">
                     <span class="badge ${
-                        remainingStock === 0
+                        product.stock === 0
                             ? "bg-danger"
-                            : remainingStock <= 5
+                            : product.stock <= 5
                             ? "bg-warning"
                             : "bg-success"
                     }">
-                        ${remainingStock}
+                        ${product.stock}
                     </span>
                 </td>
                 <td class="text-center">
@@ -738,7 +630,7 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
                         value="${product.quantity}" data-unique-id="${
                 product.uniqueId
             }"
-                        min="1" max="${product.stock}" style="width:80px;" />
+                        min="1" style="width:80px;" />
                 </td>
                 <td class="text-center">
                     <input type="number" class="form-control price-input text-center"

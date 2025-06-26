@@ -122,7 +122,7 @@ Route::prefix('admin')->group(function () {
             Route::put('/update/{id}', [SalesController::class, 'update'])->name('admin.sales.update');
             Route::delete('/destroy/{id}', [SalesController::class, 'destroy'])->name('admin.sales.destroy');
             Route::get('/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('admin.sales.product.details');
-            Route::get('/modal-view/{id}', [SalesController::class, 'modalView'])->name('admin.sales.modal-view');
+            Route::get('/modal-view/{id}', [SalesController::class, 'modalViews'])->name('admin.sales.modal-view');
             Route::post('/bulk-delete', [SalesController::class, 'bulkDelete'])->name('sales.bulk-delete');
             Route::post('/bulk-mark-paid', [SalesController::class, 'bulkMarkPaid'])->name('sales.bulk-mark-paid');
             Route::post('/bulk-export', [SalesController::class, 'bulkExport'])->name('sales.bulk-export');

@@ -34,9 +34,9 @@ class Product extends Model
         'selling_price' => 'float',
         'stock_quantity' => 'float',
         'has_expiry' => 'boolean',
-        'expiry_date' => 'date',
+        'expiry_date' => 'datetime:Y-m-d', // Changed from 'date' to 'datetime:Y-m-d'
         'low_stock_threshold' => 'integer',
-        'warehouse_id => integer', // Add casting
+        'warehouse_id' => 'integer', // Fixed the missing quote
     ];
 
     public function warehouse(): BelongsTo

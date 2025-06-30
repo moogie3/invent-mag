@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +43,9 @@ class ProductController extends Controller
         $suppliers = Supplier::all();
         $warehouses = Warehouse::all();
         $mainWarehouse = Warehouse::where('is_main', true)->first();
-        return view('admin.product.product-create', compact('categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
+        $lowStockProducts = Product::getLowStockProducts();
+        $expiringSoonProducts = Product::getExpiringSoonProducts();
+        return view('admin.product.product-create', compact('expiringSoonProducts','lowStockProducts','categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
     }
 
     public function modalView($id)
@@ -54,9 +57,14 @@ class ProductController extends Controller
             $product->formatted_selling_price = \App\Helpers\CurrencyHelper::format($product->selling_price);
 
             // Format dates if needed
-            if ($product->has_expiry && $product->expiry_date) {
-                $product->expiry_date = $product->expiry_date->format('Y-m-d');
-            }
+            // Format dates if needed
+if ($product->has_expiry && $product->expiry_date) {
+    try {
+        $product->expiry_date = Carbon::parse($product->expiry_date)->format('Y-m-d');
+    } catch (\Exception $e) {
+        $product->expiry_date = null;
+    }
+}
 
             return response()->json($product);
         } catch (\Exception $e) {
@@ -78,7 +86,9 @@ class ProductController extends Controller
         $suppliers = Supplier::all();
         $warehouses = Warehouse::all();
         $mainWarehouse = Warehouse::where('is_main', true)->first();
-        return view('admin.product.product-edit', compact('products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
+        $lowStockProducts = Product::getLowStockProducts();
+        $expiringSoonProducts = Product::getExpiringSoonProducts();
+        return view('admin.product.product-edit', compact('expiringSoonProducts','lowStockProducts','products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
     }
 
     public function store(Request $request)
@@ -587,6 +597,42 @@ class ProductController extends Controller
 
         // Format products for frontend with proper null handling
         $formattedProducts = $products->map(function ($product) {
+            // Handle expiry date formatting properly
+            $expiryDate = null;
+            if ($product->has_expiry && $product->expiry_date) {
+                try {
+                    // Get the raw attribute value to avoid casting issues
+                    $rawExpiryDate = $product->getAttributes()['expiry_date'] ?? null;
+
+                    if ($rawExpiryDate) {
+                        // Create Carbon instance from raw date string
+                        $carbonDate = Carbon::createFromFormat('Y-m-d', $rawExpiryDate);
+                        $expiryDate = $carbonDate->format('Y-m-d');
+                    }
+                } catch (\Exception $e) {
+                    // Fallback: try to work with the casted value
+                    try {
+                        if ($product->expiry_date instanceof Carbon) {
+                            $expiryDate = $product->expiry_date->format('Y-m-d');
+                        } elseif ($product->expiry_date instanceof \DateTime) {
+                            $expiryDate = $product->expiry_date->format('Y-m-d');
+                        } elseif (method_exists($product->expiry_date, 'format')) {
+                            $expiryDate = $product->expiry_date->format('Y-m-d');
+                        }
+                    } catch (\Exception $fallbackError) {
+                        Log::warning('Failed to format expiry date for product', [
+                            'product_id' => $product->id,
+                            'expiry_date_raw' => $product->getAttributes()['expiry_date'] ?? 'N/A',
+                            'expiry_date_casted' => $product->expiry_date,
+                            'expiry_date_type' => gettype($product->expiry_date),
+                            'original_error' => $e->getMessage(),
+                            'fallback_error' => $fallbackError->getMessage()
+                        ]);
+                        $expiryDate = null;
+                    }
+                }
+            }
+
             return [
                 'id' => $product->id,
                 'name' => $product->name ?? 'Unknown Product',
@@ -597,7 +643,7 @@ class ProductController extends Controller
                 'price' => $product->price ?? 0,
                 'selling_price' => $product->selling_price ?? 0,
                 'has_expiry' => $product->has_expiry ?? false,
-                'expiry_date' => $product->expiry_date ? $product->expiry_date->format('Y-m-d') : null,
+                'expiry_date' => $expiryDate,
                 'category' => $product->category ? [
                     'id' => $product->category->id,
                     'name' => $product->category->name

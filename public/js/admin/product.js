@@ -1203,7 +1203,7 @@ function getExpiryBadge(expiryDateStr) {
     expiryDate.setHours(0, 0, 0, 0);
     const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) return ' <span class="badge bg-danger">Expired</span>';
+    if (diffDays < 0) return ' <span class="badge bg-danger-lt">Expired</span>';
     if (diffDays <= 7)
         return ` <span class="badge bg-warning">Expiring Soon - ${diffDays}d</span>`;
     return "";

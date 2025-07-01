@@ -17,14 +17,11 @@
         <!-- Navigation Dropdown -->
         <nav class="nav-dropdown d-none d-md-flex" id="nav-dropdown">
             <ul class="d-flex gap-3">
-                <li><a href="{{ route('admin.dashboard') }}"><i class="ti ti-home"></i>Dashboard</a></li>
-                <li><a href="{{ route('admin.pos') }}"><i class="ti ti-cash"></i>POS</a></li>
-                <li><a href="{{ route('admin.sales') }}"><i class="ti ti-report-money"></i>Sales</a></li>
-                <li><a href="{{ route('admin.po') }}"><i class="ti ti-shopping-cart"></i>Purchase Order</a></li>
-                <li><a href="{{ route('admin.product') }}"><i class="ti ti-package"></i>Product</a></li>
-                <li><a href="{{ route('admin.customer') }}"><i class="ti ti-users"></i>Customer</a></li>
-                <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-truck"></i>Supplier</a></li>
-                <li><a href="{{ route('admin.warehouse') }}"><i class="ti ti-building-warehouse"></i>Warehouse</a></li>
+                @foreach ($navigationItems as $item)
+                    @can($item['permission'])
+                        <li><a href="{{ route($item['route']) }}"><i class="{{ $item['icon'] }}"></i>{{ $item['title'] }}</a></li>
+                    @endcan
+                @endforeach
             </ul>
         </nav>
 
@@ -34,14 +31,11 @@
         <!-- Mobile Navigation Menu -->
         <div class="mobile-nav d-md-none" id="mobile-nav">
             <ul>
-                <li><a href="{{ route('admin.dashboard') }}"><i class="ti ti-home"></i>Dashboard</a></li>
-                <li><a href="{{ route('admin.pos') }}"><i class="ti ti-cash"></i>POS</a></li>
-                <li><a href="{{ route('admin.sales') }}"><i class="ti ti-report-money"></i></i>Sales</a></li>
-                <li><a href="{{ route('admin.po') }}"><i class="ti ti-shopping-cart"></i>Purchase Order</a></li>
-                <li><a href="{{ route('admin.product') }}"><i class="ti ti-package"></i>Product</a></li>
-                <li><a href="{{ route('admin.customer') }}"><i class="ti ti-users"></i>Customer</a></li>
-                <li><a href="{{ route('admin.supplier') }}"><i class="ti ti-truck"></i>Supplier</a></li>
-                <li><a href="{{ route('admin.warehouse') }}"><i class="ti ti-building-warehouse"></i>Warehouse</a></li>
+                @foreach ($navigationItems as $item)
+                    @can($item['permission'])
+                        <li><a href="{{ route($item['route']) }}"><i class="{{ $item['icon'] }}"></i>{{ $item['title'] }}</a></li>
+                    @endcan
+                @endforeach
                 <li><a href="?theme=light" class="hide-theme-light">
                         <i class="ti ti-sun"></i>Light Mode
                     </a><a href="?theme=dark" class="hide-theme-dark">
@@ -307,10 +301,10 @@
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
                     @if (Auth::check())
                         <span class="avatar avatar-sm"
-                            style="background-image: url('{{ asset('storage/' . Auth::user()->avatar) }}');"></span>
+                            style="background-image: url('{{ Auth::user()->avatar && Storage::disk('public')->exists(Auth::user()->avatar) ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=random' }}');"></span>
                         <div class="d-none d-xl-block ps-2">
-                            <div>{{ Auth::user()->shopname ?? 'No Shop Name' }}</div>
-                            <div class="mt-1 small text-secondary">{{ Auth::user()->role }}</div>
+                            <div>{{ Auth::user()->name }}</div>
+                            <div class="mt-1 small text-secondary">{{ Auth::user()->getRoleNames()->first() }}</div>
                         </div>
                     @else
                         <span class="avatar avatar-sm"

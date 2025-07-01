@@ -25,6 +25,9 @@ class CategoryController extends Controller
         $isCategoryExist = Categories::where('name', $request->name)->exists();
 
         if ($isCategoryExist) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'This category already exists.', 'errors' => ['name' => ['This category already exists.']]], 422);
+            }
             return back()
             ->withErrors([
                 'name' => 'This category already exist'
@@ -35,6 +38,9 @@ class CategoryController extends Controller
 
         Categories::create($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Category created successfully.']);
+        }
         return redirect()->route('admin.setting.category')->with('success','Category created');
     }
 
@@ -47,6 +53,9 @@ class CategoryController extends Controller
 
         $categories = Categories::find($id);
         $categories->update($data);
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Category updated successfully.']);
+        }
         return redirect()->route('admin.setting.category')->with('success', 'Category updated');
     }
 

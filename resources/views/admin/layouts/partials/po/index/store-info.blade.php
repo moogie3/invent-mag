@@ -1,6 +1,6 @@
 <div class="card-body border-bottom py-3">
     <div class="d-flex justify-content-between">
-        <div class="col-md-12">
+        <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title">Store information</div>
@@ -73,5 +73,6 @@
                 </div>
             </div>
         </div>
+        @include('admin.layouts.partials.po.index.filters')
     </div>
 </div>

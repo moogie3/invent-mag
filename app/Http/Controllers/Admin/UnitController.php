@@ -25,6 +25,9 @@ class UnitController extends Controller
         $isUnitExist = Unit::where('name', $request->name)->exists();
 
         if ($isUnitExist) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'This unit already exists.', 'errors' => ['name' => ['This unit already exists.']]], 422);
+            }
             return back()
             ->withErrors([
                 'name' => 'This unit already exist'
@@ -35,6 +38,9 @@ class UnitController extends Controller
 
         Unit::create($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Unit created successfully.']);
+        }
         return redirect()->route('admin.setting.unit')->with('success','Unit created');
     }
 
@@ -47,6 +53,9 @@ class UnitController extends Controller
 
         $units = Unit::find($id);
         $units->update($data);
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Unit updated successfully.']);
+        }
         return redirect()->route('admin.setting.unit')->with('success', 'Unit updated');
     }
 

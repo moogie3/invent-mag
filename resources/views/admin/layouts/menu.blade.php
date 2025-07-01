@@ -25,5 +25,11 @@
             class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.tax') ? 'active' : '' }}">Tax
             Settings</a>
 
+        @can('view-users')
+            <a href="{{ route('admin.users.index') }}"
+                class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.users.index') || request()->routeIs('admin.users.create') || request()->routeIs('admin.users.edit') ? 'active' : '' }}">User
+                Management</a>
+        @endcan
+
     </div>
 </div>

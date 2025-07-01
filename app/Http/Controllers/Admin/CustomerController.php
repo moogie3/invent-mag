@@ -26,6 +26,9 @@ class CustomerController extends Controller
         $isCustomerExists = Customer::where('name', $request->name)->exists();
 
         if ($isCustomerExists) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'This customer already exists.', 'errors' => ['name' => ['This customer already exists.']]], 422);
+            }
             return back()
             ->withErrors([
                 'name' => 'This customer already exist'
@@ -37,6 +40,9 @@ class CustomerController extends Controller
 
         Customer::create($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Customer created successfully.']);
+        }
         return redirect()->route('admin.customer')->with('success', 'Customer created');
     }
 
@@ -85,6 +91,9 @@ class CustomerController extends Controller
 
         $customers = Customer::find($id);
         $customers->update($data);
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Customer updated successfully.']);
+        }
         return redirect()->route('admin.customer')->with('success', 'Customer updated');
     }
 

@@ -20,8 +20,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('remember_token', 100)->nullable();
             $table->string('avatar')->nullable();
-            $table->enum('role', ['admin','member']);
-            $table->string('timezone')->default('Asia/Jakarta');
+            $table->string('timezone')->nullable();
             $table->timestamps();
         });
 

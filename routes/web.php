@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController, UserController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -75,25 +75,25 @@ Route::prefix('admin')->group(function () {
 
         // Supplier Routes
         Route::prefix('supplier')->group(function () {
-            Route::get('/', [SupplierController::class, 'index'])->name('admin.supplier');
-            Route::get('/create', [SupplierController::class, 'create'])->name('admin.supplier.create');
-            Route::post('/store', [SupplierController::class, 'store'])->name('admin.supplier.store');
-            Route::get('/edit/{id}', [SupplierController::class, 'edit'])->name('admin.supplier.edit');
-            Route::get('/view/{id}', [SupplierController::class, 'view'])->name('admin.supplier.view');
-            Route::put('/update/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update');
-            Route::delete('/destroy/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy');
+            Route::get('/', [SupplierController::class, 'index'])->name('admin.supplier')->middleware('can:view-supplier');
+            Route::get('/create', [SupplierController::class, 'create'])->name('admin.supplier.create')->middleware('can:create-supplier');
+            Route::post('/store', [SupplierController::class, 'store'])->name('admin.supplier.store')->middleware('can:create-supplier');
+            Route::get('/edit/{id}', [SupplierController::class, 'edit'])->name('admin.supplier.edit')->middleware('can:edit-supplier');
+            Route::get('/view/{id}', [SupplierController::class, 'view'])->name('admin.supplier.view')->middleware('can:view-supplier');
+            Route::put('/update/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update')->middleware('can:edit-supplier');
+            Route::delete('/destroy/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy')->middleware('can:delete-supplier');
         });
 
         // Customer Routes
         Route::prefix('customer')->group(function () {
-            Route::get('/', [CustomerController::class, 'index'])->name('admin.customer');
-            Route::get('/create', [CustomerController::class, 'create'])->name('admin.customer.create');
-            Route::post('/store', [CustomerController::class, 'store'])->name('admin.customer.store');
-            Route::get('/edit/{id}', [CustomerController::class, 'edit'])->name('admin.customer.edit');
-            Route::get('/view/{id}', [CustomerController::class, 'view'])->name('admin.customer.view');
-            Route::put('/update/{id}', [CustomerController::class, 'update'])->name('admin.customer.update');
-            Route::delete('/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.customer.destroy');
-            Route::post('/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate');
+            Route::get('/', [CustomerController::class, 'index'])->name('admin.customer')->middleware('can:view-customer');
+            Route::get('/create', [CustomerController::class, 'create'])->name('admin.customer.create')->middleware('can:create-customer');
+            Route::post('/store', [CustomerController::class, 'store'])->name('admin.customer.store')->middleware('can:create-customer');
+            Route::get('/edit/{id}', [CustomerController::class, 'edit'])->name('admin.customer.edit')->middleware('can:edit-customer');
+            Route::get('/view/{id}', [CustomerController::class, 'view'])->name('admin.customer.view')->middleware('can:view-customer');
+            Route::put('/update/{id}', [CustomerController::class, 'update'])->name('admin.customer.update')->middleware('can:edit-customer');
+            Route::delete('/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.customer.destroy')->middleware('can:delete-customer');
+            Route::post('/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate')->middleware('can:create-customer');
         });
 
         // Purchase Order Routes
@@ -168,6 +168,11 @@ Route::prefix('admin')->group(function () {
             Route::post('/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
             Route::get('/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
             Route::get('/view/{id}', [NotificationController::class, 'view'])->name('admin.notifications.view');
+        });
+
+        // User Management Routes
+        Route::middleware(['role:superuser'])->group(function () {
+            Route::resource('users', UserController::class)->names('admin.users');
         });
 
         // Settings Routes

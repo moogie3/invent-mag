@@ -67,6 +67,10 @@
 
             $user->save();
 
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Profile updated successfully!']);
+            }
+
             return redirect()->back()->with('success', 'Profile updated successfully!');
         }
 
@@ -80,6 +84,10 @@
             if ($user->avatar) {
                 Storage::delete('public/' . $user->avatar);
                 $user->save();
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Avatar deleted successfully!']);
             }
 
             return redirect()->back()->with('success', 'Avatar deleted successfully!');

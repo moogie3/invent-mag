@@ -32,6 +32,9 @@ class SupplierController extends Controller
         $isSupplierExist = Supplier::where('name', $request->name)->exists();
 
         if ($isSupplierExist) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'This supplier already exists.', 'errors' => ['name' => ['This supplier already exists.']]], 422);
+            }
             return back()
             ->withErrors([
                 'name' => 'This supplier already exist'
@@ -45,6 +48,9 @@ class SupplierController extends Controller
 
         Supplier::create($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Supplier created successfully.']);
+        }
         return redirect()->route('admin.supplier')->with('success','Supplier created');
     }
 
@@ -61,6 +67,9 @@ class SupplierController extends Controller
 
         $suppliers = Supplier::find($id);
         $suppliers->update($data);
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Supplier updated successfully.']);
+        }
         return redirect()->route('admin.supplier')->with('success', 'Supplier updated');
     }
 

@@ -142,6 +142,9 @@ class POSController extends Controller
             }
 
             // Prepare receipt data for redirect
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Transaction completed successfully.', 'sale_id' => $sale->id]);
+            }
             return redirect()->route('admin.pos.receipt', $sale->id)->with('success', 'Transaction completed successfully.');
         } catch (\Exception $e) {
             return back()

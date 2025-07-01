@@ -906,8 +906,6 @@ class SalesOrderEdit extends SalesOrderModule {
             orderDateValue = selectedDates.length > 0 ? selectedDates[0] : null;
         } else if (this.elements.orderDate) {
             orderDateValue = this.elements.orderDate.value;
-        } else {
-            return;
         }
 
         const selectedOption =
@@ -1190,11 +1188,12 @@ class SalesOrderBulkSelection {
             this.bulkActionsBar = document.getElementById("bulkActionsBar");
             this.selectedCount = document.getElementById("selectedCount");
 
+            // If no checkboxes are found, or essential elements are missing, return early
             if (
                 !this.selectAllCheckbox ||
-                this.rowCheckboxes.length === 0 ||
                 !this.bulkActionsBar ||
-                !this.selectedCount
+                !this.selectedCount ||
+                this.rowCheckboxes.length === 0
             ) {
                 if (attempts < maxAttempts) {
                     console.log(
@@ -1205,10 +1204,14 @@ class SalesOrderBulkSelection {
                 }
 
                 console.warn(
-                    "Sales bulk selection elements not found after",
+                    "Sales bulk selection elements not found or no items to select after",
                     maxAttempts,
                     "attempts"
                 );
+                // Ensure bulk actions bar is hidden if no items
+                if (this.bulkActionsBar) {
+                    this.bulkActionsBar.style.display = "none";
+                }
                 return;
             }
 
@@ -1246,15 +1249,17 @@ class SalesOrderBulkSelection {
             ".row-checkbox:checked"
         ).length;
 
-        if (checkedCheckboxes === 0) {
-            this.selectAllCheckbox.indeterminate = false;
-            this.selectAllCheckbox.checked = false;
-        } else if (checkedCheckboxes === totalCheckboxes) {
-            this.selectAllCheckbox.indeterminate = false;
-            this.selectAllCheckbox.checked = true;
-        } else {
-            this.selectAllCheckbox.indeterminate = true;
-            this.selectAllCheckbox.checked = false;
+        if (this.selectAllCheckbox) {
+            if (checkedCheckboxes === 0) {
+                this.selectAllCheckbox.indeterminate = false;
+                this.selectAllCheckbox.checked = false;
+            } else if (checkedCheckboxes === totalCheckboxes) {
+                this.selectAllCheckbox.indeterminate = false;
+                this.selectAllCheckbox.checked = true;
+            } else {
+                this.selectAllCheckbox.indeterminate = true;
+                this.selectAllCheckbox.checked = false;
+            }
         }
     }
 
@@ -1263,11 +1268,13 @@ class SalesOrderBulkSelection {
             ".row-checkbox:checked"
         ).length;
 
-        if (checkedCount > 0) {
-            this.bulkActionsBar.style.display = "block";
-            this.selectedCount.textContent = checkedCount;
-        } else {
-            this.bulkActionsBar.style.display = "none";
+        if (this.bulkActionsBar) {
+            if (checkedCount > 0) {
+                this.bulkActionsBar.style.display = "block";
+                this.selectedCount.textContent = checkedCount;
+            } else {
+                this.bulkActionsBar.style.display = "none";
+            }
         }
     }
 
@@ -1306,47 +1313,83 @@ window.getSalesSelectedIds = function () {
     return salesBulkSelection ? salesBulkSelection.getSelectedIds() : [];
 };
 
-window.bulkDeleteSales = function () {
-    console.log("bulkDeleteSales function called");
+function performBulkDeleteSales(selectedIds, confirmButton, modal) {
+    console.log("performBulkDeleteSales called with IDs:", selectedIds);
 
-    const selected = getSalesSelectedIds();
-    console.log("Selected Sales IDs:", selected);
+    if (!selectedIds || selectedIds.length === 0) return;
 
-    // Validate selection
-    if (!selected || selected.length === 0) {
+    const originalText = confirmButton.innerHTML;
+    confirmButton.innerHTML = `
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Deleting...
+        `;
+    confirmButton.disabled = true;
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        console.error("CSRF token not found");
         showToast(
-            "Warning",
-            "Please select at least one sales order to delete.",
-            "warning"
+            "Error",
+            "Security token not found. Please refresh the page.",
+            "error"
         );
+        resetButton(confirmButton, originalText);
         return;
     }
 
-    // Update modal with selection count
-    const bulkDeleteCount = document.getElementById("bulkDeleteCount");
-    if (bulkDeleteCount) {
-        bulkDeleteCount.textContent = selected.length;
-    }
+    fetch("/admin/sales/bulk-delete", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
+            Accept: "application/json",
+        },
+        body: JSON.stringify({
+            ids: selectedIds,
+        }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                modal.hide();
+                showToast(
+                    "Success",
+                    `${data.deleted_count || selectedIds.length} sales order(s) deleted successfully!`,
+                    "success"
+                );
 
-    // Show confirmation modal
-    const bulkDeleteModal = new bootstrap.Modal(
-        document.getElementById("bulkDeleteModal")
-    );
-    bulkDeleteModal.show();
+                // Remove deleted rows from the table
+                selectedIds.forEach(id => {
+                    const row = document.querySelector(`tr[data-id="${id}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                });
 
-    // Handle confirmation button
-    const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
-    if (confirmBtn) {
-        // Remove any existing event listeners by cloning the button
-        const newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-        newConfirmBtn.addEventListener("click", function () {
-            console.log("Confirm button clicked");
-            performBulkDeleteSales(selected, this, bulkDeleteModal);
+                if (salesBulkSelection) {
+                    salesBulkSelection.updateUI();
+                }
+            } else {
+                showToast(
+                    "Error",
+                    data.message || "Failed to delete sales orders.",
+                    "error"
+                );
+            }
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            showToast(
+                "Error",
+                "An error occurred while deleting sales orders.",
+                "error"
+            );
+        })
+        .finally(() => {
+            confirmButton.innerHTML = originalText;
+            confirmButton.disabled = false;
         });
-    }
-};
+}
 
 window.bulkExportSales = function () {
     const selected = Array.from(
@@ -1675,9 +1718,29 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
                 }
 
                 // Reload page after short delay
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                // setTimeout(() => {
+                //     location.reload();
+                // }, 1000);
+
+                // Dynamically update UI
+                selectedIds.forEach(id => {
+                    const row = document.querySelector(`tr[data-id="${id}"]`); // Assuming rows have data-id attribute
+                    if (row) {
+                        const statusBadge = row.querySelector('.badge');
+                        if (statusBadge) {
+                            statusBadge.textContent = 'Paid';
+                            statusBadge.classList.remove('bg-warning', 'bg-danger', 'bg-info'); // Remove old status colors
+                            statusBadge.classList.add('bg-success'); // Add success color
+                        }
+                        const checkbox = row.querySelector('.row-checkbox');
+                        if (checkbox) {
+                            checkbox.checked = false;
+                        }
+                    }
+                });
+                if (salesBulkSelection) {
+                    salesBulkSelection.updateUI(); // Update bulk action bar and select all state
+                }
             } else {
                 showToast(
                     "Error",

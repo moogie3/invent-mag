@@ -50,7 +50,7 @@
 
     <!-- Preload critical scripts -->
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/flatpickr" as="script" crossorigin>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr" crossorigin="anonymous"></script>
     <script
         src="{{ asset('js/admin/layouts/page-loader.js?v=' . filemtime(public_path('js/admin/layouts/page-loader.js'))) }}">
     </script>

@@ -993,25 +993,24 @@ class PurchaseOrderBulkSelection {
             this.bulkActionsBar = document.getElementById("bulkActionsBar");
             this.selectedCount = document.getElementById("selectedCount");
 
+            // If no checkboxes are found, or essential elements are missing, return early
             if (
                 !this.selectAllCheckbox ||
-                this.rowCheckboxes.length === 0 ||
                 !this.bulkActionsBar ||
                 !this.selectedCount
             ) {
-                if (attempts < maxAttempts) {
-                    console.log(
-                        `Bulk selection init attempt ${attempts}/${maxAttempts} - retrying...`
-                    );
-                    setTimeout(tryInit, 300);
-                    return;
+                console.warn("Bulk selection essential elements not found.");
+                // Ensure bulk actions bar is hidden if essential elements are missing
+                if (this.bulkActionsBar) {
+                    this.bulkActionsBar.style.display = "none";
                 }
+                return;
+            }
 
-                console.warn(
-                    "Bulk selection elements not found after",
-                    maxAttempts,
-                    "attempts"
-                );
+            // If there are no checkboxes, hide the bar and return
+            if (this.rowCheckboxes.length === 0) {
+                this.bulkActionsBar.style.display = "none";
+                console.log("No purchase order items to select, hiding bulk actions bar.");
                 return;
             }
 
@@ -1037,8 +1036,7 @@ class PurchaseOrderBulkSelection {
         // Individual checkbox changes
         this.rowCheckboxes.forEach((checkbox) => {
             checkbox.addEventListener("change", () => {
-                this.updateSelectAllState();
-                this.updateBulkActionsBar();
+                this.updateUI();
             });
         });
     }
@@ -1049,15 +1047,17 @@ class PurchaseOrderBulkSelection {
             ".row-checkbox:checked"
         ).length;
 
-        if (checkedCheckboxes === 0) {
-            this.selectAllCheckbox.indeterminate = false;
-            this.selectAllCheckbox.checked = false;
-        } else if (checkedCheckboxes === totalCheckboxes) {
-            this.selectAllCheckbox.indeterminate = false;
-            this.selectAllCheckbox.checked = true;
-        } else {
-            this.selectAllCheckbox.indeterminate = true;
-            this.selectAllCheckbox.checked = false;
+        if (this.selectAllCheckbox) {
+            if (checkedCheckboxes === 0) {
+                this.selectAllCheckbox.indeterminate = false;
+                this.selectAllCheckbox.checked = false;
+            } else if (checkedCheckboxes === totalCheckboxes) {
+                this.selectAllCheckbox.indeterminate = false;
+                this.selectAllCheckbox.checked = true;
+            } else {
+                this.selectAllCheckbox.indeterminate = true;
+                this.selectAllCheckbox.checked = false;
+            }
         }
     }
 
@@ -1066,32 +1066,14 @@ class PurchaseOrderBulkSelection {
             ".row-checkbox:checked"
         ).length;
 
-        if (checkedCount > 0) {
-            this.bulkActionsBar.style.display = "block";
-            this.selectedCount.textContent = checkedCount;
-        } else {
-            this.bulkActionsBar.style.display = "none";
+        if (this.bulkActionsBar) {
+            if (checkedCount > 0) {
+                this.bulkActionsBar.style.display = "block";
+                this.selectedCount.textContent = checkedCount;
+            } else {
+                this.bulkActionsBar.style.display = "none";
+            }
         }
-    }
-
-    updateUI() {
-        this.updateSelectAllState();
-        this.updateBulkActionsBar();
-    }
-
-    clearSelection() {
-        this.selectAllCheckbox.checked = false;
-        this.selectAllCheckbox.indeterminate = false;
-        this.rowCheckboxes.forEach((checkbox) => {
-            checkbox.checked = false;
-        });
-        this.updateUI();
-    }
-
-    getSelectedIds() {
-        return Array.from(
-            document.querySelectorAll(".row-checkbox:checked")
-        ).map((cb) => cb.value);
     }
 }
 
@@ -1109,47 +1091,83 @@ window.getSelectedIds = function () {
     return bulkSelection ? bulkSelection.getSelectedIds() : [];
 };
 
-window.bulkDeletePO = function () {
-    console.log("bulkDeletePO function called");
+function performBulkDelete(selectedIds, confirmButton, modal) {
+    console.log("performBulkDelete called with IDs:", selectedIds);
 
-    const selected = getSelectedIds();
-    console.log("Selected IDs:", selected);
+    if (!selectedIds || selectedIds.length === 0) return;
 
-    // Validate selection
-    if (!selected || selected.length === 0) {
+    const originalText = confirmButton.innerHTML;
+    confirmButton.innerHTML = `
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Deleting...
+        `;
+    confirmButton.disabled = true;
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        console.error("CSRF token not found");
         showToast(
-            "Warning",
-            "Please select at least one purchase order to delete.",
-            "warning"
+            "Error",
+            "Security token not found. Please refresh the page.",
+            "error"
         );
+        resetButton(confirmButton, originalText);
         return;
     }
 
-    // Update modal with selection count
-    const bulkDeleteCount = document.getElementById("bulkDeleteCount");
-    if (bulkDeleteCount) {
-        bulkDeleteCount.textContent = selected.length;
-    }
+    fetch("/admin/po/bulk-delete", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken.getAttribute("content"),
+            Accept: "application/json",
+        },
+        body: JSON.stringify({
+            ids: selectedIds,
+        }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                modal.hide();
+                showToast(
+                    "Success",
+                    `${data.deleted_count || selectedIds.length} purchase order(s) deleted successfully!`,
+                    "success"
+                );
 
-    // Show confirmation modal
-    const bulkDeleteModal = new bootstrap.Modal(
-        document.getElementById("bulkDeleteModal")
-    );
-    bulkDeleteModal.show();
+                // Remove deleted rows from the table
+                selectedIds.forEach(id => {
+                    const row = document.querySelector(`tr[data-id="${id}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                });
 
-    // Handle confirmation button
-    const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
-    if (confirmBtn) {
-        // Remove any existing event listeners by cloning the button
-        const newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-        newConfirmBtn.addEventListener("click", function () {
-            console.log("Confirm button clicked");
-            performBulkDelete(selected, this, bulkDeleteModal);
+                if (bulkSelection) {
+                    bulkSelection.updateUI();
+                }
+            } else {
+                showToast(
+                    "Error",
+                    data.message || "Failed to delete purchase orders.",
+                    "error"
+                );
+            }
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            showToast(
+                "Error",
+                "An error occurred while deleting purchase orders.",
+                "error"
+            );
+        })
+        .finally(() => {
+            confirmButton.innerHTML = originalText;
+            confirmButton.disabled = false;
         });
-    }
-};
+}
 
 window.bulkExportPO = function () {
     const selected = Array.from(
@@ -1422,9 +1440,29 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
                 }
 
                 // Reload page after short delay
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                // setTimeout(() => {
+                //     location.reload();
+                // }, 1000);
+
+                // Dynamically update UI
+                selectedIds.forEach(id => {
+                    const row = document.querySelector(`tr[data-id="${id}"]`); // Assuming rows have data-id attribute
+                    if (row) {
+                        const statusBadge = row.querySelector('.badge');
+                        if (statusBadge) {
+                            statusBadge.textContent = 'Paid';
+                            statusBadge.classList.remove('bg-warning', 'bg-danger', 'bg-info'); // Remove old status colors
+                            statusBadge.classList.add('bg-success'); // Add success color
+                        }
+                        const checkbox = row.querySelector('.row-checkbox');
+                        if (checkbox) {
+                            checkbox.checked = false;
+                        }
+                    }
+                });
+                if (bulkSelection) {
+                    bulkSelection.updateUI(); // Update bulk action bar and select all state
+                }
             } else {
                 showToast(
                     "Error",
@@ -1491,7 +1529,7 @@ function performBulkMarkAsPaid(selectedIds, confirmButton, modal) {
 
 // Use the same toast function as transactions (from paste-1.txt)
 function showToast(title, message, type = "info", duration = 4000) {
-    // Create a toast container if it doesn't exist
+    // Create a toast container if it's not already created
     let toastContainer = document.getElementById("toast-container");
     if (!toastContainer) {
         toastContainer = document.createElement("div");
@@ -1585,7 +1623,6 @@ function hideToast(toast) {
     toast.classList.remove("toast-show");
     toast.classList.add("toast-exit");
 
-    // Remove after animation completes
     setTimeout(() => {
         toast.remove();
     }, 300);
@@ -1604,6 +1641,262 @@ function getToastColor(type) {
             return "info";
     }
 }
+
+// --- Start Search Functionality (Adapted from product.js) ---
+let searchTimeout;
+let currentRequest = null;
+let isSearchActive = false;
+let originalTableContent = null;
+let originalPoData = new Map(); // Changed from originalProductData
+
+function initializeSearch() {
+    const searchInput = document.getElementById("searchInput");
+    if (!searchInput) return;
+
+    storeOriginalTable();
+
+    searchInput.addEventListener("input", function () {
+        clearTimeout(searchTimeout);
+        if (currentRequest) {
+            currentRequest.abort();
+            currentRequest = null;
+        }
+
+        const query = this.value.trim();
+
+        searchTimeout = setTimeout(() => {
+            if (query.length === 0) {
+                if (isSearchActive) {
+                    restoreOriginalTable();
+                }
+                isSearchActive = false;
+            } else {
+                performSearch(query);
+                isSearchActive = true;
+            }
+        }, 500);
+    });
+}
+
+function storeOriginalTable() {
+    if (!originalTableContent) {
+        const tableBody = document.querySelector("table tbody");
+        if (tableBody) {
+            originalTableContent = tableBody.innerHTML;
+
+            const rows = tableBody.querySelectorAll("tr[data-id]");
+            rows.forEach((row) => {
+                const poId = row.dataset.id;
+                const poData = extractPoDataFromRow(row); // Changed function name
+                if (poData) {
+                    originalPoData.set(poId, poData); // Changed map name
+                }
+            });
+        }
+    }
+}
+
+function extractPoDataFromRow(row) { // Changed function name
+    try {
+        const invoiceElement = row.querySelector(".sort-invoice");
+        const supplierElement = row.querySelector(".sort-supplier");
+        const orderDateElement = row.querySelector(".sort-orderdate");
+        const dueDateElement = row.querySelector(".sort-duedate");
+        const amountElement = row.querySelector(".sort-amount");
+        const paymentElement = row.querySelector(".sort-payment");
+        const statusElement = row.querySelector(".sort-status");
+
+        if (!invoiceElement) return null;
+
+        return {
+            id: parseInt(row.dataset.id),
+            invoice: invoiceElement.textContent.trim(),
+            supplier_name: supplierElement?.textContent?.trim() || "N/A",
+            order_date: orderDateElement?.textContent?.trim() || "N/A",
+            due_date: dueDateElement?.textContent?.trim() || "N/A",
+            amount: amountElement?.textContent?.trim() || "N/A",
+            payment_type: paymentElement?.textContent?.trim() || "N/A",
+            status: statusElement?.textContent?.trim() || "N/A",
+        };
+    } catch (error) {
+        console.error("Error extracting PO data:", error);
+        return null;
+    }
+}
+
+function restoreOriginalTable() {
+    if (originalTableContent) {
+        const tableBody = document.querySelector("table tbody");
+        if (tableBody) {
+            tableBody.innerHTML = originalTableContent;
+            // Reinitialize bulk selection and restore states if applicable
+            setTimeout(() => {
+                if (bulkSelection) { // Check if bulkSelection exists
+                    bulkSelection.init(); // Reinitialize to re-attach listeners
+                    bulkSelection.updateUI(); // Update UI based on current state
+                }
+            }, 100);
+        }
+    }
+}
+
+function performSearch(query) {
+    storeOriginalTable();
+
+    const tableBody = document.querySelector("table tbody");
+
+    if (!query) {
+        restoreOriginalTable();
+        return;
+    }
+
+    tableBody.innerHTML = `
+        <tr><td colspan="100%" class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-3 text-muted">Searching...</p>
+        </td></tr>
+    `;
+
+    const controller = new AbortController();
+    currentRequest = controller;
+
+    // !!! IMPORTANT: This URL needs to be implemented on the backend !!!
+    fetch(`/admin/po/search?q=${encodeURIComponent(query)}`, {
+        signal: controller.signal,
+        headers: {
+            Accept: "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            currentRequest = null;
+            if (data.success) {
+                renderSearchResults(data.pos); // Changed from data.products
+            } else {
+                showNoResults(data.message);
+            }
+        })
+        .catch((error) => {
+            currentRequest = null;
+            if (error.name !== "AbortError") {
+                showSearchError(error.message);
+            }
+        });
+}
+
+function renderSearchResults(pos) { // Changed parameter name
+    const tableBody = document.querySelector("table tbody");
+    if (!pos.length) {
+        showNoResults();
+        return;
+    }
+
+    // Store search results in originalPoData for future use (e.g., bulk operations)
+    pos.forEach((po) => {
+        originalPoData.set(po.id.toString(), po);
+    });
+
+    const formatCurrency = (amount) => {
+        if (!amount) return "N/A";
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+        }).format(amount);
+    };
+
+    const html = pos
+        .map((po, index) => {
+            // Assuming po object has id, invoice, supplier_name, order_date, due_date, total, payment_type, status
+            const statusClass = po.status_class; // Assuming backend provides this
+            const statusText = po.status_text; // Assuming backend provides this
+
+            return `
+            <tr class="table-row" data-id="${po.id}">
+                <td>
+                    <input type="checkbox" class="form-check-input row-checkbox" value="${po.id}">
+                </td>
+                <td class="sort-no no-print">${index + 1}</td>
+                <td class="sort-invoice">${po.invoice}</td>
+                <td class="sort-supplier">${po.supplier_name}</td>
+                <td class="sort-orderdate">${po.order_date}</td>
+                <td class="sort-duedate" data-date="${po.due_date_raw}">
+                    ${po.due_date}
+                </td>
+                <td class="sort-amount" data-amount="${po.total_raw}">
+                    ${formatCurrency(po.total_raw)}
+                    <span class="raw-amount" style="display: none;">${po.total_raw}</span>
+                </td>
+                <td class="sort-payment no-print">${po.payment_type}</td>
+                <td class="sort-status">
+                    <span class="${statusClass}">
+                        ${statusText}
+                    </span>
+                </td>
+                <td class="no-print" style="text-align:center">
+                    <div class="dropdown">
+                        <button class="btn dropdown-toggle align-text-top"
+                            data-bs-toggle="dropdown" data-bs-boundary="viewport">
+                            Actions
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="javascript:void(0)" onclick="loadPoDetails('${po.id}')"
+                               data-bs-toggle="modal" data-bs-target="#viewPoModal" class="dropdown-item">
+                                <i class="ti ti-zoom-scan me-2"></i> View
+                            </a>
+                            <a href="/admin/po/edit/${po.id}" class="dropdown-item">
+                                <i class="ti ti-edit me-2"></i> Edit
+                            </a>
+                            <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal" onclick="setDeleteFormAction('/admin/po/destroy/${po.id}')">
+                                <i class="ti ti-trash me-2"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            `;
+        })
+        .join("");
+
+    tableBody.innerHTML = html;
+
+    // Reinitialize bulk selection with preserved states
+    setTimeout(() => {
+        if (bulkSelection) { // Check if bulkSelection exists
+            bulkSelection.init(); // Reinitialize to re-attach listeners
+            bulkSelection.updateUI(); // Update UI based on current state
+        }
+    }, 100);
+}
+
+function showNoResults(message = "No purchase orders found matching your search.") {
+    document.querySelector("table tbody").innerHTML = `
+        <tr><td colspan="100%" class="text-center py-5">
+            <i class="ti ti-search-off fs-1 text-muted"></i>
+            <p class="mt-3 text-muted">${message}</p>
+        </td></tr>
+    `;
+
+    // Hide bulk actions bar when no results
+    const bulkActionsBar = document.getElementById("bulkActionsBar");
+    if (bulkActionsBar) { // No need for selectedProductIds.size === 0 here
+        bulkActionsBar.style.display = "none";
+    }
+}
+
+function showSearchError(errorMessage = "Search error occurred.") {
+    document.querySelector("table tbody").innerHTML = `
+        <tr><td colspan="100%" class="text-center py-5">
+            <i class="ti ti-alert-circle fs-1 text-danger"></i>
+            <p class="mt-3 text-danger">${errorMessage}</p>
+            <button class="btn btn-outline-primary mt-2" onclick="window.location.reload()">
+                <i class="ti ti-refresh me-2"></i> Refresh
+            </button>
+        </td></tr>
+    `;
+}
+// --- End Search Functionality ---
 
 // Keep the existing DOMContentLoaded initialization
 document.addEventListener("DOMContentLoaded", function () {
@@ -1644,14 +1937,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Initialize view functionality even on index page for modals
                 window.poApp = new PurchaseOrderView();
 
-                // Also initialize bulk selection if the class exists
-                if (typeof PurchaseOrderBulkSelection !== "undefined") {
+                // Initialize bulk selection only if there are items to select
+                const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+                if (typeof PurchaseOrderBulkSelection !== "undefined" && rowCheckboxes.length > 0) {
                     bulkSelection = new PurchaseOrderBulkSelection();
-                    console.log(
-                        "Purchase Order Index bulk selection initialized"
-                    );
+                    console.log("Purchase Order Index bulk selection initialized");
+                } else {
+                    console.log("No purchase order items found, skipping bulk selection initialization.");
+                    // Ensure the bulk actions bar is hidden if no items
+                    const bulkActionsBar = document.getElementById("bulkActionsBar");
+                    if (bulkActionsBar) {
+                        bulkActionsBar.style.display = "none";
+                    }
                 }
 
+                // Initialize search functionality for index page
+                initializeSearch();
                 console.log("Purchase Order Index page initialized");
             }
 

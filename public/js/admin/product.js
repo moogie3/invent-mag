@@ -433,7 +433,14 @@ function performBulkDelete(ids, button, modal) {
                     "success"
                 );
                 clearProductSelection();
-                setTimeout(() => location.reload(), 1500);
+                // Remove deleted rows from the table
+                ids.forEach(id => {
+                    const row = document.querySelector(`tr[data-id="${id}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                });
+                // setTimeout(() => location.reload(), 1500);
             } else {
                 showToast("Error", data.message || "Delete failed.", "error");
             }
@@ -674,8 +681,29 @@ function handleBulkStockUpdate() {
                     } products!`,
                     "success"
                 );
+                // Update the stock quantity in the table dynamically
+                updates.forEach(updatedProduct => {
+                    const row = document.querySelector(`tr[data-id="${updatedProduct.id}"]`);
+                    if (row) {
+                        const quantityElement = row.querySelector('.sort-quantity');
+                        if (quantityElement) {
+                            quantityElement.textContent = updatedProduct.stock_quantity;
+                            // Also update the badge if it exists
+                            const badge = quantityElement.querySelector('.badge');
+                            if (badge) {
+                                const threshold = updatedProduct.low_stock_threshold || 10; // Assuming threshold is returned or default
+                                if (updatedProduct.stock_quantity <= threshold) {
+                                    badge.className = 'badge bg-danger-lt';
+                                    badge.textContent = 'Low Stock';
+                                } else {
+                                    badge.remove(); // Remove badge if no longer low stock
+                                }
+                            }
+                        }
+                    }
+                });
                 clearProductSelection();
-                setTimeout(() => location.reload(), 1500);
+                // setTimeout(() => location.reload(), 1500);
             } else {
                 showToast("Error", data.message || "Update failed.", "error");
             }

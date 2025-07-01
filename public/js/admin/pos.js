@@ -453,9 +453,135 @@ document.addEventListener("DOMContentLoaded", function () {
         // Clear localStorage before submitting to prevent cached items from reappearing
         localStorage.removeItem("cachedProducts");
 
-        // Submit the form
-        invoiceForm.submit();
+        // Submit the form via AJAX
+        fetch(invoiceForm.action, {
+            method: invoiceForm.method,
+            body: new FormData(invoiceForm),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Success', data.message, 'success');
+                paymentModal.hide();
+                clearCart(); // Clear cart after successful payment
+                // Optionally, you might want to redirect or update a specific part of the page
+                // For now, we'll just clear the cart and keep the user on the POS page
+            } else {
+                showToast('Error', data.message || 'Failed to process payment.', 'error');
+                console.error('Payment error:', data.errors);
+            }
+        })
+        .catch(error => {
+            console.error('Error processing payment:', error);
+            showToast('Error', 'An error occurred while processing payment. Please check the console for details.', 'error');
+        });
     }
+
+    // Toast notification functions (copied from user.js)
+function showToast(title, message, type = "info", duration = 4000) {
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+        toastContainer = document.createElement("div");
+        toastContainer.id = "toast-container";
+        toastContainer.className =
+            "toast-container position-fixed bottom-0 end-0 p-3";
+        toastContainer.style.zIndex = "1050";
+        document.body.appendChild(toastContainer);
+
+        if (!document.getElementById("toast-styles")) {
+            const style = document.createElement("style");
+            style.id = "toast-styles";
+            style.textContent = `
+                    .toast-enter {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    .toast-show {
+                        transform: translateX(0);
+                        opacity: 1;
+                        transition: transform 0.3s ease, opacity 0.3s ease;
+                    }
+                    .toast-exit {
+                        transform: translateX(100%);
+                        opacity: 0;
+                        transition: transform 0.3s ease, opacity 0.3s ease;
+                    }
+                `;
+            document.head.appendChild(style);
+        }
+    }
+
+    const toast = document.createElement("div");
+    toast.className =
+        "toast toast-enter align-items-center text-white bg-" +
+        getToastColor(type) +
+        " border-0";
+    toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
+
+    toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>${title}</strong>: ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+    toastContainer.appendChild(toast);
+
+    void toast.offsetWidth;
+
+    toast.classList.add("toast-show");
+
+    const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: duration,
+    });
+    bsToast.show();
+
+    const closeButton = toast.querySelector(".btn-close");
+    closeButton.addEventListener("click", () => {
+        hideToast(toast);
+    });
+
+    const hideTimeout = setTimeout(() => {
+        hideToast(toast);
+    }, duration);
+
+    toast._hideTimeout = hideTimeout;
+}
+
+function hideToast(toast) {
+    if (toast._hideTimeout) {
+        clearTimeout(toast._hideTimeout);
+    }
+
+    toast.classList.remove("toast-show");
+    toast.classList.add("toast-exit");
+
+    setTimeout(() => {
+        toast.remove();
+    }, 300);
+}
+
+function getToastColor(type) {
+    switch (type) {
+        case "success":
+            return "success";
+        case "error":
+            return "danger";
+        case "warning":
+            return "warning";
+        default:
+            return "info";
+    }
+}
 
     // Event Listeners
 

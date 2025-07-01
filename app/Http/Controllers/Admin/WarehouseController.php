@@ -33,6 +33,9 @@ class WarehouseController extends Controller
         $isWOExist = Warehouse::where('name', $request->name)->exists();
 
         if ($isWOExist) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'This warehouse already exists.', 'errors' => ['name' => ['This warehouse already exists.']]], 422);
+            }
             return back()
                 ->withErrors([
                     'name' => 'This warehouse already exists'
@@ -44,6 +47,9 @@ class WarehouseController extends Controller
         if (isset($data['is_main']) && $data['is_main']) {
             // Check if there's already a main warehouse
             if (Warehouse::hasMainWarehouse()) {
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => 'There is already a main warehouse defined. Please unset the current main warehouse first.', 'errors' => ['is_main' => ['There is already a main warehouse defined. Please unset the current main warehouse first.']]], 422);
+                }
                 return back()
                     ->withErrors([
                         'is_main' => 'There is already a main warehouse defined. Please unset the current main warehouse first.'
@@ -54,6 +60,9 @@ class WarehouseController extends Controller
 
         Warehouse::create($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Warehouse created successfully.']);
+        }
         return redirect()->route('admin.warehouse')->with('success', 'Warehouse created');
     }
 
@@ -81,6 +90,9 @@ class WarehouseController extends Controller
         }
 
         $wos->update($data);
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Warehouse updated successfully.']);
+        }
         return redirect()->route('admin.warehouse')->with('success', 'Warehouse updated');
     }
 

@@ -141,10 +141,21 @@ function confirmMarkAsPaid() {
                     "success"
                 );
 
-                // Reload page after short delay
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                // Dynamically update the row
+                const row = document.querySelector(`tr[data-id="${currentTransactionId}"]`);
+                if (row) {
+                    const statusBadge = row.querySelector('.badge');
+                    if (statusBadge) {
+                        statusBadge.textContent = 'Paid';
+                        statusBadge.classList.remove('bg-warning', 'bg-danger', 'bg-info'); // Remove old status colors
+                        statusBadge.classList.add('bg-success'); // Add success color
+                    }
+                    const checkbox = row.querySelector('.row-checkbox');
+                    if (checkbox) {
+                        checkbox.checked = false;
+                    }
+                }
+                updateBulkActions(); // Update bulk actions bar and select all state
             } else {
                 showToast("Error: " + data.message, "error");
             }
@@ -479,10 +490,23 @@ function confirmBulkMarkAsPaid() {
                 // Clear selection
                 clearSelection();
 
-                // Reload page after short delay
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                // Dynamically update the rows
+                selected.forEach(id => {
+                    const row = document.querySelector(`tr[data-id="${id}"]`);
+                    if (row) {
+                        const statusBadge = row.querySelector('.badge');
+                        if (statusBadge) {
+                            statusBadge.textContent = 'Paid';
+                            statusBadge.classList.remove('bg-warning', 'bg-danger', 'bg-info');
+                            statusBadge.classList.add('bg-success');
+                        }
+                        const checkbox = row.querySelector('.row-checkbox');
+                        if (checkbox) {
+                            checkbox.checked = false;
+                        }
+                    }
+                });
+                updateBulkActions(); // Update bulk actions bar and select all state
             } else {
                 showToast(
                     "Error",

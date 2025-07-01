@@ -25,8 +25,13 @@
     <script src="{{ asset('js/admin/auth.js') }}"></script>
 @endif
 
-{{-- SCRIPT FOR SETTING PROFILE --}}
-@if (request()->is('admin/setting/profile'))
+{{-- SCRIPT FOR USER MANAGEMENT --}}
+@if (request()->is('admin/users'))
+    <script src="{{ asset('js/admin/user.js') }}"></script>
+@endif
+
+{{-- SCRIPT FOR  PROFILE --}}
+@if (request()->is('admin/settings/profile'))
     <script src="{{ asset('js/admin/profile.js') }}"></script>
 @endif
 
@@ -56,12 +61,12 @@
 @endif
 
 {{-- SCRIPT FOR UNIT --}}
-@if (request()->is('admin/setting/unit'))
+@if (request()->is('admin/settings/unit'))
     <script src="{{ asset('js/admin/unit.js') }}"></script>
 @endif
 
 {{-- SCRIPT FOR CATEGORY --}}
-@if (request()->is('admin/setting/category'))
+@if (request()->is('admin/settings/category'))
     <script src="{{ asset('js/admin/category.js') }}"></script>
 @endif
 
@@ -83,13 +88,13 @@
         'admin/product',
         'admin/supplier',
         'admin/customer',
-        'admin/setting/unit',
-        'admin/setting/category'))
+        'admin/settings/unit',
+        'admin/settings/category'))
     <script src="{{ asset('js/admin/sorting.js') }}"></script>
 @endif
 
-{{-- SCRIPT FOR CURRENCY SETTING --}}
-@if (request()->is('admin/setting/currency'))
+{{-- SCRIPT FOR CURRENCY settings --}}
+@if (request()->is('admin/settings/currency'))
     <script src="{{ asset('js/admin/currency.js') }}"></script>
 @endif
 

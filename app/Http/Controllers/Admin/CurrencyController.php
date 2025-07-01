@@ -28,6 +28,10 @@ class CurrencyController extends Controller
     $setting = CurrencySetting::first();
     $setting->update($request->all());
 
+    if ($request->ajax()) {
+        return response()->json(['success' => true, 'message' => 'Currency settings updated successfully.']);
+    }
+
     return redirect()->back()->with('success', 'Currency settings updated successfully.');
     }
 }

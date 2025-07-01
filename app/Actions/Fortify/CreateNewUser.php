@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -31,10 +33,21 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
+            // Add other fields if they are part of your registration form and fillable
+            'shopname' => $input['shopname'] ?? null,
+            'address' => $input['address'] ?? null,
+            'avatar' => $input['avatar'] ?? null,
+            'timezone' => $input['timezone'] ?? null,
         ]);
+
+        // Assign a default role (e.g., 'staff') to the new user
+        $staffRole = Role::firstOrCreate(['name' => 'staff']);
+        $user->assignRole($staffRole);
+
+        return $user;
     }
 }

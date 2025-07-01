@@ -101,7 +101,6 @@
                                 </div>
                                 <div class="card-footer bg-transparent mt-auto">
                                     <div class="btn-list justify-content-end">
-                                        <a href="#" class="btn">Cancel</a>
                                         <button type="button" class="btn btn-primary"
                                             onclick="showPasswordModal()">Update</button>
                                     </div>

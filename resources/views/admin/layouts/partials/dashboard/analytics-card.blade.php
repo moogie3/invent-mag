@@ -16,7 +16,7 @@
     </div>
 
     <!-- Top Items Table Section -->
-    <div class="card-body p-0">
+    <div class="card-body p-0" style="min-height: 240px;">
         <div class="text-center py-2">
             <h5 class="text-muted">Top {{ ucfirst($type) }}s</h5>
         </div>

@@ -26,7 +26,7 @@
             </div>
         </div>
     </div>
-    <div class="card-body">
+    <div class="card-body" style="min-height: 420px;">
         <!-- Tab Navigation -->
         <ul class="nav nav-tabs nav-fill mb-3" id="chartTabs" role="tablist">
             <li class="nav-item" role="presentation">

@@ -27,12 +27,20 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data.success) {
                 showToast('Success', data.message, 'success');
                 const bsModal = bootstrap.Modal.getInstance(modalElement);
-                if (bsModal) bsModal.hide();
-                form.reset(); // Clear form fields
-
-                // Optionally, update the table dynamically instead of reloading
-                // For now, we'll reload to keep it simple, but this is where dynamic update would go
-                location.reload();
+                if (bsModal) {
+                    bsModal._element.addEventListener('hidden.bs.modal', function handler() {
+                        bsModal._element.removeEventListener('hidden.bs.modal', handler);
+                        form.reset(); // Clear form fields
+                        // Explicitly remove any remaining modal backdrops
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => backdrop.remove());
+                        location.reload();
+                    });
+                    bsModal.hide();
+                } else {
+                    form.reset();
+                    location.reload();
+                }
             } else {
                 showToast('Error', data.message || 'Operation failed.', 'error');
                 console.error('Form submission error:', data.errors);
@@ -87,108 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Toast notification functions (copied from user.js)
-    function showToast(title, message, type = "info", duration = 4000) {
-        let toastContainer = document.getElementById("toast-container");
-        if (!toastContainer) {
-            toastContainer = document.createElement("div");
-            toastContainer.id = "toast-container";
-            toastContainer.className =
-                "toast-container position-fixed bottom-0 end-0 p-3";
-            toastContainer.style.zIndex = "1050";
-            document.body.appendChild(toastContainer);
-
-            if (!document.getElementById("toast-styles")) {
-                const style = document.createElement("style");
-                style.id = "toast-styles";
-                style.textContent = `
-                        .toast-enter {
-                            transform: translateX(100%);
-                            opacity: 0;
-                        }
-                        .toast-show {
-                            transform: translateX(0);
-                            opacity: 1;
-                            transition: transform 0.3s ease, opacity 0.3s ease;
-                        }
-                        .toast-exit {
-                            transform: translateX(100%);
-                            opacity: 0;
-                            transition: transform 0.3s ease, opacity 0.3s ease;
-                        }
-                    `;
-                document.head.appendChild(style);
-            }
-        }
-
-        const toast = document.createElement("div");
-        toast.className =
-            "toast toast-enter align-items-center text-white bg-" +
-            getToastColor(type) +
-            " border-0";
-        toast.setAttribute("role", "alert");
-        toast.setAttribute("aria-live", "assertive");
-        toast.setAttribute("aria-atomic", "true");
-
-        toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <strong>${title}</strong>: ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            `;
-
-        toastContainer.appendChild(toast);
-
-        void toast.offsetWidth;
-
-        toast.classList.add("toast-show");
-
-        const bsToast = new bootstrap.Toast(toast, {
-            autohide: true,
-            delay: duration,
-        });
-        bsToast.show();
-
-        const closeButton = toast.querySelector(".btn-close");
-        closeButton.addEventListener("click", () => {
-            hideToast(toast);
-        });
-
-        const hideTimeout = setTimeout(() => {
-            hideToast(toast);
-        }, duration);
-
-        toast._hideTimeout = hideTimeout;
-    }
-
-    function hideToast(toast) {
-        if (toast._hideTimeout) {
-            clearTimeout(toast._hideTimeout);
-        }
-
-        toast.classList.remove("toast-show");
-        toast.classList.add("toast-exit");
-
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
-    }
-
-    function getToastColor(type) {
-        switch (type) {
-            case "success":
-                return "success";
-            case "error":
-                return "danger";
-            case "warning":
-                return "warning";
-            default:
-                return "info";
-        }
-    }
-
-    // --- Start Search Functionality (Adapted from product.js) ---
+    // Function to handle form submission via AJAX
     let searchTimeout;
     let currentRequest = null;
     let isSearchActive = false;

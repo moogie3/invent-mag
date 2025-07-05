@@ -4,7 +4,7 @@
             <i class="ti ti-category fs-3 me-2 text-blue"></i> Top Categories
         </h3>
     </div>
-    <div class="card-body p-3">
+    <div class="card-body p-3" style="min-height: 280px;">
         @forelse ($topCategories ?? [] as $category)
             <div class="d-flex align-items-center py-2">
                 <div class="avatar me-3 bg-{{ $loop->iteration % 2 ? 'primary' : 'success' }}-lt">

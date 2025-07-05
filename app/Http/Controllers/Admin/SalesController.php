@@ -141,9 +141,16 @@ class SalesController extends Controller
 
     public function modalViews($id)
     {
+        try {
             $sales = Sales::with(['customer', 'items.product'])->findOrFail($id);
-            // Return the modal view
             return view('admin.layouts.modals.salesmodals-view', compact('sales'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Sales record not found for modal view: {$id}");
+            return response('<div class="alert alert-danger">Sales record not found.</div>', 404);
+        } catch (\Exception $e) {
+            Log::error("Error loading sales modal view for ID {$id}: " . $e->getMessage());
+            return response('<div class="alert alert-danger">Error loading sales details: ' . $e->getMessage() . '</div>', 500);
+        }
     }
 
     public function store(Request $request)

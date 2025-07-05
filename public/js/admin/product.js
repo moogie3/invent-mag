@@ -425,13 +425,18 @@ function performBulkDelete(ids, button, modal) {
         .then((data) => {
             if (data.success) {
                 modal.hide();
-                showToast(
-                    "Success",
-                    `${
-                        data.deleted_count || ids.length
-                    } products deleted successfully!`,
-                    "success"
-                );
+                // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
+                modal._element.addEventListener('hidden.bs.modal', function handler() {
+                    modal._element.removeEventListener('hidden.bs.modal', handler); // Remove the listener
+                    showToast(
+                        "Success",
+                        `${data.deleted_count || ids.length} products deleted successfully!`,
+                        "success"
+                    );
+                    // Explicitly remove any remaining modal backdrops
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(backdrop => backdrop.remove());
+                });
                 clearProductSelection();
                 // Remove deleted rows from the table
                 ids.forEach(id => {
@@ -529,7 +534,7 @@ function renderBulkUpdateProducts(products) {
         };
 
         if (elements.img) {
-            elements.img.src = product.image_src;
+            elements.img.src = product.image;
             elements.img.onerror = () =>
                 (elements.img.src = "/images/default-product.png");
         }
@@ -607,7 +612,9 @@ function initializeBulkUpdateHandlers() {
     if (confirmBtn) {
         const newBtn = confirmBtn.cloneNode(true);
         confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-        newBtn.addEventListener("click", handleBulkStockUpdate);
+        newBtn.addEventListener("click", () => {
+            handleBulkStockUpdate();
+        });
     }
 }
 
@@ -633,6 +640,7 @@ function handleBulkStockUpdate() {
     });
 
     if (!updates.length) {
+        console.log("No updates found, showing warning toast.");
         showToast("Error", "No valid updates found.", "error");
         return;
     }
@@ -641,6 +649,7 @@ function handleBulkStockUpdate() {
         (u) => u.original_stock !== u.stock_quantity
     );
     if (!hasChanges) {
+        console.log("No changes detected, showing info toast.");
         showToast("Info", "No changes detected.", "info");
         return;
     }
@@ -653,11 +662,13 @@ function handleBulkStockUpdate() {
 
     const csrf = document.querySelector('meta[name="csrf-token"]');
     if (!csrf) {
+        console.error("CSRF token not found.");
         showToast("Error", "Security token not found.", "error");
         resetButton(confirmBtn, original);
         return;
     }
 
+    console.log("Sending bulk stock update request...");
     fetch("/admin/product/bulk-update-stock", {
         method: "POST",
         headers: {
@@ -667,20 +678,47 @@ function handleBulkStockUpdate() {
         },
         body: JSON.stringify({ updates }),
     })
-        .then((response) => response.json())
+        .then((response) => {
+            console.log("Received response from server.", response);
+            if (!response.ok) {
+                console.error("Server response not OK.", response.status, response.statusText);
+                // Attempt to read response body for more details on error
+                return response.json().then(errorData => {
+                    console.error("Error response data:", errorData);
+                    throw new Error(errorData.message || `Server error: ${response.status} ${response.statusText}`);
+                }).catch(() => {
+                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                });
+            }
+            return response.json();
+        })
         .then((data) => {
+            console.log("Processing server data:", data);
             if (data.success) {
-                const modal = bootstrap.Modal.getInstance(
-                    document.getElementById("bulkUpdateStockModal")
-                );
-                if (modal) modal.hide();
-                showToast(
-                    "Success",
-                    `Stock updated successfully for ${
-                        data.updated_count || updates.length
-                    } products!`,
-                    "success"
-                );
+                console.log("Update successful, hiding modal and showing success toast.");
+                // Introduce a slight delay before hiding the modal
+                setTimeout(() => {
+                    const modal = bootstrap.Modal.getInstance(
+                        document.getElementById("bulkUpdateStockModal")
+                    );
+                    if (modal) {
+                        modal.hide();
+                        // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
+                        modal._element.addEventListener('hidden.bs.modal', function handler() {
+                            modal._element.removeEventListener('hidden.bs.modal', handler); // Remove the listener
+                            // Explicitly remove any remaining modal backdrops
+                            const backdrops = document.querySelectorAll('.modal-backdrop');
+                            backdrops.forEach(backdrop => backdrop.remove());
+                        });
+                    }
+                    showToast(
+                        "Success",
+                        `Stock updated successfully for ${
+                            data.updated_count || updates.length
+                        } products!`,
+                        "success"
+                    );
+                }, 300); // 300ms delay
                 // Update the stock quantity in the table dynamically
                 updates.forEach(updatedProduct => {
                     const row = document.querySelector(`tr[data-id="${updatedProduct.id}"]`);
@@ -705,18 +743,20 @@ function handleBulkStockUpdate() {
                 clearProductSelection();
                 // setTimeout(() => location.reload(), 1500);
             } else {
+                console.log("Update failed according to server data, showing error toast.");
                 showToast("Error", data.message || "Update failed.", "error");
             }
         })
         .catch((error) => {
-            console.error("Update error:", error);
+            console.error("Fetch or processing error:", error);
             showToast(
                 "Error",
-                "An error occurred while updating stock.",
+                `An error occurred while updating stock: ${error.message}`,
                 "error"
             );
         })
         .finally(() => {
+            console.log("Bulk stock update process finished.");
             resetButton(confirmBtn, original);
         });
 }
@@ -1244,89 +1284,7 @@ function resetButton(button, originalText) {
     }
 }
 
-// TOAST NOTIFICATIONS
-function showToast(title, message, type = "info", duration = 4000) {
-    let container = document.getElementById("toast-container");
-    if (!container) {
-        container = document.createElement("div");
-        container.id = "toast-container";
-        container.className =
-            "toast-container position-fixed bottom-0 end-0 p-3";
-        container.style.zIndex = "1060";
-        document.body.appendChild(container);
 
-        const style = document.createElement("style");
-        style.textContent = `
-            .toast-enter { transform: translateX(100%); opacity: 0; }
-            .toast-show { transform: translateX(0); opacity: 1; transition: transform 0.3s ease, opacity 0.3s ease; }
-            .toast-exit { transform: translateX(100%); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; }
-            #toast-container { z-index: 1060 !important; }
-            .toast { z-index: 1061 !important; }
-        `;
-        document.head.appendChild(style);
-    }
-
-    const toast = document.createElement("div");
-    toast.className = `toast toast-enter`;
-    toast.setAttribute("role", "alert");
-    toast.setAttribute("aria-live", "assertive");
-    toast.setAttribute("aria-atomic", "true");
-
-    const typeColors = {
-        success: "bg-success",
-        error: "bg-danger",
-        warning: "bg-warning",
-        info: "bg-info",
-    };
-
-    const typeIcons = {
-        success: "ti ti-check",
-        error: "ti ti-x",
-        warning: "ti ti-alert-triangle",
-        info: "ti ti-info-circle",
-    };
-
-    toast.innerHTML = `
-        <div class="toast-header ${
-            typeColors[type] || typeColors.info
-        } text-white">
-            <i class="${typeIcons[type] || typeIcons.info} me-2"></i>
-            <strong class="me-auto">${title}</strong>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-        </div>
-        <div class="toast-body">${message}</div>
-    `;
-
-    container.appendChild(toast);
-
-    // Trigger animation
-    setTimeout(() => {
-        toast.classList.remove("toast-enter");
-        toast.classList.add("toast-show");
-    }, 10);
-
-    // Auto dismiss
-    setTimeout(() => {
-        dismissToast(toast);
-    }, duration);
-
-    // Handle manual dismiss
-    const closeBtn = toast.querySelector(".btn-close");
-    if (closeBtn) {
-        closeBtn.addEventListener("click", () => dismissToast(toast));
-    }
-}
-
-function dismissToast(toast) {
-    toast.classList.remove("toast-show");
-    toast.classList.add("toast-exit");
-
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-        }
-    }, 300);
-}
 
 // DELETE MODAL FUNCTIONALITY
 window.setDeleteFormAction = function (action) {

@@ -110,6 +110,12 @@
                                                                 Actions
                                                             </button>
                                                             <div class="dropdown-menu">
+                                                                <a href="#" class="dropdown-item crm-btn"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#crmCustomerModal"
+                                                                    data-id="{{ $customer->id }}">
+                                                                    <i class="ti ti-eye me-2"></i> View CRM
+                                                                </a>
                                                                 <a href="#" class="dropdown-item"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#editCustomerModal"
@@ -154,4 +160,5 @@
         </div>
     </div>
     @include('admin.layouts.modals.custmodals')
+    @include('admin.customer.crm-modal')
 @endsection

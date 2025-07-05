@@ -4,7 +4,7 @@
             Selling
             Products</h3>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive" style="min-height: 320px;">
         <table class="table table-vcenter table-hover mb-0">
             <thead>
                 <tr>

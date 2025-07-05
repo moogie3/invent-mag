@@ -32,26 +32,28 @@ class POSController extends Controller
     {
         try {
             // Validate the request
-            $validatedData = $request->validate([
-                'transaction_date' => 'required|date',
-                'customer_id' => 'nullable|exists:customers,id',
-                'products' => 'required|json',
-                'discount_total' => 'nullable|numeric|min:0',
-                'discount_total_type' => 'nullable|in:fixed,percentage',
-                'tax_rate' => 'nullable|numeric|min:0',
-                'tax_amount' => 'nullable|numeric|min:0',
-                'grand_total' => 'required|numeric|min:0',
-                'payment_method' => 'required|string|in:Cash,Card,Transfer,eWallet',
-                'amount_received' => 'nullable|numeric|min:0|required_if:payment_method,Cash',
-                'change_amount' => 'nullable|numeric|min:0',
-            ]);
+            try {
+                $validatedData = $request->validate([
+                    'transaction_date' => 'required|date',
+                    'customer_id' => 'nullable|exists:customers,id',
+                    'products' => 'required|json',
+                    'discount_total' => 'nullable|numeric|min:0',
+                    'discount_total_type' => 'nullable|in:fixed,percentage',
+                    'tax_rate' => 'nullable|numeric|min:0',
+                    'tax_amount' => 'nullable|numeric|min:0',
+                    'grand_total' => 'required|numeric|min:0',
+                    'payment_method' => 'required|string|in:Cash,Card,Transfer,eWallet',
+                    'amount_received' => 'nullable|numeric|min:0|required_if:payment_method,Cash',
+                    'change_amount' => 'nullable|numeric|min:0',
+                ]);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $e->errors()], 422);
+            }
 
             // Decode products
             $products = json_decode($request->products, true);
             if (!$products || !is_array($products)) {
-                return back()
-                    ->withErrors(['products' => 'Invalid product data'])
-                    ->withInput();
+                return response()->json(['success' => false, 'message' => 'Invalid product data', 'errors' => ['products' => ['Invalid product data']]], 422);
             }
 
             // Calculate totals
@@ -86,8 +88,15 @@ class POSController extends Controller
             $transactionDate = $request->transaction_date;
 
             // Generate invoice number
-            $lastInvoice = Sales::latest()->first();
-            $invoiceNumber = $lastInvoice ? intval(substr($lastInvoice->invoice, -4)) + 1 : 1;
+            $lastPosInvoice = Sales::where('invoice', 'like', 'POS-%')
+                                ->latest()
+                                ->first();
+
+            $invoiceNumber = 1;
+            if ($lastPosInvoice) {
+                $lastNumber = (int) substr($lastPosInvoice->invoice, 4); // Extract 0001 from POS-0001
+                $invoiceNumber = $lastNumber + 1;
+            }
             $invoice = 'POS-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
 
             // Get the authenticated user's ID
@@ -146,10 +155,10 @@ class POSController extends Controller
                 return response()->json(['success' => true, 'message' => 'Transaction completed successfully.', 'sale_id' => $sale->id]);
             }
             return redirect()->route('admin.pos.receipt', $sale->id)->with('success', 'Transaction completed successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return back()
-                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
-                ->withInput();
+            return response()->json(['success' => false, 'message' => 'Something went wrong: ' . $e->getMessage()], 500);
         }
     }
 

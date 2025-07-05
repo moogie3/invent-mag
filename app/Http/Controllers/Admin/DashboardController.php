@@ -113,6 +113,9 @@ class DashboardController extends Controller
 
         $monthlyData = $this->getMonthlyData($dates, $categoryId);
 
+        $lowStockProducts = Product::getLowStockProducts();
+        $expiringSoonProducts = Product::getExpiringSoonProducts();
+
         return view('admin.dashboard', [
             'topCategories' => $topCategories,
             'monthlyData' => $monthlyData,
@@ -126,8 +129,10 @@ class DashboardController extends Controller
             'topSellingProducts' => $this->getTopSellingProducts(),
             'recentSales' => $recentSales,
             'recentPurchases' => $recentPurchases,
-            'lowStockCount' => $this->getLowStockCount(),
-            'expiringSoonCount' => $this->getExpiringSoonCount(),
+            'lowStockCount' => $lowStockProducts->count(),
+            'expiringSoonCount' => $expiringSoonProducts->count(),
+            'lowStockProducts' => $lowStockProducts,
+            'expiringSoonProducts' => $expiringSoonProducts,
             'totalliability' => $totalLiability,
             'countliability' => $unpaidLiability,
             'paidDebtMonthly' => $this->getPaidDebtMonthly(),

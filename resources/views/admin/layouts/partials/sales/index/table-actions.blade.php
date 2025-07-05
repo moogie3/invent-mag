@@ -3,10 +3,15 @@
         Actions
     </button>
     <div class="dropdown-menu">
-        <a href="javascript:void(0)" onclick="loadSalesDetails('{{ $sale->id }}')" data-bs-toggle="modal"
-            data-bs-target="#viewSalesModal" class="dropdown-item">
-            <i class="ti ti-zoom-scan me-2"></i> View
-        </a>
+        @if ($sale->is_pos)
+            <a href="{{ route('admin.pos.receipt', $sale->id) }}" class="dropdown-item" target="_blank">
+                <i class="ti ti-receipt me-2"></i> View Receipt
+            </a>
+        @else
+            <a href="javascript:void(0)" class="dropdown-item view-sales-details-btn" data-id="{{ $sale->id }}">
+                <i class="ti ti-zoom-scan me-2"></i> View Details
+            </a>
+        @endif
 
         <a href="{{ route('admin.sales.edit', $sale->id) }}" class="dropdown-item">
             <i class="ti ti-edit me-2"></i> Edit

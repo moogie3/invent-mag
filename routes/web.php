@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController, UserController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController, UserController, CustomerCrmController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -95,6 +95,10 @@ Route::prefix('admin')->group(function () {
             Route::delete('/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.customer.destroy')->middleware('can:delete-customer');
             Route::post('/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate')->middleware('can:create-customer');
         });
+
+        // CRM Routes
+        Route::get('/customers/{id}/crm-details', [CustomerCrmController::class, 'show']);
+        Route::post('/customers/{id}/interactions', [CustomerCrmController::class, 'storeInteraction']);
 
         // Purchase Order Routes
         Route::prefix('po')->group(function () {

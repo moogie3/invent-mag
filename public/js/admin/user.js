@@ -73,6 +73,13 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.success) {
                 showToast('Success', data.message, 'success');
                 editUserModal.hide();
+                // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
+                editUserModal._element.addEventListener('hidden.bs.modal', function handler() {
+                    editUserModal._element.removeEventListener('hidden.bs.modal', handler); // Remove the listener
+                    // Explicitly remove any remaining modal backdrops
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(backdrop => backdrop.remove());
+                });
 
                 // Dynamically update the user row in the table
                 const userRow = document.querySelector(`tr:has(a[data-user-id="${data.user.id}"])`);
@@ -109,104 +116,4 @@ document.addEventListener('DOMContentLoaded', function () {
 // Add a log to confirm the script is loaded
 console.log('user.js script loaded.');
 
-// Toast notification functions (copied from purchase-order.js)
-function showToast(title, message, type = "info", duration = 4000) {
-    let toastContainer = document.getElementById("toast-container");
-    if (!toastContainer) {
-        toastContainer = document.createElement("div");
-        toastContainer.id = "toast-container";
-        toastContainer.className =
-            "toast-container position-fixed bottom-0 end-0 p-3";
-        toastContainer.style.zIndex = "1050";
-        document.body.appendChild(toastContainer);
 
-        if (!document.getElementById("toast-styles")) {
-            const style = document.createElement("style");
-            style.id = "toast-styles";
-            style.textContent = `
-                    .toast-enter {
-                        transform: translateX(100%);
-                        opacity: 0;
-                    }
-                    .toast-show {
-                        transform: translateX(0);
-                        opacity: 1;
-                        transition: transform 0.3s ease, opacity 0.3s ease;
-                    }
-                    .toast-exit {
-                        transform: translateX(100%);
-                        opacity: 0;
-                        transition: transform 0.3s ease, opacity 0.3s ease;
-                    }
-                `;
-            document.head.appendChild(style);
-        }
-    }
-
-    const toast = document.createElement("div");
-    toast.className =
-        "toast toast-enter align-items-center text-white bg-" +
-        getToastColor(type) +
-        " border-0";
-    toast.setAttribute("role", "alert");
-    toast.setAttribute("aria-live", "assertive");
-    toast.setAttribute("aria-atomic", "true");
-
-    toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">
-                    <strong>${title}</strong>: ${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        `;
-
-    toastContainer.appendChild(toast);
-
-    void toast.offsetWidth;
-
-    toast.classList.add("toast-show");
-
-    const bsToast = new bootstrap.Toast(toast, {
-        autohide: true,
-        delay: duration,
-    });
-    bsToast.show();
-
-    const closeButton = toast.querySelector(".btn-close");
-    closeButton.addEventListener("click", () => {
-        hideToast(toast);
-    });
-
-    const hideTimeout = setTimeout(() => {
-        hideToast(toast);
-    }, duration);
-
-    toast._hideTimeout = hideTimeout;
-}
-
-function hideToast(toast) {
-    if (toast._hideTimeout) {
-        clearTimeout(toast._hideTimeout);
-    }
-
-    toast.classList.remove("toast-show");
-    toast.classList.add("toast-exit");
-
-    setTimeout(() => {
-        toast.remove();
-    }, 300);
-}
-
-function getToastColor(type) {
-    switch (type) {
-        case "success":
-            return "success";
-        case "error":
-            return "danger";
-        case "warning":
-            return "warning";
-        default:
-            return "info";
-    }
-}

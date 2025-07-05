@@ -1,5 +1,6 @@
 {{-- Load jQuery FIRST --}}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 {{-- Load Tabler JS (remove defer since jQuery is already loaded) --}}
 <script src="{{ asset('tabler/dist/js/tabler.min.js?1692870487') }}"></script>
@@ -9,6 +10,9 @@
 {{-- Load other external libraries --}}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+
+{{-- Global Toast Helper --}}
+<script src="{{ asset('js/admin/helpers/toast.js') }}"></script>
 
 {{-- SCRIPT FOR ADMIN POS  --}}
 @if (request()->is('admin/pos'))

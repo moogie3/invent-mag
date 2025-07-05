@@ -22,4 +22,9 @@ class Customer extends Model
     {
         return $this->hasMany(Sales::class);
     }
+
+    public function interactions()
+    {
+        return $this->hasMany(CustomerInteraction::class);
+    }
 }

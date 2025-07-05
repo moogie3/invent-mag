@@ -133,6 +133,13 @@ function confirmMarkAsPaid() {
                     document.getElementById("markAsPaidModal")
                 );
                 modal.hide();
+                // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
+                modal._element.addEventListener('hidden.bs.modal', function handler() {
+                    modal._element.removeEventListener('hidden.bs.modal', handler); // Remove the listener
+                    // Explicitly remove any remaining modal backdrops
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(backdrop => backdrop.remove());
+                });
 
                 // Show success message
                 showToast(
@@ -174,120 +181,7 @@ function confirmMarkAsPaid() {
         });
 }
 
-function showToast(title, message, type = "info", duration = 4000) {
-    // Create a toast container if it doesn't exist
-    let toastContainer = document.getElementById("toast-container");
-    if (!toastContainer) {
-        toastContainer = document.createElement("div");
-        toastContainer.id = "toast-container";
-        toastContainer.className =
-            "toast-container position-fixed bottom-0 end-0 p-3";
-        toastContainer.style.zIndex = "1050";
-        document.body.appendChild(toastContainer);
-
-        // Add animation styles once
-        if (!document.getElementById("toast-styles")) {
-            const style = document.createElement("style");
-            style.id = "toast-styles";
-            style.textContent = `
-                .toast-enter {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                .toast-show {
-                    transform: translateX(0);
-                    opacity: 1;
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                }
-                .toast-exit {
-                    transform: translateX(100%);
-                    opacity: 0;
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                }
-            `;
-            document.head.appendChild(style);
-        }
-    }
-
-    // Create toast element
-    const toast = document.createElement("div");
-    toast.className =
-        "toast toast-enter align-items-center text-white bg-" +
-        getToastColor(type) +
-        " border-0";
-    toast.setAttribute("role", "alert");
-    toast.setAttribute("aria-live", "assertive");
-    toast.setAttribute("aria-atomic", "true");
-
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                <strong>${title}</strong>: ${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    `;
-
-    toastContainer.appendChild(toast);
-
-    // Force reflow to ensure animation works
-    void toast.offsetWidth;
-
-    // Show with animation
-    toast.classList.add("toast-show");
-
-    // Initialize Bootstrap toast
-    const bsToast = new bootstrap.Toast(toast, {
-        autohide: true,
-        delay: duration,
-    });
-    bsToast.show();
-
-    // Handle close button clicks
-    const closeButton = toast.querySelector(".btn-close");
-    closeButton.addEventListener("click", () => {
-        hideToast(toast);
-    });
-
-    // Auto hide after duration
-    const hideTimeout = setTimeout(() => {
-        hideToast(toast);
-    }, duration);
-
-    // Store timeout on toast element for cleanup
-    toast._hideTimeout = hideTimeout;
-}
-
-// Helper function to hide toast with animation
-function hideToast(toast) {
-    // Clear any existing timeout
-    if (toast._hideTimeout) {
-        clearTimeout(toast._hideTimeout);
-    }
-
-    // Add exit animation
-    toast.classList.remove("toast-show");
-    toast.classList.add("toast-exit");
-
-    // Remove after animation completes
-    setTimeout(() => {
-        toast.remove();
-    }, 300);
-}
-
-// Helper function to get the appropriate Bootstrap color class
-function getToastColor(type) {
-    switch (type) {
-        case "success":
-            return "success";
-        case "error":
-            return "danger";
-        case "warning":
-            return "warning";
-        default:
-            return "info";
-    }
-}
+document.addEventListener("DOMContentLoaded", function () {
 
 function clearSelection() {
     document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
@@ -477,6 +371,13 @@ function confirmBulkMarkAsPaid() {
                     document.getElementById("bulkMarkAsPaidModal")
                 );
                 modal.hide();
+                // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
+                modal._element.addEventListener('hidden.bs.modal', function handler() {
+                    modal._element.removeEventListener('hidden.bs.modal', handler); // Remove the listener
+                    // Explicitly remove any remaining modal backdrops
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(backdrop => backdrop.remove());
+                });
 
                 // Show success message
                 showToast(

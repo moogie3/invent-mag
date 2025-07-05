@@ -3,18 +3,8 @@
         <h3 class="card-title mb-0">
             <i class="ti ti-history fs-3 me-2 text-primary"></i> Recent Transactions
         </h3>
-        <div class="card-actions">
-            <div class="dropdown">
-                <a href="#" class="btn btn-sm btn-icon" data-bs-toggle="dropdown">
-                    <i class="ti ti-dots-vertical"></i>
-                </a>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="{{ route('admin.transactions') }}">View Transactions</a>
-                </div>
-            </div>
-        </div>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive" style="min-height: 360px;">
         <table class="table table-vcenter table-hover mb-0">
             <thead>
                 <tr>
@@ -78,12 +68,7 @@
         </table>
     </div>
 
-    @if ($hasMore)
-        <div class="card-footer text-center py-3">
-            <a href="{{ route('admin.transactions') }}" class="btn btn-link text-decoration-none">
-                <i class="ti ti-eye me-1"></i>
-                View other recent activities
-            </a>
-        </div>
-    @endif
+    <div class="card-footer text-center">
+        <a href="{{ route('admin.transactions') }}">View All Transactions</a>
+    </div>
 </div>

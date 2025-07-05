@@ -1057,6 +1057,14 @@ class SalesOrderView extends SalesOrderModule {
         this.formatAllCurrencyValues();
         this.initModalListeners();
         this.initGlobalFunctions();
+
+        // Add event listener for view sales details buttons
+        document.querySelectorAll('.view-sales-details-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const salesId = this.dataset.id;
+                window.showSalesDetailsModal(salesId);
+            });
+        });
     }
 
     formatAllCurrencyValues() {
@@ -1073,13 +1081,36 @@ class SalesOrderView extends SalesOrderModule {
                 this.printModalContent()
             );
         }
+
+        // Event listener for when the sales view modal is shown
+        const viewSalesModalElement = document.getElementById('viewSalesModal');
+        if (viewSalesModalElement) {
+            viewSalesModalElement.addEventListener('shown.bs.modal', (event) => {
+                const salesId = viewSalesModalElement.dataset.salesId;
+                if (salesId) {
+                    this.loadSalesDetails(salesId);
+                }
+            });
+        }
+    }
+
+    // Global function to trigger the sales details modal
+    // Ensure this is defined after DOMContentLoaded for global access
+    // (Moved to the end of the file or within a DOMContentLoaded block if not already there)
+    // For now, we'll define it as a method of the class and expose it via initGlobalFunctions
+    showSalesDetailsModal(salesId) {
+        const viewSalesModalElement = document.getElementById('viewSalesModal');
+        if (viewSalesModalElement) {
+            viewSalesModalElement.dataset.salesId = salesId; // Store the ID
+            const salesViewModal = new bootstrap.Modal(viewSalesModalElement);
+            salesViewModal.show();
+        }
     }
 
     // Add this method to ensure global functions are available
     initGlobalFunctions() {
-        // Make sure loadSalesDetails is available globally
-        window.loadSalesDetails = (id) => this.loadSalesDetails(id);
         window.setDeleteFormAction = (url) => this.setDeleteFormAction(url);
+        window.showSalesDetailsModal = (salesId) => this.showSalesDetailsModal(salesId);
     }
 
     setDeleteFormAction(url) {
@@ -1093,47 +1124,38 @@ class SalesOrderView extends SalesOrderModule {
     }
 
     loadSalesDetails(id) {
-        if (!this.elements.viewSalesModalContent) {
-            console.error("Modal content element not found");
-            return;
-        }
+        // Only load if content is not already present or is the loading spinner
+        if (this.elements.viewSalesModalContent.innerHTML.includes('spinner-border') || this.elements.viewSalesModalContent.innerHTML.trim() === '') {
+            // Show loading indicator
+            this.elements.viewSalesModalContent.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
 
-        // Set URLs for modal buttons
-        if (this.elements.salesModalEdit) {
-            this.elements.salesModalEdit.href = `/admin/sales/edit/${id}`;
-        }
-        if (this.elements.salesModalFullView) {
-            this.elements.salesModalFullView.href = `/admin/sales/view/${id}`;
-        }
-
-        // Show loading
-        this.elements.viewSalesModalContent.innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-3 text-muted">Loading sales order details...</p>
-            </div>
-        `;
-
-        // Fetch details
-        fetch(`/admin/sales/modal-view/${id}`)
-            .then((response) => {
-                if (!response.ok)
-                    throw new Error("Network response was not ok");
-                return response.text();
+            // Fetch sales data via AJAX
+            fetch(`/admin/sales/modal-view/${id}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             })
-            .then((html) => {
-                this.elements.viewSalesModalContent.innerHTML = html;
-                this.formatAllCurrencyValues();
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.text(); // Get as text, as it's likely HTML
             })
-            .catch((error) => {
-                this.elements.viewSalesModalContent.innerHTML = `
-                    <div class="alert alert-danger m-3">
-                        <i class="ti ti-alert-circle me-2"></i> Error loading Sales details: ${error.message}
-                    </div>
-                `;
+            .then(html => {
+                if (this.elements.viewSalesModalContent) {
+                    this.elements.viewSalesModalContent.innerHTML = html;
+                    // Re-format currency values after content is loaded
+                    this.formatAllCurrencyValues();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading sales details:', error);
+                if (this.elements.viewSalesModalContent) {
+                    this.elements.viewSalesModalContent.innerHTML = '<div class="alert alert-danger">Failed to load sales details.</div>';
+                }
+                showToast('Error', 'Failed to load sales details.', 'error');
             });
+        }
     }
 
     printModalContent() {
@@ -1352,14 +1374,28 @@ function performBulkDeleteSales(selectedIds, confirmButton, modal) {
         .then((data) => {
             if (data.success) {
                 modal.hide();
-                showToast(
-                    "Success",
-                    `${data.deleted_count || selectedIds.length} sales order(s) deleted successfully!`,
-                    "success"
+                // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
+                modal._element.addEventListener(
+                    "hidden.bs.modal",
+                    function handler() {
+                        modal._element.removeEventListener(
+                            "hidden.bs.modal",
+                            handler
+                        ); // Remove the listener
+                        showToast(
+                            "Success",
+                            `${data.deleted_count || selectedIds.length} sales order(s) deleted successfully!`,
+                            "success"
+                        );
+                        // Explicitly remove any remaining modal backdrops
+                        const backdrops =
+                            document.querySelectorAll(".modal-backdrop");
+                        backdrops.forEach((backdrop) => backdrop.remove());
+                    }
                 );
 
                 // Remove deleted rows from the table
-                selectedIds.forEach(id => {
+                selectedIds.forEach((id) => {
                     const row = document.querySelector(`tr[data-id="${id}"]`);
                     if (row) {
                         row.remove();
@@ -1390,6 +1426,32 @@ function performBulkDeleteSales(selectedIds, confirmButton, modal) {
             confirmButton.disabled = false;
         });
 }
+
+window.bulkDeleteSales = function () {
+    const selected = getSalesSelectedIds();
+    if (!selected.length) {
+        showToast(
+            "Warning",
+            "Please select sales orders to delete.",
+            "warning"
+        );
+        return;
+    }
+
+    document.getElementById("bulkDeleteCount").textContent = selected.length;
+    const modal = new bootstrap.Modal(
+        document.getElementById("bulkDeleteModal")
+    );
+    modal.show();
+
+    const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
+    const newBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+    newBtn.addEventListener("click", () =>
+        performBulkDeleteSales(selected, newBtn, modal)
+    );
+};
 
 window.bulkExportSales = function () {
     const selected = Array.from(
@@ -1698,24 +1760,28 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
                 // Close modal
                 modal.hide();
 
-                // Show success message
-                showToast(
-                    "Success",
-                    `${
-                        data.updated_count || selectedIds.length
-                    } sales order(s) marked as paid successfully!`,
-                    "success"
+                // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
+                modal._element.addEventListener(
+                    "hidden.bs.modal",
+                    function handler() {
+                        modal._element.removeEventListener(
+                            "hidden.bs.modal",
+                            handler
+                        ); // Remove the listener
+                        // Show success message
+                        showToast(
+                            "Success",
+                            `${data.updated_count || selectedIds.length} sales order(s) marked as paid successfully!`,
+                            "success"
+                        );
+                        // Explicitly remove any remaining modal backdrops
+                        const backdrops =
+                            document.querySelectorAll(".modal-backdrop");
+                        backdrops.forEach((backdrop) => backdrop.remove());
+                    }
                 );
 
-                // Clear selection
-                if (typeof clearSelection === "function") {
-                    clearSelection();
-                } else if (
-                    salesBulkSelection &&
-                    typeof salesBulkSelection.clearSelection === "function"
-                ) {
-                    salesBulkSelection.clearSelection();
-                }
+                
 
                 // Reload page after short delay
                 // setTimeout(() => {
@@ -1723,23 +1789,31 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
                 // }, 1000);
 
                 // Dynamically update UI
-                selectedIds.forEach(id => {
+                selectedIds.forEach((id) => {
                     const row = document.querySelector(`tr[data-id="${id}"]`); // Assuming rows have data-id attribute
                     if (row) {
-                        const statusBadge = row.querySelector('.badge');
+                        const statusBadge = row.querySelector(".badge");
                         if (statusBadge) {
-                            statusBadge.textContent = 'Paid';
-                            statusBadge.classList.remove('bg-warning', 'bg-danger', 'bg-info'); // Remove old status colors
-                            statusBadge.classList.add('bg-success'); // Add success color
+                            statusBadge.textContent = "Paid";
+                            statusBadge.classList.remove(
+                                "bg-warning",
+                                "bg-danger",
+                                "bg-info"
+                            ); // Remove old status colors
+                            statusBadge.classList.add("bg-success"); // Add success color
                         }
-                        const checkbox = row.querySelector('.row-checkbox');
-                        if (checkbox) {
-                            checkbox.checked = false;
-                        }
+                        
                     }
                 });
+
+                // Explicitly uncheck all checkboxes
+                document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+                    checkbox.checked = false;
+                });
+
+                // Update bulk action bar and select all state
                 if (salesBulkSelection) {
-                    salesBulkSelection.updateUI(); // Update bulk action bar and select all state
+                    salesBulkSelection.updateUI();
                 }
             } else {
                 showToast(
@@ -1796,120 +1870,7 @@ function performBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
     confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal);
 }
 
-function showToast(title, message, type = "info", duration = 4000) {
-    // Create a toast container if it doesn't exist
-    let toastContainer = document.getElementById("toast-container");
-    if (!toastContainer) {
-        toastContainer = document.createElement("div");
-        toastContainer.id = "toast-container";
-        toastContainer.className =
-            "toast-container position-fixed bottom-0 end-0 p-3";
-        toastContainer.style.zIndex = "1050";
-        document.body.appendChild(toastContainer);
-
-        // Add animation styles once
-        if (!document.getElementById("toast-styles")) {
-            const style = document.createElement("style");
-            style.id = "toast-styles";
-            style.textContent = `
-                .toast-enter {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                .toast-show {
-                    transform: translateX(0);
-                    opacity: 1;
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                }
-                .toast-exit {
-                    transform: translateX(100%);
-                    opacity: 0;
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                }
-            `;
-            document.head.appendChild(style);
-        }
-    }
-
-    // Create toast element
-    const toast = document.createElement("div");
-    toast.className =
-        "toast toast-enter align-items-center text-white bg-" +
-        getToastColor(type) +
-        " border-0";
-    toast.setAttribute("role", "alert");
-    toast.setAttribute("aria-live", "assertive");
-    toast.setAttribute("aria-atomic", "true");
-
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                <strong>${title}</strong>: ${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    `;
-
-    toastContainer.appendChild(toast);
-
-    // Force reflow to ensure animation works
-    void toast.offsetWidth;
-
-    // Show with animation
-    toast.classList.add("toast-show");
-
-    // Initialize Bootstrap toast
-    const bsToast = new bootstrap.Toast(toast, {
-        autohide: true,
-        delay: duration,
-    });
-    bsToast.show();
-
-    // Handle close button clicks
-    const closeButton = toast.querySelector(".btn-close");
-    closeButton.addEventListener("click", () => {
-        hideToast(toast);
-    });
-
-    // Auto hide after duration
-    const hideTimeout = setTimeout(() => {
-        hideToast(toast);
-    }, duration);
-
-    // Store timeout on toast element for cleanup
-    toast._hideTimeout = hideTimeout;
-}
-
-// Helper function to hide toast with animation
-function hideToast(toast) {
-    // Clear any existing timeout
-    if (toast._hideTimeout) {
-        clearTimeout(toast._hideTimeout);
-    }
-
-    // Add exit animation
-    toast.classList.remove("toast-show");
-    toast.classList.add("toast-exit");
-
-    // Remove after animation completes
-    setTimeout(() => {
-        toast.remove();
-    }, 300);
-}
-
-// Helper function to get the appropriate Bootstrap color class
-function getToastColor(type) {
-    switch (type) {
-        case "success":
-            return "success";
-        case "error":
-            return "danger";
-        case "warning":
-            return "warning";
-        default:
-            return "info";
-    }
-}
+// Function to handle form submission via AJAX
 
 /**
  * Initialize appropriate module based on the current page

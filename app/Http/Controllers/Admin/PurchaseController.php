@@ -325,7 +325,6 @@ class PurchaseController extends Controller
                     'payment_date' => now(),
                     'updated_at' => now(),
                 ]);
-
                 $updatedCount++;
             }
 

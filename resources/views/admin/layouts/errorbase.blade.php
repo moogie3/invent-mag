@@ -8,33 +8,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Invent-MAG | @yield('title')</title>
-    <link href="{{ asset('tabler/dist/css/tabler.min.css?1692870487') }}" rel="stylesheet" />
-    <link href="{{ asset('tabler/dist/css/tabler-flags.min.css?1692870487') }}" rel="stylesheet" />
-    <link href="{{ asset('tabler/dist/css/tabler-payments.min.css?1692870487') }}" rel="stylesheet" />
-    <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css?1692870487') }}" rel="stylesheet" />
-    <link href="{{ asset('tabler/dist/css/demo.min.css?1692870487') }}" rel="stylesheet" />
+    <link href="{{ asset('tabler/dist/css/tabler.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('tabler/dist/css/tabler-flags.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('tabler/dist/css/tabler-payments.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
+    @vite('resources/css/app.css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
-    <script src="{{ asset('js/admin/layouts/page-loader.js') }}"></script>
 </head>
 
-<body>
-    <div class="page page-center">
-        <div class="container container-slim py-4">
+<body class="error-page">
+    <div class="page-loader">
+        <div class="container-slim py-4">
             <div class="text-center">
                 <div class="mb-3">
-                    <a class="navbar-brand navbar-brand-autodark"><i
-                            class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG</a>
+                    <a class="navbar-brand navbar-brand-autodark">
+                        <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
+                    </a>
                 </div>
                 <div class="spinner-border" role="status"></div>
             </div>
         </div>
     </div>
-    <div class="main-content">
-        @yield('content')
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-body">
+                <div class="container-fluid">
+                    @yield('content')
+                </div>
+            </div>
+        </div>
     </div>
     @include('admin.layouts.footer')
     @include('admin.layouts.script')
+    @vite('resources/js/admin/layouts/page-loader.js')
 </body>
 
 </html>

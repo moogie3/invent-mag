@@ -330,5 +330,5 @@
     </div>
 </header>
 
-<link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
-<script src="{{ asset('js/admin/layouts/navbar.js') }}" defer></script>
+@vite('resources/css/navbar.css')
+@vite('resources/js/admin/layouts/navbar.js')

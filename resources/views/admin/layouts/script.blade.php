@@ -12,46 +12,46 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 
 {{-- Global Toast Helper --}}
-<script src="{{ asset('js/admin/helpers/toast.js') }}"></script>
+@vite('resources/js/admin/helpers/toast.js')
 
 {{-- SCRIPT FOR ADMIN POS  --}}
 @if (request()->is('admin/pos'))
-    <script src="{{ asset('js/admin/pos.js') }}"></script>
+    @vite('resources/js/admin/pos.js')
 @endif
 
 {{-- SCRIPT FOR RECENT TRANSACTIONS  --}}
 @if (request()->is('admin/transactions'))
-    <script src="{{ asset('js/admin/recentts.js') }}"></script>
+    @vite('resources/js/admin/recentts.js')
 @endif
 
 {{-- SCRIPT FOR ADMIN LOGIN --}}
 @if (request()->is('admin/login', 'admin/register', 'forgot-password'))
-    <script src="{{ asset('js/admin/auth.js') }}"></script>
+    @vite('resources/js/admin/auth.js')
 @endif
 
 {{-- SCRIPT FOR USER MANAGEMENT --}}
 @if (request()->is('admin/users'))
-    <script src="{{ asset('js/admin/user.js') }}"></script>
+    @vite('resources/js/admin/user.js')
 @endif
 
 {{-- SCRIPT FOR  PROFILE --}}
 @if (request()->is('admin/settings/profile'))
-    <script src="{{ asset('js/admin/profile.js') }}"></script>
+    @vite('resources/js/admin/profile.js')
 @endif
 
 {{-- SCRIPT FOR ADMIN SALES CREATE & EDIT --}}
 @if (request()->is('admin/sales', 'admin/sales/create', 'admin/sales/edit/*'))
-    <script src="{{ asset('js/admin/sales-order.js') }}"></script>
+    @vite('resources/js/admin/sales-order.js')
 @endif
 
 {{-- SCRIPT FOR ADMIN PO CREATE & EDIT --}}
 @if (request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*'))
-    <script src="{{ asset('js/admin/purchase-order.js') }}"></script>
+    @vite('resources/js/admin/purchase-order.js')
 @endif
 
 {{-- SCRIPT FOR PRODUCT --}}
 @if (request()->is('admin/product', 'admin/product/edit/*', 'admin/product/create'))
-    <script src="{{ asset('js/admin/product.js') }}"></script>
+    @vite('resources/js/admin/product.js')
 @endif
 
 {{-- SCRIPT FOR ADMIN DASHBOARD --}}
@@ -61,27 +61,27 @@
 
 {{-- SCRIPT FOR WAREHOUSE --}}
 @if (request()->is('admin/warehouse'))
-    <script src="{{ asset('js/admin/warehouse.js') }}"></script>
+    @vite('resources/js/admin/warehouse.js')
 @endif
 
 {{-- SCRIPT FOR UNIT --}}
 @if (request()->is('admin/settings/unit'))
-    <script src="{{ asset('js/admin/unit.js') }}"></script>
+    @vite('resources/js/admin/unit.js')
 @endif
 
 {{-- SCRIPT FOR CATEGORY --}}
 @if (request()->is('admin/settings/category'))
-    <script src="{{ asset('js/admin/category.js') }}"></script>
+    @vite('resources/js/admin/category.js')
 @endif
 
 {{-- SCRIPT FOR SUPPLIER --}}
 @if (request()->is('admin/supplier'))
-    <script src="{{ asset('js/admin/supplier.js') }}"></script>
+    @vite('resources/js/admin/supplier.js')
 @endif
 
 {{-- SCRIPT FOR CUSTOMER --}}
 @if (request()->is('admin/customer'))
-    <script src="{{ asset('js/admin/customer.js') }}"></script>
+    @vite('resources/js/admin/customer.js')
 @endif
 
 {{-- SCRIPT FOR SORTING TABLE --}}
@@ -94,18 +94,18 @@
         'admin/customer',
         'admin/settings/unit',
         'admin/settings/category'))
-    <script src="{{ asset('js/admin/sorting.js') }}"></script>
+    @vite('resources/js/admin/sorting.js')
 @endif
 
 {{-- SCRIPT FOR CURRENCY settings --}}
 @if (request()->is('admin/settings/currency'))
-    <script src="{{ asset('js/admin/currency.js') }}"></script>
+    @vite('resources/js/admin/currency.js')
 @endif
 
 {{--  MODAL --}}
 @if ($errors->any() || session('success'))
     @include('admin.layouts.modals')
-    <script src="{{ asset('js/admin/layouts/modal.js') }}"></script>
+    @vite('resources/js/admin/layouts/modal.js')
 @endif
 
 {{-- DELETE MODAL --}}

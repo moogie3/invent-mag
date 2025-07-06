@@ -7,7 +7,7 @@
 }
 
 .auth-body {
-    background: url('/background.jpeg') no-repeat center center;
+    background: url('@/images/background.jpeg') no-repeat center center;
     background-size: cover;
     min-height: 100vh;
     display: flex;

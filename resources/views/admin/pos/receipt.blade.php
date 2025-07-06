@@ -9,7 +9,7 @@
                 <div class="row align-items-center">
                     <div class="col">
                         <div class="page-pretitle">Overview</div>
-                        <h2 class="page-title no-print">POS Receipt</h2>
+                        <h2 class="page-title no-print"><i class="ti ti-receipt me-2"></i>POS Receipt</h2>
                     </div>
                     <div class="col text-end">
                         <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">

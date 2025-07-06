@@ -1,5 +1,24 @@
 @import url('https://rsms.me/inter/inter.css');
 
+.page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.95);
+    /* Semi-transparent white for visibility */
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-content {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
 :root {
     --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue,
         sans-serif;
@@ -109,6 +128,50 @@
     padding-top: 15px;
     border-top: 1px solid var(--tblr-border-color);
     font-size: 0.875rem;
+}
+
+/* ============================
+   LOADING & SPINNER ANIMATIONS - CONSISTENT WITH APP.CSS
+   ============================ */
+/* Loading spinner styles - matching your main app.css exactly */
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+    /* Remove custom border styling to use Bootstrap's default thin border */
+}
+
+/* Keep the keyframe animations for consistency */
+@keyframes spinner-border {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Pulse animation - kept separate from spinner */
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.95);
+        opacity: 0.7;
+    }
+}
+
+/* Optional: If you want a pulsing effect for other elements, create a separate class */
+.spinner-pulse {
+    animation: pulse 1.5s infinite;
 }
 
 /* Print Styles */

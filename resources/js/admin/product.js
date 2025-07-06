@@ -40,7 +40,6 @@ function initExpiryCheckbox() {
         container.style.display = checkbox.checked ? "block" : "none";
 
         checkbox.addEventListener("change", function () {
-            container.style.display = this.checked ? "block" : "none";
             if (this.checked) {
                 const dateInput = container.querySelector(
                     "input[name='expiry_date']"
@@ -143,13 +142,31 @@ function setupBulkSelectionListeners({
     });
 }
 
-function restoreCheckboxStates() {
-    document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
-        if (selectedProductIds.has(checkbox.value)) {
-            checkbox.checked = true;
-        }
-    });
-}
+window.addEventListener("load", function () {
+    console.log("Window loaded, ensuring all functions are initialized");
+
+    // Double-check search initialization
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput && !searchInput.hasAttribute("data-search-initialized")) {
+        initializeSearch();
+        searchInput.setAttribute("data-search-initialized", "true");
+    }
+
+    // Ensure bulk selection is working
+    const selectAllCheckbox = document.getElementById("selectAll");
+    if (
+        selectAllCheckbox &&
+        !selectAllCheckbox.hasAttribute("data-bulk-initialized")
+    ) {
+        initBulkSelection();
+        selectAllCheckbox.setAttribute("data-bulk-initialized", "true");
+    }
+
+    // Initialize selectedProductIds if not already defined
+    if (typeof selectedProductIds === "undefined") {
+        window.selectedProductIds = new Set();
+    }
+});
 
 function updateSelectAllState(selectAll, rowCheckboxes) {
     const checked = document.querySelectorAll(".row-checkbox:checked").length;
@@ -1104,7 +1121,7 @@ function renderSearchResults(products) {
     // Reinitialize bulk selection with preserved states
     setTimeout(() => {
         initBulkSelection();
-        updateSelectAllCheckbox();
+        restoreCheckboxStates();
         updateBulkActionsBarVisibility();
     }, 100);
 }
@@ -1112,7 +1129,7 @@ function renderSearchResults(products) {
 function showNoResults(message = "No products found matching your search.") {
     document.querySelector("table tbody").innerHTML = `
         <tr><td colspan="100%" class="text-center py-5">
-            <i class="ti ti-search-off fs-1 text-muted"></i>
+            <div class="spinner-border text-primary"></div>
             <p class="mt-3 text-muted">${message}</p>
         </td></tr>
     `;
@@ -1136,120 +1153,7 @@ function showSearchError(errorMessage = "Search error occurred.") {
     `;
 }
 
-// Enhanced bulk selection initialization
-function initBulkSelection() {
-    const selectAllCheckbox = document.getElementById("selectAll");
-    const bulkActionsBar = document.getElementById("bulkActionsBar");
 
-    if (!selectAllCheckbox) return;
-
-    // Remove existing event listeners to avoid duplicates
-    const newSelectAll = selectAllCheckbox.cloneNode(true);
-    selectAllCheckbox.parentNode.replaceChild(newSelectAll, selectAllCheckbox);
-
-    // Add select all functionality
-    newSelectAll.addEventListener("change", handleSelectAllChange);
-
-    // Add event listeners to row checkboxes using event delegation
-    document.addEventListener("change", function (e) {
-        if (e.target.classList.contains("row-checkbox")) {
-            handleRowCheckboxChange(e.target);
-        }
-    });
-
-    // Restore checkbox states
-    restoreCheckboxStates();
-
-    // Initialize bulk actions bar state
-    updateBulkActionsBarVisibility();
-}
-
-function handleSelectAllChange(e) {
-    const isChecked = e.target.checked;
-    const rowCheckboxes = document.querySelectorAll(".row-checkbox");
-
-    rowCheckboxes.forEach((checkbox) => {
-        checkbox.checked = isChecked;
-        if (isChecked) {
-            selectedProductIds.add(checkbox.value);
-        } else {
-            selectedProductIds.delete(checkbox.value);
-        }
-    });
-
-    updateBulkActionsBarVisibility();
-}
-
-function handleRowCheckboxChange(checkbox) {
-    if (checkbox.checked) {
-        selectedProductIds.add(checkbox.value);
-    } else {
-        selectedProductIds.delete(checkbox.value);
-    }
-
-    updateSelectAllCheckbox();
-    updateBulkActionsBarVisibility();
-}
-
-// Clear selection function
-window.clearProductSelection = function () {
-    selectedProductIds.clear();
-    document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
-        checkbox.checked = false;
-    });
-    updateSelectAllCheckbox();
-    updateBulkActionsBarVisibility();
-};
-
-window.setBulkAction = function (action, text) {
-    const element = document.getElementById("bulkActionText");
-    if (element) {
-        element.textContent = text;
-        element.dataset.action = action;
-    }
-};
-
-window.applyBulkStockAction = function () {
-    const actionElement = document.getElementById("bulkActionText");
-    const valueInput = document.getElementById("bulkStockValue");
-    const action = actionElement?.dataset.action || "add";
-    const value = parseInt(valueInput?.value) || 0;
-
-    if (!value) {
-        showToast("Warning", "Please enter a valid value.", "warning");
-        return;
-    }
-
-    document.querySelectorAll(".stock-update-row").forEach((row) => {
-        const input = row.querySelector(".new-stock-input");
-        if (!input) return;
-
-        const current = parseInt(input.value) || 0;
-        let newValue;
-
-        switch (action) {
-            case "add":
-                newValue = current + value;
-                break;
-            case "subtract":
-                newValue = Math.max(0, current - value);
-                break;
-            case "set":
-                newValue = value;
-                break;
-            default:
-                newValue = current;
-        }
-
-        input.value = newValue;
-        if (typeof updateStockChangeDisplay === "function") {
-            updateStockChangeDisplay(row);
-        }
-    });
-
-    if (valueInput) valueInput.value = "";
-    showToast("Success", "Bulk action applied to all products.", "success");
-};
 
 // UTILITY FUNCTIONS
 function setText(id, text) {
@@ -1421,28 +1325,3 @@ document.addEventListener("keydown", function (e) {
 });
 
 // BACKUP INITIALIZATION ON WINDOW LOAD
-window.addEventListener("load", function () {
-    console.log("Window loaded, ensuring all functions are initialized");
-
-    // Double-check search initialization
-    const searchInput = document.getElementById("searchInput");
-    if (searchInput && !searchInput.hasAttribute("data-search-initialized")) {
-        initializeSearch();
-        searchInput.setAttribute("data-search-initialized", "true");
-    }
-
-    // Ensure bulk selection is working
-    const selectAllCheckbox = document.getElementById("selectAll");
-    if (
-        selectAllCheckbox &&
-        !selectAllCheckbox.hasAttribute("data-bulk-initialized")
-    ) {
-        initBulkSelection();
-        selectAllCheckbox.setAttribute("data-bulk-initialized", "true");
-    }
-
-    // Initialize selectedProductIds if not already defined
-    if (typeof selectedProductIds === "undefined") {
-        window.selectedProductIds = new Set();
-    }
-});

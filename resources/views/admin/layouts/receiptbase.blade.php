@@ -10,15 +10,14 @@
     <link href="{{ asset('tabler/dist/css/tabler-flags.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-payments.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
-    <link href="{{ asset('css/pos-receipt.css') }}" rel="stylesheet" />
+    @vite('resources/css/pos-receipt.css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="{{ asset('js/admin/layouts/page-loader.js') }}"></script>
 </head>
 
 <body>
-    <div class="page page-center">
+    <div class="page-loader">
         <div class="container container-slim py-4">
             <div class="text-center">
                 <div class="mb-3">
@@ -36,6 +35,7 @@
     </div>
     @include('admin.layouts.footer')
     @include('admin.layouts.script')
+    @vite('resources/js/admin/layouts/page-loader.js')
 </body>
 
 </html>

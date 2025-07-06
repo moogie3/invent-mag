@@ -1,7 +1,6 @@
 @import url('https://rsms.me/inter/inter.css');
 @import './auth.css';
 @import './navbar.css';
-@import './pos-receipt.css';
 
 /* ============================
    CSS RESET & NORMALIZATION
@@ -101,8 +100,23 @@ body {
     min-height: 85vh;
 }
 
+.page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    /* Or your desired background color */
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .main-content {
-    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .page-wrapper {
@@ -574,8 +588,8 @@ body {
    ============================ */
 /* Loading spinner styles */
 .spinner-border {
-    width: 3rem;
-    height: 3rem;
+    width: 2rem;
+    height: 2rem;
 }
 
 @keyframes pulse {
@@ -824,7 +838,6 @@ body {
     }
 
     .customer-section .col-md-6 {
-        display: block;
         width: 100%;
         margin-bottom: 4px;
     }
@@ -898,7 +911,6 @@ body {
 
     .total-main {
         font-weight: bold;
-        font-size: 12px;
         border-top: 1px solid #000;
         border-bottom: 1px solid #000;
         padding: 3px 0;
@@ -955,8 +967,6 @@ body {
         margin-top: 6px;
     }
 }
-
-
 
 /* ============================
    20. PRINT STYLES - STANDARD A4
@@ -1063,17 +1073,11 @@ body {
     }
 
     .table th:nth-child(3),
-    .table td:nth-child(3) {
-        width: 10% !important;
-    }
-
+    .table td:nth-child(3),
     .table th:nth-child(4),
-    .table td:nth-child(4),
-    .table th:nth-child(5),
-    .table td:nth-child(5),
-    .table th:nth-child(6),
-    .table td:nth-child(6) {
+    .table td:nth-child(4) {
         width: 20% !important;
+        text-align: right;
     }
 
     .order-summary-section {
@@ -1218,4 +1222,41 @@ body {
     .amount-summary {
         margin-top: 15px !important;
     }
+}
+
+/* ============================
+   21. ERROR PAGE SPECIFIC STYLES
+   ============================ */
+.error-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+}
+
+.error-page .page-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.error-page .page-body {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.error-page .container-fluid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
 }

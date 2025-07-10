@@ -22,15 +22,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::table('customers')->insert([
-            'name' => 'Walk In Customer',
-            'address' => '-',
-            'phone_number' => '0',
-            'email' => '-',
-            'payment_terms' => '0',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+
     }
 
 

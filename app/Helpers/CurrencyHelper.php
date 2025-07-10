@@ -6,6 +6,8 @@ use App\Models\CurrencySetting;
 
 class CurrencyHelper
 {
+    protected static $settings = null;
+
     /**
      * Format amount with currency settings
      */
@@ -43,13 +45,11 @@ class CurrencyHelper
      */
     protected static function getSettings()
     {
-        static $settings = null;
-
-        if ($settings === null) {
-            $settings = CurrencySetting::first() ?? self::getDefaultSettings();
+        if (self::$settings === null) {
+            self::$settings = CurrencySetting::first() ?? self::getDefaultSettings();
         }
 
-        return $settings;
+        return self::$settings;
     }
 
     /**
@@ -64,6 +64,14 @@ class CurrencyHelper
             'thousand_separator' => '.',
             'position' => 'prefix'
         ];
+    }
+
+    /**
+     * Clear the cached settings for testing purposes.
+     */
+    public static function clearSettingsCache()
+    {
+        self::$settings = null;
     }
 
     /**

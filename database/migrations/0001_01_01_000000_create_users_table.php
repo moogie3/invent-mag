@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('shopname')->nullable();
             $table->string('address')->nullable();
             $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('remember_token', 100)->nullable();
             $table->string('avatar')->nullable();

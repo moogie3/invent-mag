@@ -7,7 +7,7 @@
         @php
             // Use the helper to calculate summary info
             $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
-                $sales->items,
+                $sales->salesItems,
                 $sales->order_discount ?? 0,
                 $sales->order_discount_type ?? 'percentage',
                 $sales->tax_rate ?? 0,

@@ -109,7 +109,7 @@ class CustomerCrmController extends Controller
                         'quantity' => $item->quantity,
                         'price_at_purchase' => $item->customer_price ?? 0, // Using customer_price from sales_items
                         'customer_latest_price' => $item->product ? ($item->product->price ?? 0) : 0, // Assuming 'price' on product is latest price
-                        'line_total' => $item->price * $item->quantity,
+                        'line_total' => $item->price * $item->quantity
                     ];
                 });
             });

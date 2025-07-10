@@ -19,14 +19,14 @@
                     // Use the SalesHelper to calculate summary info
                     // Fix the parameter names to match SalesHelper::calculateInvoiceSummary method
                     $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
-                        $sales->items,
+                        $sales->salesItems,
                         $sales->order_discount ?? 0,
                         $sales->order_discount_type ?? 'percentage',
                         $sales->tax_rate ?? 0,
                     );
                 @endphp
 
-                @foreach ($sales->items as $index => $item)
+                @foreach ($sales->salesItems as $index => $item)
                     @php
                         // Fix: Use customer_price instead of price for the calculation
                         $finalAmount = \App\Helpers\SalesHelper::calculateTotal(

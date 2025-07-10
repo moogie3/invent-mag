@@ -38,4 +38,10 @@ export default defineConfig({
             '@': path.resolve(__dirname, 'resources'),
         },
     },
+    optimizeDeps: {
+        exclude: [],
+    },
+    esbuild: {
+        jsx: false,
+    },
 });

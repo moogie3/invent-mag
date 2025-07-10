@@ -1146,6 +1146,14 @@ class SalesOrderView extends SalesOrderModule {
                     this.elements.viewSalesModalContent.innerHTML = html;
                     // Re-format currency values after content is loaded
                     this.formatAllCurrencyValues();
+
+                    // Set URLs for modal buttons
+                    if (this.elements.salesModalEdit) {
+                        this.elements.salesModalEdit.href = `/admin/sales/edit/${id}`;
+                    }
+                    if (this.elements.salesModalFullView) {
+                        this.elements.salesModalFullView.href = `/admin/sales/view/${id}`;
+                    }
                 }
             })
             .catch(error => {

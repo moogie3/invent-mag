@@ -26,7 +26,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($sales->items as $index => $item)
+                @foreach ($sales->salesItems as $index => $item)
                     @include('admin.layouts.partials.sales.edit.item-row', [
                         'item' => $item,
                         'index' => $index,

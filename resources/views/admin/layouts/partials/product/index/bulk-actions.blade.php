@@ -1,4 +1,4 @@
-<div id="bulkActionsBar" class="bulk-actions-bar border-bottom sticky-top">
+<div id="bulkActionsBar" class="bulk-actions-bar border-bottom sticky-top" style="display: none;">
     <div class="px-4 py-3">
         <div class="row align-items-center">
             <div class="col-lg-6 col-md-12">

@@ -57,17 +57,16 @@ class SalesController extends Controller
     }
     public function edit($id)
     {
-        $sales = Sales::with(['items', 'customer'])->find($id);
+        $sales = Sales::with(['salesItems', 'customer'])->find($id);
         $customers = Customer::all();
-        $items = SalesItem::all();
         $tax = Tax::where('is_active', 1)->first();
         $isPaid = $sales->status == 'Paid';
-        return view('admin.sales.sales-edit', compact('sales', 'customers', 'items', 'tax', 'isPaid'));
+        return view('admin.sales.sales-edit', compact('sales', 'customers', 'tax', 'isPaid'));
     }
 
     public function view($id)
 {
-    $sales = Sales::with(['items', 'customer'])->find($id);
+    $sales = Sales::with(['salesItems', 'customer'])->find($id);
 
     // Check if this is a POS invoice
     if (strpos($sales->invoice, 'POS-') === 0) {
@@ -77,16 +76,15 @@ class SalesController extends Controller
 
     // For regular invoices, continue with the existing code
     $customer = Customer::all();
-    $items = SalesItem::all();
     $tax = Tax::first();
 
     // Calculate summary data similar to PurchaseController
-    $itemCount = $sales->items->count();
+    $itemCount = $sales->salesItems->count();
     $subtotal = 0;
     $totalItemDiscount = 0;
 
     // Calculate subtotal and item discounts
-    foreach ($sales->items as $item) {
+    foreach ($sales->salesItems as $item) {
         $itemSubtotal = $item->customer_price * $item->quantity;
 
         // Calculate item discount
@@ -127,7 +125,6 @@ class SalesController extends Controller
     return view('admin.sales.sales-view', compact(
         'sales',
         'customer',
-        'items',
         'tax',
         'summary',
         'itemCount',
@@ -142,13 +139,13 @@ class SalesController extends Controller
     public function modalViews($id)
     {
         try {
-            $sales = Sales::with(['customer', 'items.product'])->findOrFail($id);
+            $sales = Sales::with(['customer', 'salesItems.product'])->findOrFail($id);
             return view('admin.layouts.modals.salesmodals-view', compact('sales'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Sales record not found for modal view: {$id}");
             return response('<div class="alert alert-danger">Sales record not found.</div>', 404);
         } catch (\Exception $e) {
-            Log::error("Error loading sales modal view for ID {$id}: " . $e->getMessage());
+            Log::error("Error loading sales modal view for ID {$id}: " . $e->getMessage(), ['exception' => $e]);
             return response('<div class="alert alert-danger">Error loading sales details: ' . $e->getMessage() . '</div>', 500);
         }
     }
@@ -353,7 +350,7 @@ class SalesController extends Controller
     {
         // Find the most recent sale for this customer and product
         $latestSale = Sales::where('customer_id', $customer->id)
-            ->whereHas('items', function ($query) use ($product) {
+            ->whereHas('salesItems', function ($query) use ($product) {
                 $query->where('product_id', $product->id);
             })
             ->latest()
@@ -362,7 +359,7 @@ class SalesController extends Controller
         $pastPrice = 0;
 
         if ($latestSale) {
-            $saleItem = $latestSale->items()->where('product_id', $product->id)->first();
+            $saleItem = $latestSale->salesItems()->where('product_id', $product->id)->first();
 
             if ($saleItem) {
                 // Format the price with no decimal places
@@ -401,7 +398,7 @@ class SalesController extends Controller
             // Use database transaction for data integrity
             DB::transaction(function () use ($ids, &$deletedCount, &$stockAdjustedCount, &$paidInvoicesCount) {
                 // First, get all sales orders to be deleted for logging
-                $salesOrders = Sales::whereIn('id', $ids)->with('items')->get();
+                $salesOrders = Sales::whereIn('id', $ids)->with('salesItems')->get();
 
                 if ($salesOrders->isEmpty()) {
                     throw new \Exception('No sales orders found with the provided IDs');
@@ -447,7 +444,7 @@ class SalesController extends Controller
                         'status' => $sale->status,
                     ]);
 
-                    foreach ($sale->items as $item) {
+                    foreach ($sale->salesItems as $item) {
                         $product = Product::find($item->product_id);
                         if ($product) {
                             try {
@@ -634,7 +631,7 @@ class SalesController extends Controller
             $ids = $request->ids;
 
             // Get sales orders with related data
-            $sales = Sales::with(['customer', 'items.product'])
+            $sales = Sales::with(['customer', 'salesItems.product'])
                 ->whereIn('id', $ids)
                 ->get();
 
@@ -653,7 +650,7 @@ class SalesController extends Controller
 
                 // CSV Data
                 foreach ($sales as $sale) {
-                    fputcsv($file, [$sale->invoice, $sale->customer->name ?? 'N/A', $sale->order_date, $sale->due_date, $sale->status, $sale->payment_date ?? 'N/A', $sale->total, $sale->items->count()]);
+                    fputcsv($file, [$sale->invoice, $sale->customer->name ?? 'N/A', $sale->order_date, $sale->due_date, $sale->status, $sale->payment_date ?? 'N/A', $sale->total, $sale->salesItems->count()]);
                 }
 
                 fclose($file);
@@ -677,7 +674,7 @@ class SalesController extends Controller
             // Use database transaction for data integrity
             DB::transaction(function () use ($id) {
                 // Get the sales order to be deleted
-                $salesOrder = Sales::with('items')->find($id);
+                $salesOrder = Sales::with('salesItems')->find($id);
 
                 if (!$salesOrder) {
                     throw new \Exception("Sales order with ID {$id} not found");
@@ -719,7 +716,7 @@ class SalesController extends Controller
                         'status' => $salesOrder->status,
                     ]);
 
-                    foreach ($salesOrder->items as $item) {
+                    foreach ($salesOrder->salesItems as $item) {
                         $product = Product::find($item->product_id);
                         if ($product) {
                             try {

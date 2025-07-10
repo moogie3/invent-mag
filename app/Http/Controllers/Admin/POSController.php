@@ -164,14 +164,14 @@ class POSController extends Controller
 
     public function receipt($id)
     {
-        $sale = Sales::with(['items.product', 'customer'])->findOrFail($id);
+        $sale = Sales::with(['salesItems.product', 'customer'])->findOrFail($id);
 
         // Start calculating totals
         $totalBeforeDiscount = 0;
         $totalItemDiscount = 0;
 
         // Calculate and attach item totals to each item
-        foreach ($sale->items as $item) {
+        foreach ($sale->salesItems as $item) {
             // Calculate item discount amount
             $discountAmount = SalesHelper::calculateDiscountPerUnit(
                 $item->customer_price,
@@ -228,7 +228,7 @@ class POSController extends Controller
 
     public function printReceipt($id)
     {
-        $sale = Sales::with(['items.product', 'customer'])->findOrFail($id);
+        $sale = Sales::with(['salesItems.product', 'customer'])->findOrFail($id);
         return view('admin.pos.print', compact('sale'));
     }
 }

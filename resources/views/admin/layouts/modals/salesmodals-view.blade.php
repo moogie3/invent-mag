@@ -95,14 +95,14 @@
                         @php
                             // Calculate invoice summary
                             $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
-                                $sales->items,
+                                $sales->salesItems,
                                 $sales->order_discount ?? 0,
                                 $sales->order_discount_type ?? 'percentage',
                                 $sales->tax_rate ?? 0,
                             );
                         @endphp
 
-                        @foreach ($sales->items as $index => $item)
+                        @foreach ($sales->salesItems as $index => $item)
                             @php
                                 // Calculate the final amount for this item
                                 $finalAmount = \App\Helpers\SalesHelper::calculateTotal(
@@ -116,7 +116,7 @@
                             <tr>
                                 <td class="text-center">{{ $index + 1 }}</td>
                                 <td>
-                                    <div class="strong">{{ $item->product->name }}</div>
+                                    <div class="strong">{{ $item->product->name ?? 'N/A' }}</div>
                                     @if (isset($item->product->sku) && $item->product->sku)
                                         <small class="text-muted">SKU: {{ $item->product->sku }}</small>
                                     @endif

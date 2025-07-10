@@ -99,6 +99,7 @@ Route::prefix('admin')->group(function () {
         // CRM Routes
         Route::get('/customers/{id}/crm-details', [CustomerCrmController::class, 'show']);
         Route::post('/customers/{id}/interactions', [CustomerCrmController::class, 'storeInteraction']);
+        Route::get('/customers/{id}/historical-purchases', [CustomerCrmController::class, 'getHistoricalPurchases']);
 
         // Purchase Order Routes
         Route::prefix('po')->group(function () {

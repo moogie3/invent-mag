@@ -74,7 +74,7 @@ class Product extends Model
         return Attribute::make(
             get: fn($value) => $value
                 ? asset("storage/image/{$value}") // Convert filename to full URL
-                : asset('storage/default.jpg'), // Default image if no image exists
+                : asset('img/default_placeholder.png'), // Default image if no image exists
         );
     }
 

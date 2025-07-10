@@ -81,6 +81,9 @@
 
 {{-- SCRIPT FOR CUSTOMER --}}
 @if (request()->is('admin/customer'))
+    <script>
+        window.defaultPlaceholderUrl = '{{ asset('img/default_placeholder.png') }}';
+    </script>
     @vite('resources/js/admin/customer.js')
 @endif
 

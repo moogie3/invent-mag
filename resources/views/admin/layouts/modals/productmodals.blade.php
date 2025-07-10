@@ -114,10 +114,7 @@
                                 <tr>
                                     <td>{{ $product->name }}</td>
                                     @php
-                                        [
-                                            $stockBadgeClass,
-                                            $stockBadgeText,
-                                        ] = \App\Helpers\ProductHelper::getStockClassAndText($product);
+                                        [$stockBadgeClass, $stockBadgeText,] = \App\Helpers\ProductHelper::getStockClassAndText($product);
                                     @endphp
                                     <td class="text-center">
                                         <span class="{{ $stockBadgeClass }}">
@@ -176,10 +173,7 @@
                                     <td>{{ $product->name }}</td>
                                     <td class="text-center">
                                         @php
-                                            [
-                                                $badgeClass,
-                                                $badgeText,
-                                            ] = \App\Helpers\ProductHelper::getExpiryClassAndText(
+                                            [$badgeClass, $badgeText,] = \App\Helpers\ProductHelper::getExpiryClassAndText(
                                                 $product->expiry_date,
                                             );
                                         @endphp
@@ -236,6 +230,7 @@
                 </button>
                 <a href="#" class="btn btn-primary" id="productModalEdit">
                     <i class="ti ti-edit me-1"></i> Edit
+                
                 </a>
             </div>
         </div>
@@ -261,9 +256,8 @@
             <div class="row g-4">
                 <!-- Product Image -->
                 <div class="col-md-4">
-                    <div class="text-center mb-3">
-                        <img id="productImage" src="" alt="Product Image"
-                            class="img-fluid rounded shadow-sm" style="max-height: 220px; object-fit: contain;">
+                    <div class="text-center mb-3" id="productImageContainer">
+                        <!-- Image or icon will be rendered here by JavaScript -->
                     </div>
                 </div>
 

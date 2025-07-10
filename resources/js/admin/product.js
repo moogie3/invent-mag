@@ -200,7 +200,7 @@ function updateBulkUI(elements) {
 }
 
 // PRODUCT DETAILS LOADING
-function loadProductDetails(id) {
+window.loadProductDetails = function (id) {
     const content = document.getElementById("viewProductModalContent");
     const editBtn = document.getElementById("productModalEdit");
 
@@ -222,8 +222,12 @@ function loadProductDetails(id) {
             if (!response.ok) throw new Error("Network error");
             return response.json();
         })
-        .then((data) => renderProductDetails(data))
+        .then((data) => {
+            console.log("Product data received:", data);
+            renderProductDetails(data);
+        })
         .catch((error) => {
+            console.error("Error loading product details:", error);
             content.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
         });
 }
@@ -255,8 +259,23 @@ function renderProductDetails(data) {
     );
 
     // Image
-    document.getElementById("productImage").src =
-        data.image || "/images/default-product.png";
+    const productImageContainer = document.getElementById("productImageContainer");
+    const defaultPlaceholderUrl = "/img/default_placeholder.png";
+
+    if (productImageContainer) {
+        // Check if data.image is a non-empty string and not the default placeholder URL
+        if (data.image && typeof data.image === 'string' && data.image.trim() !== '' && !data.image.endsWith(defaultPlaceholderUrl) && data.image.toLowerCase() !== 'null' && data.image.toLowerCase() !== 'undefined') {
+            productImageContainer.innerHTML = `<img id="productImage" src="${data.image}" alt="Product Image" class="img-fluid rounded shadow-sm" style="max-height: 220px; object-fit: contain;">`;
+        } else {
+            // Display the icon
+            productImageContainer.innerHTML = `
+                <div class="d-flex align-items-center justify-content-center"
+                     style="width: 220px; height: 220px; margin: 0 auto; border: 1px solid #ccc; border-radius: 5px;">
+                    <i class="ti ti-photo fs-1 text-muted" style="font-size: 100px !important;"></i>
+                </div>
+            `;
+        }
+    }
 
     // Threshold
     const thresholdElement = document.getElementById("productThreshold");
@@ -730,9 +749,7 @@ function handleBulkStockUpdate() {
                     }
                     showToast(
                         "Success",
-                        `Stock updated successfully for ${
-                            data.updated_count || updates.length
-                        } products!`,
+                        `Stock updated successfully for ${data.updated_count || updates.length} products!`,
                         "success"
                     );
                 }, 300); // 300ms delay
@@ -1244,20 +1261,12 @@ function initExpiryDateToggle() {
             ? "block"
             : "none";
 
-        // Add event listener for checkbox change
-        expiryCheckbox.addEventListener("change", function () {
+        checkbox.addEventListener("change", function () {
             if (this.checked) {
-                expiryDateField.style.display = "block";
-                // Focus on the date input when enabled
-                if (expiryDateInput) {
-                    setTimeout(() => expiryDateInput.focus(), 100);
-                }
-            } else {
-                expiryDateField.style.display = "none";
-                // Clear the date input when disabled
-                if (expiryDateInput) {
-                    expiryDateInput.value = "";
-                }
+                const dateInput = expiryDateField.querySelector(
+                    "input[name='expiry_date']"
+                );
+                dateInput?._flatpickr?.redraw();
             }
         });
     }

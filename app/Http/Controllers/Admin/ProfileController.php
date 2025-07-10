@@ -74,7 +74,7 @@
             return redirect()->back()->with('success', 'Profile updated successfully!');
         }
 
-        public function deleteAvatar()
+        public function deleteAvatar(Request $request)
         {
             /**
              * @var \App\Models\User $user

@@ -20,6 +20,8 @@ class SalesItem extends Model
         'total',
     ];
 
+    protected $with = ['product'];
+
     public function product() {
         return $this->belongsTo(Product::class);
     }

@@ -15,8 +15,19 @@ class Customer extends Model
         'name',
         'address',
         'phone_number',
-        'payment_terms'
+        'payment_terms',
+        'email',
+        'image'
     ];
+
+    protected function image(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn($value) => $value
+                ? asset("storage/image/{$value}")
+                : asset('img/default_placeholder.png'),
+        );
+    }
 
     public function sales()
     {

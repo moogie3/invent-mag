@@ -1,4 +1,4 @@
-<div class="col-md-4 mb-4">
+<div>
     <div class="card shadow-sm border-1 h-100">
         <div class="card-status-top bg-secondary"></div>
         <div class="card-header d-flex justify-content-between align-items-center">

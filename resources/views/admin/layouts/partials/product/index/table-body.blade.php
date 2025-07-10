@@ -6,7 +6,14 @@
             </td>
             <td class="sort-no">{{ $products->firstItem() + $index }}</td>
             <td class="sort-image" style="width:120px">
-                <img src="{{ asset($product->image) }}" width="80px" height="80px">
+                @if ($product->image == asset('img/default_placeholder.png'))
+                    <i class="ti ti-photo fs-1"
+                        style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
+                @else
+                    <img src="{{ $product->image }}" alt="" height="80px"
+                        width="80px"
+                        style="display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;">
+                @endif
             </td>
             <td class="sort-code no-print">{{ $product->code }}</td>
             <td class="sort-name">{{ $product->name }}</td>

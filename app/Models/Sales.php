@@ -32,6 +32,8 @@ class Sales extends Model
         'is_pos'
     ];
 
+    protected $with = ['salesItems'];
+
     protected $attributes = [
         'status' => 'Unpaid',
         'is_pos' => 'false',
@@ -61,7 +63,7 @@ class Sales extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function items(): HasMany
+    public function salesItems(): HasMany
     {
         return $this->hasMany(SalesItem::class, 'sales_id');
     }

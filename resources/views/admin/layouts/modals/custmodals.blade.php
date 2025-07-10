@@ -51,6 +51,14 @@
                             Terms</label>
                         <input type="text" class="form-control" id="customerPaymentTerms" name="payment_terms">
                     </div>
+                    <div class="mb-3">
+                        <label for="customerEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="customerEmail" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerImage" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="customerImage" name="image">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -69,7 +77,7 @@
                 <h5 class="modal-title" id="editCustomerModalLabel">Edit Customer</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editCustomerForm" method="POST">
+            <form id="editCustomerForm" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -92,6 +100,17 @@
                         <input type="text" class="form-control" id="customerPaymentTermsEdit"
                             name="payment_terms">
                     </div>
+                    <div class="mb-3">
+                        <label for="customerEmailEdit" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="customerEmailEdit" name="email">
+                    </div>
+                    <div class="mb-3 text-center" id="currentCustomerImageContainer">
+                        {{-- Image or icon will be displayed here by JavaScript --}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerImageEdit" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="customerImageEdit" name="image">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -99,6 +118,13 @@
                 </div>
                 <input type="hidden" id="updateRouteBase" value="{{ route('admin.customer.update', '') }}">
             </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.defaultPlaceholderUrl = "{{ asset('img/default_placeholder.png') }}";
+</script>
         </div>
     </div>
 </div>

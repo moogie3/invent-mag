@@ -7,8 +7,8 @@
             @foreach ([['route' => route('admin.sales.create'), 'icon' => 'ti-receipt', 'text' => 'New Sale'], ['route' => route('admin.po.create'), 'icon' => 'ti-shopping-cart', 'text' => 'New Purchase'], ['route' => route('admin.product.create'), 'icon' => 'ti-box', 'text' => 'Add Product'], ['route' => route('admin.notifications'), 'icon' => 'ti-notification', 'text' => 'Notifications'], ['route' => route('admin.pos'), 'icon' => 'ti-cash', 'text' => 'POS'], ['route' => route('admin.transactions'), 'icon' => 'ti-history', 'text' => 'Activity Log']] as $action)
                 <div class="col-6">
                     <a href="{{ $action['route'] }}"
-                        class="btn btn-outline-secondary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
-                        <i class="ti {{ $action['icon'] }} fs-1 mb-2"></i>
+                        class="btn btn-outline-secondary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-2">
+                        <i class="ti {{ $action['icon'] }} fs-2 mb-2"></i>
                         <span>{{ $action['text'] }}</span>
                     </a>
                 </div>

@@ -191,7 +191,7 @@ if ($product->has_expiry && $product->expiry_date) {
         // Add unit symbol to the product for the frontend
         $product->unit_symbol = $product->unit->symbol;
         $product->warehouse_name = $product->warehouse ? $product->warehouse->name : 'None';
-        $product->image_url = $product->image ? asset('storage/image/' . $product->image) : asset('/images/default-product.png');
+        $product->image_url = $product->image;
 
         return response()->json([
             'success' => true,
@@ -267,7 +267,7 @@ if ($product->has_expiry && $product->expiry_date) {
 
         // Delete image from storage if exists
         if (!empty($product->image)) {
-            Storage::delete('public/' . $product->image);
+            Storage::delete('public/image/' . basename($product->image));
         }
 
         $product->delete();

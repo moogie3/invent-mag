@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('address');
             $table->string('phone_number');
+            $table->string('email')->nullable();
             $table->string('payment_terms');
             $table->timestamps();
         });
@@ -25,6 +26,7 @@ return new class extends Migration
             'name' => 'Walk In Customer',
             'address' => '-',
             'phone_number' => '0',
+            'email' => '-',
             'payment_terms' => '0',
             'created_at' => now(),
             'updated_at' => now(),

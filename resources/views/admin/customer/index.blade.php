@@ -84,6 +84,7 @@
                                         <thead style="font-size: large">
                                             <tr>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-no">No</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-image">Image</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-name">Name</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-address">Address
                                                 </th>
@@ -91,6 +92,7 @@
                                                         Number</th>
                                                 <th><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-phonenumber">Payment Terms</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-email">Email</th>
                                                 <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">Action
                                                 </th>
                                             </tr>
@@ -99,10 +101,21 @@
                                             @foreach ($customers as $index => $customer)
                                                 <tr>
                                                     <td class="sort-no">{{ $customers->firstItem() + $index }}</td>
+                                                    <td class="sort-image">
+                                                        @if ($customer->image == asset('img/default_placeholder.png'))
+                                                            <i class="ti ti-photo fs-1"
+                                                                style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
+                                                        @else
+                                                            <img src="{{ $customer->image }}" alt="" height="80px"
+                                                                width="80px"
+                                                                style="display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;">
+                                                        @endif
+                                                    </td>
                                                     <td class="sort-name">{{ $customer->name }}</td>
                                                     <td class="sort-address">{{ $customer->address }}</td>
                                                     <td class="sort-phonenumber">{{ $customer->phone_number }}</td>
                                                     <td class="sort-paymentterms">{{ $customer->payment_terms }}</td>
+                                                    <td class="sort-email">{{ $customer->email }}</td>
                                                     <td class="no-print" style="text-align:center">
                                                         <div class="dropdown">
                                                             <button class="btn dropdown-toggle align-text-top"
@@ -123,7 +136,9 @@
                                                                     data-name="{{ $customer->name }}"
                                                                     data-address="{{ $customer->address }}"
                                                                     data-phone_number="{{ $customer->phone_number }}"
-                                                                    data-payment_terms="{{ $customer->payment_terms }}">
+                                                                    data-payment_terms="{{ $customer->payment_terms }}"
+                                                                    data-email="{{ $customer->email }}"
+                                                                    data-image="{{ $customer->image }}">
                                                                     <i class="ti ti-edit me-2"></i> Edit
                                                                 </a>
 
@@ -160,5 +175,5 @@
         </div>
     </div>
     @include('admin.layouts.modals.custmodals')
-    @include('admin.customer.crm-modal')
+    @include('admin.layouts.modals.crm-modal')
 @endsection

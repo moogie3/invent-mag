@@ -29,10 +29,10 @@
                     @forelse ($lowStockProducts as $product)
                         <div class="shadcn-alert-item">
                             <div class="shadcn-avatar" style="width: 80px; height: 80px; flex-shrink: 0;">
-                                @if ($product->image)
-                                    <img src="{{ $product->image }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                                @if (empty($product->image) || strtolower($product->image) === 'null' || strtolower($product->image) === 'undefined' || $product->image === asset('img/default_placeholder.png'))
+                                    <i class="ti ti-photo fs-1" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
                                 @else
-                                    <i class="ti ti-photo" style="font-size: 48px; color: #64748b; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"></i>
+                                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
                                 @endif
                             </div>
                             <div class="shadcn-product-info">
@@ -55,10 +55,10 @@
                     @forelse ($expiringSoonProducts as $product)
                         <div class="shadcn-alert-item">
                             <div class="shadcn-avatar" style="width: 80px; height: 80px; flex-shrink: 0;">
-                                @if ($product->image)
-                                    <img src="{{ $product->image }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                                @if (empty($product->image) || strtolower($product->image) === 'null' || strtolower($product->image) === 'undefined' || $product->image === asset('img/default_placeholder.png'))
+                                    <i class="ti ti-photo fs-1" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
                                 @else
-                                    <i class="ti ti-photo" style="font-size: 48px; color: #64748b; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"></i>
+                                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
                                 @endif
                             </div>
                             <div class="shadcn-product-info">

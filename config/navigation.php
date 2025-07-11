@@ -39,6 +39,12 @@ return [
             'permission' => 'view-customer',
         ],
         [
+            'title' => 'Sales Pipeline',
+            'route' => 'admin.sales_pipeline.index',
+            'icon' => 'ti ti-chart-arrows-vertical',
+            'permission' => 'view-sales-pipeline',
+        ],
+        [
             'title' => 'Supplier',
             'route' => 'admin.supplier',
             'icon' => 'ti ti-truck',

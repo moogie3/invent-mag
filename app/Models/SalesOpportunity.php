@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class SalesOpportunity extends Model
+{
+    protected $fillable = [
+        'customer_id',
+        'sales_pipeline_id',
+        'pipeline_stage_id',
+        'name',
+        'description',
+        'amount',
+        'expected_close_date',
+        'status',
+    ];
+
+    protected $casts = [
+        'expected_close_date' => 'date',
+    ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function pipeline()
+    {
+        return $this->belongsTo(SalesPipeline::class, 'sales_pipeline_id');
+    }
+
+    public function stage()
+    {
+        return $this->belongsTo(PipelineStage::class, 'pipeline_stage_id');
+    }
+
+    public function sales()
+    {
+        return $this->hasOne(Sales::class, 'sales_opportunity_id');
+    }
+}

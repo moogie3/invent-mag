@@ -72,5 +72,11 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'create-supplier']);
         Permission::firstOrCreate(['name' => 'edit-supplier']);
         Permission::firstOrCreate(['name' => 'delete-supplier']);
+
+        // Sales Pipeline Permissions
+        Permission::firstOrCreate(['name' => 'view-sales-pipeline']);
+        Permission::firstOrCreate(['name' => 'manage-sales-pipelines']);
+        Permission::firstOrCreate(['name' => 'manage-pipeline-stages']);
+        Permission::firstOrCreate(['name' => 'manage-sales-opportunities']);
     }
 }

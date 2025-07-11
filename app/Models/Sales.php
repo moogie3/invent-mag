@@ -29,7 +29,8 @@ class Sales extends Model
         'total_tax',
         'amount_received',
         'change_amount',
-        'is_pos'
+        'is_pos',
+        'sales_opportunity_id'
     ];
 
     protected $with = ['salesItems'];
@@ -76,6 +77,11 @@ class Sales extends Model
     public function tax(): BelongsTo
     {
         return $this->belongsTo(Tax::class, 'tax_id');
+    }
+
+    public function salesOpportunity(): BelongsTo
+    {
+        return $this->belongsTo(SalesOpportunity::class, 'sales_opportunity_id');
     }
 
     protected $casts = [

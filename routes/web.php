@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController, UserController, CustomerCrmController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController, UserController, CustomerCrmController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -100,6 +100,32 @@ Route::prefix('admin')->group(function () {
         Route::get('/customers/{id}/crm-details', [CustomerCrmController::class, 'show']);
         Route::post('/customers/{id}/interactions', [CustomerCrmController::class, 'storeInteraction']);
         Route::get('/customers/{id}/historical-purchases', [CustomerCrmController::class, 'getHistoricalPurchases']);
+
+        // Sales Pipeline Routes
+        Route::get('/sales-pipeline', [SalesPipelineController::class, 'index'])->name('admin.sales_pipeline.index');
+
+        Route::prefix('sales-pipeline')->group(function () {
+            // Pipelines
+            Route::get('/pipelines', [SalesPipelineController::class, 'indexPipelines'])->name('admin.sales_pipeline.pipelines.index');
+            Route::post('/pipelines', [SalesPipelineController::class, 'storePipeline'])->name('admin.sales_pipeline.pipelines.store');
+            Route::put('/pipelines/{pipeline}', [SalesPipelineController::class, 'updatePipeline'])->name('admin.sales_pipeline.pipelines.update');
+            Route::delete('/pipelines/{pipeline}', [SalesPipelineController::class, 'destroyPipeline'])->name('admin.sales_pipeline.pipelines.destroy');
+
+            // Stages
+            Route::post('/pipelines/{pipeline}/stages', [SalesPipelineController::class, 'storeStage'])->name('admin.sales_pipeline.stages.store');
+            Route::put('/stages/{stage}', [SalesPipelineController::class, 'updateStage'])->name('admin.sales_pipeline.stages.update');
+            Route::delete('/stages/{stage}', [SalesPipelineController::class, 'destroyStage'])->name('admin.sales_pipeline.stages.destroy');
+            Route::post('/pipelines/{pipeline}/stages/reorder', [SalesPipelineController::class, 'reorderStages'])->name('admin.sales_pipeline.stages.reorder');
+
+            // Opportunities
+            Route::get('/opportunities', [SalesPipelineController::class, 'indexOpportunities'])->name('admin.sales_pipeline.opportunities.index');
+            Route::post('/opportunities', [SalesPipelineController::class, 'storeOpportunity'])->name('admin.sales_pipeline.opportunities.store');
+            Route::put('/opportunities/{opportunity}', [SalesPipelineController::class, 'updateOpportunity'])->name('admin.sales_pipeline.opportunities.update');
+            Route::get('/opportunities/{opportunity}', [SalesPipelineController::class, 'showOpportunity'])->name('admin.sales_pipeline.opportunities.show');
+            Route::delete('/opportunities/{opportunity}', [SalesPipelineController::class, 'destroyOpportunity'])->name('admin.sales_pipeline.opportunities.destroy');
+            Route::put('/opportunities/{opportunity}/move', [SalesPipelineController::class, 'moveOpportunity'])->name('admin.sales_pipeline.opportunities.move');
+            Route::post('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'convertToSalesOrder'])->name('admin.sales_pipeline.opportunities.convert');
+        });
 
         // Purchase Order Routes
         Route::prefix('po')->group(function () {

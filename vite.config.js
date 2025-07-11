@@ -29,6 +29,7 @@ export default defineConfig({
                 "resources/js/admin/layouts/page-loader.js",
                 "resources/css/navbar.css",
                 "resources/js/admin/layouts/navbar.js",
+                "resources/js/admin/sales-pipeline.js",
             ],
             refresh: true,
         }),

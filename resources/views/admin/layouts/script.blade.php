@@ -81,9 +81,6 @@
 
 {{-- SCRIPT FOR CUSTOMER --}}
 @if (request()->is('admin/customer'))
-    <script>
-        window.defaultPlaceholderUrl = '{{ asset('img/default_placeholder.png') }}';
-    </script>
     @vite('resources/js/admin/customer.js')
 @endif
 
@@ -105,6 +102,12 @@
     @vite('resources/js/admin/currency.js')
 @endif
 
+{{-- SCRIPT FOR SALES PIPELINE --}}
+@if (request()->is('admin/sales-pipeline'))
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    @vite('resources/js/admin/sales-pipeline.js')
+@endif
+
 {{--  MODAL --}}
 @if ($errors->any() || session('success'))
     @include('admin.layouts.modals')
@@ -117,3 +120,5 @@
         document.getElementById('deleteForm').setAttribute('action', action);
     }
 </script>
+
+@stack('scripts')

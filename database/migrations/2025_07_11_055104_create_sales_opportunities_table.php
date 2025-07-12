@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('amount', 10, 2)->nullable();
             $table->date('expected_close_date')->nullable();
             $table->string('status')->default('open'); // e.g., open, won, lost
+            $table->foreignId('sales_id')->nullable()->constrained('sales')->onDelete('set null');
             $table->timestamps();
         });
     }

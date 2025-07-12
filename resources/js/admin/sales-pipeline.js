@@ -27,6 +27,36 @@ document.addEventListener("DOMContentLoaded", function () {
         "editOpportunityCustomer"
     );
 
+    // Confirmation Modal Helper
+    const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+    const confirmationModalConfirmBtn = document.getElementById('confirmationModalConfirm');
+    const confirmationModalTitle = document.getElementById('confirmationModalTitle');
+    const confirmationModalBody = document.getElementById('confirmationModalBody');
+
+    function showConfirmationModal(title, body) {
+        return new Promise((resolve) => {
+            confirmationModalTitle.textContent = title;
+            confirmationModalBody.innerHTML = body;
+
+            const confirmHandler = () => {
+                resolve(true);
+                confirmationModal.hide();
+                confirmationModalConfirmBtn.removeEventListener('click', confirmHandler);
+            };
+
+            const cancelHandler = () => {
+                resolve(false);
+                confirmationModal.hide();
+                confirmationModalConfirmBtn.removeEventListener('click', confirmHandler);
+            };
+
+            confirmationModalConfirmBtn.addEventListener('click', confirmHandler);
+            document.getElementById('confirmationModal').addEventListener('hidden.bs.modal', cancelHandler, { once: true });
+
+            confirmationModal.show();
+        });
+    }
+
     const CSRF_TOKEN = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
@@ -39,11 +69,33 @@ document.addEventListener("DOMContentLoaded", function () {
         opportunitiesStore: "/admin/sales-pipeline/opportunities",
         opportunitiesBaseUrl: "/admin/sales-pipeline/opportunities",
         customerIndex: "/admin/customer",
+        productIndex: "/admin/product/search?q=", // New route for products
     };
+
+    const newOpportunityItemsContainer = document.getElementById(
+        "newOpportunityItemsContainer"
+    );
+    const addNewOpportunityItemBtn = document.getElementById(
+        "addNewOpportunityItem"
+    );
+    const newOpportunityTotalAmountInput = document.getElementById(
+        "newOpportunityTotalAmount"
+    );
+
+    const editOpportunityItemsContainer = document.getElementById(
+        "editOpportunityItemsContainer"
+    );
+    const editNewOpportunityItemBtn = document.getElementById(
+        "editNewOpportunityItem"
+    );
+    const editOpportunityTotalAmountInput = document.getElementById(
+        "editOpportunityTotalAmount"
+    );
 
     // Parse initial data with error handling
     let allPipelines = [];
     let allCustomers = [];
+    let allProducts = []; // New array for products
 
     try {
         const pipelinesData = pageBody.dataset.initialPipelines;
@@ -61,12 +113,13 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Parsed customers:", allCustomers);
     } catch (error) {
         console.error("Error parsing initial data:", error);
-        alert("Error loading initial data. Please refresh the page.");
+        showToast('Error', 'Error loading initial data. Please refresh the page.', 'error');
         return;
     }
 
     // Initial data rendering
-    function initializeData() {
+    async function initializeData() {
+        // Made async to fetch products
         if (allPipelines.length > 0) {
             renderPipelinesSelect();
         } else {
@@ -80,6 +133,21 @@ document.addEventListener("DOMContentLoaded", function () {
             populateCustomerSelect(editOpportunityCustomerSelect);
         } else {
             console.warn("No customers found");
+        }
+
+        // Fetch products
+        try {
+            const productsResponse = await fetch(
+                SALES_PIPELINE_ROUTES.productIndex
+            );
+            if (!productsResponse.ok) {
+                throw new Error("Failed to fetch products");
+            }
+            allProducts = await productsResponse.json();
+            console.log("Fetched products:", allProducts);
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            showToast('Error', 'Failed to load product data. Please refresh the page.', 'error');
         }
     }
 
@@ -101,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("Data refreshed successfully");
         } catch (error) {
             console.error("Error re-fetching data:", error);
-            alert("Failed to re-fetch data. Please try again.");
+            showToast('Error', 'Failed to re-fetch data. Please try again.', 'error');
         }
     }
 
@@ -207,8 +275,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const customerName = opportunity.customer
             ? opportunity.customer.name
             : "Unknown Customer";
+        const currencySymbol = pageBody.dataset.currencySymbol || "$"; // Get currency symbol from data attribute
         const amount = opportunity.amount
-            ? `$${parseFloat(opportunity.amount).toLocaleString()}`
+            ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(opportunity.amount)
             : "No amount";
         const expectedCloseDate = opportunity.expected_close_date
             ? new Date(opportunity.expected_close_date).toLocaleDateString()
@@ -221,9 +290,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     <strong>Customer:</strong> ${customerName}<br>
                     <strong>Amount:</strong> ${amount}<br>
                     <strong>Expected Close:</strong> ${expectedCloseDate}<br>
-                    <strong>Status:</strong> <span class="badge bg-${getStatusColor(
+                    <strong>Status:</strong> <span class="badge badge-${getStatusColor(
                         opportunity.status
-                    )}">${opportunity.status}</span>
+                    )}-lt">${opportunity.status.charAt(0).toUpperCase() + opportunity.status.slice(1)}</span>
                 </p>
                 <div class="btn-group btn-group-sm" role="group">
                     <button type="button" class="btn btn-outline-primary btn-sm edit-opportunity-btn"
@@ -234,7 +303,11 @@ document.addEventListener("DOMContentLoaded", function () {
                             data-opportunity-id="${opportunity.id}">
                         <i class="ti ti-trash"></i> Delete
                     </button>
-                    ${opportunity.status === 'won' ? `<button type="button" class="btn btn-success btn-sm convert-opportunity-btn" data-opportunity-id="${opportunity.id}"><i class="ti ti-check"></i> Convert to Sales Order</button>` : ''}
+                    ${
+                        opportunity.status === "won"
+                            ? `<button type="button" class="btn btn-success btn-sm convert-opportunity-btn" data-opportunity-id="${opportunity.id}"><i class="ti ti-check"></i> Convert to Sales Order</button>`
+                            : ""
+                    }
                 </div>
             </div>
         `;
@@ -360,12 +433,118 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
+    // Helper function to create a product item row
+    function createProductItemRow(item = {}, index, containerId) {
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "row g-2 align-items-end mb-2 product-item-row";
+        itemDiv.dataset.index = index;
+
+        const productId = item.product_id || "";
+        const quantity = item.quantity || "";
+        const price = item.price || "";
+
+        let productOptions = '<option value="">Select Product</option>';
+        allProducts.forEach((product) => {
+            const selected = product.id == productId ? "selected" : "";
+            productOptions += `<option value="${product.id}" data-price="${
+                product.price || 0
+            }" ${selected}>${product.name}</option>`;
+        });
+
+        itemDiv.innerHTML = `
+            <div class="col-md-5">
+                <label for="${containerId}-product-${index}" class="form-label">Product</label>
+                <select class="form-select product-select" id="${containerId}-product-${index}" name="items[${index}][product_id]" required>
+                    ${productOptions}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="${containerId}-quantity-${index}" class="form-label">Quantity</label>
+                <input type="number" class="form-control quantity-input" id="${containerId}-quantity-${index}" name="items[${index}][quantity]" value="${quantity}" min="1" required>
+            </div>
+            <div class="col-md-3">
+                <label for="${containerId}-price-${index}" class="form-label">Price</label>
+                <input type="number" class="form-control price-input" id="${containerId}-price-${index}" name="items[${index}][price]" value="${price}" step="0.01" min="0" required>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-danger btn-icon remove-item-btn">
+                    <i class="ti ti-trash"></i>
+                </button>
+            </div>
+        `;
+
+        // Add event listeners for quantity and price changes
+        const quantityInput = itemDiv.querySelector(".quantity-input");
+        const priceInput = itemDiv.querySelector(".price-input");
+        const productSelect = itemDiv.querySelector(".product-select");
+
+        productSelect.addEventListener("change", function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const productPrice = parseFloat(selectedOption.dataset.price || 0);
+            priceInput.value = productPrice.toFixed(2);
+            calculateTotalAmount(containerId);
+        });
+
+        quantityInput.addEventListener("input", () =>
+            calculateTotalAmount(containerId)
+        );
+        priceInput.addEventListener("input", () =>
+            calculateTotalAmount(containerId)
+        );
+        itemDiv
+            .querySelector(".remove-item-btn")
+            .addEventListener("click", function () {
+                itemDiv.remove();
+                calculateTotalAmount(containerId);
+            });
+
+        return itemDiv;
+    }
+
+    // Helper function to calculate total amount
+    function calculateTotalAmount(containerId) {
+        let total = 0;
+        const container = document.getElementById(containerId);
+        const itemRows = container.querySelectorAll(".product-item-row");
+        itemRows.forEach((row) => {
+            const quantity =
+                parseFloat(row.querySelector(".quantity-input").value) || 0;
+            const price =
+                parseFloat(row.querySelector(".price-input").value) || 0;
+            total += quantity * price;
+        });
+
+        if (containerId === "newOpportunityItemsContainer") {
+            newOpportunityTotalAmountInput.value = total.toFixed(2);
+        } else if (containerId === "editOpportunityItemsContainer") {
+            editOpportunityTotalAmountInput.value = total.toFixed(2);
+        }
+    }
+
     // Event Listeners
     pipelineSelect?.addEventListener("change", function () {
         const selectedPipelineId = this.value;
         if (selectedPipelineId) {
             loadPipelineBoard(selectedPipelineId);
         }
+    });
+
+    // Add New Opportunity Item Button
+    addNewOpportunityItemBtn?.addEventListener("click", function () {
+        const index = newOpportunityItemsContainer.children.length;
+        newOpportunityItemsContainer.appendChild(
+            createProductItemRow({}, index, "newOpportunityItemsContainer")
+        );
+        calculateTotalAmount("newOpportunityItemsContainer");
+    });
+
+    // Add Edit Opportunity Item Button
+    editNewOpportunityItemBtn?.addEventListener("click", function () {
+        const index = editOpportunityItemsContainer.children.length;
+        editOpportunityItemsContainer.appendChild(
+            createProductItemRow({}, index, "editOpportunityItemsContainer")
+        );
+        calculateTotalAmount("editOpportunityItemsContainer");
     });
 
     // Fixed New Opportunity Form Handler
@@ -388,7 +567,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Found Pipeline:", selectedPipeline);
 
         if (!selectedPipeline) {
-            alert("Please select a pipeline first.");
+            showToast('Error', 'Please select a pipeline first.', 'error');
             return;
         }
 
@@ -400,9 +579,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         if (!selectedPipeline.stages || selectedPipeline.stages.length === 0) {
-            alert(
-                "The selected pipeline has no stages. Please add stages to the pipeline first."
-            );
+            showToast('Error', 'The selected pipeline has no stages. Please add stages to the pipeline first.', 'error');
             return;
         }
 
@@ -415,6 +592,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const formData = new FormData(this);
         const data = Object.fromEntries(formData);
+
+        // Collect items data
+        const items = [];
+        newOpportunityItemsContainer
+            .querySelectorAll(".product-item-row")
+            .forEach((row, index) => {
+                items.push({
+                    product_id: row.querySelector(".product-select").value,
+                    quantity: row.querySelector(".quantity-input").value,
+                    price: row.querySelector(".price-input").value,
+                });
+            });
+        data.items = items;
 
         // Debug logging
         console.log("Form data being sent:", data);
@@ -447,12 +637,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("newOpportunityModal")
             ).hide();
             this.reset();
+            newOpportunityItemsContainer.innerHTML = ""; // Clear items
+            newOpportunityTotalAmountInput.value = "0.00"; // Reset total
             loadPipelineBoard(selectedPipelineId);
 
-            alert("Opportunity created successfully!");
+            showToast('Success', 'Opportunity created successfully!', 'success');
         } catch (error) {
             console.error("Error creating opportunity:", error);
-            alert("Failed to create opportunity. Please try again.");
+            showToast('Error', 'Failed to create opportunity. Please try again.', 'error');
         }
     });
 
@@ -487,10 +679,10 @@ document.addEventListener("DOMContentLoaded", function () {
             await fetchData();
             this.reset();
 
-            alert("Pipeline created successfully!");
+            showToast('Success', 'Pipeline created successfully!', 'success');
         } catch (error) {
             console.error("Error creating pipeline:", error);
-            alert("Failed to create pipeline. Please try again.");
+            showToast('Error', 'Failed to create pipeline. Please try again.', 'error');
         }
     });
 
@@ -526,10 +718,10 @@ document.addEventListener("DOMContentLoaded", function () {
             ).hide();
             await fetchData();
 
-            alert("Pipeline updated successfully!");
+            showToast('Success', 'Pipeline updated successfully!', 'success');
         } catch (error) {
             console.error("Error updating pipeline:", error);
-            alert("Failed to update pipeline. Please try again.");
+            showToast('Error', 'Failed to update pipeline. Please try again.', 'error');
         }
     });
 
@@ -538,9 +730,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const pipelineId = newStagePipelineId.value;
 
-        // Validate pipeline ID
         if (!pipelineId) {
-            alert("Pipeline ID is missing. Please close and reopen the modal.");
+            showToast('Error', 'Pipeline ID is missing. Please close and reopen the modal.', 'error');
             return;
         }
 
@@ -548,14 +739,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const data = Object.fromEntries(formData);
         data.is_closed = formData.has("is_closed");
 
-        // Validate required fields
         if (!data.name) {
-            alert("Please fill in all required fields.");
+            showToast('Error', 'Please fill in all required fields.', 'error');
             return;
         }
-
-        const pipeline = allPipelines.find((p) => p.id == pipelineId);
-        data.position = pipeline.stages ? pipeline.stages.length : 0;
 
         try {
             const response = await fetch(
@@ -572,25 +759,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                console.error("Server response:", errorData);
-                throw new Error(`Failed to create stage: ${response.status}`);
+                throw new Error(`Failed to create stage: ${errorData.message || response.status}`);
             }
 
-            const stage = await response.json();
-
-            // Refresh pipeline data
+            // THE FIX: Force a complete refresh of the pipeline data from the server
             await fetchData();
 
-            // Re-render stages for the current pipeline
-            renderPipelineStages(pipelineId);
+            // Re-render the main pipeline board with the new, correct stage order
+            loadPipelineBoard(pipelineId);
 
-            // Clear form
+            // Also re-render the stages list inside the modal for consistency
+            const updatedPipeline = allPipelines.find(p => p.id == pipelineId);
+            if (updatedPipeline) {
+                renderPipelineStages(updatedPipeline);
+            }
+
             this.reset();
 
-            alert("Stage created successfully!");
+            showToast('Success', 'Stage created successfully!', 'success');
+
         } catch (error) {
             console.error("Error creating stage:", error);
-            alert("Failed to create stage. Please try again.");
+            showToast('Error', `Failed to create stage. Please try again.`, 'error');
         }
     });
 
@@ -602,6 +792,19 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("editOpportunityId").value;
         const formData = new FormData(this);
         const data = Object.fromEntries(formData);
+
+        // Collect items data
+        const items = [];
+        editOpportunityItemsContainer
+            .querySelectorAll(".product-item-row")
+            .forEach((row, index) => {
+                items.push({
+                    product_id: row.querySelector(".product-select").value,
+                    quantity: row.querySelector(".quantity-input").value,
+                    price: row.querySelector(".price-input").value,
+                });
+            });
+        data.items = items;
 
         try {
             const response = await fetch(
@@ -667,7 +870,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.closest(".delete-pipeline-btn")) {
             const pipelineId = e.target.closest(".delete-pipeline-btn").dataset
                 .pipelineId;
-            if (confirm("Are you sure you want to delete this pipeline?")) {
+            const confirmed = await showConfirmationModal('Delete Pipeline', 'Are you sure you want to delete this pipeline?');
+            if (confirmed) {
                 try {
                     const response = await fetch(
                         `${SALES_PIPELINE_ROUTES.pipelinesBaseUrl}/${pipelineId}`,
@@ -684,7 +888,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
                     await fetchData();
-                    alert("Pipeline deleted successfully!");
+                    showToast('Success', 'Pipeline deleted successfully!', 'success');
                 } catch (error) {
                     console.error("Error deleting pipeline:", error);
                     alert("Failed to delete pipeline. Please try again.");
@@ -696,7 +900,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.closest(".delete-stage-btn")) {
             const stageId =
                 e.target.closest(".delete-stage-btn").dataset.stageId;
-            if (confirm("Are you sure you want to delete this stage?")) {
+            const confirmed = await showConfirmationModal('Delete Stage', 'Are you sure you want to delete this stage?');
+            if (confirmed) {
                 try {
                     const response = await fetch(
                         `${SALES_PIPELINE_ROUTES.stagesBaseUrl}/${stageId}`,
@@ -718,7 +923,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         renderPipelineStages(pipelineId);
                     }
 
-                    alert("Stage deleted successfully!");
+                    showToast('Success', 'Stage deleted successfully!', 'success');
                 } catch (error) {
                     console.error("Error deleting stage:", error);
                     alert("Failed to delete stage. Please try again.");
@@ -746,8 +951,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     opportunity.name;
                 document.getElementById("editOpportunityCustomer").value =
                     opportunity.customer_id;
-                document.getElementById("editOpportunityAmount").value =
-                    opportunity.amount || "";
+                // document.getElementById("editOpportunityAmount").value = // Removed direct amount input
+                //     opportunity.amount || "";
                 document.getElementById(
                     "editOpportunityExpectedCloseDate"
                 ).value = opportunity.expected_close_date || "";
@@ -759,6 +964,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     opportunity.sales_pipeline_id;
                 document.getElementById("editOpportunityStageId").value =
                     opportunity.pipeline_stage_id;
+
+                // Populate items
+                editOpportunityItemsContainer.innerHTML = ""; // Clear existing items
+                if (opportunity.items && Array.isArray(opportunity.items)) {
+                    opportunity.items.forEach((item, index) => {
+                        editOpportunityItemsContainer.appendChild(
+                            createProductItemRow(
+                                item,
+                                index,
+                                "editOpportunityItemsContainer"
+                            )
+                        );
+                    });
+                }
+                calculateTotalAmount("editOpportunityItemsContainer");
 
                 new bootstrap.Modal(
                     document.getElementById("editOpportunityModal")
@@ -773,7 +993,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.closest(".delete-opportunity-btn")) {
             const opportunityId = e.target.closest(".delete-opportunity-btn")
                 .dataset.opportunityId;
-            if (confirm("Are you sure you want to delete this opportunity?")) {
+            const confirmed = await showConfirmationModal('Delete Opportunity', 'Are you sure you want to delete this opportunity?');
+            if (confirmed) {
                 try {
                     const response = await fetch(
                         `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}`,
@@ -790,7 +1011,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
                     loadPipelineBoard(pipelineSelect.value);
-                    alert("Opportunity deleted successfully!");
+                    showToast('Success', 'Opportunity deleted successfully!', 'success');
                 } catch (error) {
                     console.error("Error deleting opportunity:", error);
                     alert("Failed to delete opportunity. Please try again.");
@@ -802,7 +1023,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.closest(".convert-opportunity-btn")) {
             const opportunityId = e.target.closest(".convert-opportunity-btn")
                 .dataset.opportunityId;
-            if (confirm("Are you sure you want to convert this opportunity to a Sales Order?")) {
+            const confirmed = await showConfirmationModal('Convert Opportunity', 'Are you sure you want to convert this opportunity to a Sales Order?');
+            if (confirmed) {
                 try {
                     const response = await fetch(
                         `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}/convert`,
@@ -815,13 +1037,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
 
                     if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.message || "Failed to convert opportunity.");
+                        const errorData = await response
+                            .json()
+                            .catch(() => ({}));
+                        throw new Error(
+                            errorData.message ||
+                                "Failed to convert opportunity."
+                        );
                     }
 
                     const result = await response.json();
                     loadPipelineBoard(pipelineSelect.value);
-                    alert(result.message);
+                    showToast('Success', result.message, 'success');
                 } catch (error) {
                     console.error("Error converting opportunity:", error);
                     alert("Failed to convert opportunity: " + error.message);

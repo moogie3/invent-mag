@@ -107,3 +107,49 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+// Global function for confirmation modal
+window.showConfirmModal = function (title, message, onConfirm) {
+    const confirmModalHtml = `
+        <div class="modal modal-blur fade" id="confirmModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="modal-title">${title}</div>
+                        <div>${message}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmModalBtn">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Remove any existing confirm modal to prevent duplicates
+    const existingModal = document.getElementById('confirmModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    document.body.insertAdjacentHTML('beforeend', confirmModalHtml);
+
+    const confirmModalElement = document.getElementById('confirmModal');
+    const confirmModal = new bootstrap.Modal(confirmModalElement);
+
+    confirmModalElement.addEventListener('shown.bs.modal', () => {
+        document.getElementById('confirmModalBtn').focus();
+    });
+
+    document.getElementById('confirmModalBtn').onclick = () => {
+        onConfirm();
+        confirmModal.hide();
+    };
+
+    confirmModalElement.addEventListener('hidden.bs.modal', () => {
+        confirmModalElement.remove();
+    });
+
+    confirmModal.show();
+};

@@ -15,6 +15,7 @@ class SalesOpportunity extends Model
         'amount',
         'expected_close_date',
         'status',
+        'sales_id',
     ];
 
     protected $casts = [
@@ -39,5 +40,10 @@ class SalesOpportunity extends Model
     public function sales()
     {
         return $this->hasOne(Sales::class, 'sales_opportunity_id');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(SalesOpportunityItem::class);
     }
 }

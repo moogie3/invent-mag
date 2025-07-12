@@ -14,7 +14,7 @@ class SalesPipeline extends Model
 
     public function stages()
     {
-        return $this->hasMany(PipelineStage::class);
+        return $this->hasMany(PipelineStage::class)->orderBy('position');
     }
 
     public function opportunities()

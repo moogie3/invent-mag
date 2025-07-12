@@ -544,12 +544,8 @@ if ($product->has_expiry && $product->expiry_date) {
         $query = trim($request->get('q', ''));
 
         if (empty($query)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Search query is required',
-                'products' => [],
-                'count' => 0
-            ]);
+            $products = Product::with(['category', 'unit', 'supplier'])->get();
+            return response()->json($products);
         }
 
         // Build the search query with proper error handling

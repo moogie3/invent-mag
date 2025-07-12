@@ -12,6 +12,7 @@ use Illuminate\Validation\Rule;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Product;
+use App\Models\Tax;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -70,11 +71,13 @@ class SalesPipelineController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('pipeline_stages')->where(function ($query) use ($pipeline) {
                 return $query->where('sales_pipeline_id', $pipeline->id);
             })],
-            'position' => 'required|integer|min:0',
             'is_closed' => 'boolean',
         ]);
 
-        $stage = $pipeline->stages()->create($request->all());
+        $data = $request->all();
+        $data['position'] = $pipeline->stages()->count();
+
+        $stage = $pipeline->stages()->create($data);
         return response()->json($stage, 201);
     }
 
@@ -132,36 +135,100 @@ class SalesPipelineController extends Controller
 
     public function storeOpportunity(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'sales_pipeline_id' => 'required|exists:sales_pipelines,id',
             'pipeline_stage_id' => 'required|exists:pipeline_stages,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'amount' => 'nullable|numeric|min:0',
             'expected_close_date' => 'nullable|date',
             'status' => 'required|in:open,won,lost',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric|min:0',
         ]);
 
-        $opportunity = SalesOpportunity::create($request->all());
-        return response()->json($opportunity, 201);
+        DB::beginTransaction();
+
+        try {
+            $opportunity = SalesOpportunity::create([
+                'customer_id' => $validatedData['customer_id'],
+                'sales_pipeline_id' => $validatedData['sales_pipeline_id'],
+                'pipeline_stage_id' => $validatedData['pipeline_stage_id'],
+                'name' => $validatedData['name'],
+                'description' => $validatedData['description'],
+                'amount' => 0, // Will be calculated from items
+                'expected_close_date' => $validatedData['expected_close_date'],
+                'status' => $validatedData['status'],
+            ]);
+
+            $totalAmount = 0;
+            foreach ($validatedData['items'] as $itemData) {
+                $itemData['price'] = round($itemData['price']); // Round price to integer
+                $opportunity->items()->create($itemData);
+                $totalAmount += ($itemData['quantity'] * $itemData['price']);
+            }
+
+            $opportunity->update(['amount' => round($totalAmount)]); // Round total amount to integer
+
+            DB::commit();
+
+            return response()->json($opportunity->load('items'), 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Failed to create opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
+        }
     }
 
     public function updateOpportunity(Request $request, SalesOpportunity $opportunity)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'sales_pipeline_id' => 'required|exists:sales_pipelines,id',
             'pipeline_stage_id' => 'required|exists:pipeline_stages,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'amount' => 'nullable|numeric|min:0',
             'expected_close_date' => 'nullable|date',
             'status' => 'required|in:open,won,lost',
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric|min:0',
         ]);
 
-        $opportunity->update($request->all());
-        return response()->json($opportunity);
+        DB::beginTransaction();
+
+        try {
+            $opportunity->update([
+                'customer_id' => $validatedData['customer_id'],
+                'sales_pipeline_id' => $validatedData['sales_pipeline_id'],
+                'pipeline_stage_id' => $validatedData['pipeline_stage_id'],
+                'name' => $validatedData['name'],
+                'description' => $validatedData['description'],
+                'expected_close_date' => $validatedData['expected_close_date'],
+                'status' => $validatedData['status'],
+            ]);
+
+            // Delete existing items and create new ones
+            $opportunity->items()->delete();
+
+            $totalAmount = 0;
+            foreach ($validatedData['items'] as $itemData) {
+                $itemData['price'] = round($itemData['price']); // Round price to integer
+                $opportunity->items()->create($itemData);
+                $totalAmount += ($itemData['quantity'] * $itemData['price']);
+            }
+
+            $opportunity->update(['amount' => round($totalAmount)]); // Round total amount to integer
+
+            DB::commit();
+
+            return response()->json($opportunity->load('items'), 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Failed to update opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
+        }
     }
 
     public function destroyOpportunity(SalesOpportunity $opportunity)
@@ -172,7 +239,7 @@ class SalesPipelineController extends Controller
 
     public function showOpportunity(SalesOpportunity $opportunity)
     {
-        return response()->json($opportunity->load('customer', 'pipeline', 'stage'));
+        return response()->json($opportunity->load('customer', 'pipeline', 'stage', 'items.product'));
     }
 
     public function moveOpportunity(Request $request, SalesOpportunity $opportunity)
@@ -189,38 +256,48 @@ class SalesPipelineController extends Controller
     {
         // Validate that the opportunity is in a 'won' status
         if ($opportunity->status !== 'won') {
-            return response()->json(['message' => 'Opportunity must be in a "won" status to be converted.'], 400);
+            return response()->json(['message' => 'Opportunity must be in a "won" status to be converted.', 'type' => 'error'], 400);
         }
 
         // Check if a sales order already exists for this opportunity
         if ($opportunity->sales) {
-            return response()->json(['message' => 'This opportunity has already been converted to a sales order.'], 400);
+            return response()->json(['message' => 'This opportunity has already been converted to a sales order.', 'type' => 'error'], 400);
         }
 
         // Use a database transaction to ensure atomicity
         DB::beginTransaction();
 
         try {
-            // 1. Get a product to associate with the sales item (for now, just the first one)
-            $product = Product::first();
-            if (!$product) {
+            // 1. Get sales opportunity items
+            $opportunityItems = $opportunity->items;
+
+            if ($opportunityItems->isEmpty()) {
                 DB::rollBack();
-                return response()->json(['message' => 'No products available to create a sales order item.'], 404);
+                return response()->json(['message' => 'No products associated with this opportunity.', 'type' => 'error'], 404);
             }
 
-            // 2. Generate invoice number
-            $lastInvoice = Sales::latest()->first();
-            $invoiceNumber = $lastInvoice ? intval(substr($lastInvoice->invoice, -4)) + 1 : 1;
-            $invoice = 'INV-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+            // 2. Generate invoice number with PL- prefix
+            $lastSalesInvoice = Sales::where('invoice', 'LIKE', 'PL-%')
+                                    ->latest()
+                                    ->first();
+
+            $invoiceNumber = 1;
+            if ($lastSalesInvoice) {
+                $lastNumber = (int) substr($lastSalesInvoice->invoice, 3); // Get number after 'PL-'
+                $invoiceNumber = $lastNumber + 1;
+            }
+            $invoice = 'PL-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
 
             // 3. Get tax information
             $tax = Tax::where('is_active', 1)->first();
             $taxRate = $tax ? $tax->rate : 0;
 
-            // 4. Calculate total amounts (assuming opportunity amount is the subtotal for simplicity)
-            $subTotal = $opportunity->amount ?? 0;
-            $taxAmount = $subTotal * ($taxRate / 100);
-            $grandTotal = $subTotal + $taxAmount;
+            // 4. Calculate total amounts from opportunity items and round to integer
+            $subTotal = round($opportunityItems->reduce(function ($carry, $item) {
+                return $carry + ($item->quantity * $item->price);
+            }, 0));
+            $taxAmount = round($subTotal * ($taxRate / 100));
+            $grandTotal = round($subTotal + $taxAmount);
 
             // 5. Create the Sales record
             $salesOrder = Sales::create([
@@ -240,24 +317,29 @@ class SalesPipelineController extends Controller
                 'sales_opportunity_id' => $opportunity->id,
             ]);
 
-            // 6. Create a SalesItem record for the product
-            SalesItem::create([
-                'sales_id' => $salesOrder->id,
-                'product_id' => $product->id,
-                'quantity' => 1, // Assuming 1 unit for the opportunity amount
-                'discount' => 0,
-                'discount_type' => 'fixed',
-                'customer_price' => $subTotal, // Price is the total opportunity amount
-                'total' => $subTotal, // Total for this item is the subtotal
-            ]);
+            // 6. Create SalesItem records for each opportunity item and decrement product stock
+            foreach ($opportunityItems as $item) {
+                SalesItem::create([
+                    'sales_id' => $salesOrder->id,
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'discount' => 0,
+                    'discount_type' => 'fixed',
+                    'customer_price' => round($item->price), // Round price to integer
+                    'total' => round($item->quantity * $item->price), // Round total to integer
+                ]);
 
-            // 7. Decrement product stock
-            if (isset($product->stock_quantity)) {
-                $product->decrement('stock_quantity', 1);
-            } elseif (isset($product->quantity)) {
-                $product->decrement('quantity', 1);
-            } elseif (isset($product->stock)) {
-                $product->decrement('stock', 1);
+                // 7. Decrement product stock
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    if (isset($product->stock_quantity)) {
+                        $product->decrement('stock_quantity', $item->quantity);
+                    } elseif (isset($product->quantity)) {
+                        $product->decrement('quantity', $item->quantity);
+                    } elseif (isset($product->stock)) {
+                        $product->decrement('stock', $item->quantity);
+                    }
+                }
             }
 
             // 8. Update the SalesOpportunity status and link to the new Sales record
@@ -268,11 +350,11 @@ class SalesPipelineController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'Opportunity successfully converted to Sales Order.', 'sales_id' => $salesOrder->id], 200);
+            return response()->json(['message' => 'Opportunity successfully converted to Sales Order.', 'type' => 'success', 'sales_id' => $salesOrder->id], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Failed to convert opportunity: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Failed to convert opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
         }
     }
 }

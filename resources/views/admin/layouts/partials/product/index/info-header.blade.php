@@ -1,66 +1,124 @@
 <div class="card-body border-bottom py-3">
     <div class="d-flex justify-content-between">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">Product information</div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i
-                                        class="ti ti-alert-triangle fs-2 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}"></i>
-                                </span>
-                                Low Stock :
-                                <strong class="{{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}">
-                                    {{ $lowStockCount }}
-                                </strong>
-                                @if ($lowStockCount > 0)
-                                    <a href="#" class="ms-2 btn btn-sm btn-outline-danger" id="viewLowStock">
-                                        View
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-box fs-2"></i>
-                                </span>
-                                Total Product : <strong>{{ $totalproduct }}</strong>
+        <div class="col-md-12">
+            <div class="card card-primary">
+                <div class="card-body border-bottom py-3">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="ti ti-box fs-1 me-3 text-primary"></i>
+                            <div>
+                                <h2 class="mb-1">
+                                    Product Information
+                                </h2>
+                                <div class="text-muted">
+                                    Overview of your product inventory and stock levels
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i
-                                        class="ti ti-calendar-time fs-2 {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}"></i>
-                                </span>
-                                Expiring Soon :
-                                <strong class="{{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}">
-                                    {{ $expiringSoonCount }}
-                                </strong>
-                                @if ($expiringSoonCount > 0)
-                                    <a href="#" class="ms-2 btn btn-sm btn-outline-warning" id="viewExpiringSoon">
-                                        View
-                                    </a>
-                                @endif
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body py-3">
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted mb-2 d-block">
+                                            Product Details
+                                        </label>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3 d-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;">
+                                            <i class="ti ti-box fs-3 text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="small text-muted">Total Product</div>
+                                            <div class="fw-bold">{{ $totalproduct }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3 d-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;">
+                                            <i class="ti ti-category fs-3 text-success"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="small text-muted">Total Category</div>
+                                            <div class="fw-bold">{{ $totalcategory }}</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-category fs-2"></i>
-                                </span>
-                                Total Category : <strong>{{ $totalcategory }}</strong>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-white">
+                                <div class="card-body py-3">
+                                    <div class="mb-2">
+                                        <label
+                                            class="form-label {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }} mb-2 d-block">
+                                            Stock Status
+                                        </label>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i
+                                                class="ti ti-alert-triangle fs-2 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}"></i>
+                                        </div>
+                                        <div>
+                                            <div
+                                                class="small {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}">
+                                                Low Stock Items</div>
+                                            <div
+                                                class="h4 mb-0 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}">
+                                                {{ $lowStockCount }}</div>
+                                            @if ($lowStockCount > 0)
+                                                <a href="#" class="mt-2 btn btn-sm btn-outline-danger"
+                                                    id="viewLowStock">
+                                                    View Details
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-white">
+                                <div class="card-body py-3">
+                                    <div class="mb-2">
+                                        <label
+                                            class="form-label {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }} mb-2 d-block">
+                                            Expiry Status
+                                        </label>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i
+                                                class="ti ti-calendar-time fs-2 {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}"></i>
+                                        </div>
+                                        <div>
+                                            <div
+                                                class="small {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}">
+                                                Expiring Soon</div>
+                                            <div
+                                                class="h4 mb-0 {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}">
+                                                {{ $expiringSoonCount }}</div>
+                                            @if ($expiringSoonCount > 0)
+                                                <a href="#" class="mt-2 btn btn-sm btn-outline-warning"
+                                                    id="viewExpiringSoon">
+                                                    View Details
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            @include('admin.layouts.partials.product.index.search')
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        @include('admin.layouts.partials.product.index.search')
     </div>
 </div>

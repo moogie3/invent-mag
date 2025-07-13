@@ -64,16 +64,23 @@
                                                 <div class="col-md-6">
                                                     <div class="card border-0 bg-light">
                                                         <div class="card-body py-3">
+                                                            <div class="mb-2">
+                                                                <label for="pipelineSelect"
+                                                                    class="form-label text-muted mb-2 d-block">
+                                                                    Active Pipeline
+                                                                </label>
+                                                            </div>
                                                             <div class="d-flex align-items-center">
-                                                                <div class="me-3">
-                                                                    <i class="ti ti-target fs-2 text-success"></i>
+                                                                <div class="me-3 d-flex align-items-center justify-content-center"
+                                                                    style="width: 32px; height: 32px;">
+                                                                    <i class="ti ti-target fs-3 text-success"></i>
                                                                 </div>
-                                                                <div>
-                                                                    <label for="pipelineSelect"
-                                                                        class="form-label text-muted mb-1">Active
-                                                                        Pipeline</label>
+                                                                <div class="flex-grow-1">
                                                                     <select class="form-select form-select-lg"
-                                                                        id="pipelineSelect"></select>
+                                                                        id="pipelineSelect">
+                                                                        <option value="">Select Pipeline</option>
+                                                                        <!-- Options will be populated here -->
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </div>

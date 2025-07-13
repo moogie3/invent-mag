@@ -495,21 +495,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Product grid click handler
     productGrid.addEventListener("click", function (event) {
-        const target =
-            event.target.closest(".product-card") ||
-            event.target.closest(".product-image");
-        if (!target) return;
+        const productCard = event.target.closest(".product-card");
+        if (!productCard) return;
 
-        const productImage = target.classList.contains("product-image")
-            ? target
-            : target.querySelector(".product-image");
-
-        if (!productImage) return;
-
-        const productId = productImage.dataset.productId;
-        const productName = productImage.dataset.productName;
-        const productPrice = productImage.dataset.productPrice;
-        const productUnit = productImage.dataset.productUnit;
+        const productId = productCard.dataset.productId;
+        const productName = productCard.dataset.productName;
+        const productPrice = productCard.dataset.productPrice;
+        const productUnit = productCard.dataset.productUnit;
 
         addToProductList(productId, productName, productPrice, productUnit);
     });
@@ -876,7 +868,7 @@ function addProductToGrid(product) {
     productCard.className = "card product-card h-100 border hover-shadow";
 
     // Determine image source
-    const imageSrc = product.image_url || "/images/default-product.png";
+    const imageSrc = product.image_url || "/img/default_placeholder.png";
 
     // Image container
     const imageContainer = document.createElement("div");

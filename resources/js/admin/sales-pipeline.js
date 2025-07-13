@@ -98,8 +98,10 @@ document.addEventListener("DOMContentLoaded", function () {
     let allProducts = []; // New array for products
 
     try {
-        const pipelinesData = pageBody.dataset.initialPipelines;
-        const customersData = pageBody.dataset.initialCustomers;
+        const initialDataContainer = document.querySelector('.card-body[data-initial-pipelines]');
+        const pipelinesData = initialDataContainer.dataset.initialPipelines;
+        const customersData = initialDataContainer.dataset.initialCustomers;
+        const currencySymbol = initialDataContainer.dataset.currencySymbol;
 
         if (pipelinesData && pipelinesData.trim()) {
             allPipelines = JSON.parse(pipelinesData);
@@ -217,7 +219,16 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!opportunitiesResponse.ok) {
                 throw new Error("Failed to fetch opportunities");
             }
-            const opportunities = await opportunitiesResponse.json();
+            const responseData = await opportunitiesResponse.json();
+            const opportunities = responseData.opportunities;
+            const totalPipelineValue = responseData.total_pipeline_value;
+
+            // Update the total pipeline value display
+            const pipelineValueElement = document.getElementById('pipelineValue');
+            if (pipelineValueElement) {
+                const formattedValue = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(totalPipelineValue);
+                pipelineValueElement.textContent = formattedValue;
+            }
 
             selectedPipeline.stages
                 .sort((a, b) => a.position - b.position)
@@ -891,7 +902,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     showToast('Success', 'Pipeline deleted successfully!', 'success');
                 } catch (error) {
                     console.error("Error deleting pipeline:", error);
-                    alert("Failed to delete pipeline. Please try again.");
+                    showToast('Error', 'Failed to delete pipeline. Please try again.', 'error');
                 }
             }
         }
@@ -926,7 +937,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     showToast('Success', 'Stage deleted successfully!', 'success');
                 } catch (error) {
                     console.error("Error deleting stage:", error);
-                    alert("Failed to delete stage. Please try again.");
+                    showToast('Error', 'Failed to delete stage. Please try again.', 'error');
                 }
             }
         }
@@ -985,7 +996,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 ).show();
             } catch (error) {
                 console.error("Error fetching opportunity:", error);
-                alert("Failed to fetch opportunity details. Please try again.");
+                showToast('Error', 'Failed to fetch opportunity details. Please try again.', 'error');
             }
         }
 
@@ -1014,7 +1025,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     showToast('Success', 'Opportunity deleted successfully!', 'success');
                 } catch (error) {
                     console.error("Error deleting opportunity:", error);
-                    alert("Failed to delete opportunity. Please try again.");
+                    showToast('Error', 'Failed to delete opportunity. Please try again.', 'error');
                 }
             }
         }
@@ -1081,7 +1092,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("Opportunity moved successfully");
         } catch (error) {
             console.error("Error moving opportunity:", error);
-            alert("Failed to move opportunity. Please try again.");
+            showToast('Error', 'Failed to move opportunity. Please try again.', 'error');
             // Reload the board to revert the visual change
             loadPipelineBoard(pipelineSelect.value);
         }

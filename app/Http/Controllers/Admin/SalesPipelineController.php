@@ -121,16 +121,23 @@ class SalesPipelineController extends Controller
     // Sales Opportunity Management
     public function indexOpportunities(Request $request)
     {
-        $opportunities = SalesOpportunity::with(['customer', 'pipeline', 'stage'])
-            ->when($request->pipeline_id, function ($query) use ($request) {
-                $query->where('sales_pipeline_id', $request->pipeline_id);
-            })
-            ->when($request->stage_id, function ($query) use ($request) {
-                $query->where('pipeline_stage_id', $request->stage_id);
-            })
-            ->get();
+        $opportunitiesQuery = SalesOpportunity::with(['customer', 'pipeline', 'stage']);
 
-        return response()->json($opportunities);
+        if ($request->pipeline_id) {
+            $opportunitiesQuery->where('sales_pipeline_id', $request->pipeline_id);
+        }
+
+        if ($request->stage_id) {
+            $opportunitiesQuery->where('pipeline_stage_id', $request->stage_id);
+        }
+
+        $opportunities = $opportunitiesQuery->get();
+        $totalPipelineValue = $opportunities->sum('amount');
+
+        return response()->json([
+            'opportunities' => $opportunities,
+            'total_pipeline_value' => $totalPipelineValue,
+        ]);
     }
 
     public function storeOpportunity(Request $request)

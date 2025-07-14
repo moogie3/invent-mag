@@ -230,7 +230,7 @@ window.loadProductDetails = function (id) {
             console.error("Error loading product details:", error);
             content.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
         });
-}
+};
 
 function renderProductDetails(data) {
     const content = document.getElementById("viewProductModalContent");
@@ -259,12 +259,21 @@ function renderProductDetails(data) {
     );
 
     // Image
-    const productImageContainer = document.getElementById("productImageContainer");
+    const productImageContainer = document.getElementById(
+        "productImageContainer"
+    );
     const defaultPlaceholderUrl = "/img/default_placeholder.png";
 
     if (productImageContainer) {
         // Check if data.image is a non-empty string and not the default placeholder URL
-        if (data.image && typeof data.image === 'string' && data.image.trim() !== '' && !data.image.endsWith(defaultPlaceholderUrl) && data.image.toLowerCase() !== 'null' && data.image.toLowerCase() !== 'undefined') {
+        if (
+            data.image &&
+            typeof data.image === "string" &&
+            data.image.trim() !== "" &&
+            !data.image.endsWith(defaultPlaceholderUrl) &&
+            data.image.toLowerCase() !== "null" &&
+            data.image.toLowerCase() !== "undefined"
+        ) {
             productImageContainer.innerHTML = `<img id="productImage" src="${data.image}" alt="Product Image" class="img-fluid rounded shadow-sm" style="max-height: 220px; object-fit: contain;">`;
         } else {
             // Display the icon
@@ -462,20 +471,29 @@ function performBulkDelete(ids, button, modal) {
             if (data.success) {
                 modal.hide();
                 // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
-                modal._element.addEventListener('hidden.bs.modal', function handler() {
-                    modal._element.removeEventListener('hidden.bs.modal', handler); // Remove the listener
-                    showToast(
-                        "Success",
-                        `${data.deleted_count || ids.length} products deleted successfully!`,
-                        "success"
-                    );
-                    // Explicitly remove any remaining modal backdrops
-                    const backdrops = document.querySelectorAll('.modal-backdrop');
-                    backdrops.forEach(backdrop => backdrop.remove());
-                });
+                modal._element.addEventListener(
+                    "hidden.bs.modal",
+                    function handler() {
+                        modal._element.removeEventListener(
+                            "hidden.bs.modal",
+                            handler
+                        ); // Remove the listener
+                        showToast(
+                            "Success",
+                            `${
+                                data.deleted_count || ids.length
+                            } products deleted successfully!`,
+                            "success"
+                        );
+                        // Explicitly remove any remaining modal backdrops
+                        const backdrops =
+                            document.querySelectorAll(".modal-backdrop");
+                        backdrops.forEach((backdrop) => backdrop.remove());
+                    }
+                );
                 clearProductSelection();
                 // Remove deleted rows from the table
-                ids.forEach(id => {
+                ids.forEach((id) => {
                     const row = document.querySelector(`tr[data-id="${id}"]`);
                     if (row) {
                         row.remove();
@@ -717,21 +735,35 @@ function handleBulkStockUpdate() {
         .then((response) => {
             console.log("Received response from server.", response);
             if (!response.ok) {
-                console.error("Server response not OK.", response.status, response.statusText);
+                console.error(
+                    "Server response not OK.",
+                    response.status,
+                    response.statusText
+                );
                 // Attempt to read response body for more details on error
-                return response.json().then(errorData => {
-                    console.error("Error response data:", errorData);
-                    throw new Error(errorData.message || `Server error: ${response.status} ${response.statusText}`);
-                }).catch(() => {
-                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
-                });
+                return response
+                    .json()
+                    .then((errorData) => {
+                        console.error("Error response data:", errorData);
+                        throw new Error(
+                            errorData.message ||
+                                `Server error: ${response.status} ${response.statusText}`
+                        );
+                    })
+                    .catch(() => {
+                        throw new Error(
+                            `Server error: ${response.status} ${response.statusText}`
+                        );
+                    });
             }
             return response.json();
         })
         .then((data) => {
             console.log("Processing server data:", data);
             if (data.success) {
-                console.log("Update successful, hiding modal and showing success toast.");
+                console.log(
+                    "Update successful, hiding modal and showing success toast."
+                );
                 // Introduce a slight delay before hiding the modal
                 setTimeout(() => {
                     const modal = bootstrap.Modal.getInstance(
@@ -740,33 +772,54 @@ function handleBulkStockUpdate() {
                     if (modal) {
                         modal.hide();
                         // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
-                        modal._element.addEventListener('hidden.bs.modal', function handler() {
-                            modal._element.removeEventListener('hidden.bs.modal', handler); // Remove the listener
-                            // Explicitly remove any remaining modal backdrops
-                            const backdrops = document.querySelectorAll('.modal-backdrop');
-                            backdrops.forEach(backdrop => backdrop.remove());
-                        });
+                        modal._element.addEventListener(
+                            "hidden.bs.modal",
+                            function handler() {
+                                modal._element.removeEventListener(
+                                    "hidden.bs.modal",
+                                    handler
+                                ); // Remove the listener
+                                // Explicitly remove any remaining modal backdrops
+                                const backdrops =
+                                    document.querySelectorAll(
+                                        ".modal-backdrop"
+                                    );
+                                backdrops.forEach((backdrop) =>
+                                    backdrop.remove()
+                                );
+                            }
+                        );
                     }
                     showToast(
                         "Success",
-                        `Stock updated successfully for ${data.updated_count || updates.length} products!`,
+                        `Stock updated successfully for ${
+                            data.updated_count || updates.length
+                        } products!`,
                         "success"
                     );
                 }, 300); // 300ms delay
                 // Update the stock quantity in the table dynamically
-                updates.forEach(updatedProduct => {
-                    const row = document.querySelector(`tr[data-id="${updatedProduct.id}"]`);
+                updates.forEach((updatedProduct) => {
+                    const row = document.querySelector(
+                        `tr[data-id="${updatedProduct.id}"]`
+                    );
                     if (row) {
-                        const quantityElement = row.querySelector('.sort-quantity');
+                        const quantityElement =
+                            row.querySelector(".sort-quantity");
                         if (quantityElement) {
-                            quantityElement.textContent = updatedProduct.stock_quantity;
+                            quantityElement.textContent =
+                                updatedProduct.stock_quantity;
                             // Also update the badge if it exists
-                            const badge = quantityElement.querySelector('.badge');
+                            const badge =
+                                quantityElement.querySelector(".badge");
                             if (badge) {
-                                const threshold = updatedProduct.low_stock_threshold || 10; // Assuming threshold is returned or default
-                                if (updatedProduct.stock_quantity <= threshold) {
-                                    badge.className = 'badge bg-danger-lt';
-                                    badge.textContent = 'Low Stock';
+                                const threshold =
+                                    updatedProduct.low_stock_threshold || 10; // Assuming threshold is returned or default
+                                if (
+                                    updatedProduct.stock_quantity <= threshold
+                                ) {
+                                    badge.className = "badge bg-danger-lt";
+                                    badge.textContent = "Low Stock";
                                 } else {
                                     badge.remove(); // Remove badge if no longer low stock
                                 }
@@ -777,7 +830,9 @@ function handleBulkStockUpdate() {
                 clearProductSelection();
                 // setTimeout(() => location.reload(), 1500);
             } else {
-                console.log("Update failed according to server data, showing error toast.");
+                console.log(
+                    "Update failed according to server data, showing error toast."
+                );
                 showToast("Error", data.message || "Update failed.", "error");
             }
         })
@@ -1170,8 +1225,6 @@ function showSearchError(errorMessage = "Search error occurred.") {
     `;
 }
 
-
-
 // UTILITY FUNCTIONS
 function setText(id, text) {
     const el = document.getElementById(id);
@@ -1194,7 +1247,7 @@ function getExpiryBadge(expiryDateStr) {
 
     if (diffDays < 0) return ' <span class="badge bg-danger-lt">Expired</span>';
     if (diffDays <= 7)
-        return ` <span class="badge bg-warning">Expiring Soon - ${diffDays}d</span>`;
+        return ` <span class="badge bg-warning-lt">Expiring Soon - ${diffDays}d</span>`;
     return "";
 }
 
@@ -1204,8 +1257,6 @@ function resetButton(button, originalText) {
         button.disabled = false;
     }
 }
-
-
 
 // DELETE MODAL FUNCTIONALITY
 window.setDeleteFormAction = function (action) {

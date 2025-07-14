@@ -28,7 +28,7 @@
                         <button class="nav-link" id="purchase-history-tab" data-bs-toggle="tab"
                             data-bs-target="#purchase-history" type="button" role="tab"
                             aria-controls="purchase-history" aria-selected="false">
-                            <i class="ti ti-shopping-cart me-2"></i>Purchase History
+                            <i class="ti ti-shopping-cart me-2"></i>Product History
                         </button>
                     </li>
                 </ul>

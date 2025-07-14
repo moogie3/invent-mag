@@ -78,7 +78,7 @@
                                                     <div class="h4 mb-0">{{ $outCount }}</div>
                                                 </div>
                                             </div>
-                                            <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center mb-3">
                                                 <div class="me-2">
                                                     <i class="ti ti-basket-dollar fs-2"></i>
                                                 </div>
@@ -99,7 +99,7 @@
                                                     <div class="h4 mb-0">{{ $inCount }}</div>
                                                 </div>
                                             </div>
-                                            <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center mb-3">
                                                 <div class="me-2">
                                                     <i class="ti ti-basket-dollar fs-2"></i>
                                                 </div>
@@ -111,50 +111,40 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    <i class="ti ti-currency fs-2"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-white-50 small">Monthly Purchase</div>
+                                                    <div class="h4 mb-0">
+                                                        {{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    <i class="ti ti-credit-card-pay fs-2"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-white-50 small">Monthly Payment</div>
+                                                    <div class="h4 mb-0">
+                                                        {{ \App\Helpers\CurrencyHelper::format($paymentMonthly) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <!-- This Month PO Card -->
-                            <div class="card border-0 bg-white mb-3">
-                                <div class="card-body py-3">
-                                    <div class="mb-2">
-                                        <label class="form-label text-success mb-2 d-block">
-                                            Monthly Purchase
-                                        </label>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <i class="ti ti-currency fs-2 text-success"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-success small">This Month PO</div>
-                                            <div class="h3 mb-0 text-success">
-                                                {{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
                             <!-- This Month Paid Card -->
-                            <div class="card border-0 bg-white">
-                                <div class="card-body py-3">
-                                    <div class="mb-2">
-                                        <label class="form-label text-info mb-2 d-block">
-                                            Monthly Payment
-                                        </label>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <i class="ti ti-credit-card-pay fs-2 text-info"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-info small">This Month Paid</div>
-                                            <div class="h3 mb-0 text-info">
-                                                {{ \App\Helpers\CurrencyHelper::format($paymentMonthly) }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
                         <div class="col-md-3">
                             @include('admin.layouts.partials.po.index.filters')

@@ -51,6 +51,14 @@
                         <input type="text" class="form-control" id="supplierPhone" name="phone_number">
                     </div>
                     <div class="mb-3">
+                        <label for="supplierEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="supplierEmail" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="supplierImage" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="supplierImage" name="image" accept="image/*">
+                    </div>
+                    <div class="mb-3">
                         <label for="supplierLocation" class="form-label">Location</label>
                         <select class="form-select" id="supplierLocation" name="location">
                             <option value="IN">IN</option>
@@ -102,6 +110,15 @@
                         <label for="supplierPhoneEdit" class="form-label">Phone
                             Number</label>
                         <input type="text" class="form-control" id="supplierPhoneEdit" name="phone_number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="supplierEmailEdit" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="supplierEmailEdit" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="supplierImageEdit" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="supplierImageEdit" name="image" accept="image/*">
+                        <div id="currentSupplierImageContainer" class="mt-2"></div>
                     </div>
                     <div class="mb-3">
                         <label for="supplierLocationEdit" class="form-label">Location</label>

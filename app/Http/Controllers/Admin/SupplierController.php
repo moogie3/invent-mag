@@ -26,7 +26,9 @@ class SupplierController extends Controller
             'address' => 'required',
             'phone_number' => 'required',
             'location' => 'required|in:IN,OUT',
-            'payment_terms' => 'required'
+            'payment_terms' => 'required',
+            'email' => 'nullable|email',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
         $isSupplierExist = Supplier::where('name', $request->name)->exists();
@@ -39,12 +41,17 @@ class SupplierController extends Controller
             ->withErrors([
                 'name' => 'This supplier already exist'
             ])
-
             ->withInput();
         }
 
+        $data = $request->except(['_token', 'image']);
 
-        $data = $request->except("_token");
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = \Illuminate\Support\Str::random(10) . '_' . $image->getClientOriginalName();
+            $image->storeAs('public/image', $imageName);
+            $data['image'] = $imageName;
+        }
 
         Supplier::create($data);
 
@@ -55,17 +62,34 @@ class SupplierController extends Controller
     }
 
     public function update(Request $request, $id){
-        $data = $request->except("_token");
+        $data = $request->except(["_token", 'image']);
         $request->validate([
             'code' => 'required',
             'name' => 'required',
             'address' => 'required',
             'phone_number' => 'required',
             'location' => 'required',
-            'payment_terms' => 'required'
+            'payment_terms' => 'required',
+            'email' => 'nullable|email',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
         $suppliers = Supplier::find($id);
+
+        if ($request->hasFile('image')) {
+            $oldImagePath = 'public/image/' . basename($suppliers->image);
+
+            if (!empty($suppliers->image) && \Illuminate\Support\Facades\Storage::exists($oldImagePath)) {
+                \Illuminate\Support\Facades\Storage::delete($oldImagePath);
+            }
+
+            $image = $request->file('image');
+            $imageName = \Illuminate\Support\Str::random(10) . '_' . $image->getClientOriginalName();
+            $image->storeAs('public/image', $imageName);
+
+            $data['image'] = $imageName;
+        }
+
         $suppliers->update($data);
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Supplier updated successfully.']);
@@ -75,8 +99,14 @@ class SupplierController extends Controller
 
     public function destroy($id)
     {
-        Supplier::find($id)->delete();
+        $supplier = Supplier::find($id);
 
-        return redirect()->route('admin.supplier')->with('success', 'Unit deleted');
+        if (!empty($supplier->image)) {
+            \Illuminate\Support\Facades\Storage::delete('public/image/' . basename($supplier->image));
+        }
+
+        $supplier->delete();
+
+        return redirect()->route('admin.supplier')->with('success', 'Supplier deleted');
     }
 }

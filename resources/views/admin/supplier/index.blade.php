@@ -99,6 +99,7 @@
                                             <tr>
                                                 <th class="no-print"><button class="table-sort fs-4 py-3 no-print"
                                                         data-sort="sort-no">No</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-image">Image</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-code">Code</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-name">Name</th>
                                                 <th><button class="table-sort fs-4 py-3" data-sort="sort-address">Address
@@ -107,6 +108,7 @@
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-paymentterms">Payment Terms</th>
+                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-email">Email</th>
                                                 <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">Action
                                                 </th>
                                             </tr>
@@ -115,11 +117,22 @@
                                             @foreach ($suppliers as $index => $supplier)
                                                 <tr>
                                                     <td class="sort-no no-print">{{ $suppliers->firstItem() + $index }}</td>
+                                                    <td class="sort-image">
+                                                        @if ($supplier->image == asset('img/default_placeholder.png'))
+                                                            <i class="ti ti-photo fs-1"
+                                                                style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
+                                                        @else
+                                                            <img src="{{ $supplier->image }}" alt="Supplier Image"
+                                                                class="avatar avatar-sm"
+                                                                style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;">
+                                                        @endif
+                                                    </td>
                                                     <td class="sort-code">{{ $supplier->code }}</td>
                                                     <td class="sort-name">{{ $supplier->name }}</td>
                                                     <td class="sort-address">{{ $supplier->address }}</td>
                                                     <td class="sort-location">{{ $supplier->location }}</td>
                                                     <td class="sort-paymentterms">{{ $supplier->payment_terms }}</td>
+                                                    <td class="sort-email">{{ $supplier->email }}</td>
                                                     <td class="no-print" style="text-align:center">
                                                         <div class="dropdown">
                                                             <button class="btn dropdown-toggle align-text-top"
@@ -127,6 +140,11 @@
                                                                 Actions
                                                             </button>
                                                             <div class="dropdown-menu">
+                                                                <a href="#" class="dropdown-item srm-supplier-btn"
+                                                                    data-id="{{ $supplier->id }}" data-bs-toggle="modal"
+                                                                    data-bs-target="#srmSupplierModal">
+                                                                    <i class="ti ti-user-search me-2"></i> View SRM
+                                                                </a>
                                                                 <a href="#" class="dropdown-item"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#editSupplierModal"
@@ -171,4 +189,5 @@
     </div>
 
     @include('admin.layouts.modals.suppmodals')
+    @include('admin.layouts.modals.srm-modal')
 @endsection

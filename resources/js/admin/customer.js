@@ -423,9 +423,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Date formatter for "3 June 2025" format
         function formatDateToCustomString(dateString) {
-            if (!dateString) return 'N/A';
-            const options = { day: 'numeric', month: 'long', year: 'numeric' };
-            return new Date(dateString).toLocaleDateString('en-US', options);
+            if (!dateString) return "N/A";
+            const options = { day: "numeric", month: "long", year: "numeric" };
+            return new Date(dateString).toLocaleDateString("en-US", options);
         }
 
         // Status badge generator
@@ -669,7 +669,9 @@ document.addEventListener("DOMContentLoaded", function () {
                                                 <div>
                                                     Invoice #${
                                                         sale.invoice
-                                                    } - ${formatDateToCustomString(sale.created_at)}
+                                                    } - ${formatDateToCustomString(
+                                    sale.created_at
+                                )}
                                                     ${getStatusBadgeHtml(
                                                         sale.status,
                                                         sale.due_date
@@ -717,8 +719,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                                     <tbody>
                                                         ${
                                                             sale.sales_items &&
-                                                            sale.sales_items.length >
-                                                                0
+                                                            sale.sales_items
+                                                                .length > 0
                                                                 ? sale.sales_items
                                                                       .map(
                                                                           (

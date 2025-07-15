@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('phone_number');
             $table->enum('location', ['IN','OUT']);
             $table->string('payment_terms');
+            $table->string('email')->nullable();
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

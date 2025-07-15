@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController, UserController, CustomerCrmController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController, UserController, CustomerCrmController, SupplierCrmController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -100,6 +100,11 @@ Route::prefix('admin')->group(function () {
         Route::get('/customers/{id}/crm-details', [CustomerCrmController::class, 'show']);
         Route::post('/customers/{id}/interactions', [CustomerCrmController::class, 'storeInteraction']);
         Route::get('/customers/{id}/historical-purchases', [CustomerCrmController::class, 'getHistoricalPurchases']);
+
+        // SRM Routes
+        Route::get('/suppliers/{id}/srm-details', [SupplierCrmController::class, 'show']);
+        Route::post('/suppliers/{id}/interactions', [SupplierCrmController::class, 'storeInteraction']);
+        Route::get('/suppliers/{id}/historical-purchases', [SupplierCrmController::class, 'getHistoricalPurchases']);
 
         // Sales Pipeline Routes
         Route::get('/sales-pipeline', [SalesPipelineController::class, 'index'])->name('admin.sales_pipeline.index');

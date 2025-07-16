@@ -23,7 +23,7 @@ class Purchase extends Model
         'payment_date',
     ];
 
-    protected $appends = ['sub_total', 'tax_amount', 'grand_total'];
+    protected $appends = ['sub_total', 'grand_total'];
 
     protected $attributes = [
     'status' => 'Unpaid',
@@ -48,15 +48,9 @@ class Purchase extends Model
         return $this->items->sum('total');
     }
 
-    public function getTaxAmountAttribute()
-    {
-        // Assuming a tax rate of 15% for now. Adjust as per your tax logic.
-        return $this->sub_total * 0.15;
-    }
-
     public function getGrandTotalAttribute()
     {
-        return $this->sub_total + $this->tax_amount - $this->discount_total;
+        return $this->sub_total - $this->discount_total;
     }
 
     public function getTotalAmountAttribute()

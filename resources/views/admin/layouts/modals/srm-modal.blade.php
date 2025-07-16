@@ -186,21 +186,17 @@
                     <div class="tab-pane fade" id="srm-historical-purchases" role="tabpanel"
                         aria-labelledby="srm-historical-purchases-tab">
                         <div class="p-3">
-                            <div id="srmTransactionHistory" class="accordion"></div>
-                            <div class="text-center mt-3">
-                                <button class="btn btn-secondary" id="srmLoadMoreTransactions" style="display: none;"><i
-                                        class="ti ti-reload me-2"></i>Load More Transactions</button>
+                            <div id="srmHistoricalPurchaseContent">
+                                <!-- Content for Historical Purchase will be loaded here via JavaScript -->
+                                <p class="text-muted text-center">Loading historical purchase data...</p>
                             </div>
-                            <p id="srmNoTransactionsMessage" class="text-muted text-center mt-3 mb-0"
-                                style="display: none;">No
-                                transactions found.</p>
                         </div>
                     </div>
 
                     <div class="tab-pane fade" id="srm-product-history" role="tabpanel"
                         aria-labelledby="srm-product-history-tab">
                         <div class="p-3">
-                            <div id="srmHistoricalPurchaseContent">
+                            <div id="srmProductHistoryContent">
                                 <!-- Content for Historical Purchase will be loaded here via JavaScript -->
                                 <p class="text-muted text-center">Loading historical purchase data...</p>
                             </div>

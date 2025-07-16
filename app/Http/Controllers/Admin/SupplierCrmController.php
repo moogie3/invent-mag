@@ -114,10 +114,58 @@ class SupplierCrmController extends Controller
         $historicalPurchases = $supplier->purchases()
             ->with('items.product')
             ->orderByDesc('order_date')
-            ->get();
+            ->get()
+            ->map(function ($purchase) {
+                return [
+                    'id' => $purchase->id,
+                    'invoice' => $purchase->invoice,
+                    'order_date' => $purchase->order_date,
+                    'due_date' => $purchase->due_date,
+                    'payment_method' => $purchase->payment_type,
+                    'status' => $purchase->status,
+                    'total_amount' => $purchase->grand_total,
+                    'discount_amount' => $purchase->discount_total,
+                    'purchase_items' => $purchase->items->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'product' => $item->product,
+                            'quantity' => $item->quantity,
+                            'price' => $item->price,
+                            'total' => $item->total,
+                        ];
+                    }),
+                ];
+            });
 
         return response()->json([
             'historical_purchases' => $historicalPurchases,
+        ]);
+    }
+
+    public function getProductHistory(Request $request, $id)
+    {
+        $supplier = Supplier::findOrFail($id);
+
+        $productHistory = $supplier->purchases()
+            ->with('items.product')
+            ->orderByDesc('order_date')
+            ->get()
+            ->flatMap(function ($purchase) {
+                return $purchase->items->map(function ($item) use ($purchase) {
+                    return [
+                        'order_date' => $purchase->order_date,
+                        'invoice' => $purchase->invoice,
+                        'product_name' => $item->product ? $item->product->name : 'N/A',
+                        'quantity' => $item->quantity,
+                        'price_at_purchase' => $item->price ?? 0,
+                        'supplier_latest_price' => $item->product ? ($item->product->price ?? 0) : 0,
+                        'line_total' => $item->total
+                    ];
+                });
+            });
+
+        return response()->json([
+            'product_history' => $productHistory,
         ]);
     }
 }

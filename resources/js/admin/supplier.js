@@ -1106,73 +1106,68 @@ document.addEventListener("DOMContentLoaded", function () {
                             );
                             // Create modern card-based layout
                             let contentHtml = `
-                        <div class="row g-3">
+                        <div class="accordion" id="srmHistoricalPurchasesAccordion">
                     `;
 
                             data.historical_purchases.forEach((purchase) => {
-                                if (
-                                    purchase.items &&
-                                    purchase.items.length > 0
-                                ) {
-                                    purchase.items.forEach((item) => {
-                                        contentHtml += `
-                            <div class="col-12">
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-body p-4">
-                                        <div class="row align-items-center">
-                                            <div class="col-md-6">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <div class="badge bg-primary-lt text-primary me-2">
-                                                        ${purchase.invoice}
-                                                    </div>
-                                                    <span class="text-muted small">
-                                                        ${formatDateToCustomString(
-                                                            purchase.order_date
-                                                        )}
-                                                    </span>
-                                                </div>
-                                                <h6 class="mb-1 fw-semibold fs-5">${
-                                                    item.product
-                                                        ? item.product.name
-                                                        : "N/A"
-                                                }</h6>
-                                                <div class="text-muted small">
-                                                    Quantity: <span class="fw-medium">${
-                                                        item.quantity || 0
-                                                    }</span>
-                                                </div>
+                                contentHtml += `
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading-${purchase.id}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${purchase.id}" aria-expanded="false" aria-controls="collapse-${purchase.id}">
+                                        <div class="d-flex justify-content-between w-100 pe-3">
+                                            <div>
+                                                Invoice #${purchase.invoice} - ${formatDateToCustomString(purchase.order_date)}
+                                                ${getStatusBadgeHtml(purchase.status, purchase.due_date)}
                                             </div>
-                                            <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                                                <div class="mb-1">
-                                                    <span class="text-success fw-bold fs-5">${formatCurrency(
-                                                        item.total || 0
-                                                    )}</span>
-                                                </div>
-                                                <div class="small text-muted">
-                                                Unit Price:
-                                                    ${formatCurrency(
-                                                        item.price || 0
-                                                    )} per unit
-                                                </div>
-                                                ${
-                                                    item.product &&
-                                                    item.product.price !==
-                                                        item.price
-                                                        ? `<div class="small text-info">
-                                                        Last Price: ${formatCurrency(
-                                                            item.product.price
-                                                        )}
-                                                    </div>`
-                                                        : ""
-                                                }
+                                            <div class="fw-bold">${formatCurrency(purchase.total_amount)}</div>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="collapse-${purchase.id}" class="accordion-collapse collapse" aria-labelledby="heading-${purchase.id}" data-bs-parent="#srmHistoricalPurchasesAccordion">
+                                    <div class="accordion-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(purchase.order_date)}</p>
+                                                <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(purchase.due_date)}</p>
+                                            </div>
+                                            <div class="col-md-6 text-end">
+                                                <p class="mb-1"><strong>Payment Type:</strong> ${purchase.payment_method || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                        <h6 class="fs-4">Items:</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Product</th>
+                                                        <th class="text-center">Qty</th>
+                                                        <th class="text-end">Unit Price</th>
+                                                        <th class="text-end">Line Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${purchase.purchase_items && purchase.purchase_items.length > 0 ? purchase.purchase_items.map(item => `
+                                                        <tr>
+                                                            <td>${item.product ? item.product.name : 'N/A'}</td>
+                                                            <td class="text-center">${item.quantity || 0}</td>
+                                                            <td class="text-end">${formatCurrency(item.price || 0)}</td>
+                                                            <td class="text-end">${formatCurrency(item.total || 0)}</td>
+                                                        </tr>
+                                                    `).join('') : '<tr><td colspan="4" class="text-center">No items found</td></tr>'}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-md-12 text-end">
+                                                <p class="mb-1"><strong>Subtotal:</strong> ${formatCurrency(purchase.total_amount)}</p>
+                                                <p class="mb-1"><strong>Discount:</strong> ${formatCurrency(purchase.discount_amount)}</p>
+                                                <p class="mb-1"><strong>Grand Total:</strong> <span class="text-primary fw-bold">${formatCurrency(purchase.total_amount - purchase.discount_amount)}</span></p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         `;
-                                    });
-                                }
                             });
 
                             contentHtml += `
@@ -1225,7 +1220,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Event listener for Historical Purchase tab
         const historicalPurchaseTab = document.getElementById(
-            "srm-product-history-tab"
+            "srm-historical-purchases-tab"
         );
         if (historicalPurchaseTab) {
             historicalPurchaseTab.addEventListener(
@@ -1233,6 +1228,171 @@ document.addEventListener("DOMContentLoaded", function () {
                 function (event) {
                     if (supplierId) {
                         loadHistoricalPurchases(supplierId);
+                    }
+                }
+            );
+        }
+
+        // Function to load product history
+        function loadProductHistory(id) {
+            console.log("loadProductHistory called for ID:", id);
+            const productHistoryContent = document.getElementById(
+                "srmProductHistoryContent"
+            );
+
+            if (productHistoryContent) {
+                // Show loading state
+                productHistoryContent.innerHTML =
+                    '<div class="d-flex justify-content-center align-items-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            } else {
+                console.error(
+                    "Element with ID 'srmProductHistoryContent' not found!"
+                );
+                return;
+            }
+
+            fetch(`/admin/suppliers/${id}/product-history`)
+                .then((response) => {
+                    console.log(
+                        "Product history response status:",
+                        response.status
+                    );
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`
+                        );
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log("Product history data received:", data);
+                    if (productHistoryContent) {
+                        if (
+                            data.product_history &&
+                            data.product_history.length > 0
+                        ) {
+                            console.log(
+                                "Data has product_history and it's not empty."
+                            );
+                            // Create modern card-based layout
+                            let contentHtml = `
+                        <div class="row g-3">
+                    `;
+
+                            data.product_history.forEach((item) => {
+                                contentHtml += `
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-4">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <div class="badge bg-primary-lt text-primary me-2">
+                                                        ${item.invoice}
+                                                    </div>
+                                                    <span class="text-muted small">
+                                                        ${formatDateToCustomString(
+                                                            item.order_date
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                <h6 class="mb-1 fw-semibold fs-5">${
+                                                    item.product_name
+                                                }</h6>
+                                                <div class="text-muted small">
+                                                    Quantity: <span class="fw-medium">${
+                                                        item.quantity || 0
+                                                    }</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                                <div class="mb-1">
+                                                    <span class="text-success fw-bold fs-5">${formatCurrency(
+                                                        item.line_total || 0
+                                                    )}</span>
+                                                </div>
+                                                <div class="small text-muted">
+                                                Unit Price:
+                                                    ${formatCurrency(
+                                                        item.price_at_purchase || 0
+                                                    )} per unit
+                                                </div>
+                                                ${
+                                                    item.supplier_latest_price !==
+                                                    item.price_at_purchase
+                                                        ? `<div class="small text-info">
+                                                        Last Price: ${formatCurrency(
+                                                            item.supplier_latest_price
+                                                        )}
+                                                    </div>`
+                                                        : ""
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                            });
+
+                            contentHtml += `
+                        </div>
+                    `;
+                            console.log("Generated contentHtml:", contentHtml);
+                            productHistoryContent.innerHTML = contentHtml;
+                            console.log("innerHTML updated with contentHtml.");
+                        } else {
+                            console.log(
+                                "No product_history found or array is empty."
+                            );
+                            productHistoryContent.innerHTML = `
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="ti ti-shopping-cart-off fs-1 text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">No Product History</h5>
+                            <p class="text-muted mb-0">This supplier hasn't purchased any products yet.</p>
+                        </div>
+                    `;
+                            console.log(
+                                "innerHTML updated with 'No product history' message."
+                            );
+                        }
+                    } else {
+                        console.error(
+                            "Element with ID 'srmProductHistoryContent' was null after fetch!"
+                        );
+                    }
+                })
+                .catch((error) => {
+                    console.error(
+                        "Fetch error in loadProductHistory:",
+                        error
+                    );
+                    if (productHistoryContent) {
+                        productHistoryContent.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="ti ti-alert-circle fs-1 text-danger"></i>
+                        </div>
+                        <h5 class="text-danger">Error Loading Data</h5>
+                        <p class="text-muted mb-0">Failed to load product history: ${error.message}</p>
+                    </div>
+                `;
+                    }
+                });
+        }
+
+        // Event listener for Product History tab
+        const productHistoryTab = document.getElementById(
+            "srm-product-history-tab"
+        );
+        if (productHistoryTab) {
+            productHistoryTab.addEventListener(
+                "shown.bs.tab",
+                function (event) {
+                    if (supplierId) {
+                        loadProductHistory(supplierId);
                     }
                 }
             );

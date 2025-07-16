@@ -105,6 +105,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/suppliers/{id}/srm-details', [SupplierCrmController::class, 'show']);
         Route::post('/suppliers/{id}/interactions', [SupplierCrmController::class, 'storeInteraction']);
         Route::get('/suppliers/{id}/historical-purchases', [SupplierCrmController::class, 'getHistoricalPurchases']);
+        Route::get('/suppliers/{id}/product-history', [SupplierCrmController::class, 'getProductHistory']);
 
         // Sales Pipeline Routes
         Route::get('/sales-pipeline', [SalesPipelineController::class, 'index'])->name('admin.sales_pipeline.index');

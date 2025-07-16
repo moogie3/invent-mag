@@ -19,6 +19,11 @@ class POItem extends Model
         'total'
     ];
 
+    protected $casts = [
+        'quantity' => 'float',
+        'total' => 'float',
+    ];
+
     public function product() {
         return $this->belongsTo(Product::class);
     }

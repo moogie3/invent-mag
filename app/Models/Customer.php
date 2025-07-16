@@ -23,9 +23,12 @@ class Customer extends Model
     protected function image(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
         return \Illuminate\Database\Eloquent\Casts\Attribute::make(
-            get: fn($value) => $value
-                ? asset("storage/image/{$value}")
-                : asset('img/default_placeholder.png'),
+            get: function ($value) {
+                if ($value && $value !== 'default_placeholder.png') {
+                    return asset("storage/image/{$value}");
+                }
+                return asset('img/default_placeholder.png');
+            }
         );
     }
 

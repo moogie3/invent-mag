@@ -345,7 +345,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             </button>
                             <div class="dropdown-menu">
                                 <a href="#" class="dropdown-item srm-supplier-btn"
-                                                                    data-id="${supplier.id}" data-bs-toggle="modal"
+                                                                    data-id="${
+                                                                        supplier.id
+                                                                    }" data-bs-toggle="modal"
                                                                     data-bs-target="#srmSupplierModal">
                                                                     <i class="ti ti-user-search me-2"></i> View SRM
                                                                 </a>
@@ -736,13 +738,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         "/img/default_placeholder.png";
 
                     if (srmSupplierImageContainer) {
+                        console.log(
+                            "data.supplier.image received:",
+                            data.supplier.image
+                        );
                         const supplierImageRelativePath = data.supplier.image
                             ? new URL(data.supplier.image).pathname
                             : "";
-                        console.log(
-                            "data.supplier.image:",
-                            data.supplier.image
-                        );
                         console.log(
                             "supplierImageRelativePath:",
                             supplierImageRelativePath
@@ -858,9 +860,9 @@ document.addEventListener("DOMContentLoaded", function () {
                                                 ? interaction.user.name
                                                 : "Unknown"
                                         }</small>
-                                    </div>
-                                    <p class="mb-1">${interaction.notes}</p>
-                                `;
+                                </div>
+                                <p class="mb-1">${interaction.notes}</p>
+                            `;
                                     interactionTimeline.appendChild(
                                         interactionElement
                                     );
@@ -910,7 +912,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                             <div class="d-flex justify-content-between w-100 pe-3">
                                                 <div>
                                                     Invoice #${
-                                                        purchase.reference_number
+                                                        purchase.invoice
                                                     } - ${formatDateToCustomString(
                                     purchase.created_at
                                 )}
@@ -1063,6 +1065,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Function to load historical purchases
         function loadHistoricalPurchases(id) {
+            console.log("loadHistoricalPurchases called for ID:", id);
             const historicalPurchaseContent = document.getElementById(
                 "srmHistoricalPurchaseContent"
             );
@@ -1072,11 +1075,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 historicalPurchaseContent.innerHTML =
                     '<div class="d-flex justify-content-center align-items-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
             } else {
+                console.error(
+                    "Element with ID 'srmHistoricalPurchaseContent' not found!"
+                );
                 return;
             }
 
             fetch(`/admin/suppliers/${id}/historical-purchases`)
                 .then((response) => {
+                    console.log(
+                        "Historical purchases response status:",
+                        response.status
+                    );
                     if (!response.ok) {
                         throw new Error(
                             `HTTP error! status: ${response.status}`
@@ -1085,18 +1095,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     return response.json();
                 })
                 .then((data) => {
+                    console.log("Historical purchases data received:", data);
                     if (historicalPurchaseContent) {
                         if (
                             data.historical_purchases &&
                             data.historical_purchases.length > 0
                         ) {
+                            console.log(
+                                "Data has historical_purchases and it's not empty."
+                            );
                             // Create modern card-based layout
                             let contentHtml = `
                         <div class="row g-3">
                     `;
 
                             data.historical_purchases.forEach((purchase) => {
-                                contentHtml += `
+                                if (
+                                    purchase.items &&
+                                    purchase.items.length > 0
+                                ) {
+                                    purchase.items.forEach((item) => {
+                                        contentHtml += `
                             <div class="col-12">
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-body p-4">
@@ -1113,32 +1132,35 @@ document.addEventListener("DOMContentLoaded", function () {
                                                     </span>
                                                 </div>
                                                 <h6 class="mb-1 fw-semibold fs-5">${
-                                                    purchase.product_name
+                                                    item.product
+                                                        ? item.product.name
+                                                        : "N/A"
                                                 }</h6>
                                                 <div class="text-muted small">
                                                     Quantity: <span class="fw-medium">${
-                                                        purchase.quantity
+                                                        item.quantity || 0
                                                     }</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 text-md-end mt-3 mt-md-0">
                                                 <div class="mb-1">
                                                     <span class="text-success fw-bold fs-5">${formatCurrency(
-                                                        purchase.line_total
+                                                        item.total || 0
                                                     )}</span>
                                                 </div>
                                                 <div class="small text-muted">
-                                                Supplier Price:
+                                                Unit Price:
                                                     ${formatCurrency(
-                                                        purchase.price_at_purchase
+                                                        item.price || 0
                                                     )} per unit
                                                 </div>
                                                 ${
-                                                    purchase.supplier_latest_price !==
-                                                    purchase.price_at_purchase
+                                                    item.product &&
+                                                    item.product.price !==
+                                                        item.price
                                                         ? `<div class="small text-info">
-                                                        Our Price: ${formatCurrency(
-                                                            purchase.supplier_latest_price
+                                                        Last Price: ${formatCurrency(
+                                                            item.product.price
                                                         )}
                                                     </div>`
                                                         : ""
@@ -1149,27 +1171,44 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </div>
                             </div>
                         `;
+                                    });
+                                }
                             });
 
                             contentHtml += `
                         </div>
                     `;
-
+                            console.log("Generated contentHtml:", contentHtml);
                             historicalPurchaseContent.innerHTML = contentHtml;
+                            console.log("innerHTML updated with contentHtml.");
                         } else {
+                            console.log(
+                                "No historical_purchases found or array is empty."
+                            );
                             historicalPurchaseContent.innerHTML = `
                         <div class="text-center py-5">
                             <div class="mb-3">
                                 <i class="ti ti-shopping-cart-off fs-1 text-muted"></i>
                             </div>
                             <h5 class="text-muted">No Purchase History</h5>
-                            <p class="text-muted mb-0">This supplier hasn\'t made any purchases yet.</p>
+                            <p class="text-muted mb-0">This supplier hasn't made any purchases yet.</p>
                         </div>
                     `;
+                            console.log(
+                                "innerHTML updated with 'No purchase history' message."
+                            );
                         }
+                    } else {
+                        console.error(
+                            "Element with ID 'srmHistoricalPurchaseContent' was null after fetch!"
+                        );
                     }
                 })
                 .catch((error) => {
+                    console.error(
+                        "Fetch error in loadHistoricalPurchases:",
+                        error
+                    );
                     if (historicalPurchaseContent) {
                         historicalPurchaseContent.innerHTML = `
                     <div class="text-center py-5">

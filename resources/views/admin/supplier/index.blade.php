@@ -154,7 +154,8 @@
                                                                     data-address="{{ $supplier->address }}"
                                                                     data-phone_number="{{ $supplier->phone_number }}"
                                                                     data-location="{{ $supplier->location }}"
-                                                                    data-payment_terms="{{ $supplier->payment_terms }}">
+                                                                    data-payment_terms="{{ $supplier->payment_terms }}"
+                                                                    data-image="{{ $supplier->image }}">
                                                                     <i class="ti ti-edit me-2"></i> Edit
                                                                 </a>
                                                                 <button type="button" class="dropdown-item text-danger"

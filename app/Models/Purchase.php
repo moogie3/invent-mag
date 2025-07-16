@@ -23,6 +23,8 @@ class Purchase extends Model
         'payment_date',
     ];
 
+    protected $appends = ['sub_total', 'tax_amount', 'grand_total'];
+
     protected $attributes = [
     'status' => 'Unpaid',
     ];
@@ -39,6 +41,27 @@ class Purchase extends Model
 
     public function items() {
         return $this->hasMany(POItem::class, 'po_id');
+    }
+
+    public function getSubTotalAttribute()
+    {
+        return $this->items->sum('total');
+    }
+
+    public function getTaxAmountAttribute()
+    {
+        // Assuming a tax rate of 15% for now. Adjust as per your tax logic.
+        return $this->sub_total * 0.15;
+    }
+
+    public function getGrandTotalAttribute()
+    {
+        return $this->sub_total + $this->tax_amount - $this->discount_total;
+    }
+
+    public function getTotalAmountAttribute()
+    {
+        return $this->grand_total;
     }
 
     protected $casts = [

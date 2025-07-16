@@ -328,26 +328,34 @@ body {
 }
 
 #crmCustomerModal .modal-content {
-    font-size: 1.1rem; /* Adjust as needed */
+    font-size: 1.1rem;
+    /* Adjust as needed */
 }
 
 #crmCustomerModal .modal-title {
-    font-size: 1.3rem; /* Adjust as needed */
+    font-size: 1.3rem;
+    /* Adjust as needed */
 }
 
 #crmCustomerModal .nav-link {
-    font-size: 1.1rem; /* Adjust as needed */
+    font-size: 1.1rem;
+    /* Adjust as needed */
 }
 
 
 
 /* Highlight active accordion item in historical sales */
 #transactionHistory .accordion-item {
-    border: 1px solid #e0e6ed; /* Add a border to the item */
-    border-radius: 0.5rem; /* Rounded corners */
-    margin-bottom: 0.5rem; /* Space between items */
-    overflow: hidden; /* Ensures rounded corners apply to children */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+    border: 1px solid #e0e6ed;
+    /* Add a border to the item */
+    border-radius: 0.5rem;
+    /* Rounded corners */
+    margin-bottom: 0.5rem;
+    /* Space between items */
+    overflow: hidden;
+    /* Ensures rounded corners apply to children */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    /* Subtle shadow */
     transition: all 0.2s ease-in-out;
 }
 
@@ -441,14 +449,19 @@ body {
 }
 
 #transactionHistory .accordion-item .accordion-button:not(.collapsed) {
-    background-color: #e9ecef; /* A slightly darker background for the header */
-    border-color: #dee2e6; /* A subtle border */
-    color: #212529; /* Ensure text remains readable */
-    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.125); /* Add a subtle shadow */
+    background-color: #e9ecef;
+    /* A slightly darker background for the header */
+    border-color: #dee2e6;
+    /* A subtle border */
+    color: #212529;
+    /* Ensure text remains readable */
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.125);
+    /* Add a subtle shadow */
 }
 
 #transactionHistory .accordion-item .accordion-button:not(.collapsed)::after {
-    filter: brightness(0.5); /* Darken the arrow icon */
+    filter: brightness(0.5);
+    /* Darken the arrow icon */
 }
 
 #transactionHistory .accordion-item.show {
@@ -458,14 +471,16 @@ body {
 }
 
 #transactionHistory .accordion-collapse.show .accordion-body {
-    background-color: #f8f9fa; /* Apply background directly to the body when shown */
+    background-color: #f8f9fa;
+    /* Apply background directly to the body when shown */
     border-bottom-left-radius: 0.5rem;
     border-bottom-right-radius: 0.5rem;
 }
 
 /* Ensure the accordion-item itself gets the highlight when its content is shown */
 #transactionHistory .accordion-item:has(.accordion-collapse.show) {
-    background-color: #f8f9fa; /* Apply background to the entire item when open */
+    background-color: #f8f9fa;
+    /* Apply background to the entire item when open */
     border-color: #dee2e6;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }

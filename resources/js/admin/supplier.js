@@ -710,7 +710,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Populate supplier information
                     safeUpdateElement(
                         "srmSupplierNameInHeader",
-                        `[${data.supplier.name || 'N/A'}]`
+                        `[${data.supplier.name || "N/A"}]`
                     );
                     safeUpdateElement(
                         "srmSupplierName",
@@ -1116,26 +1116,52 @@ document.addEventListener("DOMContentLoaded", function () {
                             data.historical_purchases.forEach((purchase) => {
                                 contentHtml += `
                             <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading-${purchase.id}">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${purchase.id}" aria-expanded="false" aria-controls="collapse-${purchase.id}">
+                                <h2 class="accordion-header" id="heading-${
+                                    purchase.id
+                                }">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
+                                        purchase.id
+                                    }" aria-expanded="false" aria-controls="collapse-${
+                                    purchase.id
+                                }">
                                         <div class="d-flex justify-content-between w-100 pe-3">
                                             <div>
-                                                Invoice #${purchase.invoice} - ${formatDateToCustomString(purchase.order_date)}
-                                                ${getStatusBadgeHtml(purchase.status, purchase.due_date)}
+                                                Invoice #${
+                                                    purchase.invoice
+                                                } - ${formatDateToCustomString(
+                                    purchase.order_date
+                                )}
+                                                ${getStatusBadgeHtml(
+                                                    purchase.status,
+                                                    purchase.due_date
+                                                )}
                                             </div>
-                                            <div class="fw-bold">${formatCurrency(purchase.total_amount)}</div>
+                                            <div class="fw-bold">${formatCurrency(
+                                                purchase.total_amount
+                                            )}</div>
                                         </div>
                                     </button>
                                 </h2>
-                                <div id="collapse-${purchase.id}" class="accordion-collapse collapse" aria-labelledby="heading-${purchase.id}" data-bs-parent="#srmHistoricalPurchasesAccordion">
+                                <div id="collapse-${
+                                    purchase.id
+                                }" class="accordion-collapse collapse" aria-labelledby="heading-${
+                                    purchase.id
+                                }" data-bs-parent="#srmHistoricalPurchasesAccordion">
                                     <div class="accordion-body">
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(purchase.order_date)}</p>
-                                                <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(purchase.due_date)}</p>
+                                                <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(
+                                                    purchase.order_date
+                                                )}</p>
+                                                <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(
+                                                    purchase.due_date
+                                                )}</p>
                                             </div>
                                             <div class="col-md-6 text-end">
-                                                <p class="mb-1"><strong>Payment Type:</strong> ${purchase.payment_method || 'N/A'}</p>
+                                                <p class="mb-1"><strong>Payment Type:</strong> ${
+                                                    purchase.payment_method ||
+                                                    "N/A"
+                                                }</p>
                                             </div>
                                         </div>
                                         <h6 class="fs-4">Items:</h6>
@@ -1150,22 +1176,54 @@ document.addEventListener("DOMContentLoaded", function () {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    ${purchase.purchase_items && purchase.purchase_items.length > 0 ? purchase.purchase_items.map(item => `
+                                                    ${
+                                                        purchase.purchase_items &&
+                                                        purchase.purchase_items
+                                                            .length > 0
+                                                            ? purchase.purchase_items
+                                                                  .map(
+                                                                      (
+                                                                          item
+                                                                      ) => `
                                                         <tr>
-                                                            <td>${item.product ? item.product.name : 'N/A'}</td>
-                                                            <td class="text-center">${item.quantity || 0}</td>
-                                                            <td class="text-end">${formatCurrency(item.price || 0)}</td>
-                                                            <td class="text-end">${formatCurrency(item.total || 0)}</td>
+                                                            <td>${
+                                                                item.product
+                                                                    ? item
+                                                                          .product
+                                                                          .name
+                                                                    : "N/A"
+                                                            }</td>
+                                                            <td class="text-center">${
+                                                                item.quantity ||
+                                                                0
+                                                            }</td>
+                                                            <td class="text-end">${formatCurrency(
+                                                                item.price || 0
+                                                            )}</td>
+                                                            <td class="text-end">${formatCurrency(
+                                                                item.total || 0
+                                                            )}</td>
                                                         </tr>
-                                                    `).join('') : '<tr><td colspan="4" class="text-center">No items found</td></tr>'}
+                                                    `
+                                                                  )
+                                                                  .join("")
+                                                            : '<tr><td colspan="4" class="text-center">No items found</td></tr>'
+                                                    }
                                                 </tbody>
                                             </table>
                                         </div>
                                         <div class="row mt-3">
                                             <div class="col-md-12 text-end">
-                                                <p class="mb-1"><strong>Subtotal:</strong> ${formatCurrency(purchase.total_amount)}</p>
-                                                <p class="mb-1"><strong>Discount:</strong> ${formatCurrency(purchase.discount_amount)}</p>
-                                                <p class="mb-1"><strong>Grand Total:</strong> <span class="text-primary fw-bold">${formatCurrency(purchase.total_amount - purchase.discount_amount)}</span></p>
+                                                <p class="mb-1"><strong>Subtotal:</strong> ${formatCurrency(
+                                                    purchase.total_amount
+                                                )}</p>
+                                                <p class="mb-1"><strong>Discount:</strong> ${formatCurrency(
+                                                    purchase.discount_amount
+                                                )}</p>
+                                                <p class="mb-1"><strong>Grand Total:</strong> <span class="text-primary fw-bold">${formatCurrency(
+                                                    purchase.total_amount -
+                                                        purchase.discount_amount
+                                                )}</span></p>
                                             </div>
                                         </div>
                                     </div>
@@ -1286,36 +1344,72 @@ document.addEventListener("DOMContentLoaded", function () {
                             data.product_history.forEach((product) => {
                                 contentHtml += `
                             <div class="accordion-item">
-                                <h2 class="accordion-header" id="product-heading-${product.product_name.replace(/\s+/g, '-')}">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#product-collapse-${product.product_name.replace(/\s+/g, '-')}" aria-expanded="false" aria-controls="product-collapse-${product.product_name.replace(/\s+/g, '-')}">
+                                <h2 class="accordion-header" id="product-heading-${product.product_name.replace(
+                                    /\s+/g,
+                                    "-"
+                                )}">
+                                    <button class="accordion-button collapsed fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#product-collapse-${product.product_name.replace(
+                                        /\s+/g,
+                                        "-"
+                                    )}" aria-expanded="false" aria-controls="product-collapse-${product.product_name.replace(
+                                    /\s+/g,
+                                    "-"
+                                )}">
                                         <div class="d-flex justify-content-between w-100 pe-3">
                                             <span>${product.product_name}</span>
-                                            <span class="text-muted">Last Price: ${formatCurrency(product.last_price)}</span>
+                                            <span class="text-muted fs-4">Last Price: ${formatCurrency(
+                                                product.last_price
+                                            )}</span>
                                         </div>
                                     </button>
                                 </h2>
-                                <div id="product-collapse-${product.product_name.replace(/\s+/g, '-')}" class="accordion-collapse collapse" aria-labelledby="product-heading-${product.product_name.replace(/\s+/g, '-')}" data-bs-parent="#srmProductHistoryAccordion">
+                                <div id="product-collapse-${product.product_name.replace(
+                                    /\s+/g,
+                                    "-"
+                                )}" class="accordion-collapse collapse" aria-labelledby="product-heading-${product.product_name.replace(
+                                    /\s+/g,
+                                    "-"
+                                )}" data-bs-parent="#srmProductHistoryAccordion">
                                     <div class="accordion-body">
-                                        <table class="table table-sm table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Invoice</th>
-                                                    <th>Date</th>
-                                                    <th class="text-center">Qty</th>
-                                                    <th class="text-end">Price</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                ${product.history.map(item => `
-                                                    <tr>
-                                                        <td>${item.invoice}</td>
-                                                        <td>${formatDateToCustomString(item.order_date)}</td>
-                                                        <td class="text-center">${item.quantity}</td>
-                                                        <td class="text-end">${formatCurrency(item.price_at_purchase)}</td>
-                                                    </tr>
-                                                `).join('')}
-                                            </tbody>
-                                        </table>
+                                        <div class="list-group list-group-flush">
+                                            ${product.history
+                                                .map(
+                                                    (item) => `
+                                                <div class="list-group-item px-0">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-md-5 mb-2 mb-md-0">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="me-3">
+                                                                    <i class="ti ti-file-invoice text-primary fs-2"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <h6 class="mb-0 fs-4">Invoice #${
+                                                                        item.invoice
+                                                                    }</h6>
+                                                                    <small class="text-muted">${formatDateToCustomString(
+                                                                        item.order_date
+                                                                    )}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6 col-md-3 text-center">
+                                                            <div class="text-muted small">Quantity</div>
+                                                            <div class="fw-bold">${
+                                                                item.quantity
+                                                            }</div>
+                                                        </div>
+                                                        <div class="col-6 col-md-4 text-end">
+                                                            <div class="text-muted small">Price</div>
+                                                            <div class="fw-bold text-success">${formatCurrency(
+                                                                item.price_at_purchase
+                                                            )}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `
+                                                )
+                                                .join("")}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1352,10 +1446,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 })
                 .catch((error) => {
-                    console.error(
-                        "Fetch error in loadProductHistory:",
-                        error
-                    );
+                    console.error("Fetch error in loadProductHistory:", error);
                     if (productHistoryContent) {
                         productHistoryContent.innerHTML = `
                     <div class="text-center py-5">

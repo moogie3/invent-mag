@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="srmSupplierModalLabel"><i class="ti ti-users me-2"></i>Supplier Relationship
-                    Management</h5>
+                    Management <span id="srmSupplierNameInHeader" class="text-white fw-bold"></span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -94,8 +94,8 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Lifetime Value</div>
-                                                    <div id="srmLifetimeValue" class="text-success fw-bold fs-3">
+                                                    <div class="font-weight-medium fw-bold">Lifetime Value</div>
+                                                    <div id="srmLifetimeValue" class="text-success fs-3">
                                                     </div>
                                                 </div>
                                             </div>
@@ -103,7 +103,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Total Purchases Count</div>
+                                                    <div class="font-weight-medium fw-bold">Total Purchases Count</div>
                                                     <div id="srmTotalPurchasesCount" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -111,7 +111,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Average Order Value</div>
+                                                    <div class="font-weight-medium fw-bold">Average Order Value</div>
                                                     <div id="srmAverageOrderValue" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -119,7 +119,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Last Interaction Date</div>
+                                                    <div class="font-weight-medium fw-bold">Last Interaction Date</div>
                                                     <div id="srmLastInteractionDate" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -127,7 +127,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Most Purchased Product</div>
+                                                    <div class="font-weight-medium fw-bold">Most Purchased Product</div>
                                                     <div id="srmMostPurchasedProduct" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -135,7 +135,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Total Products Purchased</div>
+                                                    <div class="font-weight-medium fw-bold">Total Products Purchased</div>
                                                     <div id="srmTotalProductsPurchased" class="fs-3">N/A</div>
                                                 </div>
                                             </div>

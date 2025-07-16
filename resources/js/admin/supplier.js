@@ -709,6 +709,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // Populate supplier information
                     safeUpdateElement(
+                        "srmSupplierNameInHeader",
+                        `[${data.supplier.name || 'N/A'}]`
+                    );
+                    safeUpdateElement(
                         "srmSupplierName",
                         data.supplier.name || "N/A"
                     );
@@ -1276,59 +1280,42 @@ document.addEventListener("DOMContentLoaded", function () {
                             );
                             // Create modern card-based layout
                             let contentHtml = `
-                        <div class="row g-3">
+                        <div class="accordion" id="srmProductHistoryAccordion">
                     `;
 
-                            data.product_history.forEach((item) => {
+                            data.product_history.forEach((product) => {
                                 contentHtml += `
-                            <div class="col-12">
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-body p-4">
-                                        <div class="row align-items-center">
-                                            <div class="col-md-6">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <div class="badge bg-primary-lt text-primary me-2">
-                                                        ${item.invoice}
-                                                    </div>
-                                                    <span class="text-muted small">
-                                                        ${formatDateToCustomString(
-                                                            item.order_date
-                                                        )}
-                                                    </span>
-                                                </div>
-                                                <h6 class="mb-1 fw-semibold fs-5">${
-                                                    item.product_name
-                                                }</h6>
-                                                <div class="text-muted small">
-                                                    Quantity: <span class="fw-medium">${
-                                                        item.quantity || 0
-                                                    }</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                                                <div class="mb-1">
-                                                    <span class="text-success fw-bold fs-5">${formatCurrency(
-                                                        item.line_total || 0
-                                                    )}</span>
-                                                </div>
-                                                <div class="small text-muted">
-                                                Unit Price:
-                                                    ${formatCurrency(
-                                                        item.price_at_purchase || 0
-                                                    )} per unit
-                                                </div>
-                                                ${
-                                                    item.supplier_latest_price !==
-                                                    item.price_at_purchase
-                                                        ? `<div class="small text-info">
-                                                        Last Price: ${formatCurrency(
-                                                            item.supplier_latest_price
-                                                        )}
-                                                    </div>`
-                                                        : ""
-                                                }
-                                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="product-heading-${product.product_name.replace(/\s+/g, '-')}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#product-collapse-${product.product_name.replace(/\s+/g, '-')}" aria-expanded="false" aria-controls="product-collapse-${product.product_name.replace(/\s+/g, '-')}">
+                                        <div class="d-flex justify-content-between w-100 pe-3">
+                                            <span>${product.product_name}</span>
+                                            <span class="text-muted">Last Price: ${formatCurrency(product.last_price)}</span>
                                         </div>
+                                    </button>
+                                </h2>
+                                <div id="product-collapse-${product.product_name.replace(/\s+/g, '-')}" class="accordion-collapse collapse" aria-labelledby="product-heading-${product.product_name.replace(/\s+/g, '-')}" data-bs-parent="#srmProductHistoryAccordion">
+                                    <div class="accordion-body">
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Invoice</th>
+                                                    <th>Date</th>
+                                                    <th class="text-center">Qty</th>
+                                                    <th class="text-end">Price</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${product.history.map(item => `
+                                                    <tr>
+                                                        <td>${item.invoice}</td>
+                                                        <td>${formatDateToCustomString(item.order_date)}</td>
+                                                        <td class="text-center">${item.quantity}</td>
+                                                        <td class="text-end">${formatCurrency(item.price_at_purchase)}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>

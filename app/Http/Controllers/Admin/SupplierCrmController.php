@@ -153,16 +153,26 @@ class SupplierCrmController extends Controller
             ->flatMap(function ($purchase) {
                 return $purchase->items->map(function ($item) use ($purchase) {
                     return [
+                        'product_id' => $item->product_id,
+                        'product_name' => $item->product ? $item->product->name : 'N/A',
                         'order_date' => $purchase->order_date,
                         'invoice' => $purchase->invoice,
-                        'product_name' => $item->product ? $item->product->name : 'N/A',
                         'quantity' => $item->quantity,
                         'price_at_purchase' => $item->price ?? 0,
-                        'supplier_latest_price' => $item->product ? ($item->product->price ?? 0) : 0,
                         'line_total' => $item->total
                     ];
                 });
-            });
+            })
+            ->groupBy('product_name')
+            ->map(function ($productPurchases, $productName) {
+                $latestPurchase = $productPurchases->first();
+                return [
+                    'product_name' => $productName,
+                    'last_price' => $latestPurchase ? $latestPurchase['price_at_purchase'] : 0,
+                    'history' => $productPurchases->values()
+                ];
+            })
+            ->values();
 
         return response()->json([
             'product_history' => $productHistory,

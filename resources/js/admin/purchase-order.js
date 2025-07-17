@@ -1505,9 +1505,7 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
                     if (row) {
                         const statusBadge = row.querySelector('.badge');
                         if (statusBadge) {
-                            statusBadge.textContent = 'Paid';
-                            statusBadge.classList.remove('bg-warning', 'bg-danger', 'bg-info'); // Remove old status colors
-                            statusBadge.classList.add('bg-success'); // Add success color
+                            statusBadge.outerHTML = '<span class="badge bg-green-lt"><span class="h4"><i class="ti ti-check me-1 fs-4"></i> Paid</span></span>';
                         }
                         const checkbox = row.querySelector('.row-checkbox');
                         if (checkbox) {

@@ -6,17 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sales;
-use App\Models\SalesItem;
-use App\Models\Tax;
-use App\Helpers\SalesHelper;
 use App\Models\Categories;
 use App\Models\Supplier;
 use App\Models\Unit;
+use App\Services\PosService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class POSController extends Controller
 {
+    protected $posService;
+
+    public function __construct(PosService $posService)
+    {
+        $this->posService = $posService;
+    }
+
     public function index()
     {
         $products = Product::with('unit')->get();
@@ -25,135 +29,33 @@ class POSController extends Controller
         $categories = Categories::all();
         $units = Unit::all();
         $suppliers = Supplier::all();
-        return view('admin.pos.index', compact('products', 'customers', 'walkInCustomerId','categories','units','suppliers'));
+
+        return view('admin.pos.index', compact('products', 'customers', 'walkInCustomerId', 'categories', 'units', 'suppliers'));
     }
 
     public function store(Request $request)
     {
         try {
-            // Validate the request
-            try {
-                $validatedData = $request->validate([
-                    'transaction_date' => 'required|date',
-                    'customer_id' => 'nullable|exists:customers,id',
-                    'products' => 'required|json',
-                    'discount_total' => 'nullable|numeric|min:0',
-                    'discount_total_type' => 'nullable|in:fixed,percentage',
-                    'tax_rate' => 'nullable|numeric|min:0',
-                    'tax_amount' => 'nullable|numeric|min:0',
-                    'grand_total' => 'required|numeric|min:0',
-                    'payment_method' => 'required|string|in:Cash,Card,Transfer,eWallet',
-                    'amount_received' => 'nullable|numeric|min:0|required_if:payment_method,Cash',
-                    'change_amount' => 'nullable|numeric|min:0',
-                ]);
-            } catch (\Illuminate\Validation\ValidationException $e) {
-                return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $e->errors()], 422);
-            }
-
-            // Decode products
-            $products = json_decode($request->products, true);
-            if (!$products || !is_array($products)) {
-                return response()->json(['success' => false, 'message' => 'Invalid product data', 'errors' => ['products' => ['Invalid product data']]], 422);
-            }
-
-            // Calculate totals
-            $subTotal = 0;
-            $totalBeforeDiscounts = 0;
-
-            foreach ($products as $product) {
-                $quantity = $product['quantity'];
-                $price = $product['price'];
-
-                $productSubtotal = $price * $quantity;
-                $totalBeforeDiscounts += $productSubtotal;
-                $subTotal += $productSubtotal;
-            }
-
-            // Calculate order discount
-            $orderDiscount = $request->discount_total ?? 0;
-            $orderDiscountType = $request->discount_total_type ?? 'fixed';
-            $orderDiscountAmount = SalesHelper::calculateDiscount($totalBeforeDiscounts, $orderDiscount, $orderDiscountType);
-
-            // Calculate tax using the user-provided tax rate from the UI
-            $taxable = $subTotal - $orderDiscountAmount;
-            $taxRate = $request->tax_rate ?? 0; // Use the tax_rate from request
-            $taxAmount = $request->tax_amount ?? SalesHelper::calculateTaxAmount($taxable, $taxRate);
-            $grandTotal = $request->grand_total ?? $taxable + $taxAmount;
-
-            // Get the authenticated user's ID and timezone
-            $userId = Auth::id();
-            $userTimezone = Auth::user()->timezone ?? config('app.timezone');
-
-            $transactionDate = \Carbon\Carbon::parse($request->transaction_date, $userTimezone)->setTimezone('UTC')->format('Y-m-d');
-            $transactionDate = $request->transaction_date;
-
-            // Generate invoice number
-            $lastPosInvoice = Sales::where('invoice', 'like', 'POS-%')
-                                ->latest()
-                                ->first();
-
-            $invoiceNumber = 1;
-            if ($lastPosInvoice) {
-                $lastNumber = (int) substr($lastPosInvoice->invoice, 4); // Extract 0001 from POS-0001
-                $invoiceNumber = $lastNumber + 1;
-            }
-            $invoice = 'POS-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
-
-            // Get the authenticated user's ID
-            $userId = Auth::id();
-
-            // Create Sale with POS transaction - Fix the timezone handling
-            $sale = Sales::create([
-                'invoice' => $invoice,
-                'customer_id' => $request->customer_id,
-                'user_id' => Auth::id(),
-                'order_date' => $request->transaction_date, // The model will handle timezone conversion
-                'due_date' => $request->transaction_date, // The model will handle timezone conversion
-                'tax_rate' => $taxRate,
-                'total_tax' => $taxAmount,
-                'total' => $grandTotal,
-                'order_discount' => $orderDiscountAmount,
-                'order_discount_type' => $orderDiscountType,
-                'status' => 'Paid',
-                'payment_type' => $request->payment_method,
-                'amount_received' => $request->amount_received ?? $grandTotal,
-                'change_amount' => $request->change_amount ?? 0,
-                'payment_date' => now(), // The model will handle timezone conversion
-                'is_pos' => true,
+            $request->validate([
+                'transaction_date' => 'required|date',
+                'customer_id' => 'nullable|exists:customers,id',
+                'products' => 'required|json',
+                'discount_total' => 'nullable|numeric|min:0',
+                'discount_total_type' => 'nullable|in:fixed,percentage',
+                'tax_rate' => 'nullable|numeric|min:0',
+                'tax_amount' => 'nullable|numeric|min:0',
+                'grand_total' => 'required|numeric|min:0',
+                'payment_method' => 'required|string|in:Cash,Card,Transfer,eWallet',
+                'amount_received' => 'nullable|numeric|min:0|required_if:payment_method,Cash',
+                'change_amount' => 'nullable|numeric|min:0',
             ]);
 
-            // Insert sale items
-            foreach ($products as $product) {
-                $productSubtotal = $product['price'] * $product['quantity'];
+            $sale = $this->posService->createSale($request->all());
 
-                SalesItem::create([
-                    'sales_id' => $sale->id,
-                    'product_id' => $product['id'],
-                    'quantity' => $product['quantity'],
-                    'customer_price' => $product['price'],
-                    'discount' => 0, // No item-level discounts in current POS UI
-                    'discount_type' => 'fixed',
-                    'total' => $productSubtotal,
-                ]);
-
-                // Reduce stock quantity - check if your field is named stock or stock_quantity
-                $productModel = Product::find($product['id']);
-                if ($productModel) {
-                    // Use the correct field name based on your database structure
-                    if (isset($productModel->stock_quantity)) {
-                        $productModel->decrement('stock_quantity', $product['quantity']);
-                    } elseif (isset($productModel->quantity)) {
-                        $productModel->decrement('quantity', $product['quantity']);
-                    } elseif (isset($productModel->stock)) {
-                        $productModel->decrement('stock', $product['quantity']);
-                    }
-                }
-            }
-
-            // Prepare receipt data for redirect
             if ($request->ajax()) {
                 return response()->json(['success' => true, 'message' => 'Transaction completed successfully.', 'sale_id' => $sale->id]);
             }
+
             return redirect()->route('admin.pos.receipt', $sale->id)->with('success', 'Transaction completed successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $e->errors()], 422);
@@ -165,22 +67,17 @@ class POSController extends Controller
     public function receipt($id)
     {
         $sale = Sales::with(['salesItems.product', 'customer'])->findOrFail($id);
-
-        // Start calculating totals
         $totalBeforeDiscount = 0;
         $totalItemDiscount = 0;
 
-        // Calculate and attach item totals to each item
         foreach ($sale->salesItems as $item) {
-            // Calculate item discount amount
-            $discountAmount = SalesHelper::calculateDiscountPerUnit(
+            $discountAmount = \App\Helpers\SalesHelper::calculateDiscountPerUnit(
                 $item->customer_price,
                 $item->discount,
                 $item->discount_type
             ) * $item->quantity;
 
-            // Calculate item total and attach it to the item object
-            $item->calculated_total = SalesHelper::calculateTotal(
+            $item->calculated_total = \App\Helpers\SalesHelper::calculateTotal(
                 $item->customer_price,
                 $item->quantity,
                 $item->discount,
@@ -192,25 +89,18 @@ class POSController extends Controller
         }
 
         $subTotal = $totalBeforeDiscount - $totalItemDiscount;
-
-        // Order Discount
         $orderDiscount = $sale->order_discount ?? 0;
         $orderDiscountType = $sale->order_discount_type ?? 'fixed';
-        $orderDiscountAmount = SalesHelper::calculateDiscount(
+        $orderDiscountAmount = \App\Helpers\SalesHelper::calculateDiscount(
             $totalBeforeDiscount,
             $orderDiscount,
             $orderDiscountType
         );
 
-        // Tax
         $taxableAmount = $subTotal - $orderDiscountAmount;
         $taxRate = $sale->tax_rate ?? 0;
-        $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate);
-
-        // Grand Total
+        $taxAmount = \App\Helpers\SalesHelper::calculateTaxAmount($taxableAmount, $taxRate);
         $grandTotal = $taxableAmount + $taxAmount;
-
-        // Payment
         $amountReceived = $sale->amount_received ?? $grandTotal;
         $change = $amountReceived - $grandTotal;
 

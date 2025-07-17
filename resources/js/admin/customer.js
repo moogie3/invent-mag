@@ -990,10 +990,177 @@ document.addEventListener("DOMContentLoaded", function () {
                         checkElement
                     );
                     if (customerId) {
-                        loadHistoricalPurchases(customerId);
+                        loadProductHistory(customerId);
                     }
                 }
             );
+        }
+
+        function loadProductHistory(id) {
+            console.log("loadProductHistory called for ID:", id);
+            const productHistoryContent = document.getElementById(
+                "productHistoryContent"
+            );
+
+            if (productHistoryContent) {
+                // Show loading state
+                productHistoryContent.innerHTML =
+                    '<div class="d-flex justify-content-center align-items-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            } else {
+                console.error(
+                    "Element with ID 'productHistoryContent' not found!"
+                );
+                return;
+            }
+
+            fetch(`/admin/customers/${id}/product-history`)
+                .then((response) => {
+                    console.log(
+                        "Product history response status:",
+                        response.status
+                    );
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`
+                        );
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log("Product history data received:", data);
+                    if (productHistoryContent) {
+                        if (
+                            data.product_history &&
+                            data.product_history.length > 0
+                        ) {
+                            console.log(
+                                "Data has product_history and it's not empty."
+                            );
+                            // Create modern card-based layout
+                            let contentHtml = `
+                        <div class="accordion" id="crmProductHistoryAccordion">
+                    `;
+
+                            data.product_history.forEach((product) => {
+                                contentHtml += `
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="product-heading-${product.product_name.replace(
+                                    /\s+/g,
+                                    "-"
+                                )}">
+                                    <button class="accordion-button collapsed fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#product-collapse-${product.product_name.replace(
+                                        /\s+/g,
+                                        "-"
+                                    )}" aria-expanded="false" aria-controls="product-collapse-${product.product_name.replace(
+                                    /\s+/g,
+                                    "-"
+                                )}">
+                                        <div class="d-flex justify-content-between w-100 pe-3">
+                                            <span>${
+                                                product.product_name
+                                            }</span>
+                                            <span class="text-muted fs-4">Last Price: ${formatCurrency(
+                                                product.last_price
+                                            )}</span>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="product-collapse-${product.product_name.replace(
+                                    /\s+/g,
+                                    "-"
+                                )}" class="accordion-collapse collapse" aria-labelledby="product-heading-${product.product_name.replace(
+                                    /\s+/g,
+                                    "-"
+                                )}" data-bs-parent="#crmProductHistoryAccordion">
+                                    <div class="accordion-body">
+                                        <div class="list-group list-group-flush">
+                                            ${product.history
+                                                .map(
+                                                    (item) => `
+                                                <div class="list-group-item px-0">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-md-5 mb-2 mb-md-0">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="me-3">
+                                                                    <i class="ti ti-file-invoice text-primary fs-2"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <h6 class="mb-0 fs-4">Invoice #${
+                                                                        item.invoice
+                                                                    }</h6>
+                                                                    <small class="text-muted">${formatDateToCustomString(
+                                                                        item.order_date
+                                                                    )}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6 col-md-3 text-center">
+                                                            <div class="text-muted small">Quantity</div>
+                                                            <div class="fw-bold">${
+                                                                item.quantity
+                                                            }</div>
+                                                        </div>
+                                                        <div class="col-6 col-md-4 text-end">
+                                                            <div class="text-muted small">Price</div>
+                                                            <div class="fw-bold text-success">${formatCurrency(
+                                                                item.price_at_purchase
+                                                            )}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `
+                                                )
+                                                .join("")}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                            });
+
+                            contentHtml += `
+                        </div>
+                    `;
+                            console.log("Generated contentHtml:", contentHtml);
+                            productHistoryContent.innerHTML = contentHtml;
+                            console.log("innerHTML updated with contentHtml.");
+                        } else {
+                            console.log(
+                                "No product_history found or array is empty."
+                            );
+                            productHistoryContent.innerHTML = `
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="ti ti-shopping-cart-off fs-1 text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">No Product History</h5>
+                            <p class="text-muted mb-0">This customer has no product history yet.</p>
+                        </div>
+                    `;
+                            console.log(
+                                "innerHTML updated with 'No product history' message."
+                            );
+                        }
+                    } else {
+                        console.error(
+                            "Element with ID 'crmProductHistoryContent' was null after fetch!"
+                        );
+                    }
+                })
+                .catch((error) => {
+                    console.error("Fetch error in loadProductHistory:", error);
+                    if (productHistoryContent) {
+                        productHistoryContent.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="ti ti-alert-circle fs-1 text-danger"></i>
+                        </div>
+                        <h5 class="text-danger">Error Loading Data</h5>
+                        <p class="text-muted mb-0">Failed to load product history: ${error.message}</p>
+                    </div>
+                `;
+                    }
+                });
         }
     }
 });

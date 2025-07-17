@@ -92,30 +92,42 @@ class CustomerCrmController extends Controller
         return response()->json($interaction->load('user'));
     }
 
-    public function getHistoricalPurchases(Request $request, $id)
+    public function getProductHistory(Request $request, $id)
     {
         $customer = Customer::findOrFail($id);
 
-        $historicalPurchases = $customer->sales()
-            ->with('salesItems.product')
-            ->orderByDesc('order_date')
-            ->get()
-            ->flatMap(function ($sale) {
-                return $sale->salesItems->map(function ($item) use ($sale) {
+        // Fetch all sales items for the customer, eager loading the product and the sale
+        $salesItems = \App\Models\SalesItem::whereIn('sales_id', $customer->sales()->pluck('id'))
+            ->with(['product', 'sale'])
+            ->get();
+
+        // Group sales items by product
+        $productHistory = $salesItems->groupBy('product.name')
+            ->map(function ($items, $productName) {
+                // Sort history for each product by date
+                $history = $items->sortByDesc('sale.order_date')->map(function ($item) {
                     return [
-                        'order_date' => $sale->order_date,
-                        'invoice' => $sale->invoice,
-                        'product_name' => $item->product ? $item->product->name : 'N/A',
+                        'invoice' => $item->sale->invoice,
+                        'order_date' => $item->sale->order_date,
                         'quantity' => $item->quantity,
-                        'price_at_purchase' => $item->customer_price ?? 0, // Using customer_price from sales_items
-                        'customer_latest_price' => $item->product ? ($item->product->price ?? 0) : 0, // Assuming 'price' on product is latest price
-                        'line_total' => $item->customer_price * $item->quantity
+                        'price_at_purchase' => $item->customer_price,
                     ];
-                });
-            });
+                })->values(); // Reset keys to be a simple array
+
+                // Get the last price from the most recent sale
+                $lastPrice = $history->first()['price_at_purchase'];
+
+                return [
+                    'product_name' => $productName,
+                    'last_price' => $lastPrice,
+                    'history' => $history,
+                ];
+            })
+            ->sortBy('product_name') // Sort products alphabetically
+            ->values(); // Reset keys
 
         return response()->json([
-            'historical_purchases' => $historicalPurchases,
+            'product_history' => $productHistory,
         ]);
     }
 }

@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="crmCustomerModalLabel"><i class="ti ti-users me-2"></i>Customer Relationship
-                    Management</h5>
+                    Management <span id="crmCustomerNameInHeader" class="text-white fw-bold"></span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -94,7 +94,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Lifetime Value</div>
+                                                    <div class="font-weight-medium fw-bold">Lifetime Value</div>
                                                     <div id="crmLifetimeValue" class="text-success fw-bold fs-3">
                                                     </div>
                                                 </div>
@@ -103,7 +103,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Total Sales Count</div>
+                                                    <div class="font-weight-medium fw-bold">Total Sales Count</div>
                                                     <div id="crmTotalSalesCount" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -111,7 +111,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Average Order Value</div>
+                                                    <div class="font-weight-medium fw-bold">Average Order Value</div>
                                                     <div id="crmAverageOrderValue" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -119,7 +119,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Last Interaction Date</div>
+                                                    <div class="font-weight-medium fw-bold">Last Interaction Date</div>
                                                     <div id="crmLastInteractionDate" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -127,7 +127,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Most Purchased Product</div>
+                                                    <div class="font-weight-medium fw-bold">Most Purchased Product</div>
                                                     <div id="crmMostPurchasedProduct" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -135,7 +135,7 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium">Total Products Purchased</div>
+                                                    <div class="font-weight-medium fw-bold">Total Products Purchased</div>
                                                     <div id="crmTotalProductsPurchased" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -200,7 +200,7 @@
                     <div class="tab-pane fade" id="purchase-history" role="tabpanel"
                         aria-labelledby="purchase-history-tab">
                         <div class="p-3">
-                            <div id="historicalPurchaseContent">
+                            <div id="productHistoryContent">
                                 <!-- Content for Historical Purchase will be loaded here via JavaScript -->
                                 <p class="text-muted text-center">Loading historical purchase data...</p>
                             </div>

@@ -100,6 +100,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/customers/{id}/crm-details', [CustomerCrmController::class, 'show']);
         Route::post('/customers/{id}/interactions', [CustomerCrmController::class, 'storeInteraction']);
         Route::get('/customers/{id}/historical-purchases', [CustomerCrmController::class, 'getHistoricalPurchases']);
+        Route::get('/customers/{id}/product-history', [CustomerCrmController::class, 'getProductHistory']);
 
         // SRM Routes
         Route::get('/suppliers/{id}/srm-details', [SupplierCrmController::class, 'show']);

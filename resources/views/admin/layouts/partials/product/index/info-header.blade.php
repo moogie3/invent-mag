@@ -33,7 +33,7 @@
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="small text-muted">Total Product</div>
-                                            <div class="fw-bold">{{ $totalproduct }}</div>
+                                            <div class="fw-bold" id="totalProductCount">{{ $totalproduct }}</div>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center">
@@ -43,7 +43,7 @@
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="small text-muted">Total Category</div>
-                                            <div class="fw-bold">{{ $totalcategory }}</div>
+                                            <div class="fw-bold" id="totalCategoryCount">{{ $totalcategory }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -68,8 +68,8 @@
                                                 class="small {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}">
                                                 Low Stock Items</div>
                                             <div
-                                                class="h4 mb-0 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}">
-                                                {{ $lowStockCount }}</div>
+                                                    class="h4 mb-0 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}" id="lowStockItemsCount">
+                                                    {{ $lowStockCount }}</div>
                                             @if ($lowStockCount > 0)
                                                 <a href="#" class="mt-2 btn btn-sm btn-outline-danger"
                                                     id="viewLowStock">
@@ -100,8 +100,8 @@
                                                 class="small {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}">
                                                 Expiring Soon</div>
                                             <div
-                                                class="h4 mb-0 {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}">
-                                                {{ $expiringSoonCount }}</div>
+                                                    class="h4 mb-0 {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}" id="expiringSoonItemsCount">
+                                                    {{ $expiringSoonCount }}</div>
                                             @if ($expiringSoonCount > 0)
                                                 <a href="#" class="mt-2 btn btn-sm btn-outline-warning"
                                                     id="viewExpiringSoon">

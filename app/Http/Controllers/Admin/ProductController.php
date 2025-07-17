@@ -174,6 +174,21 @@ class ProductController extends Controller
         return redirect()->route('admin.product')->with('success', 'Product deleted');
     }
 
+    public function getProductMetrics()
+    {
+        $totalproduct = Product::count();
+        $totalcategory = \App\Models\Categories::count();
+        $lowStockCount = Product::lowStockCount();
+        $expiringSoonCount = Product::expiringSoonCount();
+
+        return response()->json([
+            'totalproduct' => $totalproduct,
+            'totalcategory' => $totalcategory,
+            'lowStockCount' => $lowStockCount,
+            'expiringSoonCount' => $expiringSoonCount,
+        ]);
+    }
+
     public function bulkDelete(Request $request)
     {
         $request->validate([

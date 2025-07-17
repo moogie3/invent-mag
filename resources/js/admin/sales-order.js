@@ -1800,16 +1800,16 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
                 selectedIds.forEach((id) => {
                     const row = document.querySelector(`tr[data-id="${id}"]`); // Assuming rows have data-id attribute
                     if (row) {
-                        const statusBadge = row.querySelector(".badge");
-                        if (statusBadge) {
-                            const statusCell = row.querySelector('.sort-status');
+                        const statusCell = row.querySelector('.sort-status');
                         if (statusCell) {
                             statusCell.innerHTML = '<span class="badge bg-green-lt"><span class="h4"><i class="ti ti-check me-1 fs-4"></i> Paid</span></span>';
-                        }
                         }
                         
                     }
                 });
+
+                // Update store info
+                updateSalesStoreInfo();
 
                 // Explicitly uncheck all checkboxes
                 document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
@@ -1841,6 +1841,20 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
             confirmButton.innerHTML = originalText;
             confirmButton.disabled = false;
         });
+}
+
+function updateSalesStoreInfo() {
+    fetch('/admin/sales/metrics')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('totalInvoiceCount').textContent = data.totalinvoice;
+            document.getElementById('thisMonthSales').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.totalMonthly);
+            document.getElementById('totalPosSales').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.posTotal);
+            document.getElementById('unpaidReceivable').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.unpaidDebt);
+            document.getElementById('pendingOrdersCount').textContent = data.pendingOrders;
+            document.getElementById('dueInvoicesCount').textContent = data.dueInvoices;
+        })
+        .catch(error => console.error('Error fetching sales metrics:', error));
 }
 
 function clearSelectionSales() {

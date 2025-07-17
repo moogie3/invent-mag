@@ -1513,6 +1513,10 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
                         }
                     }
                 });
+
+                // Update store info
+                updatePurchaseStoreInfo();
+
                 if (bulkSelection) {
                     bulkSelection.updateUI(); // Update bulk action bar and select all state
                 }
@@ -1538,6 +1542,21 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
             confirmButton.disabled = false;
             modal.hide(); // Ensure modal is always hidden
         });
+}
+
+function updatePurchaseStoreInfo() {
+    fetch('/admin/po/metrics')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('totalInvoiceCount').textContent = data.totalinvoice;
+            document.getElementById('invoiceOutCount').textContent = data.outCount;
+            document.getElementById('amountOutCount').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.outCountamount);
+            document.getElementById('invoiceInCount').textContent = data.inCount;
+            document.getElementById('amountInCount').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.inCountamount);
+            document.getElementById('monthlyPurchase').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.totalMonthly);
+            document.getElementById('monthlyPayment').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.paymentMonthly);
+        })
+        .catch(error => console.error('Error fetching purchase metrics:', error));
 }
 
 /**

@@ -153,6 +153,41 @@ class PurchaseController extends Controller
         }
     }
 
+    public function getPurchaseMetrics()
+    {
+        $totalinvoice = Purchase::count();
+        $inCount = Purchase::whereHas('supplier', function ($query) {
+            $query->where('location', 'IN');
+        })->count();
+        $inCountamount = Purchase::whereHas('supplier', function ($query) {
+            $query->where('location', 'IN');
+        })
+            ->where('status', 'Unpaid')
+            ->sum('total');
+
+        $outCount = Purchase::whereHas('supplier', function ($query) {
+            $query->where('location', 'OUT');
+        })->count();
+        $outCountamount = Purchase::whereHas('supplier', function ($query) {
+            $query->where('location', 'OUT');
+        })
+            ->where('status', 'Unpaid')
+            ->sum('total');
+
+        $totalMonthly = Purchase::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
+        $paymentMonthly = Purchase::whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->where('status', 'Paid')->sum('total');
+
+        return response()->json([
+            'totalinvoice' => $totalinvoice,
+            'inCount' => $inCount,
+            'inCountamount' => $inCountamount,
+            'outCount' => $outCount,
+            'outCountamount' => $outCountamount,
+            'totalMonthly' => $totalMonthly,
+            'paymentMonthly' => $paymentMonthly,
+        ]);
+    }
+
     public function bulkDelete(Request $request)
     {
         $request->validate([

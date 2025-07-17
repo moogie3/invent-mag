@@ -205,6 +205,28 @@ class SalesController extends Controller
         return response()->json(['past_price' => $pastPrice]);
     }
 
+    public function getSalesMetrics()
+    {
+        $totalinvoice = Sales::count();
+        $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
+        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
+        $pendingOrders = Sales::where('status', 'Unpaid')->count();
+        $dueInvoices = Sales::where('status', 'Unpaid')
+            ->whereDate('due_date', '>=', now())
+            ->whereDate('due_date', '<=', now()->addDays(7))
+            ->count();
+        $posTotal = Sales::where('is_pos', true)->sum('total');
+
+        return response()->json([
+            'totalinvoice' => $totalinvoice,
+            'unpaidDebt' => $unpaidDebt,
+            'totalMonthly' => $totalMonthly,
+            'pendingOrders' => $pendingOrders,
+            'dueInvoices' => $dueInvoices,
+            'posTotal' => $posTotal,
+        ]);
+    }
+
     public function bulkDelete(Request $request)
     {
         $request->validate([

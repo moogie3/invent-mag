@@ -71,6 +71,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/bulk-stock-details', [ProductController::class, 'bulkStockDetails'])->name('product.bulk-stock-details');
             Route::post('/bulk-update-stock', [ProductController::class, 'bulkUpdateStock'])->name('product.bulk-update-stock');
             Route::get('/search', [ProductController::class, 'search'])->name('admin.product.search');
+            Route::get('/metrics', [ProductController::class, 'getProductMetrics'])->name('admin.product.metrics');
         });
 
         // Supplier Routes
@@ -148,6 +149,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/bulk-delete', [PurchaseController::class, 'bulkDelete'])->name('po.bulk-delete');
             Route::post('/bulk-mark-paid', [PurchaseController::class, 'bulkMarkPaid'])->name('po.bulk-mark-paid');
             Route::post('/bulk-export', [PurchaseController::class, 'bulkExport'])->name('po.bulk-export');
+            Route::get('/metrics', [PurchaseController::class, 'getPurchaseMetrics'])->name('admin.po.metrics');
         });
 
         // Sales Routes
@@ -165,6 +167,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/bulk-mark-paid', [SalesController::class, 'bulkMarkPaid'])->name('sales.bulk-mark-paid');
             Route::post('/bulk-export', [SalesController::class, 'bulkExport'])->name('sales.bulk-export');
             Route::get('/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
+            Route::get('/metrics', [SalesController::class, 'getSalesMetrics'])->name('admin.sales.metrics');
         });
 
         // Warehouse Routes

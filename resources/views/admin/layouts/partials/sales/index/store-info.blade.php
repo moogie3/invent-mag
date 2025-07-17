@@ -53,7 +53,7 @@
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="small text-muted">Total Invoice</div>
-                                            <div class="fw-bold">{{ $totalinvoice }}</div>
+                                            <div class="fw-bold" id="totalInvoiceCount">{{ $totalinvoice }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -73,7 +73,7 @@
                                         </div>
                                         <div>
                                             <div class="text-white-50 small">This Month Sales</div>
-                                            <div class="h4 mb-0">
+                                            <div class="h4 mb-0" id="thisMonthSales">
                                                 {{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
                                         </div>
                                     </div>
@@ -83,7 +83,7 @@
                                         </div>
                                         <div>
                                             <div class="text-white-50 small">Total POS Sales</div>
-                                            <div class="h4 mb-0">{{ \App\Helpers\CurrencyHelper::format($posTotal) }}
+                                            <div class="h4 mb-0" id="totalPosSales">{{ \App\Helpers\CurrencyHelper::format($posTotal) }}
                                             </div>
                                         </div>
                                     </div>
@@ -93,7 +93,7 @@
                                         </div>
                                         <div>
                                             <div class="text-white-50 small">Unpaid Receivable</div>
-                                            <div class="h4 mb-0">{{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}
+                                            <div class="h4 mb-0" id="unpaidReceivable">{{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}
                                             </div>
                                         </div>
                                     </div>
@@ -115,7 +115,7 @@
                                         </div>
                                         <div>
                                             <div class="text-warning small">Pending Orders</div>
-                                            <div class="h3 mb-0 text-warning">{{ $pendingOrders }}</div>
+                                            <div class="h3 mb-0 text-warning" id="pendingOrdersCount">{{ $pendingOrders }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -134,7 +134,7 @@
                                         </div>
                                         <div>
                                             <div class="text-danger small">Due Soon Invoices</div>
-                                            <div class="h3 mb-0 text-danger">{{ $dueInvoices }}</div>
+                                            <div class="h3 mb-0 text-danger" id="dueInvoicesCount">{{ $dueInvoices }}</div>
                                         </div>
                                     </div>
                                 </div>

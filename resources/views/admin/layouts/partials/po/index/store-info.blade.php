@@ -53,7 +53,7 @@
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="small text-muted">Total Invoice</div>
-                                            <div class="fw-bold">{{ $totalinvoice }}</div>
+                                            <div class="fw-bold" id="totalInvoiceCount">{{ $totalinvoice }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -75,7 +75,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-white-50 small">Invoice OUT</div>
-                                                    <div class="h4 mb-0">{{ $outCount }}</div>
+                                                    <div class="h4 mb-0" id="invoiceOutCount">{{ $outCount }}</div>
                                                 </div>
                                             </div>
                                             <div class="d-flex align-items-center mb-3">
@@ -84,7 +84,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-white-50 small">Amount OUT</div>
-                                                    <div class="h4 mb-0">
+                                                    <div class="h4 mb-0" id="amountOutCount">
                                                         {{ \App\Helpers\CurrencyHelper::format($outCountamount) }}</div>
                                                 </div>
                                             </div>
@@ -96,7 +96,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-white-50 small">Invoice IN</div>
-                                                    <div class="h4 mb-0">{{ $inCount }}</div>
+                                                    <div class="h4 mb-0" id="invoiceInCount">{{ $inCount }}</div>
                                                 </div>
                                             </div>
                                             <div class="d-flex align-items-center mb-3">
@@ -105,7 +105,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-white-50 small">Amount IN</div>
-                                                    <div class="h4 mb-0">
+                                                    <div class="h4 mb-0" id="amountInCount">
                                                         {{ \App\Helpers\CurrencyHelper::format($inCountamount) }}</div>
                                                 </div>
                                             </div>
@@ -119,8 +119,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-white-50 small">Monthly Purchase</div>
-                                                    <div class="h4 mb-0">
-                                                        {{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
+                                                    <div class="h4 mb-0" id="monthlyPurchase">{{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -131,7 +130,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-white-50 small">Monthly Payment</div>
-                                                    <div class="h4 mb-0">
+                                                    <div class="h4 mb-0" id="monthlyPayment">
                                                         {{ \App\Helpers\CurrencyHelper::format($paymentMonthly) }}</div>
                                                 </div>
                                             </div>

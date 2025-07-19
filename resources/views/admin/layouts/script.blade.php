@@ -65,12 +65,12 @@
 @endif
 
 {{-- SCRIPT FOR UNIT --}}
-@if (request()->is('admin/settings/unit'))
+@if (request()->is('admin/settings/unit*'))
     @vite('resources/js/admin/unit.js')
 @endif
 
 {{-- SCRIPT FOR CATEGORY --}}
-@if (request()->is('admin/settings/category'))
+@if (request()->is('admin/settings/categories*'))
     @vite('resources/js/admin/category.js')
 @endif
 

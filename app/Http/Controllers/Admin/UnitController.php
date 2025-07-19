@@ -4,55 +4,57 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Unit;
+use App\Services\UnitService;
 use Illuminate\Http\Request;
 
 class UnitController extends Controller
 {
-    public function index(Request $request){
-        $entries = $request->input('entries', 10);//pagination
-        $units = Unit::paginate($entries);
-        $totalunit = Unit::count();
-        return view('admin.unit.index', compact('units', 'entries','totalunit'));
+    protected $unitService;
+
+    public function __construct(UnitService $unitService)
+    {
+        $this->unitService = $unitService;
     }
 
-    public function store(Request $request){
-        $data = $request->except("_token");
+    public function index(Request $request)
+    {
+        $entries = $request->input('entries', 10);
+        $data = $this->unitService->getUnitIndexData($entries);
+        return view('admin.unit.index', $data);
+    }
+
+    public function store(Request $request)
+    {
         $request->validate([
             'name' => 'required',
             'symbol' => 'required',
         ]);
 
-        $isUnitExist = Unit::where('name', $request->name)->exists();
+        $result = $this->unitService->createUnit($request->all());
 
-        if ($isUnitExist) {
+        if (!$result['success']) {
             if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'This unit already exists.', 'errors' => ['name' => ['This unit already exists.']]], 422);
+                return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
-            return back()
-            ->withErrors([
-                'name' => 'This unit already exist'
-            ])
-
-            ->withInput();
+            return back()->withErrors(['name' => $result['message']])->withInput();
         }
-
-        Unit::create($data);
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Unit created successfully.']);
         }
-        return redirect()->route('admin.setting.unit')->with('success','Unit created');
+        return redirect()->route('admin.setting.unit')->with('success', 'Unit created');
     }
 
-    public function update(Request $request, $id){
-        $data = $request->except("_token");
+    public function update(Request $request, $id)
+    {
         $request->validate([
             'name' => 'required',
             'symbol' => 'required',
         ]);
 
-        $units = Unit::find($id);
-        $units->update($data);
+        $unit = Unit::find($id);
+        $this->unitService->updateUnit($unit, $request->all());
+
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Unit updated successfully.']);
         }
@@ -61,9 +63,9 @@ class UnitController extends Controller
 
     public function destroy($id)
     {
-        Unit::find($id)->delete();
+        $unit = Unit::find($id);
+        $this->unitService->deleteUnit($unit);
 
         return redirect()->route('admin.setting.unit')->with('success', 'Unit deleted');
     }
-
 }

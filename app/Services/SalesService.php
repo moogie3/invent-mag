@@ -2,244 +2,324 @@
 
 namespace App\Services;
 
-use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
+use App\Models\Product;
 use App\Models\Tax;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Helpers\SalesHelper;
+use App\Models\Customer;
 
 class SalesService
 {
-    public function createSale(array $data)
+    public function getSalesIndexData(array $filters, int $entries)
     {
-        $products = json_decode($data['products'], true);
-        if (!$products || !is_array($products)) {
-            throw new \Exception('Invalid product data');
+        $query = Sales::with(['product', 'customer', 'user']);
+
+        if (isset($filters['month']) && $filters['month']) {
+            $query->whereMonth('order_date', $filters['month']);
+        }
+        if (isset($filters['year']) && $filters['year']) {
+            $query->whereYear('order_date', $filters['year']);
         }
 
-        $subTotal = 0;
-        $itemsData = [];
+        $sales = $query->paginate($entries);
+        $totalinvoice = $query->count();
+        $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
+        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created', now()->year)->sum('total');
+        $pendingOrders = Sales::where('status', 'Unpaid')->count();
+        $dueInvoices = Sales::where('status', 'Unpaid')
+            ->whereDate('due_date', '>=', now())
+            ->whereDate('due_date', '<=', now()->addDays(7))
+            ->count();
+        $posTotal = Sales::where('is_pos', true)->sum('total');
+        $shopname = User::whereNotNull('shopname')->value('shopname');
+        $address = User::whereNotNull('address')->value('address');
 
-        foreach ($products as $product) {
-            $quantity = $product['quantity'];
-            $price = $product['price'];
-            $discount = $product['discount'] ?? 0;
-            $discountType = $product['discountType'] ?? 'fixed';
+        return compact('posTotal', 'dueInvoices', 'entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt', 'pendingOrders', 'totalMonthly');
+    }
 
-            $productSubtotal = $price * $quantity;
+    public function getSalesCreateData()
+    {
+        $sales = Sales::all();
+        $customers = Customer::all();
+        $products = Product::all();
+        $items = SalesItem::all();
+        $tax = Tax::where('is_active', 1)->first();
 
-            if ($discountType === 'percentage') {
-                $itemDiscountAmount = ($productSubtotal * $discount) / 100;
+        return compact('sales', 'customers', 'products', 'items', 'tax');
+    }
+
+    public function getSalesEditData($id)
+    {
+        $sales = Sales::with(['salesItems', 'customer'])->find($id);
+        $customers = Customer::all();
+        $tax = Tax::where('is_active', 1)->first();
+        $isPaid = $sales->status == 'Paid';
+
+        return compact('sales', 'customers', 'tax', 'isPaid');
+    }
+
+    public function getSalesViewData($id)
+    {
+        $sales = Sales::with(['salesItems', 'customer'])->find($id);
+
+        if (strpos($sales->invoice, 'POS-') === 0) {
+            return redirect()->route('admin.pos.receipt', $id);
+        }
+
+        $customer = Customer::all();
+        $tax = Tax::first();
+
+        $itemCount = $sales->salesItems->count();
+        $subtotal = 0;
+        $totalItemDiscount = 0;
+
+        foreach ($sales->salesItems as $item) {
+            $itemSubtotal = $item->customer_price * $item->quantity;
+            if ($item->discount_type === 'percentage') {
+                $itemDiscountAmount = ($itemSubtotal * $item->discount) / 100;
             } else {
-                $itemDiscountAmount = $discount * $quantity;
+                $itemDiscountAmount = $item->discount * $item->quantity;
+            }
+            $totalItemDiscount += $itemDiscountAmount;
+            $subtotal += ($itemSubtotal - $itemDiscountAmount);
+        }
+
+        $orderDiscount = 0;
+        if ($sales->order_discount > 0) {
+            if ($sales->order_discount_type === 'percentage') {
+                $orderDiscount = ($subtotal * $sales->order_discount) / 100;
+            } else {
+                $orderDiscount = $sales->order_discount;
+            }
+        }
+
+        $taxAmount = $sales->total_tax;
+        $finalTotal = $sales->total;
+
+        $summary = [
+            'itemCount' => $itemCount,
+            'subtotal' => $subtotal,
+            'totalItemDiscount' => $totalItemDiscount,
+            'orderDiscount' => $orderDiscount,
+            'taxAmount' => $taxAmount,
+            'finalTotal' => $finalTotal
+        ];
+
+        return compact(
+            'sales',
+            'customer',
+            'tax',
+            'summary',
+            'itemCount',
+            'subtotal',
+            'orderDiscount',
+            'finalTotal',
+            'totalItemDiscount',
+            'taxAmount'
+        );
+    }
+
+    public function getSalesMetrics()
+    {
+        $totalinvoice = Sales::count();
+        $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
+        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
+        $pendingOrders = Sales::where('status', 'Unpaid')->count();
+        $dueInvoices = Sales::where('status', 'Unpaid')
+            ->whereDate('due_date', '>=', now())
+            ->whereDate('due_date', '<=', now()->addDays(7))
+            ->count();
+        $posTotal = Sales::where('is_pos', true)->sum('total');
+
+        return [
+            'totalinvoice' => $totalinvoice,
+            'unpaidDebt' => $unpaidDebt,
+            'totalMonthly' => $totalMonthly,
+            'pendingOrders' => $pendingOrders,
+            'dueInvoices' => $dueInvoices,
+            'posTotal' => $posTotal,
+        ];
+    }
+
+    public function createSale(array $data): Sales
+    {
+        return DB::transaction(function () use ($data) {
+            $products = json_decode($data['products'], true);
+            if (!$products || !is_array($products)) {
+                throw new \Exception('Invalid product data');
             }
 
-            $itemTotal = $productSubtotal - $itemDiscountAmount;
-            $subTotal += $itemTotal;
+            $subTotal = 0;
+            foreach ($products as $product) {
+                $subTotal += $product['customer_price'] * $product['quantity'];
+            }
 
-            $itemsData[] = [
-                'product' => $product,
-                'productSubtotal' => $productSubtotal,
-                'itemDiscountAmount' => $itemDiscountAmount,
-                'itemTotal' => $itemTotal,
-            ];
-        }
+            $orderDiscount = $data['discount_total'] ?? 0;
+            $orderDiscountType = $data['discount_total_type'] ?? 'fixed';
+            $orderDiscountAmount = SalesHelper::calculateDiscount($subTotal, $orderDiscount, $orderDiscountType);
 
-        $orderDiscount = $data['discount_total'] ?? 0;
-        $orderDiscountType = $data['discount_total_type'] ?? 'fixed';
+            $tax = Tax::where('is_active', 1)->first();
+            $taxRate = $tax ? $tax->rate : 0;
+            $taxAmount = SalesHelper::calculateTaxAmount($subTotal - $orderDiscountAmount, $taxRate);
 
-        if ($orderDiscountType === 'percentage') {
-            $orderDiscountAmount = ($subTotal * $orderDiscount) / 100;
-        } else {
-            $orderDiscountAmount = $orderDiscount;
-        }
+            $grandTotal = ($subTotal - $orderDiscountAmount) + $taxAmount;
 
-        $taxableAmount = $subTotal - $orderDiscountAmount;
-        $tax = Tax::where('is_active', 1)->first();
-        $taxRate = $tax ? $tax->rate : 0;
-        $taxAmount = $taxableAmount * ($taxRate / 100);
+            $invoice = $data['invoice'] ?? $this->generateInvoiceNumber();
 
-        $grandTotal = $taxableAmount + $taxAmount;
-
-        if (empty($data['invoice'])) {
-            $lastInvoice = Sales::latest()->first();
-            $invoiceNumber = $lastInvoice ? intval(substr($lastInvoice->invoice, -4)) + 1 : 1;
-            $invoice = 'INV-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
-        } else {
-            $invoice = $data['invoice'];
-        }
-
-        $sale = Sales::create([
-            'invoice' => $invoice,
-            'customer_id' => $data['customer_id'],
-            'order_date' => $data['order_date'],
-            'due_date' => $data['due_date'],
-            'tax_rate' => $taxRate,
-            'total_tax' => $taxAmount,
-            'total' => $grandTotal,
-            'order_discount' => $orderDiscount,
-            'order_discount_type' => $orderDiscountType,
-            'status' => 'Unpaid',
-            'is_pos' => 0,
-        ]);
-
-        foreach ($itemsData as $index => $itemData) {
-            $product = $itemData['product'];
-
-            SalesItem::create([
-                'sales_id' => $sale->id,
-                'product_id' => $product['id'],
-                'quantity' => $product['quantity'],
-                'customer_price' => $product['price'],
-                'discount' => $product['discount'] ?? 0,
-                'discount_type' => $product['discountType'] ?? 'fixed',
-                'total' => $itemData['itemTotal'],
+            $sale = Sales::create([
+                'invoice' => $invoice,
+                'customer_id' => $data['customer_id'],
+                'user_id' => Auth::id(),
+                'order_date' => $data['order_date'],
+                'due_date' => $data['due_date'],
+                'tax_rate' => $taxRate,
+                'total_tax' => $taxAmount,
+                'total' => $grandTotal,
+                'order_discount' => $orderDiscountAmount,
+                'order_discount_type' => $orderDiscountType,
+                'status' => 'Unpaid',
+                'payment_type' => '-',
+                'is_pos' => false,
             ]);
 
-            $productModel = Product::find($product['id']);
-            if ($productModel) {
-                if (isset($productModel->stock_quantity)) {
-                    $productModel->decrement('stock_quantity', $product['quantity']);
-                } elseif (isset($productModel->quantity)) {
-                    $productModel->decrement('quantity', $product['quantity']);
-                } elseif (isset($productModel->stock)) {
-                    $productModel->decrement('stock', $product['quantity']);
+            foreach ($products as $productData) {
+                SalesItem::create([
+                    'sales_id' => $sale->id,
+                    'product_id' => $productData['product_id'],
+                    'quantity' => $productData['quantity'],
+                    'customer_price' => $productData['customer_price'],
+                    'discount' => $productData['discount'] ?? 0,
+                    'discount_type' => $productData['discount_type'] ?? 'fixed',
+                    'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed'),
+                ]);
+
+                $product = Product::find($productData['product_id']);
+                if ($product) {
+                    $product->decrement('stock_quantity', $productData['quantity']);
                 }
             }
-        }
 
-        return $sale;
+            return $sale;
+        });
     }
 
-    public function updateSale(Sales $sale, array $data)
+    public function updateSale(Sales $sale, array $data): Sales
     {
-        $sale->payment_type = $data['payment_type'];
-        $sale->status = $data['status'];
-        $sale->payment_date = $data['status'] === 'Paid' ? now() : null;
-        $sale->order_discount_type = $data['order_discount_type'] ?? 'fixed';
-        $sale->order_discount = $data['order_discount'] ?? 0;
-
-        $subTotal = 0;
-        $itemDiscountTotal = 0;
-
-        if (isset($data['items']) && is_array($data['items'])) {
-            foreach ($data['items'] as $itemId => $itemData) {
-                $salesItem = SalesItem::findOrFail($itemId);
-
-                $quantity = (int) $itemData['quantity'];
-                $price = (float) $itemData['price'];
-                $discount = (float) $itemData['discount'];
-                $discountType = $itemData['discount_type'] ?? 'fixed';
-
-                $discountAmount = $discountType === 'percentage' ? (($price * $discount) / 100) * $quantity : $discount * $quantity;
-
-                $productSubtotal = $price * $quantity;
-                $itemTotal = $productSubtotal - $discountAmount;
-
-                $itemDiscountTotal += $discountAmount;
-                $subTotal += $itemTotal;
-
-                $salesItem->update([
-                    'quantity' => $quantity,
-                    'customer_price' => $price,
-                    'discount' => $discount,
-                    'discount_type' => $discountType,
-                    'total' => $itemTotal,
-                ]);
+        return DB::transaction(function () use ($sale, $data) {
+            $products = json_decode($data['products'], true);
+            if (!$products || !is_array($products)) {
+                throw new \Exception('Invalid product data');
             }
-        }
 
-        $orderDiscountAmount = $sale->order_discount_type === 'percentage' ? ($subTotal * $sale->order_discount) / 100 : $sale->order_discount;
+            // Revert old stock quantities
+            foreach ($sale->salesItems as $oldItem) {
+                $product = Product::find($oldItem->product_id);
+                if ($product) {
+                    $product->increment('stock_quantity', $oldItem->quantity);
+                }
+            }
 
-        $taxable = $subTotal - $orderDiscountAmount;
-        $taxRate = $sale->tax_rate;
-        $taxAmount = $taxable * ($taxRate / 100);
+            $sale->salesItems()->delete();
 
-        $sale->total_tax = $taxAmount;
-        $sale->total = $taxable + $taxAmount;
-        $sale->save();
+            $subTotal = 0;
+            foreach ($products as $productData) {
+                $subTotal += $productData['customer_price'] * $productData['quantity'];
+            }
 
-        return $sale;
+            $orderDiscount = $data['discount_total'] ?? 0;
+            $orderDiscountType = $data['discount_total_type'] ?? 'fixed';
+            $orderDiscountAmount = SalesHelper::calculateDiscount($subTotal, $orderDiscount, $orderDiscountType);
+
+            $tax = Tax::where('is_active', 1)->first();
+            $taxRate = $tax ? $tax->rate : 0;
+            $taxAmount = SalesHelper::calculateTaxAmount($subTotal - $orderDiscountAmount, $taxRate);
+
+            $grandTotal = ($subTotal - $orderDiscountAmount) + $taxAmount;
+
+            $sale->update([
+                'customer_id' => $data['customer_id'],
+                'order_date' => $data['order_date'],
+                'due_date' => $data['due_date'],
+                'tax_rate' => $taxRate,
+                'total_tax' => $taxAmount,
+                'total' => $grandTotal,
+                'order_discount' => $orderDiscountAmount,
+                'order_discount_type' => $orderDiscountType,
+            ]);
+
+            foreach ($products as $productData) {
+                SalesItem::create([
+                    'sales_id' => $sale->id,
+                    'product_id' => $productData['product_id'],
+                    'quantity' => $productData['quantity'],
+                    'customer_price' => $productData['customer_price'],
+                    'discount' => $productData['discount'] ?? 0,
+                    'discount_type' => $productData['discount_type'] ?? 'fixed',
+                    'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed'),
+                ]);
+
+                $product = Product::find($productData['product_id']);
+                if ($product) {
+                    $product->decrement('stock_quantity', $productData['quantity']);
+                }
+            }
+
+            return $sale;
+        });
     }
 
-    public function deleteSale(Sales $sale)
+    public function deleteSale(Sales $sale): void
     {
         DB::transaction(function () use ($sale) {
-            $isPaid = $sale->status === 'Paid';
-
-            SalesItem::where('sales_id', $sale->id)->delete();
-
-            if (!$isPaid) {
-                foreach ($sale->salesItems as $item) {
-                    $product = Product::find($item->product_id);
-                    if ($product) {
-                        if (isset($product->stock_quantity)) {
-                            $product->increment('stock_quantity', $item->quantity);
-                        } elseif (isset($product->quantity)) {
-                            $product->increment('quantity', $item->quantity);
-                        } elseif (isset($product->stock)) {
-                            $product->increment('stock', $item->quantity);
-                        }
-                    }
+            foreach ($sale->salesItems as $item) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $product->increment('stock_quantity', $item->quantity);
                 }
             }
-
             $sale->delete();
         });
     }
 
-    public function bulkDeleteSales(array $ids)
+    public function bulkDeleteSales(array $ids): void
     {
         DB::transaction(function () use ($ids) {
-            $salesOrders = Sales::whereIn('id', $ids)->with('salesItems')->get();
-
-            if ($salesOrders->isEmpty()) {
-                throw new \Exception('No sales orders found with the provided IDs');
-            }
-
-            SalesItem::whereIn('sales_id', $ids)->delete();
-
-            foreach ($salesOrders as $sale) {
-                if ($sale->status !== 'Paid') {
-                    foreach ($sale->salesItems as $item) {
-                        $product = Product::find($item->product_id);
-                        if ($product) {
-                            if (isset($product->stock_quantity)) {
-                                $product->increment('stock_quantity', $item->quantity);
-                            } elseif (isset($product->quantity)) {
-                                $product->increment('quantity', $item->quantity);
-                            } elseif (isset($product->stock)) {
-                                $product->increment('stock', $item->quantity);
-                            }
-                        }
+            $sales = Sales::whereIn('id', $ids)->with('salesItems')->get();
+            foreach ($sales as $sale) {
+                foreach ($sale->salesItems as $item) {
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $product->increment('stock_quantity', $item->quantity);
                     }
                 }
+                $sale->delete();
             }
-
-            Sales::whereIn('id', $ids)->delete();
         });
     }
 
-    public function bulkMarkPaid(array $ids)
+    public function bulkMarkPaid(array $ids): int
     {
-        $updatedCount = 0;
-        $salesOrders = Sales::whereIn('id', $ids)->get();
+        return Sales::whereIn('id', $ids)->update([
+            'status' => 'Paid',
+            'payment_date' => now(),
+            'amount_received' => DB::raw('total'),
+            'change_amount' => 0,
+        ]);
+    }
 
-        foreach ($salesOrders as $salesOrder) {
-            if ($salesOrder->status === 'Paid') {
-                continue;
-            }
-
-            $salesOrder->update([
-                'status' => 'Paid',
-                'payment_date' => now(),
-                'updated_at' => now(),
-            ]);
-
-            $updatedCount++;
+    private function generateInvoiceNumber(): string
+    {
+        $lastSalesInvoice = Sales::latest()->first();
+        $invoiceNumber = 1;
+        if ($lastSalesInvoice) {
+            $lastNumber = (int) substr($lastSalesInvoice->invoice, 4);
+            $invoiceNumber = $lastNumber + 1;
         }
-
-        return $updatedCount;
+        return 'INV-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
     }
 }

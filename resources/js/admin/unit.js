@@ -51,19 +51,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Event listener for edit modal show
     if (editUnitModal) {
+        console.log("editUnitModal element found."); // Debug
         editUnitModal.addEventListener("show.bs.modal", function (event) {
+            console.log("show.bs.modal event fired for editUnitModal."); // Debug
             const button = event.relatedTarget;
+            console.log("event.relatedTarget:", button); // Debug
 
-            const unitId = button.getAttribute("data-id");
-            const unitSymbol = button.getAttribute("data-symbol");
-            const unitName = button.getAttribute("data-name");
+            if (button) {
+                const unitId = button.getAttribute("data-id");
+                const unitSymbol = button.getAttribute("data-symbol");
+                const unitName = button.getAttribute("data-name");
 
-            document.getElementById("unitId").value = unitId;
-            document.getElementById("unitSymbolEdit").value = unitSymbol;
-            document.getElementById("unitNameEdit").value = unitName;
+                console.log("unitId:", unitId); // Debug
+                console.log("unitSymbol:", unitSymbol); // Debug
+                console.log("unitName:", unitName); // Debug
 
-            const routeBase = document.getElementById("updateRouteBase").value;
-            document.getElementById("editUnitForm").action = routeBase + "/" + unitId;
+                const unitIdInput = document.getElementById("unitId");
+                const unitSymbolEditInput = document.getElementById("unitSymbolEdit");
+                const unitNameEditInput = document.getElementById("unitNameEdit");
+
+                console.log("unitIdInput:", unitIdInput); // Debug
+                console.log("unitSymbolEditInput:", unitSymbolEditInput); // Debug
+                console.log("unitNameEditInput:", unitNameEditInput); // Debug
+
+                if (unitIdInput) {
+                    unitIdInput.value = unitId;
+                    console.log("unitIdInput.value after set:", unitIdInput.value); // Debug
+                }
+                if (unitSymbolEditInput) {
+                    unitSymbolEditInput.value = unitSymbol;
+                    console.log("unitSymbolEditInput.value after set:", unitSymbolEditInput.value); // Debug
+                }
+                if (unitNameEditInput) {
+                    unitNameEditInput.value = unitName;
+                    console.log("unitNameEditInput.value after set:", unitNameEditInput.value); // Debug
+                }
+
+                const routeBase = document.getElementById("updateRouteBase").value;
+                document.getElementById("editUnitForm").action = routeBase + "/" + unitId;
+            } else {
+                console.warn("event.relatedTarget is null for editUnitModal."); // Debug
+            }
         });
 
         // Add submit listener for edit form
@@ -71,6 +99,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (editUnitForm) {
             editUnitForm.addEventListener("submit", (event) => handleFormSubmission(event, editUnitModal));
         }
+    } else {
+        console.log("editUnitModal element NOT found."); // Debug
     }
 
     // Add submit listener for create form

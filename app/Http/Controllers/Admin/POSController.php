@@ -23,14 +23,8 @@ class POSController extends Controller
 
     public function index()
     {
-        $products = Product::with('unit')->get();
-        $customers = Customer::all();
-        $walkInCustomerId = $customers->where('name', 'Walk In Customer')->first()->id ?? null;
-        $categories = Categories::all();
-        $units = Unit::all();
-        $suppliers = Supplier::all();
-
-        return view('admin.pos.index', compact('products', 'customers', 'walkInCustomerId', 'categories', 'units', 'suppliers'));
+        $data = $this->posService->getPosIndexData();
+        return view('admin.pos.index', $data);
     }
 
     public function store(Request $request)
@@ -67,53 +61,9 @@ class POSController extends Controller
     public function receipt($id)
     {
         $sale = Sales::with(['salesItems.product', 'customer'])->findOrFail($id);
-        $totalBeforeDiscount = 0;
-        $totalItemDiscount = 0;
+        $receiptData = $this->posService->getReceiptData($sale);
 
-        foreach ($sale->salesItems as $item) {
-            $discountAmount = \App\Helpers\SalesHelper::calculateDiscountPerUnit(
-                $item->customer_price,
-                $item->discount,
-                $item->discount_type
-            ) * $item->quantity;
-
-            $item->calculated_total = \App\Helpers\SalesHelper::calculateTotal(
-                $item->customer_price,
-                $item->quantity,
-                $item->discount,
-                $item->discount_type
-            );
-
-            $totalBeforeDiscount += $item->customer_price * $item->quantity;
-            $totalItemDiscount += $discountAmount;
-        }
-
-        $subTotal = $totalBeforeDiscount - $totalItemDiscount;
-        $orderDiscount = $sale->order_discount ?? 0;
-        $orderDiscountType = $sale->order_discount_type ?? 'fixed';
-        $orderDiscountAmount = \App\Helpers\SalesHelper::calculateDiscount(
-            $totalBeforeDiscount,
-            $orderDiscount,
-            $orderDiscountType
-        );
-
-        $taxableAmount = $subTotal - $orderDiscountAmount;
-        $taxRate = $sale->tax_rate ?? 0;
-        $taxAmount = \App\Helpers\SalesHelper::calculateTaxAmount($taxableAmount, $taxRate);
-        $grandTotal = $taxableAmount + $taxAmount;
-        $amountReceived = $sale->amount_received ?? $grandTotal;
-        $change = $amountReceived - $grandTotal;
-
-        return view('admin.pos.receipt', compact(
-            'sale',
-            'subTotal',
-            'orderDiscountAmount',
-            'taxRate',
-            'taxAmount',
-            'grandTotal',
-            'amountReceived',
-            'change'
-        ));
+        return view('admin.pos.receipt', $receiptData);
     }
 
     public function printReceipt($id)

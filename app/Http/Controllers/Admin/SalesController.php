@@ -27,111 +27,31 @@ class SalesController extends Controller
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);
-        $query = Sales::with(['product', 'customer', 'user']);
+        $filters = $request->only(['month', 'year']);
+        $data = $this->salesService->getSalesIndexData($filters, $entries);
 
-        if ($request->has('month') && $request->month) {
-            $query->whereMonth('order_date', $request->month);
-        }
-        if ($request->has('year') && $request->year) {
-            $query->whereYear('order_date', $request->year);
-        }
-
-        $sales = $query->paginate($entries);
-        $totalinvoice = $query->count();
-        $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
-        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
-        $pendingOrders = Sales::where('status', 'Unpaid')->count();
-        $dueInvoices = Sales::where('status', 'Unpaid')
-            ->whereDate('due_date', '>=', now())
-            ->whereDate('due_date', '<=', now()->addDays(7))
-            ->count();
-        $posTotal = Sales::where('is_pos', true)->sum('total');
-        $shopname = User::whereNotNull('shopname')->value('shopname');
-        $address = User::whereNotNull('address')->value('address');
-
-        return view('admin.sales.index', compact('posTotal', 'dueInvoices', 'entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt', 'pendingOrders', 'totalMonthly'));
+        return view('admin.sales.index', $data);
     }
 
     public function create()
     {
-        $sales = Sales::all();
-        $customers = Customer::all();
-        $products = Product::all();
-        $items = SalesItem::all();
-        $tax = Tax::where('is_active', 1)->first();
+        $data = $this->salesService->getSalesCreateData();
 
-        return view('admin.sales.sales-create', compact('sales', 'customers', 'products', 'items', 'tax'));
+        return view('admin.sales.sales-create', $data);
     }
 
     public function edit($id)
     {
-        $sales = Sales::with(['salesItems', 'customer'])->find($id);
-        $customers = Customer::all();
-        $tax = Tax::where('is_active', 1)->first();
-        $isPaid = $sales->status == 'Paid';
+        $data = $this->salesService->getSalesEditData($id);
 
-        return view('admin.sales.sales-edit', compact('sales', 'customers', 'tax', 'isPaid'));
+        return view('admin.sales.sales-edit', $data);
     }
 
     public function view($id)
     {
-        $sales = Sales::with(['salesItems', 'customer'])->find($id);
+        $data = $this->salesService->getSalesViewData($id);
 
-        if (strpos($sales->invoice, 'POS-') === 0) {
-            return redirect()->route('admin.pos.receipt', $id);
-        }
-
-        $customer = Customer::all();
-        $tax = Tax::first();
-
-        $itemCount = $sales->salesItems->count();
-        $subtotal = 0;
-        $totalItemDiscount = 0;
-
-        foreach ($sales->salesItems as $item) {
-            $itemSubtotal = $item->customer_price * $item->quantity;
-            if ($item->discount_type === 'percentage') {
-                $itemDiscountAmount = ($itemSubtotal * $item->discount) / 100;
-            } else {
-                $itemDiscountAmount = $item->discount * $item->quantity;
-            }
-            $totalItemDiscount += $itemDiscountAmount;
-            $subtotal += ($itemSubtotal - $itemDiscountAmount);
-        }
-
-        $orderDiscount = 0;
-        if ($sales->order_discount > 0) {
-            if ($sales->order_discount_type === 'percentage') {
-                $orderDiscount = ($subtotal * $sales->order_discount) / 100;
-            } else {
-                $orderDiscount = $sales->order_discount;
-            }
-        }
-
-        $taxAmount = $sales->total_tax;
-        $finalTotal = $sales->total;
-
-        $summary = [
-            'itemCount' => $itemCount,
-            'subtotal' => $subtotal,
-            'totalItemDiscount' => $totalItemDiscount,
-            'orderDiscount' => $orderDiscount,
-            'taxAmount' => $taxAmount,
-            'finalTotal' => $finalTotal
-        ];
-
-        return view('admin.sales.sales-view', compact(
-            'sales',
-            'customer',
-            'tax',
-            'summary',
-            'itemCount',
-            'subtotal',
-            'orderDiscount',
-            'finalTotal',
-            'totalItemDiscount',
-            'taxAmount'
-        ));
+        return view('admin.sales.sales-view', $data);
     }
 
     public function modalViews($id)
@@ -207,24 +127,9 @@ class SalesController extends Controller
 
     public function getSalesMetrics()
     {
-        $totalinvoice = Sales::count();
-        $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
-        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
-        $pendingOrders = Sales::where('status', 'Unpaid')->count();
-        $dueInvoices = Sales::where('status', 'Unpaid')
-            ->whereDate('due_date', '>=', now())
-            ->whereDate('due_date', '<=', now()->addDays(7))
-            ->count();
-        $posTotal = Sales::where('is_pos', true)->sum('total');
+        $metrics = $this->salesService->getSalesMetrics();
 
-        return response()->json([
-            'totalinvoice' => $totalinvoice,
-            'unpaidDebt' => $unpaidDebt,
-            'totalMonthly' => $totalMonthly,
-            'pendingOrders' => $pendingOrders,
-            'dueInvoices' => $dueInvoices,
-            'posTotal' => $posTotal,
-        ]);
+        return response()->json($metrics);
     }
 
     public function bulkDelete(Request $request)

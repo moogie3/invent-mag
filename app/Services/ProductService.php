@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\Categories;
+use App\Models\Supplier;
+use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -11,6 +14,24 @@ use Illuminate\Support\Str;
 
 class ProductService
 {
+    public function getPaginatedProducts(int $entries)
+    {
+        return Product::with(['category', 'supplier', 'unit', 'warehouse'])->paginate($entries);
+    }
+
+    public function getProductFormData()
+    {
+        return [
+            'categories' => Categories::all(),
+            'units' => Unit::all(),
+            'suppliers' => Supplier::all(),
+            'warehouses' => Warehouse::all(),
+            'mainWarehouse' => Warehouse::where('is_main', true)->first(),
+            'lowStockProducts' => Product::getLowStockProducts(),
+            'expiringSoonProducts' => Product::getExpiringSoonProducts(),
+        ];
+    }
+
     public function createProduct(array $data)
     {
         $data['has_expiry'] = !empty($data['has_expiry']);

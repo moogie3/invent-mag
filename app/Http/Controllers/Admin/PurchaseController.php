@@ -26,61 +26,24 @@ class PurchaseController extends Controller
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);
-        $query = Purchase::with(['items', 'supplier', 'user']);
+        $filters = $request->only(['month', 'year']);
+        $data = $this->purchaseService->getPurchaseIndexData($filters, $entries);
 
-        if ($request->has('month') && $request->month) {
-            $query->whereMonth('order_date', $request->month);
-        }
-
-        if ($request->has('year') && $request->year) {
-            $query->whereYear('order_date', $request->year);
-        }
-        $pos = $query->paginate($entries);
-        $totalinvoice = Purchase::count();
-        $items = POItem::all();
-        $inCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })->count();
-        $inCountamount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })
-            ->where('status', 'Unpaid')
-            ->sum('total');
-
-        $outCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'OUT');
-        })->count();
-        $outCountamount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'OUT');
-        })
-            ->where('status', 'Unpaid')
-            ->sum('total');
-
-        $totalMonthly = Purchase::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
-        $paymentMonthly = Purchase::whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->where('status', 'Paid')->sum('total');
-        $shopname = User::whereNotNull('shopname')->value('shopname');
-        $address = User::whereNotNull('address')->value('address');
-
-        return view('admin.po.index', compact('inCountamount', 'outCountamount', 'pos', 'inCount', 'outCount', 'shopname', 'address', 'entries', 'totalinvoice', 'totalMonthly', 'paymentMonthly', 'items'));
+        return view('admin.po.index', $data);
     }
 
     public function create()
     {
-        $pos = Purchase::all();
-        $suppliers = Supplier::all();
-        $products = Product::all();
+        $data = $this->purchaseService->getPurchaseCreateData();
 
-        return view('admin.po.purchase-create', compact('pos', 'suppliers', 'products'));
+        return view('admin.po.purchase-create', $data);
     }
 
     public function edit($id)
     {
-        $pos = Purchase::with(['items', 'supplier'])->find($id);
-        $suppliers = Supplier::all();
-        $items = POItem::all();
-        $isPaid = $pos->status == 'Paid';
+        $data = $this->purchaseService->getPurchaseEditData($id);
 
-        return view('admin.po.purchase-edit', compact('pos', 'suppliers', 'items', 'isPaid'));
+        return view('admin.po.purchase-edit', $data);
     }
 
     public function view($id)
@@ -155,37 +118,9 @@ class PurchaseController extends Controller
 
     public function getPurchaseMetrics()
     {
-        $totalinvoice = Purchase::count();
-        $inCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })->count();
-        $inCountamount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })
-            ->where('status', 'Unpaid')
-            ->sum('total');
+        $metrics = $this->purchaseService->getPurchaseMetrics();
 
-        $outCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'OUT');
-        })->count();
-        $outCountamount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'OUT');
-        })
-            ->where('status', 'Unpaid')
-            ->sum('total');
-
-        $totalMonthly = Purchase::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
-        $paymentMonthly = Purchase::whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->where('status', 'Paid')->sum('total');
-
-        return response()->json([
-            'totalinvoice' => $totalinvoice,
-            'inCount' => $inCount,
-            'inCountamount' => $inCountamount,
-            'outCount' => $outCount,
-            'outCountamount' => $outCountamount,
-            'totalMonthly' => $totalMonthly,
-            'paymentMonthly' => $paymentMonthly,
-        ]);
+        return response()->json($metrics);
     }
 
     public function bulkDelete(Request $request)

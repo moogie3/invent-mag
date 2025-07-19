@@ -52,18 +52,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Event listener for edit modal show
     if (editCategoryModal) {
+        console.log("editCategoryModal element found."); // Debug
         editCategoryModal.addEventListener("show.bs.modal", function (event) {
+            console.log("show.bs.modal event fired for editCategoryModal."); // Debug
             const button = event.relatedTarget;
-            const categoryId = button.getAttribute("data-id");
-            const categoryName = button.getAttribute("data-name");
-            const categoryDescription = button.getAttribute("data-description");
+            console.log("event.relatedTarget:", button); // Debug
 
-            document.getElementById("categoryId").value = categoryId;
-            document.getElementById("categoryNameEdit").value = categoryName;
-            document.getElementById("categoryDescriptionEdit").value = categoryDescription;
+            if (button) {
+                const categoryId = button.getAttribute("data-id");
+                const categoryName = button.getAttribute("data-name");
+                const categoryDescription = button.getAttribute("data-description");
 
-            const routeBase = document.getElementById("updateRouteBase").value;
-            document.getElementById("editCategoryForm").action = routeBase + "/" + categoryId;
+                console.log("categoryId:", categoryId); // Debug
+                console.log("categoryName:", categoryName); // Debug
+                console.log("categoryDescription:", categoryDescription); // Debug
+
+                const categoryIdInput = document.getElementById("categoryId");
+                const categoryNameEditInput = document.getElementById("categoryNameEdit");
+                const categoryDescriptionEditInput = document.getElementById("categoryDescriptionEdit");
+
+                console.log("categoryIdInput:", categoryIdInput); // Debug
+                console.log("categoryNameEditInput:", categoryNameEditInput); // Debug
+                console.log("categoryDescriptionEditInput:", categoryDescriptionEditInput); // Debug
+
+                if (categoryIdInput) {
+                    categoryIdInput.value = categoryId;
+                    console.log("categoryIdInput.value after set:", categoryIdInput.value); // Debug
+                }
+                if (categoryNameEditInput) {
+                    categoryNameEditInput.value = categoryName;
+                    console.log("categoryNameEditInput.value after set:", categoryNameEditInput.value); // Debug
+                }
+                if (categoryDescriptionEditInput) {
+                    categoryDescriptionEditInput.value = categoryDescription;
+                    console.log("categoryDescriptionEditInput.value after set:", categoryDescriptionEditInput.value); // Debug
+                }
+
+                const routeBase = document.getElementById("updateRouteBase").value;
+                document.getElementById("editCategoryForm").action = routeBase + "/" + categoryId;
+            } else {
+                console.warn("event.relatedTarget is null for editCategoryModal."); // Debug
+            }
         });
 
         // Add submit listener for edit form
@@ -71,6 +100,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (editCategoryForm) {
             editCategoryForm.addEventListener("submit", (event) => handleFormSubmission(event, editCategoryModal));
         }
+    } else {
+        console.log("editCategoryModal element NOT found."); // Debug
     }
 
     // Add submit listener for create form

@@ -4,55 +4,57 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Categories;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index(Request $request) {
-        $entries = $request->input('entries', 10);//pagination
-        $categories = Categories::paginate($entries);
-        $totalcategory = Categories::count();
-        return view('admin.category.index', compact('categories', 'entries','totalcategory'));
+    protected $categoryService;
+
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
     }
 
-    public function store(Request $request){
-        $data = $request->except("_token");
+    public function index(Request $request)
+    {
+        $entries = $request->input('entries', 10);
+        $data = $this->categoryService->getCategoryIndexData($entries);
+        return view('admin.category.index', $data);
+    }
+
+    public function store(Request $request)
+    {
         $request->validate([
             'name' => 'required',
             'description' => 'required',
         ]);
 
-        $isCategoryExist = Categories::where('name', $request->name)->exists();
+        $result = $this->categoryService->createCategory($request->except('_token'));
 
-        if ($isCategoryExist) {
+        if (!$result['success']) {
             if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'This category already exists.', 'errors' => ['name' => ['This category already exists.']]], 422);
+                return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
-            return back()
-            ->withErrors([
-                'name' => 'This category already exist'
-            ])
-
-            ->withInput();
+            return back()->withErrors(['name' => $result['message']])->withInput();
         }
-
-        Categories::create($data);
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Category created successfully.']);
         }
-        return redirect()->route('admin.setting.category')->with('success','Category created');
+        return redirect()->route('admin.setting.category')->with('success', 'Category created');
     }
 
-    public function update(Request $request, $id){
-        $data = $request->except("_token");
+    public function update(Request $request, $id)
+    {
         $request->validate([
             'name' => 'required',
             'description' => 'required',
         ]);
 
-        $categories = Categories::find($id);
-        $categories->update($data);
+        $category = Categories::find($id);
+        $this->categoryService->updateCategory($category, $request->except('_token'));
+
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Category updated successfully.']);
         }
@@ -61,7 +63,8 @@ class CategoryController extends Controller
 
     public function destroy($id)
     {
-        Categories::find($id)->delete();
+        $category = Categories::find($id);
+        $this->categoryService->deleteCategory($category);
 
         return redirect()->route('admin.setting.category')->with('success', 'Category deleted');
     }

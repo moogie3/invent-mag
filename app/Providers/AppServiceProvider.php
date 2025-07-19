@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Http\Controllers\Admin\NotificationController;
+use App\Services\NotificationService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Purchase;
@@ -24,8 +24,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer(['admin.layouts.*', 'admin.*'], function ($view) {
-            $notificationController = app(NotificationController::class);
-            $notifications = $notificationController->getDueNotifications();
+            $notificationService = app(NotificationService::class);
+            $notifications = $notificationService->getDueNotifications();
             $notificationCount = $notifications->count();
 
             $view->with('notificationCount', $notificationCount);

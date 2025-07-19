@@ -113,9 +113,57 @@ class DashboardService
         ];
     }
 
+    public function calculateDateRange($dateRange, $startDate = null, $endDate = null)
+    {
+        $now = Carbon::now();
+
+        switch ($dateRange) {
+            case 'today':
+                $start = $now->copy()->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
+            case 'yesterday':
+                $start = $now->copy()->subDay()->startOfDay();
+                $end = $now->copy()->subDay()->endOfDay();
+                break;
+            case 'this_week':
+                $start = $now->copy()->startOfWeek();
+                $end = $now->copy()->endOfWeek();
+                break;
+            case 'last_week':
+                $start = $now->copy()->subWeek()->startOfWeek();
+                $end = $now->copy()->subWeek()->endOfWeek();
+                break;
+            case 'this_month':
+                $start = $now->copy()->startOfMonth();
+                $end = $now->copy()->endOfMonth();
+                break;
+            case 'last_month':
+                $start = $now->copy()->subMonth()->startOfMonth();
+                $end = $now->copy()->subMonth()->endOfMonth();
+                break;
+            case 'this_quarter':
+                $start = $now->copy()->startOfQuarter();
+                $end = $now->copy()->endOfQuarter();
+                break;
+            case 'this_year':
+                $start = $now->copy()->startOfYear();
+                $end = $now->copy()->endOfYear();
+                break;
+            case 'custom':
+                $start = $startDate ? Carbon::parse($startDate)->startOfDay() : $now->copy()->startOfMonth();
+                $end = $endDate ? Carbon::parse($endDate)->endOfDay() : $now->copy()->endOfMonth();
+                break;
+            default:
+                $start = $now->copy()->startOfMonth();
+                $end = $now->copy()->endOfMonth();
+        }
+
+        return ['start' => $start, 'end' => $end];
+    }
+
     private function getTopCategories($dates)
     {
-        // First get category revenue data
         $categoryRevenue = DB::table('sales_items')
             ->join('sales', 'sales_items.sales_id', '=', 'sales.id')
             ->join('products', 'sales_items.product_id', '=', 'products.id')
@@ -127,7 +175,6 @@ class DashboardService
             ->get()
             ->keyBy('category_id');
 
-        // Get categories and merge with revenue data
         $categoryIds = $categoryRevenue->pluck('category_id');
         $categories = Categories::whereIn('id', $categoryIds)->get();
 
@@ -210,9 +257,6 @@ class DashboardService
         return $query->sum('total') ?? 0;
     }
 
-    /**
-     * Format key metrics data for the dashboard
-     */
     private function formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid, $inCountUnpaid)
     {
         return [
@@ -283,9 +327,6 @@ class DashboardService
     {
         return Purchase::where('status', 'Unpaid')->where('due_date', '<', now())->count();
     }
-    /**
-     * Prepare financial summary items
-     */
     private function prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue)
     {
         $operatingExpenses = $totalLiability - $unpaidLiability;
@@ -319,9 +360,6 @@ class DashboardService
         ];
     }
 
-    /**
-     * Prepare invoice status data
-     */
     private function prepareInvoiceStatusData()
     {
         $inCount = $this->getPurchaseCountByLocation('IN');
@@ -350,20 +388,14 @@ class DashboardService
         ];
     }
 
-    /**
-     * Prepare customer insights data
-     */
     private function prepareCustomerInsights()
     {
-        // Average due days based on difference between due_date and payment_date (if paid)
         $avgDueDays = Sales::whereNotNull('payment_date')->whereNotNull('due_date')->select(DB::raw('AVG(DATEDIFF(payment_date, due_date)) as avg_days'))->value('avg_days') ?? 0;
 
-        // Collection rate: % of total invoices that have been paid
         $totalInvoices = Sales::count();
         $paidInvoices = Sales::whereNotNull('payment_date')->count();
         $collectionRate = $totalInvoices > 0 ? ($paidInvoices / $totalInvoices) * 100 : 0;
 
-        // Group customers by payment terms
         $paymentTermsRaw = Customer::select('payment_terms', DB::raw('count(*) as count'))->groupBy('payment_terms')->get();
 
         $paymentTerms = $paymentTermsRaw
@@ -439,31 +471,21 @@ class DashboardService
         ];
     }
 
-    /**
-     * Get count of products with low stock
-     */
     private function getLowStockCount()
     {
-        // Fallback implementation in case Product::lowStockCount() doesn't exist
         if (method_exists(Product::class, 'lowStockCount')) {
             return Product::lowStockCount();
         }
 
-        // Basic implementation - adjust thresholds as needed
         return Product::whereRaw('quantity <= min_stock')->count();
     }
 
-    /**
-     * Get count of products expiring soon
-     */
     private function getExpiringSoonCount()
     {
-        // Fallback implementation in case Product::expiringSoonCount() doesn't exist
         if (method_exists(Product::class, 'expiringSoonCount')) {
             return Product::expiringSoonCount();
         }
 
-        // Basic implementation - products expiring in the next 30 days
         return Product::whereNotNull('expiry_date')
             ->where('expiry_date', '<=', now()->addDays(30))
             ->where('expiry_date', '>=', now())
@@ -517,7 +539,6 @@ class DashboardService
             $query->whereBetween('order_date', [$dates['start'], $dates['end']]);
         })->count();
 
-        // Calculate retention rate (customers who made purchases in both current and previous period)
         $previousPeriodStart = $dates['start']->copy()->subMonths(1);
         $previousPeriodEnd = $dates['end']->copy()->subMonths(1);
 
@@ -532,13 +553,10 @@ class DashboardService
         $retainedCustomers = $currentPeriodCustomers->intersect($previousPeriodCustomers)->count();
         $retentionRate = $previousPeriodCustomers->count() > 0 ? ($retainedCustomers / $previousPeriodCustomers->count()) * 100 : 0;
 
-        // Average order value
         $avgOrderValue = Sales::whereBetween('order_date', [$dates['start'], $dates['end']])->avg('total') ?? 0;
 
-        // Customer lifetime value (simplified calculation)
         $customerLifetimeValue = $totalCustomers > 0 ? Sales::sum('total') / $totalCustomers : 0;
 
-        // Get top customers
         $topCustomers = Sales::select('customer_id', DB::raw('SUM(total) as total_sales'))->with('customer')->whereHas('customer')->groupBy('customer_id')->orderByDesc('total_sales')->limit(5)->get()->map(
             fn($item) => (object) [
                 'id' => $item->customer_id,
@@ -565,7 +583,6 @@ class DashboardService
             $query->whereBetween('order_date', [$dates['start'], $dates['end']]);
         })->count();
 
-        // Payment performance (percentage of paid purchases)
         $totalPurchases = Purchase::whereBetween('order_date', [$dates['start'], $dates['end']])->count();
         $paidPurchases = Purchase::whereBetween('order_date', [$dates['start'], $dates['end']])
             ->where('status', 'Paid')
@@ -573,16 +590,13 @@ class DashboardService
 
         $supplierPaymentPerformance = $totalPurchases > 0 ? ($paidPurchases / $totalPurchases) * 100 : 0;
 
-        // Average purchase value
         $avgPurchaseValue = Purchase::whereBetween('order_date', [$dates['start'], $dates['end']])->avg('total') ?? 0;
 
-        // Total outstanding (unpaid + partial)
         $totalOutstanding =
             Purchase::whereBetween('order_date', [$dates['start'], $dates['end']])
                 ->whereIn('status', ['Unpaid', 'Partial'])
                 ->sum('total') ?? 0;
 
-        // Get top suppliers
         $topSuppliers = Purchase::select('supplier_id', DB::raw('SUM(total) as total_purchases'))->with('supplier')->whereHas('supplier')->groupBy('supplier_id')->orderByDesc('total_purchases')->limit(5)->get()->map(
             fn($item) => (object) [
                 'id' => $item->supplier_id,
@@ -602,11 +616,6 @@ class DashboardService
         ];
     }
 
-    /**
-     * Calculate average days between due_date and payment_date for paid invoices
-     *
-     * @return int
-     */
     private function getAverageDueDays()
     {
         $avgDays = Sales::where('status', 'Paid')
@@ -620,11 +629,6 @@ class DashboardService
         return round($avgDays) ?? 0;
     }
 
-    /**
-     * Calculate percentage of paid invoices vs total
-     *
-     * @return int
-     */
     private function getCollectionRate()
     {
         $totalInvoices = Sales::count();
@@ -678,54 +682,5 @@ class DashboardService
         }
 
         return $transactions->sortByDesc('date')->take(20)->values();
-    }
-
-    public function calculateDateRange($dateRange, $startDate = null, $endDate = null)
-    {
-        $now = Carbon::now();
-
-        switch ($dateRange) {
-            case 'today':
-                $start = $now->copy()->startOfDay();
-                $end = $now->copy()->endOfDay();
-                break;
-            case 'yesterday':
-                $start = $now->copy()->subDay()->startOfDay();
-                $end = $now->copy()->subDay()->endOfDay();
-                break;
-            case 'this_week':
-                $start = $now->copy()->startOfWeek();
-                $end = $now->copy()->endOfWeek();
-                break;
-            case 'last_week':
-                $start = $now->copy()->subWeek()->startOfWeek();
-                $end = $now->copy()->subWeek()->endOfWeek();
-                break;
-            case 'this_month':
-                $start = $now->copy()->startOfMonth();
-                $end = $now->copy()->endOfMonth();
-                break;
-            case 'last_month':
-                $start = $now->copy()->subMonth()->startOfMonth();
-                $end = $now->copy()->subMonth()->endOfMonth();
-                break;
-            case 'this_quarter':
-                $start = $now->copy()->startOfQuarter();
-                $end = $now->copy()->endOfQuarter();
-                break;
-            case 'this_year':
-                $start = $now->copy()->startOfYear();
-                $end = $now->copy()->endOfYear();
-                break;
-            case 'custom':
-                $start = $startDate ? Carbon::parse($startDate)->startOfDay() : $now->copy()->startOfMonth();
-                $end = $endDate ? Carbon::parse($endDate)->endOfDay() : $now->copy()->endOfMonth();
-                break;
-            default:
-                $start = $now->copy()->startOfMonth();
-                $end = $now->copy()->endOfMonth();
-        }
-
-        return ['start' => $start, 'end' => $end];
     }
 }

@@ -23,33 +23,25 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);
-        $products = Product::with(['category', 'supplier', 'unit', 'warehouse'])->paginate($entries);
+        $products = $this->productService->getPaginatedProducts($entries);
         $totalproduct = Product::count();
         $lowStockCount = Product::lowStockCount();
         $expiringSoonCount = Product::expiringSoonCount();
-        $categories = Categories::all();
-        $units = Unit::all();
-        $suppliers = Supplier::all();
-        $warehouses = Warehouse::all();
-        $mainWarehouse = Warehouse::where('is_main', true)->first();
-        $lowStockProducts = Product::getLowStockProducts();
-        $expiringSoonProducts = Product::getExpiringSoonProducts();
         $totalcategory = Categories::count();
 
-        return view('admin.product.index', compact('totalcategory', 'products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts'));
+        $formData = $this->productService->getProductFormData();
+
+        $lowStockProducts = Product::getLowStockProducts();
+        $expiringSoonProducts = Product::getExpiringSoonProducts();
+
+        return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'expiringSoonCount', 'lowStockProducts', 'expiringSoonProducts') + $formData);
     }
 
     public function create()
     {
-        $categories = Categories::all();
-        $units = Unit::all();
-        $suppliers = Supplier::all();
-        $warehouses = Warehouse::all();
-        $mainWarehouse = Warehouse::where('is_main', true)->first();
-        $lowStockProducts = Product::getLowStockProducts();
-        $expiringSoonProducts = Product::getExpiringSoonProducts();
+        $formData = $this->productService->getProductFormData();
 
-        return view('admin.product.product-create', compact('expiringSoonProducts', 'lowStockProducts', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
+        return view('admin.product.product-create', $formData);
     }
 
     public function modalView($id)

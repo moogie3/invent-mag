@@ -130,6 +130,39 @@ class CrmService
         ];
     }
 
+    public function getSupplierHistoricalPurchases($id)
+    {
+        $supplier = Supplier::findOrFail($id);
+
+        $historicalPurchases = $supplier->purchases()
+            ->with('items.product')
+            ->orderByDesc('order_date')
+            ->get()
+            ->map(function ($purchase) {
+                return [
+                    'id' => $purchase->id,
+                    'invoice' => $purchase->invoice,
+                    'order_date' => $purchase->order_date,
+                    'due_date' => $purchase->due_date,
+                    'payment_method' => $purchase->payment_type,
+                    'status' => $purchase->status,
+                    'total_amount' => $purchase->grand_total,
+                    'discount_amount' => $purchase->discount_total,
+                    'purchase_items' => $purchase->items->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'product' => $item->product,
+                            'quantity' => $item->quantity,
+                            'price' => $item->price,
+                            'total' => $item->total,
+                        ];
+                    }),
+                ];
+            });
+
+        return $historicalPurchases;
+    }
+
     public function storeCustomerInteraction(array $data, $customerId)
     {
         $interaction = new CustomerInteraction([

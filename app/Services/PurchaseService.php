@@ -66,6 +66,11 @@ class PurchaseService
     public function getPurchaseEditData($id)
     {
         $pos = Purchase::with(['items', 'supplier'])->find($id);
+
+        if (!$pos) {
+            return []; // Or throw an exception, depending on desired behavior
+        }
+
         $suppliers = Supplier::all();
         $items = POItem::all();
         $isPaid = $pos->status == 'Paid';
@@ -81,6 +86,7 @@ class PurchaseService
                 throw new \Exception('Invalid product data');
             }
 
+            /** @var \App\Models\Purchase $purchase */
             $purchase = Purchase::create([
                 'invoice' => $data['invoice'],
                 'supplier_id' => $data['supplier_id'],
@@ -123,6 +129,7 @@ class PurchaseService
     public function updatePurchase(Purchase $purchase, array $data): Purchase
     {
         return DB::transaction(function () use ($purchase, $data) {
+            /** @var \App\Models\Purchase $purchase */
             $products = json_decode($data['products'], true);
             if (!$products || !is_array($products)) {
                 throw new \Exception('Invalid product data');

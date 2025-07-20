@@ -95,12 +95,6 @@
                         <input type="text" class="form-control" id="customerPhoneEdit" name="phone_number">
                     </div>
                     <div class="mb-3">
-                        <label for="customerPaymentTermsEdit" class="form-label">Payment
-                            Terms</label>
-                        <input type="text" class="form-control" id="customerPaymentTermsEdit"
-                            name="payment_terms">
-                    </div>
-                    <div class="mb-3">
                         <label for="customerEmailEdit" class="form-label">Email</label>
                         <input type="email" class="form-control" id="customerEmailEdit" name="email">
                     </div>
@@ -110,6 +104,12 @@
                     <div class="mb-3">
                         <label for="customerImageEdit" class="form-label">Image</label>
                         <input type="file" class="form-control" id="customerImageEdit" name="image">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerPaymentTermsEdit" class="form-label">Payment
+                            Terms</label>
+                        <input type="text" class="form-control" id="customerPaymentTermsEdit"
+                            name="payment_terms">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -125,6 +125,6 @@
 <script>
     window.defaultPlaceholderUrl = "{{ asset('img/default_placeholder.png') }}";
 </script>
-        </div>
-    </div>
+</div>
+</div>
 </div>

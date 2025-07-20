@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property string $status
+ * @property string $discount_total_type
+ * @property float $discount_total
+ */
 class Purchase extends Model
 {
     use HasFactory;

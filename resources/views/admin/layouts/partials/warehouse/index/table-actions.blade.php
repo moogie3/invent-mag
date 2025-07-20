@@ -5,7 +5,8 @@
     <div class="dropdown-menu">
         <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editWarehouseModal"
             data-id="{{ $wo->id }}" data-name="{{ $wo->name }}" data-address="{{ $wo->address }}"
-            data-description="{{ $wo->description }}" data-is-main="{{ $wo->is_main }}">
+            data-description="{{ $wo->description }}" data-is-main="{{ $wo->is_main }}"
+            data-update-url="{{ route('admin.warehouse.update', $wo->id) }}">
             <i class="ti ti-edit me-2"></i> Edit
         </a>
 

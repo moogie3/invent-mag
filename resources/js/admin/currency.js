@@ -50,5 +50,4 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Toast notification functions (copied from user.js)
-document.addEventListener("DOMContentLoaded", function () {
+

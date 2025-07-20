@@ -57,6 +57,14 @@ class WarehouseController extends Controller
         ]);
 
         $warehouse = Warehouse::find($id);
+
+        if (!$warehouse) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Warehouse not found.'], 404);
+            }
+            return redirect()->route('admin.warehouse')->with('error', 'Warehouse not found.');
+        }
+
         $result = $this->warehouseService->updateWarehouse($warehouse, $request->all());
 
         if (!$result['success']) {

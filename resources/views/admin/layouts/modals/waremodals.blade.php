@@ -146,7 +146,10 @@
             modal.find('#isMainWarehouseEdit').prop('checked', isMain == 1);
 
             // Set form action URL
-            modal.find('form').attr('action', '/admin/warehouse/' + id);
+            var updateUrl = button.data('update-url');
+            console.log('Warehouse ID:', id);
+            console.log('Update URL:', updateUrl);
+            modal.find('form').attr('action', updateUrl);
         });
 
         // For Delete Modal - check if it's main warehouse

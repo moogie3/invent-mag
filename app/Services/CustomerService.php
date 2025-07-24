@@ -126,4 +126,11 @@ class CustomerService
         $image->storeAs('public/image', $imageName);
         return $imageName;
     }
+
+    public function getCustomerMetrics()
+    {
+        return [
+            'totalcustomer' => Customer::count(),
+        ];
+    }
 }

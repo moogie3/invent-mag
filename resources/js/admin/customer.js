@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         );
                     } else {
                         form.reset();
-                        location.reload();
+                        updatePageMetrics('customer');
                     }
                 } else {
                     showToast(

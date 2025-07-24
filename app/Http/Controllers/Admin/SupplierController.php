@@ -16,6 +16,12 @@ class SupplierController extends Controller
         $this->supplierService = $supplierService;
     }
 
+    public function getMetrics()
+    {
+        $metrics = $this->supplierService->getSupplierMetrics();
+        return response()->json($metrics);
+    }
+
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);

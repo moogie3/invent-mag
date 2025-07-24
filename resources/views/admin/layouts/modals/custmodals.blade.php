@@ -125,6 +125,3 @@
 <script>
     window.defaultPlaceholderUrl = "{{ asset('img/default_placeholder.png') }}";
 </script>
-</div>
-</div>
-</div>

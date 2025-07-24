@@ -63,4 +63,13 @@ class SupplierService
         $image->storeAs('public/image', $imageName);
         return $imageName;
     }
+
+    public function getSupplierMetrics()
+    {
+        return [
+            'totalsupplier' => Supplier::count(),
+            'inCount' => Supplier::where('location', 'IN')->count(),
+            'outCount' => Supplier::where('location', 'OUT')->count(),
+        ];
+    }
 }

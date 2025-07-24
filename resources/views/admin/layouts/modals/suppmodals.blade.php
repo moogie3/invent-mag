@@ -115,10 +115,13 @@
                         <label for="supplierEmailEdit" class="form-label">Email</label>
                         <input type="email" class="form-control" id="supplierEmailEdit" name="email">
                     </div>
+                    <div class="mb-3 text-center" id="currentSupplierImageContainer">
+                        {{-- Image or icon will be displayed here by JavaScript --}}
+                    </div>
                     <div class="mb-3">
                         <label for="supplierImageEdit" class="form-label">Image</label>
-                        <input type="file" class="form-control" id="supplierImageEdit" name="image" accept="image/*">
-                        <div id="currentSupplierImageContainer" class="mt-2"></div>
+                        <input type="file" class="form-control" id="supplierImageEdit" name="image"
+                            accept="image/*">
                     </div>
                     <div class="mb-3">
                         <label for="supplierLocationEdit" class="form-label">Location</label>
@@ -144,4 +147,6 @@
     </div>
 </div>
 
-
+<script>
+    window.defaultPlaceholderUrl = "{{ asset('img/default_placeholder.png') }}";
+</script>

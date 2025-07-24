@@ -29,7 +29,7 @@ class SalesService
         $sales = $query->paginate($entries);
         $totalinvoice = $query->count();
         $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
-        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created', now()->year)->sum('total');
+        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
         $pendingOrders = Sales::where('status', 'Unpaid')->count();
         $dueInvoices = Sales::where('status', 'Unpaid')
             ->whereDate('due_date', '>=', now())

@@ -16,6 +16,12 @@ class CustomerController extends Controller
         $this->customerService = $customerService;
     }
 
+    public function getMetrics()
+    {
+        $metrics = $this->customerService->getCustomerMetrics();
+        return response()->json($metrics);
+    }
+
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);

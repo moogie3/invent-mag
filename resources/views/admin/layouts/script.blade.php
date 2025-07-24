@@ -120,5 +120,3 @@
         document.getElementById('deleteForm').setAttribute('action', action);
     }
 </script>
-
-@stack('scripts')

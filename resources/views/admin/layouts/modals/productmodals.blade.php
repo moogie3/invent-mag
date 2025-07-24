@@ -457,8 +457,10 @@
         <div class="card-body p-3">
             <div class="row align-items-center">
                 <div class="col-md-2">
-                    <img class="product-image rounded" src="" alt="Product"
-                        style="width: 60px; height: 60px; object-fit: cover;">
+                    <div class="product-image-container">
+                        <img class="product-image rounded" src="" alt="Product"
+                            style="width: 60px; height: 60px; object-fit: cover;">
+                    </div>
                 </div>
                 <div class="col-md-3">
                     <h6 class="mb-1 product-name"></h6>
@@ -493,3 +495,6 @@
         </div>
     </div>
 </div>
+<script>
+    window.defaultPlaceholderUrl = "{{ asset('img/default_placeholder.png') }}";
+</script>

@@ -48,5 +48,6 @@
     </div>
     @include('admin.layouts.footer')
     @include('admin.layouts.script')
+    @include('admin.layouts.partials.session-notifications')
     @vite('resources/js/admin/layouts/page-loader.js')
 </body>

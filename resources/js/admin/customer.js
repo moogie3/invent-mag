@@ -3,72 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const createCustomerModal = document.getElementById("createCustomerModal");
     const crmCustomerModal = document.getElementById("crmCustomerModal");
 
-    // Function to handle form submission via AJAX
-    function handleFormSubmission(event, modalElement, isCreate = false) {
-        event.preventDefault();
-
-        const form = event.target;
-        const formData = new FormData(form);
-        const actionUrl = form.action;
-        const method = form.method;
-
-        fetch(actionUrl, {
-            method: method === "GET" ? "GET" : "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    showToast("Success", data.message, "success");
-                    const bsModal = bootstrap.Modal.getInstance(modalElement);
-                    if (bsModal) {
-                        bsModal.hide();
-                        bsModal._element.addEventListener(
-                            "hidden.bs.modal",
-                            function handler() {
-                                bsModal._element.removeEventListener(
-                                    "hidden.bs.modal",
-                                    handler
-                                );
-                                form.reset();
-                                const backdrops =
-                                    document.querySelectorAll(
-                                        ".modal-backdrop"
-                                    );
-                                backdrops.forEach((backdrop) =>
-                                    backdrop.remove()
-                                );
-                                location.reload();
-                            }
-                        );
-                    } else {
-                        form.reset();
-                        updatePageMetrics('customer');
-                    }
-                } else {
-                    showToast(
-                        "Error",
-                        data.message || "Operation failed.",
-                        "error"
-                    );
-                    console.error("Form submission error:", data.errors);
-                }
-            })
-            .catch((error) => {
-                console.error("Error during fetch:", error);
-                showToast(
-                    "Error",
-                    "An error occurred. Please check the console.",
-                    "error"
-                );
-            });
-    }
+    
 
     // Edit customer modal logic
     if (editCustomerModal) {
@@ -116,9 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     customerImage !== defaultPlaceholderUrl
                 ) {
                     currentCustomerImageContainer.innerHTML = `
-                        <img src="${customerImage}" alt="${
-                        customerName || "Customer Image"
-                    }"
+                        <img src="${customerImage}" alt="${customerName || 'Customer Image'}"
                              class="img-thumbnail"
                              style="max-width: 80px; max-height: 80px; object-fit: cover;">
                     `;
@@ -155,9 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 data.customer.image !== defaultPlaceholderUrl
                             ) {
                                 currentCustomerImageContainer.innerHTML = `
-                                    <img src="${data.customer.image}" alt="${
-                                    data.customer.name || "Customer Image"
-                                }"
+                                    <img src="${data.customer.image}" alt="${data.customer.name || 'Customer Image'}"
                                          class="img-thumbnail"
                                          style="max-width: 80px; max-height: 80px; object-fit: cover;">
                                 `;
@@ -188,21 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        const editCustomerForm = document.getElementById("editCustomerForm");
-        if (editCustomerForm) {
-            editCustomerForm.addEventListener("submit", (event) =>
-                handleFormSubmission(event, editCustomerModal)
-            );
-        }
-    }
-
-    // Create customer modal logic
-    const createCustomerForm = document.getElementById("createCustomerForm");
-    if (createCustomerForm) {
-        createCustomerForm.addEventListener("submit", (event) =>
-            handleFormSubmission(event, createCustomerModal, true)
-        );
-    }
+        
 
     // CRM Modal Logic
     if (crmCustomerModal) {
@@ -375,15 +292,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                 );
                                 newInteraction.innerHTML = `
                                 <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1">${
-                                        data.type.charAt(0).toUpperCase() +
-                                        data.type.slice(1)
-                                    } on ${new Date(
-                                    data.interaction_date
-                                ).toLocaleDateString("id-ID")}</h5>
-                                    <small class="text-muted">by ${
-                                        data.user.name
-                                    }</small>
+                                    <h5 class="mb-1">${data.type.charAt(0).toUpperCase() + data.type.slice(1)} on ${new Date(data.interaction_date).toLocaleDateString("id-ID")}</h5>
+                                    <small class="text-muted">by ${data.user.name}</small>
                                 </div>
                                 <p class="mb-1">${data.notes}</p>
                             `;
@@ -524,9 +434,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             data.customer.image !== defaultPlaceholderUrl
                         ) {
                             crmCustomerImageContainer.innerHTML = `
-                                <img src="${data.customer.image}" alt="${
-                                data.customer.name || "Customer Image"
-                            }"
+                                <img src="${data.customer.image}" alt="${data.customer.name || 'Customer Image'}"
                                      class="img-thumbnail"
                                      style="max-width: 120px; max-height: 120px; object-fit: cover;">
                             `;
@@ -610,19 +518,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                     );
                                     interactionElement.innerHTML = `
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">${
-                                            interaction.type
-                                                .charAt(0)
-                                                .toUpperCase() +
-                                            interaction.type.slice(1)
-                                        } on ${new Date(
-                                        interaction.interaction_date
-                                    ).toLocaleDateString("id-ID")}</h5>
-                                        <small class="text-muted">by ${
-                                            interaction.user
-                                                ? interaction.user.name
-                                                : "Unknown"
-                                        }</small>
+                                        <h5 class="mb-1">${interaction.type.charAt(0).toUpperCase() + interaction.type.slice(1)} on ${new Date(interaction.interaction_date).toLocaleDateString("id-ID")}</h5>
+                                        <small class="text-muted">by ${interaction.user ? interaction.user.name : "Unknown"}</small>
                                     </div>
                                     <p class="mb-1">${interaction.notes}</p>
                                 `;
@@ -657,52 +554,26 @@ document.addEventListener("DOMContentLoaded", function () {
                                     document.createElement("div");
                                 saleElement.classList.add("accordion-item");
                                 saleElement.innerHTML = `
-                                    <h2 class="accordion-header" id="heading-${
-                                        sale.id
-                                    }">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
-                                            sale.id
-                                        }" aria-expanded="false" aria-controls="collapse-${
-                                    sale.id
-                                }">
+                                    <h2 class="accordion-header" id="heading-${sale.id}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${sale.id}" aria-expanded="false" aria-controls="collapse-${sale.id}">
                                             <div class="d-flex justify-content-between w-100 pe-3">
                                                 <div>
-                                                    Invoice #${
-                                                        sale.invoice
-                                                    } - ${formatDateToCustomString(
-                                    sale.created_at
-                                )}
-                                                    ${getStatusBadgeHtml(
-                                                        sale.status,
-                                                        sale.due_date
-                                                    )}
+                                                    Invoice #${sale.invoice} - ${formatDateToCustomString(sale.created_at)}
+                                                    ${getStatusBadgeHtml(sale.status, sale.due_date)}
                                                 </div>
-                                                <div class="fw-bold">${formatCurrency(
-                                                    sale.total
-                                                )}</div>
+                                                <div class="fw-bold">${formatCurrency(sale.total)}</div>
                                             </div>
                                         </button>
                                     </h2>
-                                    <div id="collapse-${
-                                        sale.id
-                                    }" class="accordion-collapse collapse" aria-labelledby="heading-${
-                                    sale.id
-                                }" data-bs-parent="#transactionHistory">
+                                    <div id="collapse-${sale.id}" class="accordion-collapse collapse" aria-labelledby="heading-${sale.id}" data-bs-parent="#transactionHistory">
                                         <div class="accordion-body">
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
-                                                    <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(
-                                                        sale.order_date
-                                                    )}</p>
-                                                    <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(
-                                                        sale.due_date
-                                                    )}</p>
+                                                    <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(sale.order_date)}</p>
+                                                    <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(sale.due_date)}</p>
                                                 </div>
                                                 <div class="col-md-6 text-end">
-                                                    <p class="mb-1"><strong>Payment Type:</strong> ${
-                                                        sale.payment_type ||
-                                                        "N/A"
-                                                    }</p>
+                                                    <p class="mb-1"><strong>Payment Type:</strong> ${sale.payment_type || "N/A"}</p>
                                                 </div>
                                             </div>
                                             <h6 class="fs-4">Items:</h6>
@@ -717,41 +588,14 @@ document.addEventListener("DOMContentLoaded", function () {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        ${
-                                                            sale.sales_items &&
-                                                            sale.sales_items
-                                                                .length > 0
-                                                                ? sale.sales_items
-                                                                      .map(
-                                                                          (
-                                                                              item
-                                                                          ) => `
+                                                        ${sale.sales_items && sale.sales_items.length > 0 ? sale.sales_items.map((item) => `
                                                             <tr>
-                                                                <td>${
-                                                                    item.product
-                                                                        ? item
-                                                                              .product
-                                                                              .name
-                                                                        : "N/A"
-                                                                }</td>
-                                                                <td class="text-center">${
-                                                                    item.quantity ||
-                                                                    0
-                                                                }</td>
-                                                                <td class="text-end">${formatCurrency(
-                                                                    item.customer_price ||
-                                                                        0
-                                                                )}</td>
-                                                                <td class="text-end">${formatCurrency(
-                                                                    item.total ||
-                                                                        0
-                                                                )}</td>
+                                                                <td>${item.product ? item.product.name : "N/A"}</td>
+                                                                <td class="text-center">${item.quantity || 0}</td>
+                                                                <td class="text-end">${formatCurrency(item.customer_price || 0)}</td>
+                                                                <td class="text-end">${formatCurrency(item.total || 0)}</td>
                                                             </tr>
-                                                        `
-                                                                      )
-                                                                      .join("")
-                                                                : '<tr><td colspan="4" class="text-center">No items found</td></tr>'
-                                                        }
+                                                        `).join("") : '<tr><td colspan="4" class="text-center">No items found</td></tr>'}
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -882,13 +726,9 @@ document.addEventListener("DOMContentLoaded", function () {
                                                         )}
                                                     </span>
                                                 </div>
-                                                <h6 class="mb-1 fw-semibold fs-5">${
-                                                    purchase.product_name
-                                                }</h6>
+                                                <h6 class="mb-1 fw-semibold fs-5">${purchase.product_name}</h6>
                                                 <div class="text-muted small">
-                                                    Quantity: <span class="fw-medium">${
-                                                        purchase.quantity
-                                                    }</span>
+                                                    Quantity: <span class="fw-medium">${purchase.quantity}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 text-md-end mt-3 mt-md-0">
@@ -899,20 +739,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                                 </div>
                                                 <div class="small text-muted">
                                                 Customer Price:
-                                                    ${formatCurrency(
-                                                        purchase.price_at_purchase
-                                                    )} per unit
+                                                    ${formatCurrency(purchase.price_at_purchase)} per unit
                                                 </div>
-                                                ${
-                                                    purchase.customer_latest_price !==
-                                                    purchase.price_at_purchase
-                                                        ? `<div class="small text-info">
-                                                        Our Price: ${formatCurrency(
-                                                            purchase.customer_latest_price
-                                                        )}
-                                                    </div>`
-                                                        : ""
-                                                }
+                                                ${purchase.customer_latest_price !== purchase.price_at_purchase ? `<div class="small text-info">
+                                                        Our Price: ${formatCurrency(purchase.customer_latest_price)}
+                                                    </div>` : ""}
                                             </div>
                                         </div>
                                     </div>
@@ -1044,39 +875,18 @@ document.addEventListener("DOMContentLoaded", function () {
                             data.product_history.forEach((product) => {
                                 contentHtml += `
                             <div class="accordion-item">
-                                <h2 class="accordion-header" id="product-heading-${product.product_name.replace(
-                                    /\s+/g,
-                                    "-"
-                                )}">
-                                    <button class="accordion-button collapsed fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#product-collapse-${product.product_name.replace(
-                                        /\s+/g,
-                                        "-"
-                                    )}" aria-expanded="false" aria-controls="product-collapse-${product.product_name.replace(
-                                    /\s+/g,
-                                    "-"
-                                )}">
+                                <h2 class="accordion-header" id="product-heading-${product.product_name.replace(/\s+/g, "-")}">
+                                    <button class="accordion-button collapsed fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#product-collapse-${product.product_name.replace(/\s+/g, "-")}" aria-expanded="false" aria-controls="product-collapse-${product.product_name.replace(/\s+/g, "-")}">
                                         <div class="d-flex justify-content-between w-100 pe-3">
-                                            <span>${
-                                                product.product_name
-                                            }</span>
-                                            <span class="text-muted fs-4">Last Price: ${formatCurrency(
-                                                product.last_price
-                                            )}</span>
+                                            <span>${product.product_name}</span>
+                                            <span class="text-muted fs-4">Last Price: ${formatCurrency(product.last_price)}</span>
                                         </div>
                                     </button>
                                 </h2>
-                                <div id="product-collapse-${product.product_name.replace(
-                                    /\s+/g,
-                                    "-"
-                                )}" class="accordion-collapse collapse" aria-labelledby="product-heading-${product.product_name.replace(
-                                    /\s+/g,
-                                    "-"
-                                )}" data-bs-parent="#crmProductHistoryAccordion">
+                                <div id="product-collapse-${product.product_name.replace(/\s+/g, "-")}" class="accordion-collapse collapse" aria-labelledby="product-heading-${product.product_name.replace(/\s+/g, "-")}" data-bs-parent="#crmProductHistoryAccordion">
                                     <div class="accordion-body">
                                         <div class="list-group list-group-flush">
-                                            ${product.history
-                                                .map(
-                                                    (item) => `
+                                            ${product.history.map((item) => `
                                                 <div class="list-group-item px-0">
                                                     <div class="row align-items-center">
                                                         <div class="col-md-5 mb-2 mb-md-0">
@@ -1085,32 +895,22 @@ document.addEventListener("DOMContentLoaded", function () {
                                                                     <i class="ti ti-file-invoice text-primary fs-2"></i>
                                                                 </div>
                                                                 <div>
-                                                                    <h6 class="mb-0 fs-4">Invoice #${
-                                                                        item.invoice
-                                                                    }</h6>
-                                                                    <small class="text-muted">${formatDateToCustomString(
-                                                                        item.order_date
-                                                                    )}</small>
+                                                                    <h6 class="mb-0 fs-4">Invoice #${item.invoice}</h6>
+                                                                    <small class="text-muted">${formatDateToCustomString(item.order_date)}</small>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="col-6 col-md-3 text-center">
                                                             <div class="text-muted small">Quantity</div>
-                                                            <div class="fw-bold">${
-                                                                item.quantity
-                                                            }</div>
+                                                            <div class="fw-bold">${item.quantity}</div>
                                                         </div>
                                                         <div class="col-6 col-md-4 text-end">
                                                             <div class="text-muted small">Price</div>
-                                                            <div class="fw-bold text-success">${formatCurrency(
-                                                                item.price_at_purchase
-                                                            )}</div>
+                                                            <div class="fw-bold text-success">${formatCurrency(item.price_at_purchase)}</div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            `
-                                                )
-                                                .join("")}
+                                            `).join("")}
                                         </div>
                                     </div>
                                 </div>
@@ -1163,4 +963,5 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
         }
     }
-});
+}
+}

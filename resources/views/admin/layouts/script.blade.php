@@ -11,8 +11,8 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 
-{{-- Global Toast Helper --}}
-@vite('resources/js/admin/helpers/toast.js')
+{{-- Global Notification Helper --}}
+@vite('resources/js/admin/helpers/notification.js')
 
 {{-- SCRIPT FOR ADMIN POS  --}}
 @if (request()->is('admin/pos'))
@@ -108,11 +108,7 @@
     @vite('resources/js/admin/sales-pipeline.js')
 @endif
 
-{{--  MODAL --}}
-@if ($errors->any() || session('success'))
-    @include('admin.layouts.modals')
-    @vite('resources/js/admin/layouts/modal.js')
-@endif
+
 
 {{-- DELETE MODAL --}}
 <script>

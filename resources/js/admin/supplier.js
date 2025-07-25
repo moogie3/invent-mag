@@ -5,73 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Store selected checkbox states globally for suppliers
     let selectedSupplierIds = new Set();
 
-    // Function to handle form submission via AJAX
-    function handleFormSubmission(event, modalElement, isCreate = false) {
-        event.preventDefault();
-
-        const form = event.target;
-        const formData = new FormData(form);
-        const actionUrl = form.action;
-        const method = form.method;
-
-        fetch(actionUrl, {
-            method: method === "GET" ? "GET" : "POST", // Ensure POST for PUT/DELETE via _method
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    showToast("Success", data.message, "success");
-                    const bsModal = bootstrap.Modal.getInstance(modalElement);
-                    if (bsModal) {
-                        bsModal._element.addEventListener(
-                            "hidden.bs.modal",
-                            function handler() {
-                                bsModal._element.removeEventListener(
-                                    "hidden.bs.modal",
-                                    handler
-                                );
-                                form.reset(); // Clear form fields
-                                // Explicitly remove any remaining modal backdrops
-                                const backdrops =
-                                    document.querySelectorAll(
-                                        ".modal-backdrop"
-                                    );
-                                backdrops.forEach((backdrop) =>
-                                    backdrop.remove()
-                                );
-                                location.reload();
-                            }
-                        );
-                        bsModal.hide();
-                    } else {
-                        form.reset();
-                        updatePageMetrics('supplier');
-                    }
-                } else {
-                    showToast(
-                        "Error",
-                        data.message || "Operation failed.",
-                        "error"
-                    );
-                    console.error("Form submission error:", data.errors);
-                }
-            })
-            .catch((error) => {
-                console.error("Error during fetch:", error);
-                showToast(
-                    "Error",
-                    "An error occurred. Please check the console.",
-                    "error"
-                );
-            });
-    }
+    
 
     // Event listener for edit modal show
     if (editSupplierModal) {
@@ -122,9 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     supplierImage !== defaultPlaceholderUrl
                 ) {
                     currentSupplierImageContainer.innerHTML = `
-                        <img src="${supplierImage}" alt="${
-                        supplierName || "Supplier Image"
-                    }"
+                        <img src="${supplierImage}" alt="${supplierName || 'Supplier Image'}"
                              class="img-thumbnail"
                              style="max-width: 80px; max-height: 80px; object-fit: cover;">
                     `;
@@ -165,9 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 data.supplier.image !== defaultPlaceholderUrl
                             ) {
                                 currentSupplierImageContainer.innerHTML = `
-                                    <img src="${data.supplier.image}" alt="${
-                                    data.supplier.name || "Supplier Image"
-                                }"
+                                    <img src="${data.supplier.image}" alt="${data.supplier.name || 'Supplier Image'}"
                                          class="img-thumbnail"
                                          style="max-width: 80px; max-height: 80px; object-fit: cover;">
                                 `;
@@ -197,22 +127,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
             }
         });
-
-        // Add submit listener for edit form
-        const editSupplierForm = document.getElementById("editSupplierForm");
-        if (editSupplierForm) {
-            editSupplierForm.addEventListener("submit", (event) =>
-                handleFormSubmission(event, editSupplierModal)
-            );
-        }
-    }
-
-    // Add submit listener for create form
-    const createSupplierForm = document.getElementById("createSupplierForm");
-    if (createSupplierForm) {
-        createSupplierForm.addEventListener("submit", (event) =>
-            handleFormSubmission(event, createSupplierModal, true)
-        );
     }
 
     // Toast notification functions (copied from user.js)
@@ -381,9 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <tr data-id="${supplier.id}">
                     <td class="sort-no no-print">${index + 1}</td>
                     <td class="sort-image">
-                        <img src="${
-                            supplier.image || "/img/default_placeholder.png"
-                        }" alt="Supplier Image" class="avatar avatar-sm">
+                        <img src="${supplier.image || '/img/default_placeholder.png'}" alt="Supplier Image" class="avatar avatar-sm">
                     </td>
                     <td class="sort-code">${supplier.code}</td>
                     <td class="sort-name">${supplier.name}</td>
@@ -399,9 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             </button>
                             <div class="dropdown-menu">
                                 <a href="#" class="dropdown-item srm-supplier-btn"
-                                                                    data-id="${
-                                                                        supplier.id
-                                                                    }" data-bs-toggle="modal"
+                                                                    data-id="${supplier.id}" data-bs-toggle="modal"
                                                                     data-bs-target="#srmSupplierModal">
                                                                     <i class="ti ti-user-search me-2"></i> View SRM
                                                                 </a>
@@ -412,22 +322,16 @@ document.addEventListener("DOMContentLoaded", function () {
                                     data-code="${supplier.code}"
                                     data-name="${supplier.name}"
                                     data-address="${supplier.address}"
-                                    data-phone_number="${
-                                        supplier.phone_number || ""
-                                    }"
+                                    data-phone_number="${supplier.phone_number || ''}"
                                     data-location="${supplier.location}"
-                                    data-payment_terms="${
-                                        supplier.payment_terms
-                                    }"
-                                    data-email="${supplier.email || ""}"
-                                    data-image="${supplier.image || ""}">
+                                    data-payment_terms="${supplier.payment_terms}"
+                                    data-email="${supplier.email || ''}"
+                                    data-image="${supplier.image || ''}">
                                     <i class="ti ti-edit me-2"></i> Edit
                                 </a>
                                 <button type="button" class="dropdown-item text-danger"
                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                    onclick="setDeleteFormAction('/admin/supplier/destroy/${
-                                        supplier.id
-                                    }')">
+                                    onclick="setDeleteFormAction('/admin/supplier/destroy/${supplier.id}')">
                                     <i class="ti ti-trash me-2"></i> Delete
                                 </button>
                             </div>
@@ -648,15 +552,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                 );
                                 newInteraction.innerHTML = `
                                 <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1">${
-                                        data.type.charAt(0).toUpperCase() +
-                                        data.type.slice(1)
-                                    } on ${new Date(
-                                    data.interaction_date
-                                ).toLocaleDateString("id-ID")}</h5>
-                                    <small class="text-muted">by ${
-                                        data.user.name
-                                    }</small>
+                                    <h5 class="mb-1">${data.type.charAt(0).toUpperCase() + data.type.slice(1)} on ${new Date(data.interaction_date).toLocaleDateString("id-ID")}</h5>
+                                    <small class="text-muted">by ${data.user.name}</small>
                                 </div>
                                 <p class="mb-1">${data.notes}</p>
                             `;
@@ -816,11 +713,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             supplierImageRelativePath !== defaultPlaceholderUrl
                         ) {
                             srmSupplierImageContainer.innerHTML = `
-                                <img src="${data.supplier.image}" alt="${
-                                data.supplier.name || "Supplier Image"
-                            }"
-                                     class="img-thumbnail"
-                                     style="max-width: 120px; max-height: 120px; object-fit: cover;">
+                                <div class="img-thumbnail d-flex align-items-center justify-content-center"
+                                     style="width: 120px; height: 120px; margin: 0 auto;">
+                                    <i class="ti ti-photo fs-1 text-muted"></i>
+                                </div>
                             `;
                         } else {
                             srmSupplierImageContainer.innerHTML = `
@@ -905,19 +801,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                     );
                                     interactionElement.innerHTML = `
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">${
-                                            interaction.type
-                                                .charAt(0)
-                                                .toUpperCase() +
-                                            interaction.type.slice(1)
-                                        } on ${new Date(
-                                        interaction.interaction_date
-                                    ).toLocaleDateString("id-ID")}</h5>
-                                        <small class="text-muted">by ${
-                                            interaction.user
-                                                ? interaction.user.name
-                                                : "Unknown"
-                                        }</small>
+                                        <h5 class="mb-1">${interaction.type.charAt(0).toUpperCase() + interaction.type.slice(1)} on ${new Date(interaction.interaction_date).toLocaleDateString("id-ID")}</h5>
+                                        <small class="text-muted">by ${interaction.user ? interaction.user.name : "Unknown"}</small>
                                 </div>
                                 <p class="mb-1">${interaction.notes}</p>
                             `;
@@ -959,52 +844,26 @@ document.addEventListener("DOMContentLoaded", function () {
                                     document.createElement("div");
                                 purchaseElement.classList.add("accordion-item");
                                 purchaseElement.innerHTML = `
-                                    <h2 class="accordion-header" id="heading-${
-                                        purchase.id
-                                    }">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
-                                            purchase.id
-                                        }" aria-expanded="false" aria-controls="collapse-${
-                                    purchase.id
-                                }">
+                                    <h2 class="accordion-header" id="heading-${purchase.id}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${purchase.id}" aria-expanded="false" aria-controls="collapse-${purchase.id}">
                                             <div class="d-flex justify-content-between w-100 pe-3">
                                                 <div>
-                                                    Invoice #${
-                                                        purchase.invoice
-                                                    } - ${formatDateToCustomString(
-                                    purchase.created_at
-                                )}
-                                                    ${getStatusBadgeHtml(
-                                                        purchase.status,
-                                                        purchase.due_date
-                                                    )}
+                                                    Invoice #${purchase.invoice} - ${formatDateToCustomString(purchase.created_at)}
+                                                    ${getStatusBadgeHtml(purchase.status, purchase.due_date)}
                                                 </div>
-                                                <div class="fw-bold">${formatCurrency(
-                                                    purchase.total_amount
-                                                )}</div>
+                                                <div class="fw-bold">${formatCurrency(purchase.total_amount)}</div>
                                             </div>
                                         </button>
                                     </h2>
-                                    <div id="collapse-${
-                                        purchase.id
-                                    }" class="accordion-collapse collapse" aria-labelledby="heading-${
-                                    purchase.id
-                                }" data-bs-parent="#srmTransactionHistory">
+                                    <div id="collapse-${purchase.id}" class="accordion-collapse collapse" aria-labelledby="heading-${purchase.id}" data-bs-parent="#srmTransactionHistory">
                                         <div class="accordion-body">
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
-                                                    <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(
-                                                        purchase.date
-                                                    )}</p>
-                                                    <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(
-                                                        purchase.due_date
-                                                    )}</p>
+                                                    <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(purchase.date)}</p>
+                                                    <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(purchase.due_date)}</p>
                                                 </div>
                                                 <div class="col-md-6 text-end">
-                                                    <p class="mb-1"><strong>Payment Type:</strong> ${
-                                                        purchase.payment_method ||
-                                                        "N/A"
-                                                    }</p>
+                                                    <p class="mb-1"><strong>Payment Type:</strong> ${purchase.payment_method || "N/A"}</p>
                                                 </div>
                                             </div>
                                             <h6 class="fs-4">Items:</h6>
@@ -1019,42 +878,14 @@ document.addEventListener("DOMContentLoaded", function () {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        ${
-                                                            purchase.purchase_items &&
-                                                            purchase
-                                                                .purchase_items
-                                                                .length > 0
-                                                                ? purchase.purchase_items
-                                                                      .map(
-                                                                          (
-                                                                              item
-                                                                          ) => `
+                                                        ${purchase.purchase_items && purchase.purchase_items.length > 0 ? purchase.purchase_items.map((item) => `
                                                             <tr>
-                                                                <td>${
-                                                                    item.product
-                                                                        ? item
-                                                                              .product
-                                                                              .name
-                                                                        : "N/A"
-                                                                }</td>
-                                                                <td class="text-center">${
-                                                                    item.quantity ||
-                                                                    0
-                                                                }</td>
-                                                                <td class="text-end">${formatCurrency(
-                                                                    item.price ||
-                                                                        0
-                                                                )}</td>
-                                                                <td class="text-end">${formatCurrency(
-                                                                    item.total ||
-                                                                        0
-                                                                )}</td>
+                                                                <td>${item.product ? item.product.name : "N/A"}</td>
+                                                                <td class="text-center">${item.quantity || 0}</td>
+                                                                <td class="text-end">${formatCurrency(item.price || 0)}</td>
+                                                                <td class="text-end">${formatCurrency(item.total || 0)}</td>
                                                             </tr>
-                                                        `
-                                                                      )
-                                                                      .join("")
-                                                                : '<tr><td colspan="4" class="text-center">No items found</td></tr>'
-                                                        }
+                                                        `).join("") : '<tr><td colspan="4" class="text-center">No items found</td></tr>'}
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -1170,52 +1001,26 @@ document.addEventListener("DOMContentLoaded", function () {
                             data.historical_purchases.forEach((purchase) => {
                                 contentHtml += `
                             <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading-${
-                                    purchase.id
-                                }">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
-                                        purchase.id
-                                    }" aria-expanded="false" aria-controls="collapse-${
-                                    purchase.id
-                                }">
+                                <h2 class="accordion-header" id="heading-${purchase.id}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${purchase.id}" aria-expanded="false" aria-controls="collapse-${purchase.id}">
                                         <div class="d-flex justify-content-between w-100 pe-3">
                                             <div>
-                                                Invoice #${
-                                                    purchase.invoice
-                                                } - ${formatDateToCustomString(
-                                    purchase.order_date
-                                )}
-                                                ${getStatusBadgeHtml(
-                                                    purchase.status,
-                                                    purchase.due_date
-                                                )}
+                                                Invoice #${purchase.invoice} - ${formatDateToCustomString(purchase.order_date)}
+                                                ${getStatusBadgeHtml(purchase.status, purchase.due_date)}
                                             </div>
-                                            <div class="fw-bold">${formatCurrency(
-                                                purchase.total_amount
-                                            )}</div>
+                                            <div class="fw-bold">${formatCurrency(purchase.total_amount)}</div>
                                         </div>
                                     </button>
                                 </h2>
-                                <div id="collapse-${
-                                    purchase.id
-                                }" class="accordion-collapse collapse" aria-labelledby="heading-${
-                                    purchase.id
-                                }" data-bs-parent="#srmHistoricalPurchasesAccordion">
+                                <div id="collapse-${purchase.id}" class="accordion-collapse collapse" aria-labelledby="heading-${purchase.id}" data-bs-parent="#srmHistoricalPurchasesAccordion">
                                     <div class="accordion-body">
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(
-                                                    purchase.order_date
-                                                )}</p>
-                                                <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(
-                                                    purchase.due_date
-                                                )}</p>
+                                                <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(purchase.order_date)}</p>
+                                                <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(purchase.due_date)}</p>
                                             </div>
                                             <div class="col-md-6 text-end">
-                                                <p class="mb-1"><strong>Payment Type:</strong> ${
-                                                    purchase.payment_method ||
-                                                    "N/A"
-                                                }</p>
+                                                <p class="mb-1"><strong>Payment Type:</strong> ${purchase.payment_method || "N/A"}</p>
                                             </div>
                                         </div>
                                         <h6 class="fs-4">Items:</h6>

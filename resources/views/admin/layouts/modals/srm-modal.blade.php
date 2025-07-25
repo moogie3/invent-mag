@@ -46,8 +46,10 @@
                                     <div class="row g-3">
                                         <div class="col-md-4 text-center">
                                             <div id="srmSupplierImageContainer" class="supplier-image-placeholder mb-3">
-                                                <img id="srmSupplierImage" src="" alt="Supplier Image"
-                                                    class="img-thumbnail" style="max-width: 120px; max-height: 120px;">
+                                                <div class="img-thumbnail d-flex align-items-center justify-content-center"
+                                                     style="width: 120px; height: 120px; margin: 0 auto;">
+                                                    <i class="ti ti-photo fs-1 text-muted"></i>
+                                                </div>
                                             </div>
                                             <h4 id="srmSupplierName" class="mb-1"></h4>
                                         </div>

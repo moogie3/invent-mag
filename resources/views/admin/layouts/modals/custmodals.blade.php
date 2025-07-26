@@ -31,7 +31,7 @@
                     Create Customer</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="createCustomerForm" action="{{ route('admin.customer.store') }}" method="POST">
+            <form id="createCustomerForm" action="{{ route('admin.customer.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">

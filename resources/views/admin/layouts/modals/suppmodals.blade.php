@@ -31,7 +31,7 @@
                 <h5 class="modal-title" id="createSupplierModalLabel">Create Supplier</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="createSupplierForm" action="{{ route('admin.supplier.store') }}" method="POST">
+            <form id="createSupplierForm" action="{{ route('admin.supplier.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
@@ -89,7 +89,7 @@
                 <h5 class="modal-title" id="editSupplierModalLabel">Edit Supplier</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editSupplierForm" method="POST">
+            <form id="editSupplierForm" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">

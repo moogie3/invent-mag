@@ -40,6 +40,9 @@ class SupplierController extends Controller
             'payment_terms' => 'required',
             'email' => 'nullable|email',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
+        ], [
+            'image.image' => 'The image field must be a valid image file. Please ensure your form has enctype="multipart/form-data" and the file input name is "image".',
+            'image.mimes' => 'The image must be a file of type: jpeg, jpg, png.',
         ]);
 
         $result = $this->supplierService->createSupplier($request->all());
@@ -68,6 +71,9 @@ class SupplierController extends Controller
             'payment_terms' => 'required',
             'email' => 'nullable|email',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
+        ], [
+            'image.image' => 'The image field must be a valid image file. Please ensure your form has enctype="multipart/form-data" and the file input name is "image".',
+            'image.mimes' => 'The image must be a file of type: jpeg, jpg, png.',
         ]);
 
         $supplier = Supplier::find($id);

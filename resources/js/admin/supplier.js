@@ -693,30 +693,16 @@ document.addEventListener("DOMContentLoaded", function () {
                         "/img/default_placeholder.png";
 
                     if (srmSupplierImageContainer) {
-                        console.log(
-                            "data.supplier.image received:",
-                            data.supplier.image
-                        );
-                        const supplierImageRelativePath = data.supplier.image
-                            ? new URL(data.supplier.image).pathname
-                            : "";
-                        console.log(
-                            "supplierImageRelativePath:",
-                            supplierImageRelativePath
-                        );
-                        console.log(
-                            "defaultPlaceholderUrl:",
-                            defaultPlaceholderUrl
-                        );
                         if (
                             data.supplier.image &&
-                            supplierImageRelativePath !== defaultPlaceholderUrl
+                            data.supplier.image !== defaultPlaceholderUrl
                         ) {
                             srmSupplierImageContainer.innerHTML = `
-                                <div class="img-thumbnail d-flex align-items-center justify-content-center"
-                                     style="width: 120px; height: 120px; margin: 0 auto;">
-                                    <i class="ti ti-photo fs-1 text-muted"></i>
-                                </div>
+                                <img src="${data.supplier.image}" alt="${
+                                    data.supplier.name || "Supplier Image"
+                                }"
+                                     class="img-thumbnail"
+                                     style="max-width: 120px; max-height: 120px; object-fit: cover;">
                             `;
                         } else {
                             srmSupplierImageContainer.innerHTML = `

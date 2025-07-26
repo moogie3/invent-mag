@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
     initProductModal();
     initBulkSelection();
     initializeSearch();
-    initExpiryDateToggle();
     initializeEntriesSelector();
 });
 
@@ -37,14 +36,20 @@ function initExpiryCheckbox() {
     const container = document.getElementById("expiry_date_container");
 
     if (checkbox && container) {
+        // Set initial state
         container.style.display = checkbox.checked ? "block" : "none";
 
+        // Add event listener for changes
         checkbox.addEventListener("change", function () {
+            container.style.display = this.checked ? "block" : "none";
             if (this.checked) {
                 const dateInput = container.querySelector(
                     "input[name='expiry_date']"
                 );
-                dateInput?._flatpickr?.redraw();
+                // Redraw flatpickr if it's initialized
+                if (dateInput && dateInput._flatpickr) {
+                    dateInput._flatpickr.redraw();
+                }
             }
         });
     }

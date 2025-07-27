@@ -593,9 +593,14 @@ function renderBulkUpdateProducts(products) {
         };
 
         if (elements.img) {
-            elements.img.src = product.image;
-            elements.img.onerror = () =>
-                (elements.img.src = "/images/default-product.png");
+            if (product.image && product.image.trim() !== '' && product.image.toLowerCase() !== 'null' && product.image.toLowerCase() !== 'undefined') {
+                elements.img.src = product.image;
+                elements.img.onerror = () => {
+                    elements.img.outerHTML = `<div class="d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border: 1px solid #ccc; border-radius: 5px;"><i class="ti ti-photo fs-1 text-muted"></i></div>`;
+                };
+            } else {
+                elements.img.outerHTML = `<div class="d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border: 1px solid #ccc; border-radius: 5px;"><i class="ti ti-photo fs-1 text-muted"></i></div>`;
+            }
         }
         if (elements.name) elements.name.textContent = product.name;
         if (elements.code) elements.code.textContent = `Code: ${product.code}`;
@@ -953,7 +958,7 @@ function extractProductDataFromRow(row) {
                 expiryElement?.textContent || ""
             ),
             has_expiry: expiryElement?.textContent?.trim() !== "N/A",
-            image: img?.src || "/images/default-product.png",
+            image: img?.src || "/img/default_placeholder.png",
         };
     } catch (error) {
         console.error("Error extracting product data:", error);
@@ -1128,9 +1133,9 @@ function renderSearchResults(products) {
                 }" ${isSelected ? "checked" : ""}></td>
                 <td class="sort-no">${index + 1}</td>
                 <td class="sort-image" style="width:120px">
-                    <img src="${product.image || "/images/default-product.png"}"
+                    <img src="${product.image || "/img/default_placeholder.png"}"
                          width="80px" height="80px" alt="${product.name}"
-                         onerror="this.src='/images/default-product.png'">
+                         onerror="this.src='/img/default_placeholder.png'">
                 </td>
                 <td class="sort-code no-print">${product.code || "N/A"}</td>
                 <td class="sort-name">${product.name}</td>

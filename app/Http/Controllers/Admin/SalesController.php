@@ -57,7 +57,7 @@ class SalesController extends Controller
     public function modalViews($id)
     {
         try {
-            $sales = Sales::with(['customer', 'salesItems.product'])->findOrFail($id);
+            $sales = $this->salesService->getSalesForModal($id);
             return view('admin.layouts.modals.salesmodals-view', compact('sales'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Sales record not found for modal view: {$id}");
@@ -92,6 +92,10 @@ class SalesController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'products' => 'required|json',
+        ]);
+
         $sale = Sales::findOrFail($id);
 
         try {
@@ -106,22 +110,7 @@ class SalesController extends Controller
 
     public function getCustomerPrice(Customer $customer, Product $product)
     {
-        $latestSale = Sales::where('customer_id', $customer->id)
-            ->whereHas('salesItems', function ($query) use ($product) {
-                $query->where('product_id', $product->id);
-            })
-            ->latest()
-            ->first();
-
-        $pastPrice = 0;
-
-        if ($latestSale) {
-            $saleItem = $latestSale->salesItems()->where('product_id', $product->id)->first();
-            if ($saleItem) {
-                $pastPrice = floor($saleItem->customer_price);
-            }
-        }
-
+        $pastPrice = $this->salesService->getPastCustomerPriceForProduct($customer, $product);
         return response()->json(['past_price' => $pastPrice]);
     }
 

@@ -17,5 +17,6 @@
         @include('admin.layouts.partials.sales.edit.sales-info-section')
         @include('admin.layouts.partials.sales.edit.items-table')
         @include('admin.layouts.partials.sales.edit.summary-section')
+        <input type="hidden" name="products" id="products-json">
     </div>
 </form>

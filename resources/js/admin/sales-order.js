@@ -572,11 +572,11 @@ class SalesOrderCreate extends SalesOrderModule {
         );
 
         this.products.push({
-            id: productId,
+            product_id: productId,
             uniqueId,
             name: productName,
             quantity,
-            price,
+            customer_price: price, // Changed from 'price' to 'customer_price'
             discount,
             discountType,
             total,
@@ -854,6 +854,48 @@ class SalesOrderEdit extends SalesOrderModule {
 
         this.initEventListeners();
         this.calculateTotals();
+
+        this.elements.form = document.getElementById("edit-sales-form");
+        this.elements.productsJsonInput =
+            document.getElementById("products-json");
+
+        if (this.elements.form) {
+            this.elements.form.addEventListener(
+                "submit",
+                this.serializeProducts.bind(this)
+            );
+        }
+    }
+
+    serializeProducts() {
+        const products = [];
+        const productRows = document.querySelectorAll("tbody tr");
+
+        productRows.forEach((row) => {
+            const productId = row.dataset.productId;
+            if (!productId) {
+                return;
+            }
+
+            const quantity = row.querySelector(".quantity-input").value;
+            const price = row.querySelector(".price-input").value;
+            const discount = row.querySelector(".discount-input").value;
+            const discountType = row.querySelector(
+                ".discount-type-input"
+            ).value;
+
+            products.push({
+                product_id: productId,
+                quantity: quantity,
+                customer_price: price,
+                discount: discount,
+                discount_type: discountType,
+            });
+        });
+
+        if (this.elements.productsJsonInput) {
+            this.elements.productsJsonInput.value = JSON.stringify(products);
+        }
     }
 
     initEventListeners() {
@@ -1059,12 +1101,14 @@ class SalesOrderView extends SalesOrderModule {
         this.initGlobalFunctions();
 
         // Add event listener for view sales details buttons
-        document.querySelectorAll('.view-sales-details-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const salesId = this.dataset.id;
-                window.showSalesDetailsModal(salesId);
+        document
+            .querySelectorAll(".view-sales-details-btn")
+            .forEach((button) => {
+                button.addEventListener("click", function () {
+                    const salesId = this.dataset.id;
+                    window.showSalesDetailsModal(salesId);
+                });
             });
-        });
     }
 
     formatAllCurrencyValues() {
@@ -1083,14 +1127,17 @@ class SalesOrderView extends SalesOrderModule {
         }
 
         // Event listener for when the sales view modal is shown
-        const viewSalesModalElement = document.getElementById('viewSalesModal');
+        const viewSalesModalElement = document.getElementById("viewSalesModal");
         if (viewSalesModalElement) {
-            viewSalesModalElement.addEventListener('shown.bs.modal', (event) => {
-                const salesId = viewSalesModalElement.dataset.salesId;
-                if (salesId) {
-                    this.loadSalesDetails(salesId);
+            viewSalesModalElement.addEventListener(
+                "shown.bs.modal",
+                (event) => {
+                    const salesId = viewSalesModalElement.dataset.salesId;
+                    if (salesId) {
+                        this.loadSalesDetails(salesId);
+                    }
                 }
-            });
+            );
         }
     }
 
@@ -1099,7 +1146,7 @@ class SalesOrderView extends SalesOrderModule {
     // (Moved to the end of the file or within a DOMContentLoaded block if not already there)
     // For now, we'll define it as a method of the class and expose it via initGlobalFunctions
     showSalesDetailsModal(salesId) {
-        const viewSalesModalElement = document.getElementById('viewSalesModal');
+        const viewSalesModalElement = document.getElementById("viewSalesModal");
         if (viewSalesModalElement) {
             viewSalesModalElement.dataset.salesId = salesId; // Store the ID
             const salesViewModal = new bootstrap.Modal(viewSalesModalElement);
@@ -1110,7 +1157,8 @@ class SalesOrderView extends SalesOrderModule {
     // Add this method to ensure global functions are available
     initGlobalFunctions() {
         window.setDeleteFormAction = (url) => this.setDeleteFormAction(url);
-        window.showSalesDetailsModal = (salesId) => this.showSalesDetailsModal(salesId);
+        window.showSalesDetailsModal = (salesId) =>
+            this.showSalesDetailsModal(salesId);
     }
 
     setDeleteFormAction(url) {
@@ -1125,44 +1173,57 @@ class SalesOrderView extends SalesOrderModule {
 
     loadSalesDetails(id) {
         // Only load if content is not already present or is the loading spinner
-        if (this.elements.viewSalesModalContent.innerHTML.includes('spinner-border') || this.elements.viewSalesModalContent.innerHTML.trim() === '') {
+        if (
+            this.elements.viewSalesModalContent.innerHTML.includes(
+                "spinner-border"
+            ) ||
+            this.elements.viewSalesModalContent.innerHTML.trim() === ""
+        ) {
             // Show loading indicator
-            this.elements.viewSalesModalContent.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            this.elements.viewSalesModalContent.innerHTML =
+                '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
 
             // Fetch sales data via AJAX
             fetch(`/admin/sales/modal-view/${id}`, {
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                    "X-Requested-With": "XMLHttpRequest",
+                },
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.text(); // Get as text, as it's likely HTML
-            })
-            .then(html => {
-                if (this.elements.viewSalesModalContent) {
-                    this.elements.viewSalesModalContent.innerHTML = html;
-                    // Re-format currency values after content is loaded
-                    this.formatAllCurrencyValues();
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! Status: ${response.status}`
+                        );
+                    }
+                    return response.text(); // Get as text, as it's likely HTML
+                })
+                .then((html) => {
+                    if (this.elements.viewSalesModalContent) {
+                        this.elements.viewSalesModalContent.innerHTML = html;
+                        // Re-format currency values after content is loaded
+                        this.formatAllCurrencyValues();
 
-                    // Set URLs for modal buttons
-                    if (this.elements.salesModalEdit) {
-                        this.elements.salesModalEdit.href = `/admin/sales/edit/${id}`;
+                        // Set URLs for modal buttons
+                        if (this.elements.salesModalEdit) {
+                            this.elements.salesModalEdit.href = `/admin/sales/edit/${id}`;
+                        }
+                        if (this.elements.salesModalFullView) {
+                            this.elements.salesModalFullView.href = `/admin/sales/view/${id}`;
+                        }
                     }
-                    if (this.elements.salesModalFullView) {
-                        this.elements.salesModalFullView.href = `/admin/sales/view/${id}`;
+                })
+                .catch((error) => {
+                    console.error("Error loading sales details:", error);
+                    if (this.elements.viewSalesModalContent) {
+                        this.elements.viewSalesModalContent.innerHTML =
+                            '<div class="alert alert-danger">Failed to load sales details.</div>';
                     }
-                }
-            })
-            .catch(error => {
-                console.error('Error loading sales details:', error);
-                if (this.elements.viewSalesModalContent) {
-                    this.elements.viewSalesModalContent.innerHTML = '<div class="alert alert-danger">Failed to load sales details.</div>';
-                }
-                showToast('Error', 'Failed to load sales details.', 'error');
-            });
+                    showToast(
+                        "Error",
+                        "Failed to load sales details.",
+                        "error"
+                    );
+                });
         }
     }
 
@@ -1392,7 +1453,9 @@ function performBulkDeleteSales(selectedIds, confirmButton, modal) {
                         ); // Remove the listener
                         showToast(
                             "Success",
-                            `${data.deleted_count || selectedIds.length} sales order(s) deleted successfully!`,
+                            `${
+                                data.deleted_count || selectedIds.length
+                            } sales order(s) deleted successfully!`,
                             "success"
                         );
                         // Explicitly remove any remaining modal backdrops
@@ -1779,7 +1842,9 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
                         // Show success message
                         showToast(
                             "Success",
-                            `${data.updated_count || selectedIds.length} sales order(s) marked as paid successfully!`,
+                            `${
+                                data.updated_count || selectedIds.length
+                            } sales order(s) marked as paid successfully!`,
                             "success"
                         );
                         // Explicitly remove any remaining modal backdrops
@@ -1788,8 +1853,6 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
                         backdrops.forEach((backdrop) => backdrop.remove());
                     }
                 );
-
-                
 
                 // Reload page after short delay
                 // setTimeout(() => {
@@ -1800,11 +1863,11 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
                 selectedIds.forEach((id) => {
                     const row = document.querySelector(`tr[data-id="${id}"]`); // Assuming rows have data-id attribute
                     if (row) {
-                        const statusCell = row.querySelector('.sort-status');
+                        const statusCell = row.querySelector(".sort-status");
                         if (statusCell) {
-                            statusCell.innerHTML = '<span class="badge bg-green-lt"><span class="h4"><i class="ti ti-check me-1 fs-4"></i> Paid</span></span>';
+                            statusCell.innerHTML =
+                                '<span class="badge bg-green-lt"><span class="h4"><i class="ti ti-check me-1 fs-4"></i> Paid</span></span>';
                         }
-                        
                     }
                 });
 
@@ -1812,9 +1875,11 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
                 updateSalesStoreInfo();
 
                 // Explicitly uncheck all checkboxes
-                document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
-                    checkbox.checked = false;
-                });
+                document
+                    .querySelectorAll(".row-checkbox")
+                    .forEach((checkbox) => {
+                        checkbox.checked = false;
+                    });
 
                 // Update bulk action bar and select all state
                 if (salesBulkSelection) {
@@ -1844,17 +1909,37 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
 }
 
 function updateSalesStoreInfo() {
-    fetch('/admin/sales/metrics')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('totalInvoiceCount').textContent = data.totalinvoice;
-            document.getElementById('thisMonthSales').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.totalMonthly);
-            document.getElementById('totalPosSales').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.posTotal);
-            document.getElementById('unpaidReceivable').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.unpaidDebt);
-            document.getElementById('pendingOrdersCount').textContent = data.pendingOrders;
-            document.getElementById('dueInvoicesCount').textContent = data.dueInvoices;
+    fetch("/admin/sales/metrics")
+        .then((response) => response.json())
+        .then((data) => {
+            document.getElementById("totalInvoiceCount").textContent =
+                data.totalinvoice;
+            document.getElementById("thisMonthSales").textContent =
+                new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    maximumFractionDigits: 0,
+                }).format(data.totalMonthly);
+            document.getElementById("totalPosSales").textContent =
+                new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    maximumFractionDigits: 0,
+                }).format(data.posTotal);
+            document.getElementById("unpaidReceivable").textContent =
+                new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    maximumFractionDigits: 0,
+                }).format(data.unpaidDebt);
+            document.getElementById("pendingOrdersCount").textContent =
+                data.pendingOrders;
+            document.getElementById("dueInvoicesCount").textContent =
+                data.dueInvoices;
         })
-        .catch(error => console.error('Error fetching sales metrics:', error));
+        .catch((error) =>
+            console.error("Error fetching sales metrics:", error)
+        );
 }
 
 function clearSelectionSales() {

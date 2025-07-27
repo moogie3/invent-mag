@@ -312,6 +312,32 @@ class SalesService
         ]);
     }
 
+    public function getSalesForModal($id)
+    {
+        return Sales::with(['customer', 'salesItems.product'])->findOrFail($id);
+    }
+
+    public function getPastCustomerPriceForProduct(Customer $customer, Product $product)
+    {
+        $latestSale = Sales::where('customer_id', $customer->id)
+            ->whereHas('salesItems', function ($query) use ($product) {
+                $query->where('product_id', $product->id);
+            })
+            ->latest()
+            ->first();
+
+        $pastPrice = 0;
+
+        if ($latestSale) {
+            $saleItem = $latestSale->salesItems()->where('product_id', $product->id)->first();
+            if ($saleItem) {
+                $pastPrice = floor($saleItem->customer_price);
+            }
+        }
+
+        return $pastPrice;
+    }
+
     private function generateInvoiceNumber(): string
     {
         $lastSalesInvoice = Sales::latest()->first();

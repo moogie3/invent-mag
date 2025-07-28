@@ -66,10 +66,14 @@ class SalesHelper
         $subtotal = 0;
         $totalProductDiscount = 0;
         $itemCount = count($items);
+        $subtotalBeforeDiscounts = 0; // New variable
 
         foreach ($items as $item) {
             // Important: Use customer_price field instead of price for sales items
             $price = $item->customer_price ?? $item->price; // Fallback to price if customer_price is not available
+
+            // Add to subtotal before any discounts
+            $subtotalBeforeDiscounts += $price * $item->quantity;
 
             $finalAmount = self::calculateTotal($price, $item->quantity, $item->discount, $item->discount_type);
 
@@ -79,7 +83,7 @@ class SalesHelper
             $totalProductDiscount += $discountPerUnit * $item->quantity;
         }
 
-        $orderDiscount = self::calculateDiscount($subtotal, $discountTotal, $discountTotalType);
+        $orderDiscount = self::calculateDiscount($subtotalBeforeDiscounts, $discountTotal, $discountTotalType);
         $taxableAmount = $subtotal - $orderDiscount;
         $taxAmount = self::calculateTaxAmount($taxableAmount, $taxRate);
         $finalTotal = $taxableAmount + $taxAmount;

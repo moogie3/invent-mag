@@ -227,13 +227,15 @@ class SalesService
             $sale->salesItems()->delete();
 
             $subTotal = 0;
+            $subtotalBeforeDiscounts = 0; // New variable
             foreach ($products as $productData) {
-                $subTotal += $productData['customer_price'] * $productData['quantity'];
+                $subTotal += SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed');
+                $subtotalBeforeDiscounts += $productData['customer_price'] * $productData['quantity'];
             }
 
-            $orderDiscount = $data['discount_total'] ?? 0;
-            $orderDiscountType = $data['discount_total_type'] ?? 'fixed';
-            $orderDiscountAmount = SalesHelper::calculateDiscount($subTotal, $orderDiscount, $orderDiscountType);
+            $orderDiscount = $data['order_discount'] ?? 0;
+            $orderDiscountType = $data['order_discount_type'] ?? 'fixed';
+            $orderDiscountAmount = SalesHelper::calculateDiscount($subtotalBeforeDiscounts, $orderDiscount, $orderDiscountType);
 
             $tax = Tax::where('is_active', 1)->first();
             $taxRate = $tax ? $tax->rate : 0;
@@ -248,7 +250,7 @@ class SalesService
                 'tax_rate' => $taxRate,
                 'total_tax' => $taxAmount,
                 'total' => $grandTotal,
-                'order_discount' => $orderDiscountAmount,
+                'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
             ]);
 

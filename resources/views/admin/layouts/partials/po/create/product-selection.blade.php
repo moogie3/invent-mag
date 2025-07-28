@@ -27,7 +27,8 @@
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">Supplier Price</label>
-        <input type="text" class="form-control" name="last_price" id="last_price" placeholder="AUTOFILL" readonly />
+        <input type="text" class="form-control" name="last_price" id="last_price" placeholder="AUTOFILL" readonly
+            disabled />
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">New Price</label>

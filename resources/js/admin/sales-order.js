@@ -976,7 +976,7 @@ class SalesOrderEdit extends SalesOrderModule {
 
     calculateTotals() {
         let subtotal = 0;
-        let totalUnitDiscount = 0;
+        let subtotalBeforeDiscounts = 0; // New variable
 
         // Calculate per-item amounts
         document.querySelectorAll("tbody tr").forEach((row) => {
@@ -994,6 +994,10 @@ class SalesOrderEdit extends SalesOrderModule {
                     row.querySelector(`.price-input[data-item-id='${itemId}']`)
                         .value
                 ) || 0;
+
+            // Add to subtotal before any discounts
+            subtotalBeforeDiscounts += price * quantity;
+
             const discountInput = row.querySelector(
                 `.discount-input[data-item-id='${itemId}']`
             );
@@ -1027,8 +1031,7 @@ class SalesOrderEdit extends SalesOrderModule {
             }
 
             // Add to running totals
-            subtotal += netAmount;
-            totalUnitDiscount += discountAmount * quantity;
+            subtotal += price * quantity;
         });
 
         // Calculate order discount
@@ -1038,9 +1041,9 @@ class SalesOrderEdit extends SalesOrderModule {
             this.elements.discountTotalType?.value || "percentage";
         let orderDiscountAmount = 0;
 
-        // Calculate order discount
+        // Calculate order discount based on subtotal before discounts
         if (discountTotalType === "percentage") {
-            orderDiscountAmount = subtotal * (discountTotalValue / 100);
+            orderDiscountAmount = subtotalBeforeDiscounts * (discountTotalValue / 100);
         } else {
             orderDiscountAmount = discountTotalValue;
         }
@@ -1068,7 +1071,7 @@ class SalesOrderEdit extends SalesOrderModule {
         document.getElementById("grandTotalInput").value =
             Math.floor(grandTotal);
         document.getElementById("totalDiscountInput").value = Math.floor(
-            totalUnitDiscount + orderDiscountAmount
+            orderDiscountAmount
         );
         document.getElementById("taxInput").value = Math.floor(taxAmount);
 
@@ -1510,9 +1513,19 @@ window.bulkDeleteSales = function () {
     }
 
     document.getElementById("bulkDeleteCount").textContent = selected.length;
-    const modal = new bootstrap.Modal(
-        document.getElementById("bulkDeleteModal")
-    );
+    const modalElement = document.getElementById("bulkDeleteModal");
+    const modal = new bootstrap.Modal(modalElement);
+
+    // Attach event listener for when the modal is completely hidden
+    modalElement.addEventListener('hidden.bs.modal', function handler() {
+        // Remove all modal backdrops
+        const backdrops = document.querySelectorAll(".modal-backdrop");
+        backdrops.forEach((backdrop) => backdrop.remove());
+
+        // Remove this event listener to prevent multiple executions
+        modalElement.removeEventListener('hidden.bs.modal', handler);
+    });
+
     modal.show();
 
     const confirmBtn = document.getElementById("confirmBulkDeleteBtn");

@@ -46,7 +46,7 @@
             <div class="d-flex justify-content-between mt-2">
                 <div><strong>Payment Date:</strong></div>
                 <div>
-                    {{ $pos->payment_date->setTimezone(auth()->user()->timezone)->format('d F Y H:i') }}
+                    {{ $pos->payment_date->format('d F Y H:i') }}
                 </div>
             </div>
         @endif

@@ -709,43 +709,39 @@ class PurchaseOrderEdit extends PurchaseOrderModule {
             discountTypeInputs: document.querySelectorAll(
                 ".discount-type-input"
             ),
-            amountInputs: document.querySelectorAll(".amount-input"),
             form: document.getElementById("edit-po-form"),
             productsJsonInput: document.getElementById("products-json"),
         };
     }
 
     initEventListeners() {
-        // Add listeners for item inputs
-        ["quantityInputs", "priceInputs", "discountInputs"].forEach(
-            (inputType) => {
-                this.elements[inputType].forEach((input) => {
-                    const eventType =
-                        inputType === "discountTypeInputs" ? "change" : "input";
-                    input.addEventListener(eventType, () => {
-                        this.updateItemAmount(input.dataset.itemId);
-                    });
-                });
+        // Input event listeners for calculations
+        document.addEventListener("input", (event) => {
+            if (
+                event.target.matches(
+                    ".quantity-input, .price-input, .discount-input"
+                )
+            ) {
+                const itemId = event.target.dataset.itemId;
+                if (itemId) {
+                    this.calculateOrderTotal(); // Always recalculate order total after item change
+                }
+            } else if (event.target.matches("#discountTotalValue")) {
+                this.calculateOrderTotal();
             }
-        );
-
-        this.elements.discountTypeInputs.forEach((select) => {
-            select.addEventListener("change", () => {
-                this.updateItemAmount(select.dataset.itemId);
-            });
         });
 
-        // Order-level discount listeners
-        if (this.elements.discountTotalValue) {
-            this.elements.discountTotalValue.addEventListener("input", () =>
-                this.calculateOrderTotal()
-            );
-        }
-        if (this.elements.discountTotalType) {
-            this.elements.discountTotalType.addEventListener("change", () =>
-                this.calculateOrderTotal()
-            );
-        }
+        // Change event listeners for select inputs
+        document.addEventListener("change", (event) => {
+            if (event.target.matches(".discount-type-input")) {
+                const itemId = event.target.dataset.itemId;
+                if (itemId) {
+                    this.calculateOrderTotal(); // Always recalculate order total after item change
+                }
+            } else if (event.target.matches("#discountTotalType")) {
+                this.calculateOrderTotal();
+            }
+        });
 
         if (this.elements.form) {
             this.elements.form.addEventListener(
@@ -755,82 +751,70 @@ class PurchaseOrderEdit extends PurchaseOrderModule {
         }
     }
 
-    updateItemAmount(itemId) {
-        const elements = {
-            quantity: document.querySelector(
-                `.quantity-input[data-item-id="${itemId}"]`
-            ),
-            price: document.querySelector(
-                `.price-input[data-item-id="${itemId}"]`
-            ),
-            discount: document.querySelector(
-                `.discount-input[data-item-id="${itemId}"]`
-            ),
-            discountType: document.querySelector(
-                `.discount-type-input[data-item-id="${itemId}"]`
-            ),
-            amount: document.querySelector(
-                `.amount-input[data-item-id="${itemId}"]`
-            ),
-        };
-
-        // Check if all elements exist
-        const missingElements = Object.keys(elements).filter(
-            (key) => !elements[key]
-        );
-        if (missingElements.length > 0) {
-            console.error(
-                `Missing elements for item ${itemId}:`,
-                missingElements
-            );
-            return;
-        }
-
-        // Get values
-        const quantity = parseInt(elements.quantity.value) || 0;
-        const price = parseFloat(elements.price.value) || 0;
-        const discount = parseFloat(elements.discount.value) || 0;
-        const discountType = elements.discountType.value;
-
-        // Calculate total
-        const total = this.calculateTotal(
-            price,
-            quantity,
-            discount,
-            discountType
-        );
-        elements.amount.value = Math.round(total);
-
-        this.calculateOrderTotal();
-    }
-
     calculateAllAmounts() {
-        this.elements.quantityInputs.forEach((input) => {
-            const itemId = input.dataset.itemId;
-            if (itemId) {
-                this.updateItemAmount(itemId);
-            }
-        });
         this.calculateOrderTotal();
     }
 
     calculateOrderTotal() {
-        // Calculate subtotal
         let subtotal = 0;
-        this.elements.amountInputs.forEach((input) => {
-            subtotal += parseFloat(input.value) || 0;
+
+        // Calculate per-item amounts and sum for subtotal
+        document.querySelectorAll("tbody tr").forEach((row) => {
+            const itemId = row.querySelector(".quantity-input")?.dataset.itemId;
+            if (!itemId) return;
+
+            const quantity =
+                parseFloat(
+                    row.querySelector(
+                        `.quantity-input[data-item-id="${itemId}"]`
+                    ).value
+                ) || 0;
+            const price =
+                parseFloat(
+                    row.querySelector(`.price-input[data-item-id="${itemId}"]`)
+                        .value
+                ) || 0;
+            const discountInput = row.querySelector(
+                `.discount-input[data-item-id="${itemId}"]`
+            );
+            const discountTypeSelect = row.querySelector(
+                `.discount-type-input[data-item-id="${itemId}"]`
+            );
+
+            const discountValue = parseFloat(discountInput?.value) || 0;
+            const discountType = discountTypeSelect?.value || "fixed";
+
+            // Calculate total for this item
+            const itemTotal = this.calculateTotal(
+                price,
+                quantity,
+                discountValue,
+                discountType
+            );
+
+            // Update the amount field for this item
+            const amountInput = row.querySelector(
+                `.amount-input[data-item-id="${itemId}"]`
+            );
+            if (amountInput) {
+                amountInput.value = Math.round(itemTotal);
+            }
+
+            // Add to running subtotal
+            subtotal += itemTotal;
         });
 
         // Get order discount values
-        const discountValue =
+        const discountTotalValue =
             parseFloat(this.elements.discountTotalValue?.value) || 0;
-        const discountType = this.elements.discountTotalType?.value || "fixed";
+        const discountTotalType =
+            this.elements.discountTotalType?.value || "fixed";
 
         // Calculate order discount and final total
         const orderDiscountAmount = this.calculateDiscount(
             subtotal,
-            discountValue,
-            discountType
+            discountTotalValue,
+            discountTotalType
         );
         const finalTotal = subtotal - orderDiscountAmount;
 
@@ -849,6 +833,42 @@ class PurchaseOrderEdit extends PurchaseOrderModule {
         }
         if (this.elements.totalDiscountInput) {
             this.elements.totalDiscountInput.value = orderDiscountAmount;
+        }
+
+        // Update JSON of products for form submission
+        if (this.elements.productsJsonInput) {
+            const products = [];
+            document.querySelectorAll("tbody tr").forEach((row) => {
+                const itemId = row.querySelector(".quantity-input")?.dataset.itemId;
+                if (!itemId) {
+                    return;
+                }
+
+                const quantity = parseFloat(
+                    row.querySelector(`.quantity-input[data-item-id="${itemId}"]`)
+                        .value
+                ) || 0;
+                const price = parseFloat(
+                    row.querySelector(`.price-input[data-item-id="${itemId}"]`)
+                        .value
+                ) || 0;
+                const discount = parseFloat(
+                    row.querySelector(`.discount-input[data-item-id="${itemId}"]`)
+                        .value
+                ) || 0;
+                const discountType = row.querySelector(
+                    `.discount-type-input[data-item-id="${itemId}"]`
+                ).value;
+
+                products.push({
+                    product_id: itemId, // Assuming itemId is the product_id
+                    quantity: quantity,
+                    price: price,
+                    discount: discount,
+                    discount_type: discountType,
+                });
+            });
+            this.elements.productsJsonInput.value = JSON.stringify(products);
         }
     }
 
@@ -1057,7 +1077,9 @@ class PurchaseOrderBulkSelection {
             // If there are no checkboxes, hide the bar and return
             if (this.rowCheckboxes.length === 0) {
                 this.bulkActionsBar.style.display = "none";
-                console.log("No purchase order items to select, hiding bulk actions bar.");
+                console.log(
+                    "No purchase order items to select, hiding bulk actions bar."
+                );
                 return;
             }
 
@@ -1137,9 +1159,9 @@ class PurchaseOrderBulkSelection {
     }
 
     getSelectedIds() {
-        return Array.from(document.querySelectorAll(".row-checkbox:checked")).map(
-            (cb) => cb.value
-        );
+        return Array.from(
+            document.querySelectorAll(".row-checkbox:checked")
+        ).map((cb) => cb.value);
     }
 }
 
@@ -1197,20 +1219,29 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
             if (data.success) {
                 modal.hide();
                 // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
-                modal._element.addEventListener('hidden.bs.modal', function handler() {
-                    modal._element.removeEventListener('hidden.bs.modal', handler); // Remove the listener
-                    showToast(
-                        "Success",
-                        `${data.deleted_count || selectedIds.length} purchase order(s) deleted successfully!`,
-                        "success"
-                    );
-                    // Explicitly remove any remaining modal backdrops
-                    const backdrops = document.querySelectorAll('.modal-backdrop');
-                    backdrops.forEach(backdrop => backdrop.remove());
-                });
+                modal._element.addEventListener(
+                    "hidden.bs.modal",
+                    function handler() {
+                        modal._element.removeEventListener(
+                            "hidden.bs.modal",
+                            handler
+                        ); // Remove the listener
+                        showToast(
+                            "Success",
+                            `${
+                                data.deleted_count || selectedIds.length
+                            } purchase order(s) deleted successfully!`,
+                            "success"
+                        );
+                        // Explicitly remove any remaining modal backdrops
+                        const backdrops =
+                            document.querySelectorAll(".modal-backdrop");
+                        backdrops.forEach((backdrop) => backdrop.remove());
+                    }
+                );
 
                 // Remove deleted rows from the table
-                selectedIds.forEach(id => {
+                selectedIds.forEach((id) => {
                     const row = document.querySelector(`tr[data-id="${id}"]`);
                     if (row) {
                         row.remove();
@@ -1239,13 +1270,18 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
         .finally(() => {
             confirmButton.innerHTML = originalText;
             confirmButton.disabled = false;
+            modal.hide(); // Ensure modal is always hidden
         });
 }
 
 window.bulkDeletePO = function () {
     const selected = getSelectedIds();
     if (!selected.length) {
-        showToast("Warning", "Please select purchase orders to delete.", "warning");
+        showToast(
+            "Warning",
+            "Please select purchase orders to delete.",
+            "warning"
+        );
         return;
     }
 
@@ -1516,29 +1552,31 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
                 modal.hide();
 
                 // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
-                modal._element.addEventListener('hidden.bs.modal', function handler() {
-                    modal._element.removeEventListener('hidden.bs.modal', handler); // Remove the listener
-                    // Show success message
-                    showToast(
-                        "Success",
-                        `${
-                            data.updated_count || selectedIds.length
-                        } purchase order(s) marked as paid successfully!`,
-                        "success"
-                    );
-                    // Explicitly remove any remaining modal backdrops
-                    const backdrops = document.querySelectorAll('.modal-backdrop');
-                    backdrops.forEach(backdrop => backdrop.remove());
-                });
+                modal._element.addEventListener(
+                    "hidden.bs.modal",
+                    function handler() {
+                        modal._element.removeEventListener(
+                            "hidden.bs.modal",
+                            handler
+                        ); // Remove the listener
+                        // Show success message
+                        showToast(
+                            "Success",
+                            `${
+                                data.updated_count || selectedIds.length
+                            } purchase order(s) marked as paid successfully!`,
+                            "success"
+                        );
+                        // Explicitly remove any remaining modal backdrops
+                        const backdrops =
+                            document.querySelectorAll(".modal-backdrop");
+                        backdrops.forEach((backdrop) => backdrop.remove());
+                    }
+                );
 
                 // Clear selection
                 if (typeof clearSelection === "function") {
                     clearSelection();
-                } else if (
-                    bulkSelection &&
-                    typeof bulkSelection.clearSelection === "function"
-                ) {
-                    bulkSelection.clearSelection();
                 }
 
                 // Reload page after short delay
@@ -1547,14 +1585,15 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
                 // }, 1000);
 
                 // Dynamically update UI
-                selectedIds.forEach(id => {
+                selectedIds.forEach((id) => {
                     const row = document.querySelector(`tr[data-id="${id}"]`); // Assuming rows have data-id attribute
                     if (row) {
-                        const statusBadge = row.querySelector('.badge');
+                        const statusBadge = row.querySelector(".badge");
                         if (statusBadge) {
-                            statusBadge.outerHTML = '<span class="badge bg-green-lt"><span class="h4"><i class="ti ti-check me-1 fs-4"></i> Paid</span></span>';
+                            statusBadge.outerHTML =
+                                '<span class="badge bg-green-lt"><span class="h4"><i class="ti ti-check me-1 fs-4"></i> Paid</span></span>';
                         }
-                        const checkbox = row.querySelector('.row-checkbox');
+                        const checkbox = row.querySelector(".row-checkbox");
                         if (checkbox) {
                             checkbox.checked = false;
                         }
@@ -1592,18 +1631,43 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
 }
 
 function updatePurchaseStoreInfo() {
-    fetch('/admin/po/metrics')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('totalInvoiceCount').textContent = data.totalinvoice;
-            document.getElementById('invoiceOutCount').textContent = data.outCount;
-            document.getElementById('amountOutCount').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.outCountamount);
-            document.getElementById('invoiceInCount').textContent = data.inCount;
-            document.getElementById('amountInCount').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.inCountamount);
-            document.getElementById('monthlyPurchase').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.totalMonthly);
-            document.getElementById('monthlyPayment').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.paymentMonthly);
+    fetch("/admin/po/metrics")
+        .then((response) => response.json())
+        .then((data) => {
+            document.getElementById("totalInvoiceCount").textContent =
+                data.totalinvoice;
+            document.getElementById("invoiceOutCount").textContent =
+                data.outCount;
+            document.getElementById("amountOutCount").textContent =
+                new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    maximumFractionDigits: 0,
+                }).format(data.outCountamount);
+            document.getElementById("invoiceInCount").textContent =
+                data.inCount;
+            document.getElementById("amountInCount").textContent =
+                new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    maximumFractionDigits: 0,
+                }).format(data.inCountamount);
+            document.getElementById("monthlyPurchase").textContent =
+                new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    maximumFractionDigits: 0,
+                }).format(data.totalMonthly);
+            document.getElementById("monthlyPayment").textContent =
+                new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    maximumFractionDigits: 0,
+                }).format(data.paymentMonthly);
         })
-        .catch(error => console.error('Error fetching purchase metrics:', error));
+        .catch((error) =>
+            console.error("Error fetching purchase metrics:", error)
+        );
 }
 
 /**
@@ -1648,7 +1712,7 @@ function performBulkMarkAsPaid(selectedIds, confirmButton, modal) {
 }
 
 // Use the same toast function as transactions (from paste-1.txt)
-    // Function to handle form submission via AJAX
+// Function to handle form submission via AJAX
 
 // --- Start Search Functionality (Adapted from product.js) ---
 let searchTimeout;
@@ -1704,7 +1768,8 @@ function storeOriginalTable() {
     }
 }
 
-function extractPoDataFromRow(row) { // Changed function name
+function extractPoDataFromRow(row) {
+    // Changed function name
     try {
         const invoiceElement = row.querySelector(".sort-invoice");
         const supplierElement = row.querySelector(".sort-supplier");
@@ -1739,7 +1804,8 @@ function restoreOriginalTable() {
             tableBody.innerHTML = originalTableContent;
             // Reinitialize bulk selection and restore states if applicable
             setTimeout(() => {
-                if (bulkSelection) { // Check if bulkSelection exists
+                if (bulkSelection) {
+                    // Check if bulkSelection exists
                     bulkSelection.init(); // Reinitialize to re-attach listeners
                     bulkSelection.updateUI(); // Update UI based on current state
                 }
@@ -1793,7 +1859,8 @@ function performSearch(query) {
         });
 }
 
-function renderSearchResults(pos) { // Changed parameter name
+function renderSearchResults(pos) {
+    // Changed parameter name
     const tableBody = document.querySelector("table tbody");
     if (!pos.length) {
         showNoResults();
@@ -1822,7 +1889,9 @@ function renderSearchResults(pos) { // Changed parameter name
             return `
             <tr class="table-row" data-id="${po.id}">
                 <td>
-                    <input type="checkbox" class="form-check-input row-checkbox" value="${po.id}">
+                    <input type="checkbox" class="form-check-input row-checkbox" value="${
+                        po.id
+                    }">
                 </td>
                 <td class="sort-no no-print">${index + 1}</td>
                 <td class="sort-invoice">${po.invoice}</td>
@@ -1833,7 +1902,9 @@ function renderSearchResults(pos) { // Changed parameter name
                 </td>
                 <td class="sort-amount" data-amount="${po.total_raw}">
                     ${formatCurrency(po.total_raw)}
-                    <span class="raw-amount" style="display: none;">${po.total_raw}</span>
+                    <span class="raw-amount" style="display: none;">${
+                        po.total_raw
+                    }</span>
                 </td>
                 <td class="sort-payment no-print">${po.payment_type}</td>
                 <td class="sort-status">
@@ -1848,15 +1919,21 @@ function renderSearchResults(pos) { // Changed parameter name
                             Actions
                         </button>
                         <div class="dropdown-menu">
-                            <a href="javascript:void(0)" onclick="loadPoDetails('${po.id}')"
+                            <a href="javascript:void(0)" onclick="loadPoDetails('${
+                                po.id
+                            }')"
                                data-bs-toggle="modal" data-bs-target="#viewPoModal" class="dropdown-item">
                                 <i class="ti ti-zoom-scan me-2"></i> View
                             </a>
-                            <a href="/admin/po/edit/${po.id}" class="dropdown-item">
+                            <a href="/admin/po/edit/${
+                                po.id
+                            }" class="dropdown-item">
                                 <i class="ti ti-edit me-2"></i> Edit
                             </a>
                             <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal" onclick="setDeleteFormAction('/admin/po/destroy/${po.id}')">
+                                    data-bs-target="#deleteModal" onclick="setDeleteFormAction('/admin/po/destroy/${
+                                        po.id
+                                    }')">
                                 <i class="ti ti-trash me-2"></i> Delete
                             </button>
                         </div>
@@ -1871,14 +1948,17 @@ function renderSearchResults(pos) { // Changed parameter name
 
     // Reinitialize bulk selection with preserved states
     setTimeout(() => {
-        if (bulkSelection) { // Check if bulkSelection exists
+        if (bulkSelection) {
+            // Check if bulkSelection exists
             bulkSelection.init(); // Reinitialize to re-attach listeners
             bulkSelection.updateUI(); // Update UI based on current state
         }
     }, 100);
 }
 
-function showNoResults(message = "No purchase orders found matching your search.") {
+function showNoResults(
+    message = "No purchase orders found matching your search."
+) {
     document.querySelector("table tbody").innerHTML = `
         <tr><td colspan="100%" class="text-center py-5">
             <i class="ti ti-search-off fs-1 text-muted"></i>
@@ -1888,7 +1968,8 @@ function showNoResults(message = "No purchase orders found matching your search.
 
     // Hide bulk actions bar when no results
     const bulkActionsBar = document.getElementById("bulkActionsBar");
-    if (bulkActionsBar) { // No need for selectedProductIds.size === 0 here
+    if (bulkActionsBar) {
+        // No need for selectedProductIds.size === 0 here
         bulkActionsBar.style.display = "none";
     }
 }
@@ -1946,14 +2027,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 window.poApp = new PurchaseOrderView();
 
                 // Initialize bulk selection only if there are items to select
-                const rowCheckboxes = document.querySelectorAll(".row-checkbox");
-                if (typeof PurchaseOrderBulkSelection !== "undefined" && rowCheckboxes.length > 0) {
+                const rowCheckboxes =
+                    document.querySelectorAll(".row-checkbox");
+                if (
+                    typeof PurchaseOrderBulkSelection !== "undefined" &&
+                    rowCheckboxes.length > 0
+                ) {
                     bulkSelection = new PurchaseOrderBulkSelection();
-                    console.log("Purchase Order Index bulk selection initialized");
+                    console.log(
+                        "Purchase Order Index bulk selection initialized"
+                    );
                 } else {
-                    console.log("No purchase order items found, skipping bulk selection initialization.");
+                    console.log(
+                        "No purchase order items found, skipping bulk selection initialization."
+                    );
                     // Ensure the bulk actions bar is hidden if no items
-                    const bulkActionsBar = document.getElementById("bulkActionsBar");
+                    const bulkActionsBar =
+                        document.getElementById("bulkActionsBar");
                     if (bulkActionsBar) {
                         bulkActionsBar.style.display = "none";
                     }

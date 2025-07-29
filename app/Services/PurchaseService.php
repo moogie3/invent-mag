@@ -27,10 +27,7 @@ class PurchaseService
 
         $pos = $query->paginate($entries);
 
-        foreach ($pos as $po) {
-            $summary = PurchaseHelper::calculateInvoiceSummary($po->items, $po->discount_total, $po->discount_total_type);
-            $po->total_amount = $summary['finalTotal'];
-        }
+        
 
         $totalinvoice = $pos->total();
         $items = POItem::all();
@@ -44,8 +41,6 @@ class PurchaseService
 
         $allPurchases = Purchase::with('items', 'supplier')->get();
         foreach ($allPurchases as $p) {
-            $summary = PurchaseHelper::calculateInvoiceSummary($p->items->toArray(), $p->discount_total, $p->discount_total_type);
-            $p->total_amount = $summary['finalTotal'];
 
             if ($p->supplier->location === 'IN') {
                 $inCount++;
@@ -101,6 +96,31 @@ class PurchaseService
         return compact('pos', 'suppliers', 'products', 'items', 'isPaid');
     }
 
+    public function getPurchaseViewData($id)
+    {
+        $pos = Purchase::with(['items', 'supplier'])->find($id);
+
+        if (!$pos) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Purchase with ID {$id} not found.");
+        }
+
+        $suppliers = Supplier::all();
+        $items = POItem::all();
+        $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary($pos->items, $pos->discount_total, $pos->discount_total_type);
+        $subtotal = $summary['subtotal'];
+        $itemCount = $summary['itemCount'];
+        $totalProductDiscount = $summary['totalProductDiscount'];
+        $orderDiscount = $summary['orderDiscount'];
+        $finalTotal = $summary['finalTotal'];
+
+        return compact('pos', 'suppliers', 'items', 'itemCount', 'subtotal', 'orderDiscount', 'finalTotal', 'totalProductDiscount');
+    }
+
+    public function getPurchaseForModal($id)
+    {
+        return Purchase::with(['supplier', 'items.product'])->findOrFail($id);
+    }
+
     public function createPurchase(array $data): Purchase
     {
         return DB::transaction(function () use ($data) {
@@ -123,7 +143,9 @@ class PurchaseService
             ]);
 
             $totalAmount = 0;
+            $subtotal = 0;
             foreach ($products as $productData) {
+                $subtotal += $productData['price'] * $productData['quantity'];
                 $itemTotal = PurchaseHelper::calculateTotal($productData['price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed');
                 POItem::create([
                     'po_id' => $purchase->id,
@@ -142,7 +164,8 @@ class PurchaseService
                 }
             }
 
-            $finalTotal = PurchaseHelper::calculateDiscount($totalAmount, $purchase->discount_total, $purchase->discount_total_type);
+            $orderDiscount = PurchaseHelper::calculateDiscount($totalAmount, $purchase->discount_total, $purchase->discount_total_type);
+            $finalTotal = $totalAmount - $orderDiscount;
             $purchase->update(['total' => $finalTotal]);
 
             return $purchase;
@@ -176,10 +199,13 @@ class PurchaseService
                 'discount_total_type' => $data['discount_total_type'] ?? 'fixed',
                 'status' => $data['status'] ?? 'Unpaid',
                 'payment_type' => $data['payment_type'] ?? '-',
+                'payment_date' => ($data['status'] ?? 'Unpaid') === 'Paid' ? now() : null,
             ]);
 
             $totalAmount = 0;
+            $subtotal = 0;
             foreach ($products as $productData) {
+                $subtotal += $productData['price'] * $productData['quantity'];
                 $itemTotal = PurchaseHelper::calculateTotal($productData['price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed');
                 POItem::create([
                     'po_id' => $purchase->id,
@@ -198,7 +224,8 @@ class PurchaseService
                 }
             }
 
-            $finalTotal = PurchaseHelper::calculateDiscount($totalAmount, $purchase->discount_total, $purchase->discount_total_type);
+            $orderDiscount = PurchaseHelper::calculateDiscount($totalAmount, $purchase->discount_total, $purchase->discount_total_type);
+            $finalTotal = $totalAmount - $orderDiscount;
             $purchase->update(['total' => $finalTotal]);
 
             return $purchase;

@@ -64,7 +64,7 @@
                             <div class="d-flex justify-content-between">
                                 <div><strong>Payment Date:</strong></div>
                                 <div>
-                                    {{ $pos->payment_date->setTimezone(auth()->user()->timezone)->format('d F Y H:i') }}
+                                    {{ $pos->payment_date->format('d F Y H:i') }}
                                 </div>
                             </div>
                         @endif
@@ -123,9 +123,9 @@
                             <tr>
                                 <td class="text-center">{{ $index + 1 }}</td>
                                 <td>
-                                    <div class="strong">{{ $item->product->name }}</div>
+                                    <div class="strong">{{ $item->product->name ?? 'N/A' }}</div>
                                     @if (isset($item->product->sku) && $item->product->sku)
-                                        <small class="text-muted">SKU: {{ $item->product->sku }}</small>
+                                        <small class="text-muted">SKU: {{ $item->product->sku ?? 'N/A' }}</small>
                                     @endif
                                 </td>
                                 <td class="text-center">{{ $item->quantity }}</td>

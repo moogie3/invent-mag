@@ -48,24 +48,23 @@ class PurchaseController extends Controller
 
     public function view($id)
     {
-        $pos = Purchase::with(['items', 'supplier'])->find($id);
-        $suppliers = Supplier::all();
-        $items = POItem::all();
-        $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary($pos->items->toArray(), $pos->discount_total, $pos->discount_total_type);
-        $subtotal = $summary['subtotal'];
-        $itemCount = $summary['itemCount'];
-        $totalProductDiscount = $summary['totalProductDiscount'];
-        $orderDiscount = $summary['orderDiscount'];
-        $finalTotal = $summary['finalTotal'];
+        $data = $this->purchaseService->getPurchaseViewData($id);
 
-        return view('admin.po.purchase-view', compact('pos', 'suppliers', 'items', 'itemCount', 'subtotal', 'orderDiscount', 'finalTotal', 'totalProductDiscount'));
+        return view('admin.po.purchase-view', $data);
     }
 
     public function modalView($id)
     {
-        $pos = Purchase::with(['supplier', 'items.product'])->findOrFail($id);
-
-        return view('admin.layouts.modals.pomodals-view', compact('pos'));
+        try {
+            $pos = $this->purchaseService->getPurchaseForModal($id);
+            return view('admin.layouts.modals.pomodals-view', compact('pos'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Purchase record not found for modal view: {$id}");
+            return response('<div class="alert alert-danger">Purchase record not found.</div>', 404);
+        } catch (\Exception $e) {
+            Log::error("Error loading purchase modal view for ID {$id}: " . $e->getMessage(), ['exception' => $e]);
+            return response('<div class="alert alert-danger">Error loading purchase details: ' . $e->getMessage() . '</div>', 500);
+        }
     }
 
     public function store(Request $request)

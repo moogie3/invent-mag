@@ -26,28 +26,50 @@ class PurchaseService
         }
 
         $pos = $query->paginate($entries);
-        $totalinvoice = Purchase::count();
+
+        foreach ($pos as $po) {
+            $summary = PurchaseHelper::calculateInvoiceSummary($po->items, $po->discount_total, $po->discount_total_type);
+            $po->total_amount = $summary['finalTotal'];
+        }
+
+        $totalinvoice = $pos->total();
         $items = POItem::all();
-        $inCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })->count();
-        $inCountamount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })
-            ->where('status', 'Unpaid')
-            ->sum('total');
 
-        $outCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'OUT');
-        })->count();
-        $outCountamount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'OUT');
-        })
-            ->where('status', 'Unpaid')
-            ->sum('total');
+        $inCount = 0;
+        $inCountamount = 0;
+        $outCount = 0;
+        $outCountamount = 0;
+        $totalMonthly = 0;
+        $paymentMonthly = 0;
 
-        $totalMonthly = Purchase::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
-        $paymentMonthly = Purchase::whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->where('status', 'Paid')->sum('total');
+        $allPurchases = Purchase::with('items', 'supplier')->get();
+        foreach ($allPurchases as $p) {
+            $summary = PurchaseHelper::calculateInvoiceSummary($p->items->toArray(), $p->discount_total, $p->discount_total_type);
+            $p->total_amount = $summary['finalTotal'];
+
+            if ($p->supplier->location === 'IN') {
+                $inCount++;
+                if ($p->status === 'Unpaid') {
+                    $inCountamount += $p->total_amount;
+                }
+            }
+
+            if ($p->supplier->location === 'OUT') {
+                $outCount++;
+                if ($p->status === 'Unpaid') {
+                    $outCountamount += $p->total_amount;
+                }
+            }
+
+            if ($p->created_at->isCurrentMonth()) {
+                $totalMonthly += $p->total_amount;
+            }
+
+            if ($p->status === 'Paid' && $p->updated_at->isCurrentMonth()) {
+                $paymentMonthly += $p->total_amount;
+            }
+        }
+
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
 
@@ -72,10 +94,11 @@ class PurchaseService
         }
 
         $suppliers = Supplier::all();
+        $products = Product::all();
         $items = POItem::all();
         $isPaid = $pos->status == 'Paid';
 
-        return compact('pos', 'suppliers', 'items', 'isPaid');
+        return compact('pos', 'suppliers', 'products', 'items', 'isPaid');
     }
 
     public function createPurchase(array $data): Purchase
@@ -152,6 +175,7 @@ class PurchaseService
                 'discount_total' => $data['discount_total'] ?? 0,
                 'discount_total_type' => $data['discount_total_type'] ?? 'fixed',
                 'status' => $data['status'] ?? 'Unpaid',
+                'payment_type' => $data['payment_type'] ?? '-',
             ]);
 
             $totalAmount = 0;

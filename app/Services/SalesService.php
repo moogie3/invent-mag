@@ -252,6 +252,9 @@ class SalesService
                 'total' => $grandTotal,
                 'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
+                'status' => $data['status'] ?? 'Unpaid',
+                'payment_type' => $data['payment_type'] ?? '-',
+                'payment_date' => ($data['status'] ?? 'Unpaid') === 'Paid' ? now() : null,
             ]);
 
             foreach ($products as $productData) {

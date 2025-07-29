@@ -91,8 +91,8 @@ class Sales extends Model
         'order_discount' => 'float',
         'amount_received' => 'float',
         'change_amount' => 'float',
-        'is_pos' => 'boolean'
-        // Removed datetime casts here since we'll handle them with accessors/mutators
+        'is_pos' => 'boolean',
+        'payment_date' => 'datetime'
     ];
 
     // Get user timezone or fallback to app timezone
@@ -154,21 +154,5 @@ class Sales extends Model
             ->setTimezone('UTC');
     }
 
-    // Payment Date Accessors & Mutators
-    public function getPaymentDateAttribute($value)
-    {
-        if (!$value) return null;
-        return \Carbon\Carbon::parse($value)->setTimezone($this->getUserTimezone());
-    }
-
-    public function setPaymentDateAttribute($value)
-    {
-        if (!$value) {
-            $this->attributes['payment_date'] = null;
-            return;
-        }
-
-        $this->attributes['payment_date'] = \Carbon\Carbon::parse($value, $this->getUserTimezone())
-            ->setTimezone('UTC');
-    }
+    
 }

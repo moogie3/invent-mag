@@ -51,7 +51,7 @@ class PurchaseController extends Controller
         $pos = Purchase::with(['items', 'supplier'])->find($id);
         $suppliers = Supplier::all();
         $items = POItem::all();
-        $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary($pos->items, $pos->discount_total, $pos->discount_total_type);
+        $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary($pos->items->toArray(), $pos->discount_total, $pos->discount_total_type);
         $subtotal = $summary['subtotal'];
         $itemCount = $summary['itemCount'];
         $totalProductDiscount = $summary['totalProductDiscount'];
@@ -82,7 +82,7 @@ class PurchaseController extends Controller
 
         try {
             $this->purchaseService->createPurchase($request->all());
-            return redirect()->route('admin.po.create')->with('success', 'Purchase Order created successfully.');
+            return redirect()->route('admin.po')->with('success', 'Purchase Order created successfully.');
         } catch (\Exception $e) {
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])

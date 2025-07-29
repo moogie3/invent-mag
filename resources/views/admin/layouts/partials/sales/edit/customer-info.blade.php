@@ -5,13 +5,13 @@
         </h4>
         <input type="hidden" name="customer_id" value="{{ $sales->customer->id }}">
         <h4 class="mb-2">{{ $sales->customer->name }}</h3>
-            <div class="text-muted mb-1">
-                <i class="ti ti-map-pin me-1"></i>
-                {{ $sales->customer->address }}
-            </div>
-            <div class="text-muted mb-1">
-                <i class="ti ti-phone me-1"></i>
-                {{ $sales->customer->phone_number }}
-            </div>
+        <div class="text-muted mb-1">
+            <i class="ti ti-map-pin me-1"></i>
+            {{ $sales->customer->address }}
+        </div>
+        <div class="text-muted mb-1">
+            <i class="ti ti-phone me-1"></i>
+            {{ $sales->customer->phone_number }}
+        </div>
     </div>
 </div>

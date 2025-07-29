@@ -6,13 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sales;
-use App\Models\SalesItem;
-use App\Models\Tax;
-use App\Models\User;
 use App\Services\SalesService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SalesController extends Controller
@@ -92,9 +87,6 @@ class SalesController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'products' => 'required|json',
-        ]);
 
         $sale = Sales::findOrFail($id);
 

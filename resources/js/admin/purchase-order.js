@@ -444,7 +444,7 @@ class PurchaseOrderCreate extends PurchaseOrderModule {
 
         // Add to products array
         this.products.push({
-            id: productId,
+            product_id: productId,
             uniqueId,
             name: productName,
             quantity,
@@ -710,6 +710,8 @@ class PurchaseOrderEdit extends PurchaseOrderModule {
                 ".discount-type-input"
             ),
             amountInputs: document.querySelectorAll(".amount-input"),
+            form: document.getElementById("edit-po-form"),
+            productsJsonInput: document.getElementById("products-json"),
         };
     }
 
@@ -742,6 +744,13 @@ class PurchaseOrderEdit extends PurchaseOrderModule {
         if (this.elements.discountTotalType) {
             this.elements.discountTotalType.addEventListener("change", () =>
                 this.calculateOrderTotal()
+            );
+        }
+
+        if (this.elements.form) {
+            this.elements.form.addEventListener(
+                "submit",
+                this.serializeProducts.bind(this)
             );
         }
     }
@@ -840,6 +849,44 @@ class PurchaseOrderEdit extends PurchaseOrderModule {
         }
         if (this.elements.totalDiscountInput) {
             this.elements.totalDiscountInput.value = orderDiscountAmount;
+        }
+    }
+
+    serializeProducts() {
+        const products = [];
+        document.querySelectorAll("tbody tr").forEach((row) => {
+            const itemId = row.querySelector(".quantity-input")?.dataset.itemId;
+            if (!itemId) {
+                return;
+            }
+
+            const quantity = parseFloat(
+                row.querySelector(`.quantity-input[data-item-id="${itemId}"]`)
+                    .value
+            );
+            const price = parseFloat(
+                row.querySelector(`.price-input[data-item-id="${itemId}"]`)
+                    .value
+            );
+            const discount = parseFloat(
+                row.querySelector(`.discount-input[data-item-id="${itemId}"]`)
+                    .value
+            );
+            const discountType = row.querySelector(
+                `.discount-type-input[data-item-id="${itemId}"]`
+            ).value;
+
+            products.push({
+                product_id: itemId, // Assuming itemId is the product_id
+                quantity: quantity,
+                price: price,
+                discount: discount,
+                discount_type: discountType,
+            });
+        });
+
+        if (this.elements.productsJsonInput) {
+            this.elements.productsJsonInput.value = JSON.stringify(products);
         }
     }
 }

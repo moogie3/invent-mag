@@ -6,12 +6,12 @@
         <div class="d-flex justify-content-between mb-2">
             <div><strong>Order Date:</strong></div>
             <div>{{ $sales->order_date->format('d F Y') }}</div>
-            <input type="hidden" name="order_date" value="{{ $sales->order_date->format('Y-m-d') }}">
+            <input type="hidden" name="order_date" value="{{ $sales->order_date }}">
         </div>
         <div class="d-flex justify-content-between mb-2">
             <div><strong>Due Date:</strong></div>
             <div>{{ $sales->due_date->format('d F Y') }}</div>
-            <input type="hidden" name="due_date" value="{{ $sales->due_date->format('Y-m-d') }}">
+            <input type="hidden" name="due_date" value="{{ $sales->due_date }}">
         </div>
 
         <div class="d-flex justify-content-between mb-2">

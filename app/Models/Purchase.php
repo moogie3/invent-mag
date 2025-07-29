@@ -56,7 +56,12 @@ class Purchase extends Model
 
     public function getGrandTotalAttribute()
     {
-        return $this->sub_total - $this->discount_total;
+        $orderDiscount = \App\Helpers\PurchaseHelper::calculateDiscount(
+            $this->sub_total,
+            $this->discount_total,
+            $this->discount_total_type
+        );
+        return $this->sub_total - $orderDiscount;
     }
 
     public function getTotalAmountAttribute()

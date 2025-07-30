@@ -14,6 +14,10 @@ class SalesOpportunityItem extends Model
         'price',
     ];
 
+    protected $casts = [
+        'price' => 'float',
+    ];
+
     public function salesOpportunity(): BelongsTo
     {
         return $this->belongsTo(SalesOpportunity::class);
@@ -21,6 +25,9 @@ class SalesOpportunityItem extends Model
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class)->withDefault([
+            'name' => 'Unknown Product',
+            'selling_price' => 0,
+        ]);
     }
 }

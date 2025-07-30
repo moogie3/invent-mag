@@ -30,7 +30,11 @@
                                         <div class="card-body border-bottom py-3"
                                             data-initial-pipelines="{{ json_encode($pipelines) }}"
                                             data-initial-customers="{{ json_encode($customers) }}"
-                                            data-currency-symbol="{{ \App\Helpers\CurrencyHelper::getCurrencySymbol() }}">
+                                            data-currency-symbol="{{ \App\Helpers\CurrencyHelper::getCurrencySymbol() }}"
+                                            data-decimal-places="{{ \App\Models\CurrencySetting::first()->decimal_places ?? 0 }}"
+                                            data-decimal-separator="{{ \App\Models\CurrencySetting::first()->decimal_separator ?? '.' }}"
+                                            data-thousand-separator="{{ \App\Models\CurrencySetting::first()->thousand_separator ?? ',' }}"
+                                            >
                                             <div class="d-flex align-items-center justify-content-between mb-4">
                                                 <div class="d-flex align-items-center">
                                                     <i class="ti ti-chart-line fs-1 me-3 text-primary"></i>
@@ -361,6 +365,8 @@
                     <form id="editOpportunityForm">
                         <div class="modal-body">
                             <input type="hidden" id="editOpportunityId" name="id">
+                            <input type="hidden" id="editOpportunityPipelineId" name="sales_pipeline_id">
+                            <input type="hidden" id="editOpportunityStageId" name="pipeline_stage_id">
                             <div class="mb-3">
                                 <label for="editOpportunityName" class="form-label">
                                     <i class="ti ti-target me-1"></i>Opportunity Name

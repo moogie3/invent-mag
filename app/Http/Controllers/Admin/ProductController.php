@@ -233,14 +233,15 @@ class ProductController extends Controller
     public function search(Request $request)
     {
         $query = trim($request->get('q', ''));
-        $products = $this->productService->searchProducts($query);
 
-        return response()->json([
-            'success' => true,
-            'products' => $products,
-            'count' => $products->count(),
-            'query' => $query,
-            'message' => $products->count() > 0 ? 'Products found' : 'No products found'
-        ]);
+        if (empty($query)) {
+            // If the query is empty, return all products
+            $products = Product::all();
+        } else {
+            // Otherwise, perform the search
+            $products = $this->productService->searchProducts($query);
+        }
+
+        return response()->json($products);
     }
 }

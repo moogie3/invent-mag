@@ -82,12 +82,12 @@ class SalesPipelineService
 
             $totalAmount = 0;
             foreach ($data['items'] as $itemData) {
-                $itemData['price'] = round($itemData['price']);
+                $itemData['price'] = round($itemData['price'], 2);
                 $opportunity->items()->create($itemData);
                 $totalAmount += ($itemData['quantity'] * $itemData['price']);
             }
 
-            $opportunity->update(['amount' => round($totalAmount)]);
+            $opportunity->update(['amount' => round($totalAmount, 2)]);
 
             return $opportunity;
         });
@@ -96,7 +96,7 @@ class SalesPipelineService
     public function updateOpportunity(SalesOpportunity $opportunity, array $data): SalesOpportunity
     {
         return DB::transaction(function () use ($opportunity, $data) {
-            $opportunity->update([
+            $updateData = [
                 'customer_id' => $data['customer_id'],
                 'sales_pipeline_id' => $data['sales_pipeline_id'],
                 'pipeline_stage_id' => $data['pipeline_stage_id'],
@@ -104,20 +104,33 @@ class SalesPipelineService
                 'description' => $data['description'],
                 'expected_close_date' => $data['expected_close_date'],
                 'status' => $data['status'],
-            ]);
+            ];
 
             $opportunity->items()->delete();
-
             $totalAmount = 0;
-            foreach ($data['items'] as $itemData) {
-                $itemData['price'] = round($itemData['price']);
-                $opportunity->items()->create($itemData);
-                $totalAmount += ($itemData['quantity'] * $itemData['price']);
+            $itemsToCreate = [];
+            if (!empty($data['items'])) {
+                foreach ($data['items'] as $itemData) {
+                    $price = round($itemData['price'], 2);
+                    $quantity = $itemData['quantity'];
+                    $itemsToCreate[] = [
+                        'product_id' => $itemData['product_id'],
+                        'quantity' => $quantity,
+                        'price' => $price,
+                    ];
+                    $totalAmount += ($quantity * $price);
+                }
             }
 
-            $opportunity->update(['amount' => round($totalAmount)]);
+            $updateData['amount'] = round($totalAmount, 2);
 
-            return $opportunity;
+            $opportunity->update($updateData);
+
+            if (!empty($itemsToCreate)) {
+                $opportunity->items()->createMany($itemsToCreate);
+            }
+
+            return $opportunity->load('items');
         });
     }
 

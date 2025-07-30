@@ -46,4 +46,21 @@ class SalesOpportunity extends Model
     {
         return $this->hasMany(SalesOpportunityItem::class);
     }
+
+    /**
+     * Calculate the total amount from items before saving.
+     *
+     * @param array $options
+     * @return bool
+     */
+    public function save(array $options = [])
+    {
+        if ($this->relationLoaded('items')) {
+            $this->amount = $this->items->sum(function ($item) {
+                return $item->quantity * $item->price;
+            });
+        }
+
+        return parent::save($options);
+    }
 }

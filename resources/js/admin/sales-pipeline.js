@@ -27,35 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "editOpportunityCustomer"
     );
 
-    // Confirmation Modal Helper
-    const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-    const confirmationModalConfirmBtn = document.getElementById('confirmationModalConfirm');
-    const confirmationModalTitle = document.getElementById('confirmationModalTitle');
-    const confirmationModalBody = document.getElementById('confirmationModalBody');
-
-    function showConfirmationModal(title, body) {
-        return new Promise((resolve) => {
-            confirmationModalTitle.textContent = title;
-            confirmationModalBody.innerHTML = body;
-
-            const confirmHandler = () => {
-                resolve(true);
-                confirmationModal.hide();
-                confirmationModalConfirmBtn.removeEventListener('click', confirmHandler);
-            };
-
-            const cancelHandler = () => {
-                resolve(false);
-                confirmationModal.hide();
-                confirmationModalConfirmBtn.removeEventListener('click', confirmHandler);
-            };
-
-            confirmationModalConfirmBtn.addEventListener('click', confirmHandler);
-            document.getElementById('confirmationModal').addEventListener('hidden.bs.modal', cancelHandler, { once: true });
-
-            confirmationModal.show();
-        });
-    }
+    
 
     const CSRF_TOKEN = document
         .querySelector('meta[name="csrf-token"]')
@@ -92,16 +64,51 @@ document.addEventListener("DOMContentLoaded", function () {
         "editOpportunityTotalAmount"
     );
 
+    // Initialize Flatpickr for date fields
+    let newOpportunityExpectedCloseDateFlatpickr;
+    const newOpportunityDateElement = document.getElementById("opportunityExpectedCloseDate");
+    if (newOpportunityDateElement) {
+        newOpportunityExpectedCloseDateFlatpickr = flatpickr(newOpportunityDateElement, {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "d F Y",
+            allowInput: true,
+        });
+    }
+
+    let editOpportunityExpectedCloseDateFlatpickr;
+
     // Parse initial data with error handling
     let allPipelines = [];
     let allCustomers = [];
+
+    
+
     let allProducts = []; // New array for products
 
+    let currencySettings = {
+        symbol: "$",
+        decimalPlaces: 2,
+        decimalSeparator: ".",
+        thousandSeparator: ",",
+    };
+
     try {
-        const initialDataContainer = document.querySelector('.card-body[data-initial-pipelines]');
+        const initialDataContainer = document.querySelector(
+            ".card-body[data-initial-pipelines]"
+        );
         const pipelinesData = initialDataContainer.dataset.initialPipelines;
         const customersData = initialDataContainer.dataset.initialCustomers;
-        const currencySymbol = initialDataContainer.dataset.currencySymbol;
+
+        currencySettings.symbol =
+            initialDataContainer.dataset.currencySymbol || "$";
+        currencySettings.decimalPlaces = parseInt(
+            initialDataContainer.dataset.decimalPlaces || 2
+        );
+        currencySettings.decimalSeparator =
+            initialDataContainer.dataset.decimalSeparator || ".";
+        currencySettings.thousandSeparator =
+            initialDataContainer.dataset.thousandSeparator || ",";
 
         if (pipelinesData && pipelinesData.trim()) {
             allPipelines = JSON.parse(pipelinesData);
@@ -113,10 +120,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("Parsed pipelines:", allPipelines);
         console.log("Parsed customers:", allCustomers);
+        console.log("Currency Settings:", currencySettings);
     } catch (error) {
         console.error("Error parsing initial data:", error);
-        showToast('Error', 'Error loading initial data. Please refresh the page.', 'error');
+        window.showToast(
+            "Error",
+            "Error loading initial data. Please refresh the page.",
+            "error"
+        );
         return;
+    }
+
+    // Helper function to format currency in JavaScript
+    function formatCurrencyJs(amount) {
+        let number = parseFloat(amount);
+        if (isNaN(number)) {
+            return amount; // Return original if not a valid number
+        }
+
+        const parts = number
+            .toFixed(currencySettings.decimalPlaces)
+            .split(".");
+        let integerPart = parts[0];
+        let decimalPart = parts.length > 1 ? parts[1] : "";
+
+        integerPart = integerPart.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            currencySettings.thousandSeparator
+        );
+
+        let formattedAmount = integerPart;
+        if (currencySettings.decimalPlaces > 0) {
+            formattedAmount += currencySettings.decimalSeparator + decimalPart;
+        }
+
+        return currencySettings.symbol + " " + formattedAmount;
     }
 
     // Initial data rendering
@@ -149,7 +187,11 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("Fetched products:", allProducts);
         } catch (error) {
             console.error("Error fetching products:", error);
-            showToast('Error', 'Failed to load product data. Please refresh the page.', 'error');
+            window.showToast(
+                "Error",
+                "Failed to load product data. Please refresh the page.",
+                "error"
+            );
         }
     }
 
@@ -165,17 +207,21 @@ document.addEventListener("DOMContentLoaded", function () {
             allPipelines = await pipelinesResponse.json();
 
             // Re-render relevant parts after fetching updated data
-            renderPipelinesSelect();
+            renderPipelinesSelect(false); // Don't automatically reload the board
             renderPipelinesList();
 
             console.log("Data refreshed successfully");
         } catch (error) {
             console.error("Error re-fetching data:", error);
-            showToast('Error', 'Failed to re-fetch data. Please try again.', 'error');
+            window.showToast(
+                "Error",
+                "Failed to re-fetch data. Please try again.",
+                "error"
+            );
         }
     }
 
-    function renderPipelinesSelect() {
+    function renderPipelinesSelect(shouldLoadBoard = true) {
         if (!pipelineSelect) return;
 
         pipelineSelect.innerHTML = '<option value="">Select Pipeline</option>';
@@ -201,7 +247,9 @@ document.addEventListener("DOMContentLoaded", function () {
             allPipelines.find((p) => p.is_default) || allPipelines[0];
         if (defaultPipeline) {
             pipelineSelect.value = defaultPipeline.id;
-            loadPipelineBoard(defaultPipeline.id);
+            if (shouldLoadBoard) {
+                loadPipelineBoard(defaultPipeline.id);
+            }
         }
     }
 
@@ -213,8 +261,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!selectedPipeline) return;
 
         try {
+            const cacheBuster = new Date().getTime();
             const opportunitiesResponse = await fetch(
-                `${SALES_PIPELINE_ROUTES.opportunitiesIndex}?pipeline_id=${pipelineId}`
+                `${SALES_PIPELINE_ROUTES.opportunitiesIndex}?pipeline_id=${pipelineId}&_=${cacheBuster}`
             );
             if (!opportunitiesResponse.ok) {
                 throw new Error("Failed to fetch opportunities");
@@ -224,10 +273,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const totalPipelineValue = responseData.total_pipeline_value;
 
             // Update the total pipeline value display
-            const pipelineValueElement = document.getElementById('pipelineValue');
+            const pipelineValueElement =
+                document.getElementById("pipelineValue");
             if (pipelineValueElement) {
-                const formattedValue = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(totalPipelineValue);
-                pipelineValueElement.textContent = formattedValue;
+                pipelineValueElement.textContent =
+                    formatCurrencyJs(totalPipelineValue);
             }
 
             selectedPipeline.stages
@@ -241,9 +291,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     stageColumn.innerHTML = `
                 <div class="card card-stacked">
                     <div class="card-header">
-                        <h3 class="card-title">${stage.name} (${stageOpportunities.length})</h3>
+                        <h3 class="card-title">${stage.name} (${
+                stageOpportunities.length
+            })</h3>
                     </div>
-                    <div class="card-body p-2 stage-column" data-stage-id="${stage.id}" style="min-height: 150px;">
+                    <div class="card-body p-2 stage-column" data-stage-id="${
+                stage.id
+            }" style="min-height: 150px;">
                         <!-- Opportunities will be dragged here -->
                     </div>
                 </div>
@@ -286,9 +340,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const customerName = opportunity.customer
             ? opportunity.customer.name
             : "Unknown Customer";
-        const currencySymbol = pageBody.dataset.currencySymbol || "$"; // Get currency symbol from data attribute
         const amount = opportunity.amount
-            ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(opportunity.amount)
+            ? formatCurrencyJs(opportunity.amount)
             : "No amount";
         const expectedCloseDate = opportunity.expected_close_date
             ? new Date(opportunity.expected_close_date).toLocaleDateString()
@@ -302,8 +355,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     <strong>Amount:</strong> ${amount}<br>
                     <strong>Expected Close:</strong> ${expectedCloseDate}<br>
                     <strong>Status:</strong> <span class="badge badge-${getStatusColor(
-                        opportunity.status
-                    )}-lt">${opportunity.status.charAt(0).toUpperCase() + opportunity.status.slice(1)}</span>
+                opportunity.status
+            )}-lt">${
+                opportunity.status.charAt(0).toUpperCase() +
+                opportunity.status.slice(1)
+            }</span>
                 </p>
                 <div class="btn-group btn-group-sm" role="group">
                     <button type="button" class="btn btn-outline-primary btn-sm edit-opportunity-btn"
@@ -375,11 +431,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     : ""
             }</h5>
                             <p class="card-text">${
-                                pipeline.description || "No description"
-                            }</p>
+                pipeline.description || "No description"
+            }</p>
                             <small class="text-muted">Stages: ${
-                                pipeline.stages ? pipeline.stages.length : 0
-                            }</small>
+                pipeline.stages ? pipeline.stages.length : 0
+            }</small>
                         </div>
                         <div class="col-auto">
                             <div class="btn-group" role="group">
@@ -423,8 +479,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="col">
                             <strong>${stage.name}</strong>
                             <small class="text-muted">Position: ${
-                                stage.position
-                            }</small>
+                stage.position
+            }</small>
                             ${
                                 stage.is_closed
                                     ? '<span class="badge bg-secondary ms-2">Closed Stage</span>'
@@ -452,19 +508,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const productId = item.product_id || "";
         const quantity = item.quantity || "";
-        const price = item.price || "";
+        const price = parseFloat(item.price || 0).toFixed(currencySettings.decimalPlaces);
 
         let productOptions = '<option value="">Select Product</option>';
         allProducts.forEach((product) => {
             const selected = product.id == productId ? "selected" : "";
             productOptions += `<option value="${product.id}" data-price="${
-                product.price || 0
+                product.selling_price || 0
             }" ${selected}>${product.name}</option>`;
         });
 
         itemDiv.innerHTML = `
             <div class="col-md-5">
-                <label for="${containerId}-product-${index}" class="form-label">Product</label>
+                <label for="${containerId}-product-${index}" class="form-label">Product ${
+            index + 1
+        }</label>
                 <select class="form-select product-select" id="${containerId}-product-${index}" name="items[${index}][product_id]" required>
                     ${productOptions}
                 </select>
@@ -492,7 +550,9 @@ document.addEventListener("DOMContentLoaded", function () {
         productSelect.addEventListener("change", function () {
             const selectedOption = this.options[this.selectedIndex];
             const productPrice = parseFloat(selectedOption.dataset.price || 0);
-            priceInput.value = productPrice.toFixed(2);
+            priceInput.value = productPrice.toFixed(
+                currencySettings.decimalPlaces
+            );
             calculateTotalAmount(containerId);
         });
 
@@ -507,9 +567,66 @@ document.addEventListener("DOMContentLoaded", function () {
             .addEventListener("click", function () {
                 itemDiv.remove();
                 calculateTotalAmount(containerId);
+                updateProductItemLabels(containerId);
             });
 
         return itemDiv;
+    }
+
+    function updateProductItemLabels(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const itemRows = container.querySelectorAll(".product-item-row");
+        itemRows.forEach((row, index) => {
+            const newIndex = index;
+            row.dataset.index = newIndex;
+
+            const productLabel = row.querySelector(
+                `label[for^='${containerId}-product-']`
+            );
+            if (productLabel) {
+                productLabel.textContent = `Product ${newIndex + 1}`;
+                productLabel.setAttribute(
+                    "for",
+                    `${containerId}-product-${newIndex}`
+                );
+            }
+
+            const productSelect = row.querySelector(".product-select");
+            if (productSelect) {
+                productSelect.id = `${containerId}-product-${newIndex}`;
+                productSelect.name = `items[${newIndex}][product_id]`;
+            }
+
+            const quantityLabel = row.querySelector(
+                `label[for^='${containerId}-quantity-']`
+            );
+            const quantityInput = row.querySelector(".quantity-input");
+            if (quantityInput) {
+                quantityInput.id = `${containerId}-quantity-${newIndex}`;
+                quantityInput.name = `items[${newIndex}][quantity]`;
+                if (quantityLabel)
+                    quantityLabel.setAttribute(
+                        "for",
+                        `${containerId}-quantity-${newIndex}`
+                    );
+            }
+
+            const priceLabel = row.querySelector(
+                `label[for^='${containerId}-price-']`
+            );
+            const priceInput = row.querySelector(".price-input");
+            if (priceInput) {
+                priceInput.id = `${containerId}-price-${newIndex}`;
+                priceInput.name = `items[${newIndex}][price]`;
+                if (priceLabel)
+                    priceLabel.setAttribute(
+                        "for",
+                        `${containerId}-price-${newIndex}`
+                    );
+            }
+        });
     }
 
     // Helper function to calculate total amount
@@ -526,9 +643,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (containerId === "newOpportunityItemsContainer") {
-            newOpportunityTotalAmountInput.value = total.toFixed(2);
+            newOpportunityTotalAmountInput.value = formatCurrencyJs(total);
         } else if (containerId === "editOpportunityItemsContainer") {
-            editOpportunityTotalAmountInput.value = total.toFixed(2);
+            editOpportunityTotalAmountInput.value = formatCurrencyJs(total);
         }
     }
 
@@ -578,7 +695,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Found Pipeline:", selectedPipeline);
 
         if (!selectedPipeline) {
-            showToast('Error', 'Please select a pipeline first.', 'error');
+            window.showToast("Error", "Please select a pipeline first.", "error");
             return;
         }
 
@@ -590,7 +707,11 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         if (!selectedPipeline.stages || selectedPipeline.stages.length === 0) {
-            showToast('Error', 'The selected pipeline has no stages. Please add stages to the pipeline first.', 'error');
+            window.showToast(
+                "Error",
+                "The selected pipeline has no stages. Please add stages to the pipeline first.",
+                "error"
+            );
             return;
         }
 
@@ -649,13 +770,17 @@ document.addEventListener("DOMContentLoaded", function () {
             ).hide();
             this.reset();
             newOpportunityItemsContainer.innerHTML = ""; // Clear items
-            newOpportunityTotalAmountInput.value = "0.00"; // Reset total
+            newOpportunityTotalAmountInput.value = formatCurrencyJs(0); // Reset total
             loadPipelineBoard(selectedPipelineId);
 
-            showToast('Success', 'Opportunity created successfully!', 'success');
+            window.showToast("Success", "Opportunity created successfully!", "success");
         } catch (error) {
             console.error("Error creating opportunity:", error);
-            showToast('Error', 'Failed to create opportunity. Please try again.', 'error');
+            window.showToast(
+                "Error",
+                "Failed to create opportunity. Please try again.",
+                "error"
+            );
         }
     });
 
@@ -690,10 +815,14 @@ document.addEventListener("DOMContentLoaded", function () {
             await fetchData();
             this.reset();
 
-            showToast('Success', 'Pipeline created successfully!', 'success');
+            window.showToast("Success", "Pipeline created successfully!", "success");
         } catch (error) {
             console.error("Error creating pipeline:", error);
-            showToast('Error', 'Failed to create pipeline. Please try again.', 'error');
+            window.showToast(
+                "Error",
+                "Failed to create pipeline. Please try again.",
+                "error"
+            );
         }
     });
 
@@ -729,10 +858,14 @@ document.addEventListener("DOMContentLoaded", function () {
             ).hide();
             await fetchData();
 
-            showToast('Success', 'Pipeline updated successfully!', 'success');
+            window.showToast("Success", "Pipeline updated successfully!", "success");
         } catch (error) {
             console.error("Error updating pipeline:", error);
-            showToast('Error', 'Failed to update pipeline. Please try again.', 'error');
+            window.showToast(
+                "Error",
+                "Failed to update pipeline. Please try again.",
+                "error"
+            );
         }
     });
 
@@ -742,7 +875,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const pipelineId = newStagePipelineId.value;
 
         if (!pipelineId) {
-            showToast('Error', 'Pipeline ID is missing. Please close and reopen the modal.', 'error');
+            window.showToast(
+                "Error",
+                "Pipeline ID is missing. Please close and reopen the modal.",
+                "error"
+            );
             return;
         }
 
@@ -751,7 +888,7 @@ document.addEventListener("DOMContentLoaded", function () {
         data.is_closed = formData.has("is_closed");
 
         if (!data.name) {
-            showToast('Error', 'Please fill in all required fields.', 'error');
+            window.showToast("Error", "Please fill in all required fields.", "error");
             return;
         }
 
@@ -770,7 +907,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(`Failed to create stage: ${errorData.message || response.status}`);
+                throw new Error(
+                    `Failed to create stage: ${
+                        errorData.message || response.status
+                    }`
+                );
             }
 
             // THE FIX: Force a complete refresh of the pipeline data from the server
@@ -780,18 +921,17 @@ document.addEventListener("DOMContentLoaded", function () {
             loadPipelineBoard(pipelineId);
 
             // Also re-render the stages list inside the modal for consistency
-            const updatedPipeline = allPipelines.find(p => p.id == pipelineId);
+            const updatedPipeline = allPipelines.find((p) => p.id == pipelineId);
             if (updatedPipeline) {
                 renderPipelineStages(updatedPipeline);
             }
 
             this.reset();
 
-            showToast('Success', 'Stage created successfully!', 'success');
-
+            window.showToast("Success", "Stage created successfully!", "success");
         } catch (error) {
             console.error("Error creating stage:", error);
-            showToast('Error', `Failed to create stage. Please try again.`, 'error');
+            window.showToast("Error", `Failed to create stage. Please try again.`, "error");
         }
     });
 
@@ -802,7 +942,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const opportunityId =
             document.getElementById("editOpportunityId").value;
         const formData = new FormData(this);
-        const data = Object.fromEntries(formData);
+        const data = Object.fromEntries(formData.entries());
+
+        // Manually add pipeline and stage IDs from the hidden fields
+        data.sales_pipeline_id = document.getElementById('editOpportunityPipelineId').value;
+        data.pipeline_stage_id = document.getElementById('editOpportunityStageId').value;
 
         // Collect items data
         const items = [];
@@ -821,7 +965,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch(
                 `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}`,
                 {
-                    method: "PUT",
+                    method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": CSRF_TOKEN,
@@ -835,15 +979,24 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             // Close modal and refresh board
+            const currentPipelineId = pipelineSelect.value;
             bootstrap.Modal.getInstance(
                 document.getElementById("editOpportunityModal")
             ).hide();
-            loadPipelineBoard(pipelineSelect.value);
+            await fetchData(); // Refresh pipelines and stages
+            pipelineSelect.value = currentPipelineId; // Restore the selected pipeline
+            loadPipelineBoard(currentPipelineId); // Refresh the board with the correct pipeline
 
-            alert("Opportunity updated successfully!");
+            window.showToast("Success", "Opportunity updated successfully!", "success");
+
+            
         } catch (error) {
             console.error("Error updating opportunity:", error);
-            alert("Failed to update opportunity. Please try again.");
+            window.showToast(
+                "Error",
+                "Failed to update opportunity. Please try again.",
+                "error"
+            );
         }
     });
 
@@ -881,7 +1034,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.closest(".delete-pipeline-btn")) {
             const pipelineId = e.target.closest(".delete-pipeline-btn").dataset
                 .pipelineId;
-            const confirmed = await showConfirmationModal('Delete Pipeline', 'Are you sure you want to delete this pipeline?');
+            const confirmed = await showConfirmationModal(
+                "Delete Pipeline",
+                "Are you sure you want to delete this pipeline?"
+            );
             if (confirmed) {
                 try {
                     const response = await fetch(
@@ -899,10 +1055,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
                     await fetchData();
-                    showToast('Success', 'Pipeline deleted successfully!', 'success');
+                    window.showToast("Success", "Pipeline deleted successfully!", "success");
                 } catch (error) {
                     console.error("Error deleting pipeline:", error);
-                    showToast('Error', 'Failed to delete pipeline. Please try again.', 'error');
+                    window.showToast(
+                        "Error",
+                        "Failed to delete pipeline. Please try again.",
+                        "error"
+                    );
                 }
             }
         }
@@ -911,7 +1071,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.closest(".delete-stage-btn")) {
             const stageId =
                 e.target.closest(".delete-stage-btn").dataset.stageId;
-            const confirmed = await showConfirmationModal('Delete Stage', 'Are you sure you want to delete this stage?');
+            const confirmed = await showConfirmationModal(
+                "Delete Stage",
+                "Are you sure you want to delete this stage?"
+            );
             if (confirmed) {
                 try {
                     const response = await fetch(
@@ -934,10 +1097,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         renderPipelineStages(pipelineId);
                     }
 
-                    showToast('Success', 'Stage deleted successfully!', 'success');
+                    window.showToast("Success", "Stage deleted successfully!", "success");
                 } catch (error) {
                     console.error("Error deleting stage:", error);
-                    showToast('Error', 'Failed to delete stage. Please try again.', 'error');
+                    window.showToast(
+                        "Error",
+                        "Failed to delete stage. Please try again.",
+                        "error"
+                    );
                 }
             }
         }
@@ -952,6 +1119,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}`
                 );
                 if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error(
+                        `Server error fetching opportunity: Status ${response.status} - ${response.statusText}`,
+                        errorData
+                    );
                     throw new Error("Failed to fetch opportunity");
                 }
                 const opportunity = await response.json();
@@ -960,21 +1132,35 @@ document.addEventListener("DOMContentLoaded", function () {
                     opportunity.id;
                 document.getElementById("editOpportunityName").value =
                     opportunity.name;
-                document.getElementById("editOpportunityCustomer").value =
-                    opportunity.customer_id;
-                // document.getElementById("editOpportunityAmount").value = // Removed direct amount input
-                //     opportunity.amount || "";
-                document.getElementById(
-                    "editOpportunityExpectedCloseDate"
-                ).value = opportunity.expected_close_date || "";
-                document.getElementById("editOpportunityDescription").value =
-                    opportunity.description || "";
-                document.getElementById("editOpportunityStatus").value =
-                    opportunity.status;
                 document.getElementById("editOpportunityPipelineId").value =
                     opportunity.sales_pipeline_id;
                 document.getElementById("editOpportunityStageId").value =
                     opportunity.pipeline_stage_id;
+                document.getElementById("editOpportunityPipelineId").value =
+                    opportunity.sales_pipeline_id;
+                document.getElementById("editOpportunityStageId").value =
+                    opportunity.pipeline_stage_id;
+                document.getElementById("editOpportunityCustomer").value =
+                    opportunity.customer_id;
+                document.getElementById("editOpportunityStatus").value = opportunity.status;
+                // document.getElementById("editOpportunityAmount").value = // Removed direct amount input
+                //     opportunity.amount || "";
+                // Initialize Flatpickr for the edit form if not already initialized
+                if (!editOpportunityExpectedCloseDateFlatpickr) {
+                    editOpportunityExpectedCloseDateFlatpickr = flatpickr(document.getElementById("editOpportunityExpectedCloseDate"), {
+                        dateFormat: "Y-m-d",
+                        altInput: true,
+                        altFormat: "d F Y",
+                        allowInput: true,
+                    });
+                }
+
+                // Set the date for the Flatpickr instance
+                if (opportunity.expected_close_date) {
+                    editOpportunityExpectedCloseDateFlatpickr.setDate(opportunity.expected_close_date);
+                } else {
+                    editOpportunityExpectedCloseDateFlatpickr.clear();
+                }
 
                 // Populate items
                 editOpportunityItemsContainer.innerHTML = ""; // Clear existing items
@@ -995,8 +1181,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("editOpportunityModal")
                 ).show();
             } catch (error) {
-                console.error("Error fetching opportunity:", error);
-                showToast('Error', 'Failed to fetch opportunity details. Please try again.', 'error');
+                console.error("Error in edit opportunity fetch:", error);
+                window.showToast(
+                    "Error",
+                    "Failed to fetch opportunity details. Please try again.",
+                    "error"
+                );
             }
         }
 
@@ -1004,7 +1194,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.closest(".delete-opportunity-btn")) {
             const opportunityId = e.target.closest(".delete-opportunity-btn")
                 .dataset.opportunityId;
-            const confirmed = await showConfirmationModal('Delete Opportunity', 'Are you sure you want to delete this opportunity?');
+            const confirmed = await showConfirmationModal(
+                "Delete Opportunity",
+                "Are you sure you want to delete this opportunity?"
+            );
             if (confirmed) {
                 try {
                     const response = await fetch(
@@ -1022,10 +1215,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
                     loadPipelineBoard(pipelineSelect.value);
-                    showToast('Success', 'Opportunity deleted successfully!', 'success');
+                    window.showToast(
+                        "Success",
+                        "Opportunity deleted successfully!",
+                        "success"
+                    );
                 } catch (error) {
                     console.error("Error deleting opportunity:", error);
-                    showToast('Error', 'Failed to delete opportunity. Please try again.', 'error');
+                    window.showToast(
+                        "Error",
+                        "Failed to delete opportunity. Please try again.",
+                        "error"
+                    );
                 }
             }
         }
@@ -1034,7 +1235,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.closest(".convert-opportunity-btn")) {
             const opportunityId = e.target.closest(".convert-opportunity-btn")
                 .dataset.opportunityId;
-            const confirmed = await showConfirmationModal('Convert Opportunity', 'Are you sure you want to convert this opportunity to a Sales Order?');
+            const confirmed = await window.showConfirmModal(
+                "Convert Opportunity",
+                "Are you sure you want to convert this opportunity to a Sales Order?"
+            );
             if (confirmed) {
                 try {
                     const response = await fetch(
@@ -1059,7 +1263,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     const result = await response.json();
                     loadPipelineBoard(pipelineSelect.value);
-                    showToast('Success', result.message, 'success');
+                    window.showToast("Success", result.message, "success");
                 } catch (error) {
                     console.error("Error converting opportunity:", error);
                     alert("Failed to convert opportunity: " + error.message);
@@ -1092,7 +1296,11 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("Opportunity moved successfully");
         } catch (error) {
             console.error("Error moving opportunity:", error);
-            showToast('Error', 'Failed to move opportunity. Please try again.', 'error');
+            window.showToast(
+                "Error",
+                "Failed to move opportunity. Please try again.",
+                "error"
+            );
             // Reload the board to revert the visual change
             loadPipelineBoard(pipelineSelect.value);
         }
@@ -1100,4 +1308,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Initialize the application
     initializeData();
+
+    // Initialize Flatpickr for date fields
+    flatpickr("#opportunityExpectedCloseDate", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d F Y",
+        allowInput: true,
+    });
+    flatpickr("#editOpportunityExpectedCloseDate", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d F Y",
+        allowInput: true,
+    });
 });

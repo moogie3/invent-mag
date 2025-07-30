@@ -186,7 +186,12 @@ class SalesPipelineController extends Controller
 
     public function showOpportunity(SalesOpportunity $opportunity)
     {
-        return response()->json($opportunity->load('customer', 'pipeline', 'stage', 'items.product'));
+        try {
+            return response()->json($opportunity->load('customer', 'pipeline', 'stage', 'items.product'));
+        } catch (\Exception $e) {
+            \Log::error('Error fetching opportunity details: ' . $e->getMessage(), ['opportunity_id' => $opportunity->id, 'exception' => $e]);
+            return response()->json(['message' => 'Failed to fetch opportunity details.', 'error' => $e->getMessage()], 500);
+        }
     }
 
     public function moveOpportunity(Request $request, SalesOpportunity $opportunity)

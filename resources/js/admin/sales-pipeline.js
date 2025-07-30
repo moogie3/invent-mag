@@ -319,8 +319,15 @@ document.addEventListener("DOMContentLoaded", function () {
                             onEnd: function (evt) {
                                 const opportunityId =
                                     evt.item.dataset.opportunityId;
+                                const oldStageId = evt.from.dataset.stageId;
                                 const newStageId = evt.to.dataset.stageId;
-                                moveOpportunity(opportunityId, newStageId);
+                                if (oldStageId !== newStageId) {
+                                    moveOpportunity(
+                                        opportunityId,
+                                        newStageId,
+                                        oldStageId
+                                    );
+                                }
                             },
                         });
                     }
@@ -1273,7 +1280,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Move opportunity between stages
-    async function moveOpportunity(opportunityId, newStageId) {
+    async function moveOpportunity(opportunityId, newStageId, oldStageId) {
         try {
             const response = await fetch(
                 `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}/move`,
@@ -1294,6 +1301,10 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             console.log("Opportunity moved successfully");
+
+            // Update stage counts without reloading the board
+            updateStageCount(oldStageId, -1);
+            updateStageCount(newStageId, 1);
         } catch (error) {
             console.error("Error moving opportunity:", error);
             window.showToast(
@@ -1303,6 +1314,22 @@ document.addEventListener("DOMContentLoaded", function () {
             );
             // Reload the board to revert the visual change
             loadPipelineBoard(pipelineSelect.value);
+        }
+    }
+
+    function updateStageCount(stageId, change) {
+        const stageColumn = pipelineBoard.querySelector(`[data-stage-id="${stageId}"]`);
+        if (stageColumn) {
+            const cardHeader = stageColumn.closest(".card-stacked").querySelector(".card-header");
+            if (cardHeader) {
+                const title = cardHeader.querySelector(".card-title");
+                if (title) {
+                    const currentCount = parseInt(title.textContent.match(/\((\d+)\)/)[1], 10);
+                    const newCount = currentCount + change;
+                    const stageName = title.textContent.split("(")[0].trim();
+                    title.textContent = `${stageName} (${newCount})`;
+                }
+            }
         }
     }
 

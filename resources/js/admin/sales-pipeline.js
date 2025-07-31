@@ -77,8 +77,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     let editOpportunityExpectedCloseDateFlatpickr;
-
-    // Parse initial data with error handling
     let allPipelines = [];
     let allCustomers = [];
 
@@ -351,7 +349,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ? formatCurrencyJs(opportunity.amount)
             : "No amount";
         const expectedCloseDate = opportunity.expected_close_date
-            ? new Date(opportunity.expected_close_date).toLocaleDateString()
+            ? new Date(opportunity.expected_close_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
             : "No date";
 
         card.innerHTML = `
@@ -378,7 +376,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <i class="ti ti-trash"></i> Delete
                     </button>
                     ${
-                        opportunity.status === "won"
+                        opportunity.status === "won" && !opportunity.sales_id
                             ? `<button type="button" class="btn btn-success btn-sm convert-opportunity-btn" data-opportunity-id="${opportunity.id}"><i class="ti ti-check"></i> Convert to Sales Order</button>`
                             : ""
                     }
@@ -397,6 +395,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 return "success";
             case "lost":
                 return "danger";
+            case "converted":
+                return "info";
             default:
                 return "secondary";
         }
@@ -1240,42 +1240,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Convert Opportunity Button
         if (e.target.closest(".convert-opportunity-btn")) {
-            const opportunityId = e.target.closest(".convert-opportunity-btn")
-                .dataset.opportunityId;
-            const confirmed = await window.showConfirmModal(
-                "Convert Opportunity",
-                "Are you sure you want to convert this opportunity to a Sales Order?"
-            );
-            if (confirmed) {
-                try {
-                    const response = await fetch(
-                        `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}/convert`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "X-CSRF-TOKEN": CSRF_TOKEN,
-                            },
-                        }
-                    );
-
-                    if (!response.ok) {
-                        const errorData = await response
-                            .json()
-                            .catch(() => ({}));
-                        throw new Error(
-                            errorData.message ||
-                                "Failed to convert opportunity."
-                        );
-                    }
-
-                    const result = await response.json();
-                    loadPipelineBoard(pipelineSelect.value);
-                    window.showToast("Success", result.message, "success");
-                } catch (error) {
-                    console.error("Error converting opportunity:", error);
-                    alert("Failed to convert opportunity: " + error.message);
-                }
-            }
+            const opportunityId = e.target.closest(".convert-opportunity-btn").dataset.opportunityId;
+            const convertModal = new bootstrap.Modal(document.getElementById('convertOpportunityModal'));
+            document.getElementById('convertOpportunityId').value = opportunityId;
+            document.getElementById('convertOpportunityForm').action = `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}/convert`;
+            convertModal.show();
         }
     });
 
@@ -1349,4 +1318,62 @@ document.addEventListener("DOMContentLoaded", function () {
         altFormat: "d F Y",
         allowInput: true,
     });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const convertOpportunityForm = document.getElementById('convertOpportunityForm');
+
+    if (convertOpportunityForm) {
+        convertOpportunityForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const url = form.action;
+            const formData = new FormData(form);
+            const opportunityId = document.getElementById('convertOpportunityId').value;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const convertModal = bootstrap.Modal.getInstance(document.getElementById('convertOpportunityModal'));
+                convertModal.hide();
+
+                if (data.type === 'success') {
+                    window.showToast('Success', data.message, 'success');
+                    
+                    // Find the opportunity card and update it
+                    const opportunityCard = document.querySelector(`.opportunity-card[data-opportunity-id='${opportunityId}']`);
+                    if (opportunityCard) {
+                        // Update status badge
+                        const statusBadge = opportunityCard.querySelector('.badge');
+                        if (statusBadge) {
+                            statusBadge.textContent = 'Converted';
+                            statusBadge.classList.remove('badge-success-lt');
+                            statusBadge.classList.add('badge-info-lt');
+                        }
+
+                        // Remove the convert button
+                        const convertButton = opportunityCard.querySelector('.convert-opportunity-btn');
+                        if (convertButton) {
+                            convertButton.remove();
+                        }
+                    }
+                } else {
+                    window.showToast('Error', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const convertModal = bootstrap.Modal.getInstance(document.getElementById('convertOpportunityModal'));
+                convertModal.hide();
+                window.showToast('Error', 'An unexpected error occurred.', 'error');
+            });
+        });
+    }
 });

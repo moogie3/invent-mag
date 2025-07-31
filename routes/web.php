@@ -132,6 +132,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/opportunities/{opportunity}', [SalesPipelineController::class, 'showOpportunity'])->name('admin.sales_pipeline.opportunities.show');
             Route::delete('/opportunities/{opportunity}', [SalesPipelineController::class, 'destroyOpportunity'])->name('admin.sales_pipeline.opportunities.destroy');
             Route::put('/opportunities/{opportunity}/move', [SalesPipelineController::class, 'moveOpportunity'])->name('admin.sales_pipeline.opportunities.move');
+            Route::get('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'showConvertForm'])->name('admin.sales_pipeline.opportunities.convert.show');
             Route::post('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'convertToSalesOrder'])->name('admin.sales_pipeline.opportunities.convert');
         });
 

@@ -147,12 +147,12 @@ class SalesPipelineService
 
     public function convertToSalesOrder(SalesOpportunity $opportunity): Sales
     {
-        if ($opportunity->status !== 'won') {
-            throw new \Exception('Opportunity must be in a "won" status to be converted.');
+        if ($opportunity->status === 'converted' || $opportunity->sales_id) {
+            throw new \Exception('This opportunity has already been converted to a sales order.');
         }
 
-        if ($opportunity->sales) {
-            throw new \Exception('This opportunity has already been converted to a sales order.');
+        if ($opportunity->status !== 'won') {
+            throw new \Exception('Opportunity must be in a "won" status to be converted.');
         }
 
         return DB::transaction(function () use ($opportunity) {

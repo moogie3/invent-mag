@@ -359,16 +359,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     <strong>Customer:</strong> ${customerName}<br>
                     <strong>Amount:</strong> ${amount}<br>
                     <strong>Expected Close:</strong> ${expectedCloseDate}<br>
-                    <strong>Status:</strong> <span class="badge badge-${getStatusColor(
+                    <strong>Status:</strong> <span class="badge ${getStatusColor(
                 opportunity.status
-            )}-lt">${
+            )}">${
                 opportunity.status.charAt(0).toUpperCase() +
                 opportunity.status.slice(1)
             }</span>
                 </p>
                 <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" class="btn btn-outline-primary btn-sm edit-opportunity-btn"
-                            data-opportunity-id="${opportunity.id}">
+                    <button type="button" class="btn btn-outline-primary btn-sm edit-opportunity-btn" 
+                            data-opportunity-id="${opportunity.id}" ${opportunity.status === 'converted' ? 'disabled' : ''}>
                         <i class="ti ti-edit"></i> Edit
                     </button>
                     <button type="button" class="btn btn-outline-danger btn-sm delete-opportunity-btn"
@@ -390,15 +390,15 @@ document.addEventListener("DOMContentLoaded", function () {
     function getStatusColor(status) {
         switch (status) {
             case "open":
-                return "primary";
+                return "badge-outline text-blue";
             case "won":
-                return "success";
+                return "badge-outline text-green";
             case "lost":
-                return "danger";
+                return "badge-outline text-red";
             case "converted":
-                return "info";
+                return "badge-outline text-teal";
             default:
-                return "secondary";
+                return "badge-outline text-gray";
         }
     }
 
@@ -1300,6 +1300,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         }
+    }
+
+    // Show confirmation modal
+    function showConfirmationModal(title, body) {
+        return new Promise((resolve) => {
+            const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            document.getElementById('confirmationModalTitle').textContent = title;
+            document.getElementById('confirmationModalBody').textContent = body;
+            document.getElementById('confirmationModalConfirm').onclick = () => {
+                modal.hide();
+                resolve(true);
+            };
+            document.getElementById('confirmationModal').addEventListener('hidden.bs.modal', () => {
+                resolve(false);
+            }, { once: true });
+            modal.show();
+        });
     }
 
     // Initialize the application

@@ -522,7 +522,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const selected = product.id == productId ? "selected" : "";
             productOptions += `<option value="${product.id}" data-price="${
                 product.selling_price || 0
-            }" ${selected}>${product.name}</option>`;
+            }" data-stock="${product.stock_quantity || 0}" ${selected}>${product.name} (Stock: ${product.stock_quantity || 0})</option>`;
         });
 
         itemDiv.innerHTML = `
@@ -536,7 +536,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <div class="col-md-3">
                 <label for="${containerId}-quantity-${index}" class="form-label">Quantity</label>
-                <input type="number" class="form-control quantity-input" id="${containerId}-quantity-${index}" name="items[${index}][quantity]" value="${quantity}" min="1" required>
+                <input type="number" class="form-control quantity-input" id="${containerId}-quantity-${index}" name="items[${index}][quantity]" value="${quantity}" min="1" max="${item.product ? item.product.stock_quantity : ''}" required>
             </div>
             <div class="col-md-3">
                 <label for="${containerId}-price-${index}" class="form-label">Price</label>
@@ -557,15 +557,25 @@ document.addEventListener("DOMContentLoaded", function () {
         productSelect.addEventListener("change", function () {
             const selectedOption = this.options[this.selectedIndex];
             const productPrice = parseFloat(selectedOption.dataset.price || 0);
+            const productStock = parseFloat(selectedOption.dataset.stock || 0);
             priceInput.value = productPrice.toFixed(
                 currencySettings.decimalPlaces
             );
+            quantityInput.max = productStock; // Set max quantity to stock
+            if (parseFloat(quantityInput.value) > productStock) {
+                quantityInput.value = productStock; // Adjust quantity if it exceeds stock
+            }
             calculateTotalAmount(containerId);
         });
 
-        quantityInput.addEventListener("input", () =>
-            calculateTotalAmount(containerId)
-        );
+        quantityInput.addEventListener("input", () => {
+            const maxStock = parseFloat(quantityInput.max);
+            if (parseFloat(quantityInput.value) > maxStock) {
+                quantityInput.value = maxStock;
+                window.showToast("Warning", `Quantity cannot exceed available stock (${maxStock}).`, "warning");
+            }
+            calculateTotalAmount(containerId);
+        });
         priceInput.addEventListener("input", () =>
             calculateTotalAmount(containerId)
         );

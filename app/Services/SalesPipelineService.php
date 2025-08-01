@@ -210,12 +210,21 @@ class SalesPipelineService
 
                 $product = Product::find($item->product_id);
                 if ($product) {
+                    // Determine the correct stock attribute
+                    $stockAttribute = null;
                     if (isset($product->stock_quantity)) {
-                        $product->decrement('stock_quantity', $item->quantity);
+                        $stockAttribute = 'stock_quantity';
                     } elseif (isset($product->quantity)) {
-                        $product->decrement('quantity', $item->quantity);
+                        $stockAttribute = 'quantity';
                     } elseif (isset($product->stock)) {
-                        $product->decrement('stock', $item->quantity);
+                        $stockAttribute = 'stock';
+                    }
+
+                    if ($stockAttribute) {
+                        if ($product->{$stockAttribute} < $item->quantity) {
+                            throw new \Exception('Insufficient stock for product: ' . $product->name . '. Available: ' . $product->{$stockAttribute} . ', Requested: ' . $item->quantity);
+                        }
+                        $product->decrement($stockAttribute, $item->quantity);
                     }
                 }
             }

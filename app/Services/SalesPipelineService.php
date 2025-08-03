@@ -136,7 +136,34 @@ class SalesPipelineService
 
     public function deleteOpportunity(SalesOpportunity $opportunity): void
     {
-        $opportunity->delete();
+        DB::transaction(function () use ($opportunity) {
+            // If the opportunity was converted to a sales order, delete the sales order and roll back stock
+            if ($opportunity->sales_id) {
+                $salesOrder = Sales::find($opportunity->sales_id);
+                if ($salesOrder) {
+                    foreach ($salesOrder->salesItems as $item) {
+                        $product = Product::find($item->product_id);
+                        if ($product) {
+                            // Determine the correct stock attribute and increment
+                            $stockAttribute = null;
+                            if (isset($product->stock_quantity)) {
+                                $stockAttribute = 'stock_quantity';
+                            } elseif (isset($product->quantity)) {
+                                $stockAttribute = 'quantity';
+                            } elseif (isset($product->stock)) {
+                                $stockAttribute = 'stock';
+                            }
+
+                            if ($stockAttribute) {
+                                $product->increment($stockAttribute, $item->quantity);
+                            }
+                        }
+                    }
+                    $salesOrder->delete(); // This will also delete salesItems due to cascade on delete if set up, or manually if not.
+                }
+            }
+            $opportunity->delete();
+        });
     }
 
     public function moveOpportunity(SalesOpportunity $opportunity, int $stageId): SalesOpportunity

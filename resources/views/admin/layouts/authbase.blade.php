@@ -32,6 +32,7 @@
             </div>
         </div>
     </div>
+    @include('admin.layouts.partials.session-notifications')
     @include('admin.layouts.script')
 </body>
 

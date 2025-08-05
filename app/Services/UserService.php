@@ -34,10 +34,6 @@ class UserService
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'shopname' => $data['shopname'],
-            'address' => $data['address'],
-            'avatar' => $data['avatar'],
-            'timezone' => $data['timezone'],
         ]);
 
         if (isset($data['roles'])) {
@@ -56,10 +52,6 @@ class UserService
         $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
-            'shopname' => $data['shopname'],
-            'address' => $data['address'],
-            'avatar' => $data['avatar'],
-            'timezone' => $data['timezone'],
         ]);
 
         if (isset($data['password'])) {

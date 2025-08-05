@@ -55,6 +55,9 @@ Route::prefix('admin')->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
+        // MOVED: Role-permissions route - accessible to authenticated users
+        Route::get('/roles-permissions', [UserController::class, 'getRolePermissions'])->name('admin.roles-permissions');
+
         // Product Routes
         Route::prefix('product')->group(function () {
             Route::get('/', [ProductController::class, 'index'])->name('admin.product');

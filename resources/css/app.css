@@ -1638,7 +1638,30 @@ body {
     min-height: 320px;
 }
 
+/* Toast Notification Styles */
+.toast-content {
+    position: relative;
+    overflow: hidden;
+}
+
+.toast-color-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 6px; /* Adjust as needed for desired thickness */
+    border-top-left-radius: 0.75rem; /* Match toast border-radius */
+    border-bottom-left-radius: 0.75rem; /* Match toast border-radius */
+    z-index: 1; /* Ensure it's behind the content but within the toast */
+}
+
+.toast-content > .d-flex {
+    position: relative;
+    z-index: 2; /* Ensure content is above the color bar */
+}
+
 /* Responsive adjustments */
+
 @media (max-width: 768px) {
     .shadcn-alert-item {
         padding: 10px;

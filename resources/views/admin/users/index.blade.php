@@ -69,12 +69,9 @@
                                                     <a href="#" class="btn btn-sm edit-user-btn"
                                                         data-bs-toggle="modal" data-bs-target="#editUserModal"
                                                         data-user-id="{{ $user->id }}">Edit</a>
-                                                    <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
-                                                        onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                                    </form>
+                                                    <a href="#" class="btn btn-sm btn-danger delete-user-btn"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteUserModal"
+                                                        data-user-id="{{ $user->id }}">Delete</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -88,5 +85,57 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteUserModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+        const deleteUserForm = document.getElementById('deleteUserForm');
+        const deleteButton = deleteUserForm.querySelector('button[type="submit"]');
+
+        document.querySelectorAll('.delete-user-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = this.getAttribute('data-user-id');
+                let actionTemplate = "{{ route('admin.users.destroy', ['user' => 'USER_ID_PLACEHOLDER']) }}";
+                const action = actionTemplate.replace('USER_ID_PLACEHOLDER', userId);
+                deleteUserForm.setAttribute('action', action);
+            });
+        });
+
+        deleteButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            const form = deleteUserForm;
+            const action = form.getAttribute('action');
+
+            fetch(action, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    deleteUserModal.hide();
+                    // Show success toast
+                    toastr.success(data.message);
+                    // Refresh page after a short delay
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    // Handle errors if needed
+                    toastr.error('An error occurred.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toastr.error('An error occurred.');
+            });
+        });
+    });
+</script>
+@endpush
 
 @include('admin.layouts.modals.usersmodals')

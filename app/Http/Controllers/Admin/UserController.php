@@ -92,6 +92,27 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $this->userService->deleteUser($user);
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'User deleted successfully.']);
+        }
+
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
+
+    public function getRolePermissions()
+{
+    $roles = Role::with('permissions')->get();
+    $allPermissions = Permission::all()->pluck('name');
+
+    $rolePermissions = [];
+    foreach ($roles as $role) {
+        $rolePermissions[$role->name] = $role->permissions->pluck('name')->toArray();
+    }
+
+    return response()->json([
+        'rolePermissions' => $rolePermissions,
+        'allPermissions' => $allPermissions
+    ]);
+}
 }

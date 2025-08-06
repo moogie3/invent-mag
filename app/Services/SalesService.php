@@ -65,6 +65,7 @@ class SalesService
 
     public function getSalesViewData($id)
     {
+        /** @var \App\Models\Sales $sales */
         $sales = Sales::with(['salesItems', 'customer'])->find($id);
 
         if (strpos($sales->invoice, 'POS-') === 0) {

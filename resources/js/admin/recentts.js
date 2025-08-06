@@ -181,8 +181,6 @@ function confirmMarkAsPaid() {
         });
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-
 function clearSelection() {
     document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
         checkbox.checked = false;

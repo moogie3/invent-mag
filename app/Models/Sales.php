@@ -8,6 +8,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @property int $id
+ * @property string $invoice
+ * @property \Illuminate\Support\Carbon $order_date
+ * @property float $total
+ * @property string $order_discount_type
+ * @property float $order_discount
+ * @property float $tax_rate
+ * @property float $amount_received
+ * @property float $total_tax
+ * @property \Illuminate\Support\Carbon $due_date
+ * @property string $payment_type
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property string $status
+ * @property \Illuminate\Support\Carbon $updated_at
+ */
 class Sales extends Model
 {
     use HasFactory;

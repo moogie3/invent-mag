@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTOs\TransactionDTO;
 use App\Models\Purchase;
 use App\Models\Sales;
 use Carbon\Carbon;

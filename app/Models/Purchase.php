@@ -11,6 +11,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $status
  * @property string $discount_total_type
  * @property float $discount_total
+ * @property string $invoice
+ * @property \Illuminate\Support\Carbon $order_date
+ * @property \Illuminate\Support\Carbon $due_date
+ * @property string $payment_type
+ * @property float $total
+ * @property float $total_amount
+ * @property float $sub_total
+ * @property float $grand_total
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  */
 class Purchase extends Model
 {

@@ -169,7 +169,7 @@ class ProductController extends Controller
     public function getProductMetrics()
     {
         $totalproduct = Product::count();
-        $totalcategory = \App\Models\Categories::count();
+        $totalcategory = Categories::count();
         $lowStockCount = Product::lowStockCount();
         $expiringSoonCount = Product::expiringSoonCount();
 

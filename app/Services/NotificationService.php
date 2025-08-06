@@ -154,7 +154,7 @@ class NotificationService
         });
     }
 
-    private function getStatusInfo(string $status, \Carbon\Carbon $dueDate, ?\Carbon\Carbon $paymentDate = null): array
+    private function getStatusInfo(string $status, Carbon $dueDate, ? Carbon $paymentDate = null): array
     {
         $today = Carbon::today();
         $diffDays = $today->diffInDays($dueDate, false);

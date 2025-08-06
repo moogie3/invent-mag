@@ -672,7 +672,7 @@ function setupQuickCreateCustomerForm() {
 
     customerForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        console.log("Customer form submitted");
+        
 
         const form = this;
         const formData = new FormData(form);
@@ -774,7 +774,7 @@ function setupQuickCreateProductForm() {
 
     productForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        console.log("Product form submitted");
+        
 
         const form = this;
         const formData = new FormData(form);

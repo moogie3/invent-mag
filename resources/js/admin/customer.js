@@ -386,13 +386,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                console.log(
-                    `Loading CRM data for customer ${id}, page ${page}, append: ${append}`
-                );
+                
 
                 fetch(`/admin/customers/${id}/crm-details?page=${page}`)
                     .then((response) => {
-                        console.log("Response status:", response.status);
+                        
                         if (!response.ok) {
                             throw new Error(
                                 `HTTP error! status: ${response.status}`
@@ -401,7 +399,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         return response.json();
                     })
                     .then((data) => {
-                        console.log("CRM Data received:", data);
+                        
 
                         if (!data || !data.customer) {
                             throw new Error(
@@ -744,7 +742,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             }
                         }
 
-                        console.log("CRM data loaded successfully");
+                        
                     })
                     .catch((error) => {
                         console.error("Error loading CRM data:", error);
@@ -761,19 +759,14 @@ document.addEventListener("DOMContentLoaded", function () {
             // Modern version of loadHistoricalPurchases function
             // Function to load historical purchases - Modern & Simplified Version
             function loadHistoricalPurchases(id) {
-                console.log("loadHistoricalPurchases called for ID:", id);
+                
 
                 const historicalPurchaseContent = document.getElementById(
                     "historicalPurchaseContent"
                 );
 
-                console.log(
-                    "Attempting to get element with ID: historicalPurchaseContent"
-                );
-                console.log(
-                    "historicalPurchaseContent element:",
-                    historicalPurchaseContent
-                );
+                
+                
 
                 if (historicalPurchaseContent) {
                     // Show loading state
@@ -796,22 +789,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         return response.json();
                     })
                     .then((data) => {
-                        console.log(
-                            "Historical purchases data received:",
-                            data
-                        );
+                        
 
                         if (historicalPurchaseContent) {
-                            console.log(
-                                "historicalPurchaseContent element found."
-                            );
+                            
                             if (
                                 data.historical_purchases &&
                                 data.historical_purchases.length > 0
                             ) {
-                                console.log(
-                                    "Data has historical_purchases and it's not empty."
-                                );
+                                
 
                                 // Create modern card-based layout
                                 let contentHtml = `
@@ -880,19 +866,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     `;
 
-                                console.log(
-                                    "Generated contentHtml:",
-                                    contentHtml
-                                );
+
                                 historicalPurchaseContent.innerHTML =
                                     contentHtml;
-                                console.log(
-                                    "innerHTML updated with contentHtml."
-                                );
+                                
                             } else {
-                                console.log(
-                                    "No historical_purchases found or array is empty."
-                                );
+                                
                                 historicalPurchaseContent.innerHTML = `
                         <div class="text-center py-5">
                             <div class="mb-3">
@@ -902,9 +881,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p class="text-muted mb-0">This customer hasn't made any purchases yet.</p>
                         </div>
                     `;
-                                console.log(
-                                    "innerHTML updated with 'No purchase history' message."
-                                );
+                                
                             }
                         } else {
                             console.error(
@@ -939,17 +916,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 historicalPurchaseTab.addEventListener(
                     "shown.bs.tab",
                     function (event) {
-                        console.log(
-                            "Historical Purchase tab shown. Customer ID:",
-                            customerId
-                        );
+                        
                         const checkElement = document.getElementById(
                             "purchaseHistoryContent"
                         );
-                        console.log(
-                            "Element 'purchaseHistoryContent' in shown.bs.tab:",
-                            checkElement
-                        );
+                        
                         if (customerId) {
                             loadProductHistory(customerId);
                         }
@@ -958,7 +929,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             function loadProductHistory(id) {
-                console.log("loadProductHistory called for ID:", id);
+                
                 const productHistoryContent = document.getElementById(
                     "productHistoryContent"
                 );
@@ -976,10 +947,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 fetch(`/admin/customers/${id}/product-history`)
                     .then((response) => {
-                        console.log(
-                            "Product history response status:",
-                            response.status
-                        );
+                        
                         if (!response.ok) {
                             throw new Error(
                                 `HTTP error! status: ${response.status}`
@@ -988,15 +956,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         return response.json();
                     })
                     .then((data) => {
-                        console.log("Product history data received:", data);
+                        
                         if (productHistoryContent) {
                             if (
                                 data.product_history &&
                                 data.product_history.length > 0
                             ) {
-                                console.log(
-                                    "Data has product_history and it's not empty."
-                                );
+                                
                                 // Create modern card-based layout
                                 let contentHtml = `
                         <div class="accordion" id="crmProductHistoryAccordion">
@@ -1080,18 +1046,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                 contentHtml += `
                         </div>
                     `;
-                                console.log(
-                                    "Generated contentHtml:",
-                                    contentHtml
-                                );
+
                                 productHistoryContent.innerHTML = contentHtml;
-                                console.log(
-                                    "innerHTML updated with contentHtml."
-                                );
+                                
                             } else {
-                                console.log(
-                                    "No product_history found or array is empty."
-                                );
+                                
                                 productHistoryContent.innerHTML = `
                         <div class="text-center py-5">
                             <div class="mb-3">
@@ -1101,9 +1060,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p class="text-muted mb-0">This customer has no product history yet.</p>
                         </div>
                     `;
-                                console.log(
-                                    "innerHTML updated with 'No product history' message."
-                                );
+                                
                             }
                         } else {
                             console.error(

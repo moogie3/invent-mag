@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then((data) => {
                 rolePermissionMap = data.rolePermissions;
                 allPermissions = data.allPermissions;
-                console.log("Role permissions loaded:", rolePermissionMap);
+                
                 return data;
             })
             .catch((error) => {
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .filter((checkbox) => checkbox.checked)
             .map((checkbox) => checkbox.value);
 
-        console.log("Selected roles:", selectedRoles);
+        
 
         // Get permissions from selected roles
         const rolePermissions = new Set();
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        console.log("Role permissions:", Array.from(rolePermissions));
+        
 
         // Update permission checkboxes
         permissionCheckboxes.forEach((checkbox) => {
@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         roleCheckboxes.forEach((checkbox) => {
             checkbox.addEventListener("change", function () {
-                console.log("Role checkbox changed:", this.value, this.checked);
+                
                 syncPermissionsFromRoles(rolesContainer, permissionsContainer);
             });
         });
@@ -194,12 +194,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Setup create user modal role-permission sync
     function setupCreateUserModal() {
-        console.log("Setting up create user modal");
-        console.log("Create roles container:", createRolesContainer);
-        console.log(
-            "Create permissions container:",
-            createPermissionsContainer
-        );
+        
 
         if (createRolesContainer && createPermissionsContainer) {
             setupRolePermissionSync(
@@ -213,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Initial sync when modal opens
             createModalElement.addEventListener("shown.bs.modal", function () {
-                console.log("Create user modal opened, syncing permissions");
+                
                 syncPermissionsFromRoles(
                     createRolesContainer,
                     createPermissionsContainer
@@ -222,11 +217,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Reset when modal closes
             createModalElement.addEventListener("hidden.bs.modal", function () {
-                console.log("Create user modal closed, resetting states");
+                
                 resetPermissionStates(createPermissionsContainer);
             });
 
-            console.log("Create user modal setup complete");
+            
         } else {
             console.error("Create user modal containers not found");
         }
@@ -265,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     return response.json();
                 })
                 .then((data) => {
-                    console.log("Edit user data:", data); // Debug log
+                    
 
                     // Populate basic fields
                     editNameInput.value = data.user.name;
@@ -359,7 +354,7 @@ document.addEventListener("DOMContentLoaded", function () {
         submitBtn.disabled = true;
         submitBtn.textContent = "Updating...";
 
-        console.log("Submitting form data for user:", userId); // Debug log
+        
 
         fetch(this.action, {
             method: "POST", // Use POST for PUT/PATCH with _method field
@@ -370,14 +365,14 @@ document.addEventListener("DOMContentLoaded", function () {
             },
         })
             .then((response) => {
-                console.log("Update response status:", response.status); // Debug log
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then((data) => {
-                console.log("Update response data:", data); // Debug log
+                
 
                 if (data.success) {
                     // Show success message
@@ -503,7 +498,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".delete-user-btn").forEach((button) => {
         button.addEventListener("click", function () {
             currentUserId = this.getAttribute("data-user-id");
-            console.log("Delete user ID:", currentUserId); // Debug log
+            
 
             // Optional: Show user name in the confirmation dialog
             const userRow = this.closest("tr");
@@ -533,7 +528,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Create the delete URL
         const deleteUrl = `/admin/users/${currentUserId}`;
-        console.log("Delete URL:", deleteUrl); // Debug log
+        
 
         // Get CSRF token
         const csrfToken = document.querySelector('meta[name="csrf-token"]');
@@ -557,14 +552,14 @@ document.addEventListener("DOMContentLoaded", function () {
             },
         })
             .then((response) => {
-                console.log("Delete response status:", response.status); // Debug log
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then((data) => {
-                console.log("Delete response data:", data); // Debug log
+                
 
                 if (data.success) {
                     // Hide modal
@@ -664,9 +659,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initialize everything when the page loads
     fetchRolePermissions()
         .then(() => {
-            console.log(
-                "Role permissions fetched successfully, setting up modals"
-            );
+            
             setupCreateUserModal();
         })
         .catch((error) => {

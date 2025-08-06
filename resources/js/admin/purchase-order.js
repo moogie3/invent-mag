@@ -955,10 +955,10 @@ class PurchaseOrderView extends PurchaseOrderModule {
     }
 
     setDeleteFormAction(url) {
-        console.log("Setting delete form action to:", url); // Debug log
+        
         if (this.elements.deleteForm) {
             this.elements.deleteForm.action = url;
-            console.log("Form action set successfully"); // Debug log
+            
         } else {
             console.error("Delete form element not found");
         }
@@ -1045,7 +1045,7 @@ class PurchaseOrderBulkSelection {
 
     init() {
         if (this.isInitialized) {
-            console.log("Bulk selection already initialized");
+            
             return;
         }
 
@@ -1077,16 +1077,14 @@ class PurchaseOrderBulkSelection {
             // If there are no checkboxes, hide the bar and return
             if (this.rowCheckboxes.length === 0) {
                 this.bulkActionsBar.style.display = "none";
-                console.log(
-                    "No purchase order items to select, hiding bulk actions bar."
-                );
+                
                 return;
             }
 
             this.setupEventListeners();
             this.updateUI();
             this.isInitialized = true;
-            console.log("Bulk selection initialized successfully");
+            
         };
 
         tryInit();
@@ -1180,7 +1178,7 @@ window.getSelectedIds = function () {
 };
 
 function performBulkDelete(selectedIds, confirmButton, modal) {
-    console.log("performBulkDelete called with IDs:", selectedIds);
+    
 
     if (!selectedIds || selectedIds.length === 0) return;
 
@@ -1363,7 +1361,7 @@ window.bulkExportPO = function () {
 
 // Updated bulkMarkAsPaidPO function with smart selection (same pattern as transactions)
 window.bulkMarkAsPaidPO = function () {
-    console.log("bulkMarkAsPaidPO function called");
+    
 
     const selected = Array.from(
         document.querySelectorAll(".row-checkbox:checked")
@@ -1433,7 +1431,7 @@ window.bulkMarkAsPaidPO = function () {
         document.querySelectorAll(".row-checkbox:checked")
     ).map((cb) => cb.value);
 
-    console.log("Final selected IDs:", finalSelected);
+    
 
     // Update the count in the modal
     const bulkPaidCount = document.getElementById("bulkPaidCount");
@@ -1455,7 +1453,7 @@ window.bulkMarkAsPaidPO = function () {
         confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
         newConfirmBtn.addEventListener("click", function () {
-            console.log("Confirm bulk mark as paid button clicked");
+            
             confirmBulkMarkAsPaidPO(finalSelected, this, bulkMarkAsPaidModal);
         });
     }
@@ -1506,7 +1504,7 @@ function smartSelectUnpaidOnlyPO() {
  * Confirm bulk mark as paid function (similar to transactions)
  */
 function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
-    console.log("confirmBulkMarkAsPaidPO called with IDs:", selectedIds);
+    
 
     if (!selectedIds || selectedIds.length === 0) return;
 
@@ -1531,7 +1529,7 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
         return;
     }
 
-    console.log("CSRF token found:", csrfToken.getAttribute("content"));
+    
 
     // Make the API request
     fetch("/admin/po/bulk-mark-paid", {
@@ -1999,7 +1997,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (pathname.includes("/admin/po/create")) {
                 // Initialize create page functionality
                 window.poApp = new PurchaseOrderCreate();
-                console.log("Purchase Order Create App initialized");
+                
             } else if (
                 pathname.includes("/admin/po/edit") ||
                 (pathname.includes("/admin/po") &&
@@ -2007,7 +2005,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
                 // Initialize edit page functionality
                 window.poApp = new PurchaseOrderEdit();
-                console.log("Purchase Order Edit App initialized");
+                
             } else if (
                 pathname.includes("/admin/po/modal") ||
                 (pathname.includes("/admin/po") && pathname.match(/\/\d+$/)) ||
@@ -2015,7 +2013,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
                 // Initialize view functionality for modal or show pages
                 window.poApp = new PurchaseOrderView();
-                console.log("Purchase Order View App initialized");
+                
             } else if (
                 pathname === "/admin/po" ||
                 pathname.includes("/admin/po?") ||

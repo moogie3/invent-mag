@@ -1165,10 +1165,10 @@ class SalesOrderView extends SalesOrderModule {
     }
 
     setDeleteFormAction(url) {
-        console.log("Setting delete form action to:", url); // Debug log
+        
         if (this.elements.deleteForm) {
             this.elements.deleteForm.action = url;
-            console.log("Form action set successfully"); // Debug log
+            
         } else {
             console.error("Delete form element not found");
         }
@@ -1267,7 +1267,7 @@ class SalesOrderBulkSelection {
 
     init() {
         if (this.isInitialized) {
-            console.log("Sales bulk selection already initialized");
+            
             return;
         }
 
@@ -1290,18 +1290,12 @@ class SalesOrderBulkSelection {
                 this.rowCheckboxes.length === 0
             ) {
                 if (attempts < maxAttempts) {
-                    console.log(
-                        `Sales bulk selection init attempt ${attempts}/${maxAttempts} - retrying...`
-                    );
+                    
                     setTimeout(tryInit, 300);
                     return;
                 }
 
-                console.warn(
-                    "Sales bulk selection elements not found or no items to select after",
-                    maxAttempts,
-                    "attempts"
-                );
+                
                 // Ensure bulk actions bar is hidden if no items
                 if (this.bulkActionsBar) {
                     this.bulkActionsBar.style.display = "none";
@@ -1312,7 +1306,7 @@ class SalesOrderBulkSelection {
             this.setupEventListeners();
             this.updateUI();
             this.isInitialized = true;
-            console.log("Sales bulk selection initialized successfully");
+            
         };
 
         tryInit();
@@ -1408,7 +1402,7 @@ window.getSalesSelectedIds = function () {
 };
 
 function performBulkDeleteSales(selectedIds, confirmButton, modal) {
-    console.log("performBulkDeleteSales called with IDs:", selectedIds);
+    
 
     if (!selectedIds || selectedIds.length === 0) return;
 
@@ -1599,13 +1593,13 @@ window.bulkExportSales = function () {
 };
 
 window.bulkMarkAsPaidSales = function () {
-    console.log("bulkMarkAsPaidSales function called");
+    
 
     const selected = Array.from(
         document.querySelectorAll(".row-checkbox:checked")
     );
 
-    console.log("Initially selected items:", selected.length);
+    
 
     // If no items are selected, perform smart selection first
     if (selected.length === 0) {
@@ -1657,7 +1651,7 @@ window.bulkMarkAsPaidSales = function () {
             );
         });
 
-        console.log("Found paid items in selection:", selectedPaidSales.length);
+        
 
         if (selectedPaidSales.length > 0) {
             // Uncheck paid sales orders and show warning
@@ -1681,10 +1675,7 @@ window.bulkMarkAsPaidSales = function () {
                 document.querySelectorAll(".row-checkbox:checked")
             );
 
-            console.log(
-                "Remaining selected after filtering:",
-                remainingSelected.length
-            );
+            
 
             if (remainingSelected.length === 0) {
                 return;
@@ -1697,7 +1688,7 @@ window.bulkMarkAsPaidSales = function () {
         document.querySelectorAll(".row-checkbox:checked")
     ).map((cb) => cb.value);
 
-    console.log("Final selected IDs:", finalSelected);
+    
 
     if (finalSelected.length === 0) {
         showToast("Info", "No unpaid sales orders selected.", "info");
@@ -1724,7 +1715,7 @@ window.bulkMarkAsPaidSales = function () {
         confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
         newConfirmBtn.addEventListener("click", function () {
-            console.log("Confirm bulk mark as paid button clicked");
+            
             confirmBulkMarkAsPaidSales(
                 finalSelected,
                 this,
@@ -1799,7 +1790,7 @@ function smartSelectUnpaidOnlySales() {
 }
 
 function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
-    console.log("confirmBulkMarkAsPaidSales called with IDs:", selectedIds);
+    
 
     if (!selectedIds || selectedIds.length === 0) return;
 
@@ -1824,7 +1815,7 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
         return;
     }
 
-    console.log("CSRF token found:", csrfToken.getAttribute("content"));
+    
 
     // Make the API request
     fetch("/admin/sales/bulk-mark-paid", {
@@ -1997,13 +1988,13 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => {
         // Determine current page
         const pathname = window.location.pathname;
-        console.log("Current pathname:", pathname); // Debug log
+        
 
         try {
             if (pathname.includes("/admin/sales/create")) {
                 // Initialize create page functionality
                 window.salesApp = new SalesOrderCreate();
-                console.log("Sales Order Create App initialized");
+                
             } else if (
                 // Fix the route matching for edit pages - matches /admin/sales/edit/46
                 pathname.includes("/admin/sales/edit/") ||
@@ -2011,7 +2002,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
                 // Initialize edit page functionality
                 window.salesApp = new SalesOrderEdit();
-                console.log("Sales Order Edit App initialized");
+                
             } else if (
                 pathname.includes("/admin/sales/modal") ||
                 (pathname.includes("/admin/sales") &&
@@ -2020,14 +2011,14 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
                 // Initialize view functionality for modal or show pages
                 window.salesApp = new SalesOrderView();
-                console.log("Sales Order View App initialized");
+                
             } else if (
                 pathname === "/admin/sales" ||
                 pathname.includes("/admin/sales?") ||
                 pathname.includes("/admin/sales/")
             ) {
                 // Initialize bulk selection for index page
-                console.log("Initializing Sales Order Index page...");
+                
 
                 // Initialize view functionality even on index page for modals
                 window.salesApp = new SalesOrderView();
@@ -2035,10 +2026,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Also initialize bulk selection if the class exists
                 if (typeof SalesOrderBulkSelection !== "undefined") {
                     salesBulkSelection = new SalesOrderBulkSelection();
-                    console.log("Sales Order Index bulk selection initialized");
+                    
                 }
 
-                console.log("Sales Order Index page initialized");
+                
             }
 
             // Debug: Force initialize SalesOrderEdit if we're on any edit page

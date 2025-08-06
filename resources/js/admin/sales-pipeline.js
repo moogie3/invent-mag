@@ -116,9 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
             allCustomers = JSON.parse(customersData);
         }
 
-        console.log("Parsed pipelines:", allPipelines);
-        console.log("Parsed customers:", allCustomers);
-        console.log("Currency Settings:", currencySettings);
+        
     } catch (error) {
         console.error("Error parsing initial data:", error);
         window.showToast(
@@ -171,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error("Failed to fetch products");
             }
             allProducts = await productsResponse.json();
-            console.log("Fetched products:", allProducts);
+            
         } catch (error) {
             console.error("Error fetching products:", error);
             window.showToast(
@@ -197,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
             renderPipelinesSelect(false); // Don't automatically reload the board
             renderPipelinesList();
 
-            console.log("Data refreshed successfully");
+            
         } catch (error) {
             console.error("Error re-fetching data:", error);
             window.showToast(
@@ -688,9 +686,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectedPipelineId = pipelineSelect.value;
 
         // Debug logging
-        console.log("Selected Pipeline ID:", selectedPipelineId);
-        console.log("Selected Pipeline ID type:", typeof selectedPipelineId);
-        console.log("All Pipelines:", allPipelines);
+        
 
         // Enhanced pipeline finding with better type handling
         const selectedPipeline = allPipelines.find((p) => {
@@ -698,7 +694,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return String(p.id) === String(selectedPipelineId);
         });
 
-        console.log("Found Pipeline:", selectedPipeline);
+        
 
         if (!selectedPipeline) {
             window.showToast("Error", "Please select a pipeline first.", "error");
@@ -706,11 +702,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Additional debugging for stages
-        console.log("Pipeline stages:", selectedPipeline.stages);
-        console.log(
-            "Stages length:",
-            selectedPipeline.stages ? selectedPipeline.stages.length : 0
-        );
+        
 
         if (!selectedPipeline.stages || selectedPipeline.stages.length === 0) {
             window.showToast(
@@ -745,7 +737,7 @@ document.addEventListener("DOMContentLoaded", function () {
         data.items = items;
 
         // Debug logging
-        console.log("Form data being sent:", data);
+        
 
         try {
             const response = await fetch(
@@ -1268,7 +1260,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error("Failed to move opportunity");
             }
 
-            console.log("Opportunity moved successfully");
+            
 
             // Update stage counts without reloading the board
             updateStageCount(oldStageId, -1);

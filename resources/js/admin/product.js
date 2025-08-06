@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("load", function () {
     initModals();
     initExpiryCheckbox();
     initFlatpickr();
@@ -6,6 +6,28 @@ document.addEventListener("DOMContentLoaded", function () {
     initBulkSelection();
     initializeSearch();
     initializeEntriesSelector();
+
+    // Double-check search initialization
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput && !searchInput.hasAttribute("data-search-initialized")) {
+        initializeSearch();
+        searchInput.setAttribute("data-search-initialized", "true");
+    }
+
+    // Ensure bulk selection is working
+    const selectAllCheckbox = document.getElementById("selectAll");
+    if (
+        selectAllCheckbox &&
+        !selectAllCheckbox.hasAttribute("data-bulk-initialized")
+    ) {
+        initBulkSelection();
+        selectAllCheckbox.setAttribute("data-bulk-initialized", "true");
+    }
+
+    // Initialize selectedProductIds if not already defined
+    if (typeof selectedProductIds === "undefined") {
+        window.selectedProductIds = new Set();
+    }
 });
 
 // Store selected checkbox states globally
@@ -147,32 +169,6 @@ function setupBulkSelectionListeners({
     });
 }
 
-window.addEventListener("load", function () {
-    console.log("Window loaded, ensuring all functions are initialized");
-
-    // Double-check search initialization
-    const searchInput = document.getElementById("searchInput");
-    if (searchInput && !searchInput.hasAttribute("data-search-initialized")) {
-        initializeSearch();
-        searchInput.setAttribute("data-search-initialized", "true");
-    }
-
-    // Ensure bulk selection is working
-    const selectAllCheckbox = document.getElementById("selectAll");
-    if (
-        selectAllCheckbox &&
-        !selectAllCheckbox.hasAttribute("data-bulk-initialized")
-    ) {
-        initBulkSelection();
-        selectAllCheckbox.setAttribute("data-bulk-initialized", "true");
-    }
-
-    // Initialize selectedProductIds if not already defined
-    if (typeof selectedProductIds === "undefined") {
-        window.selectedProductIds = new Set();
-    }
-});
-
 function updateSelectAllState(selectAll, rowCheckboxes) {
     const checked = document.querySelectorAll(".row-checkbox:checked").length;
     const total = rowCheckboxes.length;
@@ -228,7 +224,7 @@ window.loadProductDetails = function (id) {
             return response.json();
         })
         .then((data) => {
-            console.log("Product data received:", data);
+            
             renderProductDetails(data);
         })
         .catch((error) => {
@@ -704,7 +700,7 @@ function handleBulkStockUpdate() {
     });
 
     if (!updates.length) {
-        console.log("No updates found, showing warning toast.");
+        
         showToast("Error", "No valid updates found.", "error");
         return;
     }
@@ -713,7 +709,7 @@ function handleBulkStockUpdate() {
         (u) => u.original_stock !== u.stock_quantity
     );
     if (!hasChanges) {
-        console.log("No changes detected, showing info toast.");
+        
         showToast("Info", "No changes detected.", "info");
         return;
     }
@@ -732,7 +728,7 @@ function handleBulkStockUpdate() {
         return;
     }
 
-    console.log("Sending bulk stock update request...");
+    
     fetch("/admin/product/bulk-update-stock", {
         method: "POST",
         headers: {
@@ -743,7 +739,7 @@ function handleBulkStockUpdate() {
         body: JSON.stringify({ updates }),
     })
         .then((response) => {
-            console.log("Received response from server.", response);
+            
             if (!response.ok) {
                 console.error(
                     "Server response not OK.",
@@ -769,11 +765,9 @@ function handleBulkStockUpdate() {
             return response.json();
         })
         .then((data) => {
-            console.log("Processing server data:", data);
+            
             if (data.success) {
-                console.log(
-                    "Update successful, hiding modal and showing success toast."
-                );
+                
                 // Introduce a slight delay before hiding the modal
                 setTimeout(() => {
                     const modal = bootstrap.Modal.getInstance(
@@ -840,9 +834,7 @@ function handleBulkStockUpdate() {
                 clearProductSelection();
                 fetchProductMetrics();
             } else {
-                console.log(
-                    "Update failed according to server data, showing error toast."
-                );
+                
                 showToast("Error", data.message || "Update failed.", "error");
             }
         })
@@ -855,7 +847,7 @@ function handleBulkStockUpdate() {
             );
         })
         .finally(() => {
-            console.log("Bulk stock update process finished.");
+            
             resetButton(confirmBtn, original);
         });
 }

@@ -631,13 +631,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            console.log(
-                `Loading SRM data for supplier ${id}, page ${page}, append: ${append}`
-            );
+            
 
             fetch(`/admin/suppliers/${id}/srm-details?page=${page}`)
                 .then((response) => {
-                    console.log("Response status:", response.status);
+                    
                     if (!response.ok) {
                         throw new Error(
                             `HTTP error! status: ${response.status}`
@@ -646,7 +644,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     return response.json();
                 })
                 .then((data) => {
-                    console.log("SRM Data received:", data);
+                    
 
                     if (!data || !data.supplier) {
                         throw new Error("Supplier data not found in response");
@@ -932,7 +930,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
                     }
 
-                    console.log("SRM data loaded successfully");
+                    
                 })
                 .catch((error) => {
                     console.error("Error loading SRM data:", error);
@@ -947,7 +945,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Function to load historical purchases
         function loadHistoricalPurchases(id) {
-            console.log("loadHistoricalPurchases called for ID:", id);
+            
             const historicalPurchaseContent = document.getElementById(
                 "srmHistoricalPurchaseContent"
             );
@@ -965,10 +963,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             fetch(`/admin/suppliers/${id}/historical-purchases`)
                 .then((response) => {
-                    console.log(
-                        "Historical purchases response status:",
-                        response.status
-                    );
+                    
                     if (!response.ok) {
                         throw new Error(
                             `HTTP error! status: ${response.status}`
@@ -977,15 +972,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     return response.json();
                 })
                 .then((data) => {
-                    console.log("Historical purchases data received:", data);
+                    
                     if (historicalPurchaseContent) {
                         if (
                             data.historical_purchases &&
                             data.historical_purchases.length > 0
                         ) {
-                            console.log(
-                                "Data has historical_purchases and it's not empty."
-                            );
+                            
                             // Create modern card-based layout
                             let contentHtml = `
                         <div class="accordion" id="srmHistoricalPurchasesAccordion">
@@ -1087,13 +1080,11 @@ document.addEventListener("DOMContentLoaded", function () {
                             contentHtml += `
                         </div>
                     `;
-                            console.log("Generated contentHtml:", contentHtml);
+
                             historicalPurchaseContent.innerHTML = contentHtml;
-                            console.log("innerHTML updated with contentHtml.");
+                            
                         } else {
-                            console.log(
-                                "No historical_purchases found or array is empty."
-                            );
+                            
                             historicalPurchaseContent.innerHTML = `
                         <div class="text-center py-5">
                             <div class="mb-3">
@@ -1103,9 +1094,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p class="text-muted mb-0">This supplier hasn't made any purchases yet.</p>
                         </div>
                     `;
-                            console.log(
-                                "innerHTML updated with 'No purchase history' message."
-                            );
+                            
                         }
                     } else {
                         console.error(
@@ -1149,7 +1138,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Function to load product history
         function loadProductHistory(id) {
-            console.log("loadProductHistory called for ID:", id);
+            
             const productHistoryContent = document.getElementById(
                 "srmProductHistoryContent"
             );
@@ -1167,10 +1156,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             fetch(`/admin/suppliers/${id}/product-history`)
                 .then((response) => {
-                    console.log(
-                        "Product history response status:",
-                        response.status
-                    );
+                    
                     if (!response.ok) {
                         throw new Error(
                             `HTTP error! status: ${response.status}`
@@ -1179,15 +1165,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     return response.json();
                 })
                 .then((data) => {
-                    console.log("Product history data received:", data);
+                    
                     if (productHistoryContent) {
                         if (
                             data.product_history &&
                             data.product_history.length > 0
                         ) {
-                            console.log(
-                                "Data has product_history and it's not empty."
-                            );
+                            
                             // Create modern card-based layout
                             let contentHtml = `
                         <div class="accordion" id="srmProductHistoryAccordion">
@@ -1271,13 +1255,11 @@ document.addEventListener("DOMContentLoaded", function () {
                             contentHtml += `
                         </div>
                     `;
-                            console.log("Generated contentHtml:", contentHtml);
+
                             productHistoryContent.innerHTML = contentHtml;
-                            console.log("innerHTML updated with contentHtml.");
+                            
                         } else {
-                            console.log(
-                                "No product_history found or array is empty."
-                            );
+                            
                             productHistoryContent.innerHTML = `
                         <div class="text-center py-5">
                             <div class="mb-3">
@@ -1287,9 +1269,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p class="text-muted mb-0">This supplier hasn't purchased any products yet.</p>
                         </div>
                     `;
-                            console.log(
-                                "innerHTML updated with 'No product history' message."
-                            );
+                            
                         }
                     } else {
                         console.error(

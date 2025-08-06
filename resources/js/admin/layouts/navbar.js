@@ -254,7 +254,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 event.preventDefault(); // Prevent default behavior
                 event.stopPropagation(); // Stop event from propagating
 
-                console.log("Mobile menu toggle clicked"); // Debugging
+                
                 mobileNav.classList.toggle("active");
 
                 // Also toggle the overlay for better UX

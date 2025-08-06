@@ -27,7 +27,7 @@ class PurchaseService
 
         $pos = $query->paginate($entries);
 
-        
+
 
         $totalinvoice = $pos->total();
         $items = POItem::all();
@@ -106,7 +106,7 @@ class PurchaseService
 
         $suppliers = Supplier::all();
         $items = POItem::all();
-        $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary($pos->items, $pos->discount_total, $pos->discount_total_type);
+        $summary = PurchaseHelper::calculateInvoiceSummary($pos->items, $pos->discount_total, $pos->discount_total_type);
         $subtotal = $summary['subtotal'];
         $itemCount = $summary['itemCount'];
         $totalProductDiscount = $summary['totalProductDiscount'];

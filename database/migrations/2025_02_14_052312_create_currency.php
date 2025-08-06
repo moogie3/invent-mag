@@ -13,6 +13,7 @@ return new class extends Migration {
             $table->string('decimal_separator')->default(',');
             $table->string('thousand_separator')->default('.');
             $table->integer('decimal_places')->default(0);
+            $table->string('position')->default('prefix');
             $table->timestamps();
         });
     }

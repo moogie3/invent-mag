@@ -1,5 +1,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    let currencySettings = @json(\App\Helpers\CurrencyHelper::getSettings());
     let performanceChart;
     let currentChartType = 'sales';
     let currentPeriod = '30days';

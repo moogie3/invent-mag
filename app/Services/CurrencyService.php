@@ -20,6 +20,7 @@ class CurrencyService
     {
         $setting = CurrencySetting::first();
         $setting->update($data);
+        \App\Helpers\CurrencyHelper::clearSettingsCache();
 
         return ['success' => true, 'message' => 'Currency settings updated successfully.'];
     }

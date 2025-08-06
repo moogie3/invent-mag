@@ -54,6 +54,13 @@
                                                 <input type="number" name="decimal_places" class="form-control"
                                                     value="{{ $setting->decimal_places }}" required>
                                             </div>
+                                            <div class="col-md-6">
+                                                <label>Currency Position</label>
+                                                <select name="position" class="form-select" required>
+                                                    <option value="prefix" {{ $setting->position == 'prefix' ? 'selected' : '' }}>Prefix ($100)</option>
+                                                    <option value="suffix" {{ $setting->position == 'suffix' ? 'selected' : '' }}>Suffix (100$)</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>

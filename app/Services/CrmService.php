@@ -7,6 +7,7 @@ use App\Models\Supplier;
 use App\Models\CustomerInteraction;
 use App\Models\SupplierInteraction;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\CurrencyHelper;
 
 class CrmService
 {
@@ -66,6 +67,7 @@ class CrmService
             'mostPurchasedProduct' => $mostPurchasedProduct,
             'totalProductsPurchased' => $totalProductsPurchased,
             'sales' => $sales,
+            'currencySettings' => CurrencyHelper::getSettings(),
         ];
     }
 
@@ -127,6 +129,7 @@ class CrmService
             'mostPurchasedProduct' => $mostPurchasedProduct,
             'totalProductsPurchased' => $totalProductsPurchased,
             'purchases' => $purchases,
+            'currencySettings' => CurrencyHelper::getSettings(),
         ];
     }
 

@@ -17,10 +17,10 @@ class PurchaseOrderModule {
      * @returns {string} Formatted currency string
      */
     formatCurrency(amount) {
-        return new Intl.NumberFormat(this.config.locale, {
+        return new Intl.NumberFormat(currencySettings.locale, {
             style: "currency",
-            currency: this.config.currency,
-            maximumFractionDigits: 0,
+            currency: currencySettings.currency_code,
+            maximumFractionDigits: currencySettings.decimal_places,
         }).format(amount);
     }
 
@@ -1639,30 +1639,30 @@ function updatePurchaseStoreInfo() {
             document.getElementById("invoiceOutCount").textContent =
                 data.outCount;
             document.getElementById("amountOutCount").textContent =
-                new Intl.NumberFormat("id-ID", {
+                new Intl.NumberFormat(currencySettings.locale, {
                     style: "currency",
-                    currency: "IDR",
-                    maximumFractionDigits: 0,
+                    currency: currencySettings.currency_code,
+                    maximumFractionDigits: currencySettings.decimal_places,
                 }).format(data.outCountamount);
             document.getElementById("invoiceInCount").textContent =
                 data.inCount;
             document.getElementById("amountInCount").textContent =
-                new Intl.NumberFormat("id-ID", {
+                new Intl.NumberFormat(currencySettings.locale, {
                     style: "currency",
-                    currency: "IDR",
-                    maximumFractionDigits: 0,
+                    currency: currencySettings.currency_code,
+                    maximumFractionDigits: currencySettings.decimal_places,
                 }).format(data.inCountamount);
             document.getElementById("monthlyPurchase").textContent =
-                new Intl.NumberFormat("id-ID", {
+                new Intl.NumberFormat(currencySettings.locale, {
                     style: "currency",
-                    currency: "IDR",
-                    maximumFractionDigits: 0,
+                    currency: currencySettings.currency_code,
+                    maximumFractionDigits: currencySettings.decimal_places,
                 }).format(data.totalMonthly);
             document.getElementById("monthlyPayment").textContent =
-                new Intl.NumberFormat("id-ID", {
+                new Intl.NumberFormat(currencySettings.locale, {
                     style: "currency",
-                    currency: "IDR",
-                    maximumFractionDigits: 0,
+                    currency: currencySettings.currency_code,
+                    maximumFractionDigits: currencySettings.decimal_places,
                 }).format(data.paymentMonthly);
         })
         .catch((error) =>
@@ -1874,9 +1874,10 @@ function renderSearchResults(pos) {
 
     const formatCurrency = (amount) => {
         if (!amount) return "N/A";
-        return new Intl.NumberFormat("id-ID", {
+        return new Intl.NumberFormat(currencySettings.locale, {
             style: "currency",
-            currency: "IDR",
+            currency: currencySettings.currency_code,
+            maximumFractionDigits: currencySettings.decimal_places,
         }).format(amount);
     };
 

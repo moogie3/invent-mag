@@ -334,10 +334,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Currency formatter
             function formatCurrency(value) {
-                return new Intl.NumberFormat("id-ID", {
+                return new Intl.NumberFormat(currencySettings.locale, {
                     style: "currency",
-                    currency: "IDR",
-                    maximumFractionDigits: 0,
+                    currency: currencySettings.currency_code,
+                    maximumFractionDigits: currencySettings.decimal_places,
                 }).format(parseFloat(value) || 0);
             }
 

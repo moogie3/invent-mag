@@ -33,7 +33,7 @@
                             <div class="card-body p-2 text-center">
                                 <h5 class="card-title fs-4 mb-1">{{ $product->name }}</h5>
                                 <p class="card-text fs-4">
-                                    {{ \App\Helpers\CurrencyHelper::format($product->selling_price) }}
+                                    {{ \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price) }}
                                 </p>
                             </div>
                         </div>

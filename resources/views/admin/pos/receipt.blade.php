@@ -76,10 +76,10 @@
                                                         <td>{{ $item->product->name }}</td>
                                                         <td class="text-center">{{ $item->quantity }}</td>
                                                         <td class="text-end">
-                                                            {{ \App\Helpers\CurrencyHelper::format($item->customer_price) }}
+                                                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($item->customer_price) }}
                                                         </td>
                                                         <td class="text-end">
-                                                            {{ \App\Helpers\CurrencyHelper::format($item->calculated_total) }}
+                                                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($item->calculated_total) }}
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -91,34 +91,34 @@
                                     <div class="totals-section">
                                         <div class="total-row">
                                             <span>Subtotal</span>
-                                            <span>{{ \App\Helpers\CurrencyHelper::format($subTotal) }}</span>
+                                            <span>{{ \App\Helpers\CurrencyHelper::formatWithPosition($subTotal) }}</span>
                                         </div>
 
                                         @if ($orderDiscountAmount > 0)
                                             <div class="total-row">
                                                 <span>Discount</span>
-                                                <span>-{{ \App\Helpers\CurrencyHelper::format($orderDiscountAmount) }}</span>
+                                                <span>-{{ \App\Helpers\CurrencyHelper::formatWithPosition($orderDiscountAmount) }}</span>
                                             </div>
                                         @endif
 
                                         <div class="total-row">
                                             <span>Tax ({{ $taxRate }}%)</span>
-                                            <span>{{ \App\Helpers\CurrencyHelper::format($taxAmount) }}</span>
+                                            <span>{{ \App\Helpers\CurrencyHelper::formatWithPosition($taxAmount) }}</span>
                                         </div>
 
                                         <div class="total-row total-main">
                                             <span>TOTAL</span>
-                                            <span>{{ \App\Helpers\CurrencyHelper::format($grandTotal) }}</span>
+                                            <span>{{ \App\Helpers\CurrencyHelper::formatWithPosition($grandTotal) }}</span>
                                         </div>
 
                                         <div class="payment-rows">
                                             <div class="total-row">
                                                 <span>Amount Received</span>
-                                                <span>{{ \App\Helpers\CurrencyHelper::format($amountReceived) }}</span>
+                                                <span>{{ \App\Helpers\CurrencyHelper::formatWithPosition($amountReceived) }}</span>
                                             </div>
                                             <div class="total-row">
                                                 <span>Change</span>
-                                                <span>{{ \App\Helpers\CurrencyHelper::format($change) }}</span>
+                                                <span>{{ \App\Helpers\CurrencyHelper::formatWithPosition($change) }}</span>
                                             </div>
                                         </div>
                                     </div>

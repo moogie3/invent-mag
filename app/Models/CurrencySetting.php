@@ -9,5 +9,5 @@ class CurrencySetting extends Model
 {
     use HasFactory;
     protected $table = 'currency_settings';
-    protected $fillable = ['currency_symbol', 'decimal_separator', 'thousand_separator', 'decimal_places'];
+    protected $fillable = ['currency_symbol', 'decimal_separator', 'thousand_separator', 'decimal_places', 'position'];
 }

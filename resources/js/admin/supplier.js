@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Store selected checkbox states globally for suppliers
     let selectedSupplierIds = new Set();
 
+    let currencySettings = {};
+
     
 
     // Event listener for edit modal show
@@ -584,10 +586,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Currency formatter
         function formatCurrency(value) {
-            return new Intl.NumberFormat("id-ID", {
+            return new Intl.NumberFormat(currencySettings.locale, {
                 style: "currency",
-                currency: "IDR",
-                maximumFractionDigits: 0,
+                currency: currencySettings.currency_code,
+                maximumFractionDigits: currencySettings.decimal_places,
             }).format(parseFloat(value) || 0);
         }
 
@@ -648,6 +650,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (!data || !data.supplier) {
                         throw new Error("Supplier data not found in response");
+                    }
+
+                    // Assign currency settings from API response
+                    if (data.currencySettings) {
+                        currencySettings = data.currencySettings;
                     }
 
                     // Clear loading states only if not appending

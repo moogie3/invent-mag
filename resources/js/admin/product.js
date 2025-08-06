@@ -315,10 +315,10 @@ function renderProductDetails(data) {
     }
 
     // Pricing
-    setText("productPrice", data.formatted_price || data.price);
+    setText("productPrice", data.formatted_price || formatCurrency(data.price));
     setText(
         "productSellingPrice",
-        data.formatted_selling_price || data.selling_price
+        data.formatted_selling_price || formatCurrency(data.selling_price)
     );
 
     const margin = (
@@ -1114,9 +1114,11 @@ function renderSearchResults(products) {
 
     const formatCurrency = (amount) => {
         if (!amount) return "N/A";
-        return new Intl.NumberFormat("id-ID", {
+        return new Intl.NumberFormat(currencySettings.locale, {
             style: "currency",
-            currency: "IDR",
+            currency: currencySettings.currency_code,
+            minimumFractionDigits: currencySettings.decimal_places,
+            maximumFractionDigits: currencySettings.decimal_places,
         }).format(amount);
     };
 

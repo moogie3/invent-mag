@@ -47,19 +47,19 @@
                         </td>
                         <td class="text-center">{{ $item->quantity }}</td>
                         <td class="text-end">
-                            {{ \App\Helpers\CurrencyHelper::format($item->customer_price) }}
+                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($item->customer_price) }}
                         </td>
                         <td class="text-end">
                             @if ($item->discount > 0)
                                 <span class="text-danger">
-                                    {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::format($item->discount) }}
+                                    {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
                                 </span>
                             @else
                                 -
                             @endif
                         </td>
                         <td class="text-end">
-                            {{ \App\Helpers\CurrencyHelper::format($finalAmount) }}
+                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalAmount) }}
                         </td>
                     </tr>
                 @endforeach

@@ -136,23 +136,12 @@ document.addEventListener("DOMContentLoaded", function () {
             return amount; // Return original if not a valid number
         }
 
-        const parts = number
-            .toFixed(currencySettings.decimalPlaces)
-            .split(".");
-        let integerPart = parts[0];
-        let decimalPart = parts.length > 1 ? parts[1] : "";
-
-        integerPart = integerPart.replace(
-            /\B(?=(\d{3})+(?!\d))/g,
-            currencySettings.thousandSeparator
-        );
-
-        let formattedAmount = integerPart;
-        if (currencySettings.decimalPlaces > 0) {
-            formattedAmount += currencySettings.decimalSeparator + decimalPart;
-        }
-
-        return currencySettings.symbol + " " + formattedAmount;
+        return new Intl.NumberFormat(currencySettings.locale, {
+            style: "currency",
+            currency: currencySettings.currency_code,
+            minimumFractionDigits: currencySettings.decimal_places,
+            maximumFractionDigits: currencySettings.decimal_places,
+        }).format(number);
     }
 
     // Initial data rendering

@@ -130,19 +130,19 @@
                                 </td>
                                 <td class="text-center">{{ $item->quantity }}</td>
                                 <td class="text-end">
-                                    {{ \App\Helpers\CurrencyHelper::format($item->price) }}
+                                    {{ \App\Helpers\CurrencyHelper::formatWithPosition($item->price) }}
                                 </td>
                                 <td class="text-end">
                                     @if ($item->discount > 0)
                                         <span class="text-danger">
-                                            {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::format($item->discount) }}
+                                            {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
                                         </span>
                                     @else
                                         -
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    {{ \App\Helpers\CurrencyHelper::format($finalAmount) }}
+                                    {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalAmount) }}
                                 </td>
                             </tr>
                         @endforeach
@@ -179,7 +179,7 @@
                         <h5 class="mb-3 card-title">Amount Summary</h5>
                         <div class="d-flex justify-content-between mb-2">
                             <div>Subtotal:</div>
-                            <div>{{ \App\Helpers\CurrencyHelper::format($subtotal) }}</div>
+                            <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($subtotal) }}</div>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <div>
@@ -188,14 +188,14 @@
                                     ({{ $pos->discount_total_type === 'percentage' ? $pos->discount_total . '%' : 'Fixed' }})
                                 </small>:
                             </div>
-                            <div class="text-danger">- {{ \App\Helpers\CurrencyHelper::format($orderDiscount) }}
+                            <div class="text-danger">- {{ \App\Helpers\CurrencyHelper::formatWithPosition($orderDiscount) }}
                             </div>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="fs-5"><strong>Grand Total:</strong></div>
                             <div class="fs-3 fw-bold text-primary">
-                                {{ \App\Helpers\CurrencyHelper::format($finalTotal) }}</div>
+                                {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalTotal) }}</div>
                         </div>
                     </div>
                 </div>

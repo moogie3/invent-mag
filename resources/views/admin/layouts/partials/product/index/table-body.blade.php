@@ -29,10 +29,10 @@
             <td class="sort-category no-print">{{ $product->category->name }}</td>
             <td class="sort-unit">{{ $product->unit->symbol }}</td>
             <td class="sort-price text-center">
-                {{ \App\Helpers\CurrencyHelper::format($product->price) }}
+                {{ \App\Helpers\CurrencyHelper::formatWithPosition($product->price) }}
             </td>
             <td class="sort-sellingprice text-center">
-                {{ \App\Helpers\CurrencyHelper::format($product->selling_price) }}
+                {{ \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price) }}
             </td>
             <td class="sort-supplier text-center">{{ $product->supplier->name }}</td>
             <td class="sort-expiry text-center">

@@ -82,7 +82,7 @@ class UserController extends Controller
                     'email' => $user->email,
                     'roles' => $user->getRoleNames(),
                     'permissions' => $user->getAllPermissions()->pluck('name'),
-                ]
+                ],
             ]);
         }
 
@@ -101,18 +101,18 @@ class UserController extends Controller
     }
 
     public function getRolePermissions()
-{
-    $roles = Role::with('permissions')->get();
-    $allPermissions = Permission::all()->pluck('name');
+    {
+        $roles = Role::with('permissions')->get();
+        $allPermissions = Permission::all()->pluck('name');
 
-    $rolePermissions = [];
-    foreach ($roles as $role) {
-        $rolePermissions[$role->name] = $role->permissions->pluck('name')->toArray();
+        $rolePermissions = [];
+        foreach ($roles as $role) {
+            $rolePermissions[$role->name] = $role->permissions->pluck('name')->toArray();
+        }
+
+        return response()->json([
+            'rolePermissions' => $rolePermissions,
+            'allPermissions' => $allPermissions,
+        ]);
     }
-
-    return response()->json([
-        'rolePermissions' => $rolePermissions,
-        'allPermissions' => $allPermissions
-    ]);
-}
 }

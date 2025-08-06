@@ -15,8 +15,11 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-    public function getDashboardData(array $dates, $reportType, $categoryId)
+    public function getDashboardData(array $dates = [], $reportType = 'all', $categoryId = null)
     {
+        if (empty($dates) || !isset($dates['start']) || !isset($dates['end'])) {
+            $dates = $this->calculateDateRange('this_month');
+        }
         $totalLiability = Purchase::sum('total');
         $unpaidLiability = Purchase::where('status', 'Unpaid')->sum('total');
         $totalRevenue = $this->getMonthlyRevenue();

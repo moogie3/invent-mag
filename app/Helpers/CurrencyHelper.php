@@ -13,15 +13,7 @@ class CurrencyHelper
      */
     public static function format($amount)
     {
-        $settings = self::getSettings();
-
-        return $settings->currency_symbol . ' ' .
-            number_format(
-                $amount,
-                $settings->decimal_places,
-                $settings->decimal_separator,
-                $settings->thousand_separator
-            );
+        return self::formatWithPosition($amount);
     }
 
     /**
@@ -43,7 +35,7 @@ class CurrencyHelper
     /**
      * Get all currency settings with caching
      */
-    protected static function getSettings()
+    public static function getSettings()
     {
         if (self::$settings === null) {
             self::$settings = CurrencySetting::first() ?? self::getDefaultSettings();
@@ -81,7 +73,7 @@ class CurrencyHelper
     {
         $settings = self::getSettings();
         $formatted = number_format(
-            $amount,
+            (float) $amount,
             $settings->decimal_places,
             $settings->decimal_separator,
             $settings->thousand_separator

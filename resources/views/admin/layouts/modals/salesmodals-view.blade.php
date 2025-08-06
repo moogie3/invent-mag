@@ -123,19 +123,19 @@
                                 </td>
                                 <td class="text-center">{{ $item->quantity }}</td>
                                 <td class="text-end">
-                                    {{ \App\Helpers\CurrencyHelper::format($item->customer_price) }}
+                                    {{ \App\Helpers\CurrencyHelper::formatWithPosition($item->customer_price) }}
                                 </td>
                                 <td class="text-end">
                                     @if ($item->discount > 0)
                                         <span class="text-danger">
-                                            {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::format($item->discount) }}
+                                            {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
                                         </span>
                                     @else
                                         -
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    {{ \App\Helpers\CurrencyHelper::format($finalAmount) }}
+                                    {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalAmount) }}
                                 </td>
                             </tr>
                         @endforeach
@@ -174,7 +174,7 @@
                         <h5 class="mb-3 card-title">Amount Summary</h5>
                         <div class="d-flex justify-content-between mb-2">
                             <div>Subtotal:</div>
-                            <div>{{ \App\Helpers\CurrencyHelper::format($summary['subtotal']) }}</div>
+                            <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['subtotal']) }}</div>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <div>
@@ -184,7 +184,7 @@
                                 </small>:
                             </div>
                             <div class="text-danger">-
-                                {{ \App\Helpers\CurrencyHelper::format($summary['orderDiscount']) }}
+                                {{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['orderDiscount']) }}
                             </div>
                         </div>
                         @if (($sales->tax_rate ?? 0) > 0)
@@ -196,7 +196,7 @@
                                     </small>:
                                 </div>
                                 <div>
-                                    {{ \App\Helpers\CurrencyHelper::format($summary['taxAmount']) }}
+                                    {{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['taxAmount']) }}
                                 </div>
                             </div>
                         @endif
@@ -204,7 +204,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="fs-5"><strong>Grand Total:</strong></div>
                             <div class="fs-3 fw-bold text-primary">
-                                {{ \App\Helpers\CurrencyHelper::format($summary['finalTotal']) }}</div>
+                                {{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['finalTotal']) }}</div>
                         </div>
                     </div>
                 </div>

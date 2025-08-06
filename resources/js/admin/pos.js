@@ -73,11 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Helper functions
     function formatCurrency(amount) {
-        return new Intl.NumberFormat("id-ID", {
+        return new Intl.NumberFormat(currencySettings.locale, {
             style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
+            currency: currencySettings.currency_code,
+            minimumFractionDigits: currencySettings.decimal_places,
+            maximumFractionDigits: currencySettings.decimal_places,
         }).format(amount);
     }
 
@@ -925,11 +925,11 @@ function addProductToGrid(product) {
 
 // Format currency helper function
 function formatCurrency(amount) {
-    return new Intl.NumberFormat("id-ID", {
+    return new Intl.NumberFormat(currencySettings.locale, {
         style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
+        currency: currencySettings.currency_code,
+        minimumFractionDigits: currencySettings.decimal_places,
+        maximumFractionDigits: currencySettings.decimal_places,
     }).format(amount);
 }
 

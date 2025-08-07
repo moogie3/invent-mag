@@ -49,71 +49,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const profileForm = document.getElementById("profileForm");
-        const formData = new FormData(profileForm);
-
-        // Append current password from modal to form data
-        formData.append("current_password", currentPassword);
-
-        fetch(profileForm.action, {
-            method: profileForm.method,
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    showToast("Success", data.message, "success");
-                    const passwordModal = bootstrap.Modal.getInstance(
-                        document.getElementById("passwordModal")
-                    );
-                    if (passwordModal) {
-                        passwordModal.hide();
-                        // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
-                        passwordModal._element.addEventListener(
-                            "hidden.bs.modal",
-                            function handler() {
-                                passwordModal._element.removeEventListener(
-                                    "hidden.bs.modal",
-                                    handler
-                                ); // Remove the listener
-                                // Explicitly remove any remaining modal backdrops
-                                const backdrops =
-                                    document.querySelectorAll(
-                                        ".modal-backdrop"
-                                    );
-                                backdrops.forEach((backdrop) =>
-                                    backdrop.remove()
-                                );
-                            }
-                        );
-                    }
-                    // Clear password fields after successful update
-                    document.getElementById("modal_current_password").value =
-                        "";
-                    document.getElementById("new_password").value = "";
-                    document.getElementById("confirm_new_password").value = "";
-                } else {
-                    showToast(
-                        "Error",
-                        data.message || "Failed to update profile.",
-                        "error"
-                    );
-                    console.error("Profile update error:", data.errors);
-                }
-            })
-            .catch((error) => {
-                console.error("Error updating profile:", error);
-                showToast(
-                    "Error",
-                    "An error occurred while updating profile. Please check the console for details.",
-                    "error"
-                );
-            });
+        document.getElementById("current_password").value = currentPassword;
+        profileForm.submit();
     }
 
     function togglePasswordModal() {

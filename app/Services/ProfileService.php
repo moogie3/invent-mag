@@ -16,13 +16,6 @@ class ProfileService
         $user->address = $data['address'];
         $user->timezone = $data['timezone'];
 
-        if (isset($data['password'])) {
-            if (!Hash::check($data['current_password'], $user->password)) {
-                return ['success' => false, 'message' => 'Current password is incorrect.'];
-            }
-            $user->password = Hash::make($data['password']);
-        }
-
         if (isset($data['avatar'])) {
             if ($user->avatar) {
                 Storage::disk('public')->delete($user->avatar);
@@ -31,6 +24,14 @@ class ProfileService
         }
 
         $user->save();
+
+        if (isset($data['password']) && !empty($data['password'])) {
+            if (!Hash::check($data['current_password'], $user->password)) {
+                return ['success' => false, 'message' => 'Current password is incorrect.'];
+            }
+            $user->password = Hash::make($data['password']);
+            $user->save(); // Save again if password was updated
+        }
 
         return ['success' => true, 'message' => 'Profile updated successfully!'];
     }

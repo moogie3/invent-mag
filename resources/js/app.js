@@ -17,3 +17,4 @@ import './admin/sales-order';
 import './admin/supplier';
 import './admin/user';
 import './admin/warehouse';
+import './admin/helpers/notification';

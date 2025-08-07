@@ -34,14 +34,15 @@
             $result = $this->profileService->updateUser(Auth::user(), $request->all());
 
             if (!$result['success']) {
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $result['message']], 422);
+                }
                 return redirect()->back()->withErrors(['current_password' => $result['message']]);
             }
 
-            if ($request->ajax()) {
-                return response()->json(['success' => true, 'message' => 'Profile updated successfully!']);
-            }
+            
 
-            return redirect()->back()->with('success', 'Profile updated successfully!');
+            return redirect()->route('admin.setting.profile.edit')->with('success', 'Profile updated successfully!');
         }
 
         public function deleteAvatar(Request $request)

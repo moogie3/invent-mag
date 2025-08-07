@@ -1043,7 +1043,8 @@ class SalesOrderEdit extends SalesOrderModule {
 
         // Calculate order discount based on subtotal before discounts
         if (discountTotalType === "percentage") {
-            orderDiscountAmount = subtotalBeforeDiscounts * (discountTotalValue / 100);
+            orderDiscountAmount =
+                subtotalBeforeDiscounts * (discountTotalValue / 100);
         } else {
             orderDiscountAmount = discountTotalValue;
         }
@@ -1070,9 +1071,8 @@ class SalesOrderEdit extends SalesOrderModule {
         // Update hidden inputs
         document.getElementById("grandTotalInput").value =
             Math.floor(grandTotal);
-        document.getElementById("totalDiscountInput").value = Math.floor(
-            orderDiscountAmount
-        );
+        document.getElementById("totalDiscountInput").value =
+            Math.floor(orderDiscountAmount);
         document.getElementById("taxInput").value = Math.floor(taxAmount);
 
         // Update total_tax input if it exists
@@ -1165,10 +1165,8 @@ class SalesOrderView extends SalesOrderModule {
     }
 
     setDeleteFormAction(url) {
-        
         if (this.elements.deleteForm) {
             this.elements.deleteForm.action = url;
-            
         } else {
             console.error("Delete form element not found");
         }
@@ -1267,7 +1265,6 @@ class SalesOrderBulkSelection {
 
     init() {
         if (this.isInitialized) {
-            
             return;
         }
 
@@ -1290,12 +1287,10 @@ class SalesOrderBulkSelection {
                 this.rowCheckboxes.length === 0
             ) {
                 if (attempts < maxAttempts) {
-                    
                     setTimeout(tryInit, 300);
                     return;
                 }
 
-                
                 // Ensure bulk actions bar is hidden if no items
                 if (this.bulkActionsBar) {
                     this.bulkActionsBar.style.display = "none";
@@ -1306,7 +1301,6 @@ class SalesOrderBulkSelection {
             this.setupEventListeners();
             this.updateUI();
             this.isInitialized = true;
-            
         };
 
         tryInit();
@@ -1402,8 +1396,6 @@ window.getSalesSelectedIds = function () {
 };
 
 function performBulkDeleteSales(selectedIds, confirmButton, modal) {
-    
-
     if (!selectedIds || selectedIds.length === 0) return;
 
     const originalText = confirmButton.innerHTML;
@@ -1439,40 +1431,13 @@ function performBulkDeleteSales(selectedIds, confirmButton, modal) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                modal.hide();
-                // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
-                modal._element.addEventListener(
-                    "hidden.bs.modal",
-                    function handler() {
-                        modal._element.removeEventListener(
-                            "hidden.bs.modal",
-                            handler
-                        ); // Remove the listener
-                        showToast(
-                            "Success",
-                            `${
-                                data.deleted_count || selectedIds.length
-                            } sales order(s) deleted successfully!`,
-                            "success"
-                        );
-                        // Explicitly remove any remaining modal backdrops
-                        const backdrops =
-                            document.querySelectorAll(".modal-backdrop");
-                        backdrops.forEach((backdrop) => backdrop.remove());
-                    }
+                sessionStorage.setItem(
+                    "salesOrderBulkDeleteSuccess",
+                    `Bulk delete ${
+                        data.deleted_count || selectedIds.length
+                    } sales order(s) successfully!`
                 );
-
-                // Remove deleted rows from the table
-                selectedIds.forEach((id) => {
-                    const row = document.querySelector(`tr[data-id="${id}"]`);
-                    if (row) {
-                        row.remove();
-                    }
-                });
-
-                if (salesBulkSelection) {
-                    salesBulkSelection.updateUI();
-                }
+                location.reload();
             } else {
                 showToast(
                     "Error",
@@ -1511,13 +1476,13 @@ window.bulkDeleteSales = function () {
     const modal = new bootstrap.Modal(modalElement);
 
     // Attach event listener for when the modal is completely hidden
-    modalElement.addEventListener('hidden.bs.modal', function handler() {
+    modalElement.addEventListener("hidden.bs.modal", function handler() {
         // Remove all modal backdrops
         const backdrops = document.querySelectorAll(".modal-backdrop");
         backdrops.forEach((backdrop) => backdrop.remove());
 
         // Remove this event listener to prevent multiple executions
-        modalElement.removeEventListener('hidden.bs.modal', handler);
+        modalElement.removeEventListener("hidden.bs.modal", handler);
     });
 
     modal.show();
@@ -1593,13 +1558,9 @@ window.bulkExportSales = function () {
 };
 
 window.bulkMarkAsPaidSales = function () {
-    
-
     const selected = Array.from(
         document.querySelectorAll(".row-checkbox:checked")
     );
-
-    
 
     // If no items are selected, perform smart selection first
     if (selected.length === 0) {
@@ -1651,8 +1612,6 @@ window.bulkMarkAsPaidSales = function () {
             );
         });
 
-        
-
         if (selectedPaidSales.length > 0) {
             // Uncheck paid sales orders and show warning
             selectedPaidSales.forEach((checkbox) => {
@@ -1675,8 +1634,6 @@ window.bulkMarkAsPaidSales = function () {
                 document.querySelectorAll(".row-checkbox:checked")
             );
 
-            
-
             if (remainingSelected.length === 0) {
                 return;
             }
@@ -1687,8 +1644,6 @@ window.bulkMarkAsPaidSales = function () {
     const finalSelected = Array.from(
         document.querySelectorAll(".row-checkbox:checked")
     ).map((cb) => cb.value);
-
-    
 
     if (finalSelected.length === 0) {
         showToast("Info", "No unpaid sales orders selected.", "info");
@@ -1715,7 +1670,6 @@ window.bulkMarkAsPaidSales = function () {
         confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
         newConfirmBtn.addEventListener("click", function () {
-            
             confirmBulkMarkAsPaidSales(
                 finalSelected,
                 this,
@@ -1790,8 +1744,6 @@ function smartSelectUnpaidOnlySales() {
 }
 
 function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
-    
-
     if (!selectedIds || selectedIds.length === 0) return;
 
     // Show loading state
@@ -1815,8 +1767,6 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
         return;
     }
 
-    
-
     // Make the API request
     fetch("/admin/sales/bulk-mark-paid", {
         method: "POST",
@@ -1832,63 +1782,13 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                // Close modal
-                modal.hide();
-
-                // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
-                modal._element.addEventListener(
-                    "hidden.bs.modal",
-                    function handler() {
-                        modal._element.removeEventListener(
-                            "hidden.bs.modal",
-                            handler
-                        ); // Remove the listener
-                        // Show success message
-                        showToast(
-                            "Success",
-                            `${
-                                data.updated_count || selectedIds.length
-                            } sales order(s) marked as paid successfully!`,
-                            "success"
-                        );
-                        // Explicitly remove any remaining modal backdrops
-                        const backdrops =
-                            document.querySelectorAll(".modal-backdrop");
-                        backdrops.forEach((backdrop) => backdrop.remove());
-                    }
+                sessionStorage.setItem(
+                    "salesOrderBulkMarkAsPaidSuccess",
+                    `${
+                        data.updated_count || selectedIds.length
+                    } sales order(s) marked as paid successfully!`
                 );
-
-                // Reload page after short delay
-                // setTimeout(() => {
-                //     location.reload();
-                // }, 1000);
-
-                // Dynamically update UI
-                selectedIds.forEach((id) => {
-                    const row = document.querySelector(`tr[data-id="${id}"]`); // Assuming rows have data-id attribute
-                    if (row) {
-                        const statusCell = row.querySelector(".sort-status");
-                        if (statusCell) {
-                            statusCell.innerHTML =
-                                '<span class="badge bg-green-lt"><span class="h4"><i class="ti ti-check me-1 fs-4"></i> Paid</span></span>';
-                        }
-                    }
-                });
-
-                // Update store info
-                updateSalesStoreInfo();
-
-                // Explicitly uncheck all checkboxes
-                document
-                    .querySelectorAll(".row-checkbox")
-                    .forEach((checkbox) => {
-                        checkbox.checked = false;
-                    });
-
-                // Update bulk action bar and select all state
-                if (salesBulkSelection) {
-                    salesBulkSelection.updateUI();
-                }
+                location.reload();
             } else {
                 showToast(
                     "Error",
@@ -1984,17 +1884,33 @@ function performBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
  * Initialize appropriate module based on the current page
  */
 document.addEventListener("DOMContentLoaded", function () {
+    if (sessionStorage.getItem("salesOrderBulkDeleteSuccess")) {
+        showToast(
+            "Success",
+            sessionStorage.getItem("salesOrderBulkDeleteSuccess"),
+            "success"
+        );
+        sessionStorage.removeItem("salesOrderBulkDeleteSuccess");
+    }
+
+    if (sessionStorage.getItem("salesOrderBulkMarkAsPaidSuccess")) {
+        showToast(
+            "Success",
+            sessionStorage.getItem("salesOrderBulkMarkAsPaidSuccess"),
+            "success"
+        );
+        sessionStorage.removeItem("salesOrderBulkMarkAsPaidSuccess");
+    }
+
     // Add a small delay to ensure all elements are loaded
     setTimeout(() => {
         // Determine current page
         const pathname = window.location.pathname;
-        
 
         try {
             if (pathname.includes("/admin/sales/create")) {
                 // Initialize create page functionality
                 window.salesApp = new SalesOrderCreate();
-                
             } else if (
                 // Fix the route matching for edit pages - matches /admin/sales/edit/46
                 pathname.includes("/admin/sales/edit/") ||
@@ -2002,7 +1918,6 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
                 // Initialize edit page functionality
                 window.salesApp = new SalesOrderEdit();
-                
             } else if (
                 pathname.includes("/admin/sales/modal") ||
                 (pathname.includes("/admin/sales") &&
@@ -2011,14 +1926,12 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
                 // Initialize view functionality for modal or show pages
                 window.salesApp = new SalesOrderView();
-                
             } else if (
                 pathname === "/admin/sales" ||
                 pathname.includes("/admin/sales?") ||
                 pathname.includes("/admin/sales/")
             ) {
                 // Initialize bulk selection for index page
-                
 
                 // Initialize view functionality even on index page for modals
                 window.salesApp = new SalesOrderView();
@@ -2026,10 +1939,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Also initialize bulk selection if the class exists
                 if (typeof SalesOrderBulkSelection !== "undefined") {
                     salesBulkSelection = new SalesOrderBulkSelection();
-                    
                 }
-
-                
             }
 
             // Debug: Force initialize SalesOrderEdit if we're on any edit page

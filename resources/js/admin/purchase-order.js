@@ -1216,40 +1216,10 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                modal.hide();
-                // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
-                modal._element.addEventListener(
-                    "hidden.bs.modal",
-                    function handler() {
-                        modal._element.removeEventListener(
-                            "hidden.bs.modal",
-                            handler
-                        ); // Remove the listener
-                        showToast(
-                            "Success",
-                            `Bulk delete ${
-                                data.deleted_count || selectedIds.length
-                            } purchase order(s) successfully!`,
-                            "success"
-                        );
-                        // Explicitly remove any remaining modal backdrops
-                        const backdrops =
-                            document.querySelectorAll(".modal-backdrop");
-                        backdrops.forEach((backdrop) => backdrop.remove());
-                    }
-                );
-
-                // Remove deleted rows from the table
-                selectedIds.forEach((id) => {
-                    const row = document.querySelector(`tr[data-id="${id}"]`);
-                    if (row) {
-                        row.remove();
-                    }
-                });
-
-                if (bulkSelection) {
-                    bulkSelection.updateUI();
-                }
+                sessionStorage.setItem('purchaseOrderBulkDeleteSuccess', `Bulk delete ${
+                    data.deleted_count || selectedIds.length
+                } purchase order(s) successfully!`);
+                location.reload();
             } else {
                 showToast(
                     "Error",
@@ -1538,64 +1508,10 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                // Close modal
-                modal.hide();
-
-                // Listen for the 'hidden.bs.modal' event to ensure the modal is fully closed
-                modal._element.addEventListener(
-                    "hidden.bs.modal",
-                    function handler() {
-                        modal._element.removeEventListener(
-                            "hidden.bs.modal",
-                            handler
-                        ); // Remove the listener
-                        // Show success message
-                        showToast(
-                            "Success",
-                            `${
-                                data.updated_count || selectedIds.length
-                            } purchase order(s) marked as paid successfully!`,
-                            "success"
-                        );
-                        // Explicitly remove any remaining modal backdrops
-                        const backdrops =
-                            document.querySelectorAll(".modal-backdrop");
-                        backdrops.forEach((backdrop) => backdrop.remove());
-                    }
-                );
-
-                // Clear selection
-                if (typeof clearSelection === "function") {
-                    clearSelection();
-                }
-
-                // Reload page after short delay
-                // setTimeout(() => {
-                //     location.reload();
-                // }, 1000);
-
-                // Dynamically update UI
-                selectedIds.forEach((id) => {
-                    const row = document.querySelector(`tr[data-id="${id}"]`); // Assuming rows have data-id attribute
-                    if (row) {
-                        const statusBadge = row.querySelector(".badge");
-                        if (statusBadge) {
-                            statusBadge.outerHTML =
-                                '<span class="badge bg-green-lt"><span class="h4"><i class="ti ti-check me-1 fs-4"></i> Paid</span></span>';
-                        }
-                        const checkbox = row.querySelector(".row-checkbox");
-                        if (checkbox) {
-                            checkbox.checked = false;
-                        }
-                    }
-                });
-
-                // Update store info
-                updatePurchaseStoreInfo();
-
-                if (bulkSelection) {
-                    bulkSelection.updateUI(); // Update bulk action bar and select all state
-                }
+                sessionStorage.setItem('purchaseOrderBulkMarkAsPaidSuccess', `${
+                    data.updated_count || selectedIds.length
+                } purchase order(s) marked as paid successfully!`);
+                location.reload();
             } else {
                 showToast(
                     "Error",
@@ -1980,6 +1896,24 @@ function showSearchError(errorMessage = "Search error occurred.") {
 
 // Keep the existing DOMContentLoaded initialization
 document.addEventListener("DOMContentLoaded", function () {
+    if (sessionStorage.getItem('purchaseOrderBulkDeleteSuccess')) {
+        showToast(
+            "Success",
+            sessionStorage.getItem('purchaseOrderBulkDeleteSuccess'),
+            "success"
+        );
+        sessionStorage.removeItem('purchaseOrderBulkDeleteSuccess');
+    }
+
+    if (sessionStorage.getItem('purchaseOrderBulkMarkAsPaidSuccess')) {
+        showToast(
+            "Success",
+            sessionStorage.getItem('purchaseOrderBulkMarkAsPaidSuccess'),
+            "success"
+        );
+        sessionStorage.removeItem('purchaseOrderBulkMarkAsPaidSuccess');
+    }
+
     // Add a small delay to ensure all elements are loaded
     setTimeout(() => {
         // Determine current page

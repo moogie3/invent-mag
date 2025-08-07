@@ -839,23 +839,30 @@ class PurchaseOrderEdit extends PurchaseOrderModule {
         if (this.elements.productsJsonInput) {
             const products = [];
             document.querySelectorAll("tbody tr").forEach((row) => {
-                const itemId = row.querySelector(".quantity-input")?.dataset.itemId;
+                const itemId =
+                    row.querySelector(".quantity-input")?.dataset.itemId;
                 if (!itemId) {
                     return;
                 }
 
-                const quantity = parseFloat(
-                    row.querySelector(`.quantity-input[data-item-id="${itemId}"]`)
-                        .value
-                ) || 0;
-                const price = parseFloat(
-                    row.querySelector(`.price-input[data-item-id="${itemId}"]`)
-                        .value
-                ) || 0;
-                const discount = parseFloat(
-                    row.querySelector(`.discount-input[data-item-id="${itemId}"]`)
-                        .value
-                ) || 0;
+                const quantity =
+                    parseFloat(
+                        row.querySelector(
+                            `.quantity-input[data-item-id="${itemId}"]`
+                        ).value
+                    ) || 0;
+                const price =
+                    parseFloat(
+                        row.querySelector(
+                            `.price-input[data-item-id="${itemId}"]`
+                        ).value
+                    ) || 0;
+                const discount =
+                    parseFloat(
+                        row.querySelector(
+                            `.discount-input[data-item-id="${itemId}"]`
+                        ).value
+                    ) || 0;
                 const discountType = row.querySelector(
                     `.discount-type-input[data-item-id="${itemId}"]`
                 ).value;
@@ -955,10 +962,8 @@ class PurchaseOrderView extends PurchaseOrderModule {
     }
 
     setDeleteFormAction(url) {
-        
         if (this.elements.deleteForm) {
             this.elements.deleteForm.action = url;
-            
         } else {
             console.error("Delete form element not found");
         }
@@ -1045,7 +1050,6 @@ class PurchaseOrderBulkSelection {
 
     init() {
         if (this.isInitialized) {
-            
             return;
         }
 
@@ -1077,14 +1081,13 @@ class PurchaseOrderBulkSelection {
             // If there are no checkboxes, hide the bar and return
             if (this.rowCheckboxes.length === 0) {
                 this.bulkActionsBar.style.display = "none";
-                
+
                 return;
             }
 
             this.setupEventListeners();
             this.updateUI();
             this.isInitialized = true;
-            
         };
 
         tryInit();
@@ -1178,8 +1181,6 @@ window.getSelectedIds = function () {
 };
 
 function performBulkDelete(selectedIds, confirmButton, modal) {
-    
-
     if (!selectedIds || selectedIds.length === 0) return;
 
     const originalText = confirmButton.innerHTML;
@@ -1226,9 +1227,9 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
                         ); // Remove the listener
                         showToast(
                             "Success",
-                            `${
+                            `Bulk delete ${
                                 data.deleted_count || selectedIds.length
-                            } purchase order(s) deleted successfully!`,
+                            } purchase order(s) successfully!`,
                             "success"
                         );
                         // Explicitly remove any remaining modal backdrops
@@ -1361,8 +1362,6 @@ window.bulkExportPO = function () {
 
 // Updated bulkMarkAsPaidPO function with smart selection (same pattern as transactions)
 window.bulkMarkAsPaidPO = function () {
-    
-
     const selected = Array.from(
         document.querySelectorAll(".row-checkbox:checked")
     );
@@ -1431,8 +1430,6 @@ window.bulkMarkAsPaidPO = function () {
         document.querySelectorAll(".row-checkbox:checked")
     ).map((cb) => cb.value);
 
-    
-
     // Update the count in the modal
     const bulkPaidCount = document.getElementById("bulkPaidCount");
     if (bulkPaidCount) {
@@ -1453,7 +1450,6 @@ window.bulkMarkAsPaidPO = function () {
         confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
         newConfirmBtn.addEventListener("click", function () {
-            
             confirmBulkMarkAsPaidPO(finalSelected, this, bulkMarkAsPaidModal);
         });
     }
@@ -1504,8 +1500,6 @@ function smartSelectUnpaidOnlyPO() {
  * Confirm bulk mark as paid function (similar to transactions)
  */
 function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
-    
-
     if (!selectedIds || selectedIds.length === 0) return;
 
     // Show loading state
@@ -1528,8 +1522,6 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
         resetButton(confirmButton, originalText);
         return;
     }
-
-    
 
     // Make the API request
     fetch("/admin/po/bulk-mark-paid", {
@@ -1997,7 +1989,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (pathname.includes("/admin/po/create")) {
                 // Initialize create page functionality
                 window.poApp = new PurchaseOrderCreate();
-                
             } else if (
                 pathname.includes("/admin/po/edit") ||
                 (pathname.includes("/admin/po") &&
@@ -2005,7 +1996,6 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
                 // Initialize edit page functionality
                 window.poApp = new PurchaseOrderEdit();
-                
             } else if (
                 pathname.includes("/admin/po/modal") ||
                 (pathname.includes("/admin/po") && pathname.match(/\/\d+$/)) ||
@@ -2013,15 +2003,11 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
                 // Initialize view functionality for modal or show pages
                 window.poApp = new PurchaseOrderView();
-                
             } else if (
                 pathname === "/admin/po" ||
                 pathname.includes("/admin/po?") ||
                 pathname.includes("/admin/po/")
             ) {
-                // Initialize bulk selection for index page
-                console.log("Initializing Purchase Order Index page...");
-
                 // Initialize view functionality even on index page for modals
                 window.poApp = new PurchaseOrderView();
 
@@ -2033,13 +2019,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     rowCheckboxes.length > 0
                 ) {
                     bulkSelection = new PurchaseOrderBulkSelection();
-                    console.log(
-                        "Purchase Order Index bulk selection initialized"
-                    );
                 } else {
-                    console.log(
-                        "No purchase order items found, skipping bulk selection initialization."
-                    );
                     // Ensure the bulk actions bar is hidden if no items
                     const bulkActionsBar =
                         document.getElementById("bulkActionsBar");
@@ -2050,7 +2030,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Initialize search functionality for index page
                 initializeSearch();
-                console.log("Purchase Order Index page initialized");
             }
 
             // Expose global utility functions that might be called from inline handlers

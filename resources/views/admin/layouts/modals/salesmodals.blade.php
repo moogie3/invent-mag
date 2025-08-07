@@ -7,7 +7,7 @@
             </div>
             <div class="modal-status bg-danger"></div>
             <div class="modal-body text-center py-4">
-                <i class="ti ti-alert-triangle" style="font-size: 3rem;"></i>
+                <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
                 <h3>Are you sure?</h3>
                 <div class="text-muted">Do you really want to remove this sales order? This action cannot be undone.</div>
             </div>

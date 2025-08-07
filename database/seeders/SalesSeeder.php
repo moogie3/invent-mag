@@ -97,11 +97,11 @@ class SalesSeeder extends Seeder
                 $finalCalculatedTotal = $currentTotalAfterDiscount + $currentTotalTaxAmount;
 
                 $attempts++;
-            } while (($finalCalculatedTotal < 1000 || $finalCalculatedTotal > 10000) && $attempts < $maxAttempts);
+            } while (($finalCalculatedTotal < 100 || $finalCalculatedTotal > 10000) && $attempts < $maxAttempts);
 
             // If after maxAttempts, still not in range, adjust to be within range
-            if ($finalCalculatedTotal < 1000) {
-                $finalCalculatedTotal = rand(1000, 2000);
+            if ($finalCalculatedTotal < 100) {
+                $finalCalculatedTotal = rand(100, 1000);
             } elseif ($finalCalculatedTotal > 10000) {
                 $finalCalculatedTotal = rand(8000, 10000);
             }

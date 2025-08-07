@@ -50,11 +50,13 @@ class CurrencyHelper
     protected static function getDefaultSettings()
     {
         return (object) [
+            'currency_code' => 'IDR',
             'currency_symbol' => 'Rp',
             'decimal_places' => 0,
             'decimal_separator' => ',',
             'thousand_separator' => '.',
-            'position' => 'prefix'
+            'position' => 'prefix',
+            'locale' => 'id-ID',
         ];
     }
 

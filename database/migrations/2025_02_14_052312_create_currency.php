@@ -14,6 +14,8 @@ return new class extends Migration {
             $table->string('thousand_separator')->default('.');
             $table->integer('decimal_places')->default(0);
             $table->string('position')->default('prefix');
+            $table->string('currency_code')->default('IDR');
+            $table->string('locale')->default('id-ID');
             $table->timestamps();
         });
     }

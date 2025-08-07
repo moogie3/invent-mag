@@ -42,9 +42,16 @@
                                         @method('PUT')
                                         @csrf
                                         <div class="row align-items-center">
-                                            <span class="avatar avatar-xl"
-                                                style="background-image: url('{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('default-avatar.png') }}');">
-                                            </span>
+                                            @if (auth()->user()->avatar)
+                                                <span class="avatar avatar-xl"
+                                                    style="background-image: url('{{ asset('storage/' . auth()->user()->avatar) }}'); width: 100px; height: 100px;">
+                                                </span>
+                                            @else
+                                                <span class="avatar avatar-xl avatar-initial rounded-circle"
+                                                    style="width: 100px; height: 100px;">
+                                                    <i class="ti ti-person" style="font-size: 4rem;"></i>
+                                                </span>
+                                            @endif
                                             <div class="col-auto"><input type="file" name="avatar" class="form-control">
                                             </div>
                                         </div>

@@ -31,6 +31,9 @@ class CurrencyController extends Controller
             'decimal_separator' => 'required|string|max:1',
             'thousand_separator' => 'required|string|max:1',
             'decimal_places' => 'required|integer|min:0|max:4',
+            'position' => 'required|string|in:prefix,suffix',
+            'currency_code' => 'required|string|max:3',
+            'locale' => 'required|string|max:10',
         ]);
 
         $this->currencyService->updateCurrency($request->all());

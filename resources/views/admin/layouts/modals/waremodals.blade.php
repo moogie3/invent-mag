@@ -159,7 +159,7 @@
             var isMainCell = targetRow.find('.sort-is-main');
 
             // Check if the warehouse is main
-            if (isMainCell.find('.badge.bg-success').length > 0) {
+            if (isMainCell.find('.badge.bg-green-lt').length > 0) {
                 $('#mainWarehouseWarning').show();
                 $('#deleteForm button[type="submit"]').prop('disabled', true);
             } else {

@@ -21,7 +21,7 @@
         @endif
 
         <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-            onclick="setDeleteFormAction('{{ route('admin.warehouse.destroy', $wo->id) }}')">
+            onclick="setDeleteFormAction('{{ route('admin.warehouse.destroy', $wo->id) }}')" @if($wo->is_main) disabled @endif>
             <i class="ti ti-trash me-2"></i> Delete
         </button>
     </div>

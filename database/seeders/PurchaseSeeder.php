@@ -70,11 +70,11 @@ class PurchaseSeeder extends Seeder
                     ];
                 }
                 $attempts++;
-            } while (($totalPurchaseAmount < 1000 || $totalPurchaseAmount > 10000) && $attempts < $maxAttempts);
+            } while (($totalPurchaseAmount < 100 || $totalPurchaseAmount > 10000) && $attempts < $maxAttempts);
 
             // If after maxAttempts, still not in range, adjust to be within range
-            if ($totalPurchaseAmount < 1000) {
-                $totalPurchaseAmount = rand(1000, 2000);
+            if ($totalPurchaseAmount < 100) {
+                $totalPurchaseAmount = rand(100, 1000);
             } elseif ($totalPurchaseAmount > 10000) {
                 $totalPurchaseAmount = rand(8000, 10000);
             }

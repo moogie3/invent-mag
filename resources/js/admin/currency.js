@@ -27,6 +27,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const formData = new FormData(currencySettingsForm);
 
+        // Manually set hidden fields based on selected option
+        const selectedOption = document.getElementById('selectedCurrency').options[document.getElementById('selectedCurrency').selectedIndex];
+        formData.set('currency_code', selectedOption.value);
+        formData.set('locale', selectedOption.dataset.locale);
+        formData.set('currency_symbol', selectedOption.dataset.symbol);
+
         fetch(currencySettingsForm.action, {
             method: currencySettingsForm.method,
             body: formData,

@@ -260,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </a>
                                 <button type="button" class="dropdown-item text-danger"
                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                    onclick="setDeleteFormAction('/admin/warehouse/destroy/${warehouse.id}')">
+                                    onclick="setDeleteFormAction('/admin/warehouse/destroy/${warehouse.id}')" ${warehouse.is_main ? 'disabled' : ''}>
                                     <i class="ti ti-trash me-2"></i> Delete
                                 </button>
                             </div>

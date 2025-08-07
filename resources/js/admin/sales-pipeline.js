@@ -345,7 +345,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <strong>Expected Close:</strong> ${expectedCloseDate}<br>
                     <strong>Status:</strong> <span class="badge ${getStatusColor(
                         opportunity.status
-                    )}">${
+                    )} text-white">${
             opportunity.status.charAt(0).toUpperCase() +
             opportunity.status.slice(1)
         }</span>
@@ -376,15 +376,15 @@ document.addEventListener("DOMContentLoaded", function () {
     function getStatusColor(status) {
         switch (status) {
             case "open":
-                return "badge-outline text-blue";
+                return "bg-primary";
             case "won":
-                return "badge-outline text-green";
+                return "bg-success";
             case "lost":
-                return "badge-outline text-red";
+                return "bg-danger";
             case "converted":
-                return "badge-outline text-teal";
+                return "bg-info";
             default:
-                return "badge-outline text-gray";
+                return "bg-secondary";
         }
     }
 
@@ -476,7 +476,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             }</small>
                             ${
                                 stage.is_closed
-                                    ? '<span class="badge bg-secondary ms-2">Closed Stage</span>'
+                                    ? '<span class="badge bg-success text-white ms-2">Closed Stage</span>'
                                     : ""
                             }
                         </div>
@@ -946,9 +946,16 @@ document.addEventListener("DOMContentLoaded", function () {
             const updatedPipeline = allPipelines.find(
                 (p) => p.id == pipelineId
             );
+            console.log("After fetchData - allPipelines:", allPipelines);
+            console.log("After fetchData - updatedPipeline:", updatedPipeline);
             if (updatedPipeline) {
-                renderPipelineStages(updatedPipeline);
+                renderPipelineStages(updatedPipeline.id);
             }
+
+            console.log("Inside renderPipelineStages - pipelineId:", pipelineId);
+            const pipeline = allPipelines.find((p) => p.id == pipelineId);
+            console.log("Inside renderPipelineStages - found pipeline:", pipeline);
+            console.log("Inside renderPipelineStages - pipeline.stages:", pipeline ? pipeline.stages : "N/A");
 
             this.reset();
 

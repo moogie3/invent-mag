@@ -1,4 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Currency settings from meta tag
+    const currencySettings = {
+        locale: document.querySelector('meta[name="currency-locale"]').content,
+        currency_code: document.querySelector('meta[name="currency-code"]').content,
+        decimal_places: parseInt(document.querySelector('meta[name="currency-decimal-places"]').content),
+    };
+
     const editCustomerModal = document.getElementById("editCustomerModal");
     const createCustomerModal = document.getElementById("createCustomerModal");
     const crmCustomerModal = document.getElementById("crmCustomerModal");

@@ -31,7 +31,8 @@
                     Create Customer</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="createCustomerForm" action="{{ route('admin.customer.store') }}" method="POST" enctype="multipart/form-data">
+            <form id="createCustomerForm" action="{{ route('admin.customer.store') }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
@@ -47,17 +48,17 @@
                         <input type="text" class="form-control" id="customerPhone" name="phone_number">
                     </div>
                     <div class="mb-3">
-                        <label for="customerPaymentTerms" class="form-label">Payment
-                            Terms</label>
-                        <input type="text" class="form-control" id="customerPaymentTerms" name="payment_terms">
-                    </div>
-                    <div class="mb-3">
                         <label for="customerEmail" class="form-label">Email</label>
                         <input type="email" class="form-control" id="customerEmail" name="email">
                     </div>
                     <div class="mb-3">
                         <label for="customerImage" class="form-label">Image</label>
                         <input type="file" class="form-control" id="customerImage" name="image">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerPaymentTerms" class="form-label">Payment
+                            Terms</label>
+                        <input type="text" class="form-control" id="customerPaymentTerms" name="payment_terms">
                     </div>
                 </div>
                 <div class="modal-footer">

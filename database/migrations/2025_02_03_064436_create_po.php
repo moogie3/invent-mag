@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('invoice');
             $table->integer('supplier_id');
-            $table->timestamp('order_date');
+            $table->timestamp('order_date')->useCurrent();
             $table->timestamp('due_date')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->enum('payment_type', ['Cash', 'Transfer', '-']);
             $table->decimal('discount_total', 10, 2)->default(0);

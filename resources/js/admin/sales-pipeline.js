@@ -27,8 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "editOpportunityCustomer"
     );
 
-    
-
     const CSRF_TOKEN = document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content");
@@ -66,21 +64,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Initialize Flatpickr for date fields
     let newOpportunityExpectedCloseDateFlatpickr;
-    const newOpportunityDateElement = document.getElementById("opportunityExpectedCloseDate");
+    const newOpportunityDateElement = document.getElementById(
+        "opportunityExpectedCloseDate"
+    );
     if (newOpportunityDateElement) {
-        newOpportunityExpectedCloseDateFlatpickr = flatpickr(newOpportunityDateElement, {
-            dateFormat: "Y-m-d",
-            altInput: true,
-            altFormat: "d F Y",
-            allowInput: true,
-        });
+        newOpportunityExpectedCloseDateFlatpickr = flatpickr(
+            newOpportunityDateElement,
+            {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d F Y",
+                allowInput: true,
+            }
+        );
     }
 
     let editOpportunityExpectedCloseDateFlatpickr;
     let allPipelines = [];
     let allCustomers = [];
-
-    
 
     let allProducts = []; // New array for products
 
@@ -107,6 +108,8 @@ document.addEventListener("DOMContentLoaded", function () {
             initialDataContainer.dataset.decimalSeparator || ".";
         currencySettings.thousandSeparator =
             initialDataContainer.dataset.thousandSeparator || ",";
+        currencySettings.currency_code =
+            initialDataContainer.dataset.currencyCode || "USD";
 
         if (pipelinesData && pipelinesData.trim()) {
             allPipelines = JSON.parse(pipelinesData);
@@ -115,8 +118,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (customersData && customersData.trim()) {
             allCustomers = JSON.parse(customersData);
         }
-
-        
     } catch (error) {
         console.error("Error parsing initial data:", error);
         window.showToast(
@@ -169,7 +170,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error("Failed to fetch products");
             }
             allProducts = await productsResponse.json();
-            
         } catch (error) {
             console.error("Error fetching products:", error);
             window.showToast(
@@ -194,8 +194,6 @@ document.addEventListener("DOMContentLoaded", function () {
             // Re-render relevant parts after fetching updated data
             renderPipelinesSelect(false); // Don't automatically reload the board
             renderPipelinesList();
-
-            
         } catch (error) {
             console.error("Error re-fetching data:", error);
             window.showToast(
@@ -272,17 +270,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         (opp) => opp.pipeline_stage_id === stage.id
                     );
                     const stageColumn = document.createElement("div");
-                    stageColumn.className = "col-md-3";
+                    stageColumn.className = "col-md-4";
                     stageColumn.innerHTML = `
                 <div class="card card-stacked">
                     <div class="card-header">
-                        <h3 class="card-title">${stage.name} (${
-                stageOpportunities.length
-            })</h3>
+                        <h3 class="card-title">${stage.name} (${stageOpportunities.length})</h3>
                     </div>
-                    <div class="card-body p-2 stage-column" data-stage-id="${
-                stage.id
-            }" style="min-height: 150px;">
+                    <div class="card-body p-2 stage-column" data-stage-id="${stage.id}" style="min-height: 150px;">
                         <!-- Opportunities will be dragged here -->
                     </div>
                 </div>
@@ -336,7 +330,10 @@ document.addEventListener("DOMContentLoaded", function () {
             ? formatCurrencyJs(opportunity.amount)
             : "No amount";
         const expectedCloseDate = opportunity.expected_close_date
-            ? new Date(opportunity.expected_close_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+            ? new Date(opportunity.expected_close_date).toLocaleDateString(
+                  "en-GB",
+                  { day: "numeric", month: "long", year: "numeric" }
+              )
             : "No date";
 
         card.innerHTML = `
@@ -347,15 +344,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     <strong>Amount:</strong> ${amount}<br>
                     <strong>Expected Close:</strong> ${expectedCloseDate}<br>
                     <strong>Status:</strong> <span class="badge ${getStatusColor(
-                opportunity.status
-            )}">${
-                opportunity.status.charAt(0).toUpperCase() +
-                opportunity.status.slice(1)
-            }</span>
+                        opportunity.status
+                    )}">${
+            opportunity.status.charAt(0).toUpperCase() +
+            opportunity.status.slice(1)
+        }</span>
                 </p>
                 <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" class="btn btn-outline-primary btn-sm edit-opportunity-btn" 
-                            data-opportunity-id="${opportunity.id}" ${opportunity.status === 'converted' ? 'disabled' : ''}>
+                    <button type="button" class="btn btn-outline-primary btn-sm edit-opportunity-btn"
+                            data-opportunity-id="${opportunity.id}" ${
+            opportunity.status === "converted" ? "disabled" : ""
+        }>
                         <i class="ti ti-edit"></i> Edit
                     </button>
                     <button type="button" class="btn btn-outline-danger btn-sm delete-opportunity-btn"
@@ -425,11 +424,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     : ""
             }</h5>
                             <p class="card-text">${
-                pipeline.description || "No description"
-            }</p>
+                                pipeline.description || "No description"
+                            }</p>
                             <small class="text-muted">Stages: ${
-                pipeline.stages ? pipeline.stages.length : 0
-            }</small>
+                                pipeline.stages ? pipeline.stages.length : 0
+                            }</small>
                         </div>
                         <div class="col-auto">
                             <div class="btn-group" role="group">
@@ -473,8 +472,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="col">
                             <strong>${stage.name}</strong>
                             <small class="text-muted">Position: ${
-                stage.position
-            }</small>
+                                stage.position
+                            }</small>
                             ${
                                 stage.is_closed
                                     ? '<span class="badge bg-secondary ms-2">Closed Stage</span>'
@@ -502,14 +501,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const productId = item.product_id || "";
         const quantity = item.quantity || "";
-        const price = parseFloat(item.price || 0).toFixed(currencySettings.decimalPlaces);
+        const price = parseFloat(item.price || 0).toFixed(
+            currencySettings.decimalPlaces
+        );
 
         let productOptions = '<option value="">Select Product</option>';
         allProducts.forEach((product) => {
             const selected = product.id == productId ? "selected" : "";
             productOptions += `<option value="${product.id}" data-price="${
                 product.selling_price || 0
-            }" data-stock="${product.stock_quantity || 0}" ${selected}>${product.name} (Stock: ${product.stock_quantity || 0})</option>`;
+            }" data-stock="${product.stock_quantity || 0}" ${selected}>${
+                product.name
+            } (Stock: ${product.stock_quantity || 0})</option>`;
         });
 
         itemDiv.innerHTML = `
@@ -523,7 +526,9 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <div class="col-md-3">
                 <label for="${containerId}-quantity-${index}" class="form-label">Quantity</label>
-                <input type="number" class="form-control quantity-input" id="${containerId}-quantity-${index}" name="items[${index}][quantity]" value="${quantity}" min="1" max="${item.product ? item.product.stock_quantity : ''}" required>
+                <input type="number" class="form-control quantity-input" id="${containerId}-quantity-${index}" name="items[${index}][quantity]" value="${quantity}" min="1" max="${
+            item.product ? item.product.stock_quantity : ""
+        }" required>
             </div>
             <div class="col-md-3">
                 <label for="${containerId}-price-${index}" class="form-label">Price</label>
@@ -559,7 +564,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const maxStock = parseFloat(quantityInput.max);
             if (parseFloat(quantityInput.value) > maxStock) {
                 quantityInput.value = maxStock;
-                window.showToast("Warning", `Quantity cannot exceed available stock (${maxStock}).`, "warning");
+                window.showToast(
+                    "Warning",
+                    `Quantity cannot exceed available stock (${maxStock}).`,
+                    "warning"
+                );
             }
             calculateTotalAmount(containerId);
         });
@@ -686,7 +695,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectedPipelineId = pipelineSelect.value;
 
         // Debug logging
-        
 
         // Enhanced pipeline finding with better type handling
         const selectedPipeline = allPipelines.find((p) => {
@@ -694,15 +702,16 @@ document.addEventListener("DOMContentLoaded", function () {
             return String(p.id) === String(selectedPipelineId);
         });
 
-        
-
         if (!selectedPipeline) {
-            window.showToast("Error", "Please select a pipeline first.", "error");
+            window.showToast(
+                "Error",
+                "Please select a pipeline first.",
+                "error"
+            );
             return;
         }
 
         // Additional debugging for stages
-        
 
         if (!selectedPipeline.stages || selectedPipeline.stages.length === 0) {
             window.showToast(
@@ -737,7 +746,6 @@ document.addEventListener("DOMContentLoaded", function () {
         data.items = items;
 
         // Debug logging
-        
 
         try {
             const response = await fetch(
@@ -771,7 +779,11 @@ document.addEventListener("DOMContentLoaded", function () {
             newOpportunityTotalAmountInput.value = formatCurrencyJs(0); // Reset total
             loadPipelineBoard(selectedPipelineId);
 
-            window.showToast("Success", "Opportunity created successfully!", "success");
+            window.showToast(
+                "Success",
+                "Opportunity created successfully!",
+                "success"
+            );
         } catch (error) {
             console.error("Error creating opportunity:", error);
             window.showToast(
@@ -813,7 +825,11 @@ document.addEventListener("DOMContentLoaded", function () {
             await fetchData();
             this.reset();
 
-            window.showToast("Success", "Pipeline created successfully!", "success");
+            window.showToast(
+                "Success",
+                "Pipeline created successfully!",
+                "success"
+            );
         } catch (error) {
             console.error("Error creating pipeline:", error);
             window.showToast(
@@ -856,7 +872,11 @@ document.addEventListener("DOMContentLoaded", function () {
             ).hide();
             await fetchData();
 
-            window.showToast("Success", "Pipeline updated successfully!", "success");
+            window.showToast(
+                "Success",
+                "Pipeline updated successfully!",
+                "success"
+            );
         } catch (error) {
             console.error("Error updating pipeline:", error);
             window.showToast(
@@ -886,7 +906,11 @@ document.addEventListener("DOMContentLoaded", function () {
         data.is_closed = formData.has("is_closed");
 
         if (!data.name) {
-            window.showToast("Error", "Please fill in all required fields.", "error");
+            window.showToast(
+                "Error",
+                "Please fill in all required fields.",
+                "error"
+            );
             return;
         }
 
@@ -919,17 +943,27 @@ document.addEventListener("DOMContentLoaded", function () {
             loadPipelineBoard(pipelineId);
 
             // Also re-render the stages list inside the modal for consistency
-            const updatedPipeline = allPipelines.find((p) => p.id == pipelineId);
+            const updatedPipeline = allPipelines.find(
+                (p) => p.id == pipelineId
+            );
             if (updatedPipeline) {
                 renderPipelineStages(updatedPipeline);
             }
 
             this.reset();
 
-            window.showToast("Success", "Stage created successfully!", "success");
+            window.showToast(
+                "Success",
+                "Stage created successfully!",
+                "success"
+            );
         } catch (error) {
             console.error("Error creating stage:", error);
-            window.showToast("Error", `Failed to create stage. Please try again.`, "error");
+            window.showToast(
+                "Error",
+                `Failed to create stage. Please try again.`,
+                "error"
+            );
         }
     });
 
@@ -943,8 +977,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const data = Object.fromEntries(formData.entries());
 
         // Manually add pipeline and stage IDs from the hidden fields
-        data.sales_pipeline_id = document.getElementById('editOpportunityPipelineId').value;
-        data.pipeline_stage_id = document.getElementById('editOpportunityStageId').value;
+        data.sales_pipeline_id = document.getElementById(
+            "editOpportunityPipelineId"
+        ).value;
+        data.pipeline_stage_id = document.getElementById(
+            "editOpportunityStageId"
+        ).value;
 
         // Collect items data
         const items = [];
@@ -985,9 +1023,11 @@ document.addEventListener("DOMContentLoaded", function () {
             pipelineSelect.value = currentPipelineId; // Restore the selected pipeline
             loadPipelineBoard(currentPipelineId); // Refresh the board with the correct pipeline
 
-            window.showToast("Success", "Opportunity updated successfully!", "success");
-
-            
+            window.showToast(
+                "Success",
+                "Opportunity updated successfully!",
+                "success"
+            );
         } catch (error) {
             console.error("Error updating opportunity:", error);
             window.showToast(
@@ -1053,7 +1093,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
                     await fetchData();
-                    window.showToast("Success", "Pipeline deleted successfully!", "success");
+                    window.showToast(
+                        "Success",
+                        "Pipeline deleted successfully!",
+                        "success"
+                    );
                 } catch (error) {
                     console.error("Error deleting pipeline:", error);
                     window.showToast(
@@ -1095,7 +1139,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         renderPipelineStages(pipelineId);
                     }
 
-                    window.showToast("Success", "Stage deleted successfully!", "success");
+                    window.showToast(
+                        "Success",
+                        "Stage deleted successfully!",
+                        "success"
+                    );
                 } catch (error) {
                     console.error("Error deleting stage:", error);
                     window.showToast(
@@ -1140,22 +1188,30 @@ document.addEventListener("DOMContentLoaded", function () {
                     opportunity.pipeline_stage_id;
                 document.getElementById("editOpportunityCustomer").value =
                     opportunity.customer_id;
-                document.getElementById("editOpportunityStatus").value = opportunity.status;
+                document.getElementById("editOpportunityStatus").value =
+                    opportunity.status;
                 // document.getElementById("editOpportunityAmount").value = // Removed direct amount input
                 //     opportunity.amount || "";
                 // Initialize Flatpickr for the edit form if not already initialized
                 if (!editOpportunityExpectedCloseDateFlatpickr) {
-                    editOpportunityExpectedCloseDateFlatpickr = flatpickr(document.getElementById("editOpportunityExpectedCloseDate"), {
-                        dateFormat: "Y-m-d",
-                        altInput: true,
-                        altFormat: "d F Y",
-                        allowInput: true,
-                    });
+                    editOpportunityExpectedCloseDateFlatpickr = flatpickr(
+                        document.getElementById(
+                            "editOpportunityExpectedCloseDate"
+                        ),
+                        {
+                            dateFormat: "Y-m-d",
+                            altInput: true,
+                            altFormat: "d F Y",
+                            allowInput: true,
+                        }
+                    );
                 }
 
                 // Set the date for the Flatpickr instance
                 if (opportunity.expected_close_date) {
-                    editOpportunityExpectedCloseDateFlatpickr.setDate(opportunity.expected_close_date);
+                    editOpportunityExpectedCloseDateFlatpickr.setDate(
+                        opportunity.expected_close_date
+                    );
                 } else {
                     editOpportunityExpectedCloseDateFlatpickr.clear();
                 }
@@ -1231,10 +1287,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Convert Opportunity Button
         if (e.target.closest(".convert-opportunity-btn")) {
-            const opportunityId = e.target.closest(".convert-opportunity-btn").dataset.opportunityId;
-            const convertModal = new bootstrap.Modal(document.getElementById('convertOpportunityModal'));
-            document.getElementById('convertOpportunityId').value = opportunityId;
-            document.getElementById('convertOpportunityForm').action = `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}/convert`;
+            const opportunityId = e.target.closest(".convert-opportunity-btn")
+                .dataset.opportunityId;
+            const convertModal = new bootstrap.Modal(
+                document.getElementById("convertOpportunityModal")
+            );
+            document.getElementById("convertOpportunityId").value =
+                opportunityId;
+            document.getElementById(
+                "convertOpportunityForm"
+            ).action = `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}/convert`;
             convertModal.show();
         }
     });
@@ -1260,8 +1322,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error("Failed to move opportunity");
             }
 
-            
-
             // Update stage counts without reloading the board
             updateStageCount(oldStageId, -1);
             updateStageCount(newStageId, 1);
@@ -1278,13 +1338,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateStageCount(stageId, change) {
-        const stageColumn = pipelineBoard.querySelector(`[data-stage-id="${stageId}"]`);
+        const stageColumn = pipelineBoard.querySelector(
+            `[data-stage-id="${stageId}"]`
+        );
         if (stageColumn) {
-            const cardHeader = stageColumn.closest(".card-stacked").querySelector(".card-header");
+            const cardHeader = stageColumn
+                .closest(".card-stacked")
+                .querySelector(".card-header");
             if (cardHeader) {
                 const title = cardHeader.querySelector(".card-title");
                 if (title) {
-                    const currentCount = parseInt(title.textContent.match(/\((\d+)\)/)[1], 10);
+                    const currentCount = parseInt(
+                        title.textContent.match(/\((\d+)\)/)[1],
+                        10
+                    );
                     const newCount = currentCount + change;
                     const stageName = title.textContent.split("(")[0].trim();
                     title.textContent = `${stageName} (${newCount})`;
@@ -1296,16 +1363,24 @@ document.addEventListener("DOMContentLoaded", function () {
     // Show confirmation modal
     function showConfirmationModal(title, body) {
         return new Promise((resolve) => {
-            const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-            document.getElementById('confirmationModalTitle').textContent = title;
-            document.getElementById('confirmationModalBody').textContent = body;
-            document.getElementById('confirmationModalConfirm').onclick = () => {
-                modal.hide();
-                resolve(true);
-            };
-            document.getElementById('confirmationModal').addEventListener('hidden.bs.modal', () => {
-                resolve(false);
-            }, { once: true });
+            const modal = new bootstrap.Modal(
+                document.getElementById("confirmationModal")
+            );
+            document.getElementById("confirmationModalTitle").textContent =
+                title;
+            document.getElementById("confirmationModalBody").textContent = body;
+            document.getElementById("confirmationModalConfirm").onclick =
+                () => {
+                    modal.hide();
+                    resolve(true);
+                };
+            document.getElementById("confirmationModal").addEventListener(
+                "hidden.bs.modal",
+                () => {
+                    resolve(false);
+                },
+                { once: true }
+            );
             modal.show();
         });
     }
@@ -1328,60 +1403,81 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-    const convertOpportunityForm = document.getElementById('convertOpportunityForm');
+document.addEventListener("DOMContentLoaded", function () {
+    const convertOpportunityForm = document.getElementById(
+        "convertOpportunityForm"
+    );
 
     if (convertOpportunityForm) {
-        convertOpportunityForm.addEventListener('submit', function (e) {
+        convertOpportunityForm.addEventListener("submit", function (e) {
             e.preventDefault();
             const form = e.target;
             const url = form.action;
             const formData = new FormData(form);
-            const opportunityId = document.getElementById('convertOpportunityId').value;
+            const opportunityId = document.getElementById(
+                "convertOpportunityId"
+            ).value;
 
             fetch(url, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                    Accept: "application/json",
                 },
-                body: formData
+                body: formData,
             })
-            .then(response => response.json())
-            .then(data => {
-                const convertModal = bootstrap.Modal.getInstance(document.getElementById('convertOpportunityModal'));
-                convertModal.hide();
+                .then((response) => response.json())
+                .then((data) => {
+                    const convertModal = bootstrap.Modal.getInstance(
+                        document.getElementById("convertOpportunityModal")
+                    );
+                    convertModal.hide();
 
-                if (data.type === 'success') {
-                    window.showToast('Success', data.message, 'success');
-                    
-                    // Find the opportunity card and update it
-                    const opportunityCard = document.querySelector(`.opportunity-card[data-opportunity-id='${opportunityId}']`);
-                    if (opportunityCard) {
-                        // Update status badge
-                        const statusBadge = opportunityCard.querySelector('.badge');
-                        if (statusBadge) {
-                            statusBadge.textContent = 'Converted';
-                            statusBadge.classList.remove('badge-success-lt');
-                            statusBadge.classList.add('badge-info-lt');
-                        }
+                    if (data.type === "success") {
+                        window.showToast("Success", data.message, "success");
 
-                        // Remove the convert button
-                        const convertButton = opportunityCard.querySelector('.convert-opportunity-btn');
-                        if (convertButton) {
-                            convertButton.remove();
+                        // Find the opportunity card and update it
+                        const opportunityCard = document.querySelector(
+                            `.opportunity-card[data-opportunity-id='${opportunityId}']`
+                        );
+                        if (opportunityCard) {
+                            // Update status badge
+                            const statusBadge =
+                                opportunityCard.querySelector(".badge");
+                            if (statusBadge) {
+                                statusBadge.textContent = "Converted";
+                                statusBadge.classList.remove(
+                                    "badge-success-lt"
+                                );
+                                statusBadge.classList.add("badge-info-lt");
+                            }
+
+                            // Remove the convert button
+                            const convertButton = opportunityCard.querySelector(
+                                ".convert-opportunity-btn"
+                            );
+                            if (convertButton) {
+                                convertButton.remove();
+                            }
                         }
+                    } else {
+                        window.showToast("Error", data.message, "error");
                     }
-                } else {
-                    window.showToast('Error', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                const convertModal = bootstrap.Modal.getInstance(document.getElementById('convertOpportunityModal'));
-                convertModal.hide();
-                window.showToast('Error', 'An unexpected error occurred.', 'error');
-            });
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    const convertModal = bootstrap.Modal.getInstance(
+                        document.getElementById("convertOpportunityModal")
+                    );
+                    convertModal.hide();
+                    window.showToast(
+                        "Error",
+                        "An unexpected error occurred.",
+                        "error"
+                    );
+                });
         });
     }
 });

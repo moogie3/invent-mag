@@ -32,8 +32,9 @@
                                             data-initial-customers="{{ json_encode($customers) }}"
                                             data-currency-symbol="{{ \App\Helpers\CurrencyHelper::getCurrencySymbol() }}"
                                             data-decimal-places="{{ \App\Models\CurrencySetting::first()->decimal_places ?? 0 }}"
-                                            data-decimal-separator="{{ \App\Models\CurrencySetting::first()->decimal_separator ?? '.' }}"
-                                            data-thousand-separator="{{ \App\Models\CurrencySetting::first()->thousand_separator ?? ',' }}"
+                                             data-decimal-separator="{{ \App\Models\CurrencySetting::first()->decimal_separator ?? '.' }}"
+                                             data-thousand-separator="{{ \App\Models\CurrencySetting::first()->thousand_separator ?? ',' }}"
+                                             data-currency-code="{{ \App\Models\CurrencySetting::first()->currency_code ?? 'USD' }}"
                                             >
                                             <div class="d-flex align-items-center justify-content-between mb-4">
                                                 <div class="d-flex align-items-center">

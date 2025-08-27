@@ -30,6 +30,8 @@ export default defineConfig({
                 "resources/css/navbar.css",
                 "resources/js/admin/layouts/navbar.js",
                 "resources/js/admin/sales-pipeline.js",
+                "resources/css/sidebar.css",
+                "resources/js/sidebar.js",
             ],
             refresh: true,
         }),

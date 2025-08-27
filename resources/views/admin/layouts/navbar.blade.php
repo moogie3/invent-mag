@@ -1,9 +1,9 @@
 <header class="navbar navbar-expand-md d-print-none nav-container">
     <div class="container-xl d-flex justify-content-between align-items-center">
         <div class="d-flex flex-shrink-0 nav-left">
-            <!-- Hamburger Button for Mobile -->
-            <button class="navbar-toggler d-md-none" type="button" id="mobile-menu-toggle">
-                <i class="ti ti-menu fs-2"></i>
+            <!-- Hamburger Button for Sidebar -->
+            <button class="navbar-toggler" type="button" id="sidebar-toggle">
+                <i class="ti ti-menu-2 fs-2"></i>
             </button>
         </div>
 

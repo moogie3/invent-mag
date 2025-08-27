@@ -1,4 +1,9 @@
 /* Navbar CSS Styles */
+
+.navbar-toggler {
+    display: block !important;
+}
+
 @media (min-width: 768px) {
     .nav-left {
         width: 200px;
@@ -133,42 +138,7 @@
     border-radius: 50%;
 }
 
-@media (max-width: 768px) {
-    .navbar-brand {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-    }
 
-    /* FIX: Improve hamburger button clickability */
-    #mobile-menu-toggle {
-        position: relative;
-        z-index: 1000;
-        padding: 15px;
-        /* Increased padding for larger tap target */
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        display: block;
-        /* Ensure it's properly displayed */
-        margin: -10px;
-        /* Negative margin to offset increased padding */
-    }
-
-    /* FIX: Ensure the hamburger icon is visible and has a larger touch area */
-    #mobile-menu-toggle i {
-        font-size: 24px;
-        /* Larger icon */
-        pointer-events: none;
-        /* Prevent the icon from capturing events */
-    }
-
-    /* FIX: Ensure nav-left has proper positioning and doesn't block events */
-    .nav-left {
-        z-index: 1000;
-        position: relative;
-    }
-}
 
 /* Notification styling */
 #notification-dot {

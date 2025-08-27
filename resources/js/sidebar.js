@@ -2,16 +2,16 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM loaded, initializing sidebar...");
 
     const sidebar = document.querySelector(".sidebar");
-    const sidebarToggleInternal = document.getElementById(
-        "sidebar-toggle-internal"
+    const sidebarToggle = document.getElementById(
+        "sidebar-toggle"
     );
     const mainContent = document.querySelector(".main-content");
 
     console.log("Sidebar:", sidebar);
-    console.log("Toggle button:", sidebarToggleInternal);
+    console.log("Toggle button:", sidebarToggle);
     console.log("Main content:", mainContent);
 
-    if (!sidebar || !sidebarToggleInternal || !mainContent) {
+    if (!sidebar || !mainContent) {
         console.error("Required elements not found!");
         return;
     }
@@ -35,10 +35,12 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Applied saved collapsed state");
     }
 
-    sidebarToggleInternal.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("Toggle button clicked");
-        toggleSidebar();
-    });
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("Toggle button clicked");
+            toggleSidebar();
+        });
+    }
 });

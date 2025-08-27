@@ -28,28 +28,7 @@
         <!-- Mobile Menu Overlay -->
         <div class="nav-overlay" id="nav-overlay"></div>
 
-        <!-- Mobile Navigation Menu -->
-        <div class="mobile-nav d-md-none" id="mobile-nav">
-            <ul>
-                @foreach ($navigationItems as $item)
-                    @can($item['permission'])
-                        <li><a href="{{ route($item['route']) }}"><i class="{{ $item['icon'] }}"></i>{{ $item['title'] }}</a></li>
-                    @endcan
-                @endforeach
-                <li><a href="?theme=light" class="hide-theme-light">
-                        <i class="ti ti-sun"></i>Light Mode
-                    </a><a href="?theme=dark" class="hide-theme-dark">
-                        <i class="ti ti-moon"></i>Dark Mode
-                    </a></li>
-                <li><a href="{{ route('admin.setting.notifications') }}" class="dropdown-item"><i
-                            class="ti ti-settings"></i>Settings</a></li>
-                <li><a href="#" class="dropdown-item"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
-                            class="ti ti-logout-2"></i>
-                        Logout
-                    </a></li>
-            </ul>
-        </div>
+        
 
         <!-- Right Side Icons -->
         <div class="d-none d-md-flex d-flex align-items-center">

@@ -127,6 +127,8 @@
     border-radius: 0.5rem;
     transition: background-color 0.2s ease, color 0.2s ease;
     text-decoration: none;
+    min-height: 44px;
+    /* Ensures consistent height for all menu items */
 }
 
 .sidebar .navbar-nav .nav-link:hover {
@@ -140,18 +142,41 @@
 }
 
 .sidebar .nav-link-icon {
-    font-size: 1.25rem;
-    margin-right: 1rem;
-    width: 20px;
+    font-size: 1.125rem;
+    /* Slightly smaller for better proportion */
+    margin-right: 0.875rem;
+    /* Adjusted spacing */
+    width: 18px;
+    /* Fixed width for consistent alignment */
+    height: 18px;
+    /* Fixed height to match width */
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    /* Prevents icon from shrinking */
+    line-height: 1;
+    /* Ensures proper vertical centering */
 }
 
 .nav-link-title {
     flex: 1;
+    line-height: 1.2;
+    /* Improved text line height */
+    display: flex;
+    align-items: center;
+    /* Centers text vertically */
 }
 
 .nav-link-arrow {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 
 /* Submenu styling */
@@ -165,4 +190,6 @@
 .nav-submenu .nav-link {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
+    min-height: 36px;
+    /* Smaller height for submenu items */
 }

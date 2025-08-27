@@ -7,9 +7,6 @@
             </div>
             <span class="brand-text">Invent-MAG</span>
         </a>
-        <button class="sidebar-toggle" type="button" id="sidebar-toggle-internal">
-            <i class="ti ti-menu-deep"></i>
-        </button>
     </div>
 
     <!-- User Details moved to top after header -->

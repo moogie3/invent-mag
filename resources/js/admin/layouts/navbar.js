@@ -237,95 +237,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // FIX: Improved Mobile navigation functionality
-    const initMobileNav = () => {
-        const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
-        const mobileNav = document.getElementById("mobile-nav");
-        const overlay = document.getElementById("nav-overlay");
-
-        if (!mobileMenuToggle || !mobileNav) {
-            console.error("Mobile menu elements not found");
-            return;
-        }
-
-        // FIX: Use touchstart event for mobile to improve responsiveness
-        ["click", "touchstart"].forEach((eventType) => {
-            mobileMenuToggle.addEventListener(eventType, function (event) {
-                event.preventDefault(); // Prevent default behavior
-                event.stopPropagation(); // Stop event from propagating
-
-                
-                mobileNav.classList.toggle("active");
-
-                // Also toggle the overlay for better UX
-                if (overlay) {
-                    if (mobileNav.classList.contains("active")) {
-                        overlay.style.visibility = "visible";
-                        overlay.style.opacity = "1";
-                    } else {
-                        overlay.style.visibility = "hidden";
-                        overlay.style.opacity = "0";
-                    }
-                }
-            });
-        });
-
-        // Close menu when clicking on the overlay
-        if (overlay) {
-            overlay.addEventListener("click", function () {
-                mobileNav.classList.remove("active");
-                overlay.style.visibility = "hidden";
-                overlay.style.opacity = "0";
-            });
-        }
-
-        // Close menu when clicking outside
-        document.addEventListener("click", function (event) {
-            if (
-                mobileNav.classList.contains("active") &&
-                !mobileNav.contains(event.target) &&
-                !mobileMenuToggle.contains(event.target)
-            ) {
-                mobileNav.classList.remove("active");
-                if (overlay) {
-                    overlay.style.visibility = "hidden";
-                    overlay.style.opacity = "0";
-                }
-            }
-        });
-
-        // FIX: Add touch event support for better mobile experience
-        document.addEventListener("touchstart", function (event) {
-            if (
-                mobileNav.classList.contains("active") &&
-                !mobileNav.contains(event.target) &&
-                !mobileMenuToggle.contains(event.target) &&
-                event.target !== overlay
-            ) {
-                mobileNav.classList.remove("active");
-                if (overlay) {
-                    overlay.style.visibility = "hidden";
-                    overlay.style.opacity = "0";
-                }
-            }
-        });
-
-        // FIX: Make each nav item close the menu when clicked
-        const mobileNavItems = mobileNav.querySelectorAll("a");
-        mobileNavItems.forEach((item) => {
-            item.addEventListener("click", function () {
-                // Close mobile menu after selecting an item
-                // (unless it's a dropdown trigger)
-                if (!this.classList.contains("dropdown-toggle")) {
-                    mobileNav.classList.remove("active");
-                    if (overlay) {
-                        overlay.style.visibility = "hidden";
-                        overlay.style.opacity = "0";
-                    }
-                }
-            });
-        });
-    };
+    
 
     // Fix for notification tabs to prevent dropdown from closing when clicking tabs
     const fixNotificationTabsDropdown = () => {
@@ -342,7 +254,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initialize all navbar functionality
     initNotifications();
     initNavHover();
-    initMobileNav();
+    
     fixNotificationTabsDropdown();
 
     // Check for notifications immediately

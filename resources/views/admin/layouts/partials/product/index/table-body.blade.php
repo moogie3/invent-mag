@@ -19,8 +19,11 @@
             <td class="sort-name">{{ $product->name }}</td>
             <td class="sort-quantity no-print text-center">
                 {{ $product->stock_quantity }}
-                @if ($product->hasLowStock())
-                    <span class="badge bg-red-lt">Low Stock</span>
+                @php
+                    [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($product);
+                @endphp
+                @if ($badgeClass)
+                    <span class="{{ $badgeClass }}">{{ $badgeText }}</span>
                     @if ($product->low_stock_threshold)
                         <small class="d-block text-muted">Threshold: {{ $product->low_stock_threshold }}</small>
                     @endif

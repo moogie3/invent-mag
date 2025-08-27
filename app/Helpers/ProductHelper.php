@@ -23,13 +23,13 @@ class ProductHelper
         $diffDays = $today->diffInDays($expiryDate, false); // signed integer
 
         if ($expiryDate->isPast()) {
-            return ['badge bg-red-lt', 'Expired'];
+            return ['badge bg-red text-white', 'Expired'];
         } elseif ($diffDays <= 3 && $diffDays > 0) {
-            return ['badge bg-orange-lt', 'Expiring Soon (' . $diffDays . 'd)'];
+            return ['badge bg-orange text-white', 'Expiring Soon (' . $diffDays . 'd)'];
         } elseif ($diffDays <= 7) {
-            return ['badge bg-yellow-lt', 'Expiring Soon (' . $diffDays . 'd)'];
+            return ['badge bg-yellow text-white', 'Expiring Soon (' . $diffDays . 'd)'];
         } elseif ($diffDays <= 30) {
-            return ['badge bg-blue-lt', 'Expiring in ' . $diffDays . 'd'];
+            return ['badge bg-blue text-white', 'Expiring in ' . $diffDays . 'd'];
         }
 
         return [null, null]; // No badge if it's far away
@@ -48,9 +48,9 @@ class ProductHelper
         $stockQty = $product->stock_quantity;
 
         if ($stockQty <= $threshold) {
-            return ['badge bg-red-lt', 'Low Stock'];
+            return ['badge bg-red text-white', 'Low Stock'];
         }
 
-        return ['badge bg-green-lt', 'In Stock'];
+        return ['badge bg-green text-white', 'In Stock'];
     }
 }

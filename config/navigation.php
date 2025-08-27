@@ -27,6 +27,12 @@ return [
             'permission' => 'view-po',
         ],
         [
+            'title' => 'Sales Pipeline',
+            'route' => 'admin.sales_pipeline.index',
+            'icon' => 'ti ti-chart-arrows-vertical',
+            'permission' => 'view-sales-pipeline',
+        ],
+        [
             'title' => 'Product',
             'route' => 'admin.product',
             'icon' => 'ti ti-package',
@@ -37,12 +43,6 @@ return [
             'route' => 'admin.customer',
             'icon' => 'ti ti-users',
             'permission' => 'view-customer',
-        ],
-        [
-            'title' => 'Sales Pipeline',
-            'route' => 'admin.sales_pipeline.index',
-            'icon' => 'ti ti-chart-arrows-vertical',
-            'permission' => 'view-sales-pipeline',
         ],
         [
             'title' => 'Supplier',

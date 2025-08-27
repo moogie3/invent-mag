@@ -89,15 +89,7 @@ class Product extends Model
         return $this->low_stock_threshold ?? self::DEFAULT_LOW_STOCK_THRESHOLD;
     }
 
-    /**
-     * Check if the product has low stock
-     *
-     * @return bool
-     */
-    public function hasLowStock(): bool
-    {
-        return $this->stock_quantity <= $this->getLowStockThreshold();
-    }
+    
 
     /**
      * Get all products with low stock

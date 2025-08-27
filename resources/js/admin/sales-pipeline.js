@@ -420,7 +420,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="col">
                             <h5 class="card-title">${pipeline.name} ${
                 pipeline.is_default
-                    ? '<span class="badge bg-primary">Default</span>'
+                    ? '<span class="badge bg-primary text-white">Default</span>'
                     : ""
             }</h5>
                             <p class="card-text">${

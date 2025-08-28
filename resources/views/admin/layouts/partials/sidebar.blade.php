@@ -12,7 +12,7 @@
     <!-- User Details with actions on the right -->
     <div class="sidebar-user">
         <div class="user-info">
-            <div class="user-avatar">
+            <a href="{{ route('admin.setting.profile.edit') }}" class="user-avatar">
                 @if (Auth::check())
                     <span class="avatar avatar-sm"
                         style="background-image: url('{{ Auth::user()->avatar && Storage::disk('public')->exists(Auth::user()->avatar) ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=random' }}');"></span>
@@ -20,7 +20,7 @@
                     <span class="avatar avatar-sm"
                         style="background-image: url('{{ asset('storage/default-avatar.png') }}');"></span>
                 @endif
-            </div>
+            </a>
             <div class="user-details">
                 @if (Auth::check())
                     <span class="user-name">{{ Auth::user()->name }}</span>
@@ -41,19 +41,15 @@
                     <i class="ti ti-sun fs-2"></i>
                 </a>
 
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link px-1 position-relative" data-bs-toggle="dropdown"
-                        aria-expanded="false" id="notification-bell-sidebar">
+                <div class="nav-item">
+                    <a href="{{ route('admin.setting.notifications') }}" class="nav-link px-1 position-relative"
+                        id="notification-bell-sidebar" data-turbolinks-action="replace">
                         <i class="ti ti-bell fs-2"></i>
                         @if (isset($notificationCount) && $notificationCount > 0)
                             <span id="notification-dot-sidebar"
                                 class="position-absolute bg-danger border border-light rounded-circle"></span>
                         @endif
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0"
-                        style="width: 380px; max-height: 500px;">
-                        <!-- Notification content here -->
-                    </div>
                 </div>
             </div>
         </div>

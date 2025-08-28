@@ -181,10 +181,10 @@
 }
 
 #notification-dot-sidebar {
-    width: 8px;
-    height: 8px;
-    top: 2px;
-    right: 2px;
+    width: 10px;
+    height: 10px;
+    bottom: 23px;
+    right: 5px;
     border-radius: 50%;
     z-index: 1;
     background-color: red;
@@ -243,13 +243,14 @@
 }
 
 .sidebar .navbar-nav .nav-link:hover {
-    background-color: #f8f9fa;
-    color: #206bc4;
+    background-color: #343a40;
+    color: #fff;
 }
 
 .sidebar .navbar-nav .nav-link.active {
-    background-color: #206bc4;
+    background-color: #212529;
     color: #fff;
+    font-weight: bold;
 }
 
 .sidebar .nav-link-icon {
@@ -323,7 +324,30 @@
     color: #94a3b8;
 }
 
-[data-bs-theme="dark"] .sidebar-actions .nav-link:hover {
-    background-color: #334155;
-    color: #f1f5f9;
+
+[data-bs-theme="dark"] .sidebar .navbar-brand {
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .user-name {
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .user-role {
+    color: #94a3b8;
+}
+
+[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link {
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link:hover {
+    background-color: #f8f9fa;
+    color: #343a40;
+}
+
+[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active {
+    background-color: #e9ecef;
+    color: #343a40;
+    font-weight: bold;
 }

@@ -19,7 +19,8 @@
             <ul class="d-flex gap-3">
                 @foreach ($navigationItems as $item)
                     @can($item['permission'])
-                        <li><a href="{{ route($item['route']) }}"><i class="{{ $item['icon'] }}"></i>{{ $item['title'] }}</a></li>
+                        <li><a href="{{ route($item['route']) }}"><i
+                                    class="{{ $item['icon'] }}"></i>{{ $item['title'] }}</a></li>
                     @endcan
                 @endforeach
             </ul>
@@ -28,7 +29,7 @@
         <!-- Mobile Menu Overlay -->
         <div class="nav-overlay" id="nav-overlay"></div>
 
-        
+
 
         <!-- Right Side Icons -->
         <div class="d-none d-md-flex d-flex align-items-center" id="navbar-right-content">
@@ -295,13 +296,15 @@
                     @endif
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <a href="{{ route('admin.setting.profile.edit') }}" class="dropdown-item">Settings</a>
+                    <a href="{{ route('admin.setting.profile.edit') }}" class="dropdown-item">
+                        <i class="ti ti-settings me-2"></i>Settings
+                    </a>
                     <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
                         @csrf
                     </form>
                     <a href="#" class="dropdown-item"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        Logout
+                        <i class="ti ti-logout me-2"></i>Logout
                     </a>
                 </div>
             </div>

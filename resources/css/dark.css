@@ -109,3 +109,35 @@
 [data-bs-theme="dark"] hr {
     border-color: var(--tblr-border-color-translucent);
 }
+
+/* System Alerts Hover State */
+[data-bs-theme="dark"] .shadcn-alert-item:hover {
+    background-color: var(--tblr-bg-surface-secondary) !important; /* Darker background on hover */
+    color: var(--tblr-body-color) !important; /* Ensure text is visible */
+}
+
+[data-bs-theme="dark"] .shadcn-alert-item:hover .shadcn-product-name,
+[data-bs-theme="dark"] .shadcn-alert-item:hover .shadcn-product-details {
+    color: var(--tblr-body-color) !important; /* Ensure nested text is visible */
+}
+
+/* Loading Animation */
+.page-loader {
+    background-color: var(--tblr-body-bg); /* Use theme-aware background for loader */
+}
+
+[data-bs-theme="dark"] .page-loader .spinner-border {
+    color: var(--tblr-primary) !important; /* Keep spinner visible */
+}
+
+/* Navbar Overlay Blur */
+[data-bs-theme="dark"] .nav-overlay {
+    backdrop-filter: blur(5px); /* Apply blur effect */
+    background: rgba(0, 0, 0, 0.7) !important; /* Make it slightly darker and ensure it overrides */
+}
+
+/* General Badge Styling for Dark Mode */
+[data-bs-theme="dark"] .badge {
+    background-color: var(--tblr-secondary-bg-subtle) !important; /* Use a consistent dark background */
+    color: var(--tblr-body-color) !important; /* Ensure text is visible */
+}

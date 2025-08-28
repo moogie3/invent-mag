@@ -209,10 +209,18 @@
 /* Notification tabs styling */
 .notification-tabs .nav-link {
     border: none;
-    border-radius: 0;
-    font-size: 0.85rem;
-    font-weight: 500;
+    background: transparent;
     color: var(--tblr-body-color);
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding: 12px 16px;
+    transition: all 0.2s ease;
+    border-radius: 6px 6px 0 0;
+}
+
+.notification-tabs .nav-link:hover {
+    background: #f8fafc;
+    color: #1e293b;
 }
 
 .notification-tabs .nav-link.active {
@@ -324,4 +332,26 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
+}
+
+/* Hover effect for navbar icons and avatar */
+.navbar .nav-link.px-0 {
+    border-radius: var(--tblr-border-radius); /* Apply border-radius for a rounded hover effect */
+    transition: background-color 0.2s ease, color 0.2s ease; /* Add transition for smooth effect */
+}
+
+.navbar .nav-link.px-0:hover {
+    background-color: rgba(var(--tblr-primary-rgb), 0.05); /* Subtle primary color background */
+    color: var(--tblr-primary) !important; /* Change icon/text color to primary */
+}
+
+/* Dark mode adjustments for navbar hover */
+[data-bs-theme="dark"] .navbar .nav-link.px-0:hover {
+    background-color: rgba(var(--tblr-primary-rgb), 0.15); /* Slightly more prominent in dark mode */
+    color: var(--tblr-primary) !important; /* Keep primary color */
+}
+
+[data-bs-theme="dark"] .navbar .nav-link.px-0:hover i,
+[data-bs-theme="dark"] .navbar .nav-link.px-0:hover .avatar {
+    color: var(--tblr-primary) !important; /* Ensure icons and avatar get primary color */
 }

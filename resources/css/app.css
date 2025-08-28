@@ -1,6 +1,7 @@
 @import url('https://rsms.me/inter/inter.css');
 @import './auth.css';
 @import './navbar.css';
+@import './dark.css';
 
 /* ============================
    CSS RESET & NORMALIZATION
@@ -1632,7 +1633,7 @@ body {
     color: #f1f5f9;
 }
 
-.theme-dark #alertTabContent {
+[data-bs-theme="dark"] #alertTabContent {
     background: #1e293b;
     height: 320px;
     min-height: 320px;

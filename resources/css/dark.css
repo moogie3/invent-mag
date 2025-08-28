@@ -1,0 +1,111 @@
+[data-bs-theme="dark"] {
+    /* General body and text colors */
+    color: var(--tblr-body-color);
+    background-color: var(--tblr-body-bg);
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: var(--tblr-bg-surface);
+    color: var(--tblr-body-color);
+    border-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: var(--tblr-bg-surface-secondary);
+    border-bottom-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .card-footer {
+    background-color: var(--tblr-bg-surface-secondary);
+    border-top-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .modal-content {
+    background-color: var(--tblr-bg-surface);
+    color: var(--tblr-body-color);
+    border-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .modal-header {
+    background-color: var(--tblr-bg-surface-secondary);
+    border-bottom-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .modal-footer {
+    background-color: var(--tblr-bg-surface-secondary);
+    border-top-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .table {
+    color: var(--tblr-body-color);
+}
+
+[data-bs-theme="dark"] .table thead th {
+    background-color: var(--tblr-bg-surface-tertiary);
+    color: var(--tblr-secondary-color);
+    border-bottom-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .table-hover tbody tr:hover {
+    background-color: var(--tblr-active-bg);
+}
+
+/* Specific adjustments for elements that might still be white */
+[data-bs-theme="dark"] .bg-white {
+    background-color: var(--tblr-bg-surface) !important;
+}
+
+[data-bs-theme="dark"] .text-dark {
+    color: var(--tblr-body-color) !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:hover {
+    background-color: #1e293b;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+/* New rules for bg-light and bg-secondary-lt */
+[data-bs-theme="dark"] .bg-light {
+    background-color: var(--tblr-bg-surface-secondary) !important; /* A darker shade for light backgrounds */
+}
+
+[data-bs-theme="dark"] .bg-secondary-lt {
+    background-color: var(--tblr-secondary-bg-subtle) !important; /* Use Tabler's secondary subtle background */
+}
+
+/* New rules for active tabs */
+[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+    background-color: var(--tblr-bg-surface-secondary) !important; /* Light gray for selected tab */
+    color: var(--tblr-body-color) !important; /* Ensure text is readable */
+    border-color: var(--tblr-border-color) !important; /* Adjust border color */
+}
+
+[data-bs-theme="dark"] .nav-tabs .nav-link.active:hover {
+    background-color: var(--tblr-bg-surface-secondary) !important; /* Keep same on hover */
+    color: var(--tblr-body-color) !important;
+}
+
+/* General dark mode adjustments for common elements */
+[data-bs-theme="dark"] div,
+[data-bs-theme="dark"] section,
+[data-bs-theme="dark"] ul,
+[data-bs-theme="dark"] li,
+[data-bs-theme="dark"] form,
+[data-bs-theme="dark"] input,
+[data-bs-theme="dark"] select,
+[data-bs-theme="dark"] textarea {
+    background-color: inherit; /* Inherit background from parent by default */
+    color: inherit; /* Inherit color from parent by default */
+    border-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] hr {
+    border-color: var(--tblr-border-color-translucent);
+}

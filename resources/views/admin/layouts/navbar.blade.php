@@ -8,7 +8,7 @@
         </div>
 
         <!-- Centered Brand Title -->
-        <h1 class="navbar-brand text-center mx-auto position-relative">
+        <h1 class="navbar-brand text-center mx-auto position-relative" id="navbar-brand-title">
             <a class="nav-link" id="brand-trigger">
                 <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
             </a>
@@ -31,7 +31,7 @@
         
 
         <!-- Right Side Icons -->
-        <div class="d-none d-md-flex d-flex align-items-center">
+        <div class="d-none d-md-flex d-flex align-items-center" id="navbar-right-content">
             <a href="?theme=dark" class="nav-link px-2 hide-theme-dark">
                 <i class="ti ti-moon fs-2"></i>
             </a>

@@ -9,7 +9,7 @@
         </a>
     </div>
 
-    <!-- User Details moved to top after header -->
+    <!-- User Details with actions on the right -->
     <div class="sidebar-user">
         <div class="user-info">
             <div class="user-avatar">
@@ -29,6 +29,32 @@
                     <span class="user-name">Guest</span>
                     <span class="user-role">Not logged in</span>
                 @endif
+            </div>
+            <!-- Actions moved to the right side -->
+            <div class="sidebar-actions">
+                <a href="?theme=dark" class="nav-link px-1 hide-theme-dark" title="Enable dark mode"
+                    data-bs-toggle="tooltip" data-bs-placement="top">
+                    <i class="ti ti-moon fs-2"></i>
+                </a>
+                <a href="?theme=light" class="nav-link px-1 hide-theme-light" title="Enable light mode"
+                    data-bs-toggle="tooltip" data-bs-placement="top">
+                    <i class="ti ti-sun fs-2"></i>
+                </a>
+
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link px-1 position-relative" data-bs-toggle="dropdown"
+                        aria-expanded="false" id="notification-bell-sidebar">
+                        <i class="ti ti-bell fs-2"></i>
+                        @if (isset($notificationCount) && $notificationCount > 0)
+                            <span id="notification-dot-sidebar"
+                                class="position-absolute bg-danger border border-light rounded-circle"></span>
+                        @endif
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0"
+                        style="width: 380px; max-height: 500px;">
+                        <!-- Notification content here -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>

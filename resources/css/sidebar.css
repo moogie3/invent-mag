@@ -22,9 +22,12 @@
 .sidebar-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    /* Center the content */
     padding: 1rem 1.5rem;
     border-bottom: 1px solid #e0e6ed;
+    position: relative;
+    /* For absolute positioning of toggle button */
 }
 
 .sidebar-toggle {
@@ -35,6 +38,13 @@
     border-radius: 0.375rem;
     color: #6c757d;
     transition: all 0.2s ease;
+    position: absolute;
+    /* Position absolutely to not affect title centering */
+    right: 1rem;
+    /* Position on the right side */
+    top: 50%;
+    transform: translateY(-50%);
+    /* Center vertically */
 }
 
 .sidebar-toggle:hover {
@@ -58,23 +68,40 @@
 }
 
 .sidebar .navbar-brand {
-    padding: 1rem 1.5rem;
+    padding: 0;
+    /* Remove padding since header handles it */
     font-size: 1.25rem;
     font-weight: 600;
     color: #343a40;
+    text-align: center;
+    /* Center the text */
+    margin: 0;
+    /* Remove any default margins */
 }
 
-/* User section styling */
+/* User section styling - Updated */
 .sidebar-user {
     padding: 1rem 1.5rem;
     border-bottom: 1px solid #e0e6ed;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+    /* Remove margin to align with nav */
 }
 
 .user-info {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    justify-content: space-between;
+    /* Distribute space between left content and actions */
+}
+
+.user-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+    /* Allow content to shrink */
 }
 
 .user-avatar .avatar {
@@ -89,6 +116,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+    flex: 1;
 }
 
 .user-name {
@@ -108,10 +136,93 @@
     text-overflow: ellipsis;
 }
 
+/* Sidebar actions - Updated to be inline with user info */
+.sidebar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    /* Small gap between actions */
+    flex-shrink: 0;
+    /* Prevent actions from shrinking */
+}
+
+.sidebar-actions .nav-link {
+    padding: 0.5rem !important;
+    border-radius: 0.375rem;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    text-decoration: none;
+}
+
+.sidebar-actions .nav-link:hover {
+    background-color: #f8f9fa;
+    color: #206bc4;
+}
+
+.sidebar-actions .nav-link i {
+    font-size: 1.125rem;
+    /* Bigger icon size */
+}
+
+/* Notification dropdown positioning */
+.sidebar-actions .dropdown {
+    position: relative;
+}
+
+.sidebar-actions .dropdown-menu {
+    right: 0;
+    left: auto;
+    margin-top: 0.25rem;
+}
+
+#notification-dot-sidebar {
+    width: 8px;
+    height: 8px;
+    top: 2px;
+    right: 2px;
+    border-radius: 50%;
+    z-index: 1;
+    background-color: red;
+}
+
+#notification-dot-sidebar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: red;
+    animation: wave 1.8s ease-out infinite;
+    opacity: 0.5;
+    z-index: -1;
+}
+
+@keyframes wave {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    70% {
+        transform: scale(2.5);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
 /* Navigation styling */
 .sidebar-nav {
     flex: 1;
-    padding: 0 1rem;
+    padding: 1rem 1rem 0 1rem;
+    /* Add top padding to create proper spacing */
 }
 
 .sidebar .navbar-nav .nav-item {
@@ -192,4 +303,27 @@
     font-size: 0.875rem;
     min-height: 36px;
     /* Smaller height for submenu items */
+}
+
+/* Dark mode adjustments */
+[data-bs-theme="dark"] .sidebar {
+    background-color: #1e293b;
+    border-right-color: #334155;
+}
+
+[data-bs-theme="dark"] .sidebar-header {
+    border-bottom-color: #334155;
+}
+
+[data-bs-theme="dark"] .sidebar-user {
+    border-bottom-color: #334155;
+}
+
+[data-bs-theme="dark"] .sidebar-actions .nav-link {
+    color: #94a3b8;
+}
+
+[data-bs-theme="dark"] .sidebar-actions .nav-link:hover {
+    background-color: #334155;
+    color: #f1f5f9;
 }

@@ -313,3 +313,15 @@
         width: 320px !important;
     }
 }
+
+.sidebar-open .nav-dropdown {
+    pointer-events: none;
+    opacity: 0;
+}
+
+.sidebar-open #navbar-brand-title,
+.sidebar-open #navbar-right-content {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}

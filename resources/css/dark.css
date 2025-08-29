@@ -107,7 +107,7 @@
 }
 
 [data-bs-theme="dark"] hr {
-    border-color: var(--tblr-border-color-translucent);
+    border-color: #cccccc; /* Light gray for dark mode divider */
 }
 
 /* System Alerts Hover State */

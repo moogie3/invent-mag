@@ -1,5 +1,6 @@
 <div class="card-body">
     <h4 class="subheader">Business settings</h4>
+    <hr class="my-3">
     <div class="list-group list-group-transparent">
         <a href="{{ route('admin.setting.notifications') }}"
             class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.notifications') ? 'active-menu-item' : '' }}">

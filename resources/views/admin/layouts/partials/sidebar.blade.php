@@ -51,6 +51,7 @@
                         @endif
                     </a>
                 </div>
+
             </div>
         </div>
     </div>
@@ -92,4 +93,22 @@
             @endforeach
         </ul>
     </nav>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-divider"></div>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#" title="Logout" data-bs-toggle="tooltip" data-bs-placement="top"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <div class="nav-link-icon">
+                        <i class="ti ti-logout"></i>
+                    </div>
+                    <span class="nav-link-title">Logout</span>
+                </a>
+                <form id="logout-form" method="POST" action="{{ route('admin.logout') }}" style="display: none;">
+                    @csrf
+                </form>
+            </li>
+        </ul>
+    </div>
 </aside>

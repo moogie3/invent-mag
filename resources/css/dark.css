@@ -141,3 +141,13 @@
     background-color: var(--tblr-secondary-bg-subtle) !important; /* Use a consistent dark background */
     color: var(--tblr-body-color) !important; /* Ensure text is visible */
 }
+
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: var(--tblr-bg-surface);
+    color: var(--tblr-body-color);
+    border-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}

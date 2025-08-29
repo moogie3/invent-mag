@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
         body.classList.add("sidebar-open");
     }
 
-
     if (sidebarToggle) {
         sidebarToggle.addEventListener("click", function (e) {
             e.preventDefault();

@@ -23,11 +23,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Center the content */
     padding: 1rem 1.5rem;
     border-bottom: 1px solid #e0e6ed;
     position: relative;
-    /* For absolute positioning of toggle button */
 }
 
 .sidebar-toggle {
@@ -39,12 +37,9 @@
     color: #6c757d;
     transition: all 0.2s ease;
     position: absolute;
-    /* Position absolutely to not affect title centering */
     right: 1rem;
-    /* Position on the right side */
     top: 50%;
     transform: translateY(-50%);
-    /* Center vertically */
 }
 
 .sidebar-toggle:hover {
@@ -69,22 +64,30 @@
 
 .sidebar .navbar-brand {
     padding: 0;
-    /* Remove padding since header handles it */
     font-size: 1.25rem;
     font-weight: 600;
     color: #343a40;
     text-align: center;
-    /* Center the text */
     margin: 0;
-    /* Remove any default margins */
 }
 
-/* User section styling - Updated */
+/* User section styling - Updated with proper divider */
 .sidebar-user {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e0e6ed;
+    /* Remove border-bottom from here */
     margin-bottom: 0;
-    /* Remove margin to align with nav */
+    position: relative;
+}
+
+/* Add the divider after user section with margin */
+.sidebar-user::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1rem;
+    right: 1rem;
+    height: 1px;
+    background-color: #e0e6ed;
 }
 
 .user-info {
@@ -92,7 +95,6 @@
     align-items: center;
     gap: 0.75rem;
     justify-content: space-between;
-    /* Distribute space between left content and actions */
 }
 
 .user-content {
@@ -101,7 +103,6 @@
     gap: 0.75rem;
     flex: 1;
     min-width: 0;
-    /* Allow content to shrink */
 }
 
 .user-avatar .avatar {
@@ -136,14 +137,12 @@
     text-overflow: ellipsis;
 }
 
-/* Sidebar actions - Updated to be inline with user info */
+/* Sidebar actions */
 .sidebar-actions {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    /* Small gap between actions */
     flex-shrink: 0;
-    /* Prevent actions from shrinking */
 }
 
 .sidebar-actions .nav-link {
@@ -166,7 +165,6 @@
 
 .sidebar-actions .nav-link i {
     font-size: 1.125rem;
-    /* Bigger icon size */
 }
 
 /* Notification dropdown positioning */
@@ -222,7 +220,6 @@
 .sidebar-nav {
     flex: 1;
     padding: 1rem 1rem 0 1rem;
-    /* Add top padding to create proper spacing */
 }
 
 .sidebar .navbar-nav .nav-item {
@@ -239,7 +236,6 @@
     transition: background-color 0.2s ease, color 0.2s ease;
     text-decoration: none;
     min-height: 44px;
-    /* Ensures consistent height for all menu items */
 }
 
 .sidebar .navbar-nav .nav-link:hover {
@@ -255,30 +251,22 @@
 
 .sidebar .nav-link-icon {
     font-size: 1.125rem;
-    /* Slightly smaller for better proportion */
     margin-right: 0.875rem;
-    /* Adjusted spacing */
     width: 18px;
-    /* Fixed width for consistent alignment */
     height: 18px;
-    /* Fixed height to match width */
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    /* Prevents icon from shrinking */
     line-height: 1;
-    /* Ensures proper vertical centering */
 }
 
 .nav-link-title {
     flex: 1;
     line-height: 1.2;
-    /* Improved text line height */
     display: flex;
     align-items: center;
-    /* Centers text vertically */
 }
 
 .nav-link-arrow {
@@ -303,7 +291,27 @@
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     min-height: 36px;
-    /* Smaller height for submenu items */
+}
+
+/* Improved sidebar footer divider - thicker and with margin */
+.sidebar-footer {
+    position: relative;
+    padding: 1rem;
+}
+
+.sidebar-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 1rem;
+    right: 1rem;
+    height: 1px;
+    background-color: #e0e6ed;
+}
+
+/* Remove the old divider class since we're using ::before */
+.sidebar-divider {
+    display: none;
 }
 
 /* Dark mode adjustments */
@@ -316,14 +324,17 @@
     border-bottom-color: #334155;
 }
 
-[data-bs-theme="dark"] .sidebar-user {
-    border-bottom-color: #334155;
+[data-bs-theme="dark"] .sidebar-user::after {
+    background-color: #334155;
+}
+
+[data-bs-theme="dark"] .sidebar-footer::before {
+    background-color: #334155;
 }
 
 [data-bs-theme="dark"] .sidebar-actions .nav-link {
     color: #94a3b8;
 }
-
 
 [data-bs-theme="dark"] .sidebar .navbar-brand {
     color: #fff;

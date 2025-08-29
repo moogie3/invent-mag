@@ -92,11 +92,20 @@
                 @endcan
             @endforeach
         </ul>
+            
     </nav>
 
     <div class="sidebar-footer">
         <div class="sidebar-divider"></div>
         <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.setting.profile.edit') }}" title="Settings" data-bs-toggle="tooltip" data-bs-placement="top">
+                    <div class="nav-link-icon">
+                        <i class="ti ti-settings"></i>
+                    </div>
+                    <span class="nav-link-title">Settings</span>
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" title="Logout" data-bs-toggle="tooltip" data-bs-placement="top"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

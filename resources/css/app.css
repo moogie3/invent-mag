@@ -1650,15 +1650,20 @@ body {
     top: 0;
     left: 0;
     bottom: 0;
-    width: 6px; /* Adjust as needed for desired thickness */
-    border-top-left-radius: 0.75rem; /* Match toast border-radius */
-    border-bottom-left-radius: 0.75rem; /* Match toast border-radius */
-    z-index: 1; /* Ensure it's behind the content but within the toast */
+    width: 6px;
+    /* Adjust as needed for desired thickness */
+    border-top-left-radius: 0.75rem;
+    /* Match toast border-radius */
+    border-bottom-left-radius: 0.75rem;
+    /* Match toast border-radius */
+    z-index: 1;
+    /* Ensure it's behind the content but within the toast */
 }
 
-.toast-content > .d-flex {
+.toast-content>.d-flex {
     position: relative;
-    z-index: 2; /* Ensure content is above the color bar */
+    z-index: 2;
+    /* Ensure content is above the color bar */
 }
 
 /* Responsive adjustments */
@@ -1687,7 +1692,8 @@ body {
         font-size: 13px;
     }
 }
+
 .active-menu-item {
     font-weight: bold;
-    background-color: #e9ecef;
+    background-color: gray;
 }

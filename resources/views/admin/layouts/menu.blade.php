@@ -1,5 +1,5 @@
 <div class="card-body">
-    <h4 class="subheader">Business settings</h4>
+    <h3 class="header"><i class="ti ti-settings me-2"></i>SETTINGS</h3>
     <hr class="my-3">
     <div class="list-group list-group-transparent">
         <a href="{{ route('admin.setting.notifications') }}"

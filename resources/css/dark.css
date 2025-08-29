@@ -151,3 +151,9 @@
 [data-bs-theme="dark"] .modal-backdrop {
     background-color: rgba(0, 0, 0, 0.5) !important;
 }
+
+[data-bs-theme="dark"] .active-menu-item {
+    font-weight: bold;
+    background-color: #343a40;
+    color: #fff;
+}

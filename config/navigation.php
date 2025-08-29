@@ -11,7 +11,7 @@ return [
         [
             'title' => 'POS',
             'route' => 'admin.pos',
-            'icon' => 'ti ti-cash',
+            'icon' => 'ti ti-http-post',
             'permission' => 'view-pos',
         ],
         [

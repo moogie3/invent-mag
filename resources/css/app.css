@@ -1687,3 +1687,7 @@ body {
         font-size: 13px;
     }
 }
+.active-menu-item {
+    font-weight: bold;
+    background-color: #e9ecef;
+}

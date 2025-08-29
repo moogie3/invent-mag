@@ -32,12 +32,12 @@
             </div>
             <!-- Actions moved to the right side -->
             <div class="sidebar-actions">
-                <a href="?theme=dark" class="nav-link px-1 hide-theme-dark" title="Enable dark mode"
-                    data-bs-toggle="tooltip" data-bs-placement="top">
+                <a href="?theme=dark" class="nav-link px-1 hide-theme-dark" data-bs-toggle="tooltip"
+                    data-bs-placement="top">
                     <i class="ti ti-moon fs-2"></i>
                 </a>
-                <a href="?theme=light" class="nav-link px-1 hide-theme-light" title="Enable light mode"
-                    data-bs-toggle="tooltip" data-bs-placement="top">
+                <a href="?theme=light" class="nav-link px-1 hide-theme-light" data-bs-toggle="tooltip"
+                    data-bs-placement="top">
                     <i class="ti ti-sun fs-2"></i>
                 </a>
 

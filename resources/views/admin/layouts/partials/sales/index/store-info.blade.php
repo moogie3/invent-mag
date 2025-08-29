@@ -79,11 +79,12 @@
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
                                         <div class="me-3">
-                                            <i class="ti ti-cash fs-2"></i>
+                                            <i class="ti ti-http-post fs-2"></i>
                                         </div>
                                         <div>
                                             <div class="text-white-50 small">Total POS Sales</div>
-                                            <div class="h4 mb-0" id="totalPosSales">{{ \App\Helpers\CurrencyHelper::format($posTotal) }}
+                                            <div class="h4 mb-0" id="totalPosSales">
+                                                {{ \App\Helpers\CurrencyHelper::format($posTotal) }}
                                             </div>
                                         </div>
                                     </div>
@@ -93,7 +94,8 @@
                                         </div>
                                         <div>
                                             <div class="text-white-50 small">Unpaid Receivable</div>
-                                            <div class="h4 mb-0" id="unpaidReceivable">{{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}
+                                            <div class="h4 mb-0" id="unpaidReceivable">
+                                                {{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}
                                             </div>
                                         </div>
                                     </div>
@@ -115,7 +117,8 @@
                                         </div>
                                         <div>
                                             <div class="text-warning small">Pending Orders</div>
-                                            <div class="h3 mb-0 text-warning" id="pendingOrdersCount">{{ $pendingOrders }}</div>
+                                            <div class="h3 mb-0 text-warning" id="pendingOrdersCount">
+                                                {{ $pendingOrders }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -134,7 +137,8 @@
                                         </div>
                                         <div>
                                             <div class="text-danger small">Due Soon Invoices</div>
-                                            <div class="h3 mb-0 text-danger" id="dueInvoicesCount">{{ $dueInvoices }}</div>
+                                            <div class="h3 mb-0 text-danger" id="dueInvoicesCount">{{ $dueInvoices }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

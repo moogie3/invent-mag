@@ -1666,6 +1666,12 @@ body {
     /* Ensure content is above the color bar */
 }
 
+/* Explicitly set toast background and border to transparent/none */
+.toast {
+    background-color: transparent;
+    border: none;
+}
+
 /* Responsive adjustments */
 
 @media (max-width: 768px) {

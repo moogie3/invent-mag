@@ -1,12 +1,12 @@
-<!-- Modern Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-header">
-        <a href="{{ route('admin.dashboard') }}" class="navbar-brand">
+        <button type="button" id="sidebar-toggle" class="navbar-brand">
             <div class="brand-icon">
-                <i class="ti ti-brand-minecraft"></i>
+                <i class="ti ti-brand-minecraft brand-icon"></i>
             </div>
             <span class="brand-text">Invent-MAG</span>
-        </a>
+        </button>
+        <!-- Lock button will be added here by JavaScript -->
     </div>
 
     <!-- User Details with actions on the right -->
@@ -51,7 +51,6 @@
                         @endif
                     </a>
                 </div>
-
             </div>
         </div>
     </div>
@@ -92,22 +91,36 @@
                 @endcan
             @endforeach
         </ul>
-            
     </nav>
 
     <div class="sidebar-footer">
         <div class="sidebar-divider"></div>
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.setting.profile.edit') }}" title="Settings" data-bs-toggle="tooltip" data-bs-placement="top">
+                <a class="nav-link" href="{{ route('admin.setting.profile.edit') }}" data-bs-toggle="tooltip"
+                    data-bs-placement="top">
                     <div class="nav-link-icon">
                         <i class="ti ti-settings"></i>
                     </div>
                     <span class="nav-link-title">Settings</span>
                 </a>
             </li>
+
+            <!-- New User Management Link -->
+            @can('view-users')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.users.index') || request()->routeIs('admin.users.create') || request()->routeIs('admin.users.edit') ? 'active' : '' }}"
+                        href="{{ route('admin.users.index') }}" data-bs-toggle="tooltip" data-bs-placement="top">
+                        <div class="nav-link-icon">
+                            <i class="ti ti-users"></i>
+                        </div>
+                        <span class="nav-link-title">User Management</span>
+                    </a>
+                </li>
+            @endcan
+
             <li class="nav-item">
-                <a class="nav-link" href="#" title="Logout" data-bs-toggle="tooltip" data-bs-placement="top"
+                <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="top"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <div class="nav-link-icon">
                         <i class="ti ti-logout"></i>

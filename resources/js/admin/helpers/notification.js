@@ -26,31 +26,33 @@ window.showToast = function (title, message, type = "info", duration = 4000) {
     toastElement.setAttribute("aria-atomic", "true");
     toastElement.setAttribute("data-bs-autohide", "false");
     toastElement.style.pointerEvents = "auto";
+    toastElement.style.backgroundColor = "transparent"; // Ensure transparent background
+    toastElement.style.border = "none"; // Ensure no border
 
     const typeStyles = {
         success: {
-            bg: "bg-white",
+            bg: "bg-body",
             border: "border-success",
             icon: "ti ti-check-circle",
             iconColor: "text-success",
             barColor: "#198754", // Bootstrap success color
         },
         error: {
-            bg: "bg-white",
+            bg: "bg-body",
             border: "border-danger",
             icon: "ti ti-alert-circle",
             iconColor: "text-danger",
             barColor: "#dc3545", // Bootstrap danger color
         },
         warning: {
-            bg: "bg-white",
+            bg: "bg-body",
             border: "border-warning",
             icon: "ti ti-alert-triangle",
             iconColor: "text-warning",
             barColor: "#ffc107", // Bootstrap warning color
         },
         info: {
-            bg: "bg-white",
+            bg: "bg-body",
             border: "border-info",
             icon: "ti ti-info-circle",
             iconColor: "text-info",
@@ -61,8 +63,8 @@ window.showToast = function (title, message, type = "info", duration = 4000) {
     const currentType = typeStyles[type] || typeStyles.info;
 
     toastElement.innerHTML = `
-        <div class="toast-content ${currentType.bg} rounded-3 shadow-sm p-3 position-relative overflow-hidden"
-             style="min-width: 320px; border-radius: 0.75rem !important;">
+        <div class="toast-content ${currentType.bg} p-3 position-relative overflow-hidden"
+             style="min-width: 320px;">
             <div class="toast-color-bar" style="background-color: ${currentType.barColor};"></div>
             <div class="d-flex align-items-start ps-3">
                 <div class="flex-shrink-0 me-3">

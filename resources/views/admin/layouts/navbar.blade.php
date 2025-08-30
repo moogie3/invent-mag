@@ -1,10 +1,7 @@
 <header class="navbar navbar-expand-md d-print-none nav-container">
     <div class="container-xl d-flex justify-content-between align-items-center">
         <div class="d-flex flex-shrink-0 nav-left">
-            <!-- Hamburger Button for Sidebar -->
-            <button class="navbar-toggler" type="button" id="sidebar-toggle">
-                <i class="ti ti-menu-2 fs-2"></i>
-            </button>
+            <!-- Sidebar toggle will be in the sidebar itself -->
         </div>
 
         <!-- Centered Brand Title -->

@@ -26,9 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
             width: 32px;
             height: 32px;
             border: none;
-            background: rgba(255, 255, 255, 0.1);
+            background: transparent;
             border-radius: 6px;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--tblr-body-color);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -223,30 +223,14 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(addTooltips, navItems.length * 40 + 100);
     };
 
+    
     // Add CSS for smooth transitions
     const addSmoothStyles = function () {
         const style = document.createElement("style");
         style.textContent = `
             .nav-link {
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
                 position: relative;
-                overflow: hidden;
-            }
-
-            .nav-link::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-                transition: left 0.3s;
-                z-index: 1;
-            }
-
-            .nav-link:hover::before {
-                left: 100%;
             }
 
             .nav-link-title {

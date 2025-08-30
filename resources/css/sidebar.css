@@ -80,11 +80,11 @@
 }
 
 .sidebar .navbar-brand {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1.5rem;
     font-size: 1.25rem;
     font-weight: 600;
-    background-color: black;
-    color: white;
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #495057;
     text-align: center;
     margin: 0;
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -96,7 +96,7 @@
     border-radius: 0.5rem;
     min-height: 48px;
     /* Consistent height */
-    width: 100%;
+    width: auto;
 }
 
 /* FIXED: Perfect centering for collapsed navbar-brand */
@@ -332,7 +332,7 @@
 }
 
 .sidebar-actions .nav-link:hover {
-    background-color: #f8f9fa;
+    background-color: #e9ecef;
     color: #206bc4;
 }
 
@@ -646,6 +646,25 @@
     -webkit-font-smoothing: antialiased;
 }
 
+
+.sidebar-lock-btn {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+.sidebar-lock-btn:hover {
+    background: #e9ecef;
+}
+
+[data-bs-theme="dark"] .sidebar-lock-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+[data-bs-theme="dark"] .sidebar-lock-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
 /* Dark mode adjustments */
 [data-bs-theme="dark"] .sidebar {
     background-color: #1e293b;
@@ -668,7 +687,13 @@
     color: #94a3b8;
 }
 
+[data-bs-theme="dark"] .sidebar-actions .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
 [data-bs-theme="dark"] .sidebar .navbar-brand {
+    background-color: rgba(255, 255, 255, 0.1);
     color: #fff;
 }
 

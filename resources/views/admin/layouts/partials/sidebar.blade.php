@@ -6,7 +6,6 @@
             </div>
             <span class="brand-text">Invent-MAG</span>
         </button>
-        <!-- Lock button will be added here by JavaScript -->
     </div>
 
     <!-- User Details with actions on the right -->

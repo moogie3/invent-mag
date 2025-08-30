@@ -88,57 +88,9 @@
 }
 
 .nav-dropdown a i {
-    color: white;
+    color: lightblue;
     font-size: 18px;
 }
-
-/* Mobile Nav Styling */
-.mobile-nav {
-    position: fixed;
-    top: 0;
-    left: -100%;
-    width: 250px;
-    height: 100%;
-    background: rgba(20, 20, 20, 0.95);
-    box-shadow: 5px 0px 10px rgba(0, 0, 0, 0.2);
-    transition: left 0.3s ease-in-out;
-    z-index: 999;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.mobile-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.mobile-nav li {
-    padding: 10px 0;
-}
-
-.mobile-nav a {
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 15px;
-}
-
-/* Mobile nav active state */
-.mobile-nav.active {
-    left: 0;
-}
-
-.mobile-nav .avatar {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-}
-
-
 
 /* Notification styling */
 #notification-dot {
@@ -333,29 +285,151 @@
     transition: opacity 0.3s, visibility 0.3s;
 }
 
-/* Hover effect for navbar icons and avatar */
-.navbar .nav-link.px-0 {
-    border-radius: var(--tblr-border-radius); /* Apply border-radius for a rounded hover effect */
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Add transition for smooth effect */
+/* Enhanced hover effect for navbar icons, bell, theme toggles, and avatar */
+.navbar .nav-link.px-0,
+.navbar .nav-link.px-2,
+.navbar .nav-item.dropdown>.nav-link {
+    border-radius: var(--tblr-border-radius);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
 }
 
-.navbar .nav-link.px-0:hover {
-    background-color: rgba(var(--tblr-primary-rgb), 0.05); /* Subtle primary color background */
-    color: var(--tblr-primary) !important; /* Change icon/text color to primary */
+/* Hover effects for all navbar interactive elements */
+.navbar .nav-link.px-0:hover,
+.navbar .nav-link.px-2:hover,
+.navbar .nav-item.dropdown>.nav-link:hover {
+    background-color: rgba(var(--tblr-primary-rgb), 0.1);
+    color: var(--tblr-primary) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(var(--tblr-primary-rgb), 0.2);
 }
 
-
-[data-bs-theme="dark"] .navbar .nav-link.px-0 {
-    color: #94a3b8;
+/* Icon color change on hover */
+.navbar .nav-link:hover i {
+    color: var(--tblr-primary);
+    transform: scale(1.1);
+    transition: all 0.3s ease;
 }
 
-/* Dark mode adjustments for navbar hover */
-[data-bs-theme="dark"] .navbar .nav-link.px-0:hover {
-    background-color: rgba(var(--tblr-primary-rgb), 0.15); /* Slightly more prominent in dark mode */
-    color: var(--tblr-primary) !important; /* Keep primary color */
+/* Bell icon specific hover effects */
+.navbar .nav-link:hover .ti-bell {
+    animation: bellRing 0.6s ease-in-out;
 }
 
-[data-bs-theme="dark"] .navbar .nav-link.px-0:hover i,
-[data-bs-theme="dark"] .navbar .nav-link.px-0:hover .avatar {
-    color: var(--tblr-primary) !important; /* Ensure icons and avatar get primary color */
+@keyframes bellRing {
+
+    0%,
+    100% {
+        transform: rotate(0deg) scale(1.1);
+    }
+
+    25% {
+        transform: rotate(15deg) scale(1.1);
+    }
+
+    75% {
+        transform: rotate(-15deg) scale(1.1);
+    }
+}
+
+/* Theme toggle icons hover effects */
+.navbar .nav-link:hover .ti-moon,
+.navbar .nav-link:hover .ti-sun {
+    transform: scale(1.2) rotate(180deg);
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Avatar hover effects */
+.navbar .nav-item.dropdown>.nav-link:hover .avatar {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px rgba(var(--tblr-primary-rgb), 0.3);
+    transition: all 0.3s ease;
+}
+
+/* Avatar dropdown hover functionality */
+.navbar .nav-item.dropdown {
+    position: relative;
+}
+
+.navbar .nav-item.dropdown .dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    pointer-events: none;
+}
+
+.navbar .nav-item.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Keep dropdown open when hovering over it */
+.navbar .nav-item.dropdown .dropdown-menu:hover {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Dark mode adjustments */
+[data-bs-theme="dark"] .navbar .nav-link.px-0,
+[data-bs-theme="dark"] .navbar .nav-link.px-2,
+[data-bs-theme="dark"] .navbar .nav-item.dropdown>.nav-link {
+    color: white;
+}
+
+[data-bs-theme="dark"] .navbar .nav-link:hover {
+    background-color: rgba(var(--tblr-primary-rgb), 0.15);
+    color: var(--tblr-primary) !important;
+}
+
+[data-bs-theme="dark"] .navbar .nav-link:hover i,
+[data-bs-theme="dark"] .navbar .nav-link:hover .avatar {
+    color: var(--tblr-primary) !important;
+}
+
+/* Notification bell hover when there's a notification dot */
+.nav-item.dropdown:hover #notification-dot {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Smooth transitions for all hover states */
+.navbar .nav-link,
+.navbar .nav-link i,
+.navbar .avatar {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Additional enhancement for notification dropdown hover */
+.nav-item.dropdown:hover .notification-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Ensure notification dropdown stays open when hovering */
+.notification-dropdown:hover {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }

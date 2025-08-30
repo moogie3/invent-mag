@@ -79,11 +79,75 @@
     margin-left: 70px;
 }
 
+/* Sidebar Lock Button Styles */
+.sidebar-lock-btn {
+    position: absolute;
+    top: 35%;
+    right: 2px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    color: var(--tblr-body-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(-50%);
+    z-index: 10;
+    margin-left: 10px;
+}
+
+.sidebar-lock-btn:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-lock-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.sidebar-lock-btn.locked {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.sidebar-lock-btn.unlocked {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Tooltip Styles */
+.sidebar-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-tooltip.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
 .sidebar .navbar-brand {
     padding: 0.75rem 1.5rem;
     font-size: 1.25rem;
     font-weight: 600;
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: transparen;
     color: #495057;
     text-align: center;
     margin: 0;
@@ -105,12 +169,12 @@
     align-items: center;
     padding: 0.75rem;
     width: 100%;
-    margin: 0;
+    margin-left: 8px;
     display: flex !important;
     flex-direction: row !important;
-    border-radius: 0.5rem;
-    min-height: 48px;
-    min-width: 48px;
+    border-radius: 0.6rem;
+    min-height: 50px;
+    min-width: 50px;
     gap: 0;
 }
 
@@ -321,7 +385,7 @@
 .sidebar-actions .nav-link {
     padding: 0.5rem !important;
     border-radius: 0.375rem;
-    color: #6c757d;
+    color: black;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     align-items: center;
@@ -332,8 +396,8 @@
 }
 
 .sidebar-actions .nav-link:hover {
-    background-color: #e9ecef;
-    color: #206bc4;
+    background-color: black;
+    color: white;
 }
 
 .sidebar-actions .nav-link i {
@@ -646,7 +710,147 @@
     -webkit-font-smoothing: antialiased;
 }
 
+/* Enhanced styles from JavaScript - moved to CSS */
+.nav-link {
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    position: relative;
+}
 
+.nav-link-title {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: inline-block;
+}
+
+.sidebar.collapsed .nav-link {
+    justify-content: center;
+}
+
+.sidebar.collapsed .nav-link:hover {
+    transform: scale(1.03);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.03);
+    }
+}
+
+.sidebar-toggle:hover {
+    animation: pulse 0.3s ease-in-out;
+}
+
+/* Micro-interactions */
+.nav-link {
+    transform-origin: center;
+}
+
+/* Circular hover effect for lock button */
+.sidebar-lock-btn {
+    border-radius: 50% !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-lock-btn:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-lock-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Add a subtle glow effect on hover */
+.sidebar-lock-btn:hover::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0;
+    animation: glowPulse 0.3s ease-out forwards;
+}
+
+@keyframes glowPulse {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.sidebar.collapsed .sidebar-lock-btn {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Nav item staggered animation classes */
+.nav-item-animate {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-item-animate.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Text animation classes */
+.nav-text-animate {
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-text-fade-out {
+    opacity: 0;
+    transition: opacity 0.1s ease-out;
+}
+
+.nav-text-slide-in {
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.nav-text-slide-in.visible {
+    opacity: 1;
+    transform: translateX(0);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Sidebar transition states */
+.sidebar-fast-close {
+    transition: all 0.15s ease-out !important;
+}
+
+.main-content-fast-close {
+    transition: margin-left 0.15s ease-out !important;
+}
+
+.sidebar-smooth-open {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.main-content-smooth-open {
+    transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Original lock button styles maintained */
 .sidebar-lock-btn {
     background: #f8f9fa;
     color: #6c757d;
@@ -688,12 +892,12 @@
 }
 
 [data-bs-theme="dark"] .sidebar-actions .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background-color: black;
+    color: red;
 }
 
 [data-bs-theme="dark"] .sidebar .navbar-brand {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: transparent;
     color: #fff;
 }
 
@@ -723,4 +927,19 @@
 [data-bs-theme="dark"] .sidebar.collapsed .nav-link:hover::after {
     background: #475569;
     color: #e2e8f0;
+}
+
+/* Dark mode adjustments for circular hover */
+[data-bs-theme="dark"] .sidebar-lock-btn:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .sidebar-lock-btn:hover::before {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
 }

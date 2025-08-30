@@ -19,24 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
         lockButton.innerHTML = '<i class="ti ti-lock-open"></i>';
         lockButton.title = "Lock sidebar (prevents auto-close)";
 
-        lockButton.style.cssText = `
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: transparent;
-            border-radius: 6px;
-            color: var(--tblr-body-color);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 10;
-        `;
-
         const sidebarHeader = sidebar.querySelector(".sidebar-header");
         if (sidebarHeader) {
             sidebarHeader.style.position = "relative";
@@ -55,13 +37,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (sidebarLocked) {
             icon.className = "ti ti-lock";
-            lockButton.style.background = "rgba(59, 130, 246, 0.2)";
-            lockButton.style.color = "#3b82f6";
+            lockButton.classList.add("locked");
+            lockButton.classList.remove("unlocked");
             lockButton.title = "Unlock sidebar (allows auto-close)";
         } else {
             icon.className = "ti ti-lock-open";
-            lockButton.style.background = "rgba(255, 255, 255, 0.1)";
-            lockButton.style.color = "rgba(255, 255, 255, 0.7)";
+            lockButton.classList.add("unlocked");
+            lockButton.classList.remove("locked");
             lockButton.title = "Lock sidebar (prevents auto-close)";
         }
     };
@@ -72,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
         e.stopPropagation();
         toggleLock();
     });
+
     const tooltipManager = {
         tooltips: new Map(),
 
@@ -81,22 +64,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const tooltip = document.createElement("div");
             tooltip.className = "sidebar-tooltip";
             tooltip.textContent = text;
-            tooltip.style.cssText = `
-                position: absolute;
-                background: rgba(0, 0, 0, 0.9);
-                color: white;
-                padding: 8px 12px;
-                border-radius: 6px;
-                font-size: 12px;
-                white-space: nowrap;
-                z-index: 1000;
-                opacity: 0;
-                transform: translateX(10px);
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                pointer-events: none;
-                backdrop-filter: blur(8px);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-            `;
 
             document.body.appendChild(tooltip);
             this.tooltips.set(element, tooltip);
@@ -111,13 +78,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     rect.height / 2 -
                     tooltip.offsetHeight / 2 +
                     "px";
-                tooltip.style.opacity = "1";
-                tooltip.style.transform = "translateX(0)";
+                tooltip.classList.add("show");
             };
 
             const hideTooltip = () => {
-                tooltip.style.opacity = "0";
-                tooltip.style.transform = "translateX(10px)";
+                tooltip.classList.remove("show");
             };
 
             element.addEventListener("mouseenter", showTooltip);
@@ -154,13 +119,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (willCollapse) {
             // FAST closing - immediate collapse with quick transition
-            sidebar.style.transition = "all 0.15s ease-out";
-            mainContent.style.transition = "margin-left 0.15s ease-out";
+            sidebar.classList.add("sidebar-fast-close");
+            mainContent.classList.add("main-content-fast-close");
 
-            // Instantly hide text and collapse
+            // Quickly hide text and collapse
             navTexts.forEach((text) => {
-                text.style.transition = "opacity 0.1s ease-out";
-                text.style.opacity = "0";
+                text.classList.add("nav-text-fade-out");
             });
 
             // Immediate collapse
@@ -172,9 +136,10 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 50);
         } else {
             // SMOOTH opening - keep the nice opening animation
-            sidebar.style.transition = "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-            mainContent.style.transition =
-                "margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+            sidebar.classList.remove("sidebar-fast-close");
+            sidebar.classList.add("sidebar-smooth-open");
+            mainContent.classList.remove("main-content-fast-close");
+            mainContent.classList.add("main-content-smooth-open");
 
             sidebar.classList.remove("collapsed");
             mainContent.classList.remove("sidebar-collapsed");
@@ -183,15 +148,12 @@ document.addEventListener("DOMContentLoaded", function () {
             // Staggered fade-in animation for text
             setTimeout(() => {
                 navTexts.forEach((text, index) => {
-                    text.style.opacity = "0";
-                    text.style.transform = "translateX(-20px)";
+                    text.classList.remove("nav-text-fade-out");
+                    text.classList.add("nav-text-slide-in");
 
                     setTimeout(() => {
-                        text.style.transition =
-                            "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)"; // Faster text animation
-                        text.style.opacity = "1";
-                        text.style.transform = "translateX(0)";
-                    }, index * 30); // Reduced delay
+                        text.classList.add("visible");
+                    }, index * 30);
                 });
             }, 100);
 
@@ -209,73 +171,14 @@ document.addEventListener("DOMContentLoaded", function () {
         // Animate elements into view with faster menu icon
         const navItems = sidebar.querySelectorAll(".nav-link");
         navItems.forEach((item, index) => {
-            item.style.opacity = "0";
-            item.style.transform = "translateY(20px)";
+            item.classList.add("nav-item-animate");
 
             setTimeout(() => {
-                item.style.transition =
-                    "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)"; // Faster transition
-                item.style.opacity = "1";
-                item.style.transform = "translateY(0)";
-            }, index * 40); // Reduced delay
+                item.classList.add("visible");
+            }, index * 40);
         });
 
         setTimeout(addTooltips, navItems.length * 40 + 100);
-    };
-
-    
-    // Add CSS for smooth transitions
-    const addSmoothStyles = function () {
-        const style = document.createElement("style");
-        style.textContent = `
-            .nav-link {
-                transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-                position: relative;
-            }
-
-            .nav-link-title {
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                display: inline-block;
-            }
-
-            .sidebar.collapsed .nav-link {
-                justify-content: center;
-            }
-
-            .sidebar.collapsed .nav-link:hover {
-                transform: scale(1.03);
-                background-color: rgba(255, 255, 255, 0.1);
-            }
-
-            @keyframes pulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.03); }
-            }
-
-            .sidebar-toggle:hover {
-                animation: pulse 0.3s ease-in-out;
-            }
-
-            /* Micro-interactions */
-            .nav-link {
-                transform-origin: center;
-            }
-
-            .sidebar-lock-btn:hover {
-                background: rgba(255, 255, 255, 0.15) !important;
-                transform: scale(1.05);
-            }
-
-            .sidebar-lock-btn:active {
-                transform: scale(0.95);
-            }
-
-            .sidebar.collapsed .sidebar-lock-btn {
-                opacity: 0;
-                pointer-events: none;
-            }
-        `;
-        document.head.appendChild(style);
     };
 
     // Click outside to close sidebar (respects lock)
@@ -293,7 +196,6 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // Initialize everything
-    addSmoothStyles();
     initializeSidebar();
 
     // Toggle button event
@@ -329,7 +231,4 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleSidebar();
         }
     });
-
-    // Smooth scroll behavior for better overall UX
-    document.documentElement.style.scrollBehavior = "smooth";
 });

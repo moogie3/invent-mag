@@ -45,38 +45,29 @@
     margin-left: 70px;
 }
 
-/* Sidebar Header */
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e0e6ed;
-    position: relative;
-    transition: padding 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-    min-height: 72px;
-}
-
 /* Brand/Logo - FIXED CENTERING AND LARGER ICON */
 .sidebar .navbar-brand {
-    padding: 0.75rem 1.5rem;
+    padding: 0 1.5rem;
     font-size: 1.25rem;
     font-weight: 600;
     background-color: transparent;
     color: #495057;
-    text-align: center;
+    text-align: left;
+    /* Changed to left */
     margin: 0;
     transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    justify-content: flex-start;
+    gap: 0.75rem;
     border-radius: 0.5rem;
-    min-height: 48px;
+    height: 72px;
     width: 100%;
     cursor: pointer;
     border: none;
+    line-height: 1;
+    /* Add line-height for better text alignment */
 }
 
 .sidebar.collapsed .navbar-brand {
@@ -85,7 +76,6 @@
     padding: 0.75rem;
     width: 100%;
     margin: 0;
-    /* Remove margin-left that was causing left offset */
     gap: 0;
     display: flex;
     /* Ensure flexbox is maintained */
@@ -96,6 +86,11 @@
     transform: translateX(0);
     transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
     white-space: nowrap;
+    line-height: 1.2;
+    /* Add line-height for better vertical alignment */
+    display: flex;
+    align-items: center;
+    /* Ensure text is vertically centered */
 }
 
 .sidebar.collapsed .brand-text {
@@ -110,17 +105,23 @@
     align-items: center;
     justify-content: center;
     transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-    width: auto;
-    /* Allow natural sizing */
+    width: 20%;
     height: auto;
+    flex-shrink: 0;
+    /* Prevent icon from shrinking */
 }
 
-.brand-icon i {
-    font-size: 1.25rem;
+.brand-icon i,
+.brand-icon .brand-icon {
+    /* Handle both cases due to duplicate class in HTML */
+    font-size: 1.75rem;
     transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     align-items: center;
     justify-content: center;
+    line-height: 1;
+    width: auto;
+    height: auto;
 }
 
 /* MUCH LARGER ICON WHEN COLLAPSED */
@@ -146,12 +147,24 @@
 }
 
 /* Additional fix for sidebar header centering */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* Changed to flex-start to align content to left */
+    padding: 0;
+    border-bottom: 1px solid #e0e6ed;
+    position: relative;
+    transition: padding 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    height: 72px;
+    /* Use exact height instead of min-height */
+}
+
 .sidebar.collapsed .sidebar-header {
     padding: 1rem;
     justify-content: center;
     align-items: center;
     display: flex;
-    /* Ensure flexbox */
     width: 100%;
 }
 

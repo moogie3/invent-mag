@@ -274,7 +274,7 @@
                 </div>
             </div>
 
-            <div class="nav-item dropdown ms-2">
+            <div class="nav-item dropdown ms-2" id="avatar-dropdown">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
                     @if (Auth::check())
                         <span class="avatar avatar-sm"

@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Avatar dropdown hover functionality
     const initAvatarHoverDropdown = () => {
-        const avatarDropdowns = document.querySelectorAll(".nav-item.dropdown");
+        const avatarDropdowns = document.querySelectorAll("#avatar-dropdown");
 
         avatarDropdowns.forEach((dropdown) => {
             const dropdownMenu = dropdown.querySelector(".dropdown-menu");
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }, 300);
             });
 
-            // Prevent default Bootstrap click behavior for avatar dropdown
+            // Prevent default Bootstrap click behavior for avatar dropdown on desktop
             const dropdownToggle = dropdown.querySelector(
                 '[data-bs-toggle="dropdown"]'
             );
@@ -342,41 +342,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // Enhanced icon hover effects
-    const initIconHoverEffects = () => {
-        // Bell icon special animation
-        const bellIcon = document.querySelector(".ti-bell");
-        if (bellIcon) {
-            const navLink = bellIcon.closest(".nav-link");
-            if (navLink) {
-                navLink.addEventListener("mouseenter", function () {
-                    bellIcon.style.transform = "scale(1.1)";
-                    bellIcon.style.transition = "transform 0.2s ease-in-out";
-                });
-
-                navLink.addEventListener("mouseleave", function () {
-                    bellIcon.style.transform = "scale(1)";
-                });
-            }
-        }
-
-        // Theme toggle icons rotation effect
-        const themeIcons = document.querySelectorAll(".ti-moon, .ti-sun");
-        themeIcons.forEach((icon) => {
-            const navLink = icon.closest(".nav-link");
-            if (navLink) {
-                navLink.addEventListener("mouseenter", function () {
-                    icon.style.transform = "scale(1.1) rotate(15deg)";
-                    icon.style.transition = "transform 0.3s ease";
-                });
-
-                navLink.addEventListener("mouseleave", function () {
-                    icon.style.transform = "scale(1) rotate(0deg)";
-                });
-            }
-        });
-    };
-
     // Fix for notification tabs to prevent dropdown from closing when clicking tabs
     const fixNotificationTabsDropdown = () => {
         const notificationTabs = document.querySelectorAll(
@@ -431,7 +396,6 @@ document.addEventListener("DOMContentLoaded", function () {
     initAvatarHoverDropdown();
     initNotifications();
     initNavHover();
-    initIconHoverEffects();
     fixNotificationTabsDropdown();
     initOutsideClickHandler();
     initResponsiveBehavior();

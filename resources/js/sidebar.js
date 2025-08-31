@@ -9,15 +9,26 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // Sidebar lock state
-    let sidebarLocked = false;
+    // Persistent sidebar lock state using localStorage
+    let sidebarLocked = localStorage.getItem("sidebarLocked") === "true";
 
     // Create lock button
     const createLockButton = function () {
         const lockButton = document.createElement("button");
         lockButton.className = "sidebar-lock-btn";
-        lockButton.innerHTML = '<i class="ti ti-lock-open"></i>';
-        lockButton.title = "Lock sidebar (prevents auto-close)";
+        lockButton.innerHTML = sidebarLocked
+            ? '<i class="ti ti-lock"></i>'
+            : '<i class="ti ti-lock-open"></i>';
+        lockButton.title = sidebarLocked
+            ? "Unlock sidebar (allows auto-close)"
+            : "Lock sidebar (prevents auto-close)";
+
+        // Add initial locked/unlocked class
+        if (sidebarLocked) {
+            lockButton.classList.add("locked");
+        } else {
+            lockButton.classList.add("unlocked");
+        }
 
         const sidebarHeader = sidebar.querySelector(".sidebar-header");
         if (sidebarHeader) {
@@ -30,9 +41,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const lockButton = createLockButton();
 
-    // Toggle lock functionality
+    // Toggle lock functionality with persistence
     const toggleLock = function () {
         sidebarLocked = !sidebarLocked;
+
+        // Save state to localStorage
+        localStorage.setItem("sidebarLocked", sidebarLocked.toString());
+
         const icon = lockButton.querySelector("i");
 
         if (sidebarLocked) {
@@ -161,12 +176,31 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // Initialize with sidebar closed and smooth entrance animation
+    // Get persistent sidebar state
+    const getSidebarState = function () {
+        const savedState = localStorage.getItem("sidebarCollapsed");
+        return savedState === null ? true : savedState === "true"; // Default to collapsed if no saved state
+    };
+
+    // Save sidebar state
+    const saveSidebarState = function (isCollapsed) {
+        localStorage.setItem("sidebarCollapsed", isCollapsed.toString());
+    };
+
+    // Initialize with persistent sidebar state
     const initializeSidebar = function () {
-        // Set initial state - always start collapsed
-        sidebar.classList.add("collapsed");
-        mainContent.classList.add("sidebar-collapsed");
-        body.classList.remove("sidebar-open");
+        const shouldBeCollapsed = getSidebarState();
+
+        // Set initial state based on saved preference
+        if (shouldBeCollapsed) {
+            sidebar.classList.add("collapsed");
+            mainContent.classList.add("sidebar-collapsed");
+            body.classList.remove("sidebar-open");
+        } else {
+            sidebar.classList.remove("collapsed");
+            mainContent.classList.remove("sidebar-collapsed");
+            body.classList.add("sidebar-open");
+        }
 
         // Animate elements into view with faster menu icon
         const navItems = sidebar.querySelectorAll(".nav-link");
@@ -178,10 +212,25 @@ document.addEventListener("DOMContentLoaded", function () {
             }, index * 40);
         });
 
-        setTimeout(addTooltips, navItems.length * 40 + 100);
+        // Add tooltips if sidebar is collapsed
+        if (shouldBeCollapsed) {
+            setTimeout(addTooltips, navItems.length * 40 + 100);
+        }
     };
 
-    // Click outside to close sidebar (respects lock)
+    // Updated toggle function to save state
+    const toggleSidebarWithPersistence = function () {
+        const isCollapsed = sidebar.classList.contains("collapsed");
+        const willCollapse = !isCollapsed;
+
+        // Save the new state
+        saveSidebarState(willCollapse);
+
+        // Call the existing toggle function
+        toggleSidebar();
+    };
+
+    // Click outside to close sidebar (respects lock and persistence)
     const handleClickOutside = function (e) {
         const isOpen = !sidebar.classList.contains("collapsed");
 
@@ -191,6 +240,8 @@ document.addEventListener("DOMContentLoaded", function () {
             !sidebar.contains(e.target) &&
             !sidebarToggle?.contains(e.target)
         ) {
+            // Save collapsed state when auto-closing
+            saveSidebarState(true);
             toggleSidebar();
         }
     };
@@ -198,37 +249,40 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initialize everything
     initializeSidebar();
 
-    // Toggle button event
+    // Toggle button event with persistence
     if (sidebarToggle) {
         sidebarToggle.addEventListener("click", function (e) {
             e.preventDefault();
             e.stopPropagation();
-            toggleSidebar();
+            toggleSidebarWithPersistence();
         });
     }
 
     // Add click outside listener
     document.addEventListener("click", handleClickOutside);
 
-    // Enhanced responsive behavior
+    // Enhanced responsive behavior with persistence
     let resizeTimeout;
     window.addEventListener("resize", function () {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
             if (window.innerWidth < 768) {
                 if (!sidebar.classList.contains("collapsed")) {
+                    saveSidebarState(true);
                     toggleSidebar();
                 }
             }
         }, 150);
     });
 
-    // Add keyboard support
+    // Add keyboard support with persistence
     document.addEventListener("keydown", function (e) {
         // Toggle sidebar with Ctrl/Cmd + B
         if ((e.ctrlKey || e.metaKey) && e.key === "b") {
             e.preventDefault();
-            toggleSidebar();
+            toggleSidebarWithPersistence();
         }
     });
+
+    // Removed the debug logging that was causing the text to appear
 });

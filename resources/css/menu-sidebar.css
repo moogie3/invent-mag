@@ -57,13 +57,7 @@
     min-height: 72px;
 }
 
-.sidebar.collapsed .sidebar-header {
-    padding: 1rem;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Brand/Logo */
+/* Brand/Logo - FIXED CENTERING AND LARGER ICON */
 .sidebar .navbar-brand {
     padding: 0.75rem 1.5rem;
     font-size: 1.25rem;
@@ -80,7 +74,7 @@
     gap: 0.5rem;
     border-radius: 0.5rem;
     min-height: 48px;
-    width: auto;
+    width: 100%;
     cursor: pointer;
     border: none;
 }
@@ -90,8 +84,11 @@
     align-items: center;
     padding: 0.75rem;
     width: 100%;
-    margin-left: 8px;
+    margin: 0;
+    /* Remove margin-left that was causing left offset */
     gap: 0;
+    display: flex;
+    /* Ensure flexbox is maintained */
 }
 
 .brand-text {
@@ -113,22 +110,56 @@
     align-items: center;
     justify-content: center;
     transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    width: auto;
+    /* Allow natural sizing */
+    height: auto;
 }
 
 .brand-icon i {
     font-size: 1.25rem;
     transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/* MUCH LARGER ICON WHEN COLLAPSED */
 .sidebar.collapsed .brand-icon i {
-    font-size: 1.4rem;
+    font-size: 2rem;
+    /* Increased from 1.4rem to 2rem for much larger icon */
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure perfect centering in collapsed state */
+.sidebar.collapsed .brand-icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* Additional fix for sidebar header centering */
+.sidebar.collapsed .sidebar-header {
+    padding: 1rem;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    /* Ensure flexbox */
+    width: 100%;
 }
 
 /* Sidebar Lock Button */
 .sidebar-lock-btn {
     position: absolute;
     top: 35%;
-    right: 2px;
+    right: 15px;
     width: 28px;
     height: 28px;
     border: none;

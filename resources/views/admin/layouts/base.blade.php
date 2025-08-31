@@ -27,8 +27,8 @@
         href="{{ asset('tabler/dist/css/tabler-vendors.min.css?v=' . filemtime(public_path('tabler/dist/css/tabler-vendors.min.css'))) }}"
         rel="stylesheet" />
     @vite('resources/css/app.css')
-    @vite('resources/css/sidebar.css')
-    @vite('resources/js/sidebar.js')
+    @vite('resources/css/menu-sidebar.css')
+    @vite('resources/js/admin/layouts/menu-sidebar.js')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/flatpickr" as="script" crossorigin>
@@ -49,7 +49,7 @@
         </div>
     </div>
     <div class="wrapper">
-        @include('admin.layouts.partials.sidebar')
+        @include('admin.layouts.menu-sidebar')
         <div class="main-content">
             @include('admin.layouts.navbar')
             @yield('content')

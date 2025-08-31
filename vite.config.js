@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
-import path from 'path';
+import path from "path";
 
 export default defineConfig({
     plugins: [
@@ -30,15 +30,15 @@ export default defineConfig({
                 "resources/css/navbar.css",
                 "resources/js/admin/layouts/navbar.js",
                 "resources/js/admin/sales-pipeline.js",
-                "resources/css/sidebar.css",
-                "resources/js/sidebar.js",
+                "resources/css/menu-sidebar.css",
+                "resources/js/menu-sidebar.js",
             ],
             refresh: true,
         }),
     ],
     resolve: {
         alias: {
-            '@': path.resolve(__dirname, 'resources'),
+            "@": path.resolve(__dirname, "resources"),
         },
     },
     optimizeDeps: {

@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController, UserController, CustomerCrmController, SupplierCrmController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController, UserController, CustomerCrmController, SupplierCrmController, SettingsController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -266,6 +266,8 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.setting.notifications');
+
+            Route::get('/', [SettingsController::class, 'index'])->name('admin.setting.index');
         });
     });
 });

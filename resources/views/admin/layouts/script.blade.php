@@ -108,6 +108,11 @@
     @vite('resources/js/admin/sales-pipeline.js')
 @endif
 
+{{-- SCRIPT FOR SETTINGS --}}
+@if (request()->is('admin/settings'))
+    @vite('resources/js/admin/settings.js')
+@endif
+
 
 
 {{-- DELETE MODAL --}}

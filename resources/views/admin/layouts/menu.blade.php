@@ -26,6 +26,10 @@
             class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.tax') ? 'active-menu-item' : '' }}">
             <i class="ti ti-receipt-tax me-2"></i>Tax Settings
         </a>
+        <a href="{{ route('admin.setting.index') }}"
+            class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.index') ? 'active-menu-item' : '' }}">
+            <i class="ti ti-settings me-2"></i>System Settings
+        </a>
         @can('view-users')
             <a href="{{ route('admin.users.index') }}"
                 class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.users.index') || request()->routeIs('admin.users.create') || request()->routeIs('admin.users.edit') ? 'active-menu-item' : '' }}">

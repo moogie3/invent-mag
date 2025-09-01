@@ -67,7 +67,6 @@
     cursor: pointer;
     border: none;
     line-height: 1;
-    /* Add line-height for better text alignment */
 }
 
 .sidebar.collapsed .navbar-brand {
@@ -78,7 +77,6 @@
     margin: 0;
     gap: 0;
     display: flex;
-    /* Ensure flexbox is maintained */
 }
 
 .brand-text {
@@ -87,10 +85,8 @@
     transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
     white-space: nowrap;
     line-height: 1.2;
-    /* Add line-height for better vertical alignment */
     display: flex;
     align-items: center;
-    /* Ensure text is vertically centered */
 }
 
 .sidebar.collapsed .brand-text {

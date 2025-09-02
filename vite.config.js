@@ -30,7 +30,7 @@ export default defineConfig({
                 "resources/css/navbar.css",
                 "resources/js/admin/layouts/navbar.js",
                 "resources/js/admin/sales-pipeline.js",
-                "resources/js/admin/settings.js",
+                "resources/js/admin/layouts/settings.js",
                 "resources/css/menu-sidebar.css",
                 "resources/js/menu-sidebar.js",
             ],

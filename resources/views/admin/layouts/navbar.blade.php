@@ -30,12 +30,7 @@
 
         <!-- Right Side Icons -->
         <div class="d-none d-md-flex d-flex align-items-center" id="navbar-right-content">
-            <a href="?theme=dark" class="nav-link px-2 hide-theme-dark">
-                <i class="ti ti-moon fs-2"></i>
-            </a>
-            <a href="?theme=light" class="nav-link px-2 hide-theme-light">
-                <i class="ti ti-sun fs-2"></i>
-            </a>
+            
 
             <!-- Modified Notification Bell Section -->
             <div class="nav-item dropdown me-3">

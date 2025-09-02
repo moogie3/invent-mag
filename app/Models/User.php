@@ -18,7 +18,8 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
-        'timezone'
+        'timezone',
+        'system_settings'
     ];
 
     protected $hidden = [
@@ -29,6 +30,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'system_settings' => 'array',
         ];
     }
 

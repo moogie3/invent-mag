@@ -1,0 +1,281 @@
+function resetToDefaults() {
+    if (
+        confirm(
+            "Are you sure you want to reset all settings to default values? This action cannot be undone."
+        )
+    ) {
+        // Reset form to default values
+        document.getElementById("systemSettingsForm").reset();
+
+        // Interface Layout Settings
+        document.querySelector('select[name="navigation_type"]').value =
+            "sidebar";
+
+        // Theme Configuration
+        document.querySelector('select[name="theme_mode"]').value = "light";
+
+        // Notifications & Alerts
+        document.querySelector('select[name="notification_duration"]').value =
+            "5";
+
+        // Session & Security
+        document.querySelector('select[name="auto_logout_time"]').value = "60";
+
+        // Performance
+        document.querySelector('select[name="data_refresh_rate"]').value = "30";
+
+        // Language & Localization
+        document.querySelector('select[name="system_language"]').value = "en";
+
+        // Set checkboxes to default values
+        // Interface Layout
+        document.querySelector('input[name="sidebar_lock"]').checked = false;
+
+        // Theme Configuration
+        document.querySelector(
+            'input[name="show_theme_toggle"]'
+        ).checked = true;
+
+        // Notifications & Alerts
+        document.querySelector(
+            'input[name="enable_sound_notifications"]'
+        ).checked = true;
+        document.querySelector(
+            'input[name="enable_browser_notifications"]'
+        ).checked = true;
+        document.querySelector(
+            'input[name="show_success_messages"]'
+        ).checked = true;
+
+        // Session & Security
+        document.querySelector(
+            'input[name="remember_last_page"]'
+        ).checked = true;
+
+        // Performance
+        document.querySelector(
+            'input[name="enable_animations"]'
+        ).checked = true;
+        document.querySelector('input[name="lazy_load_images"]').checked = true;
+
+        // Advanced Settings
+        document.querySelector(
+            'input[name="enable_debug_mode"]'
+        ).checked = false;
+        document.querySelector(
+            'input[name="enable_keyboard_shortcuts"]'
+        ).checked = true;
+        document.querySelector('input[name="show_tooltips"]').checked = true;
+        document.querySelector('input[name="compact_mode"]').checked = false;
+    }
+}
+
+// Apply settings preview and real-time updates
+document.addEventListener("DOMContentLoaded", function () {
+    const themeSelect = document.querySelector('select[name="theme_mode"]');
+    const navigationSelect = document.querySelector(
+        'select[name="navigation_type"]'
+    );
+    const animationToggle = document.querySelector(
+        'input[name="enable_animations"]'
+    );
+    const compactModeToggle = document.querySelector(
+        'input[name="compact_mode"]'
+    );
+    const debugToggle = document.querySelector(
+        'input[name="enable_debug_mode"]'
+    );
+
+    // Theme preview functionality
+    if (themeSelect) {
+        themeSelect.addEventListener("change", function () {
+            const selectedTheme = this.value;
+            console.log("Theme changed to:", selectedTheme);
+
+            // Apply theme preview
+            if (selectedTheme === "dark") {
+                document.body.classList.add("theme-dark");
+                document.body.setAttribute("data-bs-theme", "dark");
+            } else if (selectedTheme === "light") {
+                document.body.classList.remove("theme-dark");
+                document.body.setAttribute("data-bs-theme", "light");
+            } else if (selectedTheme === "auto") {
+                // Use system preference
+                const prefersDark = window.matchMedia(
+                    "(prefers-color-scheme: dark)"
+                ).matches;
+                if (prefersDark) {
+                    document.body.classList.add("theme-dark");
+                    document.body.setAttribute("data-bs-theme", "dark");
+                } else {
+                    document.body.classList.remove("theme-dark");
+                    document.body.setAttribute("data-bs-theme", "light");
+                }
+            }
+        });
+    }
+
+    // Navigation layout - REMOVED PREVIEW FUNCTIONALITY
+    // The navigation changes will only apply after form submission
+    if (navigationSelect) {
+        navigationSelect.addEventListener("change", function () {
+            const selectedLayout = this.value;
+            console.log(
+                "Navigation layout will change to:",
+                selectedLayout,
+                "after saving"
+            );
+            // No immediate layout changes - only after form submission
+        });
+    }
+
+    // Animation preview
+    if (animationToggle) {
+        animationToggle.addEventListener("change", function () {
+            const enableAnimations = this.checked;
+            console.log(
+                "Animations:",
+                enableAnimations ? "enabled" : "disabled"
+            );
+
+            if (enableAnimations) {
+                document.body.classList.remove("no-animations");
+            } else {
+                document.body.classList.add("no-animations");
+            }
+        });
+    }
+
+    // Compact mode preview
+    if (compactModeToggle) {
+        compactModeToggle.addEventListener("change", function () {
+            const compactMode = this.checked;
+            console.log("Compact mode:", compactMode ? "enabled" : "disabled");
+
+            if (compactMode) {
+                document.body.classList.add("compact-mode");
+            } else {
+                document.body.classList.remove("compact-mode");
+            }
+        });
+    }
+
+    // Debug mode toggle
+    if (debugToggle) {
+        debugToggle.addEventListener("change", function () {
+            const debugMode = this.checked;
+            console.log("Debug mode:", debugMode ? "enabled" : "disabled");
+
+            if (debugMode) {
+                document.body.classList.add("debug-mode");
+                // You could show debug information here
+            } else {
+                document.body.classList.remove("debug-mode");
+            }
+        });
+    }
+
+    // Auto-logout warning
+    const autoLogoutSelect = document.querySelector(
+        'select[name="auto_logout_time"]'
+    );
+    if (autoLogoutSelect) {
+        autoLogoutSelect.addEventListener("change", function () {
+            const minutes = parseInt(this.value);
+            if (minutes > 0 && minutes < 30) {
+                if (
+                    !confirm(
+                        `Warning: Setting auto-logout to ${minutes} minutes may interrupt your work. Are you sure you want to continue?`
+                    )
+                ) {
+                    this.value = "60"; // Reset to default
+                }
+            }
+        });
+    }
+
+    // Notification settings interaction
+    const soundNotifications = document.querySelector(
+        'input[name="enable_sound_notifications"]'
+    );
+    const browserNotifications = document.querySelector(
+        'input[name="enable_browser_notifications"]'
+    );
+
+    if (browserNotifications) {
+        browserNotifications.addEventListener("change", function () {
+            if (this.checked) {
+                // Request notification permission
+                if (
+                    "Notification" in window &&
+                    Notification.permission === "default"
+                ) {
+                    Notification.requestPermission().then(function (
+                        permission
+                    ) {
+                        if (permission !== "granted") {
+                            browserNotifications.checked = false;
+                            alert(
+                                "Browser notifications require permission to work properly."
+                            );
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    // Language change warning
+    const languageSelect = document.querySelector(
+        'select[name="system_language"]'
+    );
+    if (languageSelect) {
+        const originalLanguage = languageSelect.value;
+        languageSelect.addEventListener("change", function () {
+            if (this.value !== originalLanguage) {
+                const langNames = {
+                    en: "English",
+                    id: "Bahasa Indonesia",
+                };
+                if (
+                    confirm(
+                        `Changing language to ${
+                            langNames[this.value]
+                        } will reload the page. Continue?`
+                    )
+                ) {
+                    // You might want to submit the form automatically or show a reload notice
+                    console.log(
+                        "Language will change to:",
+                        langNames[this.value]
+                    );
+                } else {
+                    this.value = originalLanguage; // Reset to original
+                }
+            }
+        });
+    }
+
+    // Form submission handler
+    const settingsForm = document.getElementById("systemSettingsForm");
+    if (settingsForm) {
+        settingsForm.addEventListener("submit", function (e) {
+            // Show loading state
+            const submitBtn = settingsForm.querySelector(
+                'button[type="submit"]'
+            );
+            if (submitBtn) {
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+                // Reset button after a delay (in case of errors)
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }, 10000);
+            }
+        });
+    }
+});

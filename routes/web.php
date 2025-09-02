@@ -268,6 +268,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.setting.notifications');
 
             Route::get('/', [SettingsController::class, 'index'])->name('admin.setting.index');
+            Route::put('/', [SettingsController::class, 'update'])->name('admin.setting.update');
         });
     });
 });

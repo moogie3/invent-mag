@@ -1703,3 +1703,28 @@ body {
     font-weight: bold;
     background-color: gray;
 }
+
+/* Default display for sidebar and navbar */
+.sidebar {
+    display: block !important;
+}
+
+.navbar {
+    display: block !important;
+}
+
+/* Hide sidebar when navigation type is navbar */
+body.layout-navbar .sidebar {
+    display: none !important;
+}
+
+/* Hide navbar when navigation type is sidebar */
+body:not(.layout-navbar):not(.layout-navbar-v2) .navbar {
+    display: none !important;
+}
+
+/* Show both when navigation type is both */
+body.layout-navbar-v2 .sidebar,
+body.layout-navbar-v2 .navbar {
+    display: block !important;
+}

@@ -1,3 +1,9 @@
+@php
+    $themeMode = auth()->user()->system_settings['theme_mode'] ?? 'light';
+    $navigationType = auth()->user()->system_settings['navigation_type'] ?? 'sidebar';
+    $sidebarLock = auth()->user()->system_settings['sidebar_lock'] ?? false;
+@endphp
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,9 +39,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/flatpickr" as="script" crossorigin>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr" crossorigin="anonymous"></script>
+    <style>
+        .sidebar-locked .sidebar {
+            position: fixed;
+        }
+    </style>
 </head>
 
-<body class="antialiased">
+<body class="antialiased {{ $themeMode === 'dark' ? 'theme-dark' : '' }} {{ $navigationType === 'navbar' ? 'layout-navbar' : ($navigationType === 'both' ? 'layout-navbar-v2' : '') }} {{ $sidebarLock ? 'sidebar-locked' : '' }}">
     <div class="page-loader">
         <div class="container container-slim py-4">
             <div class="text-center">

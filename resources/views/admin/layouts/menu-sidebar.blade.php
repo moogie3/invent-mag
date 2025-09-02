@@ -31,14 +31,7 @@
             </div>
             <!-- Actions moved to the right side -->
             <div class="sidebar-actions">
-                <a href="?theme=dark" class="nav-link px-1 hide-theme-dark" data-bs-toggle="tooltip"
-                    data-bs-placement="top">
-                    <i class="ti ti-moon fs-2"></i>
-                </a>
-                <a href="?theme=light" class="nav-link px-1 hide-theme-light" data-bs-toggle="tooltip"
-                    data-bs-placement="top">
-                    <i class="ti ti-sun fs-2"></i>
-                </a>
+                
 
                 <div class="nav-item">
                     <a href="{{ route('admin.setting.notifications') }}" class="nav-link px-1 position-relative"
@@ -95,6 +88,16 @@
     <div class="sidebar-footer">
         <div class="sidebar-divider"></div>
         <ul class="navbar-nav">
+            @if(auth()->user()->system_settings['sidebar_lock'] ?? false)
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="lock-sidebar-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Lock Sidebar">
+                    <div class="nav-link-icon">
+                        <i class="ti ti-lock"></i>
+                    </div>
+                    <span class="nav-link-title">Lock Sidebar</span>
+                </a>
+            </li>
+            @endif
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.setting.profile.edit') }}" data-bs-toggle="tooltip"
                     data-bs-placement="top">

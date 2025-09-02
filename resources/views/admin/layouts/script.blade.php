@@ -110,7 +110,7 @@
 
 {{-- SCRIPT FOR SETTINGS --}}
 @if (request()->is('admin/settings'))
-    @vite('resources/js/admin/settings.js')
+    @vite('resources/js/admin/layouts/settings.js')
 @endif
 
 

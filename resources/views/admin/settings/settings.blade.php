@@ -31,7 +31,7 @@
                                 <div class="card-body">
                                     <h2 class="mb-4">System Configuration</h2>
 
-                                    <form id="systemSettingsForm" action="#" method="POST">
+                                    <form id="systemSettingsForm" action="{{ route('admin.setting.update') }}" method="POST">
                                         @method('PUT')
                                         @csrf
 
@@ -48,6 +48,10 @@
                                                     <option value="navbar"
                                                         {{ (auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'navbar' ? 'selected' : '' }}>
                                                         Top Navigation Bar
+                                                    </option>
+                                                    <option value="both"
+                                                        {{ (auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'both' ? 'selected' : '' }}>
+                                                        Both
                                                     </option>
                                                 </select>
                                             </div>

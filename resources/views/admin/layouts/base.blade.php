@@ -47,7 +47,8 @@
     </style>
 </head>
 
-<body class="antialiased {{ $navigationType === 'navbar' ? 'layout-navbar' : ($navigationType === 'both' ? 'layout-navbar-v2' : '') }} {{ $sidebarLock ? 'sidebar-locked' : '' }} {{ $stickyNavbar ? 'sticky_navbar' : '' }}" data-bs-theme="{{ $themeMode === 'dark' ? 'dark' : 'light' }}" data-show-theme-toggle="{{ auth()->user()->system_settings['show_theme_toggle'] ?? true ? 'true' : 'false' }}">
+<body
+    class="{{ auth()->check() && (auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'navbar' ? 'layout-navbar' : ((auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'both' ? 'layout-navbar-v2' : '') }} {{ auth()->check() && (auth()->user()->system_settings['sticky_navbar'] ?? false) ? 'sticky-navbar' : '' }}">
     <div class="page-loader">
         <div class="container container-slim py-4">
             <div class="text-center">

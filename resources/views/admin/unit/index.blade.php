@@ -4,25 +4,14 @@
 
 @section('content')
     <div class="page-wrapper">
-        <div class="page-header">
-            <div class="container-xl">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <div class="page-pretitle">
-                            Overview
-                        </div>
-                        <h2 class="page-title">
-                            Unit Settings
-                        </h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="page-wrapper">
             <div class="page-body">
                 <div class="container-xl">
                     <div class="card">
+                        <div class="card-body">
+                            <h2><i class="ti ti-ruler me-2"></i>UNITS SETTINGS</h2>
+                        </div>
+                        <hr class="my-0">
                         <div class="row g-0">
                             <div class="col-12 col-md-3 border-end">
                                 @include('admin.layouts.menu')
@@ -32,20 +21,18 @@
                                     <div class="col-md-12">
                                         <div class="card card-primary">
                                             <div class="card-body border-bottom py-3">
-                                                <h2 class="mb-4">
-                                                    <i class="ti ti-universe fs-2"></i>
-                                                    Total Unit :
-                                                    <strong>{{ $totalunit }}</strong>
-                                                </h2>
-                                                <div class="d-flex justify-content-between">
-                                                    <div class="col-auto ms-auto">
-                                                        <div class="btn-list">
-                                                            <button type="button"
-                                                                class="btn btn-primary d-none d-sm-inline-block"
-                                                                data-bs-toggle="modal" data-bs-target="#createUnitModal">
-                                                                <i class="ti ti-plus fs-4"></i> Create Unit
-                                                            </button>
-                                                        </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h2 class="mb-0">
+                                                        <i class="ti ti-universe fs-2"></i>
+                                                        Total Unit :
+                                                        <strong>{{ $totalunit }}</strong>
+                                                    </h2>
+                                                    <div class="btn-list">
+                                                        <button type="button"
+                                                            class="btn btn-primary d-none d-sm-inline-block"
+                                                            data-bs-toggle="modal" data-bs-target="#createUnitModal">
+                                                            <i class="ti ti-plus fs-4"></i> Create Unit
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>

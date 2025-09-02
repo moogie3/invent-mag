@@ -45,6 +45,10 @@
     margin-left: 70px;
 }
 
+body.layout-navbar .main-content {
+    margin-left: 0;
+}
+
 /* Brand/Logo - FIXED CENTERING AND LARGER ICON */
 .sidebar .navbar-brand {
     padding: 0 1.5rem;

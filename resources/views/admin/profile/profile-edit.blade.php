@@ -4,32 +4,20 @@
 
 @section('content')
     <div class="page-wrapper">
-        <div class="page-header">
-            <div class="container-xl">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <div class="page-pretitle">
-                            Overview
-                        </div>
-                        <h2 class="page-title">
-                            Account Settings
-                        </h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="page-wrapper">
             <div class="page-body">
                 <div class="container-xl">
                     <div class="card">
+                        <div class="card-body">
+                            <h2><i class="ti ti-user-cog me-2"></i>ACCOUNT SETTINGS</h2>
+                        </div>
+                        <hr class="my-0">
                         <div class="row g-0">
                             <div class="col-12 col-md-3 border-end">
                                 @include('admin.layouts.menu')
                             </div>
                             <div class="col-12 col-md-9 d-flex flex-column">
                                 <div class="card-body">
-                                    <h2 class="mb-4">My Account</h2>
                                     <div class="d-flex justify-content-between align-items-center mb-4">
                                         <h3 class="card-title">Profile Details</h3>
                                         <button type="button" class="btn btn-ghost-danger" data-bs-toggle="modal"

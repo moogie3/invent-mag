@@ -4,25 +4,14 @@
 
 @section('content')
     <div class="page-wrapper">
-        <div class="page-header">
-            <div class="container-xl">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <div class="page-pretitle">
-                            Overview
-                        </div>
-                        <h2 class="page-title">
-                            Tax Settings
-                        </h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="page-wrapper">
             <div class="page-body">
                 <div class="container-xl">
                     <div class="card">
+                        <div class="card-body">
+                            <h2><i class="ti ti-receipt-tax me-2"></i>TAX SETTINGS</h2>
+                        </div>
+                        <hr class="my-0">
                         <div class="row g-0">
                             <div class="col-12 col-md-3 border-end">
                                 @include('admin.layouts.menu')
@@ -32,7 +21,6 @@
                                     <form id="taxSettingsForm" action="{{ route('admin.setting.tax.update') }}"
                                         method="POST">
                                         @csrf
-                                        <h2 class="mb-4">Tax Settings</h2>
 
                                         <div class="row g-3 mb-3">
                                             <div class="col-md-6">

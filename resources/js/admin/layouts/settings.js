@@ -100,24 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Navigation layout preview - Apply immediately
-    if (navigationSelect) {
-        navigationSelect.addEventListener("change", function () {
-            const selectedLayout = this.value;
-            console.log("Navigation layout changed to:", selectedLayout);
-
-            // Apply layout changes immediately
-            const body = document.body;
-            body.classList.remove("layout-navbar", "layout-navbar-v2");
-
-            if (selectedLayout === "navbar") {
-                body.classList.add("layout-navbar");
-            } else if (selectedLayout === "both") {
-                body.classList.add("layout-navbar-v2");
-            }
-            // 'sidebar' is the default, no additional class needed
-        });
-    }
+    
 
     // Animation preview
     if (animationToggle) {
@@ -163,6 +146,53 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    // Disable navbar options when sidebar is selected
+    const navigationSelectForDisable = document.querySelector('select[name="navigation_type"]');
+    const navbarOptionsWrapper = document.getElementById('navbar-options-wrapper');
+    const stickyNavbarCheckbox = document.querySelector('input[name="sticky_navbar"]');
+
+    function toggleNavbarOptions() {
+        if (navigationSelectForDisable.value === 'sidebar') {
+            navbarOptionsWrapper.classList.add('disabled');
+            stickyNavbarCheckbox.disabled = true;
+        } else {
+            navbarOptionsWrapper.classList.remove('disabled');
+            stickyNavbarCheckbox.disabled = false;
+        }
+    }
+
+    if (navigationSelectForDisable) {
+        toggleNavbarOptions(); // Call on page load
+        navigationSelectForDisable.addEventListener('change', toggleNavbarOptions);
+    }
+
+    // Sticky navbar preview
+    const stickyNavbarToggle = document.querySelector('input[name="sticky_navbar"]');
+    if (stickyNavbarToggle) {
+        stickyNavbarToggle.addEventListener("change", function () {
+            const enableStickyNavbar = this.checked;
+            console.log("Sticky navbar:", enableStickyNavbar ? "enabled" : "disabled");
+
+            if (enableStickyNavbar) {
+                document.body.classList.add("sticky-navbar");
+            } else {
+                document.body.classList.remove("sticky-navbar");
+                document.querySelector('.navbar')?.classList.remove('scrolled');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', function() {
+        const navbar = document.querySelector('.navbar');
+        if (navbar && document.body.classList.contains('sticky-navbar')) {
+            if (window.scrollY > 10) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }
+    });
 
     // Auto-logout warning
     const autoLogoutSelect = document.querySelector(

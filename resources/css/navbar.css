@@ -591,8 +591,14 @@
 
 /* Navbar scrolled effect */
 body.sticky-navbar .navbar.scrolled {
-    transition: opacity 0.3s ease-in-out;
-    opacity: 0.5;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+[data-bs-theme="dark"] body.sticky-navbar .navbar.scrolled {
+    background-color: rgba(30, 41, 59, 0.8);
 }
 
 /* Sticky Navbar */

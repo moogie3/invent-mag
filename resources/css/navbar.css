@@ -149,15 +149,6 @@
     background-color: rgba(var(--tblr-primary-rgb), 0.05);
 }
 
-.notification-item .badge {
-    width: 10px;
-    height: 10px;
-    padding: 0;
-    display: inline-block;
-    border-radius: 50%;
-}
-
-/* Notification tabs styling */
 .notification-tabs .nav-link {
     border: none;
     background: transparent;
@@ -184,12 +175,10 @@
     background-color: rgba(var(--tblr-primary-rgb), 0.05);
 }
 
-/* Notification groups */
 .notification-group .small.fw-medium {
     background-color: rgba(var(--tblr-secondary-rgb), 0.1);
 }
 
-/* Avatar styling in notification */
 .notification-item .avatar-sm {
     width: 32px;
     height: 32px;
@@ -198,7 +187,6 @@
     justify-content: center;
 }
 
-/* Urgency indicators */
 .notification-item .badge.bg-danger {
     background-color: #dc3545 !important;
 }
@@ -211,7 +199,6 @@
     background-color: #0dcaf0 !important;
 }
 
-/* Background colors */
 .bg-red {
     background-color: #d63939;
 }
@@ -600,4 +587,18 @@
     background-color: transparent !important;
     color: inherit !important;
     transform: none !important;
+}
+
+/* Navbar scrolled effect */
+body.sticky-navbar .navbar.scrolled {
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0.5;
+}
+
+/* Sticky Navbar */
+body.sticky-navbar .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
 }

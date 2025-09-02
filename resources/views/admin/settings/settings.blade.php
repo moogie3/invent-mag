@@ -31,7 +31,8 @@
                                 <div class="card-body">
                                     <h2 class="mb-4">System Configuration</h2>
 
-                                    <form id="systemSettingsForm" action="{{ route('admin.setting.update') }}" method="POST">
+                                    <form id="systemSettingsForm" action="{{ route('admin.setting.update') }}"
+                                        method="POST">
                                         @method('PUT')
                                         @csrf
 
@@ -61,6 +62,14 @@
                                                     <input class="form-check-input" type="checkbox" name="sidebar_lock"
                                                         {{ auth()->user()->system_settings['sidebar_lock'] ?? false ? 'checked' : '' }}>
                                                     <label class="form-check-label">Enable Sidebar Lock Button</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-label">Navbar Options</div>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" name="sticky_navbar"
+                                                        {{ auth()->user()->system_settings['sticky_navbar'] ?? false ? 'checked' : '' }}>
+                                                    <label class="form-check-label">Enable Sticky Navbar</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -175,7 +184,8 @@
                                         <div class="row g-3 mb-4">
                                             <div class="col-md-6">
                                                 <div class="form-check form-switch mb-2">
-                                                    <input class="form-check-input" type="checkbox" name="enable_animations"
+                                                    <input class="form-check-input" type="checkbox"
+                                                        name="enable_animations"
                                                         {{ auth()->user()->system_settings['enable_animations'] ?? true ? 'checked' : '' }}>
                                                     <label class="form-check-label">Enable UI Animations</label>
                                                 </div>

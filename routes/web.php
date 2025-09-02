@@ -269,6 +269,7 @@ Route::prefix('admin')->group(function () {
 
             Route::get('/', [SettingsController::class, 'index'])->name('admin.setting.index');
             Route::put('/', [SettingsController::class, 'update'])->name('admin.setting.update');
+            Route::put('/update-theme-mode', [SettingsController::class, 'updateThemeMode'])->name('admin.setting.update-theme-mode');
         });
     });
 });

@@ -32,6 +32,14 @@
         <div class="d-none d-md-flex d-flex align-items-center" id="navbar-right-content">
             
 
+            <!-- Theme Toggle Button -->
+            <div class="nav-item me-2" id="theme-toggle-navbar-container">
+                <a href="#" class="nav-link px-0" id="theme-toggle-navbar">
+                    <i class="ti ti-sun fs-2 theme-icon-light"></i>
+                    <i class="ti ti-moon fs-2 theme-icon-dark" style="display: none;"></i>
+                </a>
+            </div>
+
             <!-- Modified Notification Bell Section -->
             <div class="nav-item dropdown me-3">
                 <a href="#" class="nav-link px-2 position-relative" data-bs-toggle="dropdown"

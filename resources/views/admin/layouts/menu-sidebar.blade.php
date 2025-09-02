@@ -31,7 +31,13 @@
             </div>
             <!-- Actions moved to the right side -->
             <div class="sidebar-actions">
-                
+                <!-- Theme Toggle Button -->
+                <div class="nav-item me-2" id="theme-toggle-sidebar-container">
+                    <a href="#" class="nav-link px-0" id="theme-toggle-sidebar">
+                        <i class="ti ti-sun fs-2 theme-icon-light"></i>
+                        <i class="ti ti-moon fs-2 theme-icon-dark" style="display: none;"></i>
+                    </a>
+                </div>
 
                 <div class="nav-item">
                     <a href="{{ route('admin.setting.notifications') }}" class="nav-link px-1 position-relative"

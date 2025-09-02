@@ -30,6 +30,7 @@ function resetToDefaults() {
         // Set checkboxes to default values
         // Interface Layout
         document.querySelector('input[name="sidebar_lock"]').checked = false;
+        document.querySelector('input[name="sticky_navbar"]').checked = false;
 
         // Theme Configuration
         document.querySelector(
@@ -86,46 +87,35 @@ document.addEventListener("DOMContentLoaded", function () {
         'input[name="enable_debug_mode"]'
     );
 
-    // Theme preview functionality
+    // Theme preview functionality - Apply immediately
     if (themeSelect) {
         themeSelect.addEventListener("change", function () {
             const selectedTheme = this.value;
             console.log("Theme changed to:", selectedTheme);
 
-            // Apply theme preview
-            if (selectedTheme === "dark") {
-                document.body.classList.add("theme-dark");
-                document.body.setAttribute("data-bs-theme", "dark");
-            } else if (selectedTheme === "light") {
-                document.body.classList.remove("theme-dark");
-                document.body.setAttribute("data-bs-theme", "light");
-            } else if (selectedTheme === "auto") {
-                // Use system preference
-                const prefersDark = window.matchMedia(
-                    "(prefers-color-scheme: dark)"
-                ).matches;
-                if (prefersDark) {
-                    document.body.classList.add("theme-dark");
-                    document.body.setAttribute("data-bs-theme", "dark");
-                } else {
-                    document.body.classList.remove("theme-dark");
-                    document.body.setAttribute("data-bs-theme", "light");
-                }
+            // Apply theme immediately for preview
+            if (window.applyTheme) {
+                window.applyTheme(selectedTheme);
             }
         });
     }
 
-    // Navigation layout - REMOVED PREVIEW FUNCTIONALITY
-    // The navigation changes will only apply after form submission
+    // Navigation layout preview - Apply immediately
     if (navigationSelect) {
         navigationSelect.addEventListener("change", function () {
             const selectedLayout = this.value;
-            console.log(
-                "Navigation layout will change to:",
-                selectedLayout,
-                "after saving"
-            );
-            // No immediate layout changes - only after form submission
+            console.log("Navigation layout changed to:", selectedLayout);
+
+            // Apply layout changes immediately
+            const body = document.body;
+            body.classList.remove("layout-navbar", "layout-navbar-v2");
+
+            if (selectedLayout === "navbar") {
+                body.classList.add("layout-navbar");
+            } else if (selectedLayout === "both") {
+                body.classList.add("layout-navbar-v2");
+            }
+            // 'sidebar' is the default, no additional class needed
         });
     }
 
@@ -168,7 +158,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (debugMode) {
                 document.body.classList.add("debug-mode");
-                // You could show debug information here
             } else {
                 document.body.classList.remove("debug-mode");
             }
@@ -244,7 +233,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         } will reload the page. Continue?`
                     )
                 ) {
-                    // You might want to submit the form automatically or show a reload notice
                     console.log(
                         "Language will change to:",
                         langNames[this.value]

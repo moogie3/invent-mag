@@ -2,6 +2,7 @@
     $themeMode = auth()->user()->system_settings['theme_mode'] ?? 'light';
     $navigationType = auth()->user()->system_settings['navigation_type'] ?? 'sidebar';
     $sidebarLock = auth()->user()->system_settings['sidebar_lock'] ?? false;
+    $stickyNavbar = auth()->user()->system_settings['sticky_navbar'] ?? false;
 @endphp
 
 <!DOCTYPE html>
@@ -46,7 +47,7 @@
     </style>
 </head>
 
-<body class="antialiased {{ $themeMode === 'dark' ? 'theme-dark' : '' }} {{ $navigationType === 'navbar' ? 'layout-navbar' : ($navigationType === 'both' ? 'layout-navbar-v2' : '') }} {{ $sidebarLock ? 'sidebar-locked' : '' }}">
+<body class="antialiased {{ $navigationType === 'navbar' ? 'layout-navbar' : ($navigationType === 'both' ? 'layout-navbar-v2' : '') }} {{ $sidebarLock ? 'sidebar-locked' : '' }} {{ $stickyNavbar ? 'sticky_navbar' : '' }}" data-bs-theme="{{ $themeMode === 'dark' ? 'dark' : 'light' }}" data-show-theme-toggle="{{ auth()->user()->system_settings['show_theme_toggle'] ?? true ? 'true' : 'false' }}">
     <div class="page-loader">
         <div class="container container-slim py-4">
             <div class="text-center">
@@ -70,4 +71,5 @@
     @include('admin.layouts.script')
     @include('admin.layouts.partials.session-notifications')
     @vite('resources/js/admin/layouts/page-loader.js')
+    @vite('resources/js/admin/layouts/theme-toggle.js')
 </body>

@@ -9,22 +9,19 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // Persistent sidebar lock state using localStorage
-    let sidebarLocked = localStorage.getItem("sidebarLocked") === "true";
-
     // Create lock button
     const createLockButton = function () {
         const lockButton = document.createElement("button");
         lockButton.className = "sidebar-lock-btn";
-        lockButton.innerHTML = sidebarLocked
+        lockButton.innerHTML = document.body.classList.contains('sidebar-locked')
             ? '<i class="ti ti-lock"></i>'
             : '<i class="ti ti-lock-open"></i>';
-        lockButton.title = sidebarLocked
+        lockButton.title = document.body.classList.contains('sidebar-locked')
             ? "Unlock sidebar (allows auto-close)"
             : "Lock sidebar (prevents auto-close)";
 
         // Add initial locked/unlocked class
-        if (sidebarLocked) {
+        if (document.body.classList.contains('sidebar-locked')) {
             lockButton.classList.add("locked");
         } else {
             lockButton.classList.add("unlocked");
@@ -41,16 +38,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const lockButton = createLockButton();
 
-    // Toggle lock functionality with persistence
+    // Toggle lock functionality
     const toggleLock = function () {
-        sidebarLocked = !sidebarLocked;
-
-        // Save state to localStorage
-        localStorage.setItem("sidebarLocked", sidebarLocked.toString());
+        document.body.classList.toggle("sidebar-locked");
 
         const icon = lockButton.querySelector("i");
 
-        if (sidebarLocked) {
+        if (document.body.classList.contains('sidebar-locked')) {
             icon.className = "ti ti-lock";
             lockButton.classList.add("locked");
             lockButton.classList.remove("unlocked");
@@ -236,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (
             isOpen &&
-            !sidebarLocked && // Only close if not locked
+            !document.body.classList.contains("sidebar-locked") && // Only close if not locked
             !sidebar.contains(e.target) &&
             !sidebarToggle?.contains(e.target)
         ) {

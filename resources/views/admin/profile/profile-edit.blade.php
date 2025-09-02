@@ -20,27 +20,33 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-4">
                                         <h3 class="card-title">Profile Details</h3>
-                                        <button type="button" class="btn btn-ghost-danger" data-bs-toggle="modal"
-                                            data-bs-target="#deleteAvatarModal">
-                                            Delete avatar
-                                        </button>
                                     </div>
                                     <form id="profileForm" action="{{ route('admin.setting.profile.update') }}"
                                         method="POST" enctype="multipart/form-data">
                                         @method('PUT')
                                         @csrf
-                                        <div class="row align-items-center">
-                                            @if (auth()->user()->avatar)
-                                                <span class="avatar avatar-xl"
-                                                    style="background-image: url('{{ asset('storage/' . auth()->user()->avatar) }}'); width: 100px; height: 100px;">
-                                                </span>
-                                            @else
-                                                <span class="avatar avatar-xl avatar-initial rounded-circle"
-                                                    style="width: 100px; height: 100px;">
-                                                    <i class="ti ti-person" style="font-size: 4rem;"></i>
-                                                </span>
-                                            @endif
-                                            <div class="col-auto"><input type="file" name="avatar" class="form-control">
+                                        <div class="mb-4">
+                                            <label class="form-label">Profile Picture</label>
+                                            <div class="d-flex align-items-center gap-3">
+                                                @if (auth()->user()->avatar)
+                                                    <span class="avatar avatar-xl"
+                                                        style="background-image: url('{{ asset('storage/' . auth()->user()->avatar) }}'); width: 100px; height: 100px;">
+                                                    </span>
+                                                @else
+                                                    <span class="avatar avatar-xl avatar-initial rounded-circle"
+                                                        style="width: 100px; height: 100px;">
+                                                        <i class="ti ti-person" style="font-size: 4rem;"></i>
+                                                    </span>
+                                                @endif
+                                                <div class="d-flex flex-column gap-2">
+                                                    <input type="file" name="avatar" class="form-control">
+                                                    @if (auth()->user()->avatar)
+                                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                                            data-bs-toggle="modal" data-bs-target="#deleteAvatarModal">
+                                                            <i class="ti ti-trash me-1"></i>Remove current picture
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
                                         <h3 class="card-title mt-4">Business Profile</h3>

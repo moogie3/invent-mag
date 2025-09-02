@@ -57,7 +57,8 @@
                                                             </option>
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-6">
+
+                                                    <div class="col-md-6" id="sidebar-options-wrapper">
                                                         <div class="form-label">Sidebar Options</div>
                                                         <div class="form-check form-switch">
                                                             <input class="form-check-input" type="checkbox"
@@ -374,5 +375,5 @@
         </div>
     </div>
 
-    
+
 @endsection

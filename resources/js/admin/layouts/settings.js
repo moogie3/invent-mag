@@ -147,15 +147,31 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Disable navbar options when sidebar is selected
+    // Disable sidebar/navbar options based on navigation type
     const navigationSelectForDisable = document.querySelector('select[name="navigation_type"]');
+    const sidebarOptionsWrapper = document.getElementById('sidebar-options-wrapper');
+    const sidebarLockCheckbox = document.querySelector('input[name="sidebar_lock"]');
     const navbarOptionsWrapper = document.getElementById('navbar-options-wrapper');
     const stickyNavbarCheckbox = document.querySelector('input[name="sticky_navbar"]');
 
-    function toggleNavbarOptions() {
-        if (navigationSelectForDisable.value === 'sidebar') {
+    function toggleNavOptions() {
+        const selectedValue = navigationSelectForDisable.value;
+
+        // Sidebar options
+        if (selectedValue === 'navbar') {
+            sidebarOptionsWrapper.classList.add('disabled');
+            sidebarLockCheckbox.disabled = true;
+            sidebarLockCheckbox.checked = false;
+        } else {
+            sidebarOptionsWrapper.classList.remove('disabled');
+            sidebarLockCheckbox.disabled = false;
+        }
+
+        // Navbar options
+        if (selectedValue === 'sidebar') {
             navbarOptionsWrapper.classList.add('disabled');
             stickyNavbarCheckbox.disabled = true;
+            stickyNavbarCheckbox.checked = false;
         } else {
             navbarOptionsWrapper.classList.remove('disabled');
             stickyNavbarCheckbox.disabled = false;
@@ -163,8 +179,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (navigationSelectForDisable) {
-        toggleNavbarOptions(); // Call on page load
-        navigationSelectForDisable.addEventListener('change', toggleNavbarOptions);
+        toggleNavOptions(); // Call on page load
+        navigationSelectForDisable.addEventListener('change', toggleNavOptions);
     }
 
     // Sticky navbar preview

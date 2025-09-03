@@ -1,4 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Retrieve currency settings from meta tags
+    const currencySettings = {
+        locale: document.querySelector('meta[name="currency-locale"]').getAttribute('content'),
+        currency_code: document.querySelector('meta[name="currency-code"]').getAttribute('content'),
+        decimal_places: parseInt(document.querySelector('meta[name="currency-decimal-places"]').getAttribute('content')),
+    };
+
     // DOM Elements
     const productList = document.getElementById("productList");
     const subtotalElement = document.getElementById("subtotal");

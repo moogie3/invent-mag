@@ -9,9 +9,8 @@
                 Are you sure you want to update the currency settings?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmSubmit">Yes,
-                    Save</button>
+                <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmSubmit">Save</button>
             </div>
         </div>
     </div>

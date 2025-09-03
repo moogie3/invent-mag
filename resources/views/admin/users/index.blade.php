@@ -32,6 +32,8 @@
                                                     </a>
                                                 </div>
                                             </div>
+                                            <hr class="my-0">
+                                            <!-- Replace your role statistics section with this -->
 
                                             {{-- User Statistics --}}
                                             <div class="row">
@@ -40,8 +42,7 @@
                                                         <div class="card-body">
                                                             <div class="row align-items-center">
                                                                 <div class="col-auto">
-                                                                    <span
-                                                                        class="bg-gradient-to-r from-red-500 to-red-600 text-white avatar avatar-lg">
+                                                                    <span class="bg-red text-white avatar avatar-lg">
                                                                         <i class="ti ti-crown fs-3"></i>
                                                                     </span>
                                                                 </div>
@@ -49,7 +50,7 @@
                                                                     <div class="font-weight-bold text-lg mb-1">
                                                                         Superuser
                                                                     </div>
-                                                                    <div class="h2 mb-0 text-red-600">
+                                                                    <div class="h2 mb-0 text-red">
                                                                         {{ $users->filter(function ($user) {return $user->hasRole('superuser');})->count() }}
                                                                     </div>
                                                                     <div class="text-muted small">
@@ -57,8 +58,8 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-auto">
-                                                                    <div class="bg-red-50 rounded-circle p-2">
-                                                                        <i class="ti ti-shield-check text-red-500"></i>
+                                                                    <div class="bg-red-lt rounded-circle p-2">
+                                                                        <i class="ti ti-shield-check text-red"></i>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -70,8 +71,7 @@
                                                         <div class="card-body">
                                                             <div class="row align-items-center">
                                                                 <div class="col-auto">
-                                                                    <span
-                                                                        class="bg-gradient-to-r from-blue-500 to-blue-600 text-white avatar avatar-lg">
+                                                                    <span class="bg-blue text-white avatar avatar-lg">
                                                                         <i class="ti ti-user-shield fs-3"></i>
                                                                     </span>
                                                                 </div>
@@ -79,7 +79,7 @@
                                                                     <div class="font-weight-bold text-lg mb-1">
                                                                         Staff
                                                                     </div>
-                                                                    <div class="h2 mb-0 text-blue-600">
+                                                                    <div class="h2 mb-0 text-blue">
                                                                         {{ $users->filter(function ($user) {return $user->hasRole('staff');})->count() }}
                                                                     </div>
                                                                     <div class="text-muted small">
@@ -87,8 +87,8 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-auto">
-                                                                    <div class="bg-blue-50 rounded-circle p-2">
-                                                                        <i class="ti ti-briefcase text-blue-500"></i>
+                                                                    <div class="bg-blue-lt rounded-circle p-2">
+                                                                        <i class="ti ti-briefcase text-blue"></i>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -100,8 +100,7 @@
                                                         <div class="card-body">
                                                             <div class="row align-items-center">
                                                                 <div class="col-auto">
-                                                                    <span
-                                                                        class="bg-gradient-to-r from-green-500 to-green-600 text-white avatar avatar-lg">
+                                                                    <span class="bg-green text-white avatar avatar-lg">
                                                                         <i class="ti ti-device-desktop-analytics fs-3"></i>
                                                                     </span>
                                                                 </div>
@@ -109,7 +108,7 @@
                                                                     <div class="font-weight-bold text-lg mb-1">
                                                                         POS
                                                                     </div>
-                                                                    <div class="h2 mb-0 text-green-600">
+                                                                    <div class="h2 mb-0 text-green">
                                                                         {{ $users->filter(function ($user) {return $user->hasRole('pos');})->count() }}
                                                                     </div>
                                                                     <div class="text-muted small">
@@ -117,8 +116,8 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-auto">
-                                                                    <div class="bg-green-50 rounded-circle p-2">
-                                                                        <i class="ti ti-cash text-green-500"></i>
+                                                                    <div class="bg-green-lt rounded-circle p-2">
+                                                                        <i class="ti ti-cash text-green"></i>
                                                                     </div>
                                                                 </div>
                                                             </div>

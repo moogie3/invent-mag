@@ -59,7 +59,7 @@ class SettingsController extends Controller
 
             Log::debug('Before save - show_theme_toggle:', [
                 'value' => $user->system_settings['show_theme_toggle'] ?? 'not set',
-                'user_id' => $user->id
+                'user_id' => Auth::id()
             ]);
 
             // Save the user
@@ -70,11 +70,11 @@ class SettingsController extends Controller
 
             Log::debug('After save (and refresh) - show_theme_toggle:', [
                 'value' => $user->system_settings['show_theme_toggle'] ?? 'not set',
-                'user_id' => $user->id
+                'user_id' => Auth::id()
             ]);
 
             Log::info('System settings updated successfully', [
-                'user_id' => $user->id,
+                'user_id' => Auth::id(),
                 'theme_mode' => $settingsToSave['theme_mode'],
                 'settings' => $settingsToSave
             ]);
@@ -108,7 +108,7 @@ class SettingsController extends Controller
             $user->save();
 
             Log::info('Theme mode updated', [
-                'user_id' => $user->id,
+                'user_id' => Auth::id(),
                 'theme_mode' => $validatedData['theme_mode']
             ]);
 

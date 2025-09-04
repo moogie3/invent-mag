@@ -77,6 +77,11 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             if (data.success) {
                 console.log('Theme setting saved successfully.');
+                // Dispatch a custom event to notify other parts of the application
+                const event = new CustomEvent('themeModeUpdated', {
+                    detail: { themeMode: newTheme }
+                });
+                document.dispatchEvent(event);
             } else {
                 console.error('Error saving theme setting:', data.message);
             }

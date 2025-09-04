@@ -140,6 +140,25 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function updateThemeModeDropdownState() {
+        if (showThemeToggleCheckbox && themeModeSelect) {
+            themeModeSelect.disabled = showThemeToggleCheckbox.checked;
+        }
+    }
+
+    if (showThemeToggleCheckbox) {
+        showThemeToggleCheckbox.addEventListener('change', updateThemeModeDropdownState);
+        updateThemeModeDropdownState(); // Set initial state on page load
+    }
+
+    // Listen for theme changes from theme-toggle.js
+    document.addEventListener('themeModeUpdated', function(event) {
+        const newThemeMode = event.detail.themeMode;
+        if (themeModeSelect) {
+            themeModeSelect.value = newThemeMode;
+        }
+    });
+
     // Removed client-side immediate update for theme toggle visibility
     // if (showThemeToggleCheckbox) {
     //     showThemeToggleCheckbox.addEventListener('change', updateThemeToggleState);

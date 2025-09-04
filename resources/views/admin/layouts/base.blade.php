@@ -6,7 +6,7 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="{{ $themeMode }}">
 
 <head>
     <meta charset="utf-8" />

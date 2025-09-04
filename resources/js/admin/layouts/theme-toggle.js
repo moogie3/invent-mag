@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const body = document.body;
+    const htmlElement = document.documentElement;
     const navbarToggleContainer = document.getElementById(
         "theme-toggle-navbar-container"
     );
@@ -18,11 +18,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (navbarLightIcon && navbarDarkIcon) {
             if (theme === "dark") {
-                navbarLightIcon.style.display = "none";
-                navbarDarkIcon.style.display = "inline";
-            } else {
-                navbarLightIcon.style.display = "inline";
+                navbarLightIcon.style.display = "inline"; // Show sun icon in dark mode
                 navbarDarkIcon.style.display = "none";
+            } else {
+                navbarLightIcon.style.display = "none";
+                navbarDarkIcon.style.display = "inline"; // Show moon icon in light mode
             }
         }
 
@@ -36,36 +36,59 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (sidebarLightIcon && sidebarDarkIcon) {
             if (theme === "dark") {
-                sidebarLightIcon.style.display = "none";
-                sidebarDarkIcon.style.display = "inline";
-            } else {
-                sidebarLightIcon.style.display = "inline";
+                sidebarLightIcon.style.display = "inline"; // Show sun icon in dark mode
                 sidebarDarkIcon.style.display = "none";
+            } else {
+                sidebarLightIcon.style.display = "none";
+                sidebarDarkIcon.style.display = "inline"; // Show moon icon in light mode
             }
         }
     }
 
     function toggleTheme() {
-        const currentTheme = body.getAttribute("data-bs-theme");
-        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        const currentTheme = htmlElement.getAttribute('data-bs-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
-        console.log("Current theme:", currentTheme, "New theme:", newTheme);
-
-        // Update the theme mode select and body attribute for preview
-        const themeModeSelect = document.getElementById('themeModeSelect');
-        if (themeModeSelect) {
-            themeModeSelect.value = newTheme;
+        if (newTheme === 'dark') {
+            htmlElement.setAttribute('data-bs-theme', 'dark');
+        } else {
+            htmlElement.removeAttribute('data-bs-theme');
         }
-        body.setAttribute("data-bs-theme", newTheme);
 
-        // Update icons immediately for preview
         updateThemeIcons(newTheme);
+
+        // Send an AJAX request to update the user's system settings
+        fetch('/admin/settings/update-theme-mode', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                theme_mode: newTheme,
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Failed to save theme setting:', response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                console.log('Theme setting saved successfully.');
+            } else {
+                console.error('Error saving theme setting:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error sending AJAX request for theme setting:', error);
+        });
     }
 
-    // Initialize theme icons based on current theme mode select value
-    const themeModeSelect = document.getElementById('themeModeSelect');
-    const currentTheme = themeModeSelect ? themeModeSelect.value : "light"; // Default to light if select not found
-    updateThemeIcons(currentTheme);
+    // Initialize theme icons based on current theme mode from html element
+    const initialTheme = htmlElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
+    updateThemeIcons(initialTheme);
 
     // Add event listeners to the toggle buttons
     if (navbarToggleContainer) {

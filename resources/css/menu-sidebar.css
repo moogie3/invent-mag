@@ -786,6 +786,12 @@ body[data-bs-theme="dark"] .sidebar-actions .nav-link:hover,
     color: #000000 !important;
 }
 
+/* Custom: Make theme toggle and bell icons white in dark mode */
+[data-bs-theme="dark"] #theme-toggle-sidebar i,
+[data-bs-theme="dark"] #notification-bell-sidebar i {
+    color: #ffffff !important;
+}
+
 [data-bs-theme="dark"] .sidebar .navbar-nav .nav-link,
 html[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link,
 body[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link,

@@ -410,6 +410,12 @@
     color: #000000 !important;
 }
 
+/* Custom: Make theme toggle and bell icons white in dark mode */
+[data-bs-theme="dark"] #theme-toggle-navbar i,
+[data-bs-theme="dark"] #notification-bell i {
+    color: #ffffff !important;
+}
+
 /* FIXED: Dark mode notification bell dropdown hover - override Bootstrap defaults */
 [data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:hover,
 [data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus,

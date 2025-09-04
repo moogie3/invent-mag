@@ -114,9 +114,10 @@
                                                     <div class="col-md-6">
                                                         <div class="form-label">Theme Toggle Visibility</div>
                                                         <div class="form-check form-switch">
+                                                            <input type="hidden" name="show_theme_toggle" value="0">
                                                             <input class="form-check-input" type="checkbox"
-                                                                name="show_theme_toggle" id="showThemeToggleCheckbox"
-                                                                {{ auth()->user()->system_settings['show_theme_toggle'] ?? true ? 'checked' : '' }}>
+                                                                name="show_theme_toggle" id="showThemeToggleCheckbox" value="1"
+                                                                {{ (auth()->user()->system_settings['show_theme_toggle'] ?? true) ? 'checked' : '' }}>
                                                             <label class="form-check-label">Show Theme Toggle Button</label>
                                                         </div>
                                                     </div>

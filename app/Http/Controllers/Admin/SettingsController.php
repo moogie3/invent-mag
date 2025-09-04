@@ -48,7 +48,7 @@ class SettingsController extends Controller
             $settingsToSave = $validatedData;
 
             foreach ($checkboxFields as $field) {
-                $settingsToSave[$field] = $request->has($field);
+                $settingsToSave[$field] = $request->input($field) ? true : false;
             }
 
             // Get existing settings or create empty array

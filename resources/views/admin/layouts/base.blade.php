@@ -79,9 +79,10 @@
     @include('admin.layouts.partials.session-notifications')
     @vite('resources/js/admin/layouts/page-loader.js')
     @vite('resources/js/admin/layouts/theme-toggle.js')
+    @vite('resources/js/admin/layouts/theme-visibility.js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const showThemeToggle = {{ auth()->user()->system_settings['show_theme_toggle'] ?? 'true' ? 'true' : 'false' }};
+            const showThemeToggle = {{ json_encode(auth()->user()->system_settings['show_theme_toggle'] ?? true) }};
             console.log('show_theme_toggle setting (from base.blade.php):', showThemeToggle);
         });
     </script>

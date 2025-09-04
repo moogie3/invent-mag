@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('remember_token', 100)->nullable();
             $table->string('avatar')->nullable();
             $table->string('timezone')->nullable();
+            $table->json('system_settings')->nullable();
             $table->timestamps();
         });
 

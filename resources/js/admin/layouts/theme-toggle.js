@@ -51,43 +51,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("Current theme:", currentTheme, "New theme:", newTheme);
 
-        // Apply theme immediately
-        window.applyTheme(newTheme);
+        // Update the theme mode select and body attribute for preview
+        const themeModeSelect = document.getElementById('themeModeSelect');
+        if (themeModeSelect) {
+            themeModeSelect.value = newTheme;
+        }
+        body.setAttribute("data-bs-theme", newTheme);
 
-        // Update icons immediately
+        // Update icons immediately for preview
         updateThemeIcons(newTheme);
-
-        // Send to backend to save preference
-        fetch("/admin/settings/update-theme-mode", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-            body: JSON.stringify({ theme_mode: newTheme }),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log("Theme mode updated on backend:", data);
-            })
-            .catch((error) => {
-                console.error("Error updating theme mode:", error);
-                // Revert theme if backend update fails
-                window.applyTheme(currentTheme);
-                updateThemeIcons(currentTheme);
-            });
     }
 
     function updateToggleVisibility() {
-        const showToggle =
-            body.getAttribute("data-show-theme-toggle") === "true";
+        const showThemeToggleCheckbox = document.getElementById('showThemeToggleCheckbox');
+        const showToggle = showThemeToggleCheckbox ? showThemeToggleCheckbox.checked : true; // Default to true if checkbox not found
+
         if (navbarToggleContainer) {
             navbarToggleContainer.style.display = showToggle ? "block" : "none";
         }
@@ -98,8 +76,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Initialize theme icons based on current theme
-    const currentTheme = body.getAttribute("data-bs-theme") || "light";
+    // Initialize theme icons based on current theme mode select value
+    const themeModeSelect = document.getElementById('themeModeSelect');
+    const currentTheme = themeModeSelect ? themeModeSelect.value : "light"; // Default to light if select not found
     updateThemeIcons(currentTheme);
     updateToggleVisibility();
 

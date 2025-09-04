@@ -95,9 +95,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Apply theme immediately for preview
             if (window.applyTheme) {
-                window.applyTheme(selectedTheme);
+                // window.applyTheme(selectedTheme);
+                document.body.setAttribute("data-bs-theme", selectedTheme);
             }
         });
+    }
+
+    const showThemeToggleCheckbox = document.getElementById('showThemeToggleCheckbox');
+    const themeModeSelect = document.getElementById('themeModeSelect');
+    const navbarToggleContainer = document.getElementById("theme-toggle-navbar-container");
+    const sidebarToggleContainer = document.getElementById("theme-toggle-sidebar-container");
+
+    function updateThemeToggleState() {
+        if (!showThemeToggleCheckbox || !themeModeSelect) return;
+
+        if (showThemeToggleCheckbox.checked) {
+            themeModeSelect.disabled = true;
+            if (navbarToggleContainer) navbarToggleContainer.style.display = "block";
+            if (sidebarToggleContainer) sidebarToggleContainer.style.display = "block";
+        } else {
+            themeModeSelect.disabled = false;
+            if (navbarToggleContainer) navbarToggleContainer.style.display = "none";
+            if (sidebarToggleContainer) sidebarToggleContainer.style.display = "none";
+        }
+    }
+
+    if (showThemeToggleCheckbox) {
+        showThemeToggleCheckbox.addEventListener('change', updateThemeToggleState);
+        updateThemeToggleState(); // Set initial state
     }
 
     

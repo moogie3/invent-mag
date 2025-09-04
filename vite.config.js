@@ -33,6 +33,7 @@ export default defineConfig({
                 "resources/js/admin/layouts/settings.js",
                 "resources/css/menu-sidebar.css",
                 "resources/js/menu-sidebar.js",
+                "resources/js/admin/layouts/theme-toggle.js",
             ],
             refresh: true,
         }),

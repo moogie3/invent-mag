@@ -34,8 +34,12 @@ document.addEventListener('DOMContentLoaded', function () {
         // 1. Set the checkbox state
         visibilityCheckbox.checked = shouldShow;
 
-        // 2. Enable/disable the theme mode dropdown
-        themeModeSelect.disabled = shouldShow;
+        // 2. Make the theme mode dropdown readonly if theme toggle is visible
+        if (shouldShow) {
+            themeModeSelect.classList.add('readonly-select');
+        } else {
+            themeModeSelect.classList.remove('readonly-select');
+        }
     }
 
     // --- Event Listeners ---

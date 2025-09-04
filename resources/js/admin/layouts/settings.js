@@ -101,69 +101,33 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    const showThemeToggleCheckbox = document.getElementById('showThemeToggleCheckbox');
-    const themeModeSelect = document.getElementById('themeModeSelect');
-    const navbarToggleContainer = document.getElementById("theme-toggle-navbar-container");
-    const sidebarToggleContainer = document.getElementById("theme-toggle-sidebar-container");
-
-    function updateThemeToggleState() {
-        console.log('updateThemeToggleState called.');
-        if (!showThemeToggleCheckbox || !themeModeSelect) {
-            console.log('Missing checkbox or themeModeSelect.');
-            return;
-        }
-
-        console.log('showThemeToggleCheckbox.checked:', showThemeToggleCheckbox.checked);
-        console.log('navbarToggleContainer:', navbarToggleContainer);
-        console.log('sidebarToggleContainer:', sidebarToggleContainer);
-
-        if (showThemeToggleCheckbox.checked) {
-            
-            if (navbarToggleContainer) {
-                navbarToggleContainer.style.display = "block";
-                console.log('Navbar toggle set to block.');
-            }
-            if (sidebarToggleContainer) {
-                sidebarToggleContainer.style.display = "block";
-                console.log('Sidebar toggle set to block.');
-            }
-        } else {
-            
-            if (navbarToggleContainer) {
-                navbarToggleContainer.style.display = "none";
-                console.log('Navbar toggle set to none.');
-            }
-            if (sidebarToggleContainer) {
-                sidebarToggleContainer.style.display = "none";
-                console.log('Sidebar toggle set to none.');
-            }
-        }
-    }
-
-    function updateThemeModeDropdownState() {
-        if (showThemeToggleCheckbox && themeModeSelect) {
-            themeModeSelect.disabled = showThemeToggleCheckbox.checked;
-        }
-    }
-
-    if (showThemeToggleCheckbox) {
-        showThemeToggleCheckbox.addEventListener('change', updateThemeModeDropdownState);
-        updateThemeModeDropdownState(); // Set initial state on page load
-    }
-
     // Listen for theme changes from theme-toggle.js
     document.addEventListener('themeModeUpdated', function(event) {
         const newThemeMode = event.detail.themeMode;
+        const themeModeSelect = document.getElementById('themeModeSelect');
+
         if (themeModeSelect) {
             themeModeSelect.value = newThemeMode;
+            const changeEvent = new Event('change');
+            themeModeSelect.dispatchEvent(changeEvent);
         }
     });
 
-    // Removed client-side immediate update for theme toggle visibility
-    // if (showThemeToggleCheckbox) {
-    //     showThemeToggleCheckbox.addEventListener('change', updateThemeToggleState);
-    //     updateThemeToggleState(); // Set initial state
-    // }
+    // Listen for manual changes on themeModeSelect
+    const themeModeSelect = document.querySelector('select[name="theme_mode"]');
+    const showThemeToggleCheckbox = document.getElementById('showThemeToggleCheckbox');
+
+    if (themeModeSelect && showThemeToggleCheckbox) {
+        themeModeSelect.addEventListener('change', function(event) {
+            // Check if the change was initiated by user interaction (not programmatic)
+            if (event.isTrusted && showThemeToggleCheckbox.checked) {
+                showThemeToggleCheckbox.checked = false;
+                // Manually trigger the change event on the checkbox to update visibility and enable themeModeSelect
+                const checkboxChangeEvent = new Event('change');
+                showThemeToggleCheckbox.dispatchEvent(checkboxChangeEvent);
+            }
+        });
+    }
 
     
 

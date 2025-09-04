@@ -1873,3 +1873,10 @@ body.layout-navbar-v2 .sidebar,
 body.layout-navbar-v2 .navbar {
     display: block !important;
 }
+
+/* Styles for readonly select elements */
+.readonly-select {
+    pointer-events: none;
+    opacity: 0.6; /* Optional: to visually indicate it's not interactive */
+    cursor: not-allowed; /* Optional: to visually indicate it's not interactive */
+}

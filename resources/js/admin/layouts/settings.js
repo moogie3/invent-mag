@@ -107,16 +107,36 @@ document.addEventListener("DOMContentLoaded", function () {
     const sidebarToggleContainer = document.getElementById("theme-toggle-sidebar-container");
 
     function updateThemeToggleState() {
-        if (!showThemeToggleCheckbox || !themeModeSelect) return;
+        console.log('updateThemeToggleState called.');
+        if (!showThemeToggleCheckbox || !themeModeSelect) {
+            console.log('Missing checkbox or themeModeSelect.');
+            return;
+        }
+
+        console.log('showThemeToggleCheckbox.checked:', showThemeToggleCheckbox.checked);
+        console.log('navbarToggleContainer:', navbarToggleContainer);
+        console.log('sidebarToggleContainer:', sidebarToggleContainer);
 
         if (showThemeToggleCheckbox.checked) {
-            themeModeSelect.disabled = true;
-            if (navbarToggleContainer) navbarToggleContainer.style.display = "block";
-            if (sidebarToggleContainer) sidebarToggleContainer.style.display = "block";
+            
+            if (navbarToggleContainer) {
+                navbarToggleContainer.style.display = "block";
+                console.log('Navbar toggle set to block.');
+            }
+            if (sidebarToggleContainer) {
+                sidebarToggleContainer.style.display = "block";
+                console.log('Sidebar toggle set to block.');
+            }
         } else {
-            themeModeSelect.disabled = false;
-            if (navbarToggleContainer) navbarToggleContainer.style.display = "none";
-            if (sidebarToggleContainer) sidebarToggleContainer.style.display = "none";
+            
+            if (navbarToggleContainer) {
+                navbarToggleContainer.style.display = "none";
+                console.log('Navbar toggle set to none.');
+            }
+            if (sidebarToggleContainer) {
+                sidebarToggleContainer.style.display = "none";
+                console.log('Sidebar toggle set to none.');
+            }
         }
     }
 

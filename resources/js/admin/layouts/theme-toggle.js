@@ -62,25 +62,10 @@ document.addEventListener("DOMContentLoaded", function () {
         updateThemeIcons(newTheme);
     }
 
-    function updateToggleVisibility() {
-        const showThemeToggleCheckbox = document.getElementById('showThemeToggleCheckbox');
-        const showToggle = showThemeToggleCheckbox ? showThemeToggleCheckbox.checked : true; // Default to true if checkbox not found
-
-        if (navbarToggleContainer) {
-            navbarToggleContainer.style.display = showToggle ? "block" : "none";
-        }
-        if (sidebarToggleContainer) {
-            sidebarToggleContainer.style.display = showToggle
-                ? "block"
-                : "none";
-        }
-    }
-
     // Initialize theme icons based on current theme mode select value
     const themeModeSelect = document.getElementById('themeModeSelect');
     const currentTheme = themeModeSelect ? themeModeSelect.value : "light"; // Default to light if select not found
     updateThemeIcons(currentTheme);
-    updateToggleVisibility();
 
     // Add event listeners to the toggle buttons
     if (navbarToggleContainer) {

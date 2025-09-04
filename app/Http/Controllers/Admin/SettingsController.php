@@ -57,10 +57,23 @@ class SettingsController extends Controller
             // Merge with new settings
             $user->system_settings = array_merge($existingSettings, $settingsToSave);
 
+            Log::debug('Before save - show_theme_toggle:', [
+                'value' => $user->system_settings['show_theme_toggle'] ?? 'not set',
+                'user_id' => $user->id
+            ]);
+
             // Save the user
             $user->save();
 
-            Log::info('System settings updated', [
+            // Reload the user from the database to get the latest settings
+            $user->refresh();
+
+            Log::debug('After save (and refresh) - show_theme_toggle:', [
+                'value' => $user->system_settings['show_theme_toggle'] ?? 'not set',
+                'user_id' => $user->id
+            ]);
+
+            Log::info('System settings updated successfully', [
                 'user_id' => $user->id,
                 'theme_mode' => $settingsToSave['theme_mode'],
                 'settings' => $settingsToSave

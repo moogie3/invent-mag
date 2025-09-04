@@ -140,10 +140,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    if (showThemeToggleCheckbox) {
-        showThemeToggleCheckbox.addEventListener('change', updateThemeToggleState);
-        updateThemeToggleState(); // Set initial state
-    }
+    // Removed client-side immediate update for theme toggle visibility
+    // if (showThemeToggleCheckbox) {
+    //     showThemeToggleCheckbox.addEventListener('change', updateThemeToggleState);
+    //     updateThemeToggleState(); // Set initial state
+    // }
 
     
 

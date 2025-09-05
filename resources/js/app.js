@@ -27,12 +27,7 @@ window.applyTheme = function (themeMode) {
 
     console.log("Applying theme mode:", themeMode);
 
-    if (themeMode === "auto") {
-        appliedTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
-        console.log("Auto theme resolved to:", appliedTheme);
-    }
+    
 
     // Set the data-bs-theme attribute for Bootstrap dark mode
     body.setAttribute("data-bs-theme", appliedTheme);
@@ -100,16 +95,5 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Listen for system theme changes when in auto mode
-    window
-        .matchMedia("(prefers-color-scheme: dark)")
-        .addEventListener("change", function (e) {
-            const currentMode =
-                document.body.getAttribute("data-theme-mode") || "light";
-            console.log("System theme changed. Current mode:", currentMode);
-            if (currentMode === "auto") {
-                console.log("System theme changed, reapplying auto theme");
-                window.applyTheme("auto");
-            }
-        });
+    
 });

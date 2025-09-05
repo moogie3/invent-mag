@@ -103,10 +103,7 @@
                                                                 {{ (auth()->user()->system_settings['theme_mode'] ?? 'light') === 'dark' ? 'selected' : '' }}>
                                                                 Dark Theme
                                                             </option>
-                                                            <option value="auto"
-                                                                {{ (auth()->user()->system_settings['theme_mode'] ?? 'light') === 'auto' ? 'selected' : '' }}>
-                                                                Auto (System Preference)
-                                                            </option>
+                                                            
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">

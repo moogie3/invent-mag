@@ -22,7 +22,7 @@ class SettingsController extends Controller
 
             $validatedData = $request->validate([
                 'navigation_type' => 'required|in:sidebar,navbar,both',
-                'theme_mode' => 'required|in:light,dark,auto',
+                'theme_mode' => 'required|in:light,dark',
                 'notification_duration' => 'required|integer|min:0',
                 'auto_logout_time' => 'required|integer|min:0',
                 'data_refresh_rate' => 'required|integer|min:0',
@@ -97,7 +97,7 @@ class SettingsController extends Controller
             $user = Auth::user();
 
             $validatedData = $request->validate([
-                'theme_mode' => 'required|in:light,dark,auto',
+                'theme_mode' => 'required|in:light,dark',
             ]);
 
             $existingSettings = $user->system_settings ?? [];

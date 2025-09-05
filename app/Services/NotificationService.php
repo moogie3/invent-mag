@@ -52,7 +52,7 @@ class NotificationService
             ->orderBy('due_date', 'asc')
             ->get()
             ->map(function ($po) use ($today) {
-                $daysRemaining = $today->diffInDays($po->due_date, false);
+                $daysRemaining = (int) $today->diffInDays($po->due_date, false);
                 $statusInfo = $this->getStatusInfo($po->status, $po->due_date, $po->payment_date);
                 $showNotification = $po->status !== 'Paid' || ($po->payment_date && $today->isSameDay($po->payment_date));
 
@@ -82,7 +82,7 @@ class NotificationService
             ->orderBy('due_date', 'asc')
             ->get()
             ->map(function ($sale) use ($today) {
-                $daysRemaining = $today->diffInDays($sale->due_date, false);
+                $daysRemaining = (int) $today->diffInDays($sale->due_date, false);
                 $statusInfo = $this->getStatusInfo($sale->status, $sale->due_date, $sale->payment_date);
                 $showNotification = $sale->status !== 'Paid' || ($sale->payment_date && $today->isSameDay($sale->payment_date));
 
@@ -132,7 +132,7 @@ class NotificationService
     protected function getExpiringProductNotifications(): Collection
     {
         return Product::getExpiringSoonProducts()->map(function ($product) {
-            $daysRemaining = Carbon::now()->diffInDays($product->expiry_date, false);
+            $daysRemaining = (int) Carbon::now()->diffInDays($product->expiry_date, false);
             [, $statusText] = \App\Helpers\ProductHelper::getExpiryClassAndText($product->expiry_date);
 
             return [
@@ -157,7 +157,7 @@ class NotificationService
     private function getStatusInfo(string $status, Carbon $dueDate, ? Carbon $paymentDate = null): array
     {
         $today = Carbon::today();
-        $diffDays = $today->diffInDays($dueDate, false);
+        $diffDays = (int) $today->diffInDays($dueDate, false);
 
         if ($status === 'Paid') {
             if ($paymentDate && $today->isSameDay($paymentDate)) {

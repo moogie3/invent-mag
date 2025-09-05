@@ -20,7 +20,7 @@ class ProductHelper
 
         $expiryDate = Carbon::parse($expiryDate)->startOfDay();
         $today = now()->startOfDay();
-        $diffDays = $today->diffInDays($expiryDate, false); // signed integer
+        $diffDays = (int) $today->diffInDays($expiryDate, false); // signed integer
 
         if ($expiryDate->isPast()) {
             return ['badge bg-red text-white', 'Expired'];

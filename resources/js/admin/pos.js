@@ -1,9 +1,17 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Retrieve currency settings from meta tags
     const currencySettings = {
-        locale: document.querySelector('meta[name="currency-locale"]').getAttribute('content'),
-        currency_code: document.querySelector('meta[name="currency-code"]').getAttribute('content'),
-        decimal_places: parseInt(document.querySelector('meta[name="currency-decimal-places"]').getAttribute('content')),
+        locale: document
+            .querySelector('meta[name="currency-locale"]')
+            .getAttribute("content"),
+        currency_code: document
+            .querySelector('meta[name="currency-code"]')
+            .getAttribute("content"),
+        decimal_places: parseInt(
+            document
+                .querySelector('meta[name="currency-decimal-places"]')
+                .getAttribute("content")
+        ),
     };
 
     // DOM Elements
@@ -273,8 +281,27 @@ document.addEventListener("DOMContentLoaded", function () {
         // Show quick feedback animation
         showAddToCartFeedback();
 
+        // Play success sound
+        playSuccessSound();
+
         // Update display
         renderList();
+    }
+
+    // Function to play a success sound
+    function playSuccessSound() {
+        const audio = new Audio("/audio/success.mp3");
+        audio.play().catch((e) => console.error("Error playing sound:", e));
+    }
+
+    function playDeleteSound() {
+        const audio = new Audio("/audio/delete.mp3");
+        audio.play().catch((e) => console.error("Error playing sound:", e));
+    }
+
+    function playDecreaseSound() {
+        const audio = new Audio("/audio/decrease.mp3");
+        audio.play().catch((e) => console.error("Error playing sound:", e));
     }
 
     // Show feedback animation when adding to cart
@@ -516,6 +543,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Clear cart button
     clearCartBtn.addEventListener("click", function () {
         if (products.length === 0) return;
+        playDeleteSound();
         clearCart();
     });
 
@@ -528,6 +556,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (removeBtn) {
             const index = parseInt(removeBtn.dataset.index);
             if (!isNaN(index)) {
+                playDeleteSound();
                 products.splice(index, 1);
                 renderList();
             }
@@ -535,10 +564,12 @@ document.addEventListener("DOMContentLoaded", function () {
             const index = parseInt(decreaseBtn.dataset.index);
             if (!isNaN(index)) {
                 if (products[index].quantity > 1) {
+                    playDecreaseSound();
                     products[index].quantity -= 1;
                     products[index].total =
                         products[index].quantity * products[index].price;
                 } else {
+                    playDeleteSound();
                     products.splice(index, 1); // Remove if quantity reaches 0
                 }
                 renderList();
@@ -546,6 +577,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if (increaseBtn) {
             const index = parseInt(increaseBtn.dataset.index);
             if (!isNaN(index)) {
+                playSuccessSound();
                 products[index].quantity += 1;
                 products[index].total =
                     products[index].quantity * products[index].price;
@@ -679,7 +711,6 @@ function setupQuickCreateCustomerForm() {
 
     customerForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        
 
         const form = this;
         const formData = new FormData(form);
@@ -781,7 +812,6 @@ function setupQuickCreateProductForm() {
 
     productForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        
 
         const form = this;
         const formData = new FormData(form);

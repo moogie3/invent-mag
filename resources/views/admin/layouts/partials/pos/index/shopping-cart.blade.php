@@ -37,7 +37,7 @@
 
             <hr>
 
-            <div class="d-flex justify-content-between fs-2 fw-bold text-primary">
+            <div class="d-flex justify-content-between fs-2 fw-bold text-success">
                 <span>Grand Total:</span>
                 <span id="finalTotal">Rp 0</span>
             </div>

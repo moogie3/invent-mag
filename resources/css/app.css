@@ -205,6 +205,34 @@ body {
 
 #productList .list-group-item:hover {
     background-color: #f8f9fa;
+    color: #000000 !important;
+}
+
+#productList .list-group-item:hover strong,
+#productList .list-group-item:hover span,
+#productList .list-group-item:hover p,
+#productList .list-group-item:hover div,
+#productList .list-group-item:hover * {
+    color: #000000 !important;
+}
+
+.theme-dark #productList .list-group-item:hover {
+    background-color: var(--tblr-bg-surface-secondary) !important; /* Darker background on hover in dark mode */
+}
+
+.theme-dark #productList .list-group-item:hover strong,
+.theme-dark #productList .list-group-item:hover span,
+.theme-dark #productList .list-group-item:hover p,
+.theme-dark #productList .list-group-item:hover div {
+    color: #000000 !important; /* Force text to black */
+}
+
+.theme-dark #productList .list-group-item:hover * {
+    color: #000000 !important; /* Force all text descendants to black */
+}
+
+.theme-dark #productList .list-group-item:hover .input-group-text {
+    color: #000000 !important; /* Force input group text to black */
 }
 
 .card-product-catalog {

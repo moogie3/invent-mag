@@ -1,11 +1,11 @@
 <header class="navbar navbar-expand-md d-print-none nav-container">
-    <div class="container-xl d-flex align-items-center">
+    <div class="container-xl d-flex align-items-center justify-content-between position-relative">
         <div class="d-flex flex-grow-1 nav-left align-items-center">
             <!-- Sidebar toggle will be in the sidebar itself -->
         </div>
 
         <!-- Centered Brand Title -->
-        <h1 class="navbar-brand text-center mx-auto position-relative" id="navbar-brand-title">
+        <h1 class="navbar-brand position-absolute top-50 start-50 translate-middle text-center" id="navbar-brand-title">
             <a class="nav-link" id="brand-trigger">
                 <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
             </a>

@@ -4,11 +4,7 @@
     display: block !important;
 }
 
-@media (min-width: 768px) {
-    .nav-left {
-        width: 200px;
-    }
-}
+
 
 /* Parent container */
 .nav-container {

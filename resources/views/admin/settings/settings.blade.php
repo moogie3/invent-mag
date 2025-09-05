@@ -13,19 +13,16 @@
                         </div>
                         <hr class="my-0">
                         <div class="row g-0">
-                            @if ((auth()->user()->system_settings['navigation_type'] ?? 'sidebar') !== 'navbar')
-                                <div class="col-12 col-md-3 border-end">
-                                    @include('admin.layouts.menu')
-                                </div>
-                            @endif
+                            <div class="col-12 col-md-3 border-end">
+                                @include('admin.layouts.menu')
+                            </div>
                             <div
-                                class="@if ((auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'navbar') col-12 @else col-12 col-md-9 @endif d-flex flex-column">
+                                class="@if ((auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'navbar') col-9 @else col-12 col-md-9 @endif d-flex flex-column">
                                 <div class="card-body">
                                     <form id="systemSettingsForm" action="{{ route('admin.setting.update') }}"
                                         method="POST">
                                         @method('PUT')
                                         @csrf
-
                                         <!-- Interface Layout Settings -->
                                         <div class="settings-section mb-5">
                                             <div class="settings-section-header">
@@ -96,7 +93,8 @@
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
                                                         <div class="form-label">Theme Mode</div>
-                                                        <select name="theme_mode" id="themeModeSelect" class="form-control" required>
+                                                        <select name="theme_mode" id="themeModeSelect" class="form-control"
+                                                            required>
                                                             <option value="light"
                                                                 {{ (auth()->user()->system_settings['theme_mode'] ?? 'light') === 'light' ? 'selected' : '' }}>
                                                                 Light Theme
@@ -116,8 +114,9 @@
                                                         <div class="form-check form-switch">
                                                             <input type="hidden" name="show_theme_toggle" value="0">
                                                             <input class="form-check-input" type="checkbox"
-                                                                name="show_theme_toggle" id="showThemeToggleCheckbox" value="1"
-                                                                {{ (auth()->user()->system_settings['show_theme_toggle'] ?? true) ? 'checked' : '' }}>
+                                                                name="show_theme_toggle" id="showThemeToggleCheckbox"
+                                                                value="1"
+                                                                {{ auth()->user()->system_settings['show_theme_toggle'] ?? true ? 'checked' : '' }}>
                                                             <label class="form-check-label">Show Theme Toggle Button</label>
                                                         </div>
                                                     </div>
@@ -163,7 +162,8 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-label">Notification Duration (seconds)</div>
-                                                        <select name="notification_duration" class="form-control" required>
+                                                        <select name="notification_duration" class="form-control"
+                                                            required>
                                                             <option value="3"
                                                                 {{ (auth()->user()->system_settings['notification_duration'] ?? '5') === '3' ? 'selected' : '' }}>
                                                                 3 seconds</option>
@@ -375,6 +375,4 @@
             </div>
         </div>
     </div>
-
-
 @endsection

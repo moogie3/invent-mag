@@ -405,8 +405,8 @@
 }
 
 /* FIXED: Dark icons on white background in dark mode hover */
-[data-bs-theme="dark"] .navbar .nav-link.px-0:hover i,
-[data-bs-theme="dark"] .navbar .nav-link.px-2:hover i {
+[data-bs-theme="dark"] #theme-toggle-navbar:hover i,
+[data-bs-theme="dark"] #notification-bell:hover i {
     color: #000000 !important;
 }
 

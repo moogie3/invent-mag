@@ -1,6 +1,6 @@
 <header class="navbar navbar-expand-md d-print-none nav-container">
-    <div class="container-xl d-flex justify-content-between align-items-center">
-        <div class="d-flex flex-shrink-0 nav-left">
+    <div class="container-xl d-flex align-items-center">
+        <div class="d-flex flex-grow-1 nav-left align-items-center">
             <!-- Sidebar toggle will be in the sidebar itself -->
         </div>
 
@@ -29,8 +29,8 @@
 
 
         <!-- Right Side Icons -->
-        <div class="d-none d-md-flex d-flex align-items-center" id="navbar-right-content">
-            
+        <div class="d-flex flex-grow-1 justify-content-end align-items-center" id="navbar-right-content">
+
 
             <!-- Theme Toggle Button -->
             <div class="nav-item me-2" id="theme-toggle-navbar-container">

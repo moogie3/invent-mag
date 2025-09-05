@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function toggleTheme() {
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
         const currentTheme = htmlElement.getAttribute('data-bs-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
@@ -57,12 +58,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         updateThemeIcons(newTheme);
 
+        if (!csrfTokenMeta) {
+            // Save to local storage if no CSRF token
+            localStorage.setItem('theme', newTheme);
+            return;
+        }
+
         // Send an AJAX request to update the user's system settings
         fetch('/admin/settings/update-theme-mode', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': csrfTokenMeta.getAttribute('content')
             },
             body: JSON.stringify({
                 theme_mode: newTheme,

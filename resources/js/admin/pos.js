@@ -304,6 +304,11 @@ document.addEventListener("DOMContentLoaded", function () {
         audio.play().catch((e) => console.error("Error playing sound:", e));
     }
 
+    function playCashSound() {
+        const audio = new Audio("/audio/cash.mp3");
+        audio.play().catch((e) => console.error("Error playing sound:", e));
+    }
+
     // Show feedback animation when adding to cart
     function showAddToCartFeedback() {
         const feedback = document.createElement("div");
@@ -439,6 +444,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Complete the payment and submit the form
     function completePayment() {
+        playCashSound();
         // Map lowercase payment method values to the format expected by the backend
         const paymentMethodMap = {
             cash: "Cash",

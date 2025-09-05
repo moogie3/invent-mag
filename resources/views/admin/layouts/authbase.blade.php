@@ -1,11 +1,23 @@
+@php
+    $themeMode = auth()->user()->system_settings['theme_mode'] ?? 'light';
+@endphp
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="{{ $themeMode }}">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Invent-MAG | @yield('title')</title>
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme');
+            if (theme) {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+            }
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,6 +46,8 @@
     </div>
     @include('admin.layouts.partials.session-notifications')
     @include('admin.layouts.script')
+    @vite('resources/js/admin/layouts/theme-toggle.js')
+    @vite('resources/js/admin/layouts/theme-visibility.js')
 </body>
 
 </html>

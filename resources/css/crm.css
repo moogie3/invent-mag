@@ -1,0 +1,17 @@
+/* ============================
+   9. MODAL STYLES
+   ============================ */
+#crmCustomerModal .modal-content {
+    font-size: 1.1rem;
+    /* Adjust as needed */
+}
+
+#crmCustomerModal .modal-title {
+    font-size: 1.3rem;
+    /* Adjust as needed */
+}
+
+#crmCustomerModal .nav-link {
+    font-size: 1.1rem;
+    /* Adjust as needed */
+}

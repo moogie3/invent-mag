@@ -217,22 +217,26 @@ body {
 }
 
 .theme-dark #productList .list-group-item:hover {
-    background-color: var(--tblr-bg-surface-secondary) !important; /* Darker background on hover in dark mode */
+    background-color: var(--tblr-bg-surface-secondary) !important;
+    /* Darker background on hover in dark mode */
 }
 
 .theme-dark #productList .list-group-item:hover strong,
 .theme-dark #productList .list-group-item:hover span,
 .theme-dark #productList .list-group-item:hover p,
 .theme-dark #productList .list-group-item:hover div {
-    color: #000000 !important; /* Force text to black */
+    color: #000000 !important;
+    /* Force text to black */
 }
 
 .theme-dark #productList .list-group-item:hover * {
-    color: #000000 !important; /* Force all text descendants to black */
+    color: #000000 !important;
+    /* Force all text descendants to black */
 }
 
 .theme-dark #productList .list-group-item:hover .input-group-text {
-    color: #000000 !important; /* Force input group text to black */
+    color: #000000 !important;
+    /* Force input group text to black */
 }
 
 .card-product-catalog {
@@ -1416,42 +1420,7 @@ body {
     }
 }
 
-/* ============================
-   21. ERROR PAGE SPECIFIC STYLES
-   ============================ */
-.error-page {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #f8f9fa;
-}
 
-.error-page .page-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    min-height: 100vh;
-}
-
-.error-page .page-body {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
-.error-page .container-fluid {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-}
 
 .settings-section {
     position: relative;
@@ -1905,6 +1874,8 @@ body.layout-navbar-v2 .navbar {
 /* Styles for readonly select elements */
 .readonly-select {
     pointer-events: none;
-    opacity: 0.6; /* Optional: to visually indicate it's not interactive */
-    cursor: not-allowed; /* Optional: to visually indicate it's not interactive */
+    opacity: 0.6;
+    /* Optional: to visually indicate it's not interactive */
+    cursor: not-allowed;
+    /* Optional: to visually indicate it's not interactive */
 }

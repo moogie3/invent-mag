@@ -23,6 +23,16 @@
     <meta name="currency-thousand-separator"
         content="{{ optional(App\Models\CurrencySetting::first())->thousand_separator ?? '.' }}">
     <meta name="currency-position" content="{{ optional(App\Models\CurrencySetting::first())->position ?? 'prefix' }}">
+    <script>
+        window.currencySettings = {
+            locale: document.querySelector('meta[name="currency-locale"]').getAttribute('content'),
+            currency_code: document.querySelector('meta[name="currency-code"]').getAttribute('content'),
+            decimal_places: parseInt(document.querySelector('meta[name="currency-decimal-places"]').getAttribute('content')),
+            decimal_separator: document.querySelector('meta[name="currency-decimal-separator"]').getAttribute('content'),
+            thousand_separator: document.querySelector('meta[name="currency-thousand-separator"]').getAttribute('content'),
+            position: document.querySelector('meta[name="currency-position"]').getAttribute('content'),
+        };
+    </script>
     <title>Invent-MAG | @yield('title')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

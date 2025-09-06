@@ -143,18 +143,54 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Render shopping cart list
     function renderList() {
-        productList.innerHTML = "";
+        const existingItems = Array.from(productList.children);
+        const productIdsInCart = products.map(p => p.id);
 
+        // If cart is empty, display empty message and return
         if (products.length === 0) {
+            productList.innerHTML = ""; // Clear all existing items
             const emptyMessage = document.createElement("div");
             emptyMessage.classList.add("text-center", "py-4", "text-muted");
             emptyMessage.innerHTML =
                 '<i class="ti ti-shopping-cart text-muted" style="font-size: 3rem;"></i>' +
                 '<p class="mt-2">Your cart is empty</p>';
             productList.appendChild(emptyMessage);
-        } else {
-            products.forEach((product, index) => {
-                const item = document.createElement("div");
+            calculateTotals();
+            productsField.value = JSON.stringify(products);
+            saveProductsToCache();
+            return;
+        }
+
+        // Remove items no longer in the cart (before adding/updating to prevent flicker)
+        existingItems.forEach(item => {
+            const itemId = parseInt(item.dataset.cartItemId);
+            if (!productIdsInCart.includes(itemId)) {
+                item.remove();
+            }
+        });
+
+        // Update existing items and add new ones
+        products.forEach((product, index) => {
+            let item = document.querySelector(`[data-cart-item-id="${product.id}"]`);
+
+            if (item) {
+                // Update existing item
+                const quantityInput = item.querySelector(".quantity-input");
+                const priceInput = item.querySelector(".price-input");
+                const totalElement = item.querySelector("strong");
+
+                if (quantityInput) quantityInput.value = product.quantity;
+                if (priceInput) priceInput.value = product.price;
+                if (totalElement) totalElement.textContent = formatCurrency(product.total);
+
+                // Update data-index for all buttons/inputs
+                item.querySelectorAll("[data-index]").forEach(el => {
+                    el.dataset.index = index;
+                });
+
+            } else {
+                // Create new item
+                item = document.createElement("div");
                 item.classList.add(
                     "list-group-item",
                     "d-flex",
@@ -163,6 +199,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "border-0",
                     "border-bottom"
                 );
+                item.setAttribute("data-cart-item-id", product.id);
 
                 // Create the product info section with editable price
                 const productInfo = document.createElement("div");
@@ -170,7 +207,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 productInfo.innerHTML = `
                 <strong class="d-block">${product.name}</strong>
                 <div class="d-flex align-items-center mt-1">
-                    <span class="text-muted me-2">${product.quantity} x</span>
+                    <input type="number" class="form-control form-control-sm quantity-input" value="${product.quantity}" min="1" data-index="${index}" style="width: 70px;">
+                    <span class="text-muted mx-2">x</span>
                     <div class="input-group input-group-sm" style="width: 120px;">
                         <span class="input-group-text">Rp</span>
                         <input type="number" class="form-control price-input" value="${product.price}" min="0" data-index="${index}">
@@ -208,8 +246,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 item.appendChild(actionsSection);
 
                 productList.appendChild(item);
-            });
-        }
+            }
+        });
+
+        // This part is no longer needed as items are removed at the beginning
+        // if (products.length === 0) {
+        //     const emptyMessage = document.createElement("div");
+        //     emptyMessage.classList.add("text-center", "py-4", "text-muted");
+        //     emptyMessage.innerHTML =
+        //         '<i class="ti ti-shopping-cart text-muted" style="font-size: 3rem;"></i>' +
+        //         '<p class="mt-2">Your cart is empty</p>';
+        //     productList.appendChild(emptyMessage);
+        // }
 
         calculateTotals();
         productsField.value = JSON.stringify(products);
@@ -251,6 +299,11 @@ document.addEventListener("DOMContentLoaded", function () {
             event.preventDefault();
             event.target.blur();
         }
+        // Prevent form submission on Enter key in quantity inputs
+        if (event.target.closest(".quantity-input") && event.key === "Enter") {
+            event.preventDefault();
+            event.target.blur();
+        }
     });
 
     // Add product to cart
@@ -258,16 +311,27 @@ document.addEventListener("DOMContentLoaded", function () {
         productId,
         productName,
         productPrice,
-        productUnit
+        productUnit,
+        productStock
     ) {
         // Find if product already exists in cart
         let existingProduct = products.find((p) => p.id === productId);
 
         if (existingProduct) {
+            // Check if adding one more exceeds stock
+            if (existingProduct.quantity + 1 > existingProduct.stock) {
+                window.showToast("Error", "Insufficient Stock", "error");
+                return;
+            }
             existingProduct.quantity += 1;
             existingProduct.total =
                 existingProduct.quantity * existingProduct.price;
         } else {
+            // Check if adding a new product exceeds stock (quantity 1)
+            if (1 > productStock) {
+                window.showToast("Error", "Insufficient Stock", "error");
+                return;
+            }
             products.push({
                 id: productId,
                 name: productName,
@@ -275,8 +339,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 quantity: 1,
                 total: parseFloat(productPrice),
                 unit: productUnit,
+                stock: productStock, // Store the initial stock
             });
         }
+
+        // Update the displayed stock on the product card
+        updateProductCardStockDisplay(productId, products.find(p => p.id === productId).stock - products.find(p => p.id === productId).quantity);
 
         // Show quick feedback animation
         showAddToCartFeedback();
@@ -286,6 +354,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Update display
         renderList();
+        console.log('Product in cart after add/update:', products);
+    }
+
+    // Helper function to get badge class based on stock
+    function getStockBadgeClass(stock) {
+        if (stock > 10) {
+            return 'bg-success';
+        } else if (stock > 0) {
+            return 'bg-warning';
+        } else {
+            return 'bg-danger';
+        }
+    }
+
+    // Helper function to update the stock display on a product card
+    function updateProductCardStockDisplay(productId, newStock) {
+        console.log('Current stock display value:', newStock);
+        const productCard = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+        if (productCard) {
+            const stockDisplayElement = productCard.querySelector(".product-stock-display");
+            if (stockDisplayElement) {
+                stockDisplayElement.textContent = newStock;
+                stockDisplayElement.className = `product-stock-display badge text-light ${getStockBadgeClass(newStock)}`;
+            }
+        }
     }
 
     // Function to play a success sound
@@ -549,8 +642,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const productName = productCard.dataset.productName;
         const productPrice = productCard.dataset.productPrice;
         const productUnit = productCard.dataset.productUnit;
+        console.log('productCard.dataset.productStock:', productCard.dataset.productStock);
+        const productStock = parseInt(productCard.dataset.productStock); // Explicitly parse as integer
+        console.log('productStock after parseInt:', productStock);
 
-        addToProductList(productId, productName, productPrice, productUnit);
+        addToProductList(productId, productName, productPrice, productUnit, productStock);
     });
 
     // Clear cart button
@@ -567,6 +663,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const decreaseBtn = event.target.closest(".decrease-product");
 
         if (removeBtn) {
+            event.preventDefault(); // Prevent any default behavior
             const index = parseInt(removeBtn.dataset.index);
             if (!isNaN(index)) {
                 playDeleteSound();
@@ -574,27 +671,68 @@ document.addEventListener("DOMContentLoaded", function () {
                 renderList();
             }
         } else if (decreaseBtn) {
+            event.preventDefault(); // Prevent any default behavior
             const index = parseInt(decreaseBtn.dataset.index);
             if (!isNaN(index)) {
-                if (products[index].quantity > 1) {
+                const product = products[index];
+                if (product.quantity > 1) {
                     playDecreaseSound();
-                    products[index].quantity -= 1;
-                    products[index].total =
-                        products[index].quantity * products[index].price;
+                    product.quantity -= 1;
+                    product.total = product.quantity * product.price;
+                    updateProductCardStockDisplay(product.id, product.stock - product.quantity);
                 } else {
                     playDeleteSound();
                     products.splice(index, 1); // Remove if quantity reaches 0
+                    updateProductCardStockDisplay(product.id, product.stock); // Reset stock display if removed
                 }
                 renderList();
             }
         } else if (increaseBtn) {
+            event.preventDefault(); // Prevent any default behavior
             const index = parseInt(increaseBtn.dataset.index);
             if (!isNaN(index)) {
+                const product = products[index];
+                if (product.quantity + 1 > product.stock) {
+                    window.showToast("Error", "Insufficient Stock", "error");
+                    return;
+                }
                 playSuccessSound();
-                products[index].quantity += 1;
-                products[index].total =
-                    products[index].quantity * products[index].price;
+                product.quantity += 1;
+                product.total = product.quantity * product.price;
+                updateProductCardStockDisplay(product.id, product.stock - product.quantity);
                 renderList();
+            }
+        }
+    });
+
+    // Quantity input event listener (new dedicated listener)
+    productList.addEventListener("change", function (event) {
+        const quantityInput = event.target.closest(".quantity-input");
+
+        if (quantityInput) {
+            const index = parseInt(quantityInput.dataset.index);
+            const newQuantity = parseInt(quantityInput.value);
+
+            if (!isNaN(index) && !isNaN(newQuantity) && newQuantity >= 0) {
+                const product = products[index];
+
+                // Stock check
+                if (newQuantity > product.stock) {
+                    window.showToast("Error", "Insufficient Stock", "error");
+                    quantityInput.value = product.quantity; // Revert input to current quantity
+                    return;
+                }
+
+                if (newQuantity === 0) {
+                    playDeleteSound();
+                    products.splice(index, 1);
+                    updateProductCardStockDisplay(product.id, product.stock); // Reset stock display if removed
+                } else {
+                    product.quantity = newQuantity;
+                    product.total = product.quantity * product.price;
+                    updateProductCardStockDisplay(product.id, product.stock - product.quantity);
+                }
+                renderList(); // Re-render to update totals and potentially remove item
             }
         }
     });
@@ -933,6 +1071,7 @@ function addProductToGrid(product) {
     img.setAttribute("data-product-name", product.name);
     img.setAttribute("data-product-price", product.selling_price);
     img.setAttribute("data-product-unit", product.unit_name || "pcs");
+    img.setAttribute("data-product-stock", product.stock_quantity);
 
     imageContainer.appendChild(img);
 
@@ -945,11 +1084,16 @@ function addProductToGrid(product) {
     title.textContent = product.name;
 
     const price = document.createElement("p");
-    price.className = "card-text fs-4";
+    price.className = "card-text fs-4 mb-1";
     price.textContent = formatCurrency(product.selling_price);
+
+    const stockDisplay = document.createElement("p");
+    stockDisplay.className = "card-text fs-5 text-muted";
+    stockDisplay.innerHTML = `In Stock: <span class="product-stock-display badge text-light ${getStockBadgeClass(product.stock_quantity)}">${product.stock_quantity}</span>`;
 
     cardBody.appendChild(title);
     cardBody.appendChild(price);
+    cardBody.appendChild(stockDisplay);
 
     productCard.appendChild(imageContainer);
     productCard.appendChild(cardBody);

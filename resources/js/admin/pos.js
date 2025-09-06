@@ -445,6 +445,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Complete the payment and submit the form
     function completePayment() {
         playCashSound();
+        // Disable the button to prevent multiple submissions
+        completePaymentBtn.disabled = true;
+
         // Map lowercase payment method values to the format expected by the backend
         const paymentMethodMap = {
             cash: "Cash",
@@ -528,6 +531,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     "An error occurred while processing payment. Please check the console for details.",
                     "error"
                 );
+            })
+            .finally(() => {
+                // Re-enable the button regardless of success or failure
+                completePaymentBtn.disabled = false;
             });
     }
 

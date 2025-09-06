@@ -113,8 +113,6 @@
     @vite('resources/js/admin/layouts/settings.js')
 @endif
 
-
-
 {{-- DELETE MODAL --}}
 <script>
     function setDeleteFormAction(action) {

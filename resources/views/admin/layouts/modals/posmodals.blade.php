@@ -8,63 +8,82 @@
             </div>
 
             <div class="modal-body p-4">
-                <!-- Order Table -->
-                <div class="table-responsive mb-4 border rounded-3">
-                    <table class="table table-vcenter card-table">
-                        <thead>
-                            <tr class="text-uppercase">
-                                <th>Product</th>
-                                <th class="text-center">Qty</th>
-                                <th class="text-end">Price</th>
-                                <th class="text-end">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modalProductList"></tbody>
-                        <tfoot class="bg-light">
-                            <tr>
-                                <td colspan="3" class="text-end fw-medium">Subtotal:</td>
-                                <td class="text-end fw-medium" id="modalSubtotal">Rp 0</td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" class="text-end text-muted">
-                                    Discount <small id="modalDiscountDetail"></small>:
-                                </td>
-                                <td class="text-end" id="modalDiscount">Rp 0</td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" class="text-end text-muted">
-                                    Tax (PPN) <small id="modalTaxDetail"></small>:
-                                </td>
-                                <td class="text-end" id="modalTax">Rp 0</td>
-                            </tr>
-                            <tr class="border-top border-2 border-primary">
-                                <td colspan="3" class="text-end fw-bold fs-4">Grand Total:</td>
-                                <td class="text-end fw-bold fs-4 text-primary" id="modalGrandTotal">Rp 0</td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                <!-- Enhanced Order Table -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="table-responsive">
+                        <table class="table table-vcenter mb-0">
+                            <thead class="bg-light">
+                                <tr class="text-uppercase">
+                                    <th class="fw-semibold text-muted">Product</th>
+                                    <th class="text-center fw-semibold text-muted">Quantity</th>
+                                    <th class="text-end fw-semibold text-muted">Price</th>
+                                    <th class="text-end fw-semibold text-muted">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalProductList">
+                                <!-- Products will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Order Summary Section -->
+                    <div class="bg-light border-top p-4">
+                        <div class="row mb-2">
+                            <div class="col-8 text-end">
+                                <span class="fw-medium text-muted">Subtotal:</span>
+                            </div>
+                            <div class="col-4 text-end">
+                                <span class="fw-semibold" id="modalSubtotal">Rp 0</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-8 text-end">
+                                <span class="text-muted">Discount <small id="modalDiscountDetail"></small>:</span>
+                            </div>
+                            <div class="col-4 text-end">
+                                <span id="modalDiscount">Rp 0</span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-8 text-end">
+                                <span class="text-muted">Tax (PPN) <small id="modalTaxDetail"></small>:</span>
+                            </div>
+                            <div class="col-4 text-end">
+                                <span id="modalTax">Rp 0</span>
+                            </div>
+                        </div>
+                        <div class="row border-top pt-3">
+                            <div class="col-8 text-end">
+                                <span class="fw-bold fs-3 text-primary">Grand Total:</span>
+                            </div>
+                            <div class="col-4 text-end">
+                                <span class="fw-bold fs-3 text-primary" id="modalGrandTotal">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Payment Info -->
-                <div class="card">
+                <div class="card shadow-sm">
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Payment Method</label>
                                 <select class="form-select" id="paymentMethod">
-                                    <option value="cash">Cash</option>
-                                    <option value="card">Credit/Debit Card</option>
-                                    <option value="transfer">Bank Transfer</option>
-                                    <option value="ewallet">E-Wallet</option>
+                                    <option value="cash"> Cash</option>
+                                    <option value="card"> Credit/Debit Card</option>
+                                    <option value="transfer"> Bank Transfer</option>
+                                    <option value="ewallet"> E-Wallet</option>
                                 </select>
                             </div>
 
                             <div class="col-md-6" id="cashPaymentDiv">
                                 <label class="form-label fw-semibold">Amount Received</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="number" class="form-control" id="amountReceived" min="0">
-                                    <button type="button" class="btn btn-outline-secondary" id="exactAmountBtn"
+                                    <span class="input-group-text bg-light">Rp</span>
+                                    <input type="number" class="form-control" id="amountReceived" min="0"
+                                        placeholder="0">
+                                    <button type="button" class="btn btn-outline-primary" id="exactAmountBtn"
                                         title="Exact Amount">
                                         <i class="ti ti-equal"></i>
                                     </button>
@@ -76,19 +95,19 @@
 
                 <!-- Change -->
                 <div class="mt-3" id="changeRow" style="display: none;">
-                    <div class="alert alert-success d-flex justify-content-between align-items-center m-0">
-                        <span class="fw-semibold fs-5">Change:</span>
-                        <span class="fw-bold fs-5" id="changeAmount">Rp 0</span>
+                    <div class="alert alert-success d-flex justify-content-between align-items-center m-0 shadow-sm">
+                        <span class="fw-semibold fs-4">Change:</span>
+                        <span class="fw-bold fs-4" id="changeAmount">Rp 0</span>
                     </div>
                 </div>
             </div>
 
             <!-- Modal Footer -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="ti ti-x me-1"></i>Cancel
                 </button>
-                <button type="button" class="btn btn-primary ms-auto" id="completePaymentBtn">
+                <button type="button" class="btn btn-primary ms-auto shadow-sm" id="completePaymentBtn">
                     <i class="ti ti-check me-1"></i>Complete Transaction
                 </button>
             </div>
@@ -102,33 +121,37 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="quickCreateCustomerModalLabel"><i class="ti ti-user-plus me-2"></i>Create New Customer</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="quickCreateCustomerModalLabel"><i class="ti ti-user-plus me-2"></i>Create
+                    New Customer</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <form id="quickCreateCustomerForm" action="{{ route('admin.customer.quickCreate') }}" method="POST">
                 @csrf
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label for="customerName" class="form-label">Name</label>
+                        <label for="customerName" class="form-label fw-semibold">Name</label>
                         <input type="text" class="form-control" id="customerName" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="customerAddress" class="form-label">Address</label>
+                        <label for="customerAddress" class="form-label fw-semibold">Address</label>
                         <input type="text" class="form-control" id="customerAddress" name="address" required>
                     </div>
                     <div class="mb-3">
-                        <label for="customerPhone" class="form-label">Phone Number</label>
+                        <label for="customerPhone" class="form-label fw-semibold">Phone Number</label>
                         <input type="text" class="form-control" id="customerPhone" name="phone_number" required>
                     </div>
                     <div class="mb-3">
-                        <label for="customerPaymentTerms" class="form-label">Payment Terms</label>
+                        <label for="customerPaymentTerms" class="form-label fw-semibold">Payment Terms</label>
                         <input type="text" class="form-control" id="customerPaymentTerms" name="payment_terms"
                             placeholder="e.g., Net 30" required>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="ti ti-x me-1"></i>Cancel</button>
-                    <button type="submit" class="btn btn-primary"><i class="ti ti-plus me-1"></i>Create Customer</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i
+                            class="ti ti-x me-1"></i>Cancel</button>
+                    <button type="submit" class="btn btn-primary shadow-sm"><i class="ti ti-plus me-1"></i>Create
+                        Customer</button>
                 </div>
             </form>
         </div>
@@ -141,8 +164,10 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="quickCreateProductModalLabel"><i class="ti ti-box-seam me-2"></i>Create New Product</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="quickCreateProductModalLabel"><i class="ti ti-box-seam me-2"></i>Create
+                    New Product</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <form id="quickCreateProductForm" enctype="multipart/form-data" method="POST"
                 action="{{ route('admin.product.quickCreate') }}">
@@ -150,19 +175,19 @@
                 <div class="modal-body p-4">
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label">Product Code</label>
+                            <label class="form-label fw-semibold">Product Code</label>
                             <input type="text" class="form-control" name="code" placeholder="Enter code"
                                 required>
                         </div>
 
                         <div class="col-md-8">
-                            <label class="form-label">Product Name</label>
+                            <label class="form-label fw-semibold">Product Name</label>
                             <input type="text" class="form-control" name="name" placeholder="Enter name"
                                 required>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Supplier</label>
+                            <label class="form-label fw-semibold">Supplier</label>
                             <select class="form-select" name="supplier_id" required>
                                 <option value="">Select Supplier</option>
                                 @foreach ($suppliers as $supplier)
@@ -172,7 +197,7 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Category</label>
+                            <label class="form-label fw-semibold">Category</label>
                             <select class="form-select" name="category_id" required>
                                 <option value="">Select Category</option>
                                 @foreach ($categories as $category)
@@ -182,20 +207,20 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Stock Quantity</label>
+                            <label class="form-label fw-semibold">Stock Quantity</label>
                             <input type="number" class="form-control" name="stock_quantity" placeholder="0"
                                 required>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Low Stock Threshold</label>
+                            <label class="form-label fw-semibold">Low Stock Threshold</label>
                             <input type="number" class="form-control" name="low_stock_threshold"
                                 placeholder="Default (10)" min="1">
                             <small class="form-text text-muted">Leave empty to use system default (10)</small>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Unit</label>
+                            <label class="form-label fw-semibold">Unit</label>
                             <select class="form-select" name="units_id" required>
                                 <option value="">Select Unit</option>
                                 @foreach ($units as $unit)
@@ -205,24 +230,24 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Buying Price</label>
+                            <label class="form-label fw-semibold">Buying Price</label>
                             <input type="number" step="0" class="form-control" name="price"
                                 placeholder="0" required>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Selling Price</label>
+                            <label class="form-label fw-semibold">Selling Price</label>
                             <input type="number" step="0" class="form-control" name="selling_price"
                                 placeholder="0" required>
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label">Description</label>
+                            <label class="form-label fw-semibold">Description</label>
                             <textarea class="form-control" name="description" rows="2" placeholder="Optional description"></textarea>
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label">Product Image</label>
+                            <label class="form-label fw-semibold">Product Image</label>
                             <input type="file" class="form-control" name="image">
                         </div>
 
@@ -230,19 +255,22 @@
                             <div class="form-check form-switch mt-3">
                                 <input class="form-check-input" type="checkbox" id="has_expiry" name="has_expiry"
                                     value="1">
-                                <label class="form-check-label" for="has_expiry">Product has expiration date</label>
+                                <label class="form-check-label fw-semibold" for="has_expiry">Product has expiration
+                                    date</label>
                             </div>
                         </div>
 
                         <div class="col-md-6 expiry-date-field" style="display: none;">
-                            <label class="form-label">Expiry Date</label>
+                            <label class="form-label fw-semibold">Expiry Date</label>
                             <input type="date" class="form-control" name="expiry_date">
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="ti ti-x me-1"></i>Cancel</button>
-                    <button type="submit" class="btn btn-primary"><i class="ti ti-plus me-1"></i>Create Product</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i
+                            class="ti ti-x me-1"></i>Cancel</button>
+                    <button type="submit" class="btn btn-primary shadow-sm"><i class="ti ti-plus me-1"></i>Create
+                        Product</button>
                 </div>
             </form>
         </div>

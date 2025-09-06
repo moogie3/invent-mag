@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 productInfo.innerHTML = `
                 <strong class="d-block">${product.name}</strong>
                 <div class="d-flex align-items-center mt-1">
-                    <input type="number" class="form-control form-control-sm quantity-input" value="${product.quantity}" min="1" data-index="${index}" style="width: 70px;">
+                    <input type="number" class="form-control form-control-sm quantity-input" value="${product.quantity}" min="1" data-index="${index}" style="width: 60px;">
                     <span class="text-muted mx-2">x</span>
                     <div class="input-group input-group-sm" style="width: 120px;">
                         <span class="input-group-text">Rp</span>
@@ -228,14 +228,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
                 actionsSection.innerHTML = `
                 <strong>${formatCurrency(product.total)}</strong>
-                <div class="btn-group">
-                    <button class="btn btn-sm btn-outline-success increase-product" data-index="${index}" title="Increase">
+                <div class="btn-group" style="gap: 0.25rem;">
+                    <button class="btn btn-outline-success increase-product" data-index="${index}" title="Increase" style="padding: 0.4rem 0.6rem; font-size: 0.85rem;">
                         <i class="ti ti-plus"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-warning decrease-product" data-index="${index}" title="Decrease">
+                    <button class="btn btn-outline-warning decrease-product" data-index="${index}" title="Decrease" style="padding: 0.4rem 0.6rem; font-size: 0.85rem;">
                         <i class="ti ti-minus"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger remove-product" data-index="${index}" title="Remove">
+                    <button class="btn btn-outline-danger remove-product" data-index="${index}" title="Remove" style="padding: 0.4rem 0.6rem; font-size: 0.85rem;">
                         <i class="ti ti-trash"></i>
                     </button>
                 </div>
@@ -320,7 +320,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (existingProduct) {
             // Check if adding one more exceeds stock
             if (existingProduct.quantity + 1 > existingProduct.stock) {
-                window.showToast("Error", "Insufficient Stock", "error");
+                window.showToast("Warning", "Insufficient Stock", "warning");
                 return;
             }
             existingProduct.quantity += 1;
@@ -329,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             // Check if adding a new product exceeds stock (quantity 1)
             if (1 > productStock) {
-                window.showToast("Error", "Insufficient Stock", "error");
+                window.showToast("Warning", "Insufficient Stock", "warning");
                 return;
             }
             products.push({
@@ -442,6 +442,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Clear shopping cart
     function clearCart() {
+        // Return stock for all products in the cart
+        products.forEach(product => {
+            updateProductCardStockDisplay(product.id, product.stock); // Return to original stock
+        });
         products = [];
         renderList();
     }
@@ -666,8 +670,10 @@ document.addEventListener("DOMContentLoaded", function () {
             event.preventDefault(); // Prevent any default behavior
             const index = parseInt(removeBtn.dataset.index);
             if (!isNaN(index)) {
+                const removedProduct = products[index]; // Get product before removing
                 playDeleteSound();
                 products.splice(index, 1);
+                updateProductCardStockDisplay(removedProduct.id, removedProduct.stock); // Return to original stock
                 renderList();
             }
         } else if (decreaseBtn) {
@@ -693,7 +699,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!isNaN(index)) {
                 const product = products[index];
                 if (product.quantity + 1 > product.stock) {
-                    window.showToast("Error", "Insufficient Stock", "error");
+                    window.showToast("Warning", "Insufficient Stock", "warning");
                     return;
                 }
                 playSuccessSound();
@@ -718,7 +724,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Stock check
                 if (newQuantity > product.stock) {
-                    window.showToast("Error", "Insufficient Stock", "error");
+                    window.showToast("Warning", "Insufficient Stock", "warning");
                     quantityInput.value = product.quantity; // Revert input to current quantity
                     return;
                 }
@@ -1082,6 +1088,8 @@ function addProductToGrid(product) {
     const title = document.createElement("h5");
     title.className = "card-title fs-4 mb-1";
     title.textContent = product.name;
+    title.style.maxHeight = "2.8em";
+    title.style.overflow = "hidden";
 
     const price = document.createElement("p");
     price.className = "card-text fs-4 mb-1";

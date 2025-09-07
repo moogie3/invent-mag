@@ -94,16 +94,7 @@
     <div class="sidebar-footer">
         <div class="sidebar-divider"></div>
         <ul class="navbar-nav">
-            @if(auth()->user()->system_settings['sidebar_lock'] ?? false)
-            <li class="nav-item">
-                <a class="nav-link" href="#" id="lock-sidebar-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Lock Sidebar">
-                    <div class="nav-link-icon">
-                        <i class="ti ti-lock"></i>
-                    </div>
-                    <span class="nav-link-title">Lock Sidebar</span>
-                </a>
-            </li>
-            @endif
+
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.setting.profile.edit') }}" data-bs-toggle="tooltip"
                     data-bs-placement="top">

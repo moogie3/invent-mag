@@ -61,7 +61,7 @@ function addToProductList(
     saveProductsToCache();
 }
 
-function clearCart() {
+export function clearCart() {
     const products = getProducts();
     products.forEach(product => {
         updateProductCardStockDisplay(product.id, product.stock);

@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const sidebarToggleContainer = document.getElementById(
         "theme-toggle-sidebar-container"
     );
+    const themeToggleButton = document.getElementById("theme-toggle-button");
+    const themeIcon = document.getElementById("theme-icon");
 
     function updateThemeIcons(theme) {
         // Update navbar icons
@@ -41,6 +43,17 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 sidebarLightIcon.style.display = "none";
                 sidebarDarkIcon.style.display = "inline"; // Show moon icon in light mode
+            }
+        }
+
+        // Update login page icon if it exists
+        if (themeIcon) {
+            if (theme === "dark") {
+                themeIcon.classList.remove("ti-moon");
+                themeIcon.classList.add("ti-sun");
+            } else {
+                themeIcon.classList.remove("ti-sun");
+                themeIcon.classList.add("ti-moon");
             }
         }
     }
@@ -131,6 +144,14 @@ document.addEventListener("DOMContentLoaded", function () {
         sidebarToggleBtn.addEventListener("click", function (e) {
             e.preventDefault();
             e.stopPropagation();
+            toggleTheme();
+        });
+    }
+
+    // Add event listener for the login page theme toggle button
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener("click", function (e) {
+            e.preventDefault();
             toggleTheme();
         });
     }

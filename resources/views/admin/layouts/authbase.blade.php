@@ -36,14 +36,14 @@
             </div>
         </div>
     </div>
-    <button id="theme-toggle-button" class="btn btn-icon theme-toggle-button" style="position: absolute; top: 1rem; right: 1rem;">
+    <button id="theme-toggle-button" class="btn btn-icon theme-toggle-button"
+        style="position: absolute; top: 1rem; right: 1rem;">
         <i class="ti ti-moon" id="theme-icon"></i>
     </button>
     @include('admin.layouts.partials.session-notifications')
     @include('admin.layouts.script')
-    @vite('resources/js/admin/layouts/theme-toggle.js')
     @vite('resources/js/admin/layouts/theme-visibility.js')
-    
+
 </body>
 
 </html>

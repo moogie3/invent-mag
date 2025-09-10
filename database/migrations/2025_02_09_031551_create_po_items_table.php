@@ -21,6 +21,7 @@ return new class extends Migration
                 $table->decimal('discount', 10)->nullable();
                 $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage');
                 $table->decimal('total', 10);
+                $table->date('expiry_date')->nullable();
                 $table->timestamps();
 
                 // Define foreign key constraints

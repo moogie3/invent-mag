@@ -24,7 +24,6 @@ class Product extends Model
         'supplier_id',
         'units_id',
         'has_expiry',
-        'expiry_date',
         'low_stock_threshold',
         'warehouse_id', // Add this field to fillable
     ];
@@ -34,7 +33,6 @@ class Product extends Model
         'selling_price' => 'float',
         'stock_quantity' => 'float',
         'has_expiry' => 'boolean',
-        'expiry_date' => 'datetime:Y-m-d', // Changed from 'date' to 'datetime:Y-m-d'
         'low_stock_threshold' => 'integer',
         'warehouse_id' => 'integer', // Fixed the missing quote
     ];
@@ -67,6 +65,11 @@ class Product extends Model
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class, 'units_id');
+    }
+
+    public function poItems()
+    {
+        return $this->hasMany(POItem::class);
     }
 
     protected function image(): Attribute
@@ -118,22 +121,22 @@ class Product extends Model
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getExpiringSoonProducts()
-    {
-        $thirtyDaysFromNow = now()->addDays(30);
+    // public static function getExpiringSoonProducts()
+    // {
+    //     $thirtyDaysFromNow = now()->addDays(30);
 
-        return self::where('has_expiry', true)->whereNotNull('expiry_date')->where('expiry_date', '>', now())->where('expiry_date', '<=', $thirtyDaysFromNow)->get();
-    }
+    //     return self::where('has_expiry', true)->whereNotNull('expiry_date')->where('expiry_date', '>', now())->where('expiry_date', '<=', $thirtyDaysFromNow)->get();
+    // }
 
     /**
      * Count products that will expire soon
      *
      * @return int
      */
-    public static function expiringSoonCount()
-    {
-        $thirtyDaysFromNow = now()->addDays(30);
+    // public static function expiringSoonCount()
+    // {
+    //     $thirtyDaysFromNow = now()->addDays(30);
 
-        return self::where('has_expiry', true)->whereNotNull('expiry_date')->where('expiry_date', '>', now())->where('expiry_date', '<=', $thirtyDaysFromNow)->count();
-    }
+    //     return self::where('has_expiry', true)->whereNotNull('expiry_date')->where('expiry_date', '>', now())->where('expiry_date', '<=', $thirtyDaysFromNow)->count();
+    // }
 }

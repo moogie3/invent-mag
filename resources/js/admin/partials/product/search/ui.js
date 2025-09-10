@@ -55,15 +55,6 @@ export function renderSearchResults(products) {
                 <td class="sort-supplier text-center">${
                     product.supplier?.name || "N/A"
                 }</td>
-                <td class="sort-expiry text-center">
-                    ${
-                        product.has_expiry && product.expiry_date
-                            ? new Date(product.expiry_date).toLocaleDateString(
-                                  "id-ID"
-                              )
-                            : '<span class="text-muted">N/A</span>'
-                    }
-                </td>
                 <td class="no-print" style="text-align:center">
                     <div class="dropdown">
                         <button class="btn dropdown-toggle" data-bs-toggle="dropdown">Actions</button>

@@ -10,7 +10,6 @@ export function initProductModal() {
         const editBtn = document.getElementById("productModalEdit");
 
         if (!content || !editBtn) {
-            console.error("Modal elements not found");
             return;
         }
 
@@ -31,7 +30,6 @@ export function initProductModal() {
                 renderProductDetails(data);
             })
             .catch((error) => {
-                console.error("Error loading product details:", error);
                 content.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
             });
     };
@@ -43,6 +41,14 @@ function renderProductDetails(data) {
         "productModalViewTemplate"
     ).innerHTML;
     content.innerHTML = template;
+
+    // Activate the first tab (Basic Info) by default
+    const basicInfoTab = document.getElementById('basic-info-tab');
+    const basicInfoPane = document.getElementById('basic-info-pane');
+    if (basicInfoTab && basicInfoPane) {
+        basicInfoTab.classList.add('active');
+        basicInfoPane.classList.add('show', 'active');
+    }
 
     setText("productName", data.name);
     setText("productCode", `Code: ${data.code}`);
@@ -95,18 +101,6 @@ function renderProductDetails(data) {
             : "inline";
     }
 
-    if (data.has_expiry && data.expiry_date) {
-        const date = new Date(data.expiry_date).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-        });
-        document.getElementById("productExpiry").innerHTML =
-            date + getExpiryBadge(data.expiry_date);
-    } else {
-        setText("productExpiry", "N/A");
-    }
-
     setText("productPrice", data.formatted_price || formatCurrency(data.price));
     setText(
         "productSellingPrice",
@@ -127,6 +121,84 @@ function renderProductDetails(data) {
     } else if (descContainer) {
         descContainer.style.display = "none";
     }
+
+    // Handle Expiry Status Tab
+    const expiryStatusTab = document.getElementById('expiry-status-tab');
+    const expiryStatusPane = document.getElementById('expiry-status-pane');
+    const productExpiryStatusContent = document.getElementById('productExpiryStatusContent');
+
+    if (data.has_expiry && data.po_items && data.po_items.length > 0) {
+        if (expiryStatusTab) expiryStatusTab.style.display = 'block';
+        let expiryTableHtml = `
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>PO ID</th>
+                            <th>Quantity</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        data.po_items.forEach(item => {
+            const expiryDate = item.expiry_date ? new Date(item.expiry_date).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : 'N/A';
+            const today = new Date();
+            const itemExpiryDate = item.expiry_date ? new Date(item.expiry_date) : null;
+            let status = 'N/A';
+            let statusClass = '';
+
+            if (itemExpiryDate) {
+                if (itemExpiryDate < today) {
+                    status = 'Expired';
+                    statusClass = 'badge bg-danger-lt';
+                } else {
+                    const diffTime = Math.abs(itemExpiryDate - today);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays <= 7) {
+                        status = `Expiring in ${diffDays} days`;
+                        statusClass = 'badge bg-danger-lt'; // Critical warning
+                    } else if (diffDays <= 30) {
+                        status = `Expiring in ${diffDays} days`;
+                        statusClass = 'badge bg-warning-lt'; // Warning
+                    } else if (diffDays <= 90) {
+                        status = `Expiring in ${diffDays} days`;
+                        statusClass = 'badge bg-info-lt'; // Mild warning (using info for less critical)
+                    } else {
+                        status = 'Long Shelf Life';
+                        statusClass = 'badge bg-success-lt';
+                    }
+                }
+            }
+
+            expiryTableHtml += `
+                <tr>
+                    <td><a href="/admin/po/edit/${item.po_id}">${item.po_id}</a></td>
+                    <td>${item.quantity}</td>
+                    <td>${expiryDate}</td>
+                    <td><span class="${statusClass}">${status}</span></td>
+                </tr>
+            `;
+        });
+        expiryTableHtml += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        if (productExpiryStatusContent) {
+            productExpiryStatusContent.innerHTML = expiryTableHtml;
+        }
+    } else {
+        if (expiryStatusTab) expiryStatusTab.style.display = 'none';
+        if (productExpiryStatusContent) {
+            productExpiryStatusContent.innerHTML = `
+                <div class="text-center text-muted py-4">
+                    ${data.has_expiry ? 'No expiry data available for this product.' : 'This product does not have an expiry date.'}
+                </div>
+            `;
+        }
+    }
 }
 
 function handleProductModalPrint() {
@@ -144,4 +216,65 @@ function handleProductModalPrint() {
     window.print();
     document.body.innerHTML = original;
     setTimeout(() => window.location.reload(), 100);
+}
+
+export function loadExpiringSoonProductsModal(expiringSoonProducts) {
+    const tableBody = document.getElementById('expiringSoonProductsTableBody');
+
+    if (!tableBody) {
+        return;
+    }
+
+    tableBody.innerHTML = ''; // Clear previous content
+
+    if (expiringSoonProducts && expiringSoonProducts.length > 0) {
+        expiringSoonProducts.forEach(item => {
+            console.log('Processing item:', item);
+            const expiryDate = item.expiry_date ? new Date(item.expiry_date).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : 'N/A';
+            const today = new Date();
+            const itemExpiryDate = item.expiry_date ? new Date(item.expiry_date) : null;
+            let status = 'N/A';
+            let statusClass = '';
+
+            if (itemExpiryDate) {
+                if (itemExpiryDate < today) {
+                    status = 'Expired';
+                    statusClass = 'badge bg-danger-lt';
+                } else {
+                    const diffTime = Math.abs(itemExpiryDate - today);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays <= 7) {
+                        status = `Expiring in ${diffDays} days`;
+                        statusClass = 'badge bg-danger-lt'; // Critical warning
+                    } else if (diffDays <= 30) {
+                        status = `Expiring in ${diffDays} days`;
+                        statusClass = 'badge bg-warning-lt'; // Warning
+                    } else if (diffDays <= 90) {
+                        status = `Expiring in ${diffDays} days`;
+                        statusClass = 'badge bg-info-lt'; // Mild warning (using info for less critical)
+                    } else {
+                        status = 'Long Shelf Life';
+                        statusClass = 'badge bg-success-lt';
+                    }
+                }
+            }
+
+            const row = `
+                <tr>
+                    <td>${item.product ? item.product.name : 'N/A'}</td>
+                    <td class="text-center"><a href="/admin/po/edit/${item.po_id}">${item.po_id}</a></td>
+                    <td class="text-center">${item.quantity}</td>
+                    <td class="text-center">${expiryDate}</td>
+                    <td class="text-center"><span class="${statusClass}">${status}</span></td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    } else {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">No products expiring soon.</td>
+            </tr>
+        `;
+    }
 }

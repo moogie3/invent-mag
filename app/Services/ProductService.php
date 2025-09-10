@@ -28,7 +28,6 @@ class ProductService
             'warehouses' => Warehouse::all(),
             'mainWarehouse' => Warehouse::where('is_main', true)->first(),
             'lowStockProducts' => Product::getLowStockProducts(),
-            'expiringSoonProducts' => Product::getExpiringSoonProducts(),
         ];
     }
 
@@ -74,10 +73,6 @@ class ProductService
             if ($mainWarehouse) {
                 $data['warehouse_id'] = $mainWarehouse->id;
             }
-        }
-
-        if (!$data['has_expiry']) {
-            $data['expiry_date'] = null;
         }
 
         if (isset($data['image'])) {
@@ -207,5 +202,28 @@ class ProductService
             ->orderBy('name', 'asc')
             ->limit(50)
             ->get();
+    }
+
+    public function getExpiringSoonPOItems()
+    {
+        $thirtyDaysFromNow = now()->addDays(30);
+
+        return \App\Models\POItem::whereNotNull('expiry_date')
+            ->where('expiry_date', '>', now())
+            ->where('expiry_date', '<=', $thirtyDaysFromNow)
+            ->with(['product' => function($query) {
+                $query->select('id', 'name', 'code'); // Select only necessary product fields
+            }])
+            ->get();
+    }
+
+    public function getExpiringSoonPOItemsCount()
+    {
+        $thirtyDaysFromNow = now()->addDays(30);
+
+        return \App\Models\POItem::whereNotNull('expiry_date')
+            ->where('expiry_date', '>', now())
+            ->where('expiry_date', '<=', $thirtyDaysFromNow)
+            ->count();
     }
 }

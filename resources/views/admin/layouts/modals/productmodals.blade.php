@@ -176,41 +176,15 @@
                     <table class="table card-table table-vcenter">
                         <thead>
                             <tr>
-                                <th>Name</th>
+                                <th>Product Name</th>
+                                <th class="text-center">PO ID</th>
+                                <th class="text-center">Quantity</th>
                                 <th class="text-center">Expiry Date</th>
-                                <th class="text-center">Stock</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($expiringSoonProducts as $product)
-                                <tr>
-                                    <td>{{ $product->name }}</td>
-                                    <td class="text-center">
-                                        @php
-                                            [
-                                                $badgeClass,
-                                                $badgeText,
-                                            ] = \App\Helpers\ProductHelper::getExpiryClassAndText(
-                                                $product->expiry_date,
-                                            );
-                                        @endphp
-                                        <span class="{{ $badgeClass }}">
-                                            {{ $product->expiry_date->format('d F Y') }}
-                                            @if ($badgeText)
-                                                <small>({{ $badgeText }})</small>
-                                            @endif
-                                        </span>
-                                    </td>
-                                    <td class="text-center">{{ $product->stock_quantity }}</td>
-                                    <td class="text-end">
-                                        <a href="{{ route('admin.product.edit', $product->id) }}"
-                                            class="btn btn-sm btn-primary">
-                                            <i class="ti ti-edit me-1"></i> Edit
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                        <tbody id="expiringSoonProductsTableBody">
+                            <!-- Content will be loaded by JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -269,110 +243,130 @@
             </div>
         </div>
 
-        <!-- Body Section -->
-        <div class="card-body p-4">
-            <div class="row g-4">
-                <!-- Product Image -->
-                <div class="col-md-4">
-                    <div class="text-center mb-3" id="productImageContainer">
-                        <!-- Image or icon will be rendered here by JavaScript -->
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs nav-fill" id="productDetailsTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="basic-info-tab" data-bs-toggle="tab" data-bs-target="#basic-info-pane" type="button" role="tab" aria-controls="basic-info-pane" aria-selected="true">
+                    Basic Info
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="expiry-status-tab" data-bs-toggle="tab" data-bs-target="#expiry-status-pane" type="button" role="tab" aria-controls="expiry-status-pane" aria-selected="false">
+                    Expiry Status
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content p-4">
+            <!-- Basic Info Pane (Existing Content) -->
+            <div class="tab-pane fade show active" id="basic-info-pane" role="tabpanel" aria-labelledby="basic-info-tab">
+                <div class="row g-4">
+                    <!-- Product Image -->
+                    <div class="col-md-4">
+                        <div class="text-center mb-3" id="productImageContainer">
+                            <!-- Image or icon will be rendered here by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="col-md-8">
+                        <div class="row g-3">
+                            <!-- Basic Information -->
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="ti ti-info-circle me-2 text-primary"></i>Basic Information
+                                        </h5>
+                                        <div class="mb-2 d-flex justify-content-between">
+                                            <span class="fw-semibold">Category:</span>
+                                            <span id="productCategory"></span>
+                                        </div>
+                                        <div class="mb-2 d-flex justify-content-between">
+                                            <span class="fw-semibold">Unit:</span>
+                                            <span id="productUnit"></span>
+                                        </div>
+                                        <div class="mb-2 d-flex justify-content-between">
+                                            <span class="fw-semibold">Stock Quantity:</span>
+                                            <span id="productQuantity"></span>
+                                        </div>
+                                        <div class="mb-2 d-flex justify-content-between">
+                                            <span class="fw-semibold">Low Stock Threshold:</span>
+                                            <span>
+                                                <span id="productThreshold"></span>
+                                                <small class="text-muted" id="thresholdDefaultNote"></small>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Supplier & Storage -->
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="ti ti-building-store me-2 text-primary"></i>Supplier & Storage
+                                        </h5>
+                                        <div class="mb-2 d-flex justify-content-between">
+                                            <span class="fw-semibold">Supplier:</span>
+                                            <span id="productSupplier"></span>
+                                        </div>
+                                        <div class="mb-2 d-flex justify-content-between">
+                                            <span class="fw-semibold">Warehouse:</span>
+                                            <span id="productWarehouse"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pricing Information -->
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="ti ti-currency me-2 text-primary"></i>Pricing Information
+                                        </h5>
+                                        <div class="mb-2 d-flex justify-content-between">
+                                            <span class="fw-semibold">Purchase Price:</span>
+                                            <span id="productPrice"></span>
+                                        </div>
+                                        <div class="mb-2 d-flex justify-content-between">
+                                            <span class="fw-semibold">Selling Price:</span>
+                                            <span id="productSellingPrice"></span>
+                                        </div>
+                                        <div class="mb-2 d-flex justify-content-between">
+                                            <span class="fw-semibold">Profit Margin:</span>
+                                            <span id="productMargin"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Information -->
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="ti ti-notes me-2 text-primary"></i>Additional Information
+                                        </h5>
+                                        <div id="productDescriptionContainer">
+                                            <span class="fw-semibold">Description:</span>
+                                            <p id="productDescription" class="text-muted mb-0 mt-2"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Product Details -->
-                <div class="col-md-8">
-                    <div class="row g-3">
-                        <!-- Basic Information -->
-                        <div class="col-md-6">
-                            <div class="card h-100 border-0">
-                                <div class="card-body">
-                                    <h5 class="card-title mb-3">
-                                        <i class="ti ti-info-circle me-2 text-primary"></i>Basic Information
-                                    </h5>
-                                    <div class="mb-2 d-flex justify-content-between">
-                                        <span class="fw-semibold">Category:</span>
-                                        <span id="productCategory"></span>
-                                    </div>
-                                    <div class="mb-2 d-flex justify-content-between">
-                                        <span class="fw-semibold">Unit:</span>
-                                        <span id="productUnit"></span>
-                                    </div>
-                                    <div class="mb-2 d-flex justify-content-between">
-                                        <span class="fw-semibold">Stock Quantity:</span>
-                                        <span id="productQuantity"></span>
-                                    </div>
-                                    <div class="mb-2 d-flex justify-content-between">
-                                        <span class="fw-semibold">Low Stock Threshold:</span>
-                                        <span>
-                                            <span id="productThreshold"></span>
-                                            <small class="text-muted" id="thresholdDefaultNote"></small>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Supplier & Storage -->
-                        <div class="col-md-6">
-                            <div class="card h-100 border-0">
-                                <div class="card-body">
-                                    <h5 class="card-title mb-3">
-                                        <i class="ti ti-building-store me-2 text-primary"></i>Supplier & Storage
-                                    </h5>
-                                    <div class="mb-2 d-flex justify-content-between">
-                                        <span class="fw-semibold">Supplier:</span>
-                                        <span id="productSupplier"></span>
-                                    </div>
-                                    <div class="mb-2 d-flex justify-content-between">
-                                        <span class="fw-semibold">Warehouse:</span>
-                                        <span id="productWarehouse"></span>
-                                    </div>
-                                    <div class="mb-2 d-flex justify-content-between">
-                                        <span class="fw-semibold">Expiry Date:</span>
-                                        <span id="productExpiry"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pricing Information -->
-                        <div class="col-md-6">
-                            <div class="card h-100 border-0">
-                                <div class="card-body">
-                                    <h5 class="card-title mb-3">
-                                        <i class="ti ti-currency me-2 text-primary"></i>Pricing Information
-                                    </h5>
-                                    <div class="mb-2 d-flex justify-content-between">
-                                        <span class="fw-semibold">Purchase Price:</span>
-                                        <span id="productPrice"></span>
-                                    </div>
-                                    <div class="mb-2 d-flex justify-content-between">
-                                        <span class="fw-semibold">Selling Price:</span>
-                                        <span id="productSellingPrice"></span>
-                                    </div>
-                                    <div class="mb-2 d-flex justify-content-between">
-                                        <span class="fw-semibold">Profit Margin:</span>
-                                        <span id="productMargin"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Additional Information -->
-                        <div class="col-md-6">
-                            <div class="card h-100 border-0">
-                                <div class="card-body">
-                                    <h5 class="card-title mb-3">
-                                        <i class="ti ti-notes me-2 text-primary"></i>Additional Information
-                                    </h5>
-                                    <div id="productDescriptionContainer">
-                                        <span class="fw-semibold">Description:</span>
-                                        <p id="productDescription" class="text-muted mb-0 mt-2"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Expiry Status Pane (New Content) -->
+            <div class="tab-pane fade" id="expiry-status-pane" role="tabpanel" aria-labelledby="expiry-status-tab">
+                <div id="productExpiryStatusContent">
+                    <!-- Content will be loaded by JavaScript -->
                 </div>
             </div>
         </div>

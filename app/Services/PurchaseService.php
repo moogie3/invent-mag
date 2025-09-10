@@ -155,6 +155,7 @@ class PurchaseService
                     'discount' => $productData['discount'] ?? 0,
                     'discount_type' => $productData['discount_type'] ?? 'fixed',
                     'total' => $itemTotal,
+                    'expiry_date' => $productData['expiry_date'] ?? null,
                 ]);
                 $totalAmount += $itemTotal;
 
@@ -215,6 +216,7 @@ class PurchaseService
                     'discount' => $productData['discount'] ?? 0,
                     'discount_type' => $productData['discount_type'] ?? 'fixed',
                     'total' => $itemTotal,
+                    'expiry_date' => $productData['expiry_date'] ?? null,
                 ]);
                 $totalAmount += $itemTotal;
 

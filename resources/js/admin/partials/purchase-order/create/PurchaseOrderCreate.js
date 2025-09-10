@@ -39,7 +39,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             "invoiceForm",
             "stock_available",
             "quantity_warning",
-        ];
+            "expiry_date",
 
         const elements = {};
         elementIds.forEach((id) => {
@@ -321,6 +321,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                 this.elements.product_id.selectedIndex
             ];
         const stock = parseInt(selectedOption.getAttribute("data-stock")) || 0;
+        const hasExpiry = selectedOption.getAttribute("data-has-expiry") === "1";
 
         const uniqueId = `${Date.now()}-${Math.random()
             .toString(36)
@@ -342,6 +343,8 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             discountType,
             total,
             stock,
+            hasExpiry,
+            expiry_date: null, // Initialize expiry_date to null
         });
 
         this.renderTable();
@@ -436,6 +439,8 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             product.price = parseFloat(target.value) || 0;
         } else if (target.classList.contains("discount-input")) {
             product.discount = parseFloat(target.value) || 0;
+        } else if (target.classList.contains("expiry-date-input")) {
+            product.expiry_date = target.value;
         }
 
         this.updateProductInTable(product, target);
@@ -543,6 +548,14 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                 <td class="text-end product-total fw-bold">${formatCurrency(
                     product.total
                 )}</td>
+                <td class="text-center">
+                    ${product.hasExpiry ? `
+                    <input type="date" class="form-control expiry-date-input text-center"
+                        value="${product.expiry_date ? product.expiry_date : ''}" data-unique-id="${
+                            product.uniqueId
+                        }" style="width:120px;" />
+                    ` : 'N/A'}
+                </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-danger btn-sm removeProduct"
                         data-unique-id="${

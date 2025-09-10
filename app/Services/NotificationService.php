@@ -35,14 +35,12 @@ class NotificationService
             ->count();
 
         $lowStockCount = Product::lowStockCount();
-        $expiringSoonCount = Product::expiringSoonCount();
 
         return [
             'poCount' => $poCount,
             'salesCount' => $salesCount,
             'lowStockCount' => $lowStockCount,
-            'expiringSoonCount' => $expiringSoonCount,
-            'total' => $poCount + $salesCount + $lowStockCount + $expiringSoonCount,
+            'total' => $poCount + $salesCount + $lowStockCount,
         ];
     }
 
@@ -131,27 +129,35 @@ class NotificationService
 
     protected function getExpiringProductNotifications(): Collection
     {
-        return Product::getExpiringSoonProducts()->map(function ($product) {
-            $daysRemaining = (int) Carbon::now()->diffInDays($product->expiry_date, false);
-            [, $statusText] = \App\Helpers\ProductHelper::getExpiryClassAndText($product->expiry_date);
+        $thirtyDaysFromNow = Carbon::now()->addDays(30);
 
-            return [
-                'id' => 'product::' . $product->id,
-                'title' => "Expiring Product: {$product->name}",
-                'description' => "Expires on {$product->expiry_date->format('M d, Y')}",
-                'due_date' => $product->expiry_date,
-                'status' => 'Expiring Soon',
-                'urgency' => $this->getUrgencyLevel($daysRemaining),
-                'days_remaining' => $daysRemaining,
-                'route' => route('admin.product.edit', ['id' => $product->id]),
-                'type' => 'product',
-                'label' => 'Product #' . $product->code,
-                'status_badge' => $daysRemaining <= 3 ? 'text-red' : 'text-orange',
-                'status_text' => $statusText ?? 'Expiring Soon',
-                'status_icon' => 'ti ti-calendar-time',
-                'show_notification' => true,
-            ];
-        });
+        return \App\Models\POItem::whereNotNull('expiry_date')
+            ->where('expiry_date', '>', Carbon::now())
+            ->where('expiry_date', '<=', $thirtyDaysFromNow)
+            ->with('product') // Eager load the product relationship
+            ->get()
+            ->map(function ($poItem) {
+                $product = $poItem->product;
+                $daysRemaining = (int) Carbon::now()->diffInDays($poItem->expiry_date, false);
+                [, $statusText] = \App\Helpers\ProductHelper::getExpiryClassAndText($poItem->expiry_date);
+
+                return [
+                    'id' => 'poitem::' . $poItem->id,
+                    'title' => "Expiring Product: {$product->name}",
+                    'description' => "Expires on {$poItem->expiry_date->format('M d, Y')}",
+                    'due_date' => $poItem->expiry_date,
+                    'status' => 'Expiring Soon',
+                    'urgency' => $this->getUrgencyLevel($daysRemaining),
+                    'days_remaining' => $daysRemaining,
+                    'route' => route('admin.product.edit', ['id' => $product->id]), // Link to product edit page
+                    'type' => 'product',
+                    'label' => 'Product # ' . $product->code,
+                    'status_badge' => $daysRemaining <= 3 ? 'text-red' : 'text-orange',
+                    'status_text' => $statusText ?? 'Expiring Soon',
+                    'status_icon' => 'ti ti-calendar-time',
+                    'show_notification' => true,
+                ];
+            });
     }
 
     private function getStatusInfo(string $status, Carbon $dueDate, ? Carbon $paymentDate = null): array

@@ -8,8 +8,6 @@
     </div>
 
     <div class="col-md-6 expiry-date-field" style="{{ $products->has_expiry ? '' : 'display: none;' }}">
-        <label class="form-label">Expiry Date</label>
-        <input type="date" class="form-control" name="expiry_date" id="expiry_date"
-            value="{{ $products->expiry_date ? $products->expiry_date->format('Y-m-d') : '' }}">
+
     </div>
 </div>

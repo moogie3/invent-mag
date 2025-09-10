@@ -14,12 +14,6 @@
                     <span class="badge bg-danger-lt me-2">{{ $lowStockProducts->count() }}</span> Low Stock
                 </button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="expiring-soon-tab" data-bs-toggle="tab"
-                    data-bs-target="#expiring-soon-content" type="button" role="tab">
-                    <span class="badge bg-warning-lt me-2">{{ $expiringSoonProducts->count() }}</span> Expiring Soon
-                </button>
-            </li>
         </ul>
 
         <div class="tab-content px-3 pb-3" id="alertTabContent">
@@ -45,33 +39,6 @@
                         </div>
                     @empty
                         <div class="text-center text-muted py-4">No low stock products.</div>
-                    @endforelse
-                </div>
-            </div>
-
-            <!-- Expiring Soon Section -->
-            <div class="tab-pane fade" id="expiring-soon-content" role="tabpanel">
-                <div class="shadcn-alert-list">
-                    @forelse ($expiringSoonProducts as $product)
-                        <div class="shadcn-alert-item">
-                            <div class="shadcn-avatar" style="width: 80px; height: 80px; flex-shrink: 0;">
-                                @if (empty($product->image) || strtolower($product->image) === 'null' || strtolower($product->image) === 'undefined' || $product->image === asset('img/default_placeholder.png'))
-                                    <i class="ti ti-photo fs-1" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
-                                @else
-                                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
-                                @endif
-                            </div>
-                            <div class="shadcn-product-info">
-                                <div class="shadcn-product-name" title="{{ $product->name }}">{{ $product->name }}
-                                </div>
-                                <div class="shadcn-product-details">
-                                    Expires: <span
-                                        class="fw-bold text-warning">{{ optional($product->expiry_date)->format('d M Y') ?? 'N/A' }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center text-muted py-4">No expiring soon products.</div>
                     @endforelse
                 </div>
             </div>

@@ -80,7 +80,15 @@ class PurchaseSeeder extends Seeder
             }
 
             foreach ($poItemsData as $itemData) {
-                POItem::create(array_merge(['po_id' => $purchase->id], $itemData));
+                $product = Product::find($itemData['product_id']);
+                $expiryDate = null;
+
+                if ($product && $product->has_expiry) {
+                    // Generate a random expiry date within a reasonable range (e.g., 1 month to 1 year from now)
+                    $expiryDate = Carbon::now()->addDays(rand(1, 90));
+                }
+
+                POItem::create(array_merge(['po_id' => $purchase->id, 'expiry_date' => $expiryDate], $itemData));
             }
 
             $purchase->update(['total' => $totalPurchaseAmount]);

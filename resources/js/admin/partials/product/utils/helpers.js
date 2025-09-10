@@ -9,7 +9,6 @@ export function extractProductDataFromRow(row) {
         const priceElement = row.querySelector(".sort-price");
         const sellingPriceElement = row.querySelector(".sort-sellingprice");
         const supplierElement = row.querySelector(".sort-supplier");
-        const expiryElement = row.querySelector(".sort-expiry");
 
         if (!nameElement) return null;
 
@@ -29,10 +28,6 @@ export function extractProductDataFromRow(row) {
                 sellingPriceElement?.textContent || "0"
             ),
             supplier: { name: supplierElement?.textContent?.trim() || "N/A" },
-            expiry_date: extractExpiryFromText(
-                expiryElement?.textContent || ""
-            ),
-            has_expiry: expiryElement?.textContent?.trim() !== "N/A",
             image: img?.src || "/img/default_placeholder.png",
         };
     } catch (error) {
@@ -48,16 +43,4 @@ function extractPriceFromText(priceText) {
         return parseInt(matches.join("").replace(/,/g, "")) || 0;
     }
     return 0;
-}
-
-function extractExpiryFromText(expiryText) {
-    if (!expiryText || expiryText.trim() === "N/A") return null;
-    const dateMatch = expiryText.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-    if (dateMatch) {
-        return `${dateMatch[3]}-${dateMatch[2].padStart(
-            2,
-            "0"
-        )}-${dateMatch[1].padStart(2, "0")}`;
-    }
-    return null;
 }

@@ -104,7 +104,7 @@
                                                     {{ $expiringSoonCount }}</div>
                                             @if ($expiringSoonCount > 0)
                                                 <a href="#" class="mt-2 btn btn-sm btn-outline-warning"
-                                                    id="viewExpiringSoon">
+                                                    id="viewExpiringSoon" data-bs-toggle="modal" data-bs-target="#expiringSoonModal">
                                                     View Details
                                                 </a>
                                             @endif

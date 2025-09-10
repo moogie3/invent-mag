@@ -14,6 +14,7 @@
                         <th>Price</th>
                         <th>Discount</th>
                         <th>Amount</th>
+                        <th>Expiry Date</th>
                         <th>Action</th>
                     </tr>
                 </thead>

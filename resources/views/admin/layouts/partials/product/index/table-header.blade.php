@@ -33,9 +33,6 @@
         <th class="sticky-top " style="z-index: 1020;">
             <button class="table-sort fs-4 py-3" data-sort="sort-supplier">Supplier</button>
         </th>
-        <th class="text-center sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-expiry">Expiry Date</button>
-        </th>
         <th style="width:100px;text-align:center" class="fs-4 py-3 no-print sticky-top " style="z-index: 1020;">
             Action
         </th>

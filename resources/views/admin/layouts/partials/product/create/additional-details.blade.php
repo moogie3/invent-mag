@@ -20,10 +20,7 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div id="expiry_date_container" style="display: none;">
-                        <input type="date" class="form-control" name="expiry_date" id="expiry_date"
-                            placeholder="Select expiry date">
-                    </div>
+                    
                 </div>
             </div>
         </div>

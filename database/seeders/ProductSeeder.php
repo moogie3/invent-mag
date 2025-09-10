@@ -41,7 +41,6 @@ class ProductSeeder extends Seeder
                 'warehouse_id' => $warehouseIds[array_rand($warehouseIds)],
                 'image' => null,
                 'has_expiry' => false,
-                'expiry_date' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -60,7 +59,6 @@ class ProductSeeder extends Seeder
                 'warehouse_id' => $warehouseIds[array_rand($warehouseIds)],
                 'image' => null,
                 'has_expiry' => true,
-                'expiry_date' => now()->subDays(5), // expired 5 days ago
                 'created_at' => now()->subMonths(6),
                 'updated_at' => now(),
             ],
@@ -79,7 +77,6 @@ class ProductSeeder extends Seeder
                 'warehouse_id' => $warehouseIds[array_rand($warehouseIds)],
                 'image' => null,
                 'has_expiry' => true,
-                'expiry_date' => now()->addDays(10), // expires in 10 days
                 'created_at' => now()->subMonths(2),
                 'updated_at' => now(),
             ],
@@ -98,7 +95,6 @@ class ProductSeeder extends Seeder
                 'warehouse_id' => $warehouseIds[array_rand($warehouseIds)],
                 'image' => null,
                 'has_expiry' => true,
-                'expiry_date' => now()->addDays(3), // expires in 3 days
                 'created_at' => now()->subMonths(1),
                 'updated_at' => now(),
             ],
@@ -117,7 +113,6 @@ class ProductSeeder extends Seeder
                 'warehouse_id' => $warehouseIds[array_rand($warehouseIds)],
                 'image' => null,
                 'has_expiry' => true,
-                'expiry_date' => now()->subMonths(3), // expired 3 months ago
                 'created_at' => now()->subYears(1),
                 'updated_at' => now(),
             ],

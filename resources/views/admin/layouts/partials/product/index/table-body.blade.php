@@ -38,21 +38,6 @@
                 {{ \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price) }}
             </td>
             <td class="sort-supplier text-center">{{ $product->supplier->name }}</td>
-            <td class="sort-expiry text-center">
-                @if ($product->has_expiry && $product->expiry_date)
-                    {{ $product->expiry_date->format('d-m-Y') }}
-                    @php
-                        [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getExpiryClassAndText(
-                            $product->expiry_date,
-                        );
-                    @endphp
-                    @if ($badgeClass)
-                        <span class="{{ $badgeClass }}">{{ $badgeText }}</span>
-                    @endif
-                @else
-                    <span class="text-muted">N/A</span>
-                @endif
-            </td>
             <td class="no-print" style="text-align:center">
                 @include('admin.layouts.partials.product.index.action-dropdown', compact('product'))
             </td>

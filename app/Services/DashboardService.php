@@ -40,7 +40,6 @@ class DashboardService
         $topCategories = $this->getTopCategories($dates);
         $monthlyData = $this->getMonthlyData($dates, $categoryId);
         $lowStockProducts = Product::getLowStockProducts();
-        $expiringSoonProducts = Product::getExpiringSoonProducts();
 
         $salesData = Sales::selectRaw('
             DATE_FORMAT(order_date, "%b") as month,
@@ -76,9 +75,7 @@ class DashboardService
             'recentSales' => $recentSales,
             'recentPurchases' => $recentPurchases,
             'lowStockCount' => $lowStockProducts->count(),
-            'expiringSoonCount' => $expiringSoonProducts->count(),
             'lowStockProducts' => $lowStockProducts,
-            'expiringSoonProducts' => $expiringSoonProducts,
             'totalliability' => $totalLiability,
             'countliability' => $unpaidLiability,
             'paidDebtMonthly' => $this->getPaidDebtMonthly(),
@@ -481,18 +478,6 @@ class DashboardService
         }
 
         return Product::whereRaw('quantity <= min_stock')->count();
-    }
-
-    private function getExpiringSoonCount()
-    {
-        if (method_exists(Product::class, 'expiringSoonCount')) {
-            return Product::expiringSoonCount();
-        }
-
-        return Product::whereNotNull('expiry_date')
-            ->where('expiry_date', '<=', now()->addDays(30))
-            ->where('expiry_date', '>=', now())
-            ->count();
     }
 
     private function getMonthlyRevenue()

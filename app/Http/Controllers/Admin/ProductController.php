@@ -26,15 +26,15 @@ class ProductController extends Controller
         $products = $this->productService->getPaginatedProducts($entries);
         $totalproduct = Product::count();
         $lowStockCount = Product::lowStockCount();
-        $expiringSoonCount = Product::expiringSoonCount();
+        $expiringSoonCount = $this->productService->getExpiringSoonPOItemsCount();
         $totalcategory = Categories::count();
 
         $formData = $this->productService->getProductFormData();
 
         $lowStockProducts = Product::getLowStockProducts();
-        $expiringSoonProducts = Product::getExpiringSoonProducts();
+        $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
 
-        return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'expiringSoonCount', 'lowStockProducts', 'expiringSoonProducts') + $formData);
+        return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts') + $formData);
     }
 
     public function create()
@@ -47,16 +47,9 @@ class ProductController extends Controller
     public function modalView($id)
     {
         try {
-            $product = Product::with(['category', 'supplier', 'unit', 'warehouse'])->findOrFail($id);
+            $product = Product::with(['category', 'supplier', 'unit', 'warehouse', 'poItems'])->findOrFail($id);
             $product->formatted_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->price);
             $product->formatted_selling_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price);
-            if ($product->has_expiry && $product->expiry_date) {
-                try {
-                    $product->expiry_date = \Carbon\Carbon::parse($product->expiry_date)->format('Y-m-d');
-                } catch (\Exception $e) {
-                    $product->expiry_date = null;
-                }
-            }
             return response()->json($product);
         } catch (\Exception $e) {
             return response()->json([
@@ -75,9 +68,8 @@ class ProductController extends Controller
         $warehouses = Warehouse::all();
         $mainWarehouse = Warehouse::where('is_main', true)->first();
         $lowStockProducts = Product::getLowStockProducts();
-        $expiringSoonProducts = Product::getExpiringSoonProducts();
 
-        return view('admin.product.product-edit', compact('expiringSoonProducts', 'lowStockProducts', 'products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
+        return view('admin.product.product-edit', compact('lowStockProducts', 'products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
     }
 
     public function store(Request $request)
@@ -96,7 +88,6 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'has_expiry' => 'sometimes|boolean',
-            'expiry_date' => 'nullable|date|required_if:has_expiry,1',
         ]);
 
         $this->productService->createProduct($request->all());
@@ -120,7 +111,6 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'has_expiry' => 'nullable|sometimes|boolean',
-            'expiry_date' => 'nullable|date|required_if:has_expiry,1',
         ]);
 
         $product = $this->productService->quickCreateProduct($request->all());
@@ -150,7 +140,6 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'has_expiry' => 'sometimes|boolean',
-            'expiry_date' => 'nullable|date|required_if:has_expiry,1',
         ]);
 
         $this->productService->updateProduct($product, $request->all());
@@ -171,13 +160,11 @@ class ProductController extends Controller
         $totalproduct = Product::count();
         $totalcategory = Categories::count();
         $lowStockCount = Product::lowStockCount();
-        $expiringSoonCount = Product::expiringSoonCount();
 
         return response()->json([
             'totalproduct' => $totalproduct,
             'totalcategory' => $totalcategory,
             'lowStockCount' => $lowStockCount,
-            'expiringSoonCount' => $expiringSoonCount,
         ]);
     }
 
@@ -243,5 +230,11 @@ class ProductController extends Controller
         }
 
         return response()->json($products);
+    }
+
+    public function getExpiringSoonProducts()
+    {
+        $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
+        return response()->json($expiringSoonProducts);
     }
 }

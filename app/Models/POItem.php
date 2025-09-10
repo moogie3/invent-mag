@@ -16,12 +16,14 @@ class POItem extends Model
         'price',
         'discount',
         'discount_type',
-        'total'
+        'total',
+        'expiry_date'
     ];
 
     protected $casts = [
         'quantity' => 'float',
         'total' => 'float',
+        'expiry_date' => 'date:Y-m-d',
     ];
 
     public function product() {

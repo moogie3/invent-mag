@@ -1,21 +1,13 @@
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+
 export class SalesOrderModule {
     constructor(config = {}) {
         this.config = {
-            currency: "IDR",
-            locale: "id-ID",
             ...config,
         };
 
         this.taxRate =
             parseFloat(document.getElementById("taxRateInput")?.value) || 0;
-    }
-
-    formatCurrency(amount) {
-        return new Intl.NumberFormat(this.config.locale, {
-            style: "currency",
-            currency: this.config.currency,
-            maximumFractionDigits: 0,
-        }).format(amount);
     }
 
     calculateDiscountAmount(price, quantity, discount, discountType) {

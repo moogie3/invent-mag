@@ -1,18 +1,4 @@
-import { currencySettings } from './state.js';
-
-export function formatCurrencyJs(amount) {
-    let number = parseFloat(amount);
-    if (isNaN(number)) {
-        return amount;
-    }
-
-    return new Intl.NumberFormat(currencySettings.locale, {
-        style: "currency",
-        currency: currencySettings.currency_code,
-        minimumFractionDigits: currencySettings.decimalPlaces,
-        maximumFractionDigits: currencySettings.decimalPlaces,
-    }).format(number);
-}
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 
 export function getStatusColor(status) {
     switch (status) {

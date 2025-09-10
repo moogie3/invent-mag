@@ -40,7 +40,7 @@
         <div class="input-group">
             <input type="number" min="0" step="0" class="form-control" id="discount" placeholder="0" />
             <select class="form-select" id="discount_type" style="max-width: 70px;">
-                <option value="fixed">Rp</option>
+                <option value="fixed">Fixed</option>
                 <option value="percentage">%</option>
             </select>
         </div>

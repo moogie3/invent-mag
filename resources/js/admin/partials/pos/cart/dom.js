@@ -1,5 +1,5 @@
 import { getProducts } from './state.js';
-import { formatCurrency } from '../utils/currency.js';
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 import { calculateTotals } from './totals.js';
 
 const productList = document.getElementById("productList");
@@ -66,7 +66,7 @@ export function renderList() {
                 <input type="number" class="form-control form-control-sm quantity-input" value="${product.quantity}" min="1" data-index="${index}" style="width: 60px;">
                 <span class="text-muted mx-2">x</span>
                 <div class="input-group input-group-sm" style="width: 120px;">
-                    <span class="input-group-text">Rp</span>
+                    <span class="input-group-text">${window.currencySettings.currency_symbol}</span>
                     <input type="number" class="form-control price-input" value="${product.price}" min="0" data-index="${index}">
                 </div>
                 <span class="text-muted ms-2">/ ${product.unit}</span>

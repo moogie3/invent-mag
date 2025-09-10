@@ -23,7 +23,7 @@
                             {{ ($sales->order_discount_type ?? '') === 'percentage' ? 'selected' : '' }}>
                             %</option>
                         <option value="fixed" {{ ($sales->order_discount_type ?? '') === 'fixed' ? 'selected' : '' }}>
-                            Rp</option>
+                            Fixed</option>
                     </select>
                 </div>
                 <div class="text-danger" id="orderDiscountTotal">
@@ -32,14 +32,12 @@
             </div>
         </div>
 
-        @if (($sales->tax_rate ?? 0) > 0)
-            <div class="d-flex justify-content-between mb-2">
-                <div>Tax ({{ $sales->tax_rate }}%):</div>
+        <div class="d-flex justify-content-between mb-2">
+                <div>Tax ({{ $sales->tax_rate ?? 0 }}%):</div>
                 <div class="text-muted" id="totalTax">
                     {{ \App\Helpers\CurrencyHelper::format($summary['taxAmount']) }}
                 </div>
             </div>
-        @endif
 
         <hr>
         <div class="d-flex justify-content-between align-items-center">

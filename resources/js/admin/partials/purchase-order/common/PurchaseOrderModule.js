@@ -1,19 +1,10 @@
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+
 export class PurchaseOrderModule {
     constructor(config = {}) {
         this.config = {
-            currency: "IDR",
-            locale: "id-ID",
             ...config,
         };
-    }
-
-    formatCurrency(amount) {
-        const currencySettings = this.config;
-        return new Intl.NumberFormat(currencySettings.locale, {
-            style: "currency",
-            currency: currencySettings.currency_code,
-            maximumFractionDigits: currencySettings.decimal_places,
-        }).format(amount);
     }
 
     calculateTotal(price, quantity, discount, discountType) {

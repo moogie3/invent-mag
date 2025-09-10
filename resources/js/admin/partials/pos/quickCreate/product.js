@@ -1,4 +1,4 @@
-import { formatCurrency } from '../utils/currency.js';
+import { formatCurrency } from '@/js/utils/currencyFormatter.js';
 import { getStockBadgeClass } from '../utils/ui.js';
 
 function setupQuickCreateProductButton() {

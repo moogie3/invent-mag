@@ -1,9 +1,13 @@
-import { PurchaseOrderCreate } from './partials/purchase-order/create/PurchaseOrderCreate.js';
-import { PurchaseOrderEdit } from './partials/purchase-order/edit/PurchaseOrderEdit.js';
-import { PurchaseOrderView } from './partials/purchase-order/view/PurchaseOrderView.js';
-import { PurchaseOrderBulkSelection } from './partials/purchase-order/bulkActions/PurchaseOrderBulkSelection.js';
-import { initSearch } from './partials/purchase-order/search/main.js';
-import { bulkDeletePO, bulkExportPO, bulkMarkAsPaidPO } from './partials/purchase-order/bulkActions/actions.js';
+import { PurchaseOrderCreate } from "./partials/purchase-order/create/PurchaseOrderCreate.js";
+import { PurchaseOrderEdit } from "./partials/purchase-order/edit/PurchaseOrderEdit.js";
+import { PurchaseOrderView } from "./partials/purchase-order/view/PurchaseOrderView.js";
+import { PurchaseOrderBulkSelection } from "./partials/purchase-order/bulkActions/PurchaseOrderBulkSelection.js";
+import { initSearch } from "./partials/purchase-order/search/main.js";
+import {
+    bulkDeletePO,
+    bulkExportPO,
+    bulkMarkAsPaidPO,
+} from "./partials/purchase-order/bulkActions/actions.js";
 
 // Expose global functions for inline event handlers
 window.bulkDeletePO = bulkDeletePO;
@@ -12,22 +16,22 @@ window.bulkMarkAsPaidPO = bulkMarkAsPaidPO;
 
 // Keep the existing DOMContentLoaded initialization
 document.addEventListener("DOMContentLoaded", function () {
-    if (sessionStorage.getItem('purchaseOrderBulkDeleteSuccess')) {
+    if (sessionStorage.getItem("purchaseOrderBulkDeleteSuccess")) {
         showToast(
             "Success",
-            sessionStorage.getItem('purchaseOrderBulkDeleteSuccess'),
+            sessionStorage.getItem("purchaseOrderBulkDeleteSuccess"),
             "success"
         );
-        sessionStorage.removeItem('purchaseOrderBulkDeleteSuccess');
+        sessionStorage.removeItem("purchaseOrderBulkDeleteSuccess");
     }
 
-    if (sessionStorage.getItem('purchaseOrderBulkMarkAsPaidSuccess')) {
+    if (sessionStorage.getItem("purchaseOrderBulkMarkAsPaidSuccess")) {
         showToast(
             "Success",
-            sessionStorage.getItem('purchaseOrderBulkMarkAsPaidSuccess'),
+            sessionStorage.getItem("purchaseOrderBulkMarkAsPaidSuccess"),
             "success"
         );
-        sessionStorage.removeItem('purchaseOrderBulkMarkAsPaidSuccess');
+        sessionStorage.removeItem("purchaseOrderBulkMarkAsPaidSuccess");
     }
 
     setTimeout(() => {

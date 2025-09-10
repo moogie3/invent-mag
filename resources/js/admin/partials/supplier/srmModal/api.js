@@ -1,7 +1,7 @@
 import { srmState, currencySettings, setCurrencySettings } from './state.js';
 import { showLoadingState, showErrorState } from './ui.js';
 import { safeUpdateElement, safeUpdateElementHTML, safeToggleElement } from '../utils/dom.js';
-import { formatCurrency } from '../utils/currency.js';
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 import { formatDateToCustomString } from '../utils/date.js';
 import { getStatusBadgeHtml } from '../utils/status.js';
 

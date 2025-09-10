@@ -187,19 +187,17 @@
                                 {{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['orderDiscount']) }}
                             </div>
                         </div>
-                        @if (($sales->tax_rate ?? 0) > 0)
-                            <div class="d-flex justify-content-between mb-2">
+                        <div class="d-flex justify-content-between mb-2">
                                 <div>
                                     Tax
                                     <small class="text-muted">
-                                        ({{ $sales->tax_rate }}%)
+                                        ({{ $sales->tax_rate ?? 0 }}%)
                                     </small>:
                                 </div>
                                 <div>
                                     {{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['taxAmount']) }}
                                 </div>
                             </div>
-                        @endif
                         <hr>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="fs-5"><strong>Grand Total:</strong></div>

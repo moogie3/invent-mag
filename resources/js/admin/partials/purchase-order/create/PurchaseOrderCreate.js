@@ -1,4 +1,5 @@
 import { PurchaseOrderModule } from '../common/PurchaseOrderModule.js';
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 
 export class PurchaseOrderCreate extends PurchaseOrderModule {
     constructor(config = {}) {
@@ -276,12 +277,12 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
         const totalDiscountInputEl =
             document.getElementById("totalDiscountInput");
 
-        if (subtotalEl) subtotalEl.innerText = this.formatCurrency(subtotal);
+        if (subtotalEl) subtotalEl.innerText = formatCurrency(subtotal);
         if (orderDiscountTotalEl)
             orderDiscountTotalEl.innerText =
-                this.formatCurrency(orderDiscountAmount);
+                formatCurrency(orderDiscountAmount);
         if (finalTotalEl)
-            finalTotalEl.innerText = this.formatCurrency(finalTotal);
+            finalTotalEl.innerText = formatCurrency(finalTotal);
         if (totalDiscountInputEl)
             totalDiscountInputEl.value = orderDiscountAmount;
 
@@ -475,7 +476,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             .closest("tr")
             .querySelector(".product-total");
         if (totalElement) {
-            totalElement.innerText = this.formatCurrency(product.total);
+            totalElement.innerText = formatCurrency(product.total);
         }
 
         this.updateTotalPrice();
@@ -530,7 +531,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                                 product.discountType === "fixed"
                                     ? "selected"
                                     : ""
-                            }>Rp</option>
+                            }>${window.currencySettings.currency_symbol}</option>
                             <option value="percentage" ${
                                 product.discountType === "percentage"
                                     ? "selected"
@@ -539,7 +540,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                         </select>
                     </div>
                 </td>
-                <td class="text-end product-total fw-bold">${this.formatCurrency(
+                <td class="text-end product-total fw-bold">${formatCurrency(
                     product.total
                 )}</td>
                 <td class="text-center">

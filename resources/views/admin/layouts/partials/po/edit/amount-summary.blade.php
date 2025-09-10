@@ -22,7 +22,7 @@
                         <option value="percentage" {{ $pos->discount_total_type === 'percentage' ? 'selected' : '' }}>
                             %</option>
                         <option value="fixed" {{ $pos->discount_total_type === 'fixed' ? 'selected' : '' }}>
-                            Rp</option>
+                            Fixed</option>
                     </select>
                 </div>
                 <div class="text-danger" id="orderDiscountTotal">

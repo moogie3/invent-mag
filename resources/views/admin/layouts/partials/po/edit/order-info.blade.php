@@ -35,7 +35,7 @@
                     <option value="Paid" {{ $pos->status == 'Paid' ? 'selected' : '' }}>
                         Paid
                     </option>
-                    <option value="Unpaid" {{ $pos->status == 'Unpaid' ? 'selected' : '' }}>
+                    <option value="Unpaid" {{ $pos->status != 'Paid' ? 'selected' : '' }}>
                         Unpaid
                     </option>
                 </select>

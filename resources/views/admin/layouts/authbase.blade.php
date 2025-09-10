@@ -1,9 +1,5 @@
-@php
-    $themeMode = auth()->user()->system_settings['theme_mode'] ?? 'light';
-@endphp
-
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="{{ $themeMode }}">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />

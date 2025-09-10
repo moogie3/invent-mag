@@ -1,5 +1,5 @@
 import { getProducts } from './state.js';
-import { formatCurrency } from '../utils/currency.js';
+import { formatCurrency } from '@/js/utils/currencyFormatter.js';
 
 const subtotalElement = document.getElementById("subtotal");
 const finalTotalElement = document.getElementById("finalTotal");

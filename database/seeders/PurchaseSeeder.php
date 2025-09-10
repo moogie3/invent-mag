@@ -58,7 +58,7 @@ class PurchaseSeeder extends Seeder
                 for ($j = 0; $j < $numberOfItems; $j++) {
                     $product = $products->random();
                     $quantity = rand(1, 10);
-                    $price = $product->purchase_price + rand(0, 5);
+                    $price = $product->price;
                     $total = $quantity * $price;
                     $totalPurchaseAmount += $total;
 

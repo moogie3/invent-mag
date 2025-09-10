@@ -4,11 +4,27 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Categories;
+use App\Models\Unit;
+use App\Models\Supplier;
+use App\Models\Warehouse;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
+        // Fetch existing IDs
+        $categoryIds = Categories::pluck('id')->toArray();
+        $unitIds = Unit::pluck('id')->toArray();
+        $supplierIds = Supplier::pluck('id')->toArray();
+        $warehouseIds = Warehouse::pluck('id')->toArray();
+
+        // Check if necessary data exists
+        if (empty($categoryIds) || empty($unitIds) || empty($supplierIds) || empty($warehouseIds)) {
+            $this->command->info('Skipping ProductSeeder: Categories, Units, Suppliers, or Warehouses not found. Please run their seeders first.');
+            return;
+        }
+
         DB::table('products')->insert([
             // Near low stock, no expiry
             [
@@ -18,11 +34,11 @@ class ProductSeeder extends Seeder
                 'low_stock_threshold' => 10,
                 'price' => 600.00,
                 'selling_price' => 1100.00,
-                'category_id' => 1,
-                'units_id' => 2,
-                'supplier_id' => 1,
+                'category_id' => $categoryIds[array_rand($categoryIds)],
+                'units_id' => $unitIds[array_rand($unitIds)],
+                'supplier_id' => $supplierIds[array_rand($supplierIds)],
                 'description' => 'Capacitor close to low stock',
-                'warehouse_id' => 1,
+                'warehouse_id' => $warehouseIds[array_rand($warehouseIds)],
                 'image' => null,
                 'has_expiry' => false,
                 'expiry_date' => null,
@@ -37,11 +53,11 @@ class ProductSeeder extends Seeder
                 'low_stock_threshold' => 10,
                 'price' => 180.00,
                 'selling_price' => 350.00,
-                'category_id' => 1,
-                'units_id' => 2,
-                'supplier_id' => 2,
+                'category_id' => $categoryIds[array_rand($categoryIds)],
+                'units_id' => $unitIds[array_rand($unitIds)],
+                'supplier_id' => $supplierIds[array_rand($supplierIds)],
                 'description' => 'Diode product already expired',
-                'warehouse_id' => 1,
+                'warehouse_id' => $warehouseIds[array_rand($warehouseIds)],
                 'image' => null,
                 'has_expiry' => true,
                 'expiry_date' => now()->subDays(5), // expired 5 days ago
@@ -56,11 +72,11 @@ class ProductSeeder extends Seeder
                 'low_stock_threshold' => 20,
                 'price' => 950.00,
                 'selling_price' => 1700.00,
-                'category_id' => 1,
-                'units_id' => 2,
-                'supplier_id' => 2,
+                'category_id' => $categoryIds[array_rand($categoryIds)],
+                'units_id' => $unitIds[array_rand($unitIds)],
+                'supplier_id' => $supplierIds[array_rand($supplierIds)],
                 'description' => 'Crystal oscillator expiring soon',
-                'warehouse_id' => 2,
+                'warehouse_id' => $warehouseIds[array_rand($warehouseIds)],
                 'image' => null,
                 'has_expiry' => true,
                 'expiry_date' => now()->addDays(10), // expires in 10 days
@@ -75,11 +91,11 @@ class ProductSeeder extends Seeder
                 'low_stock_threshold' => 5,
                 'price' => 90.00,
                 'selling_price' => 160.00,
-                'category_id' => 2,
-                'units_id' => 2,
-                'supplier_id' => 2,
+                'category_id' => $categoryIds[array_rand($categoryIds)],
+                'units_id' => $unitIds[array_rand($unitIds)],
+                'supplier_id' => $supplierIds[array_rand($supplierIds)],
                 'description' => 'LED near expiry and low stock',
-                'warehouse_id' => 1,
+                'warehouse_id' => $warehouseIds[array_rand($warehouseIds)],
                 'image' => null,
                 'has_expiry' => true,
                 'expiry_date' => now()->addDays(3), // expires in 3 days
@@ -94,11 +110,11 @@ class ProductSeeder extends Seeder
                 'low_stock_threshold' => 10,
                 'price' => 1400.00,
                 'selling_price' => 2600.00,
-                'category_id' => 1,
-                'units_id' => 2,
-                'supplier_id' => 3,
+                'category_id' => $categoryIds[array_rand($categoryIds)],
+                'units_id' => $unitIds[array_rand($unitIds)],
+                'supplier_id' => $supplierIds[array_rand($supplierIds)],
                 'description' => 'Voltage regulator expired long ago',
-                'warehouse_id' => 1,
+                'warehouse_id' => $warehouseIds[array_rand($warehouseIds)],
                 'image' => null,
                 'has_expiry' => true,
                 'expiry_date' => now()->subMonths(3), // expired 3 months ago

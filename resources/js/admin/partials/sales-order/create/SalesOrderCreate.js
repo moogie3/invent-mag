@@ -1,4 +1,5 @@
 import { SalesOrderModule } from '../common/SalesOrderModule.js';
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 
 export class SalesOrderCreate extends SalesOrderModule {
     constructor(config = {}) {
@@ -362,13 +363,13 @@ export class SalesOrderCreate extends SalesOrderModule {
         const finalTotal = taxableAmount + taxAmount;
 
         document.getElementById("subtotal").innerText =
-            this.formatCurrency(subtotal);
+            formatCurrency(subtotal);
         document.getElementById("orderDiscountTotal").innerText =
-            this.formatCurrency(orderDiscountAmount);
+            formatCurrency(orderDiscountAmount);
         document.getElementById("taxTotal").innerText =
-            this.formatCurrency(taxAmount);
+            formatCurrency(taxAmount);
         document.getElementById("finalTotal").innerText =
-            this.formatCurrency(finalTotal);
+            formatCurrency(finalTotal);
 
         document.getElementById("totalDiscountInput").value = itemDiscount;
         document.getElementById("orderDiscountInput").value =
@@ -547,7 +548,7 @@ export class SalesOrderCreate extends SalesOrderModule {
                                 product.discountType === "fixed"
                                     ? "selected"
                                     : ""
-                            }>Rp</option>
+                            }>${window.currencySettings.currency_symbol}</option>
                             <option value="percentage" ${
                                 product.discountType === "percentage"
                                     ? "selected"
@@ -556,7 +557,7 @@ export class SalesOrderCreate extends SalesOrderModule {
                         </select>
                     </div>
                 </td>
-                <td class="text-end product-total fw-bold">${this.formatCurrency(
+                <td class="text-end product-total fw-bold">${formatCurrency(
                     product.total
                 )}</td>
                 <td class="text-center">
@@ -663,7 +664,7 @@ export class SalesOrderCreate extends SalesOrderModule {
             .closest("tr")
             .querySelector(".product-total");
         if (totalElement) {
-            totalElement.innerText = this.formatCurrency(product.total);
+            totalElement.innerText = formatCurrency(product.total);
         }
 
         this.updateTotalPrice();

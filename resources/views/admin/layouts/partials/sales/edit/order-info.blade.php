@@ -6,12 +6,12 @@
         <div class="d-flex justify-content-between mb-2">
             <div><strong>Order Date:</strong></div>
             <div>{{ $sales->order_date->format('d F Y') }}</div>
-            <input type="hidden" name="order_date" value="{{ $sales->order_date }}">
+            <input type="hidden" name="order_date" value="{{ optional($sales->order_date)->format('Y-m-d') }}">
         </div>
         <div class="d-flex justify-content-between mb-2">
             <div><strong>Due Date:</strong></div>
             <div>{{ $sales->due_date->format('d F Y') }}</div>
-            <input type="hidden" name="due_date" value="{{ $sales->due_date }}">
+            <input type="hidden" name="due_date" value="{{ optional($sales->due_date)->format('Y-m-d') }}">
         </div>
 
         <div class="d-flex justify-content-between mb-2">
@@ -32,12 +32,11 @@
         <div class="d-flex justify-content-between">
             <div><strong>Payment Status:</strong></div>
             <div>
-                <select class="form-select form-select-sm" name="status" id="status"
-                    {{ $sales->status == 'Paid' ? 'disabled' : '' }}>
+                <select class="form-select form-select-sm" name="status" id="status">
                     <option value="Paid" {{ $sales->status == 'Paid' ? 'selected' : '' }}>
                         Paid
                     </option>
-                    <option value="Unpaid" {{ $sales->status == 'Unpaid' ? 'selected' : '' }}>
+                    <option value="Unpaid" {{ $sales->status != 'Paid' ? 'selected' : '' }}>
                         Unpaid
                     </option>
                 </select>

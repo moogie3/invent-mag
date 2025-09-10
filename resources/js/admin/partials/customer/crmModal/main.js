@@ -1,6 +1,13 @@
 import { crmState } from './state.js';
 import { showLoadingState, showErrorState } from './ui.js';
 import { loadCrmData, handleInteractionForm } from './api.js';
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+
+function formatDateToCustomString(dateString) {
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+}
 
 export function initCrmCustomerModal() {
     const crmCustomerModal = document.getElementById("crmCustomerModal");

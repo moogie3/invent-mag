@@ -1,6 +1,6 @@
 import { getProducts } from '../cart/state.js';
 import { subtotal, orderDiscount, taxAmount, grandTotal } from '../cart/totals.js';
-import { formatCurrency } from '../utils/currency.js';
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 
 const paymentModal = new bootstrap.Modal(
     document.getElementById("paymentModal")

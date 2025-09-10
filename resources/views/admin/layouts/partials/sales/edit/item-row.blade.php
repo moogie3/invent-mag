@@ -34,7 +34,7 @@
                 <option value="percentage" {{ $item->discount_type === 'percentage' ? 'selected' : '' }}>
                     %</option>
                 <option value="fixed" {{ $item->discount_type === 'fixed' ? 'selected' : '' }}>
-                    Rp</option>
+                    Fixed</option>
             </select>
         </div>
     </td>

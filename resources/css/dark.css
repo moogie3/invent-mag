@@ -161,7 +161,7 @@
 }
 
 [data-bs-theme="dark"] .dropdown-menu {
-    background-color: var(--tblr-bg-surface);
+    background-color: var(--tblr-bg-surface) !important;
     color: var(--tblr-body-color);
     border-color: var(--tblr-border-color);
 }
@@ -232,4 +232,50 @@
 
 [data-bs-theme="dark"] .toast-container .toast {
     pointer-events: auto !important;
+}
+
+/* Dark mode overrides for SRM/CRM accordion items */
+[data-bs-theme="dark"] #srmHistoricalPurchaseContent .accordion-item .accordion-button:not(.collapsed) {
+    background-color: var(--tblr-bg-surface-secondary) !important;
+    color: var(--tblr-body-color) !important;
+}
+
+[data-bs-theme="dark"] #srmHistoricalPurchaseContent .accordion-collapse.show .accordion-body {
+    background-color: var(--tblr-bg-surface) !important;
+    color: var(--tblr-body-color) !important;
+}
+
+[data-bs-theme="dark"] #srmHistoricalPurchaseContent .accordion-item:has(.accordion-collapse.show) {
+    background-color: var(--tblr-bg-surface) !important;
+    border-color: var(--tblr-border-color) !important;
+}
+
+[data-bs-theme="dark"] #srmProductHistoryContent .accordion-item .accordion-button:not(.collapsed) {
+    background-color: var(--tblr-bg-surface-secondary) !important;
+    color: var(--tblr-body-color) !important;
+}
+
+[data-bs-theme="dark"] #srmProductHistoryContent .accordion-collapse.show .accordion-body {
+    background-color: var(--tblr-bg-surface) !important;
+    color: var(--tblr-body-color) !important;
+}
+
+[data-bs-theme="dark"] #srmProductHistoryContent .accordion-item:has(.accordion-collapse.show) {
+    background-color: var(--tblr-bg-surface) !important;
+    border-color: var(--tblr-border-color) !important;
+}
+
+[data-bs-theme="dark"] #transactionHistory .accordion-item .accordion-button:not(.collapsed) {
+    background-color: var(--tblr-bg-surface-secondary) !important;
+    color: var(--tblr-body-color) !important;
+}
+
+[data-bs-theme="dark"] #transactionHistory .accordion-collapse.show .accordion-body {
+    background-color: var(--tblr-bg-surface) !important;
+    color: var(--tblr-body-color) !important;
+}
+
+[data-bs-theme="dark"] #transactionHistory .accordion-item:has(.accordion-collapse.show) {
+    background-color: var(--tblr-bg-surface) !important;
+    border-color: var(--tblr-border-color) !important;
 }

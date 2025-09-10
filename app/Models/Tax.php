@@ -9,5 +9,5 @@ class Tax extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'rate'];
+    protected $fillable = ['name', 'rate', 'is_active'];
 }

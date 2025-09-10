@@ -34,19 +34,16 @@ html {
 /* For Webkit browsers (Chrome, Safari) */
 .custom-scroll::-webkit-scrollbar {
     width: 8px;
-
 }
 
 .custom-scroll::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
-
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 10px;
-
 }
 
 .custom-scroll::-webkit-scrollbar-thumb:hover {
@@ -81,6 +78,15 @@ html {
     --base-font-size: 14px;
     --small-font-size: 12px;
     --tiny-font-size: 10px;
+
+    /* Z-Index layers */
+    --z-base: 1;
+    --z-card: 10;
+    --z-card-hover: 20;
+    --z-dropdown: 1050;
+    --z-dropdown-menu: 9999;
+    --z-modal: 1070;
+    --z-tooltip: 1080;
 }
 
 html {
@@ -148,38 +154,147 @@ body {
    ============================ */
 .card {
     transition: transform 0.2s ease-in-out;
-    /* Fix z-index stacking issue */
     position: relative;
-    z-index: 1;
+    z-index: var(--z-card);
 }
 
 .card:hover {
     transform: translateY(-2px);
-    /* Increase z-index on hover to bring card to front */
-    z-index: 10;
+    z-index: var(--z-card-hover);
 }
 
-/* Fix dropdown z-index issue */
-.card .dropdown {
+/* ============================
+   ENHANCED DROPDOWN Z-INDEX FIX
+   ============================ */
+
+/* Dropdown container - ensure it's positioned and has proper z-index */
+.dropdown {
     position: relative;
-    z-index: 1050;
-    /* Bootstrap's dropdown z-index */
+    z-index: var(--z-dropdown);
 }
 
-.card .dropdown-menu {
-    z-index: 1051;
-    /* Higher than dropdown toggle */
+/* When dropdown is open, boost the z-index significantly */
+.dropdown.show {
+    z-index: var(--z-dropdown-menu) !important;
 }
 
-/* Ensure dropdown appears above other cards */
-.card:has(.dropdown.show),
-.card:has(.dropdown-menu.show) {
-    z-index: 1060 !important;
+/* Dropdown menu gets even higher z-index */
+.dropdown-menu {
+    position: absolute;
+    z-index: var(--z-dropdown-menu) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    isolation: isolate;
 }
 
-/* Alternative approach - set higher z-index for card with active dropdown */
-.card .dropdown.show {
-    z-index: 1060;
+/* Ensure any parent elements don't interfere */
+.dropdown-menu.show {
+    z-index: calc(var(--z-dropdown-menu) + 1) !important;
+}
+
+/* SPECIFIC FIXES FOR TABLE DROPDOWNS */
+
+/* Fix table cells containing dropdowns */
+.table td:has(.dropdown),
+.table th:has(.dropdown) {
+    position: relative;
+    z-index: var(--z-dropdown);
+}
+
+/* When dropdown is open in table cell */
+.table td:has(.dropdown.show),
+.table th:has(.dropdown.show) {
+    z-index: var(--z-dropdown-menu) !important;
+}
+
+/* Fix table rows containing open dropdowns */
+.table tr:has(.dropdown.show) {
+    position: relative;
+    z-index: var(--z-dropdown-menu) !important;
+}
+
+/* Direct targeting for table dropdowns */
+.table .dropdown {
+    position: relative;
+    z-index: var(--z-dropdown);
+}
+
+.table .dropdown.show {
+    z-index: var(--z-dropdown-menu) !important;
+}
+
+/* Fix for dropdown buttons inside tables */
+.table .btn.dropdown-toggle {
+    position: relative;
+    z-index: var(--z-dropdown);
+}
+
+.table .btn.dropdown-toggle[aria-expanded="true"] {
+    z-index: var(--z-dropdown-menu) !important;
+}
+
+/* Specific fix for your supplier table structure */
+.card-table td .dropdown.show {
+    z-index: var(--z-dropdown-menu) !important;
+}
+
+.card-table .dropdown-menu {
+    z-index: calc(var(--z-dropdown-menu) + 1) !important;
+}
+
+/* Fix for Bootstrap's btn-group dropdowns specifically */
+.btn-group>.btn.dropdown-toggle:focus,
+.btn-group>.btn.dropdown-toggle.show,
+.btn-group.show {
+    z-index: var(--z-dropdown-menu) !important;
+}
+
+/* Emergency fix for table-responsive containers */
+.table-responsive {
+    position: relative;
+    z-index: var(--z-base);
+    overflow: visible;
+    /* Allow dropdowns to overflow */
+}
+
+/* Override table-responsive overflow when dropdown is open */
+.table-responsive:has(.dropdown.show) {
+    overflow: visible !important;
+}
+
+/* Ensure action buttons don't interfere */
+.action-btn {
+    position: relative;
+    z-index: var(--z-card);
+}
+
+/* But when they contain dropdowns, boost their z-index */
+.action-btn.dropdown-toggle {
+    z-index: var(--z-dropdown);
+}
+
+/* Classes that can be toggled via JavaScript for better control */
+.dropdown-active {
+    z-index: var(--z-dropdown-menu) !important;
+}
+
+.dropdown-backdrop {
+    z-index: calc(var(--z-dropdown-menu) - 1) !important;
+}
+
+/* ULTIMATE FIX - Force dropdown menus to always be on top */
+.dropdown-menu.show,
+.show>.dropdown-menu {
+    z-index: 99999 !important;
+    position: absolute !important;
+}
+
+/* Force parent elements to not interfere */
+.table-responsive .dropdown.show {
+    z-index: 99998 !important;
+}
+
+.card-table tbody tr td .dropdown.show {
+    z-index: 99998 !important;
 }
 
 /* ============================
@@ -235,6 +350,11 @@ body {
 /* ============================
    10. TABLE STYLES
    ============================ */
+.table-responsive {
+    position: relative;
+    z-index: var(--z-base);
+}
+
 .table-responsive::-webkit-scrollbar {
     height: 8px;
 }
@@ -337,6 +457,8 @@ body {
     border-radius: 6px;
     transition: all 0.2s ease;
     border: 1px solid transparent;
+    position: relative;
+    z-index: var(--z-card);
 }
 
 .action-btn:hover {
@@ -407,14 +529,6 @@ body {
 .status-indicator {
     display: inline-block;
     border-radius: 4px;
-}
-
-/* ============================
-   13. DROPDOWN & NAVIGATION
-   ============================ */
-.dropdown-menu {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    z-index: 1030 !important;
 }
 
 /* ============================

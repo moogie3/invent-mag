@@ -1,9 +1,13 @@
-import { crmState } from './state.js';
-import { showLoadingState, showErrorState } from './ui.js';
-import { safeUpdateElement, safeUpdateElementHTML, safeToggleElement } from '../utils/dom.js';
-import { formatCurrency } from '../utils/currency.js';
-import { formatDateToCustomString } from '../utils/date.js';
-import { getStatusBadgeHtml } from '../utils/status.js';
+import { crmState } from "./state.js";
+import { showLoadingState, showErrorState } from "./ui.js";
+import {
+    safeUpdateElement,
+    safeUpdateElementHTML,
+    safeToggleElement,
+} from "../utils/dom.js";
+import { formatCurrency } from "../../../../utils/currencyFormatter.js";
+import { formatDateToCustomString } from "../utils/date.js";
+import { getStatusBadgeHtml } from "../utils/status.js";
 
 export function loadCrmData(id, page, append = false) {
     if (!id) {
@@ -15,17 +19,13 @@ export function loadCrmData(id, page, append = false) {
     fetch(`/admin/customers/${id}/crm-details?page=${page}`)
         .then((response) => {
             if (!response.ok) {
-                throw new Error(
-                    `HTTP error! status: ${response.status}`
-                );
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then((data) => {
             if (!data || !data.customer) {
-                throw new Error(
-                    "Customer data not found in response"
-                );
+                throw new Error("Customer data not found in response");
             }
 
             if (!append) {
@@ -38,23 +38,13 @@ export function loadCrmData(id, page, append = false) {
             populateCrmData(data);
 
             crmState.lastPage = data.sales.last_page || 1;
-            const currentPageNum = data.sales
-                ? data.sales.current_page
-                : 1;
-            const lastPageNum = data.sales
-                ? data.sales.last_page
-                : 1;
+            const currentPageNum = data.sales ? data.sales.current_page : 1;
+            const lastPageNum = data.sales ? data.sales.last_page : 1;
 
             if (currentPageNum < lastPageNum) {
-                safeToggleElement(
-                    "loadMoreTransactions",
-                    "block"
-                );
+                safeToggleElement("loadMoreTransactions", "block");
             } else {
-                safeToggleElement(
-                    "loadMoreTransactions",
-                    "none"
-                );
+                safeToggleElement("loadMoreTransactions", "none");
             }
         })
         .catch((error) => {
@@ -69,34 +59,20 @@ export function loadCrmData(id, page, append = false) {
 }
 
 function populateCrmData(data) {
-    safeUpdateElement(
-        "crmCustomerName",
-        data.customer.name || "N/A"
-    );
-    safeUpdateElement(
-        "crmCustomerEmail",
-        data.customer.email || "N/A"
-    );
-    safeUpdateElement(
-        "crmCustomerPhone",
-        data.customer.phone_number || "N/A"
-    );
-    safeUpdateElement(
-        "crmCustomerAddress",
-        data.customer.address || "N/A"
-    );
+    safeUpdateElement("crmCustomerName", data.customer.name || "N/A");
+    safeUpdateElement("crmCustomerEmail", data.customer.email || "N/A");
+    safeUpdateElement("crmCustomerPhone", data.customer.phone_number || "N/A");
+    safeUpdateElement("crmCustomerAddress", data.customer.address || "N/A");
     safeUpdateElement(
         "crmCustomerPaymentTerms",
         data.customer.payment_terms || "N/A"
     );
 
-    const crmCustomerImageContainer =
-        document.getElementById(
-            "crmCustomerImageContainer"
-        );
+    const crmCustomerImageContainer = document.getElementById(
+        "crmCustomerImageContainer"
+    );
     const defaultPlaceholderUrl =
-        window.defaultPlaceholderUrl ||
-        "/img/default_placeholder.png";
+        window.defaultPlaceholderUrl || "/img/default_placeholder.png";
 
     if (crmCustomerImageContainer) {
         if (
@@ -124,10 +100,7 @@ function populateCrmData(data) {
         "crmLifetimeValue",
         formatCurrency(data.lifetimeValue || 0)
     );
-    safeUpdateElement(
-        "crmTotalSalesCount",
-        data.totalSalesCount || 0
-    );
+    safeUpdateElement("crmTotalSalesCount", data.totalSalesCount || 0);
     safeUpdateElement(
         "crmAverageOrderValue",
         formatCurrency(data.averageOrderValue || 0)
@@ -135,9 +108,7 @@ function populateCrmData(data) {
     safeUpdateElement(
         "crmLastInteractionDate",
         data.lastInteractionDate
-            ? new Date(
-                  data.lastInteractionDate
-              ).toLocaleDateString("id-ID")
+            ? new Date(data.lastInteractionDate).toLocaleDateString("id-ID")
             : "N/A"
     );
     safeUpdateElement(
@@ -151,17 +122,13 @@ function populateCrmData(data) {
     safeUpdateElement(
         "crmMemberSince",
         data.customer.created_at
-            ? new Date(
-                  data.customer.created_at
-              ).toLocaleDateString("id-ID")
+            ? new Date(data.customer.created_at).toLocaleDateString("id-ID")
             : "N/A"
     );
     safeUpdateElement(
         "crmLastPurchase",
         data.lastPurchaseDate
-            ? new Date(
-                  data.lastPurchaseDate
-              ).toLocaleDateString("id-ID")
+            ? new Date(data.lastPurchaseDate).toLocaleDateString("id-ID")
             : "N/A"
     );
 
@@ -170,83 +137,53 @@ function populateCrmData(data) {
 }
 
 function populateInteractions(interactions) {
-    const interactionTimeline = document.getElementById(
-        "interactionTimeline"
-    );
+    const interactionTimeline = document.getElementById("interactionTimeline");
     if (interactionTimeline) {
         interactionTimeline.innerHTML = "";
 
-        if (
-            interactions &&
-            interactions.length > 0
-        ) {
-            safeToggleElement(
-                "noInteractionsMessage",
-                "none"
-            );
-            interactions.forEach(
-                (interaction) => {
-                    const interactionElement =
-                        document.createElement("div");
-                    interactionElement.classList.add(
-                        "list-group-item",
-                        "list-group-item-action"
-                    );
-                    interactionElement.innerHTML = `
+        if (interactions && interactions.length > 0) {
+            safeToggleElement("noInteractionsMessage", "none");
+            interactions.forEach((interaction) => {
+                const interactionElement = document.createElement("div");
+                interactionElement.classList.add(
+                    "list-group-item",
+                    "list-group-item-action"
+                );
+                interactionElement.innerHTML = `
                 <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">${
-                        interaction.type
-                            .charAt(0)
-                            .toUpperCase() +
+                        interaction.type.charAt(0).toUpperCase() +
                         interaction.type.slice(1)
                     } on ${new Date(
-                        interaction.interaction_date
-                    ).toLocaleDateString("id-ID")}</h5>
+                    interaction.interaction_date
+                ).toLocaleDateString("id-ID")}</h5>
                     <small class="text-muted">by ${
-                        interaction.user
-                            ? interaction.user.name
-                            : "Unknown"
+                        interaction.user ? interaction.user.name : "Unknown"
                     }</small>
                 </div>
                 <p class="mb-1">${interaction.notes}</p>
             `;
-                    interactionTimeline.appendChild(
-                        interactionElement
-                    );
-                }
-            );
+                interactionTimeline.appendChild(interactionElement);
+            });
         } else {
-            safeToggleElement(
-                "noInteractionsMessage",
-                "block"
-            );
+            safeToggleElement("noInteractionsMessage", "block");
         }
     }
 }
 
 function populateTransactions(sales) {
-    const transactionHistory =
-        document.getElementById("transactionHistory");
+    const transactionHistory = document.getElementById("transactionHistory");
     if (transactionHistory) {
         transactionHistory.innerHTML = "";
 
-        if (
-            sales &&
-            sales.length > 0
-        ) {
-            safeToggleElement(
-                "noTransactionsMessage",
-                "none"
-            );
+        if (sales && sales.length > 0) {
+            safeToggleElement("noTransactionsMessage", "none");
 
             sales.forEach((sale) => {
-                const saleElement =
-                    document.createElement("div");
+                const saleElement = document.createElement("div");
                 saleElement.classList.add("accordion-item");
                 saleElement.innerHTML = `
-                <h2 class="accordion-header" id="heading-${
-                    sale.id
-                }">
+                <h2 class="accordion-header" id="heading-${sale.id}">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
                         sale.id
                     }" aria-expanded="false" aria-controls="collapse-${
@@ -256,9 +193,7 @@ function populateTransactions(sales) {
                             <div>
                                 Invoice #${
                                     sale.invoice
-                                } - ${formatDateToCustomString(
-                    sale.created_at
-                )}
+                                } - ${formatDateToCustomString(sale.created_at)}
                                 ${getStatusBadgeHtml(
                                     sale.status,
                                     sale.due_date
@@ -287,8 +222,7 @@ function populateTransactions(sales) {
                             </div>
                             <div class="col-md-6 text-end">
                                 <p class="mb-1"><strong>Payment Type:</strong> ${
-                                    sale.payment_type ||
-                                    "N/A"
+                                    sale.payment_type || "N/A"
                                 }</p>
                             </div>
                         </div>
@@ -306,32 +240,24 @@ function populateTransactions(sales) {
                                 <tbody>
                                     ${
                                         sale.sales_items &&
-                                        sale.sales_items
-                                            .length > 0
+                                        sale.sales_items.length > 0
                                             ? sale.sales_items
                                                   .map(
-                                                      (
-                                                          item
-                                                      ) => `
+                                                      (item) => `
                                         <tr>
                                             <td>${
                                                 item.product
-                                                    ? item
-                                                          .product
-                                                          .name
+                                                    ? item.product.name
                                                     : "N/A"
                                             }</td>
                                             <td class="text-center">${
-                                                item.quantity ||
-                                                0
+                                                item.quantity || 0
                                             }</td>
                                             <td class="text-end">${formatCurrency(
-                                                item.customer_price ||
-                                                    0
+                                                item.customer_price || 0
                                             )}</td>
                                             <td class="text-end">${formatCurrency(
-                                                item.total ||
-                                                    0
+                                                item.total || 0
                                             )}</td>
                                         </tr>
                                     `
@@ -345,8 +271,15 @@ function populateTransactions(sales) {
                         <div class="row mt-3">
                             <div class="col-md-12 text-end">
                                 <p class="mb-1"><strong>Subtotal:</strong> ${formatCurrency(
-                                    sale.total -
-                                        sale.total_tax
+                                    sale.sales_items &&
+                                        sale.sales_items.length > 0
+                                        ? sale.sales_items.reduce(
+                                              (sum, item) =>
+                                                  sum +
+                                                  (parseFloat(item.total) || 0),
+                                              0
+                                          )
+                                        : 0
                                 )}</p>
                                 <p class="mb-1"><strong>Discount:</strong> ${formatCurrency(
                                     sale.order_discount
@@ -365,10 +298,7 @@ function populateTransactions(sales) {
                 transactionHistory.appendChild(saleElement);
             });
         } else {
-            safeToggleElement(
-                "noTransactionsMessage",
-                "block"
-            );
+            safeToggleElement("noTransactionsMessage", "block");
         }
     }
 }
@@ -399,11 +329,7 @@ export function handleInteractionForm() {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.id) {
-                        showToast(
-                            "Success",
-                            "Interaction added.",
-                            "success"
-                        );
+                        showToast("Success", "Interaction added.", "success");
                         const timeline = document.getElementById(
                             "interactionTimeline"
                         );
@@ -429,10 +355,7 @@ export function handleInteractionForm() {
                         <p class="mb-1">${data.notes}</p>
                     `;
                             timeline.prepend(newInteraction);
-                            safeToggleElement(
-                                "noInteractionsMessage",
-                                "none"
-                            );
+                            safeToggleElement("noInteractionsMessage", "none");
                         }
                         form.reset();
                         form.querySelector(

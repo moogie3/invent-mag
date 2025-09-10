@@ -1,5 +1,5 @@
 import { setText, setBadge, getExpiryBadge } from '../utils/ui.js';
-import { formatCurrency } from '../utils/currency.js';
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 
 export function initProductModal() {
     const printBtn = document.getElementById("productModalPrint");

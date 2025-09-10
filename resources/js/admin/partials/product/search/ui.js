@@ -1,6 +1,6 @@
 import { originalProductData } from './state.js';
 import { initBulkSelection, restoreCheckboxStates, updateBulkActionsBarVisibility, getSelectedProductIds } from '../bulkActions/selection.js';
-import { formatCurrency } from '../utils/currency.js';
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 
 export function renderSearchResults(products) {
     const tableBody = document.querySelector("table tbody");

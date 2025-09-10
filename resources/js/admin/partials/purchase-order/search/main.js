@@ -139,6 +139,8 @@ function performSearch(query) {
         });
 }
 
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+
 function renderSearchResults(pos) {
     const tableBody = document.querySelector("table tbody");
     if (!pos.length) {
@@ -149,20 +151,6 @@ function renderSearchResults(pos) {
     pos.forEach((po) => {
         originalPoData.set(po.id.toString(), po);
     });
-
-    const formatCurrency = (amount) => {
-        if (!amount) return "N/A";
-        const currencySettings = {
-            locale: document.querySelector('meta[name="currency-locale"]').content,
-            currency_code: document.querySelector('meta[name="currency-code"]').content,
-            decimal_places: parseInt(document.querySelector('meta[name="currency-decimal-places"]').content),
-        };
-        return new Intl.NumberFormat(currencySettings.locale, {
-            style: "currency",
-            currency: currencySettings.currency_code,
-            maximumFractionDigits: currencySettings.decimal_places,
-        }).format(amount);
-    };
 
     const html = pos
         .map((po, index) => {

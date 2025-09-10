@@ -1,5 +1,5 @@
-import { allProducts, currencySettings } from '../common/state.js';
-import { formatCurrencyJs } from '../common/utils.js';
+import { allProducts } from '../common/state.js';
+import { formatCurrency } from '../../../utils/currencyFormatter.js';
 
 export function createProductItemRow(item = {}, index, containerId) {
     const itemDiv = document.createElement("div");
@@ -173,8 +173,8 @@ export function calculateTotalAmount(containerId) {
     );
 
     if (containerId === "newOpportunityItemsContainer") {
-        newOpportunityTotalAmountInput.value = formatCurrencyJs(total);
+        newOpportunityTotalAmountInput.value = formatCurrency(total);
     } else if (containerId === "editOpportunityItemsContainer") {
-        editOpportunityTotalAmountInput.value = formatCurrencyJs(total);
+        editOpportunityTotalAmountInput.value = formatCurrency(total);
     }
 }

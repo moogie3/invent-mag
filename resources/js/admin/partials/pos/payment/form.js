@@ -1,5 +1,5 @@
 import { grandTotal } from '../cart/totals.js';
-import { formatCurrency } from '../utils/currency.js';
+import { formatCurrency } from '@/js/utils/currencyFormatter.js';
 
 const paymentMethod = document.getElementById("paymentMethod");
 const amountReceived = document.getElementById("amountReceived");

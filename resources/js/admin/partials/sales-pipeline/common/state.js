@@ -2,12 +2,7 @@ export let allPipelines = [];
 export let allCustomers = [];
 export let allProducts = [];
 
-export let currencySettings = {
-    symbol: "$",
-    decimalPlaces: 2,
-    decimalSeparator: ".",
-    thousandSeparator: ",",
-};
+// Currency settings are now globally available via window.currencySettings
 
 export function setAllPipelines(pipelines) {
     allPipelines = pipelines;
@@ -21,6 +16,4 @@ export function setAllProducts(products) {
     allProducts = products;
 }
 
-export function setCurrencySettings(settings) {
-    currencySettings = { ...currencySettings, ...settings };
-}
+

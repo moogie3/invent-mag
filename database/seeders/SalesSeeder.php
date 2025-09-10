@@ -69,7 +69,7 @@ class SalesSeeder extends Seeder
                 for ($j = 0; $j < $numberOfItems; $j++) {
                     $product = $products->random();
                     $quantity = rand(1, 5);
-                    $customerPrice = $product->sales_price + rand(0, 2);
+                    $customerPrice = $product->selling_price;
                     $total = $quantity * $customerPrice;
                     $totalSalesAmount += $total;
 

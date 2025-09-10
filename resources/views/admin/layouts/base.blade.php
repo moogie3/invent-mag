@@ -13,24 +13,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="currency-locale"
-        content="{{ optional(App\Models\CurrencySetting::first())->locale ?? app()->getLocale() }}">
-    <meta name="currency-code" content="{{ optional(App\Models\CurrencySetting::first())->currency_code ?? 'USD' }}">
-    <meta name="currency-decimal-places"
-        content="{{ optional(App\Models\CurrencySetting::first())->decimal_places ?? 2 }}">
-    <meta name="currency-decimal-separator"
-        content="{{ optional(App\Models\CurrencySetting::first())->decimal_separator ?? ',' }}">
-    <meta name="currency-thousand-separator"
-        content="{{ optional(App\Models\CurrencySetting::first())->thousand_separator ?? '.' }}">
-    <meta name="currency-position" content="{{ optional(App\Models\CurrencySetting::first())->position ?? 'prefix' }}">
+    @php
+        $currencySettings = App\Helpers\CurrencyHelper::getSettings();
+    @endphp
     <script>
         window.currencySettings = {
-            locale: document.querySelector('meta[name="currency-locale"]').getAttribute('content'),
-            currency_code: document.querySelector('meta[name="currency-code"]').getAttribute('content'),
-            decimal_places: parseInt(document.querySelector('meta[name="currency-decimal-places"]').getAttribute('content')),
-            decimal_separator: document.querySelector('meta[name="currency-decimal-separator"]').getAttribute('content'),
-            thousand_separator: document.querySelector('meta[name="currency-thousand-separator"]').getAttribute('content'),
-            position: document.querySelector('meta[name="currency-position"]').getAttribute('content'),
+            locale: "{{ $currencySettings->locale }}",
+            currency_code: "{{ $currencySettings->currency_code }}",
+            currency_symbol: "{{ $currencySettings->currency_symbol }}",
+            decimal_places: {{ $currencySettings->decimal_places }},
+            decimal_separator: "{{ $currencySettings->decimal_separator }}",
+            thousand_separator: "{{ $currencySettings->thousand_separator }}",
+            position: "{{ $currencySettings->position }}",
         };
     </script>
     <title>Invent-MAG | @yield('title')</title>
@@ -92,7 +86,8 @@
     @vite('resources/js/admin/layouts/theme-visibility.js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const showThemeToggle = {{ json_encode(auth()->user()->system_settings['show_theme_toggle'] ?? true) }};
+            const showThemeToggle =
+            {{ json_encode(auth()->user()->system_settings['show_theme_toggle'] ?? true) }};
             console.log('show_theme_toggle setting (from base.blade.php):', showThemeToggle);
         });
     </script>

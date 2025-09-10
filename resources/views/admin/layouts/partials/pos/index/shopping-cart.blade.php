@@ -13,7 +13,7 @@
         <div class="card-footer p-3">
             <div class="d-flex justify-content-between mb-2">
                 <span>Subtotal:</span>
-                <span id="subtotal" class="fw-bold">Rp 0</span>
+                <span id="subtotal" class="fw-bold">{{ \App\Helpers\CurrencyHelper::format(0) }}</span>
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -21,7 +21,7 @@
                 <div class="input-group" style="max-width: 180px;">
                     <input type="number" id="orderDiscount" class="form-control" value="0" min="0">
                     <select id="discountType" class="form-select" style="max-width: 70px;">
-                        <option value="fixed">Rp</option>
+                        <option value="fixed">Fixed</option>
                         <option value="percentage">%</option>
                     </select>
                 </div>
@@ -39,7 +39,7 @@
 
             <div class="d-flex justify-content-between fs-2 fw-bold text-success">
                 <span>Grand Total:</span>
-                <span id="finalTotal">Rp 0</span>
+                <span id="finalTotal">{{ \App\Helpers\CurrencyHelper::format(0) }}</span>
             </div>
 
             <input type="hidden" id="totalDiscountInput" name="total_discount" value="0">

@@ -1,4 +1,5 @@
 import { SalesOrderModule } from '../common/SalesOrderModule.js';
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 
 export class SalesOrderEdit extends SalesOrderModule {
     constructor(config = {}) {
@@ -202,17 +203,17 @@ export class SalesOrderEdit extends SalesOrderModule {
         const grandTotal = totalAfterAllDiscounts + taxAmount;
 
         document.getElementById("subtotal").innerText =
-            Math.floor(subtotal).toLocaleString("id-ID");
+            formatCurrency(subtotal);
         document.getElementById("orderDiscountTotal").innerText =
-            Math.floor(orderDiscountAmount).toLocaleString("id-ID");
+            formatCurrency(orderDiscountAmount);
 
         if (document.getElementById("totalTax")) {
             document.getElementById("totalTax").innerText =
-                Math.floor(taxAmount).toLocaleString("id-ID");
+                formatCurrency(taxAmount);
         }
 
         document.getElementById("finalTotal").innerText =
-            Math.floor(grandTotal).toLocaleString("id-ID");
+            formatCurrency(grandTotal);
 
         document.getElementById("grandTotalInput").value =
             Math.floor(grandTotal);

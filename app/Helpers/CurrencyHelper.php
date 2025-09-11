@@ -85,4 +85,9 @@ class CurrencyHelper
             ? $settings->currency_symbol . ' ' . $formatted
             : $formatted . ' ' . $settings->currency_symbol;
     }
+
+    public static function formatDate($date)
+    {
+        return \Carbon\Carbon::parse($date)->format('d M Y');
+    }
 }

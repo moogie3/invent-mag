@@ -7,24 +7,19 @@
                         <div class="d-flex align-items-center">
                             <i class="ti ti-building-store fs-1 me-3 text-primary"></i>
                             <div>
-                                <h2 class="mb-1">
-                                    Store Information
-                                </h2>
-                                <div class="text-muted">
-                                    Overview of your store performance and metrics
-                                </div>
+                                <h2 class="mb-1">Store Information</h2>
+                                <div class="text-muted">Overview of your store performance and metrics</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="row g-3 mb-4">
-                        <div class="col-md-3">
-                            <div class="card border-0 bg-light">
+                        <!-- Store Details -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card border-0 bg-light h-100">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
-                                        <label class="form-label text-muted mb-2 d-block">
-                                            Store Details
-                                        </label>
+                                        <label class="form-label text-muted mb-2 d-block">Store Details</label>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
                                         <div class="me-3 d-flex align-items-center justify-content-center"
@@ -59,13 +54,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="card border-0 bg-primary text-white">
+
+                        <!-- Sales Overview -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card border-0 bg-primary text-white h-100">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
-                                        <label class="form-label text-white-50 mb-2 d-block">
-                                            Sales Overview
-                                        </label>
+                                        <label class="form-label text-white-50 mb-2 d-block">Sales Overview</label>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
                                         <div class="me-3">
@@ -84,8 +79,7 @@
                                         <div>
                                             <div class="text-white-50 small">Total POS Sales</div>
                                             <div class="h4 mb-0" id="totalPosSales">
-                                                {{ \App\Helpers\CurrencyHelper::format($posTotal) }}
-                                            </div>
+                                                {{ \App\Helpers\CurrencyHelper::format($posTotal) }}</div>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center">
@@ -95,57 +89,95 @@
                                         <div>
                                             <div class="text-white-50 small">Unpaid Receivable</div>
                                             <div class="h4 mb-0" id="unpaidReceivable">
-                                                {{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}
+                                                {{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pending Orders & Due Soon Invoices -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="row g-2 h-100">
+                                <div class="col-12">
+                                    <div class="card border-0 bg-white">
+                                        <div class="card-body py-3">
+                                            <div class="mb-2">
+                                                <label class="form-label text-warning mb-2 d-block">Pending
+                                                    Orders</label>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    <i class="ti ti-loader fs-2 text-warning"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-warning small">Pending Orders</div>
+                                                    <div class="h3 mb-0 text-warning" id="pendingOrdersCount">
+                                                        {{ $pendingOrders }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="card border-0 bg-white">
+                                        <div class="card-body py-3">
+                                            <div class="mb-2">
+                                                <label class="form-label text-danger mb-2 d-block">Due Soon
+                                                    Invoices</label>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    <i class="ti ti-reload fs-2 text-danger"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-danger small">Due Soon Invoices</div>
+                                                    <div class="h3 mb-0 text-danger" id="dueInvoicesCount">
+                                                        {{ $dueInvoices }}</div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <!-- Pending Orders Card -->
-                            <div class="card border-0 bg-white">
-                                <div class="card-body py-3">
-                                    <div class="mb-2">
-                                        <label class="form-label text-warning mb-2 d-block">
-                                            Pending Orders
-                                        </label>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <i class="ti ti-loader fs-2 text-warning"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-warning small">Pending Orders</div>
-                                            <div class="h3 mb-0 text-warning" id="pendingOrdersCount">
-                                                {{ $pendingOrders }}</div>
-                                        </div>
-                                    </div>
+
+                        <!-- Expiry Status & Filters -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="row g-2 h-100">
+                                <div class="col-12">
+                                    @include('admin.layouts.partials.sales.index.filters')
                                 </div>
-                            </div>
-                            <!-- Due Soon Invoices Card -->
-                            <div class="card border-0 bg-white">
-                                <div class="card-body py-3">
-                                    <div class="mb-2">
-                                        <label class="form-label text-danger mb-2 d-block">
-                                            Due Soon Invoices
-                                        </label>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <i class="ti ti-reload fs-2 text-danger"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-danger small">Due Soon Invoices</div>
-                                            <div class="h3 mb-0 text-danger" id="dueInvoicesCount">{{ $dueInvoices }}
+                                <div class="col-12">
+                                    <div class="card border-0 bg-white">
+                                        <div class="card-body py-3">
+                                            <div class="mb-2">
+                                                <label
+                                                    class="form-label {{ $expiringSalesCount > 0 ? 'text-warning' : 'text-success' }} mb-2 d-block">Expiry
+                                                    Status</label>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    <i
+                                                        class="ti ti-calendar-time fs-2 {{ $expiringSalesCount > 0 ? 'text-warning' : 'text-success' }}"></i>
+                                                </div>
+                                                <div>
+                                                    <div
+                                                        class="small {{ $expiringSalesCount > 0 ? 'text-warning' : 'text-success' }}">
+                                                        Expiring Soon Sales Invoices</div>
+                                                    <div class="h4 mb-0 {{ $expiringSalesCount > 0 ? 'text-warning' : 'text-success' }}"
+                                                        id="expiringSalesItemsCount">{{ $expiringSalesCount }}</div>
+                                                    @if ($expiringSalesCount > 0)
+                                                        <a href="#" class="mt-2 btn btn-sm btn-outline-warning"
+                                                            id="viewExpiringSales" data-bs-toggle="modal"
+                                                            data-bs-target="#expiringSalesModal">View Details</a>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            @include('admin.layouts.partials.sales.index.filters')
                         </div>
                     </div>
                 </div>

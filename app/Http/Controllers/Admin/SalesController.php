@@ -25,7 +25,17 @@ class SalesController extends Controller
         $filters = $request->only(['month', 'year']);
         $data = $this->salesService->getSalesIndexData($filters, $entries);
 
+        // Add expiring sales count
+        $expiringSalesCount = $this->salesService->getExpiringSalesCount();
+        $data['expiringSalesCount'] = $expiringSalesCount;
+
         return view('admin.sales.index', $data);
+    }
+
+    public function getExpiringSoonSales()
+    {
+        $expiringSales = $this->salesService->getExpiringSales();
+        return response()->json($expiringSales);
     }
 
     public function create()

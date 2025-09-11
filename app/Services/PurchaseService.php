@@ -8,8 +8,10 @@ use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\PurchaseHelper;
+use App\Helpers\CurrencyHelper;
 use App\Models\Supplier;
 use App\Models\User;
+use Carbon\Carbon;
 
 class PurchaseService
 {
@@ -305,5 +307,31 @@ class PurchaseService
             'totalMonthly' => $totalMonthly,
             'paymentMonthly' => $paymentMonthly,
         ];
+    }
+
+    public function getExpiringPurchaseCount(): int
+    {
+        return Purchase::where('due_date', '<=', Carbon::now()->addDays(90))
+                        ->where('status', '!=', 'Paid')
+                        ->count();
+    }
+
+    public function getExpiringPurchases()
+    {
+        $expiringPurchases = Purchase::with('supplier')
+            ->where('due_date', '<=', Carbon::now()->addDays(90))
+            ->where('status', '!=', 'Paid')
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        return $expiringPurchases->map(function ($purchase) {
+            return [
+                'id' => $purchase->id,
+                'invoice' => $purchase->invoice,
+                'supplier' => $purchase->supplier,
+                'due_date' => Carbon::parse($purchase->due_date)->format('d M Y'),
+                'total' => CurrencyHelper::format($purchase->total),
+            ];
+        });
     }
 }

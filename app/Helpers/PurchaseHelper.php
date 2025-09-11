@@ -56,12 +56,17 @@ class PurchaseHelper
         $itemCount = count($items);
 
         foreach ($items as $item) {
-            $finalAmount = self::calculateTotal($item->price, $item->quantity, $item->discount, $item->discount_type);
+            $price = is_object($item) ? $item->price : $item['price'];
+            $quantity = is_object($item) ? $item->quantity : $item['quantity'];
+            $discount = is_object($item) ? $item->discount : $item['discount'];
+            $discount_type = is_object($item) ? $item->discount_type : $item['discount_type'];
 
-            $discountPerUnit = self::calculateDiscountPerUnit($item->price, $item->discount, $item->discount_type);
+            $finalAmount = self::calculateTotal($price, $quantity, $discount, $discount_type);
+
+            $discountPerUnit = self::calculateDiscountPerUnit($price, $discount, $discount_type);
 
             $subtotal += $finalAmount;
-            $totalProductDiscount += $discountPerUnit * $item->quantity;
+            $totalProductDiscount += $discountPerUnit * $quantity;
         }
 
         $orderDiscount = self::calculateDiscount($subtotal, $discountTotal, $discountTotalType);

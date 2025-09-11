@@ -29,7 +29,17 @@ class PurchaseController extends Controller
         $filters = $request->only(['month', 'year']);
         $data = $this->purchaseService->getPurchaseIndexData($filters, $entries);
 
+        // Add expiring purchase count
+        $expiringPurchaseCount = $this->purchaseService->getExpiringPurchaseCount();
+        $data['expiringPurchaseCount'] = $expiringPurchaseCount;
+
         return view('admin.po.index', $data);
+    }
+
+    public function getExpiringSoonPurchases()
+    {
+        $expiringPurchases = $this->purchaseService->getExpiringPurchases();
+        return response()->json($expiringPurchases);
     }
 
     public function create()

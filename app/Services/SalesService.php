@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Helpers\SalesHelper;
+use App\Helpers\CurrencyHelper;
 use App\Models\Customer;
+use Carbon\Carbon;
 
 class SalesService
 {
@@ -353,5 +355,31 @@ class SalesService
             $invoiceNumber = $lastNumber + 1;
         }
         return 'INV-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+    }
+
+    public function getExpiringSalesCount(): int
+    {
+        return Sales::where('due_date', '<=', Carbon::now()->addDays(90))
+                        ->where('status', '!=', 'Paid')
+                        ->count();
+    }
+
+    public function getExpiringSales()
+    {
+        $expiringSales = Sales::with('customer')
+            ->where('due_date', '<=', Carbon::now()->addDays(90))
+            ->where('status', '!=', 'Paid')
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        return $expiringSales->map(function ($sale) {
+            return [
+                'id' => $sale->id,
+                'invoice' => $sale->invoice,
+                'customer' => $sale->customer,
+                'due_date' => Carbon::parse($sale->due_date)->format('d M Y'),
+                'total' => CurrencyHelper::format($sale->total),
+            ];
+        });
     }
 }

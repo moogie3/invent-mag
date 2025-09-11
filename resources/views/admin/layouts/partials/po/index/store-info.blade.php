@@ -119,7 +119,8 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-white-50 small">Monthly Purchase</div>
-                                                    <div class="h4 mb-0" id="monthlyPurchase">{{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
+                                                    <div class="h4 mb-0" id="monthlyPurchase">
+                                                        {{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -140,10 +141,37 @@
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <!-- This Month PO Card -->
-
-                            <!-- This Month Paid Card -->
-
+                            <div class="card border-0 bg-white">
+                                <div class="card-body py-3">
+                                    <div class="mb-2">
+                                        <label
+                                            class="form-label {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }} mb-2 d-block">
+                                            Expiry Status
+                                        </label>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i
+                                                class="ti ti-calendar-time fs-2 {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }}"></i>
+                                        </div>
+                                        <div>
+                                            <div
+                                                class="small {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }}">
+                                                Expiring Soon Purchase Orders</div>
+                                            <div class="h4 mb-0 {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }}"
+                                                id="expiringPurchaseItemsCount">
+                                                {{ $expiringPurchaseCount }}</div>
+                                            @if ($expiringPurchaseCount > 0)
+                                                <a href="#" class="mt-2 btn btn-sm btn-outline-warning"
+                                                    id="viewExpiringPurchase" data-bs-toggle="modal"
+                                                    data-bs-target="#expiringPurchaseModal">
+                                                    View Details
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-3">
                             @include('admin.layouts.partials.po.index.filters')

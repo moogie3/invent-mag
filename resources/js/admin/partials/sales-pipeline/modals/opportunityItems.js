@@ -1,5 +1,5 @@
 import { allProducts } from '../common/state.js';
-import { formatCurrency } from '../../../utils/currencyFormatter.js';
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 
 export function createProductItemRow(item = {}, index, containerId) {
     const itemDiv = document.createElement("div");

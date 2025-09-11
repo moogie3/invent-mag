@@ -236,3 +236,39 @@
         });
     </script>
 @endif
+<!-- Expiring Soon Sales Invoices Modal -->
+<div class="modal modal-blur fade" id="expiringSalesModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h4 class="modal-title"><i class="ti ti-calendar-time me-2"></i>Expiring Soon Sales Invoices</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter">
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Customer</th>
+                                <th class="text-center">Due Date</th>
+                                <th class="text-end">Total</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expiringSalesTableBody">
+                            <!-- Content will be loaded by JavaScript -->
+                        </tbody>
+                    </table>
+                    <div class="text-muted small mt-3">
+                        <i class="ti ti-info-circle me-1"></i> Sales invoices with a due date within the next 90 days are shown here.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

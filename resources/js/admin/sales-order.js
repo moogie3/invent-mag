@@ -102,3 +102,77 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }, 250);
 });
+
+// Fallback for setDeleteFormAction if initialization fails
+if (typeof window.setDeleteFormAction === "undefined") {
+    window.setDeleteFormAction = function (url) {
+        const deleteForm = document.getElementById("deleteForm");
+        if (deleteForm) {
+            deleteForm.action = url;
+            console.log("Fallback: Delete form action set to:", url);
+        } else {
+            console.error("Fallback: Delete form not found");
+        }
+    };
+}
+
+// Fallback for loadSalesDetails if initialization fails
+if (typeof window.loadSalesDetails === "undefined") {
+    window.loadSalesDetails = function (id) {
+        console.log("Fallback loadSalesDetails called for ID:", id);
+    };
+}
+
+// Fallback for showToast if not defined
+if (typeof showToast === "undefined") {
+    window.showToast = function (title, message, type) {
+        console.log(`Toast (${type}): ${title} - ${message}`);
+        alert(`Toast (${type}): ${title} - ${message}`);
+    };
+}
+
+// JavaScript for Sales Expiring Soon functionality
+document.addEventListener('DOMContentLoaded', function () {
+    const expiringSalesModalElement = document.getElementById('expiringSalesModal');
+    if (expiringSalesModalElement) {
+        expiringSalesModalElement.addEventListener('show.bs.modal', function () {
+            const tableBody = document.getElementById('expiringSalesTableBody');
+            tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3 text-muted">Loading expiring sales invoices...</p></td></tr>';
+
+            fetch('/admin/sales/expiring-soon') // This endpoint needs to be defined in web.php
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    tableBody.innerHTML = ''; // Clear loading indicator
+                    if (data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No sales invoices expiring soon.</td></tr>';
+                        return;
+                    }
+
+                    data.forEach(sale => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${sale.invoice}</td>
+                            <td>${sale.customer ? sale.customer.name : 'N/A'}</td>
+                            <td class="text-center">${sale.due_date}</td>
+                            <td class="text-end">${sale.total}</td>
+                            <td class="text-end">
+                                <a href="/admin/sales/view/${sale.id}" class="btn btn-sm btn-primary">
+                                    <i class="ti ti-eye me-1"></i> View
+                                </a>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching expiring sales invoices:', error);
+                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Error loading data. Please try again.</td></tr>';
+                });
+        });
+    }
+});

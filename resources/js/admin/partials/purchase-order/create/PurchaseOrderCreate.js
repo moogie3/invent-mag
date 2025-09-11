@@ -40,6 +40,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             "stock_available",
             "quantity_warning",
             "expiry_date",
+        ];
 
         const elements = {};
         elementIds.forEach((id) => {
@@ -229,11 +230,19 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                 this.elements.quantity.removeAttribute("max");
                 this.elements.quantity.value = "";
             }
+
+            const hasExpiry = selectedOption.getAttribute("data-has-expiry") === "1";
+            if (this.elements.expiry_date) {
+                this.elements.expiry_date.parentElement.style.display = hasExpiry ? 'block' : 'none';
+            }
         } else {
             this.elements.stock_available.textContent = "-";
             this.currentStock = 0;
             if (this.elements.quantity) {
                 this.elements.quantity.removeAttribute("max");
+            }
+            if (this.elements.expiry_date) {
+                this.elements.expiry_date.parentElement.style.display = 'none';
             }
         }
     }
@@ -322,6 +331,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             ];
         const stock = parseInt(selectedOption.getAttribute("data-stock")) || 0;
         const hasExpiry = selectedOption.getAttribute("data-has-expiry") === "1";
+        const expiryDate = this.elements.expiry_date ? this.elements.expiry_date.value : null;
 
         const uniqueId = `${Date.now()}-${Math.random()
             .toString(36)
@@ -344,7 +354,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             total,
             stock,
             hasExpiry,
-            expiry_date: null, // Initialize expiry_date to null
+            expiry_date: expiryDate, // Initialize expiry_date to null
         });
 
         this.renderTable();
@@ -554,7 +564,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                         value="${product.expiry_date ? product.expiry_date : ''}" data-unique-id="${
                             product.uniqueId
                         }" style="width:120px;" />
-                    ` : 'N/A'}
+                    ` : '-'}
                 </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-danger btn-sm removeProduct"

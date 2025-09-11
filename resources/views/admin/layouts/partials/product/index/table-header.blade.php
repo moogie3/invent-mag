@@ -30,7 +30,7 @@
         <th class="sticky-top " style="z-index: 1020;">
             <button class="table-sort fs-4 py-3" data-sort="sort-sellingprice">Selling Price</button>
         </th>
-        <th class="sticky-top " style="z-index: 1020;">
+        <th class="sticky-top text-center" style="z-index: 1020;">
             <button class="table-sort fs-4 py-3" data-sort="sort-supplier">Supplier</button>
         </th>
         <th style="width:100px;text-align:center" class="fs-4 py-3 no-print sticky-top " style="z-index: 1020;">

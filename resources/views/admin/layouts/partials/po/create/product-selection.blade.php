@@ -6,7 +6,7 @@
             <option value="">Select Product</option>
             @foreach ($products as $product)
                 <option value="{{ $product->id }}" data-price="{{ $product->price }}"
-                    data-stock="{{ $product->stock_quantity ?? 0 }}">
+                    data-stock="{{ $product->stock_quantity ?? 0 }}" data-has-expiry="{{ $product->has_expiry ? '1' : '0' }}">
                     {{ $product->name }}
                 </option>
             @endforeach
@@ -34,6 +34,10 @@
         <label class="form-label fw-bold">New Price</label>
         <input type="number" min="0" step="0" class="form-control" name="new_price" id="new_price"
             placeholder="0" />
+    </div>
+    <div class="col-md-2 mb-3" style="display: none;">
+        <label class="form-label fw-bold">Expiry Date</label>
+        <input type="date" class="form-control" name="expiry_date" id="expiry_date" />
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">Discount</label>

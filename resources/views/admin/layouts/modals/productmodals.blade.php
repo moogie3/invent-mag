@@ -163,6 +163,7 @@
 </div>
 
 <!-- Expiring Soon Products Modal -->
+<!-- Expiring Soon Products Modal -->
 <div class="modal modal-blur fade" id="expiringSoonModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -187,6 +188,71 @@
                             <!-- Content will be loaded by JavaScript -->
                         </tbody>
                     </table>
+                    <div class="text-muted small mt-3">
+                        <i class="ti ti-info-circle me-1"></i> Products expiring within the next 90 days are shown
+                        here.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Stock Products Modal -->
+<div class="modal modal-blur fade" id="lowStockModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h4 class="modal-title"><i class="ti ti-alert-triangle me-2"></i>Low Stock Products</h4>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th class="text-center">Current Stock</th>
+                                <th class="text-center">Threshold</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($lowStockProducts as $product)
+                                <tr>
+                                    <td>{{ $product->name }}</td>
+                                    @php
+                                        [
+                                            $stockBadgeClass,
+                                            $stockBadgeText,
+                                        ] = \App\Helpers\ProductHelper::getStockClassAndText($product);
+                                    @endphp
+                                    <td class="text-center">
+                                        <span class="{{ $stockBadgeClass }}">
+                                            {{ $product->stock_quantity }}
+                                            @if ($stockBadgeText)
+                                                <small>({{ $stockBadgeText }})</small>
+                                            @endif
+                                        </span>
+                                    </td>
+                                    <td class="text-center">{{ $product->low_stock_threshold ?? 10 }}</td>
+                                    <td class="text-end">
+                                        <a href="{{ route('admin.product.edit', $product->id) }}"
+                                            class="btn btn-sm btn-primary">
+                                            <i class="ti ti-edit me-1"></i> Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <div class="text-muted small mt-3">
+                        <i class="ti ti-info-circle me-1"></i> Default low stock threshold is 10 if not specified.
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -246,12 +312,16 @@
         <!-- Tab Navigation -->
         <ul class="nav nav-tabs nav-fill" id="productDetailsTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="basic-info-tab" data-bs-toggle="tab" data-bs-target="#basic-info-pane" type="button" role="tab" aria-controls="basic-info-pane" aria-selected="true">
+                <button class="nav-link active" id="basic-info-tab" data-bs-toggle="tab"
+                    data-bs-target="#basic-info-pane" type="button" role="tab" aria-controls="basic-info-pane"
+                    aria-selected="true">
                     Basic Info
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="expiry-status-tab" data-bs-toggle="tab" data-bs-target="#expiry-status-pane" type="button" role="tab" aria-controls="expiry-status-pane" aria-selected="false">
+                <button class="nav-link" id="expiry-status-tab" data-bs-toggle="tab"
+                    data-bs-target="#expiry-status-pane" type="button" role="tab"
+                    aria-controls="expiry-status-pane" aria-selected="false">
                     Expiry Status
                 </button>
             </li>
@@ -260,7 +330,8 @@
         <!-- Tab Content -->
         <div class="tab-content p-4">
             <!-- Basic Info Pane (Existing Content) -->
-            <div class="tab-pane fade show active" id="basic-info-pane" role="tabpanel" aria-labelledby="basic-info-tab">
+            <div class="tab-pane fade show active" id="basic-info-pane" role="tabpanel"
+                aria-labelledby="basic-info-tab">
                 <div class="row g-4">
                     <!-- Product Image -->
                     <div class="col-md-4">
@@ -501,6 +572,3 @@
         </div>
     </div>
 </div>
-<script>
-    window.defaultPlaceholderUrl = "{{ asset('img/default_placeholder.png') }}";
-</script>

@@ -22,7 +22,7 @@
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.1s ease-in-out;
-    z-index: 998;
+    z-index: 99998;
 }
 
 /* Navigation dropdown */
@@ -37,7 +37,7 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease-in-out;
-    z-index: 999;
+    z-index: 99999; /* Increased z-index */
     border-radius: 8px;
     padding: 10px 20px;
 }
@@ -610,4 +610,8 @@ body.sticky-navbar .navbar {
     top: 0;
     z-index: 1000;
     width: 100%;
+}
+
+body.layout-navbar-v2.sidebar-open #navbar-brand-title {
+    left: calc(50% - 125px);
 }

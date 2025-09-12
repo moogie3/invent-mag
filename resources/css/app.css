@@ -656,3 +656,8 @@ body.layout-navbar-v2 .navbar {
     cursor: not-allowed;
     /* Optional: to visually indicate it's not interactive */
 }
+
+.page-header {
+    position: relative;
+    z-index: 1;
+}

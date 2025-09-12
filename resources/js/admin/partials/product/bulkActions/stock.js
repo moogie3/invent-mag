@@ -11,11 +11,19 @@ export function bulkUpdateStock() {
         return;
     }
 
-    const modal = new bootstrap.Modal(
-        document.getElementById("bulkUpdateStockModal")
-    );
-    modal.show();
-    loadBulkUpdateProductsFromTable(selected);
+    const modalElement = document.getElementById("bulkUpdateStockModal");
+
+    if (modalElement) {
+        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            loadBulkUpdateProductsFromTable(selected);
+        } else {
+            showToast("Error", "Bootstrap Modal functionality not available.", "error");
+        }
+    } else {
+        showToast("Error", "Bulk update modal not found.", "error");
+    }
 }
 
 function loadBulkUpdateProductsFromTable(ids) {
@@ -327,4 +335,4 @@ function handleBulkStockUpdate() {
         });
 }
 
-window.bulkUpdateStock = bulkUpdateStock;
+

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Product;
+use App\Models\POItem;
 use App\Models\Tax;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -204,6 +205,24 @@ class SalesService
                 $product = Product::find($productData['product_id']);
                 if ($product) {
                     $product->decrement('stock_quantity', $productData['quantity']);
+
+                    // FEFO Logic
+                    $poItems = POItem::where('product_id', $product->id)
+                        ->where('remaining_quantity', '>', 0)
+                        ->orderBy('expiry_date', 'asc')
+                        ->get();
+
+                    $quantityToDecrement = $productData['quantity'];
+
+                    foreach ($poItems as $poItem) {
+                        if ($quantityToDecrement <= 0) {
+                            break;
+                        }
+
+                        $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
+                        $poItem->decrement('remaining_quantity', $decrement);
+                        $quantityToDecrement -= $decrement;
+                    }
                 }
             }
 
@@ -224,6 +243,23 @@ class SalesService
                 $product = Product::find($oldItem->product_id);
                 if ($product) {
                     $product->increment('stock_quantity', $oldItem->quantity);
+
+                    // Revert remaining quantity
+                    $poItems = POItem::where('product_id', $product->id)
+                        ->orderBy('expiry_date', 'desc')
+                        ->get();
+
+                    $quantityToIncrement = $oldItem->quantity;
+
+                    foreach ($poItems as $poItem) {
+                        if ($quantityToIncrement <= 0) {
+                            break;
+                        }
+
+                        $increment = min($poItem->quantity - $poItem->remaining_quantity, $quantityToIncrement);
+                        $poItem->increment('remaining_quantity', $increment);
+                        $quantityToIncrement -= $increment;
+                    }
                 }
             }
 
@@ -274,6 +310,24 @@ class SalesService
                 $product = Product::find($productData['product_id']);
                 if ($product) {
                     $product->decrement('stock_quantity', $productData['quantity']);
+
+                    // FEFO Logic
+                    $poItems = POItem::where('product_id', $product->id)
+                        ->where('remaining_quantity', '>', 0)
+                        ->orderBy('expiry_date', 'asc')
+                        ->get();
+
+                    $quantityToDecrement = $productData['quantity'];
+
+                    foreach ($poItems as $poItem) {
+                        if ($quantityToDecrement <= 0) {
+                            break;
+                        }
+
+                        $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
+                        $poItem->decrement('remaining_quantity', $decrement);
+                        $quantityToDecrement -= $decrement;
+                    }
                 }
             }
 
@@ -288,6 +342,23 @@ class SalesService
                 $product = Product::find($item->product_id);
                 if ($product) {
                     $product->increment('stock_quantity', $item->quantity);
+
+                    // Revert remaining quantity
+                    $poItems = POItem::where('product_id', $product->id)
+                        ->orderBy('expiry_date', 'desc')
+                        ->get();
+
+                    $quantityToIncrement = $item->quantity;
+
+                    foreach ($poItems as $poItem) {
+                        if ($quantityToIncrement <= 0) {
+                            break;
+                        }
+
+                        $increment = min($poItem->quantity - $poItem->remaining_quantity, $quantityToIncrement);
+                        $poItem->increment('remaining_quantity', $increment);
+                        $quantityToIncrement -= $increment;
+                    }
                 }
             }
             $sale->delete();
@@ -303,6 +374,23 @@ class SalesService
                     $product = Product::find($item->product_id);
                     if ($product) {
                         $product->increment('stock_quantity', $item->quantity);
+
+                        // Revert remaining quantity
+                        $poItems = POItem::where('product_id', $product->id)
+                            ->orderBy('expiry_date', 'desc')
+                            ->get();
+
+                        $quantityToIncrement = $item->quantity;
+
+                        foreach ($poItems as $poItem) {
+                            if ($quantityToIncrement <= 0) {
+                                break;
+                            }
+
+                            $increment = min($poItem->quantity - $poItem->remaining_quantity, $quantityToIncrement);
+                            $poItem->increment('remaining_quantity', $increment);
+                            $quantityToIncrement -= $increment;
+                        }
                     }
                 }
                 $sale->delete();

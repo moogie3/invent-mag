@@ -153,6 +153,7 @@ class PurchaseService
                     'po_id' => $purchase->id,
                     'product_id' => $productData['product_id'],
                     'quantity' => $productData['quantity'],
+                    'remaining_quantity' => $productData['quantity'],
                     'price' => $productData['price'],
                     'discount' => $productData['discount'] ?? 0,
                     'discount_type' => $productData['discount_type'] ?? 'fixed',
@@ -214,6 +215,7 @@ class PurchaseService
                     'po_id' => $purchase->id,
                     'product_id' => $productData['product_id'],
                     'quantity' => $productData['quantity'],
+                    'remaining_quantity' => $productData['quantity'],
                     'price' => $productData['price'],
                     'discount' => $productData['discount'] ?? 0,
                     'discount_type' => $productData['discount_type'] ?? 'fixed',
@@ -244,6 +246,8 @@ class PurchaseService
                 if ($product) {
                     $product->decrement('stock_quantity', $item->quantity);
                 }
+                // Delete the POItem as well
+                $item->delete();
             }
             $purchase->delete();
         });
@@ -259,6 +263,8 @@ class PurchaseService
                     if ($product) {
                         $product->decrement('stock_quantity', $item->quantity);
                     }
+                    // Delete the POItem as well
+                    $item->delete();
                 }
                 $purchase->delete();
             }

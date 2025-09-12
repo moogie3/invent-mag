@@ -10,14 +10,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Invent-MAG | @yield('title')</title>
-    <script>
-        (function() {
-            const theme = localStorage.getItem('theme');
-            if (theme) {
-                document.documentElement.setAttribute('data-bs-theme', theme);
-            }
-        })();
-    </script>
     <link href="{{ asset('tabler/dist/css/tabler.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-flags.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-payments.min.css') }}" rel="stylesheet" />

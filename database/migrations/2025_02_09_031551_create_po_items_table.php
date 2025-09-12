@@ -17,6 +17,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('po_id');
                 $table->unsignedBigInteger('product_id');
                 $table->integer('quantity');
+                $table->integer('remaining_quantity')->default(0);
                 $table->decimal('price', 10);
                 $table->decimal('discount', 10)->nullable();
                 $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage');

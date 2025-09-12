@@ -40,6 +40,7 @@ class DashboardService
         $topCategories = $this->getTopCategories($dates);
         $monthlyData = $this->getMonthlyData($dates, $categoryId);
         $lowStockProducts = Product::getLowStockProducts();
+        $expiringSoonItems = \App\Models\POItem::getExpiringSoonItems();
 
         $salesData = Sales::selectRaw('
             DATE_FORMAT(order_date, "%b") as month,
@@ -76,6 +77,7 @@ class DashboardService
             'recentPurchases' => $recentPurchases,
             'lowStockCount' => $lowStockProducts->count(),
             'lowStockProducts' => $lowStockProducts,
+            'expiringSoonItems' => $expiringSoonItems,
             'totalliability' => $totalLiability,
             'countliability' => $unpaidLiability,
             'paidDebtMonthly' => $this->getPaidDebtMonthly(),

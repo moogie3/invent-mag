@@ -92,7 +92,7 @@ class Product extends Model
         return $this->low_stock_threshold ?? self::DEFAULT_LOW_STOCK_THRESHOLD;
     }
 
-    
+
 
     /**
      * Get all products with low stock
@@ -121,22 +121,40 @@ class Product extends Model
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    // public static function getExpiringSoonProducts()
-    // {
-    //     $thirtyDaysFromNow = now()->addDays(30);
+    public static function getExpiringSoonProducts()
+    {
+        $thirtyDaysFromNow = now()->addDays(30);
 
-    //     return self::where('has_expiry', true)->whereNotNull('expiry_date')->where('expiry_date', '>', now())->where('expiry_date', '<=', $thirtyDaysFromNow)->get();
-    // }
+        return self::whereHas('poItems', function ($query) use ($thirtyDaysFromNow) {
+            $query->whereNotNull('expiry_date')
+                  ->where('expiry_date', '>', now())
+                  ->where('expiry_date', '<=', $thirtyDaysFromNow);
+        })->with(['poItems' => function ($query) use ($thirtyDaysFromNow) {
+            $query->whereNotNull('expiry_date')
+                  ->where('expiry_date', '>', now())
+                  ->where('expiry_date', '<=', $thirtyDaysFromNow)
+                  ->orderBy('expiry_date', 'asc');
+        }])->get();
+    }
 
     /**
      * Count products that will expire soon
      *
      * @return int
      */
-    // public static function expiringSoonCount()
-    // {
-    //     $thirtyDaysFromNow = now()->addDays(30);
+    public static function expiringSoonCount()
+    {
+        $thirtyDaysFromNow = now()->addDays(30);
 
-    //     return self::where('has_expiry', true)->whereNotNull('expiry_date')->where('expiry_date', '>', now())->where('expiry_date', '<=', $thirtyDaysFromNow)->count();
-    // }
+        return self::whereHas('poItems', function ($query) use ($thirtyDaysFromNow) {
+            $query->whereNotNull('expiry_date')
+                  ->where('expiry_date', '>', now())
+                  ->where('expiry_date', '<=', $thirtyDaysFromNow);
+        })->count();
+    }
+
+    public function getSoonestExpiryDateAttribute()
+    {
+        return $this->poItems->whereNotNull('expiry_date')->min('expiry_date');
+    }
 }

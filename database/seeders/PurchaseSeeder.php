@@ -88,7 +88,12 @@ class PurchaseSeeder extends Seeder
                     $expiryDate = Carbon::now()->addDays(rand(1, 90));
                 }
 
-                POItem::create(array_merge(['po_id' => $purchase->id, 'expiry_date' => $expiryDate], $itemData));
+                POItem::create(array_merge(['po_id' => $purchase->id, 'expiry_date' => $expiryDate, 'remaining_quantity' => $itemData['quantity']], $itemData));
+
+                // Update product stock_quantity
+                if ($product) {
+                    $product->increment('stock_quantity', $itemData['quantity']);
+                }
             }
 
             $purchase->update(['total' => $totalPurchaseAmount]);

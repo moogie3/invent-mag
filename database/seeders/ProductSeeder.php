@@ -84,7 +84,8 @@ class ProductSeeder extends Seeder
             [
                 'code' => 'TR14',
                 'name' => 'Low Stock LED',
-                'stock_quantity' => 4,
+                
+                'stock_quantity' => 0,
                 'low_stock_threshold' => 5,
                 'price' => 90.00,
                 'selling_price' => 160.00,
@@ -102,7 +103,7 @@ class ProductSeeder extends Seeder
             [
                 'code' => 'TR15',
                 'name' => 'Expired Voltage Regulator',
-                'stock_quantity' => 100,
+                'stock_quantity' => 0,
                 'low_stock_threshold' => 10,
                 'price' => 1400.00,
                 'selling_price' => 2600.00,

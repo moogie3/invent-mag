@@ -167,15 +167,41 @@ export class SalesOrderCreate extends SalesOrderModule {
             this.elements.priceField.value = "";
             this.elements.sellingPriceField.value = "";
             this.elements.customerPriceField.value = "";
+            this.elements.stock_available.textContent = "-";
+            this.currentStock = 0;
+            this.selectedProductData = null; // Clear previously selected product data
+            this.hideQuantityWarning();
+            this.enableAddButton();
             return;
         }
 
-        this.elements.priceField.value =
-            selectedOption.getAttribute("data-price");
-        this.elements.sellingPriceField.value =
-            selectedOption.getAttribute("data-selling-price");
+        const productId = selectedOption.value;
 
-        this.fetchCustomerPastPrice();
+        fetch(`/admin/product/modal-view/${productId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                this.selectedProductData = data; // Store the full product data
+                this.elements.priceField.value = data.price;
+                this.elements.sellingPriceField.value = data.selling_price;
+                this.fetchCustomerPastPrice();
+                this.updateStockDisplay(); // Update stock display after data is fetched
+            })
+            .catch(error => {
+                console.error('Error fetching product details:', error);
+                this.elements.priceField.value = "";
+                this.elements.sellingPriceField.value = "";
+                this.elements.customerPriceField.value = "";
+                this.elements.stock_available.textContent = "-";
+                this.currentStock = 0;
+                this.selectedProductData = null;
+                this.hideQuantityWarning();
+                this.enableAddButton();
+            });
     }
 
     updateStockDisplay() {
@@ -183,38 +209,33 @@ export class SalesOrderCreate extends SalesOrderModule {
             return;
         }
 
-        const selectedOption =
-            this.elements.productSelect.options[
-                this.elements.productSelect.selectedIndex
-            ];
-
-        if (selectedOption && selectedOption.value) {
-            const stock =
-                parseInt(selectedOption.getAttribute("data-stock")) || 0;
-            this.currentStock = stock;
-
-            const orderedQuantity = this.getOrderedQuantityForProduct(
-                selectedOption.value
-            );
-            const remainingStock = Math.max(0, stock - orderedQuantity);
-
-            this.elements.stock_available.textContent = remainingStock;
-
-            this.updateStockStyling(remainingStock);
-
-            if (this.elements.quantity) {
-                this.elements.quantity.max = remainingStock;
-                this.elements.quantity.value = "";
-            }
-            this.hideQuantityWarning();
-        } else {
+        if (!this.selectedProductData) {
             this.elements.stock_available.textContent = "-";
             this.currentStock = 0;
             if (this.elements.quantity) {
                 this.elements.quantity.removeAttribute("max");
             }
             this.hideQuantityWarning();
+            return;
         }
+
+        const totalStockQuantity = this.selectedProductData.stock_quantity;
+        this.currentStock = totalStockQuantity;
+
+        const orderedQuantity = this.getOrderedQuantityForProduct(
+            this.selectedProductData.id
+        );
+        const availableForSale = Math.max(0, totalStockQuantity - orderedQuantity); // Changed from totalRemainingQuantity
+
+        this.elements.stock_available.textContent = availableForSale;
+
+        this.updateStockStyling(availableForSale);
+
+        if (this.elements.quantity) {
+            this.elements.quantity.max = availableForSale;
+            this.elements.quantity.value = "";
+        }
+        this.hideQuantityWarning();
     }
 
     getOrderedQuantityForProduct(productId) {
@@ -242,27 +263,18 @@ export class SalesOrderCreate extends SalesOrderModule {
     }
 
     validateQuantity() {
-        if (!this.elements.quantity || !this.elements.productSelect) {
+        if (!this.elements.quantity || !this.elements.productSelect || !this.selectedProductData) {
             return true;
         }
 
         const quantity = parseInt(this.elements.quantity.value) || 0;
-        const selectedOption =
-            this.elements.productSelect.options[
-                this.elements.productSelect.selectedIndex
-            ];
+        const productId = this.selectedProductData.id;
 
-        if (!selectedOption || !selectedOption.value) {
-            this.hideQuantityWarning();
-            return true;
-        }
-
-        const productId = selectedOption.value;
-        const stock = parseInt(selectedOption.getAttribute("data-stock")) || 0;
+        const totalStockQuantity = this.selectedProductData.stock_quantity;
         const orderedQuantity = this.getOrderedQuantityForProduct(productId);
-        const remainingStock = Math.max(0, stock - orderedQuantity);
+        const availableForSale = Math.max(0, totalStockQuantity - orderedQuantity); // Changed from totalRemainingQuantity
 
-        if (quantity > remainingStock) {
+        if (quantity > availableForSale) {
             this.showQuantityWarning();
             this.disableAddButton();
             return false;
@@ -430,7 +442,8 @@ export class SalesOrderCreate extends SalesOrderModule {
             discount,
             discountType,
             total,
-            stock,
+            stock: this.selectedProductData.stock_quantity, // Use overall stock for display
+            // Removed po_items: this.selectedProductData.po_items,
         });
 
         this.renderTable();
@@ -497,13 +510,11 @@ export class SalesOrderCreate extends SalesOrderModule {
         this.elements.productTableBody.innerHTML = "";
 
         this.products.forEach((product, index) => {
+            const totalStockQuantity = product.stock; // Changed from totalRemainingQuantity
             const totalOrderedForProduct = this.products
-                .filter((p) => p.id === product.id)
+                .filter((p) => p.product_id === product.product_id)
                 .reduce((sum, p) => sum + p.quantity, 0);
-            const remainingStock = Math.max(
-                0,
-                product.stock - totalOrderedForProduct + product.quantity
-            );
+            const availableForSale = Math.max(0, totalStockQuantity - totalOrderedForProduct + product.quantity); // Add back current product's quantity for its own row
 
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -511,13 +522,13 @@ export class SalesOrderCreate extends SalesOrderModule {
                 <td>${product.name}</td>
                 <td class="text-center">
                     <span class="badge ${
-                        remainingStock === 0
+                        availableForSale === 0
                             ? "bg-danger"
-                            : remainingStock <= 5
+                            : availableForSale <= 5
                             ? "bg-warning"
                             : "bg-success"
                     }">
-                        ${remainingStock}
+                        ${availableForSale}
                     </span>
                 </td>
                 <td class="text-center">
@@ -525,11 +536,11 @@ export class SalesOrderCreate extends SalesOrderModule {
                         value="${product.quantity}" data-unique-id="${
                 product.uniqueId
             }"
-                        min="1" max="${product.stock}" style="width:80px;" />
+                        min="1" max="${availableForSale}" style="width:80px;" />
                 </td>
                 <td class="text-center">
                     <input type="number" class="form-control price-input text-center"
-                        value="${product.price}" data-unique-id="${
+                        value="${product.customer_price}" data-unique-id="${
                 product.uniqueId
             }"
                         min="0" step="0.01" style="width:100px;" />

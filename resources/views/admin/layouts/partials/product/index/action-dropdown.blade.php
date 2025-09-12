@@ -10,6 +10,9 @@
         <a href="{{ route('admin.product.edit', $product->id) }}" class="dropdown-item">
             <i class="ti ti-edit me-2"></i> Edit
         </a>
+        <a href="javascript:void(0)" onclick="openAdjustStockModal('{{ $product->id }}', '{{ $product->name }}', '{{ $product->stock_quantity }}')" class="dropdown-item">
+            <i class="ti ti-arrows-diff me-2"></i> Adjust Stock
+        </a>
         <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
             onclick="setDeleteFormAction('{{ route('admin.product.destroy', $product->id) }}')">
             <i class="ti ti-trash me-2"></i> Delete

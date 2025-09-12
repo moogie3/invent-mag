@@ -14,6 +14,12 @@
                     <span class="badge bg-danger-lt me-2">{{ $lowStockProducts->count() }}</span> Low Stock
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="expiring-soon-tab" data-bs-toggle="tab"
+                    data-bs-target="#expiring-soon-content" type="button" role="tab">
+                    <span class="badge bg-warning-lt me-2">{{ $expiringSoonItems->count() }}</span> Expiring Soon
+                </button>
+            </li>
         </ul>
 
         <div class="tab-content px-3 pb-3" id="alertTabContent">
@@ -40,6 +46,35 @@
                     @empty
                         <div class="text-center text-muted py-4">No low stock products.</div>
                     @endforelse
+                </div>
+            </div>
+            <!-- Expiring Soon Section -->
+            <div class="tab-pane fade" id="expiring-soon-content" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th class="text-center">PO ID</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-center">Expiry Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($expiringSoonItems as $item)
+                                <tr>
+                                    <td>{{ $item->product->name }}</td>
+                                    <td class="text-center">{{ $item->po_id }}</td>
+                                    <td class="text-center">{{ $item->quantity }}</td>
+                                    <td class="text-center">{{ $item->expiry_date->format('d M Y') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">No products expiring soon.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

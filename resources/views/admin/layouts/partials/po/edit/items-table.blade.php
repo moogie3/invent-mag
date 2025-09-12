@@ -23,6 +23,7 @@
                     <th class="text-end" style="width: 140px">Price</th>
                     <th class="text-end" style="width: 160px">Discount</th>
                     <th class="text-end" style="width: 140px">Amount</th>
+                    <th class="text-center" style="width: 140px">Expiry Date</th>
                 </tr>
             </thead>
             <tbody>

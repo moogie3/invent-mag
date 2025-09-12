@@ -42,4 +42,8 @@
         <input type="text" name="items[{{ $item->id }}][amount]" value="{{ intval($finalAmount) }}"
             class="form-control text-end amount-input" data-item-id="{{ $item->id }}" readonly />
     </td>
+    <td>
+        <input type="date" name="items[{{ $item->id }}][expiry_date]" value="{{ $item->expiry_date ? \Carbon\Carbon::parse($item->expiry_date)->format('Y-m-d') : '' }}"
+            class="form-control text-center expiry-date-input" data-item-id="{{ $item->id }}" />
+    </td>
 </tr>

@@ -73,6 +73,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/bulk-export', [ProductController::class, 'bulkExport'])->name('product.bulk-export');
             Route::post('/bulk-stock-details', [ProductController::class, 'bulkStockDetails'])->name('product.bulk-stock-details');
             Route::post('/bulk-update-stock', [ProductController::class, 'bulkUpdateStock'])->name('product.bulk-update-stock');
+            Route::post('/adjust-stock', [ProductController::class, 'adjustStock'])->name('admin.product.adjust-stock');
             Route::get('/search', [ProductController::class, 'search'])->name('admin.product.search');
             Route::get('/metrics', [ProductController::class, 'getProductMetrics'])->name('admin.product.metrics');
             Route::get('/expiring-soon', [ProductController::class, 'getExpiringSoonProducts'])->name('admin.product.expiring-soon');

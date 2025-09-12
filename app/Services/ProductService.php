@@ -169,6 +169,42 @@ class ProductService
         ];
     }
 
+    public function adjustProductStock(Product $product, float $adjustmentAmount, string $adjustmentType, ?string $reason, ?int $adjustedBy): Product
+    {
+        DB::transaction(function () use ($product, $adjustmentAmount, $adjustmentType, $reason, $adjustedBy) {
+            $quantityBefore = $product->stock_quantity;
+            $quantityAfter = $quantityBefore;
+
+            if ($adjustmentType === 'increase') {
+                $product->increment('stock_quantity', $adjustmentAmount);
+                $quantityAfter = $quantityBefore + $adjustmentAmount;
+            } elseif ($adjustmentType === 'decrease') {
+                // Ensure we don't go below zero
+                $newQuantity = max(0, $quantityBefore - $adjustmentAmount);
+                $product->update(['stock_quantity' => $newQuantity]);
+                $quantityAfter = $newQuantity;
+            } elseif ($adjustmentType === 'correction') {
+                // For correction, adjustmentAmount is the target quantity
+                $product->update(['stock_quantity' => $adjustmentAmount]);
+                $quantityAfter = $adjustmentAmount;
+            }
+
+            // Record the adjustment
+            \App\Models\StockAdjustment::create([
+                'product_id' => $product->id,
+                'adjustment_type' => $adjustmentType,
+                'quantity_before' => $quantityBefore,
+                'quantity_after' => $quantityAfter,
+                'adjustment_amount' => $adjustmentAmount,
+                'reason' => $reason,
+                'adjusted_by' => $adjustedBy,
+            ]);
+        });
+
+        $product->refresh(); // Refresh the product model to get the latest stock_quantity
+        return $product;
+    }
+
     public function searchProducts($query)
     {
         $productsQuery = Product::query();
@@ -209,8 +245,9 @@ class ProductService
         $thirtyDaysFromNow = now()->addDays(30);
 
         return \App\Models\POItem::whereNotNull('expiry_date')
-            ->where('expiry_date', '>', now())
+            ->where('expiry_date', '>=', now())
             ->where('expiry_date', '<=', $thirtyDaysFromNow)
+            ->where('remaining_quantity', '>', 0) // Only show items with remaining quantity
             ->with(['product' => function($query) {
                 $query->select('id', 'name', 'code'); // Select only necessary product fields
             }])
@@ -222,8 +259,24 @@ class ProductService
         $thirtyDaysFromNow = now()->addDays(30);
 
         return \App\Models\POItem::whereNotNull('expiry_date')
-            ->where('expiry_date', '>', now())
-            ->where('expiry_date', '<=', $thirtyDaysFromNow)
+            ->whereDate('expiry_date', '>=', now())
+            ->whereDate('expiry_date', '<=', $thirtyDaysFromNow)
+            ->where('remaining_quantity', '>', 0) // Only count items with remaining quantity
             ->count();
+    }
+
+    public function getRecentlyPurchasedExpiringPOItems()
+    {
+        $thirtyDaysFromNow = now()->addDays(30);
+        $sevenDaysAgo = now()->subDays(7);
+
+        return \App\Models\POItem::whereNotNull('expiry_date')
+            ->where('expiry_date', '>=', now())
+            ->where('expiry_date', '<=', $thirtyDaysFromNow)
+            ->where('created_at', '>=', $sevenDaysAgo) // Filter for recently purchased items
+            ->with(['product' => function($query) {
+                $query->select('id', 'name', 'code'); // Select only necessary product fields
+            }])
+            ->get();
     }
 }

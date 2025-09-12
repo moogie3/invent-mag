@@ -12,6 +12,7 @@
                     <th class="text-end" style="width: 140px">Price</th>
                     <th class="text-end" style="width: 140px">Discount</th>
                     <th class="text-end" style="width: 140px">Amount</th>
+                    <th class="text-center" style="width: 140px">Expiry Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -71,6 +72,13 @@
                         </td>
                         <td class="text-end">
                             {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalAmount) }}
+                        </td>
+                        <td class="text-center">
+                            @if ($item->expiry_date)
+                                {{ \Carbon\Carbon::parse($item->expiry_date)->format('d M Y') }}
+                            @else
+                                N/A
+                            @endif
                         </td>
                     </tr>
                 @endforeach

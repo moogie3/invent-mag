@@ -18,7 +18,7 @@
             </div>
             <div class="col-lg-6 col-md-12">
                 <div class="d-flex flex-wrap justify-content-lg-end justify-content-center gap-2 mt-lg-0 mt-2">
-                    <button onclick="bulkUpdateStock()" class="btn btn-info action-btn d-flex align-items-center">
+                    <button id="bulkUpdateStockBtn" class="btn btn-info action-btn d-flex align-items-center">
                         <i class="ti ti-packages me-2"></i> Update Stock
                     </button>
                     <button onclick="bulkExportProducts()"

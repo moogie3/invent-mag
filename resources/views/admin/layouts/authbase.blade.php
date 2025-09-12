@@ -39,7 +39,7 @@
     @include('admin.layouts.partials.session-notifications')
     @include('admin.layouts.script')
     @vite('resources/js/admin/layouts/theme-visibility.js')
-
+    @vite('resources/js/admin/layouts/theme-toggle.js')
 </body>
 
 </html>

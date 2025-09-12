@@ -529,6 +529,63 @@
     </div>
 </div>
 
+<!-- Adjust Stock Modal -->
+<div class="modal modal-blur fade" id="adjustStockModal" tabindex="-1" aria-labelledby="adjustStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="adjustStockModalLabel">
+                    <i class="ti ti-arrows-diff me-2"></i>
+                    Adjust Stock for <span id="adjustProductName" class="fw-bold"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="adjustProductId">
+                <div class="alert alert-info d-flex align-items-center mb-3">
+                    <i class="ti ti-info-circle me-2 fs-4"></i>
+                    <div>
+                        Adjust the stock quantity for the selected product.
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Current Stock</label>
+                        <input type="text" class="form-control" id="adjustCurrentStock" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Adjustment Type</label>
+                        <select class="form-select" id="adjustmentType">
+                            <option value="increase">Increase Stock</option>
+                            <option value="decrease">Decrease Stock</option>
+                            <option value="correction">Set to Exact Quantity</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" id="adjustmentAmountLabel">Adjustment Amount</label>
+                    <input type="number" class="form-control" id="adjustmentAmount" min="1" value="1">
+                </div>
+
+                <div class="mb-3 text-center">
+                    <span class="badge fs-3 stock-change-badge bg-secondary-lt" id="adjustmentPreviewBadge">No change</span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Reason for Adjustment (Optional)</label>
+                    <textarea class="form-control" id="adjustmentReason" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-info" id="confirmAdjustStockBtn">Apply Adjustment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="stockUpdateRowTemplate" class="stock-update-row" style="display: none;">
     <div class="card mb-3">
         <div class="card-body p-3">

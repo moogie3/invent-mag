@@ -17,7 +17,8 @@ class POItem extends Model
         'discount',
         'discount_type',
         'total',
-        'expiry_date'
+        'expiry_date',
+        'remaining_quantity'
     ];
 
     protected $casts = [
@@ -32,5 +33,14 @@ class POItem extends Model
 
     public function purchaseOrder() {
         return $this->belongsTo(Purchase::class , 'po_id');
+    }
+
+    public static function getExpiringSoonItems()
+    {
+        $thirtyDaysFromNow = now()->addDays(30);
+        return self::with('product')->whereNotNull('expiry_date')
+            ->where('expiry_date', '>', now())
+            ->where('expiry_date', '<=', $thirtyDaysFromNow)
+            ->get();
     }
 }

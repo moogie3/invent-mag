@@ -178,13 +178,16 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
                     price: price,
                     discount: discount,
                     discount_type: discountType,
+                    expiry_date: expiryDateInput ? expiryDateInput.value : null,
                 });
             });
             this.elements.productsJsonInput.value = JSON.stringify(products);
         }
     }
 
-    serializeProducts() {
+    serializeProducts(event) {
+        event.preventDefault(); // Prevent default form submission
+
         const products = [];
         document.querySelectorAll("tbody tr").forEach((row) => {
             const itemId = row.querySelector(".quantity-input")?.dataset.itemId;
@@ -207,18 +210,26 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
             const discountType = row.querySelector(
                 `.discount-type-input[data-item-id="${itemId}"]`
             ).value;
+            const expiryDateInput = row.querySelector(
+                `.expiry-date-input[data-item-id="${itemId}"]`
+            );
+            const expiry_date = expiryDateInput ? expiryDateInput.value : null;
 
             products.push({
-                product_id: itemId,
+                id: itemId, // Include item ID for updating existing POItems
                 quantity: quantity,
                 price: price,
                 discount: discount,
                 discount_type: discountType,
+                expiry_date: expiry_date,
             });
         });
 
         if (this.elements.productsJsonInput) {
             this.elements.productsJsonInput.value = JSON.stringify(products);
         }
+
+        // Manually submit the form after serialization
+        this.elements.form.submit();
     }
 }

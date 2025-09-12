@@ -47,7 +47,9 @@ class ProductController extends Controller
     public function modalView($id)
     {
         try {
-            $product = Product::with(['category', 'supplier', 'unit', 'warehouse', 'poItems'])->findOrFail($id);
+            $product = Product::with(['category', 'supplier', 'unit', 'warehouse', 'poItems' => function($query) {
+                $query->where('remaining_quantity', '>', 0)->orderBy('expiry_date', 'asc');
+            }])->findOrFail($id);
             $product->formatted_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->price);
             $product->formatted_selling_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price);
             return response()->json($product);
@@ -212,6 +214,39 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating stock quantities. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    public function adjustStock(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|integer|exists:products,id',
+            'adjustment_amount' => 'required|numeric|min:1', // Can be positive or negative, validation for negative will be handled by adjustment_type
+            'adjustment_type' => 'required|in:increase,decrease,correction',
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $product = Product::findOrFail($request->product_id);
+            $adjustedProduct = $this->productService->adjustProductStock(
+                $product,
+                $request->adjustment_amount,
+                $request->adjustment_type,
+                $request->reason,
+                auth()->id() // Pass the authenticated user's ID
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Stock adjusted successfully.',
+                'product' => $adjustedProduct,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error adjusting stock: ' . $e->getMessage(),
                 'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }

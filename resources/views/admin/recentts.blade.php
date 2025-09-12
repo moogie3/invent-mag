@@ -178,7 +178,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="subheader">Outstanding</div>
                                     <div class="ms-auto">
-                                        <div class="avatar avatar-sm bg-warning-lt">
+                                        <div class="avatar avatar-sm bg-warning">
                                             <i class="ti ti-clock fs-3"></i>
                                         </div>
                                     </div>

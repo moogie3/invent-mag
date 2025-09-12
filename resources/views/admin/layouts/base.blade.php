@@ -87,7 +87,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const showThemeToggle =
-            {{ json_encode(auth()->user()->system_settings['show_theme_toggle'] ?? true) }};
+                {{ json_encode(auth()->user()->system_settings['show_theme_toggle'] ?? true) }};
             console.log('show_theme_toggle setting (from base.blade.php):', showThemeToggle);
         });
     </script>

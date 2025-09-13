@@ -18,7 +18,7 @@
             <td class="sort-code no-print">{{ $product->code }}</td>
             <td class="sort-name">{{ $product->name }}</td>
             <td class="sort-quantity no-print text-center">
-                {{ $product->stock_quantity }}
+                <div class="fw-bold">{{ $product->stock_quantity }}</div>
                 @php
                     [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($product);
                 @endphp

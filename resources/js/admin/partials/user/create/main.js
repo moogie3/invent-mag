@@ -1,5 +1,5 @@
 import { createUserModal, createUserForm, createRolesContainer, createPermissionsContainer } from '../common/elements.js';
-import { setupRolePermissionSync, resetPermissionStates } from '../rolesPermissions/sync.js';
+import { setupRolePermissionSync, resetPermissionStates, syncPermissionsFromRoles } from '../rolesPermissions/sync.js';
 
 export function setupCreateUserModal() {
     if (createRolesContainer && createPermissionsContainer) {

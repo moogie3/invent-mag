@@ -1,9 +1,9 @@
 import { SalesOrderBulkSelection } from './SalesOrderBulkSelection.js';
 
-let salesBulkSelection = null;
+
 
 function getSalesSelectedIds() {
-    return salesBulkSelection ? salesBulkSelection.getSelectedIds() : [];
+    return window.salesBulkSelection ? window.salesBulkSelection.getSelectedIds() : [];
 }
 
 function resetButton(button, originalText) {
@@ -228,8 +228,8 @@ export function bulkMarkAsPaidSales() {
                 }, 2000);
             });
 
-            if (salesBulkSelection) {
-                salesBulkSelection.updateBulkActionsBar();
+            if (window.salesBulkSelection) {
+                window.salesBulkSelection.updateBulkActionsBar();
             }
 
             showToast(
@@ -323,8 +323,8 @@ function smartSelectUnpaidOnlySales() {
         }
     });
 
-    if (salesBulkSelection) {
-        salesBulkSelection.updateBulkActionsBar();
+    if (window.salesBulkSelection) {
+        window.salesBulkSelection.updateBulkActionsBar();
     }
 
     if (excludedCount > 0) {

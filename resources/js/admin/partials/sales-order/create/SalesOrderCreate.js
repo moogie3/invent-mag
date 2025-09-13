@@ -521,7 +521,7 @@ export class SalesOrderCreate extends SalesOrderModule {
                 <td class="text-center">${index + 1}</td>
                 <td>${product.name}</td>
                 <td class="text-center">
-                    <span class="badge ${
+                    <span class="badge text-white ${
                         availableForSale === 0
                             ? "bg-danger"
                             : availableForSale <= 5

@@ -508,7 +508,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                 <td class="text-center">${index + 1}</td>
                 <td>${product.name}</td>
                 <td class="text-center">
-                    <span class="badge ${
+                    <span class="badge text-white ${
                         product.stock === 0
                             ? "bg-danger"
                             : product.stock <= 5

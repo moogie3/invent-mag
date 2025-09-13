@@ -4,6 +4,7 @@ import { initBulkSelection } from './bulkActions/selection.js';
 import { initializeSearch } from './search/main.js';
 import { initializeEntriesSelector, initKeyboardShortcuts, initExport } from './events.js';
 import { bulkUpdateStock } from './bulkActions/stock.js'; // Import bulkUpdateStock
+import { bulkDeleteProducts } from './bulkActions/delete.js'; // Import bulkDeleteProducts
 
 export function initProductPage() {
     document.addEventListener("DOMContentLoaded", function () {
@@ -191,5 +192,7 @@ export function initProductPage() {
                 bulkUpdateStock(); // Call the function from stock.js
             });
         }
+
+        window.bulkDeleteProducts = bulkDeleteProducts; // Expose globally
     });
 }

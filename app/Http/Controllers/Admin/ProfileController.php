@@ -24,8 +24,8 @@
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email,' . Auth::id(),
-                'shopname' => 'required|string',
-                'address' => 'required|string',
+                'shopname' => 'nullable|string',
+                'address' => 'nullable|string',
                 'timezone' => 'required|string|in:' . implode(',', timezone_identifiers_list()),
                 'password' => 'nullable|min:6|confirmed',
                 'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',

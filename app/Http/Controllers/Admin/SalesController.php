@@ -113,7 +113,7 @@ class SalesController extends Controller
     public function getCustomerPrice(Customer $customer, Product $product)
     {
         $pastPrice = $this->salesService->getPastCustomerPriceForProduct($customer, $product);
-        return response()->json(['past_price' => \App\Helpers\CurrencyHelper::formatWithPosition($pastPrice)]);
+        return response()->json(['past_price' => $pastPrice]);
     }
 
     public function getSalesMetrics()

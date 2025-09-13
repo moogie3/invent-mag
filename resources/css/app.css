@@ -167,15 +167,23 @@ body {
    ENHANCED DROPDOWN Z-INDEX FIX
    ============================ */
 
-/* Dropdown container - ensure it's positioned and has proper z-index */
-.dropdown {
-    position: relative;
-    z-index: var(--z-dropdown);
-}
+/* ============================
+   ENHANCED DROPDOWN Z-INDEX FIX
+   ============================ */
 
-/* When dropdown is open, boost the z-index significantly */
 .dropdown.show {
     z-index: var(--z-dropdown-menu) !important;
+}
+
+.dropdown-menu {
+    position: absolute;
+    z-index: var(--z-dropdown-menu) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    isolation: isolate;
+}
+
+.dropdown-menu.show {
+    z-index: calc(var(--z-dropdown-menu) + 1) !important;
 }
 
 /* Dropdown menu gets even higher z-index */
@@ -191,62 +199,7 @@ body {
     z-index: calc(var(--z-dropdown-menu) + 1) !important;
 }
 
-/* SPECIFIC FIXES FOR TABLE DROPDOWNS */
 
-/* Fix table cells containing dropdowns */
-.table td:has(.dropdown),
-.table th:has(.dropdown) {
-    position: relative;
-    z-index: var(--z-dropdown);
-}
-
-/* When dropdown is open in table cell */
-.table td:has(.dropdown.show),
-.table th:has(.dropdown.show) {
-    z-index: var(--z-dropdown-menu) !important;
-}
-
-/* Fix table rows containing open dropdowns */
-.table tr:has(.dropdown.show) {
-    position: relative;
-    z-index: var(--z-dropdown-menu) !important;
-}
-
-/* Direct targeting for table dropdowns */
-.table .dropdown {
-    position: relative;
-    z-index: var(--z-dropdown);
-}
-
-.table .dropdown.show {
-    z-index: var(--z-dropdown-menu) !important;
-}
-
-/* Fix for dropdown buttons inside tables */
-.table .btn.dropdown-toggle {
-    position: relative;
-    z-index: var(--z-dropdown);
-}
-
-.table .btn.dropdown-toggle[aria-expanded="true"] {
-    z-index: var(--z-dropdown-menu) !important;
-}
-
-/* Specific fix for your supplier table structure */
-.card-table td .dropdown.show {
-    z-index: var(--z-dropdown-menu) !important;
-}
-
-.card-table .dropdown-menu {
-    z-index: calc(var(--z-dropdown-menu) + 1) !important;
-}
-
-/* Fix for Bootstrap's btn-group dropdowns specifically */
-.btn-group>.btn.dropdown-toggle:focus,
-.btn-group>.btn.dropdown-toggle.show,
-.btn-group.show {
-    z-index: var(--z-dropdown-menu) !important;
-}
 
 /* Emergency fix for table-responsive containers */
 .table-responsive {
@@ -281,21 +234,7 @@ body {
     z-index: calc(var(--z-dropdown-menu) - 1) !important;
 }
 
-/* ULTIMATE FIX - Force dropdown menus to always be on top */
-.dropdown-menu.show,
-.show>.dropdown-menu {
-    z-index: 99999 !important;
-    position: absolute !important;
-}
 
-/* Force parent elements to not interfere */
-.table-responsive .dropdown.show {
-    z-index: 99998 !important;
-}
-
-.card-table tbody tr td .dropdown.show {
-    z-index: 99998 !important;
-}
 
 /* ============================
    7. PROGRESS & UI ELEMENTS
@@ -661,3 +600,4 @@ body.layout-navbar-v2 .navbar {
     position: relative;
     z-index: 1;
 }
+

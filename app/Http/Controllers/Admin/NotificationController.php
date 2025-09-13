@@ -23,7 +23,7 @@ class NotificationController extends Controller
         $financialNotifications = $notifications->filter(fn($item) => in_array($item['type'], ['purchase', 'sales']));
         $inventoryNotifications = $notifications->filter(fn($item) => $item['type'] === 'product');
         $lowStockNotifications = $inventoryNotifications->filter(fn($item) => $item['status_text'] === 'Low Stock');
-        $expiringNotifications = $inventoryNotifications->filter(fn($item) => $item['status'] === 'Expiring Soon');
+        $expiringNotifications = $inventoryNotifications->filter(fn($item) => str_contains($item['status_text'], 'Expiring'));
 
         $hasNotifications = $notifications->isNotEmpty();
 

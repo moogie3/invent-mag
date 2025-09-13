@@ -139,21 +139,23 @@ class NotificationService
             ->map(function ($poItem) {
                 $product = $poItem->product;
                 $daysRemaining = (int) Carbon::now()->diffInDays($poItem->expiry_date, false);
-                [, $statusText] = \App\Helpers\ProductHelper::getExpiryClassAndText($poItem->expiry_date);
+                [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getExpiryClassAndText($poItem->expiry_date);
 
                 return [
                     'id' => 'poitem::' . $poItem->id,
                     'title' => "Expiring Product: {$product->name}",
                     'description' => "Expires on {$poItem->expiry_date->format('M d, Y')}",
+                    'po_id' => $poItem->po_id,
+                    'quantity' => $poItem->quantity,
                     'due_date' => $poItem->expiry_date,
-                    'status' => 'Expiring Soon',
+                    'status' => $badgeText, // Use the text from the helper
                     'urgency' => $this->getUrgencyLevel($daysRemaining),
                     'days_remaining' => $daysRemaining,
                     'route' => route('admin.product.edit', ['id' => $product->id]), // Link to product edit page
                     'type' => 'product',
                     'label' => 'Product # ' . $product->code,
-                    'status_badge' => $daysRemaining <= 3 ? 'text-red' : 'text-orange',
-                    'status_text' => $statusText ?? 'Expiring Soon',
+                    'status_badge' => str_replace('badge ', '', $badgeClass), // Use the class from the helper
+                    'status_text' => $badgeText,
                     'status_icon' => 'ti ti-calendar-time',
                     'show_notification' => true,
                 ];

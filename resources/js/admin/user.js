@@ -1,8 +1,10 @@
 import { fetchRolePermissions } from './partials/user/rolesPermissions/api.js';
 import { setupCreateUserModal } from './partials/user/create/main.js';
-import { initEditUserModal, initEditUserFormSubmission } from './partials/user/edit/main.js';
-import { initDeleteUserModal, initDeleteUserFormSubmission } from './partials/user/delete/main.js';
-import { editUserModal, deleteUserModal } from './partials/user/common/elements.js';
+import { initEditUserModal } from './partials/user/edit/main.js';
+import { initEditUserFormSubmission } from './partials/user/edit/api.js';
+import { initDeleteUserModal } from './partials/user/delete/main.js';
+import { initDeleteUserFormSubmission } from './partials/user/delete/api.js';
+import { editUserModal, deleteUserModal, editUserForm, editRolesContainer, editPermissionsContainer } from './partials/user/common/elements.js';
 import { resetPermissionStates } from './partials/user/rolesPermissions/sync.js';
 
 document.addEventListener("DOMContentLoaded", function () {

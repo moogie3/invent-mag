@@ -1,9 +1,9 @@
 import { PurchaseOrderBulkSelection } from './PurchaseOrderBulkSelection.js';
 
-let bulkSelection = null;
+
 
 function getSelectedIds() {
-    return bulkSelection ? bulkSelection.getSelectedIds() : [];
+    return window.bulkSelection ? window.bulkSelection.getSelectedIds() : [];
 }
 
 function resetButton(button, originalText) {
@@ -197,8 +197,8 @@ export function bulkMarkAsPaidPO() {
                 }, 2000);
             });
 
-            if (bulkSelection) {
-                bulkSelection.updateBulkActionsBar();
+            if (window.bulkSelection) {
+                window.bulkSelection.updateBulkActionsBar();
             }
 
             showToast(
@@ -263,8 +263,8 @@ function smartSelectUnpaidOnlyPO() {
         }
     });
 
-    if (bulkSelection) {
-        bulkSelection.updateBulkActionsBar();
+    if (window.bulkSelection) {
+        window.bulkSelection.updateBulkActionsBar();
     }
 
     if (excludedCount > 0) {

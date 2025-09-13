@@ -1,6 +1,7 @@
 import { loadProductsFromCache, getProducts } from './partials/pos/cart/state.js';
 import { initCartActions } from './partials/pos/cart/actions.js';
 import { calculateTotals } from './partials/pos/cart/totals.js';
+import { renderList } from './partials/pos/cart/dom.js';
 import { initPaymentForm } from './partials/pos/payment/form.js';
 import { initPaymentApi } from './partials/pos/payment/api.js';
 import { populatePaymentModal } from './partials/pos/payment/modal.js';
@@ -28,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
         loadProductsFromCache();
     }
 
+    renderList();
     initCartActions();
     calculateTotals();
     initPaymentForm();

@@ -11,7 +11,7 @@
                             <div>
                                 <span class="fw-bold">{{ $item['title'] }}</span>
                                 <small class="text-muted d-block">{{ $item['description'] }}</small>
-                                <small class="text-muted d-block">PO ID: {{ $item['po_id'] }} | Quantity: {{ $item['quantity'] }}</small>
+                                <small class="text-muted d-block">PO ID: {{ $item['po_id'] }} | Quantity: {{ $item['quantity'] }} | Expiring in {{ $item['days_remaining'] }} days</small>
                             </div>
                         </div>
                         <span class="badge {{ str_replace('text-', 'bg-', $item['status_badge']) }}-lt">

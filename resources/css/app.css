@@ -601,3 +601,16 @@ body.layout-navbar-v2 .navbar {
     z-index: 1;
 }
 
+/* Styles for disabled options with transition */
+.disabled-option {
+    opacity: 0.6;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.disabled-option input,
+.disabled-option select,
+.disabled-option label {
+    cursor: not-allowed;
+}
+

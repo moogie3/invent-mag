@@ -24,7 +24,7 @@ class SettingsController extends Controller
                 'navigation_type' => 'required|in:sidebar,navbar,both',
                 'theme_mode' => 'required|in:light,dark',
                 'notification_duration' => 'required|integer|min:0',
-                'auto_logout_time' => 'required|integer|min:0',
+                'auto_logout_time' => 'required|numeric|min:0',
                 'data_refresh_rate' => 'required|integer|min:0',
                 'system_language' => 'required|in:en,id',
             ]);

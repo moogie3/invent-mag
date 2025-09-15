@@ -125,3 +125,85 @@ function initSettingsPage() {
 
 // Initialize settings on script load
 fetchSystemSettings();
+
+document.addEventListener('DOMContentLoaded', function () {
+    let logoutTimer;
+    let modalVisible = false;
+
+    const autoLogoutTimeInput = document.getElementById('autoLogoutTime');
+    if (!autoLogoutTimeInput) {
+        return;
+    }
+
+    let autoLogoutTime = parseFloat(autoLogoutTimeInput.value) * 60 * 1000;
+
+    function showInactivityModal() {
+        if (modalVisible) return;
+        modalVisible = true;
+
+        const modalHtml = `
+            <div class="modal modal-blur fade" id="inactivityModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                    <div class="modal-content rounded-3 shadow-lg border-0">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-status bg-warning"></div>
+                        <div class="modal-body text-center py-5 px-4">
+                            <i class="ti ti-alert-triangle text-warning d-block mx-auto mb-3" style="font-size: 3rem;"></i>
+                            <h3 class="fw-bold mb-3" style="font-size: 1.15rem;">You have been inactive</h3>
+                            <div class="text-muted" style="font-size: 1.1rem; line-height: 1.5;">Do you want to stay logged in?</div>
+                        </div>
+                        <div class="modal-footer d-flex">
+                            <button type="button" class="btn btn-secondary flex-grow-1" id="stayLoggedInBtn" data-bs-dismiss="modal">Stay</button>
+                            <button type="button" class="btn btn-danger flex-grow-1" id="logoutBtn">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        const modalElement = document.getElementById('inactivityModal');
+        const modal = new bootstrap.Modal(modalElement);
+
+        modal.show();
+
+        document.getElementById('stayLoggedInBtn').addEventListener('click', () => {
+            resetLogoutTimer();
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/logout'; // Use the correct logout route
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+            document.body.appendChild(form);
+            form.submit();
+        });
+
+        modalElement.addEventListener('hidden.bs.modal', () => {
+            modalElement.remove();
+            modalVisible = false;
+        });
+    }
+
+    function resetLogoutTimer() {
+        clearTimeout(logoutTimer);
+        if (autoLogoutTime > 0) {
+            logoutTimer = setTimeout(showInactivityModal, autoLogoutTime);
+        }
+    }
+
+    if (autoLogoutTime > 0) {
+        window.addEventListener('mousemove', resetLogoutTimer);
+        window.addEventListener('keydown', resetLogoutTimer);
+        window.addEventListener('click', resetLogoutTimer);
+        window.addEventListener('scroll', resetLogoutTimer);
+        resetLogoutTimer();
+    }
+});

@@ -7,7 +7,14 @@
  * @param {string} [type='info'] - The type of toast ('success', 'error', 'warning', 'info'). Determines color and icon.
  * @param {number} [duration=4000] - How long the toast should be visible in milliseconds.
  */
-window.showToast = function (title, message, type = "info", duration = 4000) {
+window.showToast = function (title, message, type = "info", duration) {
+    if (type === 'success' && window.userSettings && !window.userSettings.show_success_messages) {
+        return; // Do not show success messages if disabled
+    }
+
+    const userDuration = window.userSettings ? parseInt(window.userSettings.notification_duration, 10) * 1000 : 4000;
+    const notificationDuration = duration !== undefined ? duration : userDuration;
+
     let container = document.getElementById("toast-container");
     if (!container) {
         container = document.createElement("div");
@@ -84,10 +91,17 @@ window.showToast = function (title, message, type = "info", duration = 4000) {
 
     container.appendChild(toastElement);
 
-    const toast = new bootstrap.Toast(toastElement, {
-        delay: duration,
+    let toastOptions = {
+        delay: notificationDuration,
         autohide: true,
-    });
+    };
+
+    if (notificationDuration === 0) {
+        toastOptions.autohide = false;
+        toastOptions.delay = 9999999; // A very large number to keep it visible indefinitely
+    }
+
+    const toast = new bootstrap.Toast(toastElement, toastOptions);
 
     toastElement.addEventListener("hidden.bs.toast", () => {
         toastElement.remove();

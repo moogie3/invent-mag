@@ -224,6 +224,8 @@ Route::prefix('admin')->group(function () {
             Route::resource('users', UserController::class)->names('admin.users');
         });
 
+        Route::get('api/settings', [SettingsController::class, 'getSettings'])->name('admin.api.settings');
+
         // Settings Routes
         Route::prefix('settings')->group(function () {
             // Currency Settings

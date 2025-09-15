@@ -79,15 +79,50 @@ class SettingsController extends Controller
                 'settings' => $settingsToSave
             ]);
 
-            return back()->with('success', 'System settings updated successfully.');
+            return response()->json(['success' => true, 'message' => 'System settings updated successfully.', 'settings' => $settingsToSave]);
         } catch (\Exception $e) {
             Log::error('Error updating system settings', [
                 'error' => $e->getMessage(),
                 'user_id' => Auth::id()
             ]);
 
-            return back()->with('error', 'Failed to update system settings. Please try again.');
+            return response()->json(['success' => false, 'message' => 'Failed to update system settings. Please try again.'], 500);
         }
+    }
+
+    public function getSettings()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $settings = $user->system_settings ?? [];
+
+        // Ensure default values are present if not set
+        $defaults = [
+            'navigation_type' => 'sidebar',
+            'theme_mode' => 'light',
+            'notification_duration' => 5,
+            'auto_logout_time' => 60,
+            'data_refresh_rate' => 30,
+            'system_language' => 'en',
+            'sidebar_lock' => false,
+            'show_theme_toggle' => true,
+            'enable_sound_notifications' => true,
+            'enable_browser_notifications' => true,
+            'show_success_messages' => true,
+            'remember_last_page' => true,
+            'enable_animations' => true,
+            'lazy_load_images' => true,
+            'enable_debug_mode' => false,
+            'enable_keyboard_shortcuts' => true,
+            'show_tooltips' => true,
+            'compact_mode' => false,
+            'sticky_navbar' => false,
+        ];
+
+        $settings = array_merge($defaults, $settings);
+
+        return response()->json($settings);
     }
 
     public function updateThemeMode(Request $request)

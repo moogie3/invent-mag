@@ -14,6 +14,8 @@
 {{-- Global Notification Helper --}}
 @vite('resources/js/admin/helpers/notification.js')
 
+
+
 {{-- SCRIPT FOR ADMIN POS  --}}
 @if (request()->is('admin/pos'))
     @vite('resources/js/admin/pos.js')
@@ -109,9 +111,7 @@
 @endif
 
 {{-- SCRIPT FOR SETTINGS --}}
-@if (request()->is('admin/settings'))
-    @vite('resources/js/admin/layouts/settings.js')
-@endif
+@vite('resources/js/admin/layouts/settings.js')
 
 {{-- DELETE MODAL --}}
 <script>

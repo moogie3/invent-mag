@@ -8,16 +8,72 @@ async function fetchSystemSettings() {
         const settings = await response.json();
         window.userSettings = settings;
         console.log('System settings loaded:', window.userSettings);
-        initSettingsPage(); // Initialize the page after settings are loaded
     } catch (error) {
         console.error('Error fetching system settings:', error);
         // Fallback to default settings if fetch fails
         window.userSettings = {
             enable_sound_notifications: true,
             show_success_messages: true,
-            notification_duration: 5000,
+            notification_duration: 5,
         };
-        initSettingsPage(); // Initialize the page even if settings fetch fails
+    }
+
+    // Once settings are loaded, check for and display any session-based notifications.
+    if (window.handleSessionNotifications) {
+        window.handleSessionNotifications();
+    }
+
+    // Apply performance settings globally
+    if (window.userSettings) {
+        applyPerformanceSettings(window.userSettings);
+    }
+
+    // Initialize the settings page functionality if the form exists on the current page.
+    initSettingsPage();
+}
+
+/**
+ * Applies global performance settings based on user preferences.
+ * @param {object} settings - The user settings object.
+ */
+function applyPerformanceSettings(settings) {
+    // 1. UI Animations
+    if (settings.enable_animations === false) {
+        document.body.classList.add('no-animations');
+    } else {
+        document.body.classList.remove('no-animations');
+    }
+
+    // 2. Lazy Load Images
+    if (settings.lazy_load_images === true) {
+        const images = document.querySelectorAll('img:not([loading])');
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.setAttribute('loading', 'lazy');
+                        observer.unobserve(img);
+                    }
+                });
+            });
+            images.forEach(img => observer.observe(img));
+        } else {
+            // Fallback for older browsers
+            images.forEach(img => img.setAttribute('loading', 'lazy'));
+        }
+    }
+
+    // 3. Data Refresh Rate
+    if (window.dataRefreshInterval) {
+        clearInterval(window.dataRefreshInterval);
+    }
+    const refreshRate = parseInt(settings.data_refresh_rate, 10);
+    if (refreshRate > 0) {
+        window.dataRefreshInterval = setInterval(() => {
+            document.dispatchEvent(new CustomEvent('datarefresh'));
+            console.log('Dispatched datarefresh event.');
+        }, refreshRate * 1000);
     }
 }
 
@@ -25,7 +81,7 @@ function initSettingsPage() {
     const systemSettingsForm = document.getElementById('systemSettingsForm');
 
     if (systemSettingsForm) {
-        systemSettingsForm.addEventListener('submit', function (e) {
+        /* systemSettingsForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
             const formData = new FormData(systemSettingsForm);
@@ -68,7 +124,7 @@ function initSettingsPage() {
                 saveButton.disabled = false;
                 saveButton.innerHTML = originalButtonText;
             });
-        });
+        }); */
     }
 
     const navigationTypeSelect = document.querySelector('select[name="navigation_type"]');

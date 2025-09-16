@@ -195,5 +195,11 @@
                 });
             });
         }
+
+        // Listen for the global datarefresh event
+        document.addEventListener('datarefresh', function() {
+            console.log('datarefresh event received, updating chart.');
+            updateChart(currentPeriod);
+        });
     });
 </script>

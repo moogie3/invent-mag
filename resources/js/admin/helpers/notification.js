@@ -226,8 +226,4 @@ window.handleSessionNotifications = function () {
     }
 };
 
-// Call handleSessionNotifications when the DOM is fully loaded
-document.addEventListener(
-    "DOMContentLoaded",
-    window.handleSessionNotifications
-);
+// The call to handleSessionNotifications is now triggered from settings.js after user settings are loaded.

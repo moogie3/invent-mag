@@ -608,6 +608,16 @@ body.layout-navbar-v2 .navbar {
     transition: opacity 0.3s ease-in-out;
 }
 
+/* Disable animations when the .no-animations class is present on the body */
+.no-animations *,
+.no-animations *::before,
+.no-animations *::after {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+}
+
 .disabled-option input,
 .disabled-option select,
 .disabled-option label {

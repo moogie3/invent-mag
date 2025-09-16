@@ -79,7 +79,11 @@ class SettingsController extends Controller
                 'settings' => $settingsToSave
             ]);
 
-            return response()->json(['success' => true, 'message' => 'System settings updated successfully.', 'settings' => $settingsToSave]);
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'System settings updated successfully.', 'settings' => $settingsToSave]);
+            }
+
+            return redirect()->route('admin.setting.index')->with('success', 'System settings updated successfully.');
         } catch (\Exception $e) {
             Log::error('Error updating system settings', [
                 'error' => $e->getMessage(),

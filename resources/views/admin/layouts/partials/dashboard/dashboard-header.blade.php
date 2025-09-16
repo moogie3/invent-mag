@@ -3,7 +3,7 @@
         <div class="row align-items-center">
             <div class="col">
                 <h2 class="page-title d-flex align-items-center">
-                    <i class="ti ti-dashboard fs-2 me-2"></i> Dashboard
+                    <i class="ti ti-dashboard fs-2 me-2"></i> {{ __('messages.dashboard') }}
                 </h2>
                 <div class="text-muted mt-1">Business overview and performance metrics</div>
             </div>

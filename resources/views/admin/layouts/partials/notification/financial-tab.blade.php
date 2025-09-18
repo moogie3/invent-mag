@@ -10,7 +10,7 @@
                             </div>
                             <div>
                                 <span class="fw-bold">{{ ucfirst($item['type']) }} - {{ $item['label'] }}</span>
-                                <small class="text-muted d-block">Due on
+                                <small class="text-muted d-block">{{ __('messages.due_on') }}
                                     {{ \Carbon\Carbon::parse($item['due_date'])->format('d M Y') }}</small>
                             </div>
                         </div>
@@ -22,6 +22,6 @@
             @endforeach
         </div>
     @else
-        <div class="text-muted text-center">No financial notifications</div>
+        <div class="text-muted text-center">{{ __('messages.no_financial_notifications') }}</div>
     @endif
 </div>

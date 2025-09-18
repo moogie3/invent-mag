@@ -14,7 +14,7 @@
                                 <small class="text-muted d-block">
                                     {{ $item['description'] }}
                                     <span class="ms-2 text-muted">
-                                        (Threshold: {{ $item['threshold'] }})
+                                        ({{ __('messages.threshold') }}: {{ $item['threshold'] }})
                                     </span>
                                 </small>
                             </div>
@@ -27,6 +27,6 @@
             @endforeach
         </div>
     @else
-        <div class="text-muted text-center">No low stock products</div>
+        <div class="text-muted text-center">{{ __('messages.no_low_stock_products') }}</div>
     @endif
 </div>

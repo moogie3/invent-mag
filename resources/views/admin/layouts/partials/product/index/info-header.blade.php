@@ -8,10 +8,10 @@
                             <i class="ti ti-box fs-1 me-3 text-primary"></i>
                             <div>
                                 <h2 class="mb-1">
-                                    Product Information
+                                    {{ __('Product Information') }}
                                 </h2>
                                 <div class="text-muted">
-                                    Overview of your product inventory and stock levels
+                                    {{ __('Overview of your product inventory and stock levels') }}
                                 </div>
                             </div>
                         </div>
@@ -23,7 +23,7 @@
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label class="form-label text-muted mb-2 d-block">
-                                            Product Details
+                                            {{ __('Product Details') }}
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
@@ -32,7 +32,7 @@
                                             <i class="ti ti-box fs-3 text-primary"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <div class="small text-muted">Total Product</div>
+                                            <div class="small text-muted">{{ __('Total Product') }}</div>
                                             <div class="fw-bold" id="totalProductCount">{{ $totalproduct }}</div>
                                         </div>
                                     </div>
@@ -42,7 +42,7 @@
                                             <i class="ti ti-category fs-3 text-success"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <div class="small text-muted">Total Category</div>
+                                            <div class="small text-muted">{{ __('Total Category') }}</div>
                                             <div class="fw-bold" id="totalCategoryCount">{{ $totalcategory }}</div>
                                         </div>
                                     </div>
@@ -55,7 +55,7 @@
                                     <div class="mb-2">
                                         <label
                                             class="form-label {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }} mb-2 d-block">
-                                            Stock Status
+                                            {{ __('Stock Status') }}
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center">
@@ -66,14 +66,14 @@
                                         <div>
                                             <div
                                                 class="small {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}">
-                                                Low Stock Items</div>
+                                                {{ __('Low Stock Items') }}</div>
                                             <div
                                                     class="h4 mb-0 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}" id="lowStockItemsCount">
                                                     {{ $lowStockCount }}</div>
                                             @if ($lowStockCount > 0)
                                                 <a href="#" class="mt-2 btn btn-sm btn-outline-danger"
                                                     id="viewLowStock">
-                                                    View Details
+                                                    {{ __('View Details') }}
                                                 </a>
                                             @endif
                                         </div>
@@ -87,7 +87,7 @@
                                     <div class="mb-2">
                                         <label
                                             class="form-label {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }} mb-2 d-block">
-                                            Expiry Status
+                                            {{ __('Expiry Status') }}
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center">
@@ -98,14 +98,14 @@
                                         <div>
                                             <div
                                                 class="small {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}">
-                                                Expiring Soon</div>
+                                                {{ __('Expiring Soon') }}</div>
                                             <div
                                                     class="h4 mb-0 {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}" id="expiringSoonItemsCount">
                                                     {{ $expiringSoonCount }}</div>
                                             @if ($expiringSoonCount > 0)
                                                 <a href="#" class="mt-2 btn btn-sm btn-outline-warning"
                                                     id="viewExpiringSoon" data-bs-toggle="modal" data-bs-target="#expiringSoonModal">
-                                                    View Details
+                                                    {{ __('View Details') }}
                                                 </a>
                                             @endif
                                         </div>

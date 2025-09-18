@@ -2,14 +2,14 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Delete Purchase Order</h5>
+                <h5 class="modal-title">{{ __('messages.po_modal_delete_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-status bg-danger"></div>
             <div class="modal-body text-center py-4">
                 <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
-                <h3>Are you sure?</h3>
-                <div class="text-muted">Do you really want to remove this purchase order? This action cannot be undone.
+                <h3>{{ __('messages.are_you_sure') }}</h3>
+                <div class="text-muted">{{ __('messages.po_modal_delete_warning') }}
                 </div>
             </div>
             <div class="modal-footer">
@@ -17,14 +17,14 @@
                     <div class="row">
                         <div class="col">
                             <button type="button" class="btn w-100" data-bs-dismiss="modal">
-                                Cancel
+                                {{ __('messages.cancel') }}
                             </button>
                         </div>
                         <div class="col">
                             <form id="deleteForm" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger w-100">Delete</button>
+                                <button type="submit" class="btn btn-danger w-100">{{ __('messages.delete') }}</button>
                             </form>
                         </div>
                     </div>
@@ -41,7 +41,7 @@
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="bulkDeleteModalLabel">
                     <i class="ti ti-trash me-2"></i>
-                    Confirm Bulk Delete
+                    {{ __('messages.po_modal_bulk_delete_title') }}
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
@@ -51,23 +51,23 @@
                     <div class="alert alert-warning d-flex align-items-center w-100 mb-0">
                         <i class="ti ti-alert-circle me-2 fs-4"></i>
                         <div>
-                            <strong>Warning!</strong> This action cannot be undone.
+                            <strong>{{ __('messages.warning') }}</strong> {{ __('messages.po_modal_bulk_delete_warning_message') }}
                         </div>
                     </div>
                 </div>
 
                 <p class="mb-3">
-                    You are about to permanently delete
+                    {{ __('messages.po_modal_bulk_delete_message_part1') }}
                     <strong id="bulkDeleteCount">0</strong>
-                    purchase order(s) and all associated data.
+                    {{ __('messages.po_modal_bulk_delete_message_part2') }}
                 </p>
 
                 <div class="bg-light p-3 rounded">
-                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be deleted:</h6>
+                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> {{ __('messages.po_modal_bulk_delete_what_deleted_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">
-                        <li><i class="ti ti-check text-danger me-1"></i> Purchase order records</li>
-                        <li><i class="ti ti-check text-danger me-1"></i> Associated purchase order items</li>
-                        <li><i class="ti ti-check text-danger me-1"></i> Related transaction history</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> {{ __('messages.po_modal_bulk_delete_item1') }}</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> {{ __('messages.po_modal_bulk_delete_item2') }}</li>
+                        <li><i class="ti ti-check text-danger me-1"></i> {{ __('messages.po_modal_bulk_delete_item3') }}</li>
                     </ul>
                 </div>
 
@@ -75,10 +75,10 @@
                     <div class="alert alert-info d-flex align-items-start">
                         <i class="ti ti-info-circle me-2 fs-4 mt-1"></i>
                         <div>
-                            <strong>Stock Level Impact:</strong>
+                            <strong>{{ __('messages.po_modal_bulk_delete_stock_impact_title') }}</strong>
                             <ul class="mb-0 mt-1 small">
-                                <li><strong>Unpaid invoices:</strong> Stock levels will be adjusted (reduced)</li>
-                                <li><strong>Paid invoices:</strong> Stock levels will remain unchanged</li>
+                                <li><strong>{{ __('messages.po_modal_bulk_delete_stock_impact_unpaid') }}</strong> {{ __('messages.po_modal_bulk_delete_stock_impact_unpaid_desc') }}</li>
+                                <li><strong>{{ __('messages.po_modal_bulk_delete_stock_impact_paid') }}</strong> {{ __('messages.po_modal_bulk_delete_stock_impact_paid_desc') }}</li>
                             </ul>
                         </div>
                     </div>
@@ -86,12 +86,12 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="ti ti-x me-1"></i>
-                    Cancel
-                </button>
+                        <i class="ti ti-x me-1"></i>
+                        {{ __('messages.cancel') }}
+                    </button>
                 <button type="button" class="btn btn-danger" id="confirmBulkDeleteBtn">
                     <i class="ti ti-trash me-1"></i>
-                    Delete Selected
+                    {{ __('messages.po_modal_bulk_delete_button') }}
                 </button>
             </div>
         </div>
@@ -105,7 +105,7 @@
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="bulkMarkAsPaidModalLabel">
                     <i class="ti ti-check me-2"></i>
-                    Confirm Bulk Mark as Paid
+                    {{ __('messages.po_modal_bulk_mark_paid_title') }}
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
@@ -115,40 +115,40 @@
                     <div class="alert alert-info d-flex align-items-center w-100 mb-0">
                         <i class="ti ti-info-circle me-2 fs-4"></i>
                         <div>
-                            <strong>Info!</strong> This will update the payment status of selected purchase orders.
+                            <strong>{{ __('messages.info') }}</strong> {{ __('messages.po_modal_bulk_mark_paid_info_message') }}
                         </div>
                     </div>
                 </div>
 
                 <p class="mb-3">
-                    You are about to mark
+                    {{ __('messages.po_modal_bulk_mark_paid_message_part1') }}
                     <strong id="bulkPaidCount">0</strong>
-                    purchase order(s) as fully paid.
+                    {{ __('messages.po_modal_bulk_mark_paid_message_part2') }}
                 </p>
 
                 <div class="bg-light p-3 rounded">
-                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> What will be updated:</h6>
+                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> {{ __('messages.po_modal_bulk_mark_paid_what_updated_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">
-                        <li><i class="ti ti-check text-success me-1"></i> Payment status will be set to "Paid"</li>
-                        <li><i class="ti ti-check text-success me-1"></i> Outstanding amounts will be cleared</li>
-                        <li><i class="ti ti-check text-success me-1"></i> Payment completion date will be recorded</li>
-                        <li><i class="ti ti-check text-success me-1"></i> Purchase order status will be updated</li>
+                        <li><i class="ti ti-check text-success me-1"></i> {{ __('messages.po_modal_bulk_mark_paid_item1') }}</li>
+                        <li><i class="ti ti-check text-success me-1"></i> {{ __('messages.po_modal_bulk_mark_paid_item2') }}</li>
+                        <li><i class="ti ti-check text-success me-1"></i> {{ __('messages.po_modal_bulk_mark_paid_item3') }}</li>
+                        <li><i class="ti ti-check text-success me-1"></i> {{ __('messages.po_modal_bulk_mark_paid_item4') }}</li>
                     </ul>
                 </div>
 
                 <p class="mt-3 mb-1 text-muted small">
                     <i class="ti ti-info-circle me-1"></i>
-                    Only unpaid and partially paid purchase orders will be affected.
+                    {{ __('messages.po_modal_bulk_mark_paid_note') }}
                 </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="ti ti-x me-1"></i>
-                    Cancel
+                    {{ __('messages.cancel') }}
                 </button>
                 <button type="button" class="btn btn-success" id="confirmBulkPaidBtn">
                     <i class="ti ti-check me-1"></i>
-                    Mark as Paid
+                    {{ __('messages.po_modal_bulk_mark_paid_button') }}
                 </button>
             </div>
         </div>
@@ -159,31 +159,30 @@
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h4 class="modal-title"><i class="ti ti-file-invoice me-2"></i>Purchase Order Details</h4>
+                <h4 class="modal-title"><i class="ti ti-file-invoice me-2"></i>{{ __('messages.po_modal_details_title') }}</h4>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
             <div class="modal-body p-0" id="viewPoModalContent">
                 <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                        <span class="visually-hidden">{{ __('messages.loading') }}</span>
                     </div>
-                    <p class="mt-3 text-muted">Loading purchase order details...</p>
+                    <p class="mt-3 text-muted">{{ __('messages.po_modal_details_loading_message') }}</p>
                 </div>
             </div>
             <div class="modal-footer">
                 <div class="text-muted me-auto">
-                    <small><i class="ti ti-info-circle me-1"></i> View complete purchase order details and recheck the
-                        invoice</small>
+                    <small><i class="ti ti-info-circle me-1"></i> {{ __('messages.po_modal_details_info_message') }}</small>
                 </div>
                 <a href="#" class="btn btn-info" id="poModalFullView">
-                    <i class="ti ti-zoom-scan me-1"></i> Full View
+                    <i class="ti ti-zoom-scan me-1"></i> {{ __('messages.po_modal_details_full_view_button') }}
                 </a>
                 <button type="button" class="btn btn-secondary" id="poModalPrint">
-                    <i class="ti ti-printer me-1"></i> Print
+                    <i class="ti ti-printer me-1"></i> {{ __('messages.po_modal_details_print_button') }}
                 </button>
                 <a href="#" class="btn btn-primary" id="poModalEdit">
-                    <i class="ti ti-edit me-1"></i> Edit
+                    <i class="ti ti-edit me-1"></i> {{ __('messages.edit') }}
                 </a>
             </div>
         </div>
@@ -198,15 +197,15 @@
                 <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body text-center py-4">
                     <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4"></i>
-                    <h3 class="mb-3">Warning!</h3>
+                    <h3 class="mb-3">{{ __('messages.warning') }}</h3>
                     <div class="text-secondary">
                         <div class="text-warning text-center">
-                            Paid invoices cannot be edited.<br>View mode only.
+                            {{ __('messages.po_modal_paid_warning_message1') }}<br>{{ __('messages.po_modal_paid_warning_message2') }}
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="{{ route('admin.po.view', $pos->id) }}" class="btn btn-primary w-100">View Invoice</a>
+                    <a href="{{ route('admin.po.view', $pos->id) }}" class="btn btn-primary w-100">{{ __('messages.po_modal_paid_view_invoice_button') }}</a>
                 </div>
             </div>
         </div>
@@ -240,7 +239,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-warning text-white">
-                <h4 class="modal-title"><i class="ti ti-calendar-time me-2"></i>Expiring Soon Purchase Orders</h4>
+                <h4 class="modal-title"><i class="ti ti-calendar-time me-2"></i>{{ __('messages.po_modal_expiring_title') }}</h4>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -249,11 +248,11 @@
                     <table class="table card-table table-vcenter">
                         <thead>
                             <tr>
-                                <th>Invoice</th>
-                                <th>Supplier</th>
-                                <th class="text-center">Due Date</th>
-                                <th class="text-end">Total</th>
-                                <th class="text-end">Action</th>
+                                <th>{{ __('messages.table_invoice') }}</th>
+                                <th>{{ __('messages.supplier_title') }}</th>
+                                <th class="text-center">{{ __('messages.po_due_date') }}</th>
+                                <th class="text-end">{{ __('messages.table_total') }}</th>
+                                <th class="text-end">{{ __('messages.table_action') }}</th>
                             </tr>
                         </thead>
                         <tbody id="expiringPurchaseTableBody">
@@ -261,13 +260,12 @@
                         </tbody>
                     </table>
                     <div class="text-muted small mt-3">
-                        <i class="ti ti-info-circle me-1"></i> Purchase orders with a due date within the next 90 days
-                        are shown here.
+                        <i class="ti ti-info-circle me-1"></i> {{ __('messages.po_modal_expiring_info_message') }}
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
             </div>
         </div>
     </div>

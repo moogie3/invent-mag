@@ -2,7 +2,7 @@
     <div class="container-xl">
         <div class="card">
             <div class="card-body">
-                <h2><i class="ti ti-bell me-2"></i>NOTIFICATION</h2>
+                <h2><i class="ti ti-bell me-2"></i>{{ __('messages.notification') }}</h2>
             </div>
             <hr class="my-0">
             <div class="row g-0">

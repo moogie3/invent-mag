@@ -25,7 +25,7 @@
                 @if ($badgeClass)
                     <span class="{{ $badgeClass }}">{{ $badgeText }}</span>
                     @if ($product->low_stock_threshold)
-                        <small class="d-block text-muted">Threshold: {{ $product->low_stock_threshold }}</small>
+                        <small class="d-block text-muted">{{ __('Threshold:') }} {{ $product->low_stock_threshold }}</small>
                     @endif
                 @endif
             </td>

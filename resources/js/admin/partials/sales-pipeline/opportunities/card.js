@@ -1,4 +1,4 @@
-import { formatCurrencyJs, getStatusColor } from '../common/utils.js';
+import { formatCurrency, getStatusColor } from '../common/utils.js';
 
 export function createOpportunityCard(opportunity) {
     const card = document.createElement("div");
@@ -9,7 +9,7 @@ export function createOpportunityCard(opportunity) {
         ? opportunity.customer.name
         : "Unknown Customer";
     const amount = opportunity.amount
-        ? formatCurrencyJs(opportunity.amount)
+        ? formatCurrency(opportunity.amount)
         : "No amount";
     const expectedCloseDate = opportunity.expected_close_date
         ? new Date(opportunity.expected_close_date).toLocaleDateString(

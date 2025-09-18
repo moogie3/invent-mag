@@ -1,6 +1,6 @@
 import { SALES_PIPELINE_ROUTES } from '../common/constants.js';
 import { allPipelines } from '../common/state.js';
-import { formatCurrencyJs } from '../common/utils.js';
+import { formatCurrency } from '../common/utils.js';
 import { loadPipelineBoard } from '../ui/pipelineBoard.js';
 
 const newOpportunityForm = document.getElementById("newOpportunityForm");
@@ -95,7 +95,7 @@ export function initNewOpportunityForm() {
             ).hide();
             this.reset();
             newOpportunityItemsContainer.innerHTML = "";
-            newOpportunityTotalAmountInput.value = formatCurrencyJs(0);
+            newOpportunityTotalAmountInput.value = formatCurrency(0);
             loadPipelineBoard(selectedPipelineId);
 
             window.showToast(

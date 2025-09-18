@@ -3,28 +3,28 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Delete Unit</h5>
+                <h5 class="modal-title">{{ __('unit_modal_delete_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-status bg-danger"></div>
             <div class="modal-body text-center py-4">
                 <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
-                <h3>Are you sure?</h3>
-                <div class="text-muted">Do you really want to remove this unit? This action cannot be undone.</div>
+                <h3>{{ __('are_you_sure') }}</h3>
+                <div class="text-muted">{{ __('unit_modal_delete_warning') }}</div>
             </div>
             <div class="modal-footer">
                 <div class="w-100">
                     <div class="row">
                         <div class="col">
                             <button type="button" class="btn w-100" data-bs-dismiss="modal">
-                                Cancel
+                                {{ __('cancel') }}
                             </button>
                         </div>
                         <div class="col">
                             <form id="deleteForm" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger w-100">Delete</button>
+                                <button type="submit" class="btn btn-danger w-100">{{ __('delete') }}</button>
                             </form>
                         </div>
                     </div>
@@ -39,24 +39,25 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createUnitModalLabel">
-                    Create Warehouse</h5>
+                    {{ __('unit_modal_create_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="createUnitForm" action="{{ route('admin.setting.unit.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="symbol" class="form-label">Code</label>
+                        <label for="symbol" class="form-label">{{ __('table_code') }}</label>
                         <input type="text" class="form-control" id="symbol" name="symbol">
                     </div>
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
+                        <label for="name" class="form-label">{{ __('table_name') }}</label>
                         <input type="text" class="form-control" id="name" name="name">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">{{ __('cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('save') }}</button>
                 </div>
             </form>
         </div>
@@ -67,7 +68,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editUnitModalLabel">Edit Unit
+                <h5 class="modal-title" id="editUnitModalLabel">{{ __('unit_modal_edit_title') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -77,17 +78,18 @@
                 <div class="modal-body">
                     <input type="hidden" id="unitId" name="id">
                     <div class="mb-3">
-                        <label for="unitSymbolEdit" class="form-label">Code</label>
+                        <label for="unitSymbolEdit" class="form-label">{{ __('table_code') }}</label>
                         <input type="text" class="form-control" id="unitSymbolEdit" name="symbol">
                     </div>
                     <div class="mb-3">
-                        <label for="unitNameEdit" class="form-label">Name</label>
+                        <label for="unitNameEdit" class="form-label">{{ __('table_name') }}</label>
                         <input type="text" class="form-control" id="unitNameEdit" name="name">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">{{ __('cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('save') }}</button>
                 </div>
                 <input type="hidden" id="updateRouteBase" value="{{ route('admin.setting.unit.update', '') }}">
             </form>

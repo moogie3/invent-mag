@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'User Management')
+@section('title', __('messages.user_page_title'))
 
 @section('content')
     <div class="page-wrapper">
@@ -8,7 +8,7 @@
             <div class="container-xl">
                 <div class="card">
                     <div class="card-body">
-                        <h2><i class="ti ti-users me-2"></i>USER MANAGEMENT</h2>
+                        <h2><i class="ti ti-users me-2"></i>{{ __('messages.user_management_title') }}</h2>
                     </div>
                     <hr class="my-0">
                     <div class="row g-0">
@@ -23,12 +23,12 @@
                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                 <h2 class="mb-0">
                                                     <i class="ti ti-users fs-2"></i>
-                                                    Total Users : <strong>{{ $users->count() }}</strong>
+                                                    {{ __('messages.user_total_users') }} <strong>{{ $users->count() }}</strong>
                                                 </h2>
                                                 <div class="btn-list">
                                                     <a href="#" class="btn btn-primary d-none d-sm-inline-block"
                                                         data-bs-toggle="modal" data-bs-target="#createUserModal">
-                                                        <i class="ti ti-plus fs-4"></i> New User
+                                                        <i class="ti ti-plus fs-4"></i> {{ __('messages.user_new_user') }}
                                                     </a>
                                                 </div>
                                             </div>
@@ -48,13 +48,13 @@
                                                                 </div>
                                                                 <div class="col">
                                                                     <div class="font-weight-bold text-lg mb-1">
-                                                                        Superuser
+                                                                        {{ __('messages.user_role_superuser') }}
                                                                     </div>
                                                                     <div class="h2 mb-0 text-red">
                                                                         {{ $users->filter(function ($user) {return $user->hasRole('superuser');})->count() }}
                                                                     </div>
                                                                     <div class="text-muted small">
-                                                                        System Administrator
+                                                                        {{ __('messages.user_role_superuser_description') }}
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-auto">
@@ -77,13 +77,13 @@
                                                                 </div>
                                                                 <div class="col">
                                                                     <div class="font-weight-bold text-lg mb-1">
-                                                                        Staff
+                                                                        {{ __('messages.user_role_staff') }}
                                                                     </div>
                                                                     <div class="h2 mb-0 text-blue">
                                                                         {{ $users->filter(function ($user) {return $user->hasRole('staff');})->count() }}
                                                                     </div>
                                                                     <div class="text-muted small">
-                                                                        Administrative Staff
+                                                                        {{ __('messages.user_role_staff_description') }}
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-auto">
@@ -106,13 +106,13 @@
                                                                 </div>
                                                                 <div class="col">
                                                                     <div class="font-weight-bold text-lg mb-1">
-                                                                        POS
+                                                                        {{ __('messages.user_role_pos') }}
                                                                     </div>
                                                                     <div class="h2 mb-0 text-green">
                                                                         {{ $users->filter(function ($user) {return $user->hasRole('pos');})->count() }}
                                                                     </div>
                                                                     <div class="text-muted small">
-                                                                        Point of Sale
+                                                                        {{ __('messages.user_role_pos_description') }}
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-auto">
@@ -133,14 +133,14 @@
                                                 <thead style="font-size: large">
                                                     <tr>
                                                         <th><button class="table-sort fs-4 py-3"
-                                                                data-sort="sort-name">Name</button></th>
+                                                                data-sort="sort-name">{{ __('messages.table_name') }}</button></th>
                                                         <th><button class="table-sort fs-4 py-3"
-                                                                data-sort="sort-email">Email</button></th>
+                                                                data-sort="sort-email">{{ __('messages.table_email') }}</button></th>
                                                         <th><button class="table-sort fs-4 py-3"
-                                                                data-sort="sort-roles">Roles</button></th>
+                                                                data-sort="sort-roles">{{ __('messages.table_roles') }}</button></th>
                                                         <th><button class="table-sort fs-4 py-3"
-                                                                data-sort="sort-permissions">Permissions</button></th>
-                                                        <th style="width:180px;text-align:center" class="fs-4 py-3">Action
+                                                                data-sort="sort-permissions">{{ __('messages.table_permissions') }}</button></th>
+                                                        <th style="width:180px;text-align:center" class="fs-4 py-3">{{ __('messages.table_action') }}
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -166,7 +166,7 @@
                                                                     <button class="btn dropdown-toggle align-text-top"
                                                                         data-bs-toggle="dropdown"
                                                                         data-bs-boundary="viewport">
-                                                                        Actions
+                                                                        {{ __('messages.table_action') }}
                                                                     </button>
                                                                     <div class="dropdown-menu">
                                                                         <a href="#"
@@ -174,14 +174,14 @@
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#editUserModal"
                                                                             data-user-id="{{ $user->id }}">
-                                                                            <i class="ti ti-edit me-2"></i> Edit
+                                                                            <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
                                                                         </a>
                                                                         <button type="button"
                                                                             class="dropdown-item text-danger delete-user-btn"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#deleteUserModal"
                                                                             data-user-id="{{ $user->id }}">
-                                                                            <i class="ti ti-trash me-2"></i> Delete
+                                                                            <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
                                                                         </button>
                                                                     </div>
                                                                 </div>
@@ -196,8 +196,11 @@
                                         @if (method_exists($users, 'links'))
                                             <div class="card-footer d-flex align-items-center">
                                                 <p class="m-0 text-secondary">
-                                                    Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of
-                                                    {{ $users->total() }} entries
+                                                    {{ __('messages.pagination_showing_entries', [
+                                                        'first' => $users->firstItem(),
+                                                        'last' => $users->lastItem(),
+                                                        'total' => $users->total(),
+                                                    ]) }} entries
                                                 </p>
                                                 <div class="ms-auto">
                                                     {{ $users->appends(request()->query())->links('vendor.pagination.tabler') }}

@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'Edit Product')
+@section('title', __('Edit Product'))
 
 @section('content')
     <div class="page-wrapper">

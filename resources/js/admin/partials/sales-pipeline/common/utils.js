@@ -1,5 +1,7 @@
 import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 
+export { formatCurrency };
+
 export function getStatusColor(status) {
     switch (status) {
         case "open":

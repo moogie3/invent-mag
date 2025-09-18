@@ -9,10 +9,10 @@
                 <div class="row align-items-center">
                     <div class="col">
                         <div class="page-pretitle">
-                            Sales Management
+                            {{ __('messages.sales_management') }}
                         </div>
                         <h2 class="page-title">
-                            Sales Pipeline
+                            {{ __('messages.sales_pipeline') }}
                         </h2>
                     </div>
                 </div>
@@ -41,21 +41,21 @@
                                                     <i class="ti ti-chart-line fs-1 me-3 text-primary"></i>
                                                     <div>
                                                         <h2 class="mb-1">
-                                                            Sales Pipeline Management
+                                                            {{ __('messages.sales_pipeline_management') }}
                                                         </h2>
                                                         <div class="text-muted">
-                                                            Track and manage your sales opportunities
+                                                            {{ __('messages.track_and_manage_your_sales_opportunities') }}
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="btn-list">
                                                     <button class="btn btn-outline-primary" data-bs-toggle="modal"
                                                         data-bs-target="#managePipelinesModal">
-                                                        <i class="ti ti-settings me-2"></i>Manage Pipelines
+                                                        <i class="ti ti-settings me-2"></i>{{ __('messages.manage_pipelines') }}
                                                     </button>
                                                     <button class="btn btn-primary d-none d-sm-inline-block"
                                                         data-bs-toggle="modal" data-bs-target="#newOpportunityModal">
-                                                        <i class="ti ti-plus me-2"></i>New Opportunity
+                                                        <i class="ti ti-plus me-2"></i>{{ __('messages.new_opportunity') }}
                                                     </button>
                                                     <button class="btn btn-primary d-sm-none btn-icon"
                                                         data-bs-toggle="modal" data-bs-target="#newOpportunityModal"
@@ -72,7 +72,7 @@
                                                             <div class="mb-2">
                                                                 <label for="pipelineSelect"
                                                                     class="form-label text-muted mb-2 d-block">
-                                                                    Active Pipeline
+                                                                    {{ __('messages.active_pipeline') }}
                                                                 </label>
                                                             </div>
                                                             <div class="d-flex align-items-center">
@@ -83,7 +83,7 @@
                                                                 <div class="flex-grow-1">
                                                                     <select class="form-select form-select-lg"
                                                                         id="pipelineSelect">
-                                                                        <option value="">Select Pipeline</option>
+                                                                        <option value="">{{ __('messages.select_pipeline') }}</option>
                                                                         <!-- Options will be populated here -->
                                                                     </select>
                                                                 </div>
@@ -96,10 +96,10 @@
                                                         <div class="card-body py-3">
                                                             <div class="d-flex align-items-center">
                                                                 <div class="me-3">
-                                                                    <i class="ti ti-currency-dollar fs-2"></i>
+                                                                    <i class="ti ti-currency fs-2"></i>
                                                                 </div>
                                                                 <div>
-                                                                    <div class="text-white-50 small">Total Pipeline Value
+                                                                    <div class="text-white-50 small">{{ __('messages.total_pipeline_value') }}
                                                                     </div>
                                                                     <div class="h3 mb-0" id="pipelineValue">
                                                                         {{ \App\Helpers\CurrencyHelper::getCurrencySymbol() }}0
@@ -115,7 +115,7 @@
                                         <div class="card-body">
                                             <div class="d-flex align-items-center mb-3">
                                                 <i class="ti ti-layout-kanban fs-4 me-2 text-primary"></i>
-                                                <h4 class="mb-0">Pipeline Board</h4>
+                                                <h4 class="mb-0">{{ __('messages.pipeline_board') }}</h4>
                                             </div>
 
                                             <div class="border rounded p-3 bg-light">
@@ -140,7 +140,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="newOpportunityModalLabel">
-                            <i class="ti ti-plus me-2"></i>Create New Sales Opportunity
+                            <i class="ti ti-plus me-2"></i>{{ __('messages.create_new_sales_opportunity') }}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -148,13 +148,13 @@
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="opportunityName" class="form-label">
-                                    <i class="ti ti-target me-1"></i>Opportunity Name
+                                    <i class="ti ti-target me-1"></i>{{ __('messages.opportunity_name') }}
                                 </label>
                                 <input type="text" class="form-control" id="opportunityName" name="name" required>
                             </div>
                             <div class="mb-3">
                                 <label for="opportunityCustomer" class="form-label">
-                                    <i class="ti ti-user me-1"></i>Customer
+                                    <i class="ti ti-user me-1"></i>{{ __('messages.customer') }}
                                 </label>
                                 <select class="form-select" id="opportunityCustomer" name="customer_id" required>
                                     <!-- Customers will be loaded here -->
@@ -162,32 +162,32 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">
-                                    <i class="ti ti-package me-1"></i>Products
+                                    <i class="ti ti-package me-1"></i>{{ __('messages.products') }}
                                 </label>
                                 <div id="newOpportunityItemsContainer">
                                     <!-- Product items will be added here dynamically -->
                                 </div>
                                 <button type="button" class="btn btn-outline-primary btn-sm" id="addNewOpportunityItem">
-                                    <i class="ti ti-plus me-2"></i>Add Product
+                                    <i class="ti ti-plus me-2"></i>{{ __('messages.add_product') }}
                                 </button>
                             </div>
                             <div class="mb-3">
                                 <label for="newOpportunityTotalAmount" class="form-label">
-                                    <i class="ti ti-currency-dollar me-1"></i>Total Amount
+                                    <i class="ti ti-currency-dollar me-1"></i>{{ __('messages.total_amount') }}
                                 </label>
                                 <input type="text" class="form-control bg-light" id="newOpportunityTotalAmount"
                                     readonly>
                             </div>
                             <div class="mb-3">
                                 <label for="opportunityExpectedCloseDate" class="form-label">
-                                    <i class="ti ti-calendar me-1"></i>Expected Close Date
+                                    <i class="ti ti-calendar me-1"></i>{{ __('messages.expected_close_date') }}
                                 </label>
                                 <input type="date" class="form-control" id="opportunityExpectedCloseDate"
                                     name="expected_close_date">
                             </div>
                             <div class="mb-3">
                                 <label for="opportunityDescription" class="form-label">
-                                    <i class="ti ti-notes me-1"></i>Description
+                                    <i class="ti ti-notes me-1"></i>{{ __('messages.description') }}
                                 </label>
                                 <textarea class="form-control" id="opportunityDescription" name="description" rows="3"></textarea>
                             </div>
@@ -196,9 +196,9 @@
                             <input type="hidden" name="status" value="open">
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn me-auto" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="ti ti-check me-2"></i>Save Opportunity
+                                <i class="ti ti-check me-2"></i>{{ __('messages.save_changes') }}
                             </button>
                         </div>
                     </form>
@@ -213,7 +213,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="managePipelinesModalLabel">
-                            <i class="ti ti-settings me-2"></i>Manage Sales Pipelines
+                            <i class="ti ti-settings me-2"></i>{{ __('messages.manage_sales_pipelines') }}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -223,14 +223,14 @@
                                 <button class="nav-link active" id="pipelines-list-tab" data-bs-toggle="tab"
                                     data-bs-target="#pipelines-list" type="button" role="tab"
                                     aria-controls="pipelines-list" aria-selected="true">
-                                    <i class="ti ti-list me-2"></i>Pipelines
+                                    <i class="ti ti-list me-2"></i>{{ __('messages.pipelines') }}
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="add-pipeline-tab" data-bs-toggle="tab"
                                     data-bs-target="#add-pipeline" type="button" role="tab"
                                     aria-controls="add-pipeline" aria-selected="false">
-                                    <i class="ti ti-plus me-2"></i>Add New Pipeline
+                                    <i class="ti ti-plus me-2"></i>{{ __('messages.add_new_pipeline') }}
                                 </button>
                             </li>
                         </ul>
@@ -246,7 +246,7 @@
                                 <form id="newPipelineForm">
                                     <div class="mb-3">
                                         <label for="newPipelineName" class="form-label">
-                                            <i class="ti ti-chart-line me-1"></i>Pipeline Name
+                                            <i class="ti ti-chart-line me-1"></i>{{ __('messages.pipeline_name') }}
                                         </label>
                                         <input type="text" class="form-control" id="newPipelineName" name="name"
                                             required>
@@ -261,11 +261,11 @@
                                         <input class="form-check-input" type="checkbox" id="newPipelineIsDefault"
                                             name="is_default">
                                         <label class="form-check-label" for="newPipelineIsDefault">
-                                            <i class="ti ti-star me-1"></i>Set as Default
+                                            <i class="ti ti-star me-1"></i>{{ __('messages.set_as_default') }}
                                         </label>
                                     </div>
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="ti ti-check me-2"></i>Create Pipeline
+                                        <i class="ti ti-check me-2"></i>{{ __('messages.create_pipeline') }}
                                     </button>
                                 </form>
                             </div>
@@ -282,7 +282,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editPipelineModalLabel">
-                            <i class="ti ti-edit me-2"></i>Edit Sales Pipeline
+                            <i class="ti ti-edit me-2"></i>{{ __('messages.edit_sales_pipeline') }}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -310,13 +310,13 @@
                                 </label>
                             </div>
                             <button type="submit" class="btn btn-primary">
-                                <i class="ti ti-check me-2"></i>Update Pipeline
+                                <i class="ti ti-check me-2"></i>{{ __('messages.update_pipeline') }}
                             </button>
                         </form>
                         <hr>
                         <div class="d-flex align-items-center mb-3">
                             <i class="ti ti-layout-list me-2"></i>
-                            <h6 class="mb-0">Pipeline Stages</h6>
+                            <h6 class="mb-0">{{ __('messages.pipeline_stages') }}</h6>
                         </div>
                         <div id="pipelineStagesContainer" class="mb-3">
                             <!-- Stages will be loaded here -->
@@ -325,7 +325,7 @@
                             <input type="hidden" id="newStagePipelineId">
                             <div class="col-md-5">
                                 <label for="newStageName" class="form-label">
-                                    <i class="ti ti-flag me-1"></i>Stage Name
+                                    <i class="ti ti-flag me-1"></i>{{ __('messages.stage_name') }}
                                 </label>
                                 <input type="text" class="form-control" id="newStageName" name="name" required>
                             </div>
@@ -334,13 +334,13 @@
                                     <input class="form-check-input" type="checkbox" id="newStageIsClosed"
                                         name="is_closed">
                                     <label class="form-check-label" for="newStageIsClosed">
-                                        <i class="ti ti-lock me-1"></i>Is 'Closed' Stage (Won/Lost)?
+                                        <i class="ti ti-lock me-1"></i>{{ __('messages.is_closed_stage_won_lost') }}
                                     </label>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <button type="submit" class="btn btn-primary w-100">
-                                    <i class="ti ti-plus me-2"></i>Add Stage
+                                    <i class="ti ti-plus me-2"></i>{{ __('messages.add_stage') }}
                                 </button>
                             </div>
                         </form>
@@ -359,7 +359,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editOpportunityModalLabel">
-                            <i class="ti ti-edit me-2"></i>Edit Sales Opportunity
+                            <i class="ti ti-edit me-2"></i>{{ __('messages.edit_sales_opportunity') }}
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -385,7 +385,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">
-                                    <i class="ti ti-package me-1"></i>Products
+                                    <i class="ti ti-package me-1"></i>{{ __('messages.products') }}
                                 </label>
                                 <div id="editOpportunityItemsContainer">
                                     <!-- Product items will be added here dynamically -->
@@ -417,21 +417,21 @@
                             </div>
                             <div class="mb-3">
                                 <label for="editOpportunityStatus" class="form-label">
-                                    <i class="ti ti-flag me-1"></i>Status
+                                    <i class="ti ti-flag me-1"></i>{{ __('messages.status') }}
                                 </label>
                                 <select class="form-select" id="editOpportunityStatus" name="status" required>
-                                    <option value="open">Open</option>
-                                    <option value="won">Won</option>
-                                    <option value="lost">Lost</option>
+                                    <option value="open">{{ __('messages.open') }}</option>
+                                    <option value="won">{{ __('messages.won') }}</option>
+                                    <option value="lost">{{ __('messages.lost') }}</option>
                                 </select>
                             </div>
                             <input type="hidden" id="editOpportunityPipelineId" name="sales_pipeline_id">
                             <input type="hidden" id="editOpportunityStageId" name="pipeline_stage_id">
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn me-auto" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="ti ti-check me-2"></i>Save Changes
+                                <i class="ti ti-check me-2"></i>{{ __('messages.save_changes') }}
                             </button>
                         </div>
                     </form>

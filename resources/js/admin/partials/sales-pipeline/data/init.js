@@ -1,5 +1,5 @@
 import { SALES_PIPELINE_ROUTES } from '../common/constants.js';
-import { allPipelines, allCustomers, allProducts, setAllPipelines, setAllCustomers, setAllProducts, setCurrencySettings } from '../common/state.js';
+import { allPipelines, allCustomers, allProducts, setAllPipelines, setAllCustomers, setAllProducts } from '../common/state.js';
 import { renderPipelinesSelect } from '../ui/pipelineSelect.js';
 import { renderPipelinesList } from '../ui/pipelinesList.js';
 import { populateCustomerSelect } from '../ui/customerSelect.js';
@@ -13,15 +13,15 @@ export async function initializeData() {
         const pipelinesData = initialDataContainer.dataset.initialPipelines;
         const customersData = initialDataContainer.dataset.initialCustomers;
 
-        setCurrencySettings({
-            symbol: initialDataContainer.dataset.currencySymbol || "$",
+        window.currencySettings = {
+            currency_symbol: initialDataContainer.dataset.currencySymbol || "$",
             decimalPlaces: parseInt(
                 initialDataContainer.dataset.decimalPlaces || 2
             ),
             decimalSeparator: initialDataContainer.dataset.decimalSeparator || ".",
             thousandSeparator: initialDataContainer.dataset.thousandSeparator || ",",
             currency_code: initialDataContainer.dataset.currencyCode || "USD",
-        });
+        };
 
         try {
             if (pipelinesData && pipelinesData.trim()) {

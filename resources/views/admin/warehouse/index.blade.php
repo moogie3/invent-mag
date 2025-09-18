@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'Warehouse')
+@section('title', __('messages.warehouse_page_title'))
 
 @section('content')
     <div class="page-wrapper">

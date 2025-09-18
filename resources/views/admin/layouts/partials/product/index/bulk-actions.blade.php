@@ -10,27 +10,27 @@
                     <div>
                         <div class="selection-text">
                             <span id="selectedCount" class="text-primary">0</span>
-                            <span class="text-muted">products selected</span>
+                            <span class="text-muted">{{ __('products selected') }}</span>
                         </div>
-                        <div class="selection-subtext">Choose an action to apply to selected items</div>
+                        <div class="selection-subtext">{{ __('Choose an action to apply to selected items') }}</div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6 col-md-12">
                 <div class="d-flex flex-wrap justify-content-lg-end justify-content-center gap-2 mt-lg-0 mt-2">
                     <button id="bulkUpdateStockBtn" class="btn btn-info action-btn d-flex align-items-center">
-                        <i class="ti ti-packages me-2"></i> Update Stock
+                        <i class="ti ti-packages me-2"></i> {{ __('Update Stock') }}
                     </button>
                     <button onclick="bulkExportProducts()"
                         class="btn btn-secondary action-btn d-flex align-items-center">
-                        <i class="ti ti-download me-2"></i> Export
+                        <i class="ti ti-download me-2"></i> {{ __('Export') }}
                     </button>
                     <button onclick="bulkDeleteProducts()" class="btn btn-danger action-btn d-flex align-items-center">
-                        <i class="ti ti-trash me-2"></i> Delete
+                        <i class="ti ti-trash me-2"></i> {{ __('Delete') }}
                     </button>
                     <button onclick="clearProductSelection()"
                         class="btn btn-outline-secondary action-btn d-flex align-items-center">
-                        <i class="ti ti-x me-2"></i> Clear Selection
+                        <i class="ti ti-x me-2"></i> {{ __('Clear Selection') }}
                     </button>
                 </div>
             </div>

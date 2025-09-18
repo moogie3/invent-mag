@@ -2,18 +2,18 @@
     <div class="container-xl">
         <div class="row align-items-center">
             <div class="col">
-                <div class="page-pretitle">Overview</div>
-                <h2 class="page-title"><i class="ti ti-building-warehouse me-2"></i>Warehouse</h2>
+                <div class="page-pretitle">{{ __('messages.warehouse_overview') }}</div>
+                <h2 class="page-title"><i class="ti ti-building-warehouse me-2"></i>{{ __('messages.warehouse_title') }}</h2>
             </div>
             <div class="col-auto ms-auto">
                 <button type="button" class="btn btn-secondary d-none d-sm-inline-block"
                     onclick="javascript:window.print();">
                     <i class="ti ti-printer fs-4"></i>
-                    Export PDF
+                    {{ __('messages.warehouse_export_pdf') }}
                 </button>
                 <button type="button" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal"
                     data-bs-target="#createWarehouseModal">
-                    <i class="ti ti-plus fs-4"></i> Create Warehouse
+                    <i class="ti ti-plus fs-4"></i> {{ __('messages.warehouse_create_warehouse') }}
                 </button>
             </div>
         </div>

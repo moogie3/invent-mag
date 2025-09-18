@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'Profile Settings')
+@section('title', __('messages.profile_settings'))
 
 @section('content')
     <div class="page-wrapper">
@@ -9,7 +9,7 @@
                 <div class="container-xl">
                     <div class="card">
                         <div class="card-body">
-                            <h2><i class="ti ti-user-cog me-2"></i>ACCOUNT SETTINGS</h2>
+                            <h2><i class="ti ti-user-cog me-2"></i>{{ __('messages.account_settings') }}</h2>
                         </div>
                         <hr class="my-0">
                         <div class="row g-0">
@@ -30,8 +30,8 @@
                                                     <i class="ti ti-photo"></i>
                                                 </div>
                                                 <div class="settings-section-title">
-                                                    <h3 class="mb-1">Profile Picture</h3>
-                                                    <p class="text-muted mb-0 small">Upload and manage your profile image
+                                                    <h3 class="mb-1">{{ __('messages.profile_picture') }}</h3>
+                                                    <p class="text-muted mb-0 small">{{ __('messages.upload_and_manage_your_profile_image') }}
                                                     </p>
                                                 </div>
                                             </div>
@@ -52,7 +52,7 @@
                                                         @if (auth()->user()->avatar)
                                                             <button type="button" class="btn btn-sm btn-outline-danger"
                                                                 data-bs-toggle="modal" data-bs-target="#deleteAvatarModal">
-                                                                <i class="ti ti-trash me-1"></i>Remove current picture
+                                                                <i class="ti ti-trash me-1"></i>{{ __('messages.remove_current_picture') }}
                                                             </button>
                                                         @endif
                                                     </div>
@@ -67,37 +67,36 @@
                                                     <i class="ti ti-building-store"></i>
                                                 </div>
                                                 <div class="settings-section-title">
-                                                    <h3 class="mb-1">Business Profile</h3>
-                                                    <p class="text-muted mb-0 small">Manage your business information and
-                                                        contact details</p>
+                                                    <h3 class="mb-1">{{ __('messages.business_profile') }}</h3>
+                                                    <p class="text-muted mb-0 small">{{ __('messages.manage_your_business_information_and_contact_details') }}</p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
                                                 <div class="row g-3">
                                                     <div class="col-md-4">
-                                                        <div class="form-label">User Name</div>
+                                                        <div class="form-label">{{ __('messages.user_name') }}</div>
                                                         <input type="text" name="name" class="form-control"
                                                             value="{{ auth()->user()->name }}" required>
                                                     </div>
                                                     <div class="col-md-4">
-                                                        <div class="form-label">Business Name</div>
+                                                        <div class="form-label">{{ __('messages.business_name') }}</div>
                                                         <input type="text" name="shopname" class="form-control"
                                                             value="{{ auth()->user()->shopname }}" required>
                                                     </div>
                                                     <div class="col-md-4">
-                                                        <div class="form-label">Address</div>
+                                                        <div class="form-label">{{ __('messages.address') }}</div>
                                                         <input type="text" name="address" class="form-control"
                                                             value="{{ auth()->user()->address }}" required>
                                                     </div>
                                                 </div>
                                                 <div class="row g-3 mt-2">
                                                     <div class="col-md-6">
-                                                        <div class="form-label">Email</div>
+                                                        <div class="form-label">{{ __('messages.email') }}</div>
                                                         <input type="email" name="email" class="form-control"
                                                             value="{{ auth()->user()->email }}" required>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="form-label">Timezone</div>
+                                                        <div class="form-label">{{ __('messages.timezone') }}</div>
                                                         <select name="timezone" class="form-control" required>
                                                             @foreach (timezone_identifiers_list() as $tz)
                                                                 <option value="{{ $tz }}"
@@ -118,28 +117,26 @@
                                                     <i class="ti ti-lock"></i>
                                                 </div>
                                                 <div class="settings-section-title">
-                                                    <h3 class="mb-1">Security & Password</h3>
-                                                    <p class="text-muted mb-0 small">Update your password to keep your
-                                                        account secure</p>
+                                                    <h3 class="mb-1">{{ __('messages.security_password') }}</h3>
+                                                    <p class="text-muted mb-0 small">{{ __('messages.update_your_password_to_keep_your_account_secure') }}</p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <div class="form-label">New Password</div>
+                                                        <div class="form-label">{{ __('messages.new_password') }}</div>
                                                         <input type="password" name="password" id="new_password"
                                                             class="form-control"
-                                                            placeholder="Enter new password (leave empty if not changing)"
+                                                            placeholder="{{ __('messages.enter_new_password_leave_empty_if_not_changing') }}"
                                                             oninput="togglePasswordModal()">
-                                                        <small class="text-muted">Leave empty if you don't want to change
-                                                            your password</small>
+                                                        <small class="text-muted">{{ __('messages.leave_empty_if_you_dont_want_to_change_your_password') }}</small>
                                                     </div>
                                                     <div class="col-md-6" id="confirmPasswordContainer"
                                                         style="display: none;">
-                                                        <div class="form-label">Confirm New Password</div>
+                                                        <div class="form-label">{{ __('messages.confirm_new_password') }}</div>
                                                         <input type="password" name="password_confirmation"
                                                             id="confirm_new_password" class="form-control"
-                                                            placeholder="Re-enter new password">
+                                                            placeholder="{{ __('messages.re_enter_new_password') }}">
                                                     </div>
                                                 </div>
                                                 <input type="hidden" name="current_password" id="current_password">
@@ -151,7 +148,7 @@
                                 <div class="card-footer bg-transparent mt-auto">
                                     <div class="btn-list justify-content-end">
                                         <button type="button" class="btn btn-primary"
-                                            onclick="showPasswordModal()">Update Profile</button>
+                                            onclick="showPasswordModal()">{{ __('messages.update_profile') }}</button>
                                     </div>
                                 </div>
                             </div>

@@ -3,8 +3,9 @@
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="crmCustomerModalLabel"><i class="ti ti-users me-2"></i>Customer Relationship
-                    Management <span id="crmCustomerNameInHeader" class="text-white fw-bold"></span></h5>
+                <h5 class="modal-title" id="crmCustomerModalLabel"><i
+                        class="ti ti-users me-2"></i>{{ __('messages.customer_crm_title') }} <span
+                        id="crmCustomerNameInHeader" class="text-white fw-bold"></span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -14,21 +15,22 @@
                         <button class="nav-link active" id="overview-tab" data-bs-toggle="tab"
                             data-bs-target="#overview" type="button" role="tab" aria-controls="overview"
                             aria-selected="true">
-                            <i class="ti ti-dashboard me-2"></i>Overview & Interactions
+                            <i class="ti ti-dashboard me-2"></i>{{ __('messages.supplier_srm_tab_overview') }}
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="historical-sales-tab" data-bs-toggle="tab"
                             data-bs-target="#historical-sales" type="button" role="tab"
                             aria-controls="historical-sales" aria-selected="false">
-                            <i class="ti ti-history me-2"></i>Historical Sales
+                            <i class="ti ti-history me-2"></i>{{ __('messages.customer_crm_tab_historical_sales') }}
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="purchase-history-tab" data-bs-toggle="tab"
                             data-bs-target="#purchase-history" type="button" role="tab"
                             aria-controls="purchase-history" aria-selected="false">
-                            <i class="ti ti-shopping-cart me-2"></i>Product History
+                            <i
+                                class="ti ti-shopping-cart me-2"></i>{{ __('messages.supplier_srm_tab_product_history') }}
                         </button>
                     </li>
                 </ul>
@@ -39,8 +41,9 @@
                             <!-- Customer Summary -->
                             <div class="card shadow-sm mb-3">
                                 <div class="card-header">
-                                    <h3 class="card-title"><i class="ti ti-user me-2 text-primary"></i>Customer
-                                        Information</h3>
+                                    <h3 class="card-title"><i
+                                            class="ti ti-user me-2 text-primary"></i>{{ __('messages.customer_info_title') }}
+                                    </h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="row g-3">
@@ -54,28 +57,33 @@
                                         <div class="col-md-8">
                                             <div class="row row-cols-1 row-cols-md-2 g-2">
                                                 <div class="col">
-                                                    <p class="mb-1"><strong>Email:</strong> <span
-                                                            id="crmCustomerEmail"></span></p>
+                                                    <p class="mb-1"><strong>{{ __('messages.table_email') }}:</strong>
+                                                        <span id="crmCustomerEmail"></span></p>
                                                 </div>
                                                 <div class="col">
-                                                    <p class="mb-1"><strong>Phone:</strong> <span
+                                                    <p class="mb-1">
+                                                        <strong>{{ __('messages.customer_crm_phone') }}:</strong> <span
                                                             id="crmCustomerPhone"></span></p>
                                                 </div>
                                                 <div class="col">
-                                                    <p class="mb-1"><strong>Address:</strong> <span
+                                                    <p class="mb-1">
+                                                        <strong>{{ __('messages.table_address') }}:</strong> <span
                                                             id="crmCustomerAddress"></span></p>
                                                 </div>
                                                 <div class="col">
-                                                    <p class="mb-1"><strong>Payment Terms:</strong> <span
+                                                    <p class="mb-1">
+                                                        <strong>{{ __('messages.table_payment_terms') }}:</strong> <span
                                                             id="crmCustomerPaymentTerms"></span></p>
                                                 </div>
                                                 <div class="col">
-                                                    <p class="mb-1"><strong>Member Since:</strong> <span
-                                                            id="crmMemberSince"></span></p>
+                                                    <p class="mb-1">
+                                                        <strong>{{ __('messages.customer_crm_member_since') }}:</strong>
+                                                        <span id="crmMemberSince"></span></p>
                                                 </div>
                                                 <div class="col">
-                                                    <p class="mb-1"><strong>Last Purchase:</strong> <span
-                                                            id="crmLastPurchase"></span></p>
+                                                    <p class="mb-1">
+                                                        <strong>{{ __('messages.customer_crm_last_purchase') }}:</strong>
+                                                        <span id="crmLastPurchase"></span></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -86,7 +94,8 @@
                             <!-- Key Metrics -->
                             <div class="card shadow-sm mb-3">
                                 <div class="card-header">
-                                    <h3 class="card-title"><i class="ti ti-chart-bar me-2 text-primary"></i>Key Metrics
+                                    <h3 class="card-title"><i
+                                            class="ti ti-chart-bar me-2 text-primary"></i>{{ __('messages.supplier_srm_key_metrics_title') }}
                                     </h3>
                                 </div>
                                 <div class="card-body">
@@ -94,7 +103,9 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium fw-bold">Lifetime Value</div>
+                                                    <div class="font-weight-medium fw-bold">
+                                                        {{ __('messages.supplier_srm_key_metrics_lifetime_value') }}
+                                                    </div>
                                                     <div id="crmLifetimeValue" class="text-success fw-bold fs-3">
                                                     </div>
                                                 </div>
@@ -103,7 +114,9 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium fw-bold">Total Sales Count</div>
+                                                    <div class="font-weight-medium fw-bold">
+                                                        {{ __('messages.customer_crm_key_metrics_total_sales_count') }}
+                                                    </div>
                                                     <div id="crmTotalSalesCount" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -111,7 +124,9 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium fw-bold">Average Order Value</div>
+                                                    <div class="font-weight-medium fw-bold">
+                                                        {{ __('messages.supplier_srm_key_metrics_average_order_value') }}
+                                                    </div>
                                                     <div id="crmAverageOrderValue" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -119,7 +134,9 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium fw-bold">Last Interaction Date</div>
+                                                    <div class="font-weight-medium fw-bold">
+                                                        {{ __('messages.supplier_srm_key_metrics_last_interaction_date') }}
+                                                    </div>
                                                     <div id="crmLastInteractionDate" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -127,7 +144,9 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium fw-bold">Most Purchased Product</div>
+                                                    <div class="font-weight-medium fw-bold">
+                                                        {{ __('messages.supplier_srm_key_metrics_most_purchased_product') }}
+                                                    </div>
                                                     <div id="crmMostPurchasedProduct" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -135,7 +154,9 @@
                                         <div class="col">
                                             <div class="card card-sm">
                                                 <div class="card-body">
-                                                    <div class="font-weight-medium fw-bold">Total Products Purchased</div>
+                                                    <div class="font-weight-medium fw-bold">
+                                                        {{ __('messages.supplier_srm_key_metrics_total_products_purchased') }}
+                                                    </div>
                                                     <div id="crmTotalProductsPurchased" class="fs-3">N/A</div>
                                                 </div>
                                             </div>
@@ -147,19 +168,30 @@
                             <!-- Interaction History -->
                             <div class="card shadow-sm mb-0">
                                 <div class="card-header">
-                                    <h3 class="card-title"><i class="ti ti-messages me-2 text-primary"></i>Interaction
-                                        History</h3>
+                                    <h3 class="card-title"><i
+                                            class="ti ti-messages me-2 text-primary"></i>{{ __('messages.supplier_srm_interaction_history_title') }}
+                                    </h3>
                                 </div>
                                 <div class="card-body pb-2">
                                     <form id="interactionForm" class="mb-3">
                                         <div class="row g-2">
                                             <div class="col-md-3">
                                                 <select class="form-select" name="type" required>
-                                                    <option value="">Select Type</option>
-                                                    <option value="call">Call</option>
-                                                    <option value="email">Email</option>
-                                                    <option value="meeting">Meeting</option>
-                                                    <option value="note">Note</option>
+                                                    <option value="">
+                                                        {{ __('messages.supplier_srm_interaction_history_select_type') }}
+                                                    </option>
+                                                    <option value="call">
+                                                        {{ __('messages.supplier_srm_interaction_history_type_call') }}
+                                                    </option>
+                                                    <option value="email">
+                                                        {{ __('messages.customer_crm_interaction_history_type_email') }}
+                                                    </option>
+                                                    <option value="meeting">
+                                                        {{ __('messages.supplier_srm_interaction_history_type_meeting') }}
+                                                    </option>
+                                                    <option value="note">
+                                                        {{ __('messages.supplier_srm_interaction_history_type_note') }}
+                                                    </option>
                                                 </select>
                                             </div>
                                             <div class="col-md-3">
@@ -167,17 +199,19 @@
                                                     value="2025-07-08" required>
                                             </div>
                                             <div class="col-md-4">
-                                                <textarea class="form-control" name="notes" rows="1" placeholder="Add a new interaction..." required></textarea>
+                                                <textarea class="form-control" name="notes" rows="1"
+                                                    placeholder="{{ __('messages.supplier_srm_interaction_history_add_placeholder') }}" required></textarea>
                                             </div>
                                             <div class="col-md-2">
                                                 <button type="submit" class="btn btn-primary w-100"><i
-                                                        class="ti ti-plus me-2"></i>Add</button>
+                                                        class="ti ti-plus me-2"></i>{{ __('messages.supplier_srm_interaction_history_add_button') }}</button>
                                             </div>
                                         </div>
                                     </form>
                                     <div id="interactionTimeline" class="list-group list-group-flush"></div>
                                     <p id="noInteractionsMessage" class="text-muted text-center py-2 mb-0"
-                                        style="display: none;">No interactions yet.</p>
+                                        style="display: none;">
+                                        {{ __('messages.supplier_srm_interaction_history_no_interactions') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -189,11 +223,11 @@
                             <div id="transactionHistory" class="accordion"></div>
                             <div class="text-center mt-3">
                                 <button class="btn btn-secondary" id="loadMoreTransactions" style="display: none;"><i
-                                        class="ti ti-reload me-2"></i>Load More Transactions</button>
+                                        class="ti ti-reload me-2"></i>{{ __('messages.customer_crm_historical_sales_load_more') }}</button>
                             </div>
                             <p id="noTransactionsMessage" class="text-muted text-center mt-3 mb-0"
-                                style="display: none;">No
-                                transactions found.</p>
+                                style="display: none;">
+                                {{ __('messages.customer_crm_historical_sales_no_transactions') }}</p>
                         </div>
                     </div>
 
@@ -202,7 +236,8 @@
                         <div class="p-3">
                             <div id="productHistoryContent">
                                 <!-- Content for Historical Purchase will be loaded here via JavaScript -->
-                                <p class="text-muted text-center">Loading historical purchase data...</p>
+                                <p class="text-muted text-center">
+                                    {{ __('messages.supplier_srm_historical_purchases_loading') }}...</p>
                             </div>
                         </div>
                     </div>

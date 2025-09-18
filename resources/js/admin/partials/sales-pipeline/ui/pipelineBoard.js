@@ -1,6 +1,6 @@
 import { SALES_PIPELINE_ROUTES } from '../common/constants.js';
 import { allPipelines } from '../common/state.js';
-import { formatCurrencyJs, getStatusColor } from '../common/utils.js';
+import { formatCurrency, getStatusColor } from '../common/utils.js';
 import { createOpportunityCard } from '../opportunities/card.js';
 import { moveOpportunity } from '../opportunities/dragAndDrop.js';
 
@@ -29,7 +29,7 @@ export async function loadPipelineBoard(pipelineId) {
             document.getElementById("pipelineValue");
         if (pipelineValueElement) {
             pipelineValueElement.textContent =
-                formatCurrencyJs(totalPipelineValue);
+                formatCurrency(totalPipelineValue);
         }
 
         selectedPipeline.stages

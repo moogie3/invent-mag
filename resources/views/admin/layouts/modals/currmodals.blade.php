@@ -2,15 +2,15 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmModalLabel">Confirm Changes</h5>
+                <h5 class="modal-title" id="confirmModalLabel">{{ __('messages.currency_modal_confirm_changes_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to update the currency settings?
+                {{ __('messages.currency_modal_confirm_changes_message') }}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmSubmit">Save</button>
+                <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                <button type="button" class="btn btn-primary" id="confirmSubmit">{{ __('messages.save') }}</button>
             </div>
         </div>
     </div>

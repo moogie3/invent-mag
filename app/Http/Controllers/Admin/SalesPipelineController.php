@@ -60,7 +60,7 @@ class SalesPipelineController extends Controller
     public function destroyPipeline(SalesPipeline $pipeline)
     {
         $this->salesPipelineService->deletePipeline($pipeline);
-        return response()->json(null, 204);
+        return redirect()->route('admin.sales_pipeline.index')->with('success', 'Pipeline deleted successfully!');
     }
 
     public function storeStage(Request $request, SalesPipeline $pipeline)
@@ -93,7 +93,7 @@ class SalesPipelineController extends Controller
     public function destroyStage(PipelineStage $stage)
     {
         $this->salesPipelineService->deleteStage($stage);
-        return response()->json(null, 204);
+        return redirect()->route('admin.sales_pipeline.index')->with('success', 'Stage deleted successfully!');
     }
 
     public function reorderStages(Request $request, SalesPipeline $pipeline)
@@ -181,16 +181,14 @@ class SalesPipelineController extends Controller
     public function destroyOpportunity(SalesOpportunity $opportunity)
     {
         $this->salesPipelineService->deleteOpportunity($opportunity);
-        return response()->json(null, 204);
+        return redirect()->route('admin.sales_pipeline.index')->with('success', 'Opportunity deleted successfully!');
     }
 
     public function showOpportunity(SalesOpportunity $opportunity)
     {
         try {
             return response()->json($opportunity->load('customer', 'pipeline', 'stage', 'items.product'));
-        } catch (\Exception $e) {
-            \Log::error('Error fetching opportunity details: ' . $e->getMessage(), ['opportunity_id' => $opportunity->id, 'exception' => $e]);
-            return response()->json(['message' => 'Failed to fetch opportunity details.', 'error' => $e->getMessage()], 500);
+        } catch (\Exception $e) {return response()->json(['message' => 'Failed to fetch opportunity details.', 'error' => $e->getMessage()], 500);
         }
     }
 

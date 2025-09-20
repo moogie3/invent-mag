@@ -1,4 +1,4 @@
-import { initializeData } from './partials/sales-pipeline/data/init.js';
+import { initializeData, fetchData } from './partials/sales-pipeline/data/init.js';
 import { initNewOpportunityForm } from './partials/sales-pipeline/forms/newOpportunity.js';
 import { initNewPipelineForm } from './partials/sales-pipeline/forms/newPipeline.js';
 import { initEditPipelineForm } from './partials/sales-pipeline/forms/editPipeline.js';
@@ -10,6 +10,10 @@ import { SALES_PIPELINE_ROUTES, CSRF_TOKEN } from './partials/sales-pipeline/com
 import { allPipelines } from './partials/sales-pipeline/common/state.js';
 import { loadPipelineBoard } from './partials/sales-pipeline/ui/pipelineBoard.js';
 import { renderPipelineStages } from './partials/sales-pipeline/ui/stagesList.js';
+import {
+    createProductItemRow,
+    calculateTotalAmount,
+} from "./partials/sales-pipeline/modals/opportunityItems.js";
 
 const pipelineSelect = document.getElementById("pipelineSelect");
 const newStagePipelineId = document.getElementById("newStagePipelineId");
@@ -71,86 +75,19 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.closest(".delete-pipeline-btn")) {
             const pipelineId = e.target.closest(".delete-pipeline-btn").dataset
                 .pipelineId;
-            const confirmed = await showConfirmationModal(
-                "Delete Pipeline",
-                "Are you sure you want to delete this pipeline?"
-            );
-            if (confirmed) {
-                try {
-                    const response = await fetch(
-                        `${SALES_PIPELINE_ROUTES.pipelinesBaseUrl}/${pipelineId}`,
-                        {
-                            method: "DELETE",
-                            headers: {
-                                "X-CSRF-TOKEN": CSRF_TOKEN,
-                            },
-                        }
-                    );
-
-                    if (!response.ok) {
-                        throw new Error("Failed to delete pipeline");
-                    }
-
-                    await fetchData();
-                    window.showToast(
-                        "Success",
-                        "Pipeline deleted successfully!",
-                        "success"
-                    );
-                } catch (error) {
-                    console.error("Error deleting pipeline:", error);
-                    window.showToast(
-                        "Error",
-                        "Failed to delete pipeline. Please try again.",
-                        "error"
-                    );
-                }
-            }
+            const actionUrl = `${SALES_PIPELINE_ROUTES.pipelinesBaseUrl}/${pipelineId}`;
+            const confirmed = await showConfirmationModal(actionUrl);
+            // The form submission in the modal will handle the deletion and page refresh
+            // No need for explicit fetch call here anymore
         }
 
         if (e.target.closest(".delete-stage-btn")) {
             const stageId =
                 e.target.closest(".delete-stage-btn").dataset.stageId;
-            const confirmed = await showConfirmationModal(
-                "Delete Stage",
-                "Are you sure you want to delete this stage?"
-            );
-            if (confirmed) {
-                try {
-                    const response = await fetch(
-                        `${SALES_PIPELINE_ROUTES.stagesBaseUrl}/${stageId}`,
-                        {
-                            method: "DELETE",
-                            headers: {
-                                "X-CSRF-TOKEN": CSRF_TOKEN,
-                            },
-                        }
-                    );
-
-                    if (!response.ok) {
-                        throw new Error("Failed to delete stage");
-                    }
-
-                    await fetchData();
-                    const pipelineId = newStagePipelineId.value;
-                    if (pipelineId) {
-                        renderPipelineStages(pipelineId);
-                    }
-
-                    window.showToast(
-                        "Success",
-                        "Stage deleted successfully!",
-                        "success"
-                    );
-                } catch (error) {
-                    console.error("Error deleting stage:", error);
-                    window.showToast(
-                        "Error",
-                        "Failed to delete stage. Please try again.",
-                        "error"
-                    );
-                }
-            }
+            const actionUrl = `${SALES_PIPELINE_ROUTES.stagesBaseUrl}/${stageId}`;
+            const confirmed = await showConfirmationModal(actionUrl);
+            // The form submission in the modal will handle the deletion and page refresh
+            // No need for explicit fetch call here anymore
         }
 
         if (e.target.closest(".edit-opportunity-btn")) {
@@ -162,41 +99,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.closest(".delete-opportunity-btn")) {
             const opportunityId = e.target.closest(".delete-opportunity-btn")
                 .dataset.opportunityId;
-            const confirmed = await showConfirmationModal(
-                "Delete Opportunity",
-                "Are you sure you want to delete this opportunity?"
-            );
-            if (confirmed) {
-                try {
-                    const response = await fetch(
-                        `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}`,
-                        {
-                            method: "DELETE",
-                            headers: {
-                                "X-CSRF-TOKEN": CSRF_TOKEN,
-                            },
-                        }
-                    );
-
-                    if (!response.ok) {
-                        throw new Error("Failed to delete opportunity");
-                    }
-
-                    loadPipelineBoard(pipelineSelect.value);
-                    window.showToast(
-                        "Success",
-                        "Opportunity deleted successfully!",
-                        "success"
-                    );
-                } catch (error) {
-                    console.error("Error deleting opportunity:", error);
-                    window.showToast(
-                        "Error",
-                        "Failed to delete opportunity. Please try again.",
-                        "error"
-                    );
-                }
-            }
+            const actionUrl = `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}`;
+            const confirmed = await showConfirmationModal(actionUrl);
+            // The form submission in the modal will handle the deletion and page refresh
+            // No need for explicit fetch call here anymore
         }
 
         if (e.target.closest(".convert-opportunity-btn")) {
@@ -211,6 +117,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 "convertOpportunityForm"
             ).action = `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}/convert`;
             convertModal.show();
+        }
+
+        if (e.target.matches("#addNewOpportunityItem")) {
+            const container = document.getElementById(
+                "newOpportunityItemsContainer"
+            );
+            const index = container.children.length;
+            const newItemRow = createProductItemRow({}, index, container.id);
+            container.appendChild(newItemRow);
+        }
+
+        if (e.target.matches("#editNewOpportunityItem")) {
+            const container = document.getElementById(
+                "editOpportunityItemsContainer"
+            );
+            const index = container.children.length;
+            const newItemRow = createProductItemRow({}, index, container.id);
+            container.appendChild(newItemRow);
         }
     });
 });

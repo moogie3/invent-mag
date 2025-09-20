@@ -1,4 +1,4 @@
-import { SALES_PIPELINE_ROUTES } from '../common/constants.js';
+import { SALES_PIPELINE_ROUTES, CSRF_TOKEN } from '../common/constants.js';
 import { fetchData } from '../data/init.js';
 import { loadPipelineBoard } from '../ui/pipelineBoard.js';
 import { createProductItemRow, calculateTotalAmount } from '../modals/opportunityItems.js';

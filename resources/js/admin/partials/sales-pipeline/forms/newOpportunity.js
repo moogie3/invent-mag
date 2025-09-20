@@ -1,15 +1,13 @@
-import { SALES_PIPELINE_ROUTES } from '../common/constants.js';
-import { allPipelines } from '../common/state.js';
-import { formatCurrency } from '../common/utils.js';
-import { loadPipelineBoard } from '../ui/pipelineBoard.js';
+import { SALES_PIPELINE_ROUTES, CSRF_TOKEN } from "../common/constants.js";
+import { allPipelines } from "../common/state.js";
+import { formatCurrency } from "../common/utils.js";
+import { loadPipelineBoard } from "../ui/pipelineBoard.js";
 
 const newOpportunityForm = document.getElementById("newOpportunityForm");
 const newOpportunityPipelineId = document.getElementById(
     "newOpportunityPipelineId"
 );
-const newOpportunityStageId = document.getElementById(
-    "newOpportunityStageId"
-);
+const newOpportunityStageId = document.getElementById("newOpportunityStageId");
 const newOpportunityItemsContainer = document.getElementById(
     "newOpportunityItemsContainer"
 );

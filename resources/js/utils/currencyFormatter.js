@@ -6,6 +6,12 @@
  * @returns {string} The formatted currency string.
  */
 export function formatCurrency(amount) {
+    const {
+        currency_code,
+        decimal_places,
+        decimal_separator,
+        thousand_separator,
+    } = window.currencySettings;
     if (typeof window.currencySettings === 'undefined') {
         console.error('window.currencySettings is not defined. Cannot format currency.');
         // Fallback to a simple format if settings are not available

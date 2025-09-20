@@ -1,4 +1,4 @@
-import { SALES_PIPELINE_ROUTES } from '../common/constants.js';
+import { SALES_PIPELINE_ROUTES, CSRF_TOKEN } from '../common/constants.js';
 import { loadPipelineBoard } from '../ui/pipelineBoard.js';
 
 const pipelineBoard = document.getElementById("pipeline-board");

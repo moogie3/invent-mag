@@ -9,7 +9,7 @@ export function createProductItemRow(item = {}, index, containerId) {
     const productId = item.product_id || "";
     const quantity = item.quantity || "";
     const price = parseFloat(item.price || 0).toFixed(
-        currencySettings.decimalPlaces
+        window.currencySettings.decimal_places
     );
 
     let productOptions = '<option value="">Select Product</option>';
@@ -57,8 +57,8 @@ export function createProductItemRow(item = {}, index, containerId) {
         const productPrice = parseFloat(selectedOption.dataset.price || 0);
         const productStock = parseFloat(selectedOption.dataset.stock || 0);
         priceInput.value = productPrice.toFixed(
-            currencySettings.decimalPlaces
-        );
+        window.currencySettings.decimal_places
+    );
         quantityInput.max = productStock;
         if (parseFloat(quantityInput.value) > productStock) {
             quantityInput.value = productStock;

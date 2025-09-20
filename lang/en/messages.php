@@ -476,4 +476,10 @@ return [
     'user_modal_bulk_delete_item2' => 'Associated roles and permissions',
     'user_modal_bulk_delete_impact_item1' => 'Ownership:',
     'user_modal_bulk_delete_impact_item1_desc' => 'Any records owned by these users will not be deleted.',
+
+    'opportunity_name' => 'Opportunity Name',
+    'customer' => 'Customer',
+    'add_product' => 'Add Product',
+    'total_amount' => 'Total Amount',
+    'expected_close_date' => 'Expected Close Date',
 ];

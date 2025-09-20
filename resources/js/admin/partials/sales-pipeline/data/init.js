@@ -14,13 +14,15 @@ export async function initializeData() {
         const customersData = initialDataContainer.dataset.initialCustomers;
 
         window.currencySettings = {
+            locale: initialDataContainer.dataset.locale || "en-US",
+            currency_code: initialDataContainer.dataset.currencyCode || "USD",
             currency_symbol: initialDataContainer.dataset.currencySymbol || "$",
-            decimalPlaces: parseInt(
+            decimal_places: parseInt(
                 initialDataContainer.dataset.decimalPlaces || 2
             ),
-            decimalSeparator: initialDataContainer.dataset.decimalSeparator || ".",
-            thousandSeparator: initialDataContainer.dataset.thousandSeparator || ",",
-            currency_code: initialDataContainer.dataset.currencyCode || "USD",
+            decimal_separator: initialDataContainer.dataset.decimalSeparator || ".",
+            thousand_separator: initialDataContainer.dataset.thousandSeparator || ",",
+            position: initialDataContainer.dataset.position || "prefix",
         };
 
         try {

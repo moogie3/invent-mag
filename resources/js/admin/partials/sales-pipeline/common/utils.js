@@ -17,17 +17,21 @@ export function getStatusColor(status) {
     }
 }
 
-export function showConfirmationModal(title, body) {
+export function showConfirmationModal(actionUrl) {
     return new Promise((resolve) => {
         const modal = new bootstrap.Modal(
             document.getElementById("confirmationModal")
         );
-        document.getElementById("confirmationModalTitle").textContent =
-            title;
-        document.getElementById("confirmationModalBody").textContent = body;
+        document.getElementById("deleteConfirmationForm").action = actionUrl;
+
+        // We no longer set title and body dynamically, as they are handled by Blade
+        // document.getElementById("confirmationModalTitle").textContent = title;
+        // document.getElementById("confirmationModalBody").textContent = body;
+
         document.getElementById("confirmationModalConfirm").onclick =
             () => {
-                modal.hide();
+                // The form submission will handle the deletion and page refresh
+                // We just need to resolve true if the user confirms
                 resolve(true);
             };
         document.getElementById("confirmationModal").addEventListener(

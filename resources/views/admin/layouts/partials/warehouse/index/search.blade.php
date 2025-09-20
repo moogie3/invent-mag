@@ -1,6 +1,6 @@
 <div class="ms-auto text-secondary no-print">
     <div class="ms-2 mb-2 text-end">
-        {{ __('messages.warehouse_search_label') }}
+        {{ __('messages.search_label') }}
         <div class="ms-2">
             <input type="text" id="searchInput" class="form-control form-control-sm">
         </div>

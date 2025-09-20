@@ -9,9 +9,9 @@
                     style="width: 6px; height: 36px; border-radius: 3px; margin-right: 15px;">
                 </div>
                 <div>
-                    <h2 class="mb-0">PO #{{ $pos->invoice }}</h2>
+                    <h2 class="mb-0">{{ __('messages.po_hash') }}{{ $pos->invoice }}</h2>
                     <div class="text-muted fs-5">{{ $pos->supplier->code }} -
-                        {{ $pos->supplier->location ?? 'N/A' }}
+                        {{ $pos->supplier->location ?? __('messages.not_available') }}
                     </div>
                 </div>
             </div>

@@ -165,7 +165,7 @@
                                                 <a href="#" class="mt-2 btn btn-sm btn-outline-warning"
                                                     id="viewExpiringPurchase" data-bs-toggle="modal"
                                                     data-bs-target="#expiringPurchaseModal">
-                                                    View Details
+                                                    {{ __('messages.view_details') }}
                                                 </a>
                                             @endif
                                         </div>

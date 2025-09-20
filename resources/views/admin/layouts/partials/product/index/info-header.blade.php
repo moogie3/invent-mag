@@ -8,10 +8,10 @@
                             <i class="ti ti-box fs-1 me-3 text-primary"></i>
                             <div>
                                 <h2 class="mb-1">
-                                    {{ __('Product Information') }}
+                                    {{ __('messages.product_information') }}
                                 </h2>
                                 <div class="text-muted">
-                                    {{ __('Overview of your product inventory and stock levels') }}
+                                    {{ __('messages.overview_product_inventory_stock_levels') }}
                                 </div>
                             </div>
                         </div>
@@ -23,7 +23,7 @@
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label class="form-label text-muted mb-2 d-block">
-                                            {{ __('Product Details') }}
+                                            {{ __('messages.product_details') }}
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
@@ -32,7 +32,7 @@
                                             <i class="ti ti-box fs-3 text-primary"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <div class="small text-muted">{{ __('Total Product') }}</div>
+                                            <div class="small text-muted">{{ __('messages.total_product') }}</div>
                                             <div class="fw-bold" id="totalProductCount">{{ $totalproduct }}</div>
                                         </div>
                                     </div>
@@ -42,7 +42,7 @@
                                             <i class="ti ti-category fs-3 text-success"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <div class="small text-muted">{{ __('Total Category') }}</div>
+                                            <div class="small text-muted">{{ __('messages.total_category') }}</div>
                                             <div class="fw-bold" id="totalCategoryCount">{{ $totalcategory }}</div>
                                         </div>
                                     </div>
@@ -55,7 +55,7 @@
                                     <div class="mb-2">
                                         <label
                                             class="form-label {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }} mb-2 d-block">
-                                            {{ __('Stock Status') }}
+                                            {{ __('messages.stock_status') }}
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center">
@@ -66,14 +66,14 @@
                                         <div>
                                             <div
                                                 class="small {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}">
-                                                {{ __('Low Stock Items') }}</div>
+                                                {{ __('messages.low_stock_items') }}</div>
                                             <div
                                                     class="h4 mb-0 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}" id="lowStockItemsCount">
                                                     {{ $lowStockCount }}</div>
                                             @if ($lowStockCount > 0)
                                                 <a href="#" class="mt-2 btn btn-sm btn-outline-danger"
                                                     id="viewLowStock">
-                                                    {{ __('View Details') }}
+                                                    {{ __('messages.view_details') }}
                                                 </a>
                                             @endif
                                         </div>
@@ -87,7 +87,7 @@
                                     <div class="mb-2">
                                         <label
                                             class="form-label {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }} mb-2 d-block">
-                                            {{ __('Expiry Status') }}
+                                            {{ __('messages.expiry_status') }}
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center">
@@ -98,14 +98,14 @@
                                         <div>
                                             <div
                                                 class="small {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}">
-                                                {{ __('Expiring Soon') }}</div>
+                                                {{ __('messages.expiring_soon') }}</div>
                                             <div
                                                     class="h4 mb-0 {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}" id="expiringSoonItemsCount">
                                                     {{ $expiringSoonCount }}</div>
                                             @if ($expiringSoonCount > 0)
                                                 <a href="#" class="mt-2 btn btn-sm btn-outline-warning"
                                                     id="viewExpiringSoon" data-bs-toggle="modal" data-bs-target="#expiringSoonModal">
-                                                    {{ __('View Details') }}
+                                                    {{ __('messages.view_details') }}
                                                 </a>
                                             @endif
                                         </div>

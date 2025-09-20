@@ -55,7 +55,7 @@
                                         </div>
                                     </div>
                                     <div class="ms-auto text-secondary no-print">
-                                        {{ __('messages.warehouse_search_label') }}
+                                        {{ __('messages.search_label') }}
                                         <div class="ms-2 d-inline-block">
                                             <input type="text" id="searchInput" class="form-control form-control-sm">
                                         </div>

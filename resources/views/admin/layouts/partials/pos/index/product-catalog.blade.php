@@ -2,7 +2,7 @@
     <div class="card card-product-catalog mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="card-title mb-0">
-                <i class="ti ti-box me-2"></i>Product Catalog
+                <i class="ti ti-box me-2"></i>{{ __('messages.product_catalog') }}
             </h4>
         </div>
         <div class="card-body">
@@ -10,7 +10,7 @@
                 <span class="input-group-text">
                     <i class="ti ti-search"></i>
                 </span>
-                <input type="text" class="form-control" id="searchProduct" placeholder="Search products">
+                <input type="text" class="form-control" id="searchProduct" placeholder="{{ __('messages.search_products') }}">
             </div>
             <div class="row g-2" id="productGrid">
                 @foreach ($products as $product)
@@ -37,7 +37,7 @@
                                     {{ \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price) }}
                                 </p>
                                 <p class="card-text fs-5 text-muted">
-                                    In Stock: <span
+                                    {{ __('messages.in_stock') }} <span
                                         class="product-stock-display badge text-light {{ $product->stock_quantity > 10 ? 'bg-success' : ($product->stock_quantity > 0 ? 'bg-warning' : 'bg-danger') }}">{{ $product->stock_quantity }}</span>
                                 </p>
                             </div>

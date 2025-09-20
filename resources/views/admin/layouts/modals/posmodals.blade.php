@@ -252,8 +252,7 @@
                             <div class="form-check form-switch mt-3">
                                 <input class="form-check-input" type="checkbox" id="has_expiry" name="has_expiry"
                                     value="1">
-                                <label class="form-check-label fw-semibold" for="has_expiry">{{ __('messages.pos_product_has_expiry') }}
-                                    date</label>
+                                <label class="form-check-label fw-semibold" for="has_expiry">{{ __('messages.pos_product_has_expiry') }} {{ __('messages.pos_product_has_expiry_date') }}</label>
                             </div>
                         </div>
 

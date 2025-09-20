@@ -34,7 +34,7 @@
                 <option value="percentage" {{ $item->discount_type === 'percentage' ? 'selected' : '' }}>
                     %</option>
                 <option value="fixed" {{ $item->discount_type === 'fixed' ? 'selected' : '' }}>
-                    Fixed</option>
+                    {{ __('messages.po_fixed') }}</option>
             </select>
         </div>
     </td>

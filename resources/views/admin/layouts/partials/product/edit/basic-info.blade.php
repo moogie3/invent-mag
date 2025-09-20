@@ -1,11 +1,11 @@
 <div class="row g-3">
     <div class="col-md-2">
-        <label class="form-label">{{ __('Code') }}</label>
+        <label class="form-label">{{ __('messages.code') }}</label>
         <input type="text" class="form-control" value="{{ $products->code }}" disabled>
     </div>
 
     <div class="col-md-4">
-        <label class="form-label">{{ __('Supplier') }}</label>
+        <label class="form-label">{{ __('messages.supplier') }}</label>
         <select name="supplier_id" class="form-select">
             <option value="{{ $products->supplier_id }}">{{ $products->supplier->name }}</option>
             @foreach ($suppliers as $supplier)
@@ -15,7 +15,7 @@
     </div>
 
     <div class="col-md-6">
-        <label class="form-label">{{ __('Product Name') }}</label>
+        <label class="form-label">{{ __('messages.product_name') }}</label>
         <input type="text" name="name" class="form-control" value="{{ $products->name }}">
     </div>
 </div>

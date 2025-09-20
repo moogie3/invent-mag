@@ -2,8 +2,8 @@
     <div class="container-xl">
         <div class="row align-items-center">
             <div class="col">
-                <div class="page-pretitle">Overview</div>
-                <h2 class="page-title"><i class="ti ti-shopping-cart me-2"></i> Purchase Order</h2>
+                <div class="page-pretitle">{{ __('messages.overview') }}</div>
+                <h2 class="page-title"><i class="ti ti-shopping-cart me-2"></i> {{ __('messages.purchase_order') }}</h2>
             </div>
             <div class="col-auto ms-auto">
                 <button type="button" class="btn btn-secondary d-none d-sm-inline-block"

@@ -1,8 +1,8 @@
-import { getSelectedProductIds, clearProductSelection } from './selection.js';
-import { resetButton } from '../utils/ui.js';
-import { fetchProductMetrics } from '../stats.js';
-import { originalProductData } from '../search/state.js';
-import { extractProductDataFromRow } from '../utils/helpers.js';
+import { getSelectedProductIds, clearProductSelection } from "./selection.js";
+import { resetButton } from "../utils/ui.js";
+import { fetchProductMetrics } from "../stats.js";
+import { originalProductData } from "../search/state.js";
+import { extractProductDataFromRow } from "../utils/helpers.js";
 
 export function bulkUpdateStock() {
     const selected = getSelectedProductIds();
@@ -14,12 +14,19 @@ export function bulkUpdateStock() {
     const modalElement = document.getElementById("bulkUpdateStockModal");
 
     if (modalElement) {
-        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
+        if (
+            typeof bootstrap !== "undefined" &&
+            typeof bootstrap.Modal !== "undefined"
+        ) {
             const modal = new bootstrap.Modal(modalElement);
             modal.show();
             loadBulkUpdateProductsFromTable(selected);
         } else {
-            showToast("Error", "Bootstrap Modal functionality not available.", "error");
+            showToast(
+                "Error",
+                "Bootstrap Modal functionality not available.",
+                "error"
+            );
         }
     } else {
         showToast("Error", "Bulk update modal not found.", "error");
@@ -92,7 +99,12 @@ function renderBulkUpdateProducts(products) {
         };
 
         if (elements.img) {
-            if (product.image && product.image.trim() !== '' && product.image.toLowerCase() !== 'null' && product.image.toLowerCase() !== 'undefined') {
+            if (
+                product.image &&
+                product.image.trim() !== "" &&
+                product.image.toLowerCase() !== "null" &&
+                product.image.toLowerCase() !== "undefined"
+            ) {
                 elements.img.src = product.image;
                 elements.img.onerror = () => {
                     elements.img.outerHTML = `<div class="d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border: 1px solid #ccc; border-radius: 5px;"><i class="ti ti-photo fs-1 text-muted"></i></div>`;
@@ -215,6 +227,10 @@ function handleBulkStockUpdate() {
         return;
     }
 
+    const bulkAdjustmentReason = document.getElementById(
+        "bulkAdjustmentReason"
+    ).value;
+
     const confirmBtn = document.getElementById("confirmBulkUpdateBtn");
     const original = confirmBtn.innerHTML;
     confirmBtn.innerHTML =
@@ -236,7 +252,10 @@ function handleBulkStockUpdate() {
             "X-CSRF-TOKEN": csrf.getAttribute("content"),
             Accept: "application/json",
         },
-        body: JSON.stringify({ updates }),
+        body: JSON.stringify({
+            updates,
+            reason: bulkAdjustmentReason,
+        }),
     })
         .then((response) => {
             if (!response.ok) {
@@ -264,6 +283,7 @@ function handleBulkStockUpdate() {
                     );
                     if (modal) {
                         modal.hide();
+                        // Ensure all modal backdrops are removed
                         modal._element.addEventListener(
                             "hidden.bs.modal",
                             function handler() {
@@ -278,46 +298,82 @@ function handleBulkStockUpdate() {
                                 backdrops.forEach((backdrop) =>
                                     backdrop.remove()
                                 );
+                                // Show toast
+                                showToast(
+                                    "Success",
+                                    `Stock updated successfully for ${
+                                        data.updated_count || updates.length
+                                    } products!`,
+                                    "success"
+                                );
+                                // Then reload after a short delay
+                                // Update the main table rows dynamically
+                                if (
+                                    data.changes &&
+                                    Array.isArray(data.changes)
+                                ) {
+                                    data.changes.forEach((change) => {
+                                        const row = document.querySelector(
+                                            `tr[data-id="${change.product_id}"]`
+                                        );
+                                        if (row) {
+                                            const stockQuantityElement =
+                                                row.querySelector(
+                                                    ".sort-quantity .fw-bold"
+                                                );
+                                            if (stockQuantityElement) {
+                                                stockQuantityElement.textContent =
+                                                    change.new_stock_quantity;
+                                            }
+                                            const badgeElement =
+                                                row.querySelector(
+                                                    ".sort-quantity .badge"
+                                                );
+                                            if (
+                                                badgeElement &&
+                                                change.badge_class &&
+                                                change.badge_text
+                                            ) {
+                                                badgeElement.className =
+                                                    change.badge_class;
+                                                badgeElement.textContent =
+                                                    change.badge_text;
+                                            } else if (badgeElement) {
+                                                // If no badge is returned, remove existing badge or hide it
+                                                badgeElement.remove();
+                                            }
+                                            // Also update the threshold if it's displayed
+                                            const thresholdElement =
+                                                row.querySelector(
+                                                    ".sort-quantity small.text-muted"
+                                                );
+                                            if (
+                                                thresholdElement &&
+                                                change.low_stock_threshold !==
+                                                    undefined
+                                            ) {
+                                                thresholdElement.textContent = `Threshold: ${change.low_stock_threshold}`;
+                                            }
+                                        }
+                                    });
+                                }
+                                // Clear selection after successful update
+                                clearProductSelection();
                             }
                         );
+                    } else {
+                        // Fallback if modal instance not found
+                        showToast(
+                            "Success",
+                            `Stock updated successfully for ${
+                                data.updated_count || updates.length
+                            } products!`,
+                            "success"
+                        );
+                        // Clear selection after successful update
+                        clearProductSelection();
                     }
-                    showToast(
-                        "Success",
-                        `Stock updated successfully for ${
-                            data.updated_count || updates.length
-                        } products!`,
-                        "success"
-                    );
                 }, 300);
-                updates.forEach((updatedProduct) => {
-                    const row = document.querySelector(
-                        `tr[data-id="${updatedProduct.id}"]`
-                    );
-                    if (row) {
-                        const quantityElement =
-                            row.querySelector(".sort-quantity");
-                        if (quantityElement) {
-                            quantityElement.textContent =
-                                updatedProduct.stock_quantity;
-                            const badge =
-                                quantityElement.querySelector(".badge");
-                            if (badge) {
-                                const threshold =
-                                    updatedProduct.low_stock_threshold || 10;
-                                if (
-                                    updatedProduct.stock_quantity <= threshold
-                                ) {
-                                    badge.className = "badge bg-danger-lt";
-                                    badge.textContent = "Low Stock";
-                                } else {
-                                    badge.remove();
-                                }
-                            }
-                        }
-                    }
-                });
-                clearProductSelection();
-                fetchProductMetrics();
             } else {
                 showToast("Error", data.message || "Update failed.", "error");
             }
@@ -334,5 +390,3 @@ function handleBulkStockUpdate() {
             resetButton(confirmBtn, original);
         });
 }
-
-

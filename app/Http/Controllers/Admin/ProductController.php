@@ -200,15 +200,31 @@ class ProductController extends Controller
             'updates' => 'required|array|min:1',
             'updates.*.id' => 'required|integer|exists:products,id',
             'updates.*.stock_quantity' => 'required|integer|min:0',
+            'reason' => 'nullable|string|max:500',
         ]);
 
         try {
-            $result = $this->productService->bulkUpdateStock($request->updates);
+            $result = $this->productService->bulkUpdateStock(
+                $request->updates,
+                $request->reason,
+                auth()->id()
+            );
+            $updatedProductsWithBadges = [];
+            foreach ($result['changes'] as $change) {
+                // Assuming 'low_stock_threshold' is returned in the $change array from ProductService
+                $lowStockThreshold = $change['low_stock_threshold'] ?? 10; // Default to 10 if not provided
+                [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($change['new_stock_quantity'], $lowStockThreshold);
+                $updatedProductsWithBadges[] = array_merge($change, [
+                    'badge_class' => $badgeClass,
+                    'badge_text' => $badgeText,
+                ]);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => "Successfully updated stock for {$result['updated_count']} product(s)",
                 'updated_count' => $result['updated_count'],
-                'changes' => $result['changes'],
+                'changes' => $updatedProductsWithBadges,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -271,5 +287,23 @@ class ProductController extends Controller
     {
         $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
         return response()->json($expiringSoonProducts);
+    }
+
+    public function getAdjustmentLog($id)
+    {
+        try {
+            $adjustments = \App\Models\StockAdjustment::where('product_id', $id)
+                ->with('adjustedBy:id,name') // Eager load user name
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json($adjustments);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching adjustment log.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
     }
 }

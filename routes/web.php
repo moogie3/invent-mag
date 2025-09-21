@@ -68,6 +68,7 @@ Route::prefix('admin')->group(function () {
             Route::put('/update/{id}', [ProductController::class, 'update'])->name('admin.product.update');
             Route::delete('/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
             Route::get('/modal-view/{id}', [ProductController::class, 'modalView'])->name('admin.product.modal-view');
+            Route::get('/{id}/adjustment-log', [ProductController::class, 'getAdjustmentLog'])->name('admin.product.adjustment-log');
             Route::post('/quick-create', [ProductController::class, 'quickCreate'])->name('admin.product.quickCreate');
             Route::post('/bulk-delete', [ProductController::class, 'bulkDelete'])->name('product.bulk-delete');
             Route::post('/bulk-export', [ProductController::class, 'bulkExport'])->name('product.bulk-export');

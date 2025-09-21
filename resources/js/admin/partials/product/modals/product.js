@@ -28,6 +28,18 @@ export function initProductModal() {
             })
             .then((data) => {
                 renderProductDetails(data);
+                // Also fetch and render the adjustment log
+                fetch(`/admin/product/${id}/adjustment-log`)
+                    .then(response => response.json())
+                    .then(logData => {
+                        renderAdjustmentLog(logData);
+                    })
+                    .catch(error => {
+                        const logContent = document.getElementById('productAdjustmentLogContent');
+                        if (logContent) {
+                            logContent.innerHTML = `<div class="alert alert-danger">Error loading adjustment log: ${error.message}</div>`;
+                        }
+                    });
             })
             .catch((error) => {
                 content.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
@@ -277,4 +289,58 @@ export function loadExpiringSoonProductsModal(expiringSoonProducts) {
             </tr>
         `;
     }
+}
+
+function renderAdjustmentLog(logData) {
+    const logContent = document.getElementById('productAdjustmentLogContent');
+    if (!logContent) return;
+
+    if (!logData || logData.length === 0) {
+        logContent.innerHTML = `<div class="text-center text-muted py-4">No adjustment history for this product.</div>`;
+        return;
+    }
+
+    let logTableHtml = `
+        <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Qty Before</th>
+                        <th>Qty After</th>
+                        <th>Change</th>
+                        <th>Reason</th>
+                        <th>Adjusted By</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    logData.forEach(log => {
+        const adjustmentDate = new Date(log.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const change = log.quantity_after - log.quantity_before;
+        const changeClass = change > 0 ? 'text-success' : (change < 0 ? 'text-danger' : 'text-muted');
+        const changeSign = change > 0 ? '+' : '';
+
+        logTableHtml += `
+            <tr>
+                <td>${adjustmentDate}</td>
+                <td><span class="badge bg-secondary-lt">${log.adjustment_type}</span></td>
+                <td>${log.quantity_before}</td>
+                <td>${log.quantity_after}</td>
+                <td class="${changeClass}">${changeSign}${change}</td>
+                <td>${log.reason || 'N/A'}</td>
+                <td>${log.adjusted_by ? log.adjusted_by.name : 'System'}</td>
+            </tr>
+        `;
+    });
+
+    logTableHtml += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    logContent.innerHTML = logTableHtml;
 }

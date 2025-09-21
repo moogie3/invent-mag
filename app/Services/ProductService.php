@@ -134,12 +134,12 @@ class ProductService
         ];
     }
 
-    public function bulkUpdateStock(array $updates)
+    public function bulkUpdateStock(array $updates, ?string $reason, ?int $adjustedBy)
     {
         $updatedCount = 0;
         $stockChanges = [];
 
-        DB::transaction(function () use ($updates, &$updatedCount, &$stockChanges) {
+        DB::transaction(function () use ($updates, $reason, $adjustedBy, &$updatedCount, &$stockChanges) {
             foreach ($updates as $update) {
                 $product = Product::findOrFail($update['id']);
                 $originalStock = $product->stock_quantity;
@@ -152,12 +152,32 @@ class ProductService
 
                     $updatedCount++;
 
+                    $adjustmentAmount = abs($newStock - $originalStock);
+                    $adjustmentType = 'correction'; // Default to correction
+
+                    if ($newStock > $originalStock) {
+                        $adjustmentType = 'increase';
+                    } elseif ($newStock < $originalStock) {
+                        $adjustmentType = 'decrease';
+                    }
+
+                    \App\Models\StockAdjustment::create([
+                        'product_id' => $product->id,
+                        'adjustment_type' => $adjustmentType,
+                        'quantity_before' => $originalStock,
+                        'quantity_after' => $newStock,
+                        'adjustment_amount' => $adjustmentAmount,
+                        'reason' => $reason ?? 'Bulk stock update',
+                        'adjusted_by' => $adjustedBy,
+                    ]);
+
                     $stockChanges[] = [
                         'product_id' => $product->id,
                         'product_code' => $product->code,
                         'original_stock' => $originalStock,
-                        'new_stock' => $newStock,
+                        'new_stock_quantity' => $newStock,
                         'change' => $newStock - $originalStock,
+                        'low_stock_threshold' => $product->low_stock_threshold,
                     ];
                 }
             }

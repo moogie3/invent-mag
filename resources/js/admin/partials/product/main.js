@@ -6,6 +6,13 @@ import { initializeEntriesSelector, initKeyboardShortcuts, initExport } from './
 import { bulkUpdateStock } from './bulkActions/stock.js'; // Import bulkUpdateStock
 import { bulkDeleteProducts } from './bulkActions/delete.js'; // Import bulkDeleteProducts
 
+function getStockClassAndText(stockQty, threshold = 10) {
+    if (stockQty <= threshold) {
+        return ['bg-red text-white', 'Low Stock'];
+    }
+    return ['bg-green text-white', 'In Stock'];
+}
+
 export function initProductPage() {
     document.addEventListener("DOMContentLoaded", function () {
         initModals();
@@ -98,13 +105,20 @@ export function initProductPage() {
         const adjustCurrentStockInput = document.getElementById('adjustCurrentStock');
         const adjustmentTypeSelect = document.getElementById('adjustmentType');
         const adjustmentAmountInput = document.getElementById('adjustmentAmount');
-        const adjustmentAmountLabel = document.getElementById('adjustmentAmountLabel');
+        const correctionAmountInput = document.getElementById('correctionAmount');
         const adjustmentPreviewBadge = document.getElementById('adjustmentPreviewBadge');
 
         function updateAdjustmentPreview() {
             const currentStock = parseFloat(adjustCurrentStockInput.value) || 0;
             const adjustmentType = adjustmentTypeSelect.value;
-            const adjustmentAmount = parseFloat(adjustmentAmountInput.value) || 0;
+            let adjustmentAmount = 0;
+            
+            if (adjustmentType === 'correction') {
+                adjustmentAmount = parseFloat(correctionAmountInput.value) || 0;
+            } else {
+                adjustmentAmount = parseFloat(adjustmentAmountInput.value) || 0;
+            }
+
             let newStock = currentStock;
             let change = 0;
 
@@ -130,14 +144,17 @@ export function initProductPage() {
             }
         }
 
+        const adjustmentAmountContainer = document.getElementById('adjustmentAmountContainer');
+        const correctionAmountContainer = document.getElementById('correctionAmountContainer');
+
         adjustmentTypeSelect.addEventListener('change', function() {
             const type = this.value;
             if (type === 'correction') {
-                adjustmentAmountLabel.textContent = 'Set to Exact Quantity';
-                adjustmentAmountInput.min = 0;
+                adjustmentAmountContainer.style.display = 'none';
+                correctionAmountContainer.style.display = 'block';
             } else {
-                adjustmentAmountLabel.textContent = 'Adjustment Amount';
-                adjustmentAmountInput.min = 1;
+                adjustmentAmountContainer.style.display = 'block';
+                correctionAmountContainer.style.display = 'none';
             }
             updateAdjustmentPreview();
         });
@@ -147,10 +164,16 @@ export function initProductPage() {
         document.getElementById('confirmAdjustStockBtn').addEventListener('click', function() {
             const productId = document.getElementById('adjustProductId').value;
             const adjustmentType = document.getElementById('adjustmentType').value;
-            const adjustmentAmount = document.getElementById('adjustmentAmount').value;
             const reason = document.getElementById('adjustmentReason').value;
+            let adjustmentAmount = 0;
 
-            if (!adjustmentAmount || parseFloat(adjustmentAmount) <= 0) {
+            if (adjustmentType === 'correction') {
+                adjustmentAmount = parseFloat(document.getElementById('correctionAmount').value) || 0;
+            } else {
+                adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value) || 0;
+            }
+
+            if (!adjustmentAmount || adjustmentAmount < 0) {
                 alert('Please enter a valid adjustment amount.');
                 return;
             }
@@ -170,18 +193,50 @@ export function initProductPage() {
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    // Optionally update the stock display on the page without full reload
-                    // For simplicity, we'll just reload the page for now
-                    location.reload();
+                if (data.success && data.product) {
+                    const product = data.product;
+                    const row = document.querySelector(`tr[data-id="${product.id}"]`);
+
+                    if (row) {
+                        const stockQuantityElement = row.querySelector(".sort-quantity .fw-bold");
+                        if (stockQuantityElement) {
+                            stockQuantityElement.textContent = product.stock_quantity;
+                        }
+
+                        let badgeElement = row.querySelector(".sort-quantity .badge");
+                        if (!badgeElement) {
+                            const badgeContainer = row.querySelector(".sort-quantity");
+                            if (badgeContainer) {
+                                badgeElement = document.createElement("span");
+                                badgeContainer.appendChild(badgeElement);
+                            }
+                        }
+
+                        if (badgeElement) {
+                            const [badgeClass, badgeText] = getStockClassAndText(product.stock_quantity, product.low_stock_threshold);
+                            badgeElement.className = `badge ${badgeClass}`;
+                            badgeElement.textContent = badgeText;
+                        }
+
+                        const thresholdElement = row.querySelector(".sort-quantity small.text-muted");
+                        if (thresholdElement && product.low_stock_threshold !== undefined) {
+                            thresholdElement.textContent = `Threshold: ${product.low_stock_threshold}`;
+                        }
+                    }
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('adjustStockModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+
+                    window.showToast('Success', data.message, 'success');
                 } else {
-                    alert('Error: ' + data.message);
+                    window.showToast('Error', data.message || 'Failed to update stock.', 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred during stock adjustment.');
+                window.showToast('Error', 'An error occurred during stock adjustment.', 'error');
             });
         });
 

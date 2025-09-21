@@ -20,7 +20,7 @@
             <td class="sort-quantity no-print text-center">
                 <div class="fw-bold">{{ $product->stock_quantity }}</div>
                 @php
-                    [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($product);
+                    [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($product->stock_quantity, $product->low_stock_threshold);
                 @endphp
                 @if ($badgeClass)
                     <span class="{{ $badgeClass }}">{{ $badgeText }}</span>

@@ -145,7 +145,7 @@
                                         [
                                             $stockBadgeClass,
                                             $stockBadgeText,
-                                        ] = \App\Helpers\ProductHelper::getStockClassAndText($product);
+                                        ] = \App\Helpers\ProductHelper::getStockClassAndText($product->stock_quantity, $product->low_stock_threshold);
                                     @endphp
                                     <td class="text-center">
                                         <span class="{{ $stockBadgeClass }}">
@@ -283,6 +283,13 @@
                     {{ __('messages.product_expiry_status_tab') }}
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="adjustment-log-tab" data-bs-toggle="tab"
+                    data-bs-target="#adjustment-log-pane" type="button" role="tab"
+                    aria-controls="adjustment-log-pane" aria-selected="false">
+                    {{ __('messages.product_adjustment_log_tab') }}
+                </button>
+            </li>
         </ul>
 
         <!-- Tab Content -->
@@ -407,6 +414,13 @@
                     <!-- Content will be loaded by JavaScript -->
                 </div>
             </div>
+
+            <!-- Adjustment Log Pane -->
+            <div class="tab-pane fade" id="adjustment-log-pane" role="tabpanel" aria-labelledby="adjustment-log-tab">
+                <div id="productAdjustmentLogContent">
+                    <!-- Content will be loaded by JavaScript -->
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -479,6 +493,13 @@
                         <p class="mt-3 text-muted">{{ __('messages.product_bulk_update_stock_loading_products') }}</p>
                     </div>
                 </div>
+
+                <div class="p-3 border-top">
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.product_reason_for_adjustment') }}</label>
+                        <textarea class="form-control" id="bulkAdjustmentReason" rows="3" placeholder="Optional: Enter a reason for the bulk adjustment"></textarea>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <div class="me-auto">
@@ -539,10 +560,14 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label"
-                        id="adjustmentAmountLabel">{{ __('messages.product_adjustment_amount') }}</label>
+                <div id="adjustmentAmountContainer" class="mb-3">
+                    <label class="form-label" id="adjustmentAmountLabel">{{ __('messages.product_adjustment_amount') }}</label>
                     <input type="number" class="form-control" id="adjustmentAmount" min="1" value="1">
+                </div>
+
+                <div id="correctionAmountContainer" class="mb-3" style="display: none;">
+                    <label class="form-label">{{ __('messages.product_set_exact_quantity') }}</label>
+                    <input type="number" class="form-control" id="correctionAmount" min="0" value="0">
                 </div>
                 <div class="mb-3 text-center">
                     <span class="badge fs-3 stock-change-badge bg-secondary-lt"

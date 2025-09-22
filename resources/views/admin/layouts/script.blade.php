@@ -5,7 +5,7 @@
 {{-- Load Tabler JS (remove defer since jQuery is already loaded) --}}
 <script src="{{ asset('tabler/dist/js/tabler.min.js?1692870487') }}"></script>
 <script src="{{ asset('tabler/dist/js/demo.min.js?1692870487') }}"></script>
-<script src="{{ asset('tabler/dist/js/demo-theme.min.js?1692870487') }}"></script>
+
 
 {{-- Load other external libraries --}}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>

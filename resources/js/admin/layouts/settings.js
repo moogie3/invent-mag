@@ -180,7 +180,9 @@ function initSettingsPage() {
 }
 
 // Initialize settings on script load
-fetchSystemSettings();
+if (document.querySelector('meta[name="csrf-token"]')) {
+    fetchSystemSettings();
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     let logoutTimer;

@@ -337,7 +337,7 @@ document.addEventListener("DOMContentLoaded", function () {
             overlay.addEventListener("click", function () {
                 navContainer.classList.remove("active");
                 navDropdown.classList.remove("collapsed");
-                toggleIconHoverListeners(false); // Disable icon hover listeners
+                
             });
         }
     };
@@ -446,47 +446,6 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(checkForNewNotifications, 5 * 60 * 1000);
 });
 
-
-// Theme toggle functionality
-document.addEventListener("DOMContentLoaded", function () {
-    const themeToggleNavbar = document.getElementById("theme-toggle-navbar");
-    const themeIconLight = document.querySelector(".theme-icon-light");
-    const themeIconDark = document.querySelector(".theme-icon-dark");
-
-    if (themeToggleNavbar) {
-        themeToggleNavbar.addEventListener("click", function (e) {
-            e.preventDefault();
-            const currentTheme = document.documentElement.getAttribute(
-                "data-bs-theme"
-            );
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
-            document.documentElement.setAttribute("data-bs-theme", newTheme);
-            localStorage.setItem("theme", newTheme);
-
-            // Toggle icon visibility
-            if (newTheme === "dark") {
-                themeIconLight.style.display = "none";
-                themeIconDark.style.display = "inline-block";
-            }
-            else {
-                themeIconLight.style.display = "inline-block";
-                themeIconDark.style.display = "none";
-            }
-        });
-
-        // Set initial icon based on current theme
-        const initialTheme =
-            document.documentElement.getAttribute("data-bs-theme");
-        if (initialTheme === "dark") {
-            themeIconLight.style.display = "none";
-            themeIconDark.style.display = "inline-block";
-        }
-        else {
-            themeIconLight.style.display = "inline-block";
-            themeIconDark.style.display = "none";
-        }
-    }
-});
 
 // Sticky Navbar functionality
 document.addEventListener("DOMContentLoaded", function () {

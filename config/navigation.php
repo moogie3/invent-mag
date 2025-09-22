@@ -65,11 +65,13 @@ return [
                     'title' => 'Adjustment Log',
                     'route' => 'admin.reports.adjustment-log',
                     'permission' => 'view-reports',
+                    'icon' => 'ti ti-clipboard-list',
                 ],
                 [
                     'title' => 'Recent Transactions',
                     'route' => 'admin.reports.recent-transactions',
                     'permission' => 'view-reports',
+                    'icon' => 'ti ti-history',
                 ],
             ],
         ],

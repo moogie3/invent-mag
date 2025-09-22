@@ -7,7 +7,7 @@ import { extractProductDataFromRow } from "../utils/helpers.js";
 export function bulkUpdateStock() {
     const selected = getSelectedProductIds();
     if (!selected.length) {
-        showToast("Warning", "Please select products to update.", "warning");
+        InventMagApp.showToast("Warning", "Please select products to update.", "warning");
         return;
     }
 
@@ -22,14 +22,14 @@ export function bulkUpdateStock() {
             modal.show();
             loadBulkUpdateProductsFromTable(selected);
         } else {
-            showToast(
+            InventMagApp.showToast(
                 "Error",
                 "Bootstrap Modal functionality not available.",
                 "error"
             );
         }
     } else {
-        showToast("Error", "Bulk update modal not found.", "error");
+        InventMagApp.showToast("Error", "Bulk update modal not found.", "error");
     }
 }
 
@@ -215,7 +215,7 @@ function handleBulkStockUpdate() {
     });
 
     if (!updates.length) {
-        showToast("Error", "No valid updates found.", "error");
+        InventMagApp.showToast("Error", "No valid updates found.", "error");
         return;
     }
 
@@ -223,7 +223,7 @@ function handleBulkStockUpdate() {
         (u) => u.original_stock !== u.stock_quantity
     );
     if (!hasChanges) {
-        showToast("Info", "No changes detected.", "info");
+        InventMagApp.showToast("Info", "No changes detected.", "info");
         return;
     }
 
@@ -240,7 +240,7 @@ function handleBulkStockUpdate() {
     const csrf = document.querySelector('meta[name="csrf-token"]');
     if (!csrf) {
         console.error("CSRF token not found.");
-        showToast("Error", "Security token not found.", "error");
+        InventMagApp.showToast("Error", "Security token not found.", "error");
         resetButton(confirmBtn, original);
         return;
     }
@@ -299,7 +299,7 @@ function handleBulkStockUpdate() {
                                     backdrop.remove()
                                 );
                                 // Show toast
-                                showToast(
+                                InventMagApp.showToast(
                                     "Success",
                                     `Stock updated successfully for ${
                                         data.updated_count || updates.length
@@ -363,7 +363,7 @@ function handleBulkStockUpdate() {
                         );
                     } else {
                         // Fallback if modal instance not found
-                        showToast(
+                        InventMagApp.showToast(
                             "Success",
                             `Stock updated successfully for ${
                                 data.updated_count || updates.length
@@ -375,12 +375,12 @@ function handleBulkStockUpdate() {
                     }
                 }, 300);
             } else {
-                showToast("Error", data.message || "Update failed.", "error");
+                InventMagApp.showToast("Error", data.message || "Update failed.", "error");
             }
         })
         .catch((error) => {
             console.error("Fetch or processing error:", error);
-            showToast(
+            InventMagApp.showToast(
                 "Error",
                 `An error occurred while updating stock: ${error.message}`,
                 "error"

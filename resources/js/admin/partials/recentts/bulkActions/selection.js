@@ -40,7 +40,7 @@ export function smartSelectUnpaidOnly() {
     updateBulkActions();
 
     if (excludedCount > 0) {
-        showToast(
+        InventMagApp.showToast(
             "Info",
             `${excludedCount} paid transaction(s) were excluded from selection.`,
             "info",
@@ -62,7 +62,7 @@ export function bulkMarkAsPaid() {
         );
 
         if (newSelected.length === 0) {
-            showToast(
+            InventMagApp.showToast(
                 "Info",
                 "No unpaid transactions available to mark as paid.",
                 "info"
@@ -89,7 +89,7 @@ export function bulkMarkAsPaid() {
 
             updateBulkActions();
 
-            showToast(
+            InventMagApp.showToast(
                 "Warning",
                 `${selectedPaidTransactions.length} paid transaction(s) were excluded from selection.`,
                 "warning"

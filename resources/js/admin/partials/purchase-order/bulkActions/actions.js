@@ -26,7 +26,7 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     if (!csrfToken) {
         console.error("CSRF token not found");
-        showToast(
+        InventMagApp.showToast(
             "Error",
             "Security token not found. Please refresh the page.",
             "error"
@@ -54,7 +54,7 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
                 } purchase order(s) successfully!`);
                 location.reload();
             } else {
-                showToast(
+                InventMagApp.showToast(
                     "Error",
                     data.message || "Failed to delete purchase orders.",
                     "error"
@@ -63,7 +63,7 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
         })
         .catch((error) => {
             console.error("Error:", error);
-            showToast(
+            InventMagApp.showToast(
                 "Error",
                 "An error occurred while deleting purchase orders.",
                 "error"
@@ -79,7 +79,7 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
 export function bulkDeletePO() {
     const selected = getSelectedIds();
     if (!selected.length) {
-        showToast(
+        InventMagApp.showToast(
             "Warning",
             "Please select purchase orders to delete.",
             "warning"
@@ -108,7 +108,7 @@ export function bulkExportPO() {
     ).map((cb) => cb.value);
 
     if (selected.length === 0) {
-        showToast(
+        InventMagApp.showToast(
             "Warning",
             "Please select at least one purchase order to export.",
             "warning"
@@ -172,7 +172,7 @@ export function bulkMarkAsPaidPO() {
         );
 
         if (newSelected.length === 0) {
-            showToast(
+            InventMagApp.showToast(
                 "Info",
                 "No unpaid purchase orders available to mark as paid.",
                 "info"
@@ -201,7 +201,7 @@ export function bulkMarkAsPaidPO() {
                 window.bulkSelection.updateBulkActionsBar();
             }
 
-            showToast(
+            InventMagApp.showToast(
                 "Warning",
                 `${selectedPaidPOs.length} paid purchase order(s) were excluded from selection.`,
                 "warning"
@@ -268,7 +268,7 @@ function smartSelectUnpaidOnlyPO() {
     }
 
     if (excludedCount > 0) {
-        showToast(
+        InventMagApp.showToast(
             "Info",
             `${excludedCount} paid purchase order(s) were excluded from selection.`,
             "info",
@@ -290,7 +290,7 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     if (!csrfToken) {
         console.error("CSRF token not found");
-        showToast(
+        InventMagApp.showToast(
             "Error",
             "Security token not found. Please refresh the page.",
             "error"
@@ -318,7 +318,7 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
                 } purchase order(s) marked as paid successfully!`);
                 location.reload();
             } else {
-                showToast(
+                InventMagApp.showToast(
                     "Error",
                     data.message || "Failed to update purchase orders.",
                     "error"
@@ -327,7 +327,7 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
         })
         .catch((error) => {
             console.error("Error:", error);
-            showToast(
+            InventMagApp.showToast(
                 "Error",
                 "An error occurred while updating purchase orders.",
                 "error"

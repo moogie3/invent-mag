@@ -27,7 +27,7 @@ export async function moveOpportunity(opportunityId, newStageId, oldStageId) {
         updateStageCount(newStageId, 1);
     } catch (error) {
         console.error("Error moving opportunity:", error);
-        window.showToast(
+        window.InventMagApp.showToast(
             "Error",
             "Failed to move opportunity. Please try again.",
             "error"

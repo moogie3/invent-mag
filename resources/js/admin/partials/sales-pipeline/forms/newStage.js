@@ -14,7 +14,7 @@ export function initNewStageForm() {
         const pipelineId = newStagePipelineId.value;
 
         if (!pipelineId) {
-            window.showToast(
+            window.InventMagApp.showToast(
                 "Error",
                 "Pipeline ID is missing. Please close and reopen the modal.",
                 "error"
@@ -27,7 +27,7 @@ export function initNewStageForm() {
         data.is_closed = formData.has("is_closed");
 
         if (!data.name) {
-            window.showToast(
+            window.InventMagApp.showToast(
                 "Error",
                 "Please fill in all required fields.",
                 "error"
@@ -70,14 +70,14 @@ export function initNewStageForm() {
 
             this.reset();
 
-            window.showToast(
+            window.InventMagApp.showToast(
                 "Success",
                 "Stage created successfully!",
                 "success"
             );
         } catch (error) {
             console.error("Error creating stage:", error);
-            window.showToast(
+            window.InventMagApp.showToast(
                 "Error",
                 `Failed to create stage. Please try again.`,
                 "error"

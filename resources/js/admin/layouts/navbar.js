@@ -345,12 +345,19 @@ document.addEventListener("DOMContentLoaded", function () {
     // Staggered dropdown children animation
     const initStaggeredDropdown = () => {
         document.querySelectorAll('.nav-item.dropdown > .nav-link.dropdown-toggle').forEach(toggle => {
+            const linkTitle = toggle.querySelector('.nav-link-title');
+            if (linkTitle && linkTitle.textContent.trim() === 'Reports') {
+                // For the 'Reports' menu, we let the default Bootstrap data-bs-toggle handle it.
+                // This is because the custom handler was conflicting with the Blade template logic.
+                return;
+            }
+
             toggle.addEventListener('click', function (e) {
                 e.preventDefault(); // Prevent default Bootstrap dropdown behavior
                 e.stopPropagation(); // Stop propagation to prevent parent dropdowns from closing
 
-                const dropdownMenu = this.nextElementSibling; // The .dropdown-menu
-                if (!dropdownMenu || !dropdownMenu.classList.contains('dropdown-menu')) return;
+                const dropdownMenu = this.closest('.dropdown').querySelector('.dropdown-menu');
+                if (!dropdownMenu) return;
 
                 // Toggle the 'show' class for Bootstrap's internal handling
                 dropdownMenu.classList.toggle('show');
@@ -471,6 +478,33 @@ document.addEventListener("DOMContentLoaded", function () {
     if (sidebarToggle) {
         sidebarToggle.addEventListener("click", function () {
             body.classList.toggle("sidebar-open");
+        });
+    }
+});
+
+// HYBRID ANIMATION FOR REPORTS DROPDOWN
+document.addEventListener('DOMContentLoaded', function () {
+    const reportsNavItem = document.getElementById('reports-nav-item');
+
+    if (reportsNavItem) {
+        reportsNavItem.addEventListener('shown.bs.dropdown', function () {
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            dropdownMenu.classList.add('staggered-open');
+            dropdownItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.05}s`;
+            });
+        });
+
+        reportsNavItem.addEventListener('hide.bs.dropdown', function () {
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            dropdownMenu.classList.remove('staggered-open');
+            dropdownItems.forEach(item => {
+                item.style.animationDelay = '';
+            });
         });
     }
 });

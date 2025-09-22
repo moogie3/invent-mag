@@ -70,12 +70,12 @@ function completePayment() {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                showToast("Success", data.message, "success");
+                InventMagApp.showToast("Success", data.message, "success");
                 paymentModal.hide();
                 clearCart();
                 window.location.href = `/admin/pos/receipt/${data.sale_id}`;
             } else {
-                showToast(
+                InventMagApp.showToast(
                     "Error",
                     data.message || "Failed to process payment.",
                     "error"
@@ -85,7 +85,7 @@ function completePayment() {
         })
         .catch((error) => {
             console.error("Error processing payment:", error);
-            showToast(
+            InventMagApp.showToast(
                 "Error",
                 "An error occurred while processing payment. Please check the console for details.",
                 "error"

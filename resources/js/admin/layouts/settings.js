@@ -23,9 +23,10 @@ async function fetchSystemSettings() {
         window.handleSessionNotifications();
     }
 
-    // Apply performance settings globally
+    // Initialize features that depend on these settings
     if (window.userSettings) {
         applyPerformanceSettings(window.userSettings);
+        initAutoLogout(window.userSettings);
     }
 
     // Initialize the settings page functionality if the form exists on the current page.
@@ -111,14 +112,14 @@ function initSettingsPage() {
                             }
                         }
                     }
-                    showToast('Success', data.message, 'success');
+                    InventMagApp.showToast('Success', data.message, 'success');
                 } else {
-                    showToast('Error', data.message || 'An error occurred.', 'error');
+                    InventMagApp.showToast('Error', data.message || 'An error occurred.', 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showToast('Error', 'An unexpected error occurred.', 'error');
+                InventMagApp.showToast('Error', 'An unexpected error occurred.', 'error');
             })
             .finally(() => {
                 saveButton.disabled = false;
@@ -179,21 +180,18 @@ function initSettingsPage() {
     }
 }
 
-// Initialize settings on script load
-if (document.querySelector('meta[name="csrf-token"]')) {
-    fetchSystemSettings();
-}
 
-document.addEventListener('DOMContentLoaded', function () {
+// Add a new function to initialize the auto-logout feature
+function initAutoLogout(settings) {
     let logoutTimer;
     let modalVisible = false;
+    // Convert minutes to milliseconds
+    const autoLogoutTime = parseFloat(settings.auto_logout_time) * 60 * 1000;
 
-    const autoLogoutTimeInput = document.getElementById('autoLogoutTime');
-    if (!autoLogoutTimeInput) {
+    // If logout time is 0 or not a number, disable the feature
+    if (!autoLogoutTime || autoLogoutTime <= 0) {
         return;
     }
-
-    let autoLogoutTime = parseFloat(autoLogoutTimeInput.value) * 60 * 1000;
 
     function showInactivityModal() {
         if (modalVisible) return;
@@ -223,7 +221,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const modalElement = document.getElementById('inactivityModal');
         const modal = new bootstrap.Modal(modalElement);
-
         modal.show();
 
         document.getElementById('stayLoggedInBtn').addEventListener('click', () => {
@@ -233,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('logoutBtn').addEventListener('click', () => {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '/admin/logout'; // Use the correct logout route
+            form.action = '/admin/logout';
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             const csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
@@ -252,16 +249,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function resetLogoutTimer() {
         clearTimeout(logoutTimer);
-        if (autoLogoutTime > 0) {
-            logoutTimer = setTimeout(showInactivityModal, autoLogoutTime);
-        }
+        logoutTimer = setTimeout(showInactivityModal, autoLogoutTime);
     }
 
-    if (autoLogoutTime > 0) {
-        window.addEventListener('mousemove', resetLogoutTimer);
-        window.addEventListener('keydown', resetLogoutTimer);
-        window.addEventListener('click', resetLogoutTimer);
-        window.addEventListener('scroll', resetLogoutTimer);
-        resetLogoutTimer();
-    }
-});
+    // Attach event listeners
+    window.addEventListener('mousemove', resetLogoutTimer, { passive: true });
+    window.addEventListener('keydown', resetLogoutTimer, { passive: true });
+    window.addEventListener('click', resetLogoutTimer, { passive: true });
+    window.addEventListener('scroll', resetLogoutTimer, { passive: true });
+
+    // Initial timer start
+    resetLogoutTimer();
+}
+
+// Initialize settings on script load
+if (document.querySelector('meta[name="csrf-token"]')) {
+    fetchSystemSettings();
+}

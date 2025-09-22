@@ -5,7 +5,7 @@ import {
     safeUpdateElementHTML,
     safeToggleElement,
 } from "../utils/dom.js";
-import { formatCurrency } from "../../../../utils/currencyFormatter.js";
+import { formatCurrency } => "../../../../utils/currencyFormatter.js";
 import { formatDateToCustomString } from "../utils/date.js";
 import { getStatusBadgeHtml } from "../utils/status.js";
 
@@ -49,7 +49,7 @@ export function loadCrmData(id, page, append = false) {
         })
         .catch((error) => {
             console.error("Error loading CRM data:", error);
-            showToast(
+            InventMagApp.showToast(
                 "Error",
                 `Failed to load CRM data: ${error.message}`,
                 "error"
@@ -312,7 +312,7 @@ export function handleInteractionForm() {
             const formData = new FormData(form);
 
             if (!crmState.customerId) {
-                showToast("Error", "Customer ID not found.", "error");
+                InventMagApp.showToast("Error", "Customer ID not found.", "error");
                 return;
             }
 
@@ -329,7 +329,7 @@ export function handleInteractionForm() {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.id) {
-                        showToast("Success", "Interaction added.", "success");
+                        InventMagApp.showToast("Success", "Interaction added.", "success");
                         const timeline = document.getElementById(
                             "interactionTimeline"
                         );
@@ -362,7 +362,7 @@ export function handleInteractionForm() {
                             'input[name="interaction_date"]'
                         ).value = new Date().toISOString().slice(0, 10);
                     } else {
-                        showToast(
+                        InventMagApp.showToast(
                             "Error",
                             "Failed to add interaction.",
                             "error"
@@ -371,7 +371,7 @@ export function handleInteractionForm() {
                 })
                 .catch((error) => {
                     console.error("Error:", error);
-                    showToast("Error", "An error occurred.", "error");
+                    InventMagApp.showToast("Error", "An error occurred.", "error");
                 });
         });
     }

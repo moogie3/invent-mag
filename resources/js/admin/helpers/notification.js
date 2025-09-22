@@ -7,7 +7,9 @@
  * @param {string} [type='info'] - The type of toast ('success', 'error', 'warning', 'info'). Determines color and icon.
  * @param {number} [duration=4000] - How long the toast should be visible in milliseconds.
  */
-window.showToast = function (title, message, type = "info", duration) {
+window.InventMagApp = window.InventMagApp || {};
+
+window.InventMagApp.showToast = function (title, message, type = "info", duration) {
     if (type === 'success' && window.userSettings && !window.userSettings.show_success_messages) {
         return; // Do not show success messages if disabled
     }
@@ -214,13 +216,13 @@ window.handleSessionNotifications = function () {
             if (isAuthPage) {
                 window.showAuthModal("Success", successMessage, "success");
             } else {
-                window.showToast("Success", successMessage, "success");
+                window.InventMagApp.showToast("Success", successMessage, "success");
             }
         } else if (errorMessage) {
             if (isAuthPage) {
                 window.showAuthModal("Error", errorMessage, "error");
             } else {
-                window.showToast("Error", errorMessage, "error");
+                window.InventMagApp.showToast("Error", errorMessage, "error");
             }
         }
     }

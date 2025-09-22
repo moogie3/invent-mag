@@ -27,8 +27,8 @@ export function initEditUserFormSubmission() {
             })
             .then((data) => {
                 if (data.success) {
-                    if (typeof showToast === "function") {
-                        showToast("Success", data.message, "success");
+                    if (typeof InventMagApp.showToast === "function") {
+                        InventMagApp.showToast("Success", data.message, "success");
                     } else if (typeof toastr !== "undefined") {
                         toastr.success(data.message);
                     } else {
@@ -85,16 +85,14 @@ export function initEditUserFormSubmission() {
                             )}\n`;
                         });
 
-                        if (typeof showToast === "function") {
-                            showToast("Error", errorMessage, "error");
+                        if (typeof InventMagApp.showToast === "function") {
+                            InventMagApp.showToast("Error", errorMessage, "error");
                         } else if (typeof toastr !== "undefined") {
                             toastr.error(errorMessage);
-                        } else {
-                            alert(errorMessage);
                         }
                     } else {
-                        if (typeof showToast === "function") {
-                            showToast(
+                        if (typeof InventMagApp.showToast === "function") {
+                            InventMagApp.showToast(
                                 "Error",
                                 data.message || "Failed to update user.",
                                 "error"
@@ -103,8 +101,6 @@ export function initEditUserFormSubmission() {
                             toastr.error(
                                 data.message || "Failed to update user."
                             );
-                        } else {
-                            alert(data.message || "Failed to update user.");
                         }
                     }
                     console.error(
@@ -115,16 +111,14 @@ export function initEditUserFormSubmission() {
             })
             .catch((error) => {
                 console.error("Error updating user:", error);
-                if (typeof showToast === "function") {
-                    showToast(
+                if (typeof InventMagApp.showToast === "function") {
+                    InventMagApp.showToast(
                         "Error",
                         "An error occurred while updating the user. Please check the console for details.",
                         "error"
                     );
                 } else if (typeof toastr !== "undefined") {
                     toastr.error("An error occurred while updating the user.");
-                } else {
-                    alert("An error occurred while updating the user.");
                 }
             })
             .finally(() => {

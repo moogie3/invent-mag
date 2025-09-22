@@ -57,7 +57,7 @@ export function confirmMarkAsPaid() {
                     backdrops.forEach(backdrop => backdrop.remove());
                 });
 
-                showToast(
+                InventMagApp.showToast(
                     "Success",
                     "Transaction marked as paid successfully!",
                     "success"
@@ -78,12 +78,12 @@ export function confirmMarkAsPaid() {
                 }
                 updateBulkActions();
             } else {
-                showToast("Error: " + data.message, "error");
+                InventMagApp.showToast("Error: " + data.message, "error");
             }
         })
         .catch((error) => {
             console.error("Error:", error);
-            showToast(
+            InventMagApp.showToast(
                 "An error occurred while updating the transaction.",
                 "error"
             );

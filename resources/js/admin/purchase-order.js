@@ -17,7 +17,7 @@ window.bulkMarkAsPaidPO = bulkMarkAsPaidPO;
 // Keep the existing DOMContentLoaded initialization
 document.addEventListener("DOMContentLoaded", function () {
     if (sessionStorage.getItem("purchaseOrderBulkDeleteSuccess")) {
-        showToast(
+        InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("purchaseOrderBulkDeleteSuccess"),
             "success"
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (sessionStorage.getItem("purchaseOrderBulkMarkAsPaidSuccess")) {
-        showToast(
+        InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("purchaseOrderBulkMarkAsPaidSuccess"),
             "success"

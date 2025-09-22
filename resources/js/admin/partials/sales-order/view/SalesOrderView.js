@@ -73,8 +73,6 @@ export class SalesOrderView extends SalesOrderModule {
     setDeleteFormAction(url) {
         if (this.elements.deleteForm) {
             this.elements.deleteForm.action = url;
-        } else {
-            console.error("Delete form element not found");
         }
     }
 
@@ -120,7 +118,7 @@ export class SalesOrderView extends SalesOrderModule {
                         this.elements.viewSalesModalContent.innerHTML =
                             '<div class="alert alert-danger">Failed to load sales details.</div>';
                     }
-                    showToast(
+                    InventMagApp.showToast(
                         "Error",
                         "Failed to load sales details.",
                         "error"

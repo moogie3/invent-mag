@@ -27,7 +27,7 @@ export function initNewOpportunityForm() {
         });
 
         if (!selectedPipeline) {
-            window.showToast(
+            window.InventMagApp.showToast(
                 "Error",
                 "Please select a pipeline first.",
                 "error"
@@ -36,7 +36,7 @@ export function initNewOpportunityForm() {
         }
 
         if (!selectedPipeline.stages || selectedPipeline.stages.length === 0) {
-            window.showToast(
+            window.InventMagApp.showToast(
                 "Error",
                 "The selected pipeline has no stages. Please add stages to the pipeline first.",
                 "error"
@@ -96,14 +96,14 @@ export function initNewOpportunityForm() {
             newOpportunityTotalAmountInput.value = formatCurrency(0);
             loadPipelineBoard(selectedPipelineId);
 
-            window.showToast(
+            window.InventMagApp.showToast(
                 "Success",
                 "Opportunity created successfully!",
                 "success"
             );
         } catch (error) {
             console.error("Error creating opportunity:", error);
-            window.showToast(
+            window.InventMagApp.showToast(
                 "Error",
                 "Failed to create opportunity. Please try again.",
                 "error"

@@ -229,14 +229,14 @@ export function initProductPage() {
                         modal.hide();
                     }
 
-                    window.showToast('Success', data.message, 'success');
+                    window.InventMagApp.showToast('Success', data.message, 'success');
                 } else {
-                    window.showToast('Error', data.message || 'Failed to update stock.', 'error');
+                    window.InventMagApp.showToast('Error', data.message || 'Failed to update stock.', 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                window.showToast('Error', 'An error occurred during stock adjustment.', 'error');
+                window.InventMagApp.showToast('Error', 'An error occurred during stock adjustment.', 'error');
             });
         });
 

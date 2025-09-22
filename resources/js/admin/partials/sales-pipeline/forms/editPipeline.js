@@ -34,14 +34,14 @@ export function initEditPipelineForm() {
             ).hide();
             await fetchData();
 
-            window.showToast(
+            window.InventMagApp.showToast(
                 "Success",
                 "Pipeline updated successfully!",
                 "success"
             );
         } catch (error) {
             console.error("Error updating pipeline:", error);
-            window.showToast(
+            window.InventMagApp.showToast(
                 "Error",
                 "Failed to update pipeline. Please try again.",
                 "error"

@@ -3,7 +3,7 @@ import { getSelectedProductIds } from './selection.js';
 export function bulkExportProducts() {
     const selected = getSelectedProductIds();
     if (!selected.length) {
-        showToast("Warning", "Please select products to export.", "warning");
+        InventMagApp.showToast("Warning", "Please select products to export.", "warning");
         return;
     }
 

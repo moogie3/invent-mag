@@ -24,8 +24,8 @@ export function fetchRolePermissions() {
         })
         .catch((error) => {
             console.error("Error fetching role permissions:", error);
-            if (typeof showToast === "function") {
-                showToast(
+            if (typeof InventMagApp.showToast === "function") {
+                InventMagApp.showToast(
                     "Error",
                     "Failed to load role permissions. Some features may not work correctly.",
                     "error"

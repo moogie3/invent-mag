@@ -56,16 +56,16 @@ export function initDeleteUserFormSubmission() {
                         }, 300);
                     }
 
-                    if (typeof showToast === "function") {
-                        showToast("Success", data.message, "success");
+                    if (typeof InventMagApp.showToast === "function") {
+                        InventMagApp.showToast("Success", data.message, "success");
                     } else if (typeof toastr !== "undefined") {
                         toastr.success(data.message);
                     } else {
                         alert(data.message);
                     }
                 } else {
-                    if (typeof showToast === "function") {
-                        showToast(
+                    if (typeof InventMagApp.showToast === "function") {
+                        InventMagApp.showToast(
                             "Error",
                             data.message || "Failed to delete user.",
                             "error"
@@ -79,8 +79,8 @@ export function initDeleteUserFormSubmission() {
             })
             .catch((error) => {
                 console.error("Error deleting user:", error);
-                if (typeof showToast === "function") {
-                    showToast(
+                if (typeof InventMagApp.showToast === "function") {
+                    InventMagApp.showToast(
                         "Error",
                         "An error occurred while deleting the user.",
                         "error"

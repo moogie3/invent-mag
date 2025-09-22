@@ -5,7 +5,7 @@ import { fetchProductMetrics } from '../stats.js';
 export function bulkDeleteProducts() {
     const selected = getSelectedProductIds();
     if (!selected.length) {
-        showToast("Warning", "Please select products to delete.", "warning");
+        InventMagApp.showToast("Warning", "Please select products to delete.", "warning");
         return;
     }
 
@@ -32,7 +32,7 @@ function performBulkDelete(ids, button, modal) {
 
     const csrf = document.querySelector('meta[name="csrf-token"]');
     if (!csrf) {
-        showToast("Error", "Security token not found.", "error");
+        InventMagApp.showToast("Error", "Security token not found.", "error");
         resetButton(button, original);
         return;
     }
@@ -57,7 +57,7 @@ function performBulkDelete(ids, button, modal) {
                             "hidden.bs.modal",
                             handler
                         );
-                        showToast(
+                        InventMagApp.showToast(
                             "Success",
                             `${
                                 data.deleted_count || ids.length
@@ -78,12 +78,12 @@ function performBulkDelete(ids, button, modal) {
                 });
                 fetchProductMetrics();
             } else {
-                showToast("Error", data.message || "Delete failed.", "error");
+                InventMagApp.showToast("Error", data.message || "Delete failed.", "error");
             }
         })
         .catch((error) => {
             console.error("Delete error:", error);
-            showToast(
+            InventMagApp.showToast(
                 "Error",
                 "An error occurred while deleting products.",
                 "error"

@@ -19,7 +19,7 @@ window.bulkMarkAsPaidSales = bulkMarkAsPaidSales;
 
 document.addEventListener("DOMContentLoaded", function () {
     if (sessionStorage.getItem("salesOrderBulkDeleteSuccess")) {
-        showToast(
+        InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("salesOrderBulkDeleteSuccess"),
             "success"
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (sessionStorage.getItem("salesOrderBulkMarkAsPaidSuccess")) {
-        showToast(
+        InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("salesOrderBulkMarkAsPaidSuccess"),
             "success"
@@ -120,14 +120,6 @@ if (typeof window.setDeleteFormAction === "undefined") {
 if (typeof window.loadSalesDetails === "undefined") {
     window.loadSalesDetails = function (id) {
         console.log("Fallback loadSalesDetails called for ID:", id);
-    };
-}
-
-// Fallback for showToast if not defined
-if (typeof showToast === "undefined") {
-    window.showToast = function (title, message, type) {
-        console.log(`Toast (${type}): ${title} - ${message}`);
-        alert(`Toast (${type}): ${title} - ${message}`);
     };
 }
 

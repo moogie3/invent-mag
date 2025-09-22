@@ -304,42 +304,73 @@ document.addEventListener("DOMContentLoaded", function () {
     const initNavHover = () => {
         const brandTrigger = document.getElementById("brand-trigger");
         const navContainer = document.querySelector(".nav-container");
+        const navDropdown = document.getElementById("nav-dropdown");
         const overlay = document.getElementById("nav-overlay");
-        const dropdown = document.getElementById("nav-dropdown");
-        let timeout;
+        let hoverTimeout;
 
-        if (!brandTrigger || !navContainer || !dropdown) return;
+        if (!brandTrigger || !navContainer || !navDropdown) return;
 
-        // Show dropdown on hover
+        const navItems = navDropdown.querySelectorAll('ul > li'); // Get all top-level nav items
+
+        // Show dropdown on hover of brand trigger (icon only)
         brandTrigger.addEventListener("mouseenter", function () {
-            clearTimeout(timeout);
-            navContainer.classList.add("active");
+            clearTimeout(hoverTimeout);
+            navContainer.classList.add("active"); // Show the main dropdown container
+            navDropdown.classList.add("collapsed"); // Collapse menu to icons
         });
 
-        // Hide dropdown when mouse leaves
+        // Hide dropdown and reset when mouse leaves nav-container
         navContainer.addEventListener("mouseleave", function () {
-            timeout = setTimeout(() => {
+            hoverTimeout = setTimeout(() => {
                 navContainer.classList.remove("active");
+                navDropdown.classList.remove("collapsed");
             }, 300);
         });
 
-        // Prevent dropdown from closing when hovering inside it
-        dropdown.addEventListener("mouseenter", function () {
-            clearTimeout(timeout);
-        });
-
-        dropdown.addEventListener("mouseleave", function () {
-            timeout = setTimeout(() => {
-                navContainer.classList.remove("active");
-            }, 300);
+        // Prevent dropdown from closing when hovering inside it (if not collapsed)
+        navDropdown.addEventListener("mouseenter", function () {
+            clearTimeout(hoverTimeout);
         });
 
         // Close dropdown when clicking overlay
         if (overlay) {
             overlay.addEventListener("click", function () {
                 navContainer.classList.remove("active");
+                navDropdown.classList.remove("collapsed");
+                toggleIconHoverListeners(false); // Disable icon hover listeners
             });
         }
+    };
+
+    // Staggered dropdown children animation
+    const initStaggeredDropdown = () => {
+        document.querySelectorAll('.nav-item.dropdown > .nav-link.dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent default Bootstrap dropdown behavior
+                e.stopPropagation(); // Stop propagation to prevent parent dropdowns from closing
+
+                const dropdownMenu = this.nextElementSibling; // The .dropdown-menu
+                if (!dropdownMenu || !dropdownMenu.classList.contains('dropdown-menu')) return;
+
+                // Toggle the 'show' class for Bootstrap's internal handling
+                dropdownMenu.classList.toggle('show');
+                this.setAttribute('aria-expanded', dropdownMenu.classList.contains('show'));
+
+                const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.add('staggered-open');
+                    dropdownItems.forEach((item, index) => {
+                        item.style.animationDelay = `${index * 0.05}s`; // Staggered delay
+                    });
+                } else {
+                    dropdownMenu.classList.remove('staggered-open');
+                    dropdownItems.forEach(item => {
+                        item.style.animationDelay = ''; // Clear delay
+                    });
+                }
+            });
+        });
     };
 
     // Fix for notification tabs to prevent dropdown from closing when clicking tabs
@@ -358,7 +389,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const initOutsideClickHandler = () => {
         document.addEventListener("click", function (e) {
             // Close all hover dropdowns when clicking outside
-            if (!e.target.closest(".nav-item.dropdown")) {
+            if (!e.target.closest(".nav-item.dropdown") && !e.target.closest("#nav-dropdown")) {
                 document
                     .querySelectorAll(".nav-item.dropdown .dropdown-menu.show")
                     .forEach((menu) => {
@@ -370,6 +401,13 @@ document.addEventListener("DOMContentLoaded", function () {
                                 ?.setAttribute("aria-expanded", "false");
                         }
                     });
+                // Also close the main nav-dropdown if open and not clicked inside
+                const navContainer = document.querySelector(".nav-container");
+                const navDropdown = document.getElementById("nav-dropdown");
+                if (navContainer.classList.contains("active") && !e.target.closest("#nav-dropdown")) {
+                    navContainer.classList.remove("active");
+                    navDropdown.classList.remove("collapsed");
+                }
             }
         });
     };
@@ -396,6 +434,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initAvatarHoverDropdown();
     initNotifications();
     initNavHover();
+    initStaggeredDropdown(); // New function call
     fixNotificationTabsDropdown();
     initOutsideClickHandler();
     initResponsiveBehavior();
@@ -405,4 +444,74 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Check for new notifications every 5 minutes
     setInterval(checkForNewNotifications, 5 * 60 * 1000);
+});
+
+
+// Theme toggle functionality
+document.addEventListener("DOMContentLoaded", function () {
+    const themeToggleNavbar = document.getElementById("theme-toggle-navbar");
+    const themeIconLight = document.querySelector(".theme-icon-light");
+    const themeIconDark = document.querySelector(".theme-icon-dark");
+
+    if (themeToggleNavbar) {
+        themeToggleNavbar.addEventListener("click", function (e) {
+            e.preventDefault();
+            const currentTheme = document.documentElement.getAttribute(
+                "data-bs-theme"
+            );
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            document.documentElement.setAttribute("data-bs-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+
+            // Toggle icon visibility
+            if (newTheme === "dark") {
+                themeIconLight.style.display = "none";
+                themeIconDark.style.display = "inline-block";
+            }
+            else {
+                themeIconLight.style.display = "inline-block";
+                themeIconDark.style.display = "none";
+            }
+        });
+
+        // Set initial icon based on current theme
+        const initialTheme =
+            document.documentElement.getAttribute("data-bs-theme");
+        if (initialTheme === "dark") {
+            themeIconLight.style.display = "none";
+            themeIconDark.style.display = "inline-block";
+        }
+        else {
+            themeIconLight.style.display = "inline-block";
+            themeIconDark.style.display = "none";
+        }
+    }
+});
+
+// Sticky Navbar functionality
+document.addEventListener("DOMContentLoaded", function () {
+    const navbar = document.querySelector(".navbar");
+    if (navbar) {
+        window.addEventListener("scroll", function () {
+            if (window.scrollY > 50) {
+                // Adjust this value as needed
+                navbar.classList.add("scrolled");
+            }
+            else {
+                navbar.classList.remove("scrolled");
+            }
+        });
+    }
+});
+
+// Sidebar toggle functionality
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebarToggle = document.getElementById("sidebar-toggle");
+    const body = document.body;
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener("click", function () {
+            body.classList.toggle("sidebar-open");
+        });
+    }
 });

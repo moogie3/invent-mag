@@ -22,10 +22,7 @@ class NavigationServiceProvider extends ServiceProvider
     {
         View::composer('admin.layouts.navbar', function ($view) {
             $menu = config('navigation.menu');
-            $filteredMenu = array_filter($menu, function ($item) {
-                return !isset($item['children']);
-            });
-            $view->with('navigationItems', $filteredMenu);
+            $view->with('navigationItems', $menu);
         });
     }
 }

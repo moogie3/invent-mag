@@ -15,9 +15,33 @@
         <nav class="nav-dropdown d-none d-md-flex" id="nav-dropdown">
             <ul class="d-flex gap-3">
                 @foreach ($navigationItems as $item)
-                    @can($item['permission'])
-                        <li><a href="{{ route($item['route']) }}"><i
-                                    class="{{ $item['icon'] }}"></i>{{ $item['title'] }}</a></li>
+                    @can($item['permission'] ?? null) {{-- Apply @can to top-level item --}}
+                        @if (isset($item['children']))
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                    <i class="{{ $item['icon'] }}"></i>
+                                    <span class="nav-link-title">
+                                        {{ $item['title'] }}
+                                    </span>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <div class="dropdown-menu-columns">
+                                        <div class="dropdown-menu-column">
+                                            @foreach ($item['children'] as $child)
+                                                @can($child['permission'] ?? null) {{-- Apply @can to child item --}}
+                                                    <a class="dropdown-item" href="{{ route($child['route']) }}">
+                                                        {{ $child['title'] }}
+                                                    </a>
+                                                @endcan
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        @else
+                            <li><a href="{{ route($item['route']) }}"><i
+                                        class="{{ $item['icon'] }}"></i><span class="nav-link-title">{{ $item['title'] }}</span></a></li>
+                        @endif
                     @endcan
                 @endforeach
             </ul>

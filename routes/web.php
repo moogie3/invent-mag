@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, TransactionController, UserController, CustomerCrmController, SupplierCrmController, SettingsController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -206,9 +206,15 @@ Route::prefix('admin')->group(function () {
 
         // Transaction Routes
         Route::prefix('transactions')->group(function () {
-            Route::get('/', [TransactionController::class, 'index'])->name('admin.transactions');
-            Route::post('/{id}/mark-paid', [TransactionController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');
-            Route::post('/bulk-mark-paid', [TransactionController::class, 'bulkMarkAsPaid']);
+            Route::get('/', [ReportController::class, 'recentTransactions'])->name('admin.transactions');
+            Route::post('/{id}/mark-paid', [ReportController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');
+            Route::post('/bulk-mark-paid', [ReportController::class, 'bulkMarkAsPaid']);
+        });
+
+        // Reports Routes
+        Route::prefix('reports')->group(function () {
+            Route::get('/adjustment-log', [ReportController::class, 'adjustmentLog'])->name('admin.reports.adjustment-log');
+            Route::get('/recent-transactions', [ReportController::class, 'recentTransactions'])->name('admin.reports.recent-transactions');
         });
 
         // Notification Routes

@@ -56,34 +56,35 @@
     <nav class="sidebar-nav">
         <ul class="navbar-nav">
             @foreach (config('navigation.menu') as $item)
-                @can($item['permission'])
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route($item['route']) }}">
+                @can($item['permission'] ?? null)
+                    <li class="nav-item @if(isset($item['children'])) dropdown @endif">
+                        <a class="nav-link @if(isset($item['children'])) dropdown-toggle @endif" href="{{ isset($item['route']) ? route($item['route']) : '#' }}" @if(isset($item['children'])) data-bs-toggle="collapse" data-bs-target="#submenu-{{ $loop->index }}" role="button" aria-expanded="false" aria-controls="submenu-{{ $loop->index }}" @endif>
+                            @if(isset($item['icon']))
                             <div class="nav-link-icon">
                                 <i class="{{ $item['icon'] }}"></i>
                             </div>
-                            <span class="nav-link-title">{{ $item['title'] }}</span>
-                            @if (isset($item['children']))
-                                <div class="nav-link-arrow">
-                                    <i class="ti ti-chevron-right"></i>
-                                </div>
                             @endif
+                            <span class="nav-link-title">{{ $item['title'] ?? '' }}</span>
                         </a>
                         @if (isset($item['children']))
-                            <ul class="nav-submenu">
-                                @foreach ($item['children'] as $child)
-                                    @can($child['permission'])
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{ route($child['route']) }}">
-                                                <div class="nav-link-icon">
-                                                    <i class="{{ $child['icon'] }}"></i>
-                                                </div>
-                                                <span class="nav-link-title">{{ $child['title'] }}</span>
-                                            </a>
-                                        </li>
-                                    @endcan
-                                @endforeach
-                            </ul>
+                            <div class="collapse" id="submenu-{{ $loop->index }}">
+                                <ul class="nav-submenu">
+                                    @foreach ($item['children'] as $child)
+                                        @can($child['permission'] ?? null)
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ isset($child['route']) ? route($child['route']) : '#' }}">
+                                                    @if(isset($child['icon']))
+                                                    <div class="nav-link-icon">
+                                                        <i class="{{ $child['icon'] }}"></i>
+                                                    </div>
+                                                    @endif
+                                                    <span class="nav-link-title">{{ $child['title'] ?? '' }}</span>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                    @endforeach
+                                </ul>
+                            </div>
                         @endif
                     </li>
                 @endcan

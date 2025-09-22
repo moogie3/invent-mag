@@ -56,5 +56,22 @@ return [
             'icon' => 'ti ti-building-warehouse',
             'permission' => 'view-warehouse',
         ],
+        [
+            'title' => 'Reports',
+            'icon' => 'ti ti-report',
+            'permission' => 'view-reports',
+            'children' => [
+                [
+                    'title' => 'Adjustment Log',
+                    'route' => 'admin.reports.adjustment-log',
+                    'permission' => 'view-reports',
+                ],
+                [
+                    'title' => 'Recent Transactions',
+                    'route' => 'admin.reports.recent-transactions',
+                    'permission' => 'view-reports',
+                ],
+            ],
+        ],
     ],
 ];

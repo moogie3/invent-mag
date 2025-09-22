@@ -1,17 +1,18 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\TransactionService;
+use App\Models\StockAdjustment;
 use Illuminate\Http\Request;
+use App\Services\TransactionService;
 use Illuminate\Support\Facades\Log;
 use App\Models\Sales;
 use App\Models\Purchase;
 use Carbon\Carbon;
-
 use App\DTOs\TransactionDTO;
 
-class TransactionController extends Controller
+class ReportController extends Controller
 {
     protected $transactionService;
 
@@ -20,7 +21,16 @@ class TransactionController extends Controller
         $this->transactionService = $transactionService;
     }
 
-    public function index(Request $request)
+    public function adjustmentLog(Request $request)
+    {
+        $adjustments = StockAdjustment::with(['product:id,name', 'adjustedBy:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('admin.reports.adjustment-log', compact('adjustments'));
+    }
+
+    public function recentTransactions(Request $request)
     {
         $filters = [
             'per_page' => $request->get('per_page', 25),
@@ -41,7 +51,12 @@ class TransactionController extends Controller
             return $this->exportTransactions($request, $filters);
         }
 
-        return view('admin.recentts', array_merge(compact('transactions', 'summary'), $filters));
+        return view('admin.reports.recentts', array_merge(compact('transactions', 'summary'), $filters));
+    }
+
+    private function exportTransactions(Request $request, array $filters)
+    {
+        return $this->transactionService->exportTransactions($filters, $request->get('selected') ? explode(',', $request->get('selected')) : null);
     }
 
     public function bulkMarkAsPaid(Request $request)
@@ -87,10 +102,5 @@ class TransactionController extends Controller
                 'message' => 'Error updating transaction: ' . $e->getMessage(),
             ], 500);
         }
-    }
-
-    private function exportTransactions(Request $request, array $filters)
-    {
-        return $this->transactionService->exportTransactions($filters, $request->get('selected') ? explode(',', $request->get('selected')) : null);
     }
 }

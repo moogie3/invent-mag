@@ -127,6 +127,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const navTexts = sidebar.querySelectorAll(".nav-link-title");
 
         if (willCollapse) {
+            // Hide any open submenus before collapsing the sidebar
+            sidebar.querySelectorAll('.collapse.show').forEach(openSubmenu => {
+                const bsCollapse = bootstrap.Collapse.getInstance(openSubmenu);
+                if (bsCollapse) {
+                    bsCollapse.hide();
+                }
+            });
+
             // FAST closing - immediate collapse with quick transition
             sidebar.classList.add("sidebar-fast-close");
             mainContent.classList.add("main-content-fast-close");
@@ -167,6 +175,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 100);
 
             tooltipManager.removeAll();
+
+            // Ensure all submenu items are visible when sidebar opens
+            sidebar.querySelectorAll('.nav-submenu .nav-item').forEach(item => {
+                item.classList.remove('visible');
+                item.style.transitionDelay = '';
+            });
         }
     };
 
@@ -203,13 +217,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
             setTimeout(() => {
                 item.classList.add("visible");
-            }, index * 40);
+            }, index * 80);
         });
 
         // Add tooltips if sidebar is collapsed
         if (shouldBeCollapsed) {
             setTimeout(addTooltips, navItems.length * 40 + 100);
         }
+
+        // Apply staggered animation to initially open submenus
+        sidebar.querySelectorAll('.nav-submenu.show').forEach(openSubmenu => {
+            const submenuItems = openSubmenu.querySelectorAll('.nav-item');
+            submenuItems.forEach((item, idx) => {
+                item.style.transitionDelay = `${idx * 100}ms`;
+                item.classList.add('visible');
+            });
+        });
     };
 
     // Updated toggle function to save state
@@ -242,6 +265,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Initialize everything
     initializeSidebar();
+
+    // Handle clicks on parent menu items when sidebar is collapsed
+    const navLinksWithChildren = sidebar.querySelectorAll('.nav-item.dropdown > .nav-link[data-bs-toggle="collapse"]');
+    navLinksWithChildren.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (sidebar.classList.contains('collapsed')) {
+                // Prevent default collapse behavior initially
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Expand the sidebar
+                saveSidebarState(false); // Set state to expanded
+                toggleSidebar();
+
+                // After a short delay to allow sidebar to open, trigger the collapse
+                setTimeout(() => {
+                    // Manually trigger Bootstrap's collapse toggle
+                    const targetId = link.getAttribute('data-bs-target');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const bsCollapse = new bootstrap.Collapse(targetElement, {
+                            toggle: false // Do not toggle immediately
+                        });
+
+                        // Listen for when the submenu is fully shown by Bootstrap
+                        targetElement.addEventListener('shown.bs.collapse', function handler() {
+                            // Staggered animation for submenu items
+                            const submenuItems = targetElement.querySelectorAll('.nav-item');
+                            submenuItems.forEach((item, idx) => {
+                                item.style.transitionDelay = `${idx * 100}ms`; // Stagger delay
+                                item.classList.add('visible');
+                            });
+                            targetElement.removeEventListener('shown.bs.collapse', handler); // Remove listener after it fires
+                        });
+
+                        bsCollapse.show(); // Explicitly show the submenu
+                    }
+                }, 500); // Adjust delay to match sidebar transition duration
+            }
+        });
+    });
 
     // Toggle button event with persistence
     if (sidebarToggle) {

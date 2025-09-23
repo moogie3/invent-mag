@@ -518,8 +518,7 @@ body.layout-navbar .main-content {
 }
 
 .sidebar.collapsed .nav-submenu {
-    max-height: 0;
-    opacity: 0;
+    /* Removed max-height: 0 and opacity: 0 to rely on Bootstrap's collapse */
     margin: 0;
     padding: 0;
 }
@@ -889,4 +888,23 @@ body[data-bs-theme="dark"] .sidebar-tooltip::before,
 /* Smooth Scroll */
 html {
     scroll-behavior: smooth;
+}
+
+/* Staggered animation for submenu items */
+.sidebar.collapsed .nav-submenu .nav-item {
+    opacity: 0;
+    transform: translateY(10px);
+}
+.nav-submenu .nav-item {
+    transition: opacity 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.nav-submenu .nav-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Ensure collapse transitions correctly within a collapsed sidebar */
+.sidebar.collapsed .collapse {
+    transition: max-height 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
 }

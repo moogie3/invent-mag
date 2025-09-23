@@ -58,13 +58,18 @@
             @foreach (config('navigation.menu') as $item)
                 @can($item['permission'] ?? null)
                     <li class="nav-item @if(isset($item['children'])) dropdown @endif">
-                        <a class="nav-link @if(isset($item['children'])) dropdown-toggle @endif" href="{{ isset($item['route']) ? route($item['route']) : '#' }}" @if(isset($item['children'])) data-bs-toggle="collapse" data-bs-target="#submenu-{{ $loop->index }}" role="button" aria-expanded="false" aria-controls="submenu-{{ $loop->index }}" @endif>
+                        <a class="nav-link" href="{{ isset($item['route']) ? route($item['route']) : '#' }}" @if(isset($item['children'])) data-bs-toggle="collapse" data-bs-target="#submenu-{{ $loop->index }}" role="button" aria-expanded="false" aria-controls="submenu-{{ $loop->index }}" @endif>
                             @if(isset($item['icon']))
                             <div class="nav-link-icon">
                                 <i class="{{ $item['icon'] }}"></i>
                             </div>
                             @endif
                             <span class="nav-link-title">{{ $item['title'] ?? '' }}</span>
+                            @if(isset($item['children']))
+                            <div class="nav-link-arrow">
+                                <i class="ti ti-chevron-down"></i>
+                            </div>
+                            @endif
                         </a>
                         @if (isset($item['children']))
                             <div class="collapse" id="submenu-{{ $loop->index }}">

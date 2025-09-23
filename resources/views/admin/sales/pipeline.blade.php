@@ -120,9 +120,27 @@
                                             </div>
 
                                             <div class="border rounded p-3 bg-light">
-                                                <div id="pipeline-board" class="row flex-nowrap overflow-auto pb-3">
-                                                    <!-- Pipeline stages will be loaded here -->
-                                                </div>
+                                                @if (count($pipelines) == 0)
+                                                    <div class="empty">
+                                                        <div class="empty-img">
+                                                            <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>
+                                                        </div>
+                                                        <p class="empty-title">{{ __('messages.no_sales_pipelines_found') }}</p>
+                                                        <p class="empty-subtitle text-muted">
+                                                            {{ __('messages.it_looks_like_you_havent_created_any_sales_pipelines_yet') }}
+                                                        </p>
+                                                        <div class="empty-action">
+                                                            <button class="btn btn-primary" data-bs-toggle="modal"
+                                                                data-bs-target="#managePipelinesModal">
+                                                                <i class="ti ti-plus me-2"></i>{{ __('messages.create_your_first_pipeline') }}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <div id="pipeline-board" class="row flex-nowrap overflow-auto pb-3">
+                                                        <!-- Pipeline stages will be loaded here -->
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

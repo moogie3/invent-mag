@@ -8,6 +8,15 @@
         </div>
         <div class="card-body">
             <div id="productList" class="list-group">
+                <div class="empty">
+                    <div class="empty-img">
+                        <i class="ti ti-shopping-cart" style="font-size: 5rem; color: #ccc;"></i>
+                    </div>
+                    <p class="empty-title">{{ __('messages.no_products_found') }}</p>
+                    <p class="empty-subtitle text-muted">
+                        {{ __('messages.it_looks_like_you_havent_added_any_products_yet') }}
+                    </p>
+                </div>
             </div>
         </div>
         <div class="card-footer p-3">

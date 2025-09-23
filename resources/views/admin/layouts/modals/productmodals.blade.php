@@ -65,7 +65,7 @@
 
                 <div class="bg-light p-3 rounded">
                     <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i>
-                        {{ __('product_modal_bulk_delete_what_deleted_title') }}</h6>
+                        {{ __('messages.product_modal_bulk_delete_what_deleted_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">
                         <li><i class="ti ti-check text-danger me-1"></i>
                             {{ __('messages.product_modal_bulk_delete_item1') }}

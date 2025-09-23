@@ -8,10 +8,10 @@
                             <i class="ti ti-building-store fs-1 me-3 text-primary"></i>
                             <div>
                                 <h2 class="mb-1">
-                                    Store Information
+                                    {{ __('messages.store_information') }}
                                 </h2>
                                 <div class="text-muted">
-                                    Overview of your store performance and metrics
+                                    {{ __('messages.overview_store_performance_metrics') }}
                                 </div>
                             </div>
                         </div>
@@ -23,7 +23,7 @@
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label class="form-label text-muted mb-2 d-block">
-                                            Store Details
+                                            {{ __('messages.store_details') }}
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
@@ -32,7 +32,7 @@
                                             <i class="ti ti-building-store fs-2 text-primary"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <div class="small text-muted">User Store</div>
+                                            <div class="small text-muted">{{ __('messages.user_store') }}</div>
                                             <div class="fw-bold">{{ $shopname }}</div>
                                         </div>
                                     </div>
@@ -42,7 +42,7 @@
                                             <i class="ti ti-map fs-2 text-success"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <div class="small text-muted">Store Address</div>
+                                            <div class="small text-muted">{{ __('messages.store_address') }}</div>
                                             <div class="fw-bold">{{ $address }}</div>
                                         </div>
                                     </div>
@@ -52,7 +52,7 @@
                                             <i class="ti ti-file-invoice fs-2 text-info"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <div class="small text-muted">Total Invoice</div>
+                                            <div class="small text-muted">{{ __('messages.total_invoice') }}</div>
                                             <div class="fw-bold" id="totalInvoiceCount">{{ $totalinvoice }}</div>
                                         </div>
                                     </div>
@@ -64,7 +64,7 @@
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label class="form-label text-white-50 mb-2 d-block">
-                                            Financial Overview
+                                            {{ __('messages.financial_overview') }}
                                         </label>
                                     </div>
                                     <div class="row">
@@ -74,7 +74,7 @@
                                                     <i class="ti ti-step-out fs-2"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="text-white-50 small">Invoice OUT</div>
+                                                    <div class="text-white-50 small">{{ __('messages.invoice_out') }}</div>
                                                     <div class="h4 mb-0" id="invoiceOutCount">{{ $outCount }}</div>
                                                 </div>
                                             </div>
@@ -83,7 +83,7 @@
                                                     <i class="ti ti-basket-dollar fs-2"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="text-white-50 small">Amount OUT</div>
+                                                    <div class="text-white-50 small">{{ __('messages.amount_out') }}</div>
                                                     <div class="h4 mb-0" id="amountOutCount">
                                                         {{ \App\Helpers\CurrencyHelper::format($outCountamount) }}</div>
                                                 </div>
@@ -95,7 +95,7 @@
                                                     <i class="ti ti-step-into fs-2"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="text-white-50 small">Invoice IN</div>
+                                                    <div class="text-white-50 small">{{ __('messages.invoice_in') }}</div>
                                                     <div class="h4 mb-0" id="invoiceInCount">{{ $inCount }}</div>
                                                 </div>
                                             </div>
@@ -104,7 +104,7 @@
                                                     <i class="ti ti-basket-dollar fs-2"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="text-white-50 small">Amount IN</div>
+                                                    <div class="text-white-50 small">{{ __('messages.amount_in') }}</div>
                                                     <div class="h4 mb-0" id="amountInCount">
                                                         {{ \App\Helpers\CurrencyHelper::format($inCountamount) }}</div>
                                                 </div>
@@ -118,7 +118,7 @@
                                                     <i class="ti ti-currency fs-2"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="text-white-50 small">Monthly Purchase</div>
+                                                    <div class="text-white-50 small">{{ __('messages.monthly_purchase') }}</div>
                                                     <div class="h4 mb-0" id="monthlyPurchase">
                                                         {{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
                                                 </div>
@@ -130,7 +130,7 @@
                                                     <i class="ti ti-credit-card-pay fs-2"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="text-white-50 small">Monthly Payment</div>
+                                                    <div class="text-white-50 small">{{ __('messages.monthly_payment') }}</div>
                                                     <div class="h4 mb-0" id="monthlyPayment">
                                                         {{ \App\Helpers\CurrencyHelper::format($paymentMonthly) }}</div>
                                                 </div>
@@ -146,7 +146,7 @@
                                     <div class="mb-2">
                                         <label
                                             class="form-label {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }} mb-2 d-block">
-                                            Expiry Status
+                                            {{ __('messages.expiry_status') }}
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center">
@@ -157,7 +157,7 @@
                                         <div>
                                             <div
                                                 class="small {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }}">
-                                                Expiring Soon Purchase Orders</div>
+                                                {{ __('messages.expiring_soon_purchase_orders') }}</div>
                                             <div class="h4 mb-0 {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }}"
                                                 id="expiringPurchaseItemsCount">
                                                 {{ $expiringPurchaseCount }}</div>

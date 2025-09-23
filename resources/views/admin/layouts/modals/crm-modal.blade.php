@@ -58,32 +58,38 @@
                                             <div class="row row-cols-1 row-cols-md-2 g-2">
                                                 <div class="col">
                                                     <p class="mb-1"><strong>{{ __('messages.table_email') }}:</strong>
-                                                        <span id="crmCustomerEmail"></span></p>
+                                                        <span id="crmCustomerEmail"></span>
+                                                    </p>
                                                 </div>
                                                 <div class="col">
                                                     <p class="mb-1">
                                                         <strong>{{ __('messages.customer_crm_phone') }}:</strong> <span
-                                                            id="crmCustomerPhone"></span></p>
+                                                            id="crmCustomerPhone"></span>
+                                                    </p>
                                                 </div>
                                                 <div class="col">
                                                     <p class="mb-1">
                                                         <strong>{{ __('messages.table_address') }}:</strong> <span
-                                                            id="crmCustomerAddress"></span></p>
+                                                            id="crmCustomerAddress"></span>
+                                                    </p>
                                                 </div>
                                                 <div class="col">
                                                     <p class="mb-1">
                                                         <strong>{{ __('messages.table_payment_terms') }}:</strong> <span
-                                                            id="crmCustomerPaymentTerms"></span></p>
+                                                            id="crmCustomerPaymentTerms"></span>
+                                                    </p>
                                                 </div>
                                                 <div class="col">
                                                     <p class="mb-1">
                                                         <strong>{{ __('messages.customer_crm_member_since') }}:</strong>
-                                                        <span id="crmMemberSince"></span></p>
+                                                        <span id="crmMemberSince"></span>
+                                                    </p>
                                                 </div>
                                                 <div class="col">
                                                     <p class="mb-1">
                                                         <strong>{{ __('messages.customer_crm_last_purchase') }}:</strong>
-                                                        <span id="crmLastPurchase"></span></p>
+                                                        <span id="crmLastPurchase"></span>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -209,9 +215,13 @@
                                         </div>
                                     </form>
                                     <div id="interactionTimeline" class="list-group list-group-flush"></div>
-                                    <p id="noInteractionsMessage" class="text-muted text-center py-2 mb-0"
-                                        style="display: none;">
-                                        {{ __('messages.supplier_srm_interaction_history_no_interactions') }}</p>
+                                    <div id="noInteractionsMessage" class="empty" style="display: none;">
+                                        <div class="empty-img">
+                                            <i class="ti ti-messages fs-1 text-muted"></i>
+                                        </div>
+                                        <p class="empty-title">
+                                            {{ __('messages.supplier_srm_interaction_history_no_interactions') }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -220,14 +230,30 @@
                     <div class="tab-pane fade" id="historical-sales" role="tabpanel"
                         aria-labelledby="historical-sales-tab">
                         <div class="p-3">
-                            <div id="transactionHistory" class="accordion"></div>
+                            <div id="transactionHistory" class="accordion">
+                                <div class="empty">
+                                    <div class="empty-img">
+                                        <i class="ti ti-shopping-cart-off fs-1 text-muted"></i>
+                                    </div>
+                                    <p class="empty-title">{{ __('messages.no_historical_sales_found') }}</p>
+                                    <p class="empty-subtitle text-muted">
+                                        {{ __('messages.this_customer_hasnt_made_any_purchases_yet') }}
+                                    </p>
+                                </div>
+                            </div>
                             <div class="text-center mt-3">
                                 <button class="btn btn-secondary" id="loadMoreTransactions" style="display: none;"><i
                                         class="ti ti-reload me-2"></i>{{ __('messages.customer_crm_historical_sales_load_more') }}</button>
                             </div>
-                            <p id="noTransactionsMessage" class="text-muted text-center mt-3 mb-0"
-                                style="display: none;">
-                                {{ __('messages.customer_crm_historical_sales_no_transactions') }}</p>
+                            <div id="noTransactionsMessage" class="empty" style="display: none;">
+                                <div class="empty-img">
+                                    <i class="ti ti-shopping-cart-off fs-1 text-muted"></i>
+                                </div>
+                                <p class="empty-title">{{ __('messages.no_historical_sales_found') }}</p>
+                                <p class="empty-subtitle text-muted">
+                                    {{ __('messages.this_customer_hasnt_made_any_purchases_yet') }}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
@@ -236,8 +262,15 @@
                         <div class="p-3">
                             <div id="productHistoryContent">
                                 <!-- Content for Historical Purchase will be loaded here via JavaScript -->
-                                <p class="text-muted text-center">
-                                    {{ __('messages.supplier_srm_historical_purchases_loading') }}...</p>
+                            </div>
+                            <div id="noProductHistoryMessage" class="empty" style="display: none;">
+                                <div class="empty-img">
+                                    <i class="ti ti-shopping-cart-off fs-1 text-muted"></i>
+                                </div>
+                                <p class="empty-title">{{ __('messages.no_product_history_found') }}</p>
+                                <p class="empty-subtitle text-muted">
+                                    {{ __('messages.this_customer_hasnt_purchased_any_products_yet') }}
+                                </p>
                             </div>
                         </div>
                     </div>

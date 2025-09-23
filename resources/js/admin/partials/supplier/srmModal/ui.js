@@ -20,18 +20,12 @@ export function showLoadingState() {
         "srmInteractionTimeline",
         '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div></div>'
     );
-    safeUpdateElementHTML(
-        "srmTransactionHistory",
-        '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div></div>'
-    );
-    safeUpdateElementHTML(
-        "srmHistoricalPurchaseContent",
-        '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div></div>'
-    );
+    // Removed direct HTML update for srmTransactionHistory and srmProductHistoryContent
+    // Their content will be managed by populateHistoricalPurchases and loadProductHistory functions
 
     safeToggleElement("srmLoadMoreTransactions", "none");
     safeToggleElement("srmNoInteractionsMessage", "none");
-    safeToggleElement("srmNoTransactionsMessage", "none");
+    safeToggleElement("srmNoProductHistoryMessage", "none");
 }
 
 export function showErrorState(message = "Error") {
@@ -54,13 +48,44 @@ export function showErrorState(message = "Error") {
         `<p class="text-danger text-center py-3">Failed to load interactions.</p>`
     );
     safeUpdateElementHTML(
-        "srmTransactionHistory",
+        "srmHistoricalPurchaseContent",
         `<p class="text-danger text-center py-3">Failed to load transactions.</p>`
     );
     safeUpdateElementHTML(
-        "srmHistoricalPurchaseContent",
-        `<p class="text-danger text-center py-3">Failed to load purchase history.</p>`
+        "srmProductHistoryContent",
+        `<p class="text-danger text-center py-3">Failed to load product history.</p>`
     );
 
     safeToggleElement("srmLoadMoreTransactions", "none");
+    safeToggleElement("srmNoProductHistoryMessage", "none");
+}
+
+export function showSrmNoInteractionsMessage() {
+    safeToggleElement("srmInteractionTimeline", "none");
+    safeToggleElement("srmNoInteractionsMessage", "block");
+}
+
+export function hideSrmNoInteractionsMessage() {
+    safeToggleElement("srmInteractionTimeline", "block");
+    safeToggleElement("srmNoInteractionsMessage", "none");
+}
+
+export function showSrmNoProductHistoryMessage() {
+    safeToggleElement("srmProductHistoryContent", "none");
+    safeToggleElement("srmNoProductHistoryMessage", "block");
+}
+
+export function hideSrmNoProductHistoryMessage() {
+    safeToggleElement("srmProductHistoryContent", "block");
+    safeToggleElement("srmNoProductHistoryMessage", "none");
+}
+
+export function showSrmNoHistoricalPurchasesMessage() {
+    safeToggleElement("srmHistoricalPurchaseContent", "none");
+    safeToggleElement("srmNoHistoricalPurchasesMessage", "block");
+}
+
+export function hideSrmNoHistoricalPurchasesMessage() {
+    safeToggleElement("srmHistoricalPurchaseContent", "block");
+    safeToggleElement("srmNoHistoricalPurchasesMessage", "none");
 }

@@ -751,4 +751,7 @@ return [
     'no_historical_sales_found' => 'Tidak ada penjualan historis ditemukan',
     'this_customer_hasnt_made_any_purchases_yet' => 'Pelanggan ini belum melakukan pembelian apa pun.',
     'failed_to_load_historical_sales' => 'Gagal memuat penjualan historis',
+    'no_product_history_found' => 'Tidak ada riwayat produk ditemukan.',
+    'this_customer_hasnt_purchased_any_products_yet' => 'Pelanggan ini belum membeli produk apa pun.',
+    'this_supplier_hasnt_supplied_any_products_yet' => 'Pemasok ini belum menyediakan produk apa pun.',
 ];

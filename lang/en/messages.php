@@ -751,4 +751,7 @@ return [
     'no_historical_sales_found' => 'No historical sales found',
     'this_customer_hasnt_made_any_purchases_yet' => 'This customer hasnt made any purchases yet.',
     'failed_to_load_historical_sales' => 'Failed to load historical sales',
+    'no_product_history_found' => 'No product history found yet.',
+    'this_supplier_hasnt_supplied_any_products_yet' => 'This supplier hasnt supplied any products yet.',
+    'this_customer_hasnt_purchased_any_products_yet' => 'This customer hasnt purchases any products yet.',
 ];

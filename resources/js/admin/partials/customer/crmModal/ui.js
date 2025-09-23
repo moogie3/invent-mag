@@ -23,19 +23,14 @@ export function showLoadingState() {
         "interactionTimeline",
         '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div></div>'
     );
-    safeUpdateElementHTML(
-        "transactionHistory",
-        '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div></div>'
-    );
-    safeUpdateElementHTML(
-        "purchaseHistoryContent",
-        '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div></div>'
-    );
+    // Removed direct HTML update for transactionHistory and productHistoryContent
+    // Their content will be managed by populateTransactions and loadProductHistory functions
 
     // Hide buttons and messages
     safeToggleElement("loadMoreTransactions", "none");
     safeToggleElement("noInteractionsMessage", "none");
     safeToggleElement("noTransactionsMessage", "none");
+    safeToggleElement("noProductHistoryMessage", "none");
 }
 
 export function showErrorState(message = "Error") {
@@ -62,9 +57,41 @@ export function showErrorState(message = "Error") {
         `<p class="text-danger text-center py-3">Failed to load transactions.</p>`
     );
     safeUpdateElementHTML(
-        "purchaseHistoryContent",
-        `<p class="text-danger text-center py-3">Failed to load purchase history.</p>`
+        "productHistoryContent",
+        `<p class="text-danger text-center py-3">Failed to load product history.</p>`
     );
 
     safeToggleElement("loadMoreTransactions", "none");
+    safeToggleElement("noProductHistoryMessage", "none");
 }
+
+export function showNoInteractionsMessage() {
+    safeToggleElement("interactionTimeline", "none");
+    safeToggleElement("noInteractionsMessage", "block");
+}
+
+export function hideNoInteractionsMessage() {
+    safeToggleElement("interactionTimeline", "block");
+    safeToggleElement("noInteractionsMessage", "none");
+}
+
+export function showNoTransactionsMessage() {
+    safeToggleElement("transactionHistory", "none");
+    safeToggleElement("noTransactionsMessage", "block");
+}
+
+export function hideNoTransactionsMessage() {
+    safeToggleElement("transactionHistory", "block");
+    safeToggleElement("noTransactionsMessage", "none");
+}
+
+export function showNoProductHistoryMessage() {
+    safeToggleElement("productHistoryContent", "none");
+    safeToggleElement("noProductHistoryMessage", "block");
+}
+
+export function hideNoProductHistoryMessage() {
+    safeToggleElement("productHistoryContent", "block");
+    safeToggleElement("noProductHistoryMessage", "none");
+}
+

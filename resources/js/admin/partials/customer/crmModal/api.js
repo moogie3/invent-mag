@@ -1,11 +1,11 @@
 import { crmState } from "./state.js";
-import { showLoadingState, showErrorState } from "./ui.js";
+import { showLoadingState, showErrorState, showNoTransactionsMessage, hideNoTransactionsMessage } from "./ui.js";
 import {
     safeUpdateElement,
     safeUpdateElementHTML,
     safeToggleElement,
 } from "../utils/dom.js";
-import { formatCurrency } => "../../../../utils/currencyFormatter.js";
+import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 import { formatDateToCustomString } from "../utils/date.js";
 import { getStatusBadgeHtml } from "../utils/status.js";
 
@@ -177,7 +177,7 @@ function populateTransactions(sales) {
         transactionHistory.innerHTML = "";
 
         if (sales && sales.length > 0) {
-            safeToggleElement("noTransactionsMessage", "none");
+            hideNoTransactionsMessage();
 
             sales.forEach((sale) => {
                 const saleElement = document.createElement("div");
@@ -298,7 +298,7 @@ function populateTransactions(sales) {
                 transactionHistory.appendChild(saleElement);
             });
         } else {
-            safeToggleElement("noTransactionsMessage", "block");
+            showNoTransactionsMessage();
         }
     }
 }
@@ -312,7 +312,11 @@ export function handleInteractionForm() {
             const formData = new FormData(form);
 
             if (!crmState.customerId) {
-                InventMagApp.showToast("Error", "Customer ID not found.", "error");
+                InventMagApp.showToast(
+                    "Error",
+                    "Customer ID not found.",
+                    "error"
+                );
                 return;
             }
 
@@ -329,7 +333,11 @@ export function handleInteractionForm() {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.id) {
-                        InventMagApp.showToast("Success", "Interaction added.", "success");
+                        InventMagApp.showToast(
+                            "Success",
+                            "Interaction added.",
+                            "success"
+                        );
                         const timeline = document.getElementById(
                             "interactionTimeline"
                         );
@@ -371,7 +379,11 @@ export function handleInteractionForm() {
                 })
                 .catch((error) => {
                     console.error("Error:", error);
-                    InventMagApp.showToast("Error", "An error occurred.", "error");
+                    InventMagApp.showToast(
+                        "Error",
+                        "An error occurred.",
+                        "error"
+                    );
                 });
         });
     }

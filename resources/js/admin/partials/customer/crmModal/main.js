@@ -1,11 +1,11 @@
-import { crmState } from './state.js';
-import { showLoadingState, showErrorState } from './ui.js';
-import { loadCrmData, handleInteractionForm } from './api.js';
-import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+import { crmState } from "./state.js";
+import { showLoadingState, showErrorState, showNoProductHistoryMessage, hideNoProductHistoryMessage } from "./ui.js";
+import { loadCrmData, handleInteractionForm } from "./api.js";
+import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 
 function formatDateToCustomString(dateString) {
     const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { year: "numeric", month: "long", day: "numeric" };
     return date.toLocaleDateString(undefined, options);
 }
 
@@ -13,31 +13,32 @@ export function initCrmCustomerModal() {
     const crmCustomerModal = document.getElementById("crmCustomerModal");
 
     if (crmCustomerModal) {
-        crmCustomerModal.addEventListener(
-            "show.bs.modal",
-            function (event) {
-                const button = event.relatedTarget;
-                if (!button) return;
+        crmCustomerModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            if (!button) return;
 
-                crmState.customerId = button.getAttribute("data-id");
-                if (!crmState.customerId) {
-                    console.error("Customer ID not found");
-                    showErrorState("Customer ID not found");
-                    return;
-                }
-
-                crmState.currentPage = 1;
-                showLoadingState();
-                loadCrmData(crmState.customerId, crmState.currentPage);
+            crmState.customerId = button.getAttribute("data-id");
+            if (!crmState.customerId) {
+                console.error("Customer ID not found");
+                showErrorState("Customer ID not found");
+                return;
             }
-        );
+
+            crmState.currentPage = 1;
+            showLoadingState();
+            loadCrmData(crmState.customerId, crmState.currentPage);
+        });
 
         const loadMoreBtn = document.getElementById("loadMoreTransactions");
         if (loadMoreBtn) {
             loadMoreBtn.addEventListener("click", function () {
                 if (crmState.currentPage < crmState.lastPage) {
                     crmState.currentPage++;
-                    loadCrmData(crmState.customerId, crmState.currentPage, true);
+                    loadCrmData(
+                        crmState.customerId,
+                        crmState.currentPage,
+                        true
+                    );
                 }
             });
         }
@@ -66,30 +67,23 @@ function loadProductHistory(id) {
     );
 
     if (productHistoryContent) {
-        productHistoryContent.innerHTML =
-            '<div class="d-flex justify-content-center align-items-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        productHistoryContent.innerHTML = ''; // Clear content, loading state is handled by ui.js
+        hideNoProductHistoryMessage();
     } else {
-        console.error(
-            "Element with ID 'productHistoryContent' not found!"
-        );
+        console.error("Element with ID 'productHistoryContent' not found!");
         return;
     }
 
     fetch(`/admin/customers/${id}/product-history`)
         .then((response) => {
             if (!response.ok) {
-                throw new Error(
-                    `HTTP error! status: ${response.status}`
-                );
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then((data) => {
             if (productHistoryContent) {
-                if (
-                    data.product_history &&
-                    data.product_history.length > 0
-                ) {
+                if (data.product_history && data.product_history.length > 0) {
                     let contentHtml = `
             <div class="accordion" id="crmProductHistoryAccordion">
         `;
@@ -172,18 +166,10 @@ function loadProductHistory(id) {
                     contentHtml += `
             </div>
         `;
-
+                    hideNoProductHistoryMessage(); // Hide empty message if data is loaded
                     productHistoryContent.innerHTML = contentHtml;
                 } else {
-                    productHistoryContent.innerHTML = `
-            <div class="text-center py-5">
-                <div class="mb-3">
-                    <i class="ti ti-shopping-cart-off fs-1 text-muted"></i>
-                </div>
-                <h5 class="text-muted">No Product History</h5>
-                <p class="text-muted mb-0">This customer has no product history yet.</p>
-            </div>
-        `;
+                    showNoProductHistoryMessage();
                 }
             } else {
                 console.error(
@@ -192,10 +178,7 @@ function loadProductHistory(id) {
             }
         })
         .catch((error) => {
-            console.error(
-                "Fetch error in loadProductHistory:",
-                error
-            );
+            console.error("Fetch error in loadProductHistory:", error);
             if (productHistoryContent) {
                 productHistoryContent.innerHTML = `
         <div class="text-center py-5">
@@ -206,6 +189,7 @@ function loadProductHistory(id) {
             <p class="text-muted mb-0">Failed to load product history: ${error.message}</p>
         </div>
     `;
+                showNoProductHistoryMessage(); // Also show empty message on error
             }
         });
 }

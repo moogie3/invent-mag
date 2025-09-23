@@ -22,12 +22,26 @@
                 </tr>
             </thead>
             <tbody id="invoiceTableBody" class="table-tbody">
-                @foreach ($wos as $index => $wo)
+                @forelse ($wos as $index => $wo)
                     @include('admin.layouts.partials.warehouse.index.table-row', [
                         'wo' => $wo,
                         'index' => $index,
                     ])
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty">
+                                <div class="empty-img">
+                                    <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>
+                                </div>
+                                <p class="empty-title">{{ __('messages.no_warehouses_found') }}</p>
+                                <p class="empty-subtitle text-muted">
+                                    {{ __('messages.it_looks_like_you_havent_added_any_warehouses_yet') }}
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

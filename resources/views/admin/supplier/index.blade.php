@@ -33,33 +33,55 @@
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex justify-content-between">
                                     <div class="col-md-8">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="card-title">{{ __('messages.supplier_info_title') }}</div>
-                                                <div class="purchase-info row">
-                                                    <div class="col-md-3">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="card border-0 bg-light">
+                                                    <div class="card-body py-3">
                                                         <div class="mb-2">
-                                                            <span
-                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                                                <i class="ti ti-step-out fs-2"></i>
-                                                            </span>
-                                                            {{ __('messages.supplier_info_out') }} <strong>{{ $outCount }}</strong>
+                                                            <label class="form-label text-muted mb-2 d-block">
+                                                                {{ __('messages.supplier_info_title') }}
+                                                            </label>
                                                         </div>
-                                                        <div class="mb-2">
-                                                            <span
-                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                                                <i class="ti ti-step-into fs-2"></i>
-                                                            </span>
-                                                            {{ __('messages.supplier_info_in') }} <strong>{{ $inCount }}</strong>
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="me-3 d-flex align-items-center justify-content-center"
+                                                                style="width: 32px; height: 32px;">
+                                                                <i class="ti ti-building-warehouse fs-3 text-primary"></i>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div class="small text-muted">{{ __('messages.supplier_info_total') }}</div>
+                                                                <div class="fw-bold" id="totalSupplierCount">{{ $totalsupplier }}</div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card border-0 bg-light">
+                                                    <div class="card-body py-3">
                                                         <div class="mb-2">
-                                                            <span
-                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                                                <i class="ti ti-building fs-2"></i>
-                                                            </span>
-                                                            {{ __('messages.supplier_info_total') }} <strong>{{ $totalsupplier }}</strong>
+                                                            <label class="form-label text-muted mb-2 d-block">
+                                                                {{ __('messages.supplier_info_transactions') }}
+                                                            </label>
+                                                        </div>
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="me-3 d-flex align-items-center justify-content-center"
+                                                                style="width: 32px; height: 32px;">
+                                                                <i class="ti ti-step-out fs-3 text-danger"></i>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div class="small text-muted">{{ __('messages.supplier_info_out') }}</div>
+                                                                <div class="fw-bold">{{ $outCount }}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="me-3 d-flex align-items-center justify-content-center"
+                                                                style="width: 32px; height: 32px;">
+                                                                <i class="ti ti-step-into fs-3 text-success"></i>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div class="small text-muted">{{ __('messages.supplier_info_in') }}</div>
+                                                                <div class="fw-bold">{{ $inCount }}</div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -114,62 +136,76 @@
                                             </tr>
                                         </thead>
                                         <tbody id="invoiceTableBody" class="table-tbody">
-                                            @foreach ($suppliers as $index => $supplier)
-                                                <tr>
-                                                    <td class="sort-no no-print">{{ $suppliers->firstItem() + $index }}</td>
-                                                    <td class="sort-image">
-                                                        @if ($supplier->image == asset('img/default_placeholder.png'))
-                                                            <i class="ti ti-photo fs-1"
-                                                                style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
-                                                        @else
-                                                            <img src="{{ $supplier->image }}" alt="Supplier Image"
-                                                                class="avatar avatar-sm"
-                                                                style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;">
-                                                        @endif
-                                                    </td>
-                                                    <td class="sort-code">{{ $supplier->code }}</td>
-                                                    <td class="sort-name">{{ $supplier->name }}</td>
-                                                    <td class="sort-address">{{ $supplier->address }}</td>
-                                                    <td class="sort-location">{{ $supplier->location }}</td>
-                                                    <td class="sort-paymentterms">{{ $supplier->payment_terms }}</td>
-                                                    <td class="sort-email">{{ $supplier->email }}</td>
-                                                    <td class="no-print" style="text-align:center">
-                                                        <div class="dropdown">
-                                                            <button class="btn dropdown-toggle align-text-top"
-                                                                data-bs-toggle="dropdown" data-bs-boundary="viewport">
-                                                                {{ __('messages.table_action') }}
-                                                            </button>
-                                                            <div class="dropdown-menu">
-                                                                <a href="#" class="dropdown-item srm-supplier-btn"
-                                                                    data-id="{{ $supplier->id }}" data-bs-toggle="modal"
-                                                                    data-bs-target="#srmSupplierModal">
-                                                                    <i class="ti ti-user-search me-2"></i> {{ __('messages.supplier_action_view_srm') }}
-                                                                </a>
-                                                                <a href="#" class="dropdown-item"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#editSupplierModal"
-                                                                    data-id="{{ $supplier->id }}"
-                                                                    data-code="{{ $supplier->code }}"
-                                                                    data-name="{{ $supplier->name }}"
-                                                                    data-address="{{ $supplier->address }}"
-                                                                    data-phone_number="{{ $supplier->phone_number }}"
-                                                                    data-location="{{ $supplier->location }}"
-                                                                    data-payment_terms="{{ $supplier->payment_terms }}"
-                                                                    data-image="{{ $supplier->image }}"
-                                                                    data-email="{{ $supplier->email }}">
-                                                                    <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
-                                                                </a>
-                                                                <button type="button" class="dropdown-item text-danger"
-                                                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                                    onclick="setDeleteFormAction('{{ route('admin.supplier.destroy', $supplier->id) }}')">
-                                                                    <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
+    @forelse ($suppliers as $index => $supplier)
+        <tr>
+            <td class="sort-no no-print">{{ $suppliers->firstItem() + $index }}</td>
+            <td class="sort-image">
+                @if ($supplier->image == asset('img/default_placeholder.png'))
+                    <i class="ti ti-photo fs-1"
+                        style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
+                @else
+                    <img src="{{ $supplier->image }}" alt="Supplier Image"
+                        class="avatar avatar-sm"
+                        style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;">
+                @endif
+            </td>
+            <td class="sort-code">{{ $supplier->code }}</td>
+            <td class="sort-name">{{ $supplier->name }}</td>
+            <td class="sort-address">{{ $supplier->address }}</td>
+            <td class="sort-location">{{ $supplier->location }}</td>
+            <td class="sort-paymentterms">{{ $supplier->payment_terms }}</td>
+            <td class="sort-email">{{ $supplier->email }}</td>
+            <td class="no-print" style="text-align:center">
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle align-text-top"
+                        data-bs-toggle="dropdown" data-bs-boundary="viewport">
+                        {{ __('messages.table_action') }}
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item srm-supplier-btn"
+                            data-id="{{ $supplier->id }}" data-bs-toggle="modal"
+                            data-bs-target="#srmSupplierModal">
+                            <i class="ti ti-user-search me-2"></i> {{ __('messages.supplier_action_view_srm') }}
+                        </a>
+                        <a href="#" class="dropdown-item"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editSupplierModal"
+                            data-id="{{ $supplier->id }}"
+                            data-code="{{ $supplier->code }}"
+                            data-name="{{ $supplier->name }}"
+                            data-address="{{ $supplier->address }}"
+                            data-phone_number="{{ $supplier->phone_number }}"
+                            data-location="{{ $supplier->location }}"
+                            data-payment_terms="{{ $supplier->payment_terms }}"
+                            data-image="{{ $supplier->image }}"
+                            data-email="{{ $supplier->email }}">
+                            <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
+                        </a>
+                        <button type="button" class="dropdown-item text-danger"
+                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                            onclick="setDeleteFormAction('{{ route('admin.supplier.destroy', $supplier->id) }}')">
+                            <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
+                        </button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="9">
+                <div class="empty">
+                    <div class="empty-img">
+                        <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>
+                    </div>
+                    <p class="empty-title">{{ __('messages.no_suppliers_found') }}</p>
+                    <p class="empty-subtitle text-muted">
+                        {{ __('messages.it_looks_like_you_havent_added_any_suppliers_yet') }}
+                    </p>
+                </div>
+            </td>
+        </tr>
+    @endforelse
+</tbody>
                                     </table>
                                 </div>
                             </div>

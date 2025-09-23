@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'Create Sales')
+@section('title', __('messages.create_sales_order'))
 
 @section('content')
     <div class="page-wrapper">

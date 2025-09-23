@@ -11,7 +11,7 @@
                     <div class="status-indicator {{ $statusClass }}"
                         style="width: 6px; height: 36px; border-radius: 3px; margin-right: 15px;"></div>
                     <div>
-                        <h2 class="mb-0">{{ __('sales_modal_invoice_no') }}{{ $sales->invoice }}</h2>
+                        <h2 class="mb-0">{{ __('messages.sales_modal_invoice_no') }}{{ $sales->invoice }}</h2>
                         <div class="text-muted fs-5">
                             {{ $sales->customer->name }} - {{ $sales->customer->address ?? 'N/A' }}
                         </div>
@@ -32,7 +32,8 @@
             <div class="col-md-6">
                 <div class="card border-0 h-100">
                     <div class="card-body p-3">
-                        <h4 class="card-title mb-3"><i class="ti ti-user me-2 text-info"></i>{{ __('model_customer') }}
+                        <h4 class="card-title mb-3"><i
+                                class="ti ti-user me-2 text-info"></i>{{ __('messages.model_customer') }}
                         </h4>
                         <h5 class="mb-2">{{ $sales->customer->name }}</h5>
                         <div class="text-muted mb-1"><i class="ti ti-map-pin me-1"></i>
@@ -48,23 +49,23 @@
                 <div class="card border-0 h-100">
                     <div class="card-body p-3">
                         <h4 class="card-title mb-3"><i
-                                class="ti ti-calendar-event me-2 text-info"></i>{{ __('po_order_information_title') }}
+                                class="ti ti-calendar-event me-2 text-info"></i>{{ __('messages.sales_order_information_title') }}
                         </h4>
                         <div class="d-flex justify-content-between mb-2">
-                            <div><strong>{{ __('po_order_date') }}</strong></div>
+                            <div><strong>{{ __('messages.sales_order_date') }}</strong></div>
                             <div>{{ $sales->order_date->format('d F Y') }}</div>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
-                            <div><strong>{{ __('po_due_date') }}</strong></div>
+                            <div><strong>{{ __('messages.sales_due_date') }}</strong></div>
                             <div>{{ $sales->due_date->format('d F Y') }}</div>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
-                            <div><strong>{{ __('po_payment_type') }}</strong></div>
+                            <div><strong>{{ __('messages.sales_payment_type') }}</strong></div>
                             <div>{{ $sales->payment_type ?? 'N/A' }}</div>
                         </div>
                         @if ($sales->status === 'Paid')
                             <div class="d-flex justify-content-between">
-                                <div><strong>{{ __('po_payment_date') }}</strong></div>
+                                <div><strong>{{ __('messages.sales_payment_date') }}</strong></div>
                                 <div>
                                     {{ $sales->payment_date->setTimezone(auth()->user()->timezone ?? 'UTC')->format('d F Y H:i') }}
                                 </div>
@@ -78,19 +79,20 @@
         <!-- Items Table -->
         <div class="card border mb-4">
             <div class="card-header py-2">
-                <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-info"></i>{{ __('po_order_items_title') }}
+                <h4 class="card-title mb-0"><i
+                        class="ti ti-list me-2 text-info"></i>{{ __('messages.sales_order_items_title') }}
                 </h4>
             </div>
             <div class="table-responsive">
                 <table class="table card-table table-vcenter table-hover">
                     <thead>
                         <tr>
-                            <th class="text-center" style="width: 60px">{{ __('no') }}</th>
+                            <th class="text-center" style="width: 60px">{{ __('messages.no') }}</th>
                             <th>{{ __('table_product') }}</th>
-                            <th class="text-center" style="width: 100px">{{ __('table_qty') }}</th>
-                            <th class="text-end" style="width: 140px">{{ __('table_price') }}</th>
-                            <th class="text-end" style="width: 140px">{{ __('table_discount') }}</th>
-                            <th class="text-end" style="width: 140px">{{ __('table_amount') }}</th>
+                            <th class="text-center" style="width: 100px">{{ __('messages.table_qty') }}</th>
+                            <th class="text-end" style="width: 140px">{{ __('messages.table_price') }}</th>
+                            <th class="text-end" style="width: 140px">{{ __('messages.table_discount') }}</th>
+                            <th class="text-end" style="width: 140px">{{ __('messages.table_amount') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -153,19 +155,19 @@
                 <div class="card border-0">
                     <div class="card-body p-3">
                         <h5 class="card-title mb-3"><i
-                                class="ti ti-info-circle me-2 text-info"></i>{{ __('po_order_summary_title') }}
+                                class="ti ti-info-circle me-2 text-info"></i>{{ __('messages.sales_order_summary_title') }}
                         </h5>
                         <div class="mb-2">
-                            <i class="ti ti-package me-1"></i> {{ __('po_total_items') }}
+                            <i class="ti ti-package me-1"></i> {{ __('messages.sales_total_items') }}
                             <strong>{{ $summary['itemCount'] }}</strong>
                         </div>
                         <div class="mb-2">
-                            <i class="ti ti-receipt me-1"></i> {{ __('po_payment_type') }}
+                            <i class="ti ti-receipt me-1"></i> {{ __('messages.sales_payment_type') }}
                             <strong>{{ $sales->payment_type ?? 'N/A' }}</strong>
                         </div>
                         @if (property_exists($sales, 'notes') && $sales->notes)
                             <div class="mt-3">
-                                <h6>{{ __('po_notes') }}</h6>
+                                <h6>{{ __('sales_notes') }}</h6>
                                 <p class="text-muted">{{ $sales->notes }}</p>
                             </div>
                         @endif
@@ -175,16 +177,16 @@
             <div class="col-md-6">
                 <div class="card border">
                     <div class="card-body p-3">
-                        <h5 class="mb-3 card-title">{{ __('po_amount_summary_title') }}</h5>
+                        <h5 class="mb-3 card-title">{{ __('messages.sales_amount_summary_title') }}</h5>
                         <div class="d-flex justify-content-between mb-2">
-                            <div>{{ __('po_subtotal') }}</div>
+                            <div>{{ __('sales_subtotal') }}</div>
                             <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['subtotal']) }}</div>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <div>
-                                {{ __('po_order_discount') }}
+                                {{ __('messages.sales_order_discount') }}
                                 <small class="text-muted">
-                                    ({{ ($sales->order_discount_type ?? 'fixed') === 'percentage' ? ($sales->order_discount ?? 0) . '%' : __('po_fixed') }})
+                                    ({{ ($sales->order_discount_type ?? 'fixed') === 'percentage' ? ($sales->order_discount ?? 0) . '%' : __('sales_fixed') }})
                                 </small>:
                             </div>
                             <div class="text-danger">-
@@ -193,7 +195,7 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <div>
-                                {{ __('tax') }}
+                                {{ __('messages.tax') }}
                                 <small class="text-muted">
                                     ({{ $sales->tax_rate ?? 0 }}%)
                                 </small>:
@@ -204,7 +206,7 @@
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between align-items-center">
-                            <div class="fs-5"><strong>{{ __('po_grand_total') }}</strong></div>
+                            <div class="fs-5"><strong>{{ __('messages.sales_grand_total') }}</strong></div>
                             <div class="fs-3 fw-bold text-primary">
                                 {{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['finalTotal']) }}</div>
                         </div>

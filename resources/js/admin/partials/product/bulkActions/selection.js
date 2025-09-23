@@ -94,16 +94,17 @@ export function initBulkSelection() {
             selectedCount: document.getElementById("selectedCount"),
         };
 
-        if (
-            !elements.selectAll ||
-            !elements.bulkBar ||
-            elements.rowCheckboxes.length === 0
-        ) {
+        if (!elements.selectAll || !elements.bulkBar) {
             if (attempts < maxAttempts) {
                 setTimeout(tryInit, 300);
                 return;
             }
             console.warn("Bulk selection elements not found");
+            return;
+        }
+
+        // If there are no checkboxes, we don't need to set up listeners or show the bar
+        if (elements.rowCheckboxes.length === 0) {
             return;
         }
 

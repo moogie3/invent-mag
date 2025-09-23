@@ -22,11 +22,17 @@
                                         <div class="card card-primary">
                                             <div class="card-body border-bottom py-3">
                                                 <div class="d-flex justify-content-between align-items-center">
-                                                    <h2 class="mb-0">
-                                                        <i class="ti ti-universe fs-2"></i>
-                                                        {{ __('messages.unit_total_unit') }}
-                                                        <strong>{{ $totalunit }}</strong>
-                                                    </h2>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="ti ti-ruler fs-1 me-3 text-primary"></i>
+                                                        <div>
+                                                            <h2 class="mb-1">
+                                                                {{ __('messages.unit_settings_title') }}
+                                                            </h2>
+                                                            <div class="text-muted">
+                                                                {{ __('messages.unit_total_unit') }} <strong id="totalUnitCount">{{ $totalunit }}</strong>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div class="btn-list">
                                                         <button type="button"
                                                             class="btn btn-primary d-none d-sm-inline-block"
@@ -56,7 +62,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody id="invoiceTableBody" class="table-tbody">
-                                                            @foreach ($units as $index => $unit)
+                                                            @forelse ($units as $index => $unit)
                                                                 <tr>
                                                                     <td class="sort-no">
                                                                         {{ $units->firstItem() + $index }}</td>
@@ -93,7 +99,21 @@
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="4">
+                                                                        <div class="empty">
+                                                                            <div class="empty-img">
+                                                                                <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>
+                                                                            </div>
+                                                                            <p class="empty-title">{{ __('messages.no_units_found') }}</p>
+                                                                            <p class="empty-subtitle text-muted">
+                                                                                {{ __('messages.it_looks_like_you_havent_added_any_units_yet') }}
+                                                                            </p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>

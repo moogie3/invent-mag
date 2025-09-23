@@ -1,7 +1,7 @@
 <div class="card border-0 h-100">
     <div class="card-body p-3">
         <h4 class="card-title mb-3">
-            <i class="ti ti-users me-2 text-primary"></i>Customer
+            <i class="ti ti-users me-2 text-primary"></i>{{ __('messages.customer') }}
         </h4>
         <input type="hidden" name="customer_id" value="{{ $sales->customer->id }}">
         <h4 class="mb-2">{{ $sales->customer->name }}</h3>

@@ -9,7 +9,7 @@ return [
     'sidebar_navigation' => 'Sidebar Navigation',
     'top_navigation_bar' => 'Top Navigation Bar',
     'both' => 'Both',
-    'sidebar_options' => 'Sidebar Options',
+    'sidebar_options' => 'Sidebar Option',
     'enable_sidebar_lock' => 'Enable Sidebar Lock',
     'navbar_options' => 'Navbar Options',
     'enable_sticky_navbar' => 'Enable Sticky Navbar',

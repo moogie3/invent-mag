@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'dashboard' => 'Dasbor',
+    'dashboard' => 'Dashboard',
     'system_settings' => 'Pengaturan Sistem',
     'interface_layout' => 'Tata Letak Antarmuka',
     'customize_your_navigation_and_layout_preferences' => 'Sesuaikan preferensi navigasi dan tata letak Anda',

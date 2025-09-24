@@ -1,17 +1,15 @@
 <div class="card shadow-sm border-1 mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="card-title mb-0"><i class="ti ti-shopping-cart-star fs-3 me-2"></i> Top 5
-            Selling
-            Products</h3>
+        <h3 class="card-title mb-0"><i class="ti ti-shopping-cart-star fs-3 me-2"></i> {{ __('messages.top_5_selling_products') }}
     </div>
     <div class="table-responsive" style="min-height: 320px;">
         <table class="table table-vcenter table-hover mb-0">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th class="text-center">Units Sold</th>
-                    <th class="text-end">Revenue</th>
+                    <th>{{ __('messages.product') }}</th>
+                    <th>{{ __('messages.category') }}</th>
+                    <th class="text-center">{{ __('messages.units_sold') }}</th>
+                    <th class="text-end">{{ __('messages.revenue') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -35,15 +33,14 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center py-3 text-muted">No products data
-                            available</td>
+                        <td colspan="4" class="text-center py-3 text-muted">{{ __('messages.no_products_data_available') }}
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
     <div class="card-footer text-end">
-        <a href="{{ route('admin.product') }}" class="text-primary">View all products <i
+        <a href="{{ route('admin.product') }}" class="text-primary">{{ __('messages.view_all_products') }} <i
                 class="ti ti-arrow-right ms-1"></i></a>
     </div>
 </div>

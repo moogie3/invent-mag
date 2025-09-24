@@ -4,9 +4,9 @@
             <tr>
                 <th>{{ ucfirst($type) }}</th>
                 @if ($type === 'supplier')
-                    <th>Location</th>
+                    <th>{{ __('messages.table_location') }}</th>
                 @endif
-                <th class="text-end">Total {{ $type === 'customer' ? 'Sales' : 'Purchases' }}</th>
+                <th class="text-end">{{ __('messages.total_' . ($type === 'customer' ? 'sales' : 'purchases')) }}</th>
             </tr>
         </thead>
         <tbody>

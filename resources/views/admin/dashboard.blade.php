@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'Dashboard')
+@section('title', __('messages.dashboard'))
 
 @section('content')
     <div class="page-wrapper">

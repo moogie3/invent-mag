@@ -1,9 +1,9 @@
 <div class="card shadow-sm border-1">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title mb-0">
-            <i class="ti ti-bell-ringing fs-3 me-2"></i> System Alerts
+            <i class="ti ti-bell-ringing fs-3 me-2"></i> {{ __('messages.system_alerts') }}
         </h3>
-        <a href="{{ route('admin.product') }}" class="btn btn-sm btn-ghost-secondary">View All</a>
+        <a href="{{ route('admin.product') }}" class="btn btn-sm btn-ghost-secondary">{{ __('messages.view_all') }}</a>
     </div>
 
     <div class="card-body p-0">
@@ -11,13 +11,13 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="low-stock-tab" data-bs-toggle="tab"
                     data-bs-target="#low-stock-content" type="button" role="tab">
-                    <span class="badge bg-danger-lt me-2">{{ $lowStockProducts->count() }}</span> Low Stock
+                    <span class="badge bg-danger-lt me-2">{{ $lowStockProducts->count() }}</span> {{ __('messages.low_stock') }}
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="expiring-soon-tab" data-bs-toggle="tab"
                     data-bs-target="#expiring-soon-content" type="button" role="tab">
-                    <span class="badge bg-warning-lt me-2">{{ $expiringSoonItems->count() }}</span> Expiring Soon
+                    <span class="badge bg-warning-lt me-2">{{ $expiringSoonItems->count() }}</span> {{ __('messages.expiring_soon') }}
                 </button>
             </li>
         </ul>
@@ -38,13 +38,13 @@
                             <div class="shadcn-product-info">
                                 <div class="shadcn-product-name" title="{{ $product->name }}">{{ $product->name }}</div>
                                 <div class="shadcn-product-details">
-                                    Stock: <span class="fw-bold text-danger">{{ $product->stock_quantity }}</span>
-                                    / Threshold: {{ $product->low_stock_threshold ?? 'N/A' }}
+                                    {{ __('messages.stock_colon') }} <span class="fw-bold text-danger">{{ $product->stock_quantity }}</span>
+                                    / {{ __('messages.threshold_colon') }} {{ $product->low_stock_threshold ?? 'N/A' }}
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <div class="text-center text-muted py-4">No low stock products.</div>
+                        <div class="text-center text-muted py-4">{{ __('messages.no_low_stock_products') }}</div>
                     @endforelse
                 </div>
             </div>
@@ -54,10 +54,10 @@
                     <table class="table card-table table-vcenter">
                         <thead>
                             <tr>
-                                <th>Product Name</th>
-                                <th class="text-center">PO ID</th>
-                                <th class="text-center">Quantity</th>
-                                <th class="text-center">Expiry Date</th>
+                                <th>{{ __('messages.table_product_name') }}</th>
+                                <th class="text-center">{{ __('messages.po_id') }}</th>
+                                <th class="text-center">{{ __('messages.quantity') }}</th>
+                                <th class="text-center">{{ __('messages.table_expiry_date') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -70,7 +70,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">No products expiring soon.</td>
+                                    <td colspan="4" class="text-center text-muted py-4">{{ __('messages.no_expiring_products') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>

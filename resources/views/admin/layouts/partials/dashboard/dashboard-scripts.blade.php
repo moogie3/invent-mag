@@ -104,7 +104,7 @@
         const chartContainer = document.querySelector('.chart-container');
         const originalContent = chartContainer.innerHTML;
         chartContainer.innerHTML =
-            '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border" role="status"><span class="visually-hidden">{{ __('messages.loading') }}</span></div></div>';
 
         fetch(`{{ route('admin.dashboard') }}?period=${period}&type=${currentChartType}`, {
                 headers: {
@@ -151,7 +151,7 @@
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'alert alert-danger alert-dismissible fade show';
                 errorDiv.innerHTML = `
-                    <strong>Error!</strong> Failed to update chart data. Please try again.
+                    <strong>Error!</strong> {{ __('messages.failed_to_update_chart_data') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 `;
                 chartContainer.parentNode.insertBefore(errorDiv, chartContainer);

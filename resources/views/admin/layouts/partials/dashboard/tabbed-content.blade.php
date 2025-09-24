@@ -2,13 +2,13 @@
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">
             <li class="nav-item">
-                <a href="#overview-tab" class="nav-link active fw-bold fs-4" data-bs-toggle="tab">Overview</a>
+                <a href="#overview-tab" class="nav-link active fw-bold fs-4" data-bs-toggle="tab">{{ __('messages.overview') }}</a>
             </li>
             <li class="nav-item">
-                <a href="#sales-products-tab" class="nav-link fw-bold fs-4" data-bs-toggle="tab">Sales & Products</a>
+                <a href="#sales-products-tab" class="nav-link fw-bold fs-4" data-bs-toggle="tab">{{ __('messages.sales_products') }}</a>
             </li>
             <li class="nav-item">
-                <a href="#analysis-reports-tab" class="nav-link fw-bold fs-4" data-bs-toggle="tab">Analysis & Reports</a>
+                <a href="#analysis-reports-tab" class="nav-link fw-bold fs-4" data-bs-toggle="tab">{{ __('messages.analysis_reports') }}</a>
             </li>
         </ul>
     </div>

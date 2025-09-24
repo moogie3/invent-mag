@@ -18,7 +18,7 @@ return [
     'theme_mode' => 'Mode Tema',
     'light_theme' => 'Tema Terang',
     'dark_theme' => 'Tema Gelap',
-    'theme_toggle_visibility' => 'Visibilitas Tombol Tema',
+    'theme_toggle_visibility' => 'Visibilitas Tombol Temas',
     'show_theme_toggle_button' => 'Tampilkan Tombol Beralih Tema',
     'notifications_alerts' => 'Notifikasi & Peringatan',
     'manage_notification_preferences_and_alert_settings' => 'Kelola preferensi notifikasi dan pengaturan peringatan',

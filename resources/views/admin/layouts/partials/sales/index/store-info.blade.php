@@ -8,7 +8,8 @@
                             <i class="ti ti-building-store fs-1 me-3 text-primary"></i>
                             <div>
                                 <h2 class="mb-1">{{ __('messages.store_information') }}</h2>
-                                <div class="text-muted">{{ __('messages.overview_of_your_store_performance_and_metrics') }}</div>
+                                <div class="text-muted">
+                                    {{ __('messages.overview_of_your_store_performance_and_metrics') }}</div>
                             </div>
                         </div>
                     </div>
@@ -19,7 +20,8 @@
                             <div class="card border-0 bg-light h-100">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
-                                        <label class="form-label text-muted mb-2 d-block">{{ __('messages.store_details') }}</label>
+                                        <label
+                                            class="form-label text-muted mb-2 d-block">{{ __('messages.store_details') }}</label>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
                                         <div class="me-3 d-flex align-items-center justify-content-center"
@@ -60,14 +62,16 @@
                             <div class="card border-0 bg-primary text-white h-100">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
-                                        <label class="form-label text-white-50 mb-2 d-block">{{ __('messages.sales_overview') }}</label>
+                                        <label
+                                            class="form-label text-white-50 mb-2 d-block">{{ __('messages.sales_overview') }}</label>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
                                         <div class="me-3">
                                             <i class="ti ti-currency fs-2"></i>
                                         </div>
                                         <div>
-                                            <div class="text-white-50 small">{{ __('messages.this_month_sales') }}</div>
+                                            <div class="text-white-50 small">{{ __('messages.this_month_sales') }}
+                                            </div>
                                             <div class="h4 mb-0" id="thisMonthSales">
                                                 {{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
                                         </div>
@@ -87,7 +91,8 @@
                                             <i class="ti ti-moneybag fs-2"></i>
                                         </div>
                                         <div>
-                                            <div class="text-white-50 small">{{ __('messages.unpaid_receivable') }}</div>
+                                            <div class="text-white-50 small">{{ __('messages.unpaid_receivable') }}
+                                            </div>
                                             <div class="h4 mb-0" id="unpaidReceivable">
                                                 {{ \App\Helpers\CurrencyHelper::format($unpaidDebt) }}</div>
                                         </div>
@@ -96,86 +101,58 @@
                             </div>
                         </div>
 
-                        <!-- Pending Orders & Due Soon Invoices -->
+                        <!-- Order & Invoice Status - Unified Blue Design -->
                         <div class="col-lg-3 col-md-6">
-                            <div class="row g-2 h-100">
-                                <div class="col-12">
-                                    <div class="card border-0 bg-white">
-                                        <div class="card-body py-3">
-                                            <div class="mb-2">
-                                                <label class="form-label text-warning mb-2 d-block">{{ __('messages.pending_orders') }}
-                                                    </label>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <div class="me-3">
-                                                    <i class="ti ti-loader fs-2 text-warning"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="text-warning small">{{ __('messages.pending_orders') }}</div>
-                                                    <div class="h3 mb-0 text-warning" id="pendingOrdersCount">
-                                                        {{ $pendingOrders }}</div>
-                                                </div>
-                                            </div>
+                            <div class="card border-0 bg-info text-white h-100">
+                                <div class="card-body py-3">
+                                    <div class="mb-2">
+                                        <label
+                                            class="form-label text-white-50 mb-2 d-block">{{ __('messages.order_invoice_status') }}</label>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3">
+                                            <i class="ti ti-loader fs-2"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-white-50 small">{{ __('messages.pending_orders') }}</div>
+                                            <div class="h4 mb-0" id="pendingOrdersCount">{{ $pendingOrders }}</div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="card border-0 bg-white">
-                                        <div class="card-body py-3">
-                                            <div class="mb-2">
-                                                <label class="form-label text-danger mb-2 d-block">{{ __('messages.due_soon_invoices') }}
-                                                    </label>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3">
+                                            <i class="ti ti-reload fs-2"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-white-50 small">{{ __('messages.due_soon_invoices') }}
                                             </div>
-                                            <div class="d-flex align-items-center">
-                                                <div class="me-3">
-                                                    <i class="ti ti-reload fs-2 text-danger"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="text-danger small">{{ __('messages.due_soon_invoices') }}</div>
-                                                    <div class="h3 mb-0 text-danger" id="dueInvoicesCount">
-                                                        {{ $dueInvoices }}</div>
-                                                </div>
+                                            <div class="h4 mb-0" id="dueInvoicesCount">{{ $dueInvoices }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="ti ti-calendar-time fs-2"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="text-white-50 small">
+                                                {{ __('messages.expiring_soon_sales_invoices') }}</div>
+                                            <div class="h4 mb-0" id="expiringSalesItemsCount">{{ $expiringSalesCount }}
                                             </div>
+                                            @if ($expiringSalesCount > 0)
+                                                <a href="#" class="mt-1 btn btn-sm btn-outline-light btn-sm"
+                                                    id="viewExpiringSales" data-bs-toggle="modal"
+                                                    data-bs-target="#expiringSalesModal">{{ __('messages.view_details') }}</a>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Expiry Status & Filters -->
+                        <!-- Filters Only -->
                         <div class="col-lg-3 col-md-6">
-                            <div class="row g-2 h-100">
-                                <div class="col-12">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body py-3">
                                     @include('admin.layouts.partials.sales.index.filters')
-                                </div>
-                                <div class="col-12">
-                                    <div class="card border-0 bg-white">
-                                        <div class="card-body py-3">
-                                            <div class="mb-2">
-                                                <label
-                                                    class="form-label {{ $expiringSalesCount > 0 ? 'text-warning' : 'text-success' }} mb-2 d-block">{{ __('messages.expiry_status') }}
-                                                    </label>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <div class="me-3">
-                                                    <i
-                                                        class="ti ti-calendar-time fs-2 {{ $expiringSalesCount > 0 ? 'text-warning' : 'text-success' }}"></i>
-                                                </div>
-                                                <div>
-                                                    <div
-                                                        class="small {{ $expiringSalesCount > 0 ? 'text-warning' : 'text-success' }}">
-                                                        {{ __('messages.expiring_soon_sales_invoices') }}</div>
-                                                    <div class="h4 mb-0 {{ $expiringSalesCount > 0 ? 'text-warning' : 'text-success' }}"
-                                                        id="expiringSalesItemsCount">{{ $expiringSalesCount }}</div>
-                                                    @if ($expiringSalesCount > 0)
-                                                        <a href="#" class="mt-2 btn btn-sm btn-outline-warning"
-                                                            id="viewExpiringSales" data-bs-toggle="modal"
-                                                            data-bs-target="#expiringSalesModal">{{ __('messages.view_details') }}</a>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>

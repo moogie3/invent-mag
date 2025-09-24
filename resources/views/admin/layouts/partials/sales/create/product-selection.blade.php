@@ -51,12 +51,12 @@
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.supplier_price') }}</label>
-        <input type="text" class="form-control bg-light" name="price" id="price" placeholder="AUTOFILL"
-            readonly disabled />
+        <input type="text" class="form-control bg-light" name="price" id="price"
+            placeholder="{{ __('messages.autofill') }}" readonly disabled />
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.pos_selling_price') }}</label>
         <input type="text" class="form-control bg-light" name="selling_price" id="selling_price"
-            placeholder="AUTOFILL" readonly disabled />
+            placeholder="{{ __('messages.autofill') }}" readonly disabled />
     </div>
 </div>

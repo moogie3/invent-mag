@@ -13,7 +13,7 @@
         @if ($sale->tax_rate)
             <span class="badge bg-black-lt">Tax {{ $sale->tax_rate }}%</span>
         @else
-            <span class="badge bg-black-lt">Not Applied</span>
+            <span class="badge bg-black-lt">{{ __('messages.not_applied') }}</span>
         @endif
     </td>
     <td class="sort-amount" data-amount="{{ $sale->total }}">

@@ -12,7 +12,7 @@
                     ({{ ($sales->order_discount_type ?? 'fixed') === 'percentage' ? ($sales->order_discount ?? 0) . '%' : __('messages.fixed') }})
                 </small>:
             </div>
-            <div class="text-danger">-
+            <div class="text-danger">
                 {{ \App\Helpers\CurrencyHelper::format($orderDiscount) }}
             </div>
         </div>

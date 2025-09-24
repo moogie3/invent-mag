@@ -11,7 +11,7 @@
     <td>
         <div class="strong">{{ $item->product->name }}</div>
         @if (isset($item->product->sku) && $item->product->sku)
-            <small class="text-muted">SKU: {{ $item->product->sku }}</small>
+            <small class="text-muted">{{ __('messages.sku_colon') }} {{ $item->product->sku }}</small>
         @endif
     </td>
     <td>
@@ -34,7 +34,7 @@
                 <option value="percentage" {{ $item->discount_type === 'percentage' ? 'selected' : '' }}>
                     %</option>
                 <option value="fixed" {{ $item->discount_type === 'fixed' ? 'selected' : '' }}>
-                    Fixed</option>
+                    {{ __('messages.fixed') }}</option>
             </select>
         </div>
     </td>

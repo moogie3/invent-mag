@@ -55,7 +55,7 @@
                                     {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
                                 </span>
                             @else
-                                -
+                                {{ __('messages.not_available') }}
                             @endif
                         </td>
                         <td class="text-end">

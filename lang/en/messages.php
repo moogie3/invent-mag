@@ -854,4 +854,10 @@ return [
     'sales_modal_paid_warning_message2' => 'View mode only.',
     'sales_modal_paid_view_invoice_button' => 'View Invoice',
     'sales_due_date' => 'Due Date',
+    'no' => 'No',
+    'not_applied' => 'Not Applied',
+    'view_receipt' => 'View Receipt',
+    'sku_colon' => 'SKU:',
+    'overview_of_your_store_performance_and_metrics' => 'Overview of your store performance and metrics',
+    'order_invoice_status' => 'Invoice Status',
 ];

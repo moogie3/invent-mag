@@ -3,7 +3,7 @@
         <div class="row align-items-center">
             <div class="col">
                 <div class="page-pretitle">{{ __('messages.overview') }}</div>
-                <h2 class="page-title no-print">{{ __('messages.view_po_invoice') }}</h2>
+                <h2 class="page-title no-print">{{ __('messages.view_sales_invoice') }}</h2>
             </div>
             <div class="col text-end">
                 <button type="button" class="btn btn-secondary me-2" onclick="javascript:window.print();">

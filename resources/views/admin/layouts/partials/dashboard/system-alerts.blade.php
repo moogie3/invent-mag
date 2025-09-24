@@ -6,7 +6,7 @@
         <a href="{{ route('admin.product') }}" class="btn btn-sm btn-ghost-secondary">{{ __('messages.view_all') }}</a>
     </div>
 
-    <div class="card-body p-0">
+    <div class="card-body p-0" style="overflow-x: auto;">
         <ul class="nav nav-tabs nav-fill mb-3" id="alertTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="low-stock-tab" data-bs-toggle="tab"
@@ -50,8 +50,7 @@
             </div>
             <!-- Expiring Soon Section -->
             <div class="tab-pane fade" id="expiring-soon-content" role="tabpanel">
-                <div class="table-responsive">
-                    <table class="table card-table table-vcenter">
+                <table class="table card-table table-vcenter" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th>{{ __('messages.table_product_name') }}</th>
@@ -75,7 +74,6 @@
                             @endforelse
                         </tbody>
                     </table>
-                </div>
             </div>
         </div>
     </div>

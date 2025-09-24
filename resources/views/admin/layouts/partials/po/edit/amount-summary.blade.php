@@ -20,7 +20,7 @@
                     <select name="discount_total_type" class="form-select" id="discountTotalType"
                         style="min-width: 70px;">
                         <option value="percentage" {{ $pos->discount_total_type === 'percentage' ? 'selected' : '' }}>
-                            %</option>
+                            {{ __('messages.percentage') }}</option>
                         <option value="fixed" {{ $pos->discount_total_type === 'fixed' ? 'selected' : '' }}>
                             {{ __('messages.po_fixed') }}</option>
                     </select>

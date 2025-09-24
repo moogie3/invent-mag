@@ -32,7 +32,7 @@
             <select name="items[{{ $item->id }}][discount_type]" class="form-select discount-type-input"
                 style="min-width: 70px;" data-item-id="{{ $item->id }}">
                 <option value="percentage" {{ $item->discount_type === 'percentage' ? 'selected' : '' }}>
-                    %</option>
+                    {{ __('messages.percentage') }}</option>
                 <option value="fixed" {{ $item->discount_type === 'fixed' ? 'selected' : '' }}>
                     {{ __('messages.fixed') }}</option>
             </select>

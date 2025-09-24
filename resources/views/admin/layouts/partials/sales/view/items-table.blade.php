@@ -1,6 +1,6 @@
 <div class="card border mb-4">
     <div class="card-header py-2">
-        <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-info"></i>{{ __('messages.order_items') }}</h4>
+        <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-info"></i>{{ __('messages.sales_order_items_title') }}</h4>
     </div>
     <div class="table-responsive">
         <table class="table card-table table-vcenter table-hover">
@@ -21,7 +21,7 @@
                     $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
                         $sales->salesItems,
                         $sales->order_discount ?? 0,
-                        $sales->order_discount_type ?? 'percentage',
+                        $sales->order_discount_type ?? __('messages.percentage'),
                         $sales->tax_rate ?? 0,
                     );
                 @endphp
@@ -42,7 +42,7 @@
                         <td>
                             <div class="strong">{{ $item->product->name }}</div>
                             @if (isset($item->product->sku) && $item->product->sku)
-                                <small class="text-muted">{{ __('messages.sku') }}: {{ $item->product->sku }}</small>
+                                <small class="text-muted">{{ __('messages.sku_colon') }} {{ $item->product->sku }}</small>
                             @endif
                         </td>
                         <td class="text-center">{{ $item->quantity }}</td>
@@ -52,7 +52,7 @@
                         <td class="text-end">
                             @if ($item->discount > 0)
                                 <span class="text-danger">
-                                    {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
+                                    {{ $item->discount_type === __('messages.percentage') ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
                                 </span>
                             @else
                                 {{ __('messages.not_available') }}

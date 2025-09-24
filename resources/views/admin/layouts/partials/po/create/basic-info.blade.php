@@ -6,7 +6,7 @@
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.supplier') }}</label>
         <select class="form-select" name="supplier_id" id="supplier_id">
-            <option value="">{{ __('messages.pos_select_supplier') }}</option>
+            <option value="">{{ __('messages.select_supplier') }}</option>
             @foreach ($suppliers as $supplier)
                 <option value="{{ $supplier->id }}" data-payment-terms="{{ $supplier->payment_terms }}">
                     {{ $supplier->name }}

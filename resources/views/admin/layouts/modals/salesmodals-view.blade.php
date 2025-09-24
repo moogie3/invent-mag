@@ -13,7 +13,7 @@
                     <div>
                         <h2 class="mb-0">{{ __('messages.sales_modal_invoice_no') }}{{ $sales->invoice }}</h2>
                         <div class="text-muted fs-5">
-                            {{ $sales->customer->name }} - {{ $sales->customer->address ?? 'N/A' }}
+                            {{ $sales->customer->name }} - {{ $sales->customer->address ?? __('messages.not_available') }}
                         </div>
                     </div>
                 </div>
@@ -61,9 +61,9 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <div><strong>{{ __('messages.sales_payment_type') }}</strong></div>
-                            <div>{{ $sales->payment_type ?? 'N/A' }}</div>
+                            <div>{{ $sales->payment_type ?? __('messages.not_available') }}</div>
                         </div>
-                        @if ($sales->status === 'Paid')
+                        @if ($sales->status === __('messages.paid'))
                             <div class="d-flex justify-content-between">
                                 <div><strong>{{ __('messages.sales_payment_date') }}</strong></div>
                                 <div>
@@ -88,7 +88,7 @@
                     <thead>
                         <tr>
                             <th class="text-center" style="width: 60px">{{ __('messages.no') }}</th>
-                            <th>{{ __('table_product') }}</th>
+                            <th>{{ __('messages.table_product') }}</th>
                             <th class="text-center" style="width: 100px">{{ __('messages.table_qty') }}</th>
                             <th class="text-end" style="width: 140px">{{ __('messages.table_price') }}</th>
                             <th class="text-end" style="width: 140px">{{ __('messages.table_discount') }}</th>
@@ -101,7 +101,7 @@
                             $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
                                 $sales->salesItems,
                                 $sales->order_discount ?? 0,
-                                $sales->order_discount_type ?? 'percentage',
+                                $sales->order_discount_type ?? __('messages.percentage'),
                                 $sales->tax_rate ?? 0,
                             );
                         @endphp
@@ -120,9 +120,9 @@
                             <tr>
                                 <td class="text-center">{{ $index + 1 }}</td>
                                 <td>
-                                    <div class="strong">{{ $item->product->name ?? 'N/A' }}</div>
+                                    <div class="strong">{{ $item->product->name ?? __('messages.not_available') }}</div>
                                     @if (isset($item->product->sku) && $item->product->sku)
-                                        <small class="text-muted">{{ __('table_sku') }}
+                                        <small class="text-muted">{{ __('messages.table_sku') }}
                                             {{ $item->product->sku }}</small>
                                     @endif
                                 </td>
@@ -133,7 +133,7 @@
                                 <td class="text-end">
                                     @if ($item->discount > 0)
                                         <span class="text-danger">
-                                            {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
+                                            {{ $item->discount_type === __('messages.percentage') ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
                                         </span>
                                     @else
                                         -
@@ -163,11 +163,11 @@
                         </div>
                         <div class="mb-2">
                             <i class="ti ti-receipt me-1"></i> {{ __('messages.sales_payment_type') }}
-                            <strong>{{ $sales->payment_type ?? 'N/A' }}</strong>
+                            <strong>{{ $sales->payment_type ?? __('messages.not_available') }}</strong>
                         </div>
                         @if (property_exists($sales, 'notes') && $sales->notes)
                             <div class="mt-3">
-                                <h6>{{ __('sales_notes') }}</h6>
+                                <h6>{{ __('messages.sales_notes') }}</h6>
                                 <p class="text-muted">{{ $sales->notes }}</p>
                             </div>
                         @endif
@@ -179,14 +179,14 @@
                     <div class="card-body p-3">
                         <h5 class="mb-3 card-title">{{ __('messages.sales_amount_summary_title') }}</h5>
                         <div class="d-flex justify-content-between mb-2">
-                            <div>{{ __('sales_subtotal') }}</div>
+                            <div>{{ __('messages.sales_subtotal') }}</div>
                             <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['subtotal']) }}</div>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <div>
                                 {{ __('messages.sales_order_discount') }}
                                 <small class="text-muted">
-                                    ({{ ($sales->order_discount_type ?? 'fixed') === 'percentage' ? ($sales->order_discount ?? 0) . '%' : __('sales_fixed') }})
+                                    ({{ ($sales->order_discount_type ?? __('messages.fixed')) === __('messages.percentage') ? ($sales->order_discount ?? 0) . '%' : __('messages.sales_fixed') }})
                                 </small>:
                             </div>
                             <div class="text-danger">-

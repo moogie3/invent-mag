@@ -27,8 +27,8 @@
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.pos_selling_price') }}</label>
-        <input type="text" class="form-control bg-light" name="past_price" id="past_price" placeholder="AUTOFILL"
-            readonly disabled />
+        <input type="text" class="form-control bg-light" name="past_price" id="past_price"
+            placeholder="{{ __('messages.autofill') }}" readonly disabled />
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.new_price') }}</label>
@@ -39,7 +39,7 @@
         <div class="input-group">
             <input type="number" min="0" class="form-control" id="discount" placeholder="0" />
             <select class="form-select" id="discount_type" style="max-width: 70px;">
-                <option value="fixed">{{ __('messages.po_fixed') }}</option>
+                <option value="fixed">{{ __('messages.sales_fixed') }}</option>
                 <option value="percentage">%</option>
             </select>
         </div>

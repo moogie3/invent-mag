@@ -10,6 +10,6 @@ class CustomRegisterResponse implements RegisterResponse
 {
     public function toResponse($request)
     {
-        return redirect()->route('admin.login')->with('success', 'Registration successful! Please log in.');
+        return redirect()->route('admin.login')->with('success', __('messages.register_success'));
     }
 }

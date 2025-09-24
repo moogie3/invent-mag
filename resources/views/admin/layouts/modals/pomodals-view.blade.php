@@ -11,7 +11,7 @@
                     <div class="status-indicator {{ $statusClass }}"
                         style="width: 6px; height: 36px; border-radius: 3px; margin-right: 15px;"></div>
                     <div>
-                        <h2 class="mb-0">PO #{{ $pos->invoice }}</h2>
+                        <h2 class="mb-0">{{ __('messages.po_hash') }}{{ $pos->invoice }}</h2>
                         <div class="text-muted fs-5">
                             {{ $pos->supplier->code }} - {{ $pos->supplier->location ?? __('messages.not_available') }}
                         </div>
@@ -60,7 +60,7 @@
                             <div><strong>{{ __('messages.po_payment_type') }}</strong></div>
                             <div>{{ $pos->payment_type }}</div>
                         </div>
-                        @if ($pos->status === 'Paid')
+                        @if ($pos->status === __('messages.paid'))
                             <div class="d-flex justify-content-between">
                                 <div><strong>{{ __('messages.po_payment_date') }}</strong></div>
                                 <div>
@@ -124,7 +124,7 @@
                             <tr>
                                 <td class="text-center">{{ $index + 1 }}</td>
                                 <td>
-                                    <div class="strong">{{ $item->product->name ?? 'N/A' }}</div>
+                                    <div class="strong">{{ $item->product->name ?? __('messages.not_available') }}</div>
                                     @if (isset($item->product->sku) && $item->product->sku)
                                         <small class="text-muted">{{ __('messages.table_sku') }} {{ $item->product->sku ?? __('messages.not_available') }}</small>
                                     @endif
@@ -136,15 +136,15 @@
                                 <td class="text-end">
                                     @if ($item->discount > 0)
                                         <span class="text-danger">
-                                            {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
-                                        </span>
-                                    @else
-                                        {{ __('messages.not_available') }}
-                                    @endif
-                                </td>
-                                <td class="text-end">
-                                    {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalAmount) }}
-                                </td>
+                                            {{ $item->discount_type === __('messages.percentage') ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
+                                </span>
+                            @else
+                                {{ __('messages.not_available') }}
+                            @endif
+                        </td>
+                        <td class="text-end">
+                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalAmount) }}
+                        </td>
                                 <td class="text-center">
                                     @if ($item->expiry_date)
                                         {{ \Carbon\Carbon::parse($item->expiry_date)->format('d M Y') }}
@@ -193,7 +193,7 @@
                             <div>
                                 {{ __('messages.po_order_discount') }}
                                 <small class="text-muted">
-                                    ({{ $pos->discount_total_type === 'percentage' ? $pos->discount_total . '%' : __('messages.po_fixed') }})
+                                    ({{ $pos->discount_total_type === __('messages.percentage') ? $pos->discount_total . '%' : __('messages.po_fixed') }})
                                 </small>:
                             </div>
                             <div class="text-danger">- {{ \App\Helpers\CurrencyHelper::formatWithPosition($orderDiscount) }}

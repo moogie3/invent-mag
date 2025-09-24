@@ -116,17 +116,17 @@ class PurchaseHelper
         $diffDays = (int) $today->diffInDays($dueDate, false); // Cast to integer to remove decimals
 
         if ($status === 'Paid') {
-            return '<span class="h4"><i class="ti ti-check me-1 fs-4"></i> Paid</span>';
+            return '<span class="h4"><i class="ti ti-check me-1 fs-4"></i> ' . __('messages.purchase_status_paid') . '</span>';
         } elseif ($diffDays == 0) {
-            return '<span class="h4"><i class="ti ti-alert-triangle me-1 fs-4"></i> Due Today</span>';
+            return '<span class="h4"><i class="ti ti-alert-triangle me-1 fs-4"></i> ' . __('messages.purchase_status_due_today') . '</span>';
         } elseif ($diffDays > 0 && $diffDays <= 3) {
-            return '<span class="h4"><i class="ti ti-calendar-event me-1 fs-4"></i> Due in ' . $diffDays . ' Days</span>';
+            return '<span class="h4"><i class="ti ti-calendar-event me-1 fs-4"></i> ' . __('messages.purchase_status_due_in_days', ['days' => $diffDays]) . '</span>';
         } elseif ($diffDays > 3 && $diffDays <= 7) {
-            return '<span class="h4"><i class="ti ti-calendar me-1 fs-4"></i> Due in 1 Week</span>';
+            return '<span class="h4"><i class="ti ti-calendar me-1 fs-4"></i> ' . __('messages.purchase_status_due_in_1_week') . '</span>';
         } elseif ($diffDays < 0) {
-            return '<span class="h4"><i class="ti ti-alert-circle me-1 fs-4"></i> Overdue</span>';
+            return '<span class="h4"><i class="ti ti-alert-circle me-1 fs-4"></i> ' . __('messages.purchase_status_overdue') . '</span>';
         } else {
-            return '<span class="h4"><i class="ti ti-clock me-1 fs-4"></i> Pending</span>';
+            return '<span class="h4"><i class="ti ti-clock me-1 fs-4"></i> ' . __('messages.purchase_status_pending') . '</span>';
         }
     }
 }

@@ -84,7 +84,7 @@
                                 <li><strong>{{ __('messages.sales_modal_bulk_delete_stock_impact_unpaid') }}</strong>
                                     {{ __('messages.sales_modal_stock_impact_unpaid_desc') }}</li>
                                 <li><strong>{{ __('messages.sales_modal_bulk_delete_stock_impact_paid') }}</strong>
-                                    {{ __('messages.sales_modal_bulk_delete_stock_impact_paid_desc') }}</li>
+                                    {{ __('messages.sales_modal_bulk_delete_stock_impact_paid_description') }}</li>
                             </ul>
                         </div>
                     </div>

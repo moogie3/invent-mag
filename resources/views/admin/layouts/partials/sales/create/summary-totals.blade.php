@@ -4,11 +4,11 @@
     </div>
     <div class="card-body">
         <div class="d-flex justify-content-between mb-2">
-            <span class="text-muted">{{ __('messages.po_subtotal') }}:</span>
+            <span class="text-muted">{{ __('messages.sales_subtotal') }}:</span>
             <span id="subtotal" class="fw-bold">Rp 0</span>
         </div>
         <div class="d-flex justify-content-between mb-2">
-            <span class="text-muted">{{ __('messages.po_order_discount') }}:</span>
+            <span class="text-muted">{{ __('messages.sales_order_discount') }}:</span>
             <span id="orderDiscountTotal" class="fw-bold">Rp 0</span>
         </div>
         <div class="d-flex justify-content-between mb-2">
@@ -17,7 +17,7 @@
         </div>
         <hr class="my-2">
         <div class="d-flex justify-content-between">
-            <span class="fs-4 fw-bold">{{ __('messages.po_grand_total') }}:</span>
+            <span class="fs-4 fw-bold">{{ __('messages.sales_grand_total') }}:</span>
             <span id="finalTotal" class="fs-4 fw-bold text-primary">Rp 0</span>
         </div>
         <input type="hidden" id="taxInput" name="tax_amount" value="0">

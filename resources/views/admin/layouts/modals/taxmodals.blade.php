@@ -4,13 +4,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="confirmModalLabel">
-                    <i class="ti ti-receipt-tax me-2"></i>{{ __('tax_modal_confirm_tax_settings_title') }}
+                    <i class="ti ti-receipt-tax me-2"></i>{{ __('messages.tax_modal_confirm_tax_settings_title') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <p class="mb-2">{{ __('tax_modal_confirm_tax_settings_message') }}
+                    <p class="mb-2">{{ __('messages.tax_modal_confirm_tax_settings_message') }}
                     </p>
                 </div>
 
@@ -18,15 +18,15 @@
                 <div class="alert alert-light border">
                     <div class="row g-2">
                         <div class="col-6">
-                            <small class="text-muted d-block">{{ __('tax_modal_tax_name') }}</small>
+                            <small class="text-muted d-block">{{ __('messages.tax_modal_tax_name') }}</small>
                             <span id="previewTaxName" class="fw-medium">-</span>
                         </div>
                         <div class="col-6">
-                            <small class="text-muted d-block">{{ __('tax_modal_tax_rate') }}</small>
+                            <small class="text-muted d-block">{{ __('messages.tax_modal_tax_rate') }}</small>
                             <span id="previewTaxRate" class="fw-medium">-</span>%
                         </div>
                         <div class="col-12 mt-2">
-                            <small class="text-muted d-block">{{ __('tax_modal_status') }}</small>
+                            <small class="text-muted d-block">{{ __('messages.tax_modal_status') }}</small>
                             <span id="previewTaxStatus" class="badge">-</span>
                         </div>
                     </div>
@@ -36,18 +36,18 @@
                     <div class="d-flex align-items-center">
                         <i class="ti ti-alert-triangle me-2"></i>
                         <div>
-                            <small><strong>{{ __('tax_modal_note') }}</strong>
-                                {{ __('tax_modal_note_message') }}</small>
+                            <small><strong>{{ __('messages.tax_modal_note') }}</strong>
+                                {{ __('messages.tax_modal_note_message') }}</small>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="ti ti-x me-1"></i>{{ __('cancel') }}
+                    <i class="ti ti-x me-1"></i>{{ __('messages.cancel') }}
                 </button>
                 <button type="submit" form="taxSettingsForm" class="btn btn-primary">
-                    <i class="ti ti-check me-1"></i>{{ __('tax_modal_yes_save_settings') }}
+                    <i class="ti ti-check me-1"></i>{{ __('messages.tax_modal_yes_save_settings') }}
                 </button>
             </div>
         </div>
@@ -155,7 +155,7 @@
 
                     if (nameElement) {
                         nameElement.textContent = taxName ||
-                            '{{ __('tax_modal_not_specified') }}';
+                            '{{ __('messages.tax_modal_not_specified') }}';
                         nameElement.style.color = taxName ? '#000' : '#999';
                     }
 
@@ -166,10 +166,10 @@
 
                     if (statusElement) {
                         if (isActive) {
-                            statusElement.textContent = '{{ __('tax_modal_active') }}';
+                            statusElement.textContent = '{{ __('messages.tax_modal_active') }}';
                             statusElement.className = 'badge bg-success text-white';
                         } else {
-                            statusElement.textContent = '{{ __('tax_modal_inactive') }}';
+                            statusElement.textContent = '{{ __('messages.tax_modal_inactive') }}';
                             statusElement.className = 'badge bg-danger text-white';
                         }
                     }

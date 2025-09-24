@@ -13,9 +13,9 @@
         </div>
         <div class="d-flex justify-content-between mb-2">
             <div><strong>{{ __('messages.payment_type') }}:</strong></div>
-            <div>{{ $sales->payment_type ?? 'N/A' }}</div>
+            <div>{{ $sales->payment_type ?? __('messages.not_available') }}</div>
         </div>
-        @if ($sales->status === 'Paid')
+        @if ($sales->status === __('messages.paid'))
             <div class="d-flex justify-content-between">
                 <div><strong>{{ __('messages.payment_date') }}:</strong></div>
                 <div>

@@ -182,9 +182,31 @@ export function bulkMarkAsPaidPO() {
     } else {
         const selectedPaidPOs = selected.filter((checkbox) => {
             const row = checkbox.closest("tr");
-            const statusBadge = row.querySelector(".badge");
-            const status = statusBadge ? statusBadge.textContent.trim() : "";
-            return status === "Paid";
+
+            let statusElement = row.querySelector(".sort-status span");
+
+            if (!statusElement) {
+                const statusCell = row.querySelector(".sort-status");
+                if (statusCell) {
+                    statusElement = statusCell.querySelector("span");
+                }
+            }
+
+            if (!statusElement) {
+                statusElement = row.querySelector(".badge");
+            }
+
+            const status = statusElement
+                ? statusElement.textContent.trim()
+                : "";
+
+            return (
+                status === "Paid" ||
+                status.toLowerCase().includes("paid") ||
+                statusElement?.classList.contains("badge-success") ||
+                statusElement?.classList.contains("bg-success") ||
+                statusElement?.innerHTML.toLowerCase().includes("paid")
+            );
         });
 
         if (selectedPaidPOs.length > 0) {
@@ -248,10 +270,30 @@ function smartSelectUnpaidOnlyPO() {
 
     rowCheckboxes.forEach((checkbox) => {
         const row = checkbox.closest("tr");
-        const statusBadge = row.querySelector(".badge");
-        const status = statusBadge ? statusBadge.textContent.trim() : "";
 
-        if (status === "Paid") {
+        let statusElement = row.querySelector(".sort-status span");
+
+        if (!statusElement) {
+            const statusCell = row.querySelector(".sort-status");
+            if (statusCell) {
+                statusElement = statusCell.querySelector("span");
+            }
+        }
+
+        if (!statusElement) {
+            statusElement = row.querySelector(".badge");
+        }
+
+        const status = statusElement ? statusElement.textContent.trim() : "";
+
+        const isPaid =
+            status === "Paid" ||
+            status.toLowerCase().includes("paid") ||
+            statusElement?.classList.contains("badge-success") ||
+            statusElement?.classList.contains("bg-success") ||
+            statusElement?.innerHTML.toLowerCase().includes("paid");
+
+        if (isPaid) {
             checkbox.checked = false;
             row.classList.add("table-warning");
             setTimeout(() => {

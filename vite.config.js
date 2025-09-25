@@ -24,6 +24,7 @@ export default defineConfig({
                 "resources/js/admin/unit.js",
                 "resources/js/admin/user.js",
                 "resources/js/admin/warehouse.js",
+                "resources/js/admin/helpers/notification.js",
                 "resources/js/admin/helpers/toast.js",
                 "resources/js/admin/layouts/modal.js",
                 "resources/js/admin/layouts/page-loader.js",

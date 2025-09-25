@@ -4,4 +4,5 @@ import { showContentAfterLoading } from './partials/auth/showContentAfterLoading
 document.addEventListener("DOMContentLoaded", function () {
     togglePasswordVisibility();
     showContentAfterLoading();
+    window.handleSessionNotifications();
 });

@@ -1,6 +1,6 @@
 import { initModals } from './modals/init.js';
 import { initProductModal, loadExpiringSoonProductsModal } from './modals/product.js'; // Import loadExpiringSoonProductsModal
-import { initBulkSelection } from './bulkActions/selection.js';
+import { initBulkSelection, clearProductSelection } from './bulkActions/selection.js';
 import { initializeSearch } from './search/main.js';
 import { initializeEntriesSelector, initKeyboardShortcuts, initExport } from './events.js';
 import { bulkUpdateStock } from './bulkActions/stock.js'; // Import bulkUpdateStock
@@ -249,5 +249,6 @@ export function initProductPage() {
         }
 
         window.bulkDeleteProducts = bulkDeleteProducts; // Expose globally
+        window.clearProductSelection = clearProductSelection; // Expose globally
     });
 }

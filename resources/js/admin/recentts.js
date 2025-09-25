@@ -2,7 +2,7 @@ import { updateBulkActions } from './partials/recentts/utils/dom.js';
 import { searchTransactions } from './partials/recentts/utils/search.js';
 import { exportTransactions, bulkExport } from './partials/recentts/utils/export.js';
 import { showMarkAsPaidModal, confirmMarkAsPaid } from './partials/recentts/modals/markAsPaid.js';
-import { initBulkSelection, bulkMarkAsPaid } from './partials/recentts/bulkActions/selection.js';
+import { initBulkSelection, bulkMarkAsPaid, clearSelection } from './partials/recentts/bulkActions/selection.js';
 import { confirmBulkMarkAsPaid as confirmBulkMarkAsPaidApi } from './partials/recentts/bulkActions/api.js';
 
 // Expose global functions
@@ -13,6 +13,7 @@ window.confirmMarkAsPaid = confirmMarkAsPaid;
 window.bulkMarkAsPaid = bulkMarkAsPaid;
 window.confirmBulkMarkAsPaid = confirmBulkMarkAsPaidApi;
 window.bulkExport = bulkExport;
+window.clearSelection = clearSelection;
 
 document.addEventListener("DOMContentLoaded", function () {
     const dateRangeSelect = document.querySelector('select[name="date_range"]');

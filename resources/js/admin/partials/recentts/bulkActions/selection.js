@@ -25,7 +25,13 @@ export function smartSelectUnpaidOnly() {
         const statusBadge = row.querySelector(".badge");
         const status = statusBadge ? statusBadge.textContent.trim() : "";
 
-        if (status === "Paid") {
+        const isPaid =
+            status === "Paid" ||
+            status.toLowerCase().includes("paid") ||
+            statusBadge?.classList.contains("bg-success-lt") ||
+            statusBadge?.classList.contains("bg-success");
+
+        if (isPaid) {
             checkbox.checked = false;
             row.classList.add("table-warning");
             setTimeout(() => {
@@ -74,7 +80,12 @@ export function bulkMarkAsPaid() {
             const row = checkbox.closest("tr");
             const statusBadge = row.querySelector(".badge");
             const status = statusBadge ? statusBadge.textContent.trim() : "";
-            return status === "Paid";
+            const isPaid =
+                status === "Paid" ||
+                status.toLowerCase().includes("paid") ||
+                statusBadge?.classList.contains("bg-success-lt") ||
+                statusBadge?.classList.contains("bg-success");
+            return isPaid;
         });
 
         if (selectedPaidTransactions.length > 0) {
@@ -116,4 +127,18 @@ export function bulkMarkAsPaid() {
         document.getElementById("bulkMarkAsPaidModal")
     );
     modal.show();
+}
+
+export function clearSelection() {
+    const selectAll = document.getElementById("selectAll");
+    if (selectAll) {
+        selectAll.checked = false;
+    }
+
+    const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+    rowCheckboxes.forEach((checkbox) => {
+        checkbox.checked = false;
+    });
+
+    updateBulkActions();
 }

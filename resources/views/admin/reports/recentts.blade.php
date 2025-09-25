@@ -1,18 +1,18 @@
-@extends('admin.layouts.base') @section('title', 'All Transactions')
+@extends('admin.layouts.base') @section('title', __('messages.all_transactions'))
 
- @section('content')
+@section('content')
     <div class="page-wrapper">
         <!-- Page Header -->
-        <div class="page-header d-print-none">
+        <div class="page-header d-print-none" style="position: relative; z-index: 20;">
             <div class="container-xl">
                 <div class="row g-2 align-items-center">
                     <div class="col">
                         <div class="page-pretitle">
-                            Transaction Management
+                            {{ __('messages.transaction_management') }}
                         </div>
                         <h2 class="page-title">
                             <i class="ti ti-history fs-3 me-2 text-primary"></i>
-                            All Transactions
+                            {{ __('messages.all_transactions') }}
                         </h2>
                     </div>
                     <div class="col-auto ms-auto d-print-none">
@@ -20,55 +20,64 @@
                             <div class="dropdown">
                                 <button class="btn btn-secondary" onclick="exportTransactions()">
                                     <i class="ti ti-printer me-1"></i>
-                                    Export PDF
+                                    {{ __('messages.export_pdf') }}
                                 </button>
                                 <button class="btn btn-outline-primary dropdown-toggle" type="button"
                                     data-bs-toggle="dropdown">
                                     <i class="ti ti-filter me-1"></i>
-                                    Filter
+                                    {{ __('messages.filter') }}
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 300px;">
                                     <form id="filterForm" method="GET">
                                         <div class="mb-3">
-                                            <label class="form-label">Transaction Type</label>
+                                            <label class="form-label">{{ __('messages.transaction_type') }}</label>
                                             <select name="type" class="form-select">
-                                                <option value="">All Types</option>
+                                                <option value="">{{ __('messages.all_types') }}</option>
                                                 <option value="sale" {{ request('type') == 'sale' ? 'selected' : '' }}>
-                                                    Sales</option>
+                                                    {{ __('messages.sales') }}</option>
                                                 <option value="purchase"
-                                                    {{ request('type') == 'purchase' ? 'selected' : '' }}>Purchases</option>
+                                                    {{ request('type') == 'purchase' ? 'selected' : '' }}>
+                                                    {{ __('messages.purchasing') }}</option>
                                             </select>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Payment Status</label>
+                                            <label class="form-label">{{ __('messages.payment_status') }}</label>
                                             <select name="status" class="form-select">
-                                                <option value="">All Status</option>
+                                                <option value="">{{ __('messages.all_status') }}</option>
                                                 <option value="Paid" {{ request('status') == 'Paid' ? 'selected' : '' }}>
-                                                    Paid</option>
+                                                    {{ __('messages.paid') }}</option>
                                                 <option value="Partial"
-                                                    {{ request('status') == 'Partial' ? 'selected' : '' }}>Partial</option>
+                                                    {{ request('status') == 'Partial' ? 'selected' : '' }}>
+                                                    {{ __('messages.partial') }}</option>
                                                 <option value="Unpaid"
-                                                    {{ request('status') == 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
+                                                    {{ request('status') == 'Unpaid' ? 'selected' : '' }}>
+                                                    {{ __('messages.unpaid') }}</option>
                                             </select>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Date Range</label>
+                                            <label class="form-label">{{ __('messages.date_range') }}</label>
                                             <select name="date_range" class="form-select">
                                                 <option value="all"
-                                                    {{ request('date_range') == 'all' ? 'selected' : '' }}>All Time</option>
+                                                    {{ request('date_range') == 'all' ? 'selected' : '' }}>
+                                                    {{ __('messages.all_time') }}</option>
                                                 <option value="today"
-                                                    {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
+                                                    {{ request('date_range') == 'today' ? 'selected' : '' }}>
+                                                    {{ __('messages.today') }}</option>
                                                 <option value="this_week"
-                                                    {{ request('date_range') == 'this_week' ? 'selected' : '' }}>This Week
+                                                    {{ request('date_range') == 'this_week' ? 'selected' : '' }}>
+                                                    {{ __('messages.this_week') }}
                                                 </option>
                                                 <option value="this_month"
-                                                    {{ request('date_range') == 'this_month' ? 'selected' : '' }}>This Month
+                                                    {{ request('date_range') == 'this_month' ? 'selected' : '' }}>
+                                                    {{ __('messages.this_month') }}
                                                 </option>
                                                 <option value="last_month"
-                                                    {{ request('date_range') == 'last_month' ? 'selected' : '' }}>Last Month
+                                                    {{ request('date_range') == 'last_month' ? 'selected' : '' }}>
+                                                    {{ __('messages.last_month') }}
                                                 </option>
                                                 <option value="custom"
-                                                    {{ request('date_range') == 'custom' ? 'selected' : '' }}>Custom Range
+                                                    {{ request('date_range') == 'custom' ? 'selected' : '' }}>
+                                                    {{ __('messages.custom_range') }}
                                                 </option>
                                             </select>
                                         </div>
@@ -76,12 +85,12 @@
                                             style="display: {{ request('date_range') == 'custom' ? 'block' : 'none' }};">
                                             <div class="row">
                                                 <div class="col">
-                                                    <label class="form-label">From</label>
+                                                    <label class="form-label">{{ __('messages.from') }}</label>
                                                     <input type="date" name="start_date" class="form-control"
                                                         value="{{ request('start_date') }}">
                                                 </div>
                                                 <div class="col">
-                                                    <label class="form-label">To</label>
+                                                    <label class="form-label">{{ __('messages.to') }}</label>
                                                     <input type="date" name="end_date" class="form-control"
                                                         value="{{ request('end_date') }}">
                                                 </div>
@@ -90,11 +99,11 @@
                                         <div class="d-flex gap-2">
                                             <button type="submit" class="btn btn-primary flex-fill">
                                                 <i class="ti ti-search me-1"></i>
-                                                Apply
+                                                {{ __('messages.apply') }}
                                             </button>
                                             <a href="{{ route('admin.transactions') }}" class="btn btn-outline-secondary">
                                                 <i class="ti ti-x me-1"></i>
-                                                Clear
+                                                {{ __('messages.clear') }}
                                             </a>
                                         </div>
                                     </form>
@@ -115,7 +124,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
-                                    <div class="subheader">Total Transactions</div>
+                                    <div class="subheader">{{ __('messages.total_transactions') }}</div>
                                     <div class="ms-auto">
                                         <div class="avatar avatar-sm bg-primary-lt">
                                             <i class="ti ti-receipt-2 fs-3"></i>
@@ -124,8 +133,9 @@
                                 </div>
                                 <div class="h2 mb-2">{{ number_format($summary['total_count'] ?? 0) }}</div>
                                 <div class="d-flex mb-2">
-                                    <div class="text-muted">Sales: {{ number_format($summary['sales_count'] ?? 0) }}</div>
-                                    <div class="ms-2 text-muted">Purchases:
+                                    <div class="text-muted">{{ __('messages.sales') }}:
+                                        {{ number_format($summary['sales_count'] ?? 0) }}</div>
+                                    <div class="ms-2 text-muted">{{ __('messages.purchasing') }}:
                                         {{ number_format($summary['purchases_count'] ?? 0) }}</div>
                                 </div>
                             </div>
@@ -135,7 +145,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
-                                    <div class="subheader">Total Amount</div>
+                                    <div class="subheader">{{ __('messages.total_amount') }}</div>
                                     <div class="ms-auto">
                                         <div class="avatar avatar-sm bg-success-lt">
                                             <i class="ti ti-currency-dollar fs-3"></i>
@@ -145,7 +155,7 @@
                                 <div class="h2 mb-2">
                                     {{ \App\Helpers\CurrencyHelper::format($summary['total_amount'] ?? 0) }}</div>
                                 <div class="d-flex mb-2">
-                                    <div class="text-success">Revenue:
+                                    <div class="text-success">{{ __('messages.revenue') }}:
                                         {{ \App\Helpers\CurrencyHelper::format($summary['sales_amount'] ?? 0) }}</div>
                                 </div>
                             </div>
@@ -155,7 +165,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
-                                    <div class="subheader">Paid Transactions</div>
+                                    <div class="subheader">{{ __('messages.paid_transactions') }}</div>
                                     <div class="ms-auto">
                                         <div class="avatar avatar-sm bg-success-lt">
                                             <i class="ti ti-check fs-3"></i>
@@ -174,9 +184,9 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
-                                    <div class="subheader">Outstanding</div>
+                                    <div class="subheader">{{ __('messages.outstanding') }}</div>
                                     <div class="ms-auto">
-                                        <div class="avatar avatar-sm bg-warning">
+                                        <div class="avatar avatar-sm bg-red-lt">
                                             <i class="ti ti-clock fs-3"></i>
                                         </div>
                                     </div>
@@ -205,9 +215,10 @@
                                         <div>
                                             <div class="selection-text">
                                                 <span id="selectedCount" class="text-primary">0</span>
-                                                <span class="text-muted">transactions selected</span>
+                                                <span class="text-muted">{{ __('messages.transactions_selected') }}</span>
                                             </div>
-                                            <div class="selection-subtext">Choose an action to apply to selected items
+                                            <div class="selection-subtext">
+                                                {{ __('messages.choose_action_apply_selected') }}
                                             </div>
                                         </div>
                                     </div>
@@ -217,15 +228,15 @@
                                         class="d-flex flex-wrap justify-content-lg-end justify-content-center gap-2 mt-lg-0 mt-2">
                                         <button onclick="bulkMarkAsPaid()"
                                             class="btn btn-success action-btn d-flex align-items-center">
-                                            <i class="ti ti-check me-2"></i> Mark as Paid
+                                            <i class="ti ti-check me-2"></i> {{ __('messages.mark_as_paid') }}
                                         </button>
                                         <button onclick="bulkExport()"
                                             class="btn btn-secondary action-btn d-flex align-items-center">
-                                            <i class="ti ti-download me-2"></i> Export
+                                            <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
                                         </button>
                                         <button onclick="clearSelection()"
                                             class="btn btn-outline-secondary action-btn d-flex align-items-center">
-                                            <i class="ti ti-x me-2"></i> Clear Selection
+                                            <i class="ti ti-x me-2"></i> {{ __('messages.clear_selection') }}
                                         </button>
                                     </div>
                                 </div>
@@ -235,12 +246,13 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="ti ti-list me-2"></i>
-                            Transaction History
+                            {{ __('messages.transaction_history') }}
                         </h3>
                         <div class="card-actions">
                             <div class="input-group input-group-md" style="max-width: 300px;">
-                                <input type="text" class="form-control" placeholder="Search transactions..."
-                                    id="searchInput" value="{{ request('search') }}">
+                                <input type="text" class="form-control"
+                                    placeholder="{{ __('messages.search_transactions') }}" id="searchInput"
+                                    value="{{ request('search') }}">
                                 <button class="btn btn-outline-secondary" type="button" onclick="searchTransactions()">
                                     <i class="ti ti-search"></i>
                                 </button>
@@ -252,31 +264,32 @@
                     @if (request()->hasAny(['type', 'status', 'date_range', 'search']))
                         <div class="card-body border-bottom py-2">
                             <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <span class="text-muted small">Active filters:</span>
+                                <span class="text-muted small">{{ __('messages.active_filters') }}</span>
                                 @if (request('type'))
                                     <span class="badge bg-primary-lt">
-                                        Type: {{ ucfirst(request('type')) }}
+                                        {{ __('messages.type') }}: {{ ucfirst(request('type')) }}
                                         <a href="{{ request()->fullUrlWithQuery(['type' => null]) }}"
                                             class="btn-close ms-1" style="font-size: 0.75em;"></a>
                                     </span>
                                 @endif
                                 @if (request('status'))
                                     <span class="badge bg-info-lt">
-                                        Status: {{ request('status') }}
+                                        {{ __('messages.status') }}: {{ request('status') }}
                                         <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}"
                                             class="btn-close ms-1" style="font-size: 0.75em;"></a>
                                     </span>
                                 @endif
                                 @if (request('date_range') && request('date_range') != 'all')
                                     <span class="badge bg-warning-lt">
-                                        Period: {{ ucfirst(str_replace('_', ' ', request('date_range')))}}
+                                        {{ __('messages.period') }}:
+                                        {{ ucfirst(str_replace('_', ' ', request('date_range'))) }}
                                         <a href="{{ request()->fullUrlWithQuery(['date_range' => null, 'start_date' => null, 'end_date' => null]) }}"
                                             class="btn-close ms-1" style="font-size: 0.75em;"></a>
                                     </span>
                                 @endif
                                 @if (request('search'))
                                     <span class="badge bg-secondary-lt">
-                                        Search: "{{ request('search') }}"
+                                        {{ __('messages.search_label') }} "{{ request('search') }}"
                                         <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}"
                                             class="btn-close ms-1" style="font-size: 0.75em;"></a>
                                     </span>
@@ -284,7 +297,7 @@
                                 <a href="{{ route('admin.transactions') }}"
                                     class="btn btn-sm btn-outline-secondary ms-2">
                                     <i class="ti ti-x me-1"></i>
-                                    Clear filters
+                                    {{ __('messages.clear_filters') }}
                                 </a>
                             </div>
                         </div>
@@ -300,40 +313,40 @@
                                     <th>
                                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'type', 'direction' => request('sort') == 'type' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
                                             class="table-sort {{ request('sort') == 'type' ? 'table-sort-' . request('direction', 'asc') : '' }}">
-                                            Type
+                                            {{ __('messages.type') }}
                                         </a>
                                     </th>
                                     <th>
                                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'invoice', 'direction' => request('sort') == 'invoice' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
                                             class="table-sort {{ request('sort') == 'invoice' ? 'table-sort-' . request('direction', 'asc') : '' }}">
-                                            Invoice
+                                            {{ __('messages.invoice') }}
                                         </a>
                                     </th>
                                     <th>
                                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'customer_supplier', 'direction' => request('sort') == 'customer_supplier' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
                                             class="table-sort {{ request('sort') == 'customer_supplier' ? 'table-sort-' . request('direction', 'asc') : '' }}">
-                                            Customer/Supplier
+                                            {{ __('messages.customer_supplier') }}
                                         </a>
                                     </th>
                                     <th>
                                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'date', 'direction' => request('sort') == 'date' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
                                             class="table-sort {{ request('sort') == 'date' ? 'table-sort-' . request('direction', 'asc') : '' }}">
-                                            Date
+                                            {{ __('messages.date') }}
                                         </a>
                                     </th>
                                     <th class="text-end">
                                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'amount', 'direction' => request('sort') == 'amount' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
                                             class="table-sort {{ request('sort') == 'amount' ? 'table-sort-' . request('direction', 'asc') : '' }}">
-                                            Amount
+                                            {{ __('messages.amount') }}
                                         </a>
                                     </th>
                                     <th class="text-center">
                                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => request('sort') == 'status' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
                                             class="table-sort {{ request('sort') == 'status' ? 'table-sort-' . request('direction', 'asc') : '' }}">
-                                            Status
+                                            {{ __('messages.status') }}
                                         </a>
                                     </th>
-                                    <th class="w-1">Actions</th>
+                                    <th class="w-1">{{ __('messages.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -353,7 +366,7 @@
                                         <td>
                                             <div class="fw-semibold">{{ $transaction->invoice }}</div>
                                             <div class="small text-muted">
-                                                {{ $transaction->type == 'sale' ? 'Sales' : 'Purchase' }}
+                                                {{ $transaction->type == 'sale' ? __('messages.sales') : __('messages.purchasing') }}
                                             </div>
                                         </td>
                                         <td>
@@ -364,17 +377,17 @@
                                         </td>
                                         <td>
                                             <div class="fw-semibold">
-                                                {{ \Carbon\Carbon::parse($transaction->date)->format('M d, Y') }}
+                                                {{ \Carbon\Carbon::parse($transaction->date)->translatedFormat('M d, Y') }}
                                             </div>
                                             <div class="small text-muted">
-                                                {{ \Carbon\Carbon::parse($transaction->date)->format('h:i A') }}
+                                                {{ \Carbon\Carbon::parse($transaction->date)->translatedFormat('h:i') }}
                                             </div>
                                         </td>
                                         <td class="text-end fw-medium">
                                             {{ \App\Helpers\CurrencyHelper::format($transaction->amount) }}
                                             @if (isset($transaction->due_amount) && $transaction->due_amount > 0)
                                                 <div class="small text-danger">
-                                                    Due:
+                                                    {{ __('messages.due') }}:
                                                     {{ \App\Helpers\CurrencyHelper::format($transaction->due_amount) }}
                                                 </div>
                                             @endif
@@ -382,7 +395,7 @@
                                         <td class="text-center">
                                             <span
                                                 class="badge {{ $transaction->status == 'Paid' ? 'bg-success' : ($transaction->status == 'Partial' ? 'bg-warning' : 'bg-danger') }}-lt">
-                                                {{ $transaction->status }}
+                                                {{ __('messages.' . strtolower($transaction->status)) }}
                                             </span>
                                         </td>
                                         <td>
@@ -393,26 +406,26 @@
                                                 <div class="dropdown-menu dropdown-menu-end">
                                                     <a class="dropdown-item" href="{{ $transaction->view_url ?? '#' }}">
                                                         <i class="ti ti-eye me-2"></i>
-                                                        View Details
+                                                        {{ __('messages.view_details') }}
                                                     </a>
                                                     @if (isset($transaction->edit_url))
                                                         <a class="dropdown-item" href="{{ $transaction->edit_url }}">
                                                             <i class="ti ti-edit me-2"></i>
-                                                            Edit
+                                                            {{ __('messages.edit') }}
                                                         </a>
                                                     @endif
                                                     @if (isset($transaction->print_url))
                                                         <a class="dropdown-item" href="{{ $transaction->print_url }}"
                                                             target="_blank">
                                                             <i class="ti ti-printer me-2"></i>
-                                                            Print
+                                                            {{ __('messages.print') }}
                                                         </a>
                                                     @endif
                                                     @if ($transaction->status != 'Paid')
                                                         <a class="dropdown-item text-success" href="#"
                                                             onclick="showMarkAsPaidModal('{{ $transaction->id ?? '' }}', '{{ $transaction->type }}', '{{ $transaction->invoice }}', '{{ $transaction->customer_supplier }}', '{{ \App\Helpers\CurrencyHelper::format($transaction->amount) }}')">
                                                             <i class="ti ti-check me-2"></i>
-                                                            Mark as Paid
+                                                            {{ __('messages.mark_as_paid') }}
                                                         </a>
                                                     @endif
                                                 </div>
@@ -426,12 +439,12 @@
                                                 <div class="empty-img">
                                                     <i class="ti ti-receipt-off" style="font-size: 3rem;"></i>
                                                 </div>
-                                                <p class="empty-title">No transactions found</p>
+                                                <p class="empty-title">{{ __('messages.no_transactions_found') }}</p>
                                                 <p class="empty-subtitle text-muted">
                                                     @if (request()->hasAny(['type', 'status', 'date_range', 'search']))
-                                                        Try adjusting your search criteria or filters.
+                                                        {{ __('messages.try_adjusting_search_criteria') }}
                                                     @else
-                                                        No transactions have been recorded yet.
+                                                        {{ __('messages.no_transactions_recorded') }}
                                                     @endif
                                                 </p>
                                                 @if (request()->hasAny(['type', 'status', 'date_range', 'search']))
@@ -439,7 +452,7 @@
                                                         <a href="{{ route('admin.transactions') }}"
                                                             class="btn btn-primary">
                                                             <i class="ti ti-x me-1"></i>
-                                                            Clear filters
+                                                            {{ __('messages.clear_filters') }}
                                                         </a>
                                                     </div>
                                                 @endif
@@ -454,8 +467,7 @@
                     @if (method_exists($transactions, 'links') && $transactions->hasPages())
                         <div class="card-footer d-flex align-items-center">
                             <p class="m-0 text-muted">
-                                Showing {{ $transactions->firstItem() }} to {{ $transactions->lastItem() }} of
-                                {{ $transactions->total() }} entries
+                                {{ __('messages.pagination_showing_entries', ['first' => $transactions->firstItem(), 'last' => $transactions->lastItem(), 'total' => $transactions->total()]) }}
                             </p>
                             <div class="ms-auto">
                                 {{ $transactions->appends(request()->query())->links('vendor.pagination.tabler') }}
@@ -466,4 +478,4 @@
             </div>
         </div>
     </div>
-    @include('admin.layouts.modals.recentmodals') @endsection
+@include('admin.layouts.modals.recentmodals') @endsection

@@ -15,10 +15,12 @@
         <nav class="nav-dropdown d-none d-md-flex" id="nav-dropdown">
             <ul class="d-flex gap-3">
                 @foreach ($navigationItems as $item)
-                    {{-- Check if the item is 'Reports' to display it unfiltered --}}
-                    @if (isset($item['title']) && $item['title'] === 'Reports')
-                        <li class="nav-item dropdown" id="reports-nav-item">
-                            <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    {{-- Check if the item has a special key, e.g., 'reports' --}}
+                    @if (isset($item['key']) && $item['key'] === 'reports')
+                        <li class="nav-item dropdown" id="{{ $item['key'] }}-nav-item">
+                            <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}"
+                                data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
+                                aria-expanded="false">
                                 <i class="{{ $item['icon'] }}"></i>
                                 <span class="nav-link-title">
                                     {{ __($item['title']) }}
@@ -27,7 +29,7 @@
                             <div class="dropdown-menu">
                                 <div class="dropdown-menu-columns">
                                     <div class="dropdown-menu-column">
-                                        {{-- Loop through children without permission check --}}
+                                        {{-- Loop through children without permission check for special items --}}
                                         @foreach ($item['children'] as $child)
                                             <a class="dropdown-item" href="{{ route($child['route']) }}">
                                                 <i class="{{ $child['icon'] ?? 'ti ti-point' }}"></i>
@@ -43,7 +45,9 @@
                         @can($item['permission'] ?? null)
                             @if (isset($item['children']))
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                    <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}"
+                                        data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
+                                        aria-expanded="false">
                                         <i class="{{ $item['icon'] }}"></i>
                                         <span class="nav-link-title">
                                             {{ __($item['title']) }}
@@ -64,8 +68,8 @@
                                     </div>
                                 </li>
                             @else
-                                <li><a href="{{ route($item['route']) }}"><i
-                                            class="{{ $item['icon'] }}"></i><span class="nav-link-title">{{ __($item['title']) }}</span></a></li>
+                                <li><a href="{{ route($item['route']) }}"><i class="{{ $item['icon'] }}"></i><span
+                                            class="nav-link-title">{{ __($item['title']) }}</span></a></li>
                             @endif
                         @endcan
                     @endif

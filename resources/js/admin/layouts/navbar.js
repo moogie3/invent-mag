@@ -345,8 +345,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Staggered dropdown children animation
     const initStaggeredDropdown = () => {
         document.querySelectorAll('.nav-item.dropdown > .nav-link.dropdown-toggle').forEach(toggle => {
-            const linkTitle = toggle.querySelector('.nav-link-title');
-            if (linkTitle && linkTitle.textContent.trim() === 'Reports') {
+            const dropdown = toggle.closest('.nav-item.dropdown');
+            if (dropdown && dropdown.id === 'reports-nav-item') {
                 // For the 'Reports' menu, we let the default Bootstrap data-bs-toggle handle it.
                 // This is because the custom handler was conflicting with the Blade template logic.
                 return;

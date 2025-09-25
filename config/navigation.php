@@ -60,6 +60,7 @@ return [
             'title' => 'messages.reports',
             'icon' => 'ti ti-report',
             'permission' => 'view-reports',
+            'key' => 'reports',
             'children' => [
                 [
                     'title' => 'messages.adjustment_log',

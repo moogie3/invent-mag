@@ -20,7 +20,7 @@
                     <div class="row g-3 mb-4">
                         <!-- Store Details -->
                         <div class="col-md-3">
-                            <div class="card border-0 bg-light h-100">
+                            <div class="card border-0 shadow-sm" style="background-color: #f8f9fa;">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label class="form-label text-muted mb-2 d-block">
@@ -28,33 +28,33 @@
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
-                                        <div class="me-3 d-flex align-items-center justify-content-center"
-                                            style="width: 32px; height: 32px;">
-                                            <i class="ti ti-building-store fs-2 text-primary"></i>
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
+                                            style="width: 40px; height: 40px; background-color: #e3f2fd;">
+                                            <i class="ti ti-building-store fs-3 text-primary"></i>
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="small text-muted">{{ __('messages.user_store') }}</div>
-                                            <div class="fw-bold">{{ $shopname }}</div>
+                                            <div class="fw-bold fs-4">{{ $shopname }}</div>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
-                                        <div class="me-3 d-flex align-items-center justify-content-center"
-                                            style="width: 32px; height: 32px;">
-                                            <i class="ti ti-map fs-2 text-success"></i>
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
+                                            style="width: 40px; height: 40px; background-color: #e8f5e8;">
+                                            <i class="ti ti-map fs-3 text-success"></i>
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="small text-muted">{{ __('messages.store_address') }}</div>
-                                            <div class="fw-bold">{{ $address }}</div>
+                                            <div class="fw-bold fs-4">{{ $address }}</div>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <div class="me-3 d-flex align-items-center justify-content-center"
-                                            style="width: 32px; height: 32px;">
-                                            <i class="ti ti-file-invoice fs-2 text-info"></i>
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
+                                            style="width: 40px; height: 40px; background-color: #e3f2fd;">
+                                            <i class="ti ti-file-invoice fs-3 text-info"></i>
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="small text-muted">{{ __('messages.total_invoice') }}</div>
-                                            <div class="fw-bold" id="totalInvoiceCount">{{ $totalinvoice }}</div>
+                                            <div class="fw-bold fs-4" id="totalInvoiceCount">{{ $totalinvoice }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -63,7 +63,7 @@
 
                         <!-- Financial Overview -->
                         <div class="col-md-4">
-                            <div class="card border-0 bg-primary text-white h-100">
+                            <div class="card border-0 shadow-sm bg-primary text-white h-100">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label class="form-label text-white-50 mb-2 d-block">
@@ -154,7 +154,7 @@
 
                         <!-- Expiry Status with Blue Background -->
                         <div class="col-md-2">
-                            <div class="card border-0 bg-info text-white h-100">
+                            <div class="card border-0 shadow-sm bg-info text-white h-100">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label class="form-label text-white-50 mb-2 d-block">
@@ -162,8 +162,9 @@
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <i class="ti ti-calendar-time fs-2"></i>
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
+                                            style="width: 50px; height: 50px;">
+                                            <i class="ti ti-calendar-time fs-2 text-white"></i>
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="text-white-50 small">
@@ -185,7 +186,7 @@
 
                         <!-- Filters -->
                         <div class="col-md-3">
-                            <div class="card border-0 bg-light h-100">
+                            <div class="card border-0 shadow-sm bg-light h-100">
                                 <div class="card-body py-3">
                                     @include('admin.layouts.partials.po.index.filters')
                                 </div>

@@ -64,7 +64,7 @@
                                 <i class="{{ $item['icon'] }}"></i>
                             </div>
                             @endif
-                            <span class="nav-link-title">{{ $item['title'] ?? '' }}</span>
+                            <span class="nav-link-title">{{ __($item['title'] ?? '') }}</span>
                             @if(isset($item['children']))
                             <div class="nav-link-arrow">
                                 <i class="ti ti-chevron-down"></i>
@@ -83,7 +83,7 @@
                                                         <i class="{{ $child['icon'] }}"></i>
                                                     </div>
                                                     @endif
-                                                    <span class="nav-link-title">{{ $child['title'] ?? '' }}</span>
+                                                    <span class="nav-link-title">{{ __($child['title'] ?? '') }}</span>
                                                 </a>
                                             </li>
                                         @endcan
@@ -107,7 +107,7 @@
                     <div class="nav-link-icon">
                         <i class="ti ti-settings"></i>
                     </div>
-                    <span class="nav-link-title">Settings</span>
+                    <span class="nav-link-title">{{ __('messages.settings') }}</span>
                 </a>
             </li>
 
@@ -119,7 +119,7 @@
                         <div class="nav-link-icon">
                             <i class="ti ti-users"></i>
                         </div>
-                        <span class="nav-link-title">User Management</span>
+                        <span class="nav-link-title">{{ __('messages.user_management') }}</span>
                     </a>
                 </li>
             @endcan
@@ -130,7 +130,7 @@
                     <div class="nav-link-icon">
                         <i class="ti ti-logout"></i>
                     </div>
-                    <span class="nav-link-title">Logout</span>
+                    <span class="nav-link-title">{{ __('messages.logout') }}</span>
                 </a>
                 <form id="logout-form" method="POST" action="{{ route('admin.logout') }}" style="display: none;">
                     @csrf

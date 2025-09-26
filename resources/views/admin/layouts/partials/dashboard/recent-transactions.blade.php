@@ -68,6 +68,6 @@
     </div>
 
     <div class="card-footer text-center">
-        <a href="{{ route('admin.transactions') }}">{{ __('messages.view_all_transactions') }}</a>
+        <a href="{{ route('admin.reports.recent-transactions') }}">{{ __('messages.view_all_transactions') }}</a>
     </div>
 </div>

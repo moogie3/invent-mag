@@ -19,7 +19,7 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <div class="card border-0 shadow-sm" style="background-color: #f8f9fa;">
+                            <div class="card border-0 shadow-sm">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label class="form-label text-muted mb-2 d-block">
@@ -27,8 +27,8 @@
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
-                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
-                                            style="width: 40px; height: 40px; background-color: #e3f2fd;">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded badge"
+                                            style="width: 40px; height: 40px;"">
                                             <i class="ti ti-box fs-3 text-primary"></i>
                                         </div>
                                         <div class="flex-grow-1">
@@ -37,8 +37,8 @@
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
-                                            style="width: 40px; height: 40px; background-color: #e8f5e8;">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded badge"
+                                            style="width: 40px; height: 40px;">
                                             <i class="ti ti-category fs-3 text-success"></i>
                                         </div>
                                         <div class="flex-grow-1">
@@ -50,8 +50,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card border-0 shadow-sm"
-                                style="background-color: {{ $lowStockCount > 0 ? '#fff5f5' : '#f0fff4' }};">
+                            <div class="card border-0 shadow-sm bg-red-lt">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label
@@ -60,8 +59,8 @@
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
-                                            style="width: 50px; height: 50px; background-color: {{ $lowStockCount > 0 ? '#ffebee' : '#e8f5e8' }};">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded badge"
+                                            style="width: 40px; height: 40px; background-color: {{ $lowStockCount > 0 ? '#ffebee' : '#e8f5e8' }};">
                                             <i
                                                 class="ti ti-alert-triangle fs-2 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}"></i>
                                         </div>
@@ -84,8 +83,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card border-0 shadow-sm"
-                                style="background-color: {{ $expiringSoonCount > 0 ? '#fffbf0' : '#f0fff4' }};">
+                            <div class="card border-0 shadow-sm bg-orange-lt">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label
@@ -94,8 +92,8 @@
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
-                                            style="width: 50px; height: 50px; background-color: {{ $expiringSoonCount > 0 ? '#fff3cd' : '#e8f5e8' }};">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded badge"
+                                            style="width: 40px; height: 40px; background-color: {{ $expiringSoonCount > 0 ? '#fff3cd' : '#e8f5e8' }};">
                                             <i
                                                 class="ti ti-calendar-time fs-2 {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}"></i>
                                         </div>

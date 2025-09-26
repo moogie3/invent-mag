@@ -20,7 +20,7 @@
                     <div class="row g-3 mb-4">
                         <!-- Store Details -->
                         <div class="col-md-3">
-                            <div class="card border-0 shadow-sm" style="background-color: #f8f9fa;">
+                            <div class="card border-0 shadow-sm">
                                 <div class="card-body py-3">
                                     <div class="mb-2">
                                         <label class="form-label text-muted mb-2 d-block">
@@ -28,8 +28,8 @@
                                         </label>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
-                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
-                                            style="width: 40px; height: 40px; background-color: #e3f2fd;">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded badge"
+                                            style="width: 40px; height: 40px;">
                                             <i class="ti ti-building-store fs-3 text-primary"></i>
                                         </div>
                                         <div class="flex-grow-1">
@@ -38,8 +38,8 @@
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center mb-3">
-                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
-                                            style="width: 40px; height: 40px; background-color: #e8f5e8;">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded badge"
+                                            style="width: 40px; height: 40px;"">
                                             <i class="ti ti-map fs-3 text-success"></i>
                                         </div>
                                         <div class="flex-grow-1">
@@ -48,8 +48,8 @@
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
-                                            style="width: 40px; height: 40px; background-color: #e3f2fd;">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded badge"
+                                            style="width: 40px; height: 40px">
                                             <i class="ti ti-file-invoice fs-3 text-info"></i>
                                         </div>
                                         <div class="flex-grow-1">

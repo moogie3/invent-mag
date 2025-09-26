@@ -45,7 +45,7 @@
                 <div class="row mb-4">
                     <div class="col-md-6">
                         @include('admin.layouts.partials.dashboard.analytics-card', [
-                            'title' => 'Customer Analysis',
+                            'title' => __('messages.customer_analysis'),
                             'icon' => 'ti-users',
                             'color' => 'azure',
                             'route' => route('admin.customer'),
@@ -55,7 +55,7 @@
                     </div>
                     <div class="col-md-6">
                         @include('admin.layouts.partials.dashboard.analytics-card', [
-                            'title' => 'Supplier Analysis',
+                            'title' => __('messages.supplier_analysis'),
                             'icon' => 'ti-truck',
                             'color' => 'purple',
                             'route' => route('admin.supplier'),

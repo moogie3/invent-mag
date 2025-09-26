@@ -263,7 +263,7 @@ class DashboardService
     {
         return [
             [
-                'title' => 'Remaining Liability',
+                'title' => __('messages.remaining_liability'),
                 'icon' => 'ti-building-warehouse',
                 'value' => $unpaidLiability,
                 'total' => $totalLiability,
@@ -278,7 +278,7 @@ class DashboardService
                 'badge_class' => $unpaidLiability < $totalLiability * 0.5 ? 'bg-success-lt' : 'bg-danger-lt',
             ],
             [
-                'title' => 'Account Receivable',
+                'title' => __('messages.account_receivable'),
                 'icon' => 'ti-moneybag',
                 'value' => $unpaidRevenue,
                 'total' => $totalRevenue,
@@ -293,7 +293,7 @@ class DashboardService
                 'badge_class' => $unpaidRevenue > $totalRevenue * 0.5 ? 'bg-success-lt' : 'bg-danger-lt',
             ],
             [
-                'title' => 'Monthly Earnings',
+                'title' => __('messages.monthly_earnings'),
                 'icon' => 'ti-chart-pie',
                 'value' => $monthlySales,
                 'total' => null,
@@ -303,12 +303,12 @@ class DashboardService
                 'route' => null,
                 'percentage' => 0,
                 'trend' => $monthlySales > 0 ? 'positive' : 'neutral',
-                'trend_label' => 'This Month',
+                'trend_label' => __('messages.this_month'),
                 'trend_icon' => '',
                 'badge_class' => $monthlySales > 0 ? 'bg-success-lt' : 'bg-muted-lt',
             ],
             [
-                'title' => 'Payment Overdue',
+                'title' => __('messages.payment_overdue'),
                 'icon' => 'ti-alert-triangle',
                 'value' => $this->getOverdueInvoicesCount(),
                 'total' => null,
@@ -318,7 +318,7 @@ class DashboardService
                 'route' => route('admin.po', ['status' => 'Overdue']),
                 'percentage' => 0,
                 'trend' => $this->getOverdueInvoicesCount() == 0 ? 'positive' : 'negative',
-                'trend_label' => $this->getOverdueInvoicesCount() == 0 ? 'No overdue payments' : 'Action required',
+                'trend_label' => $this->getOverdueInvoicesCount() == 0 ? __('messages.no_overdue_payments') : __('messages.action_required'),
                 'trend_icon' => $this->getOverdueInvoicesCount() == 0 ? 'ti ti-check' : 'ti ti-alert-circle',
                 'badge_class' => $this->getOverdueInvoicesCount() == 0 ? 'bg-success-lt' : 'bg-danger-lt',
             ],
@@ -335,27 +335,27 @@ class DashboardService
 
         return [
             [
-                'label' => 'Total Liabilities',
+                'label' => __('messages.total_liabilities'),
                 'value' => $totalLiability,
                 'icon' => 'ti-wallet',
             ],
             [
-                'label' => 'This Month Paid Liabilities',
+                'label' => __('messages.this_month_paid_liabilities'),
                 'value' => $this->getLiabilityPaymentsMonthly(),
                 'icon' => 'ti-calendar',
             ],
             [
-                'label' => 'Total Account Receivable',
+                'label' => __('messages.total_account_receivable'),
                 'value' => $totalRevenue,
                 'icon' => 'ti-report-money',
             ],
             [
-                'label' => 'This Month Receivable Paid',
+                'label' => __('messages.this_month_receivable_paid'),
                 'value' => $this->getPaidDebtMonthly(),
                 'icon' => 'ti-coin',
             ],
             [
-                'label' => 'Operating Expenses',
+                'label' => __('messages.operating_expenses'),
                 'value' => $operatingExpenses,
                 'icon' => 'ti-shopping-cart',
             ],

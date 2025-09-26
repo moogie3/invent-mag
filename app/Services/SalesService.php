@@ -447,7 +447,7 @@ class SalesService
 
     public function getExpiringSalesCount(): int
     {
-        return Sales::where('due_date', '<=', Carbon::now()->addDays(90))
+        return Sales::where('due_date', '<=', Carbon::now()->addDays(10))
                         ->where('status', '!=', 'Paid')
                         ->count();
     }

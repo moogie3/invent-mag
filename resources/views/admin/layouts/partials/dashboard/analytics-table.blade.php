@@ -25,7 +25,7 @@
             @empty
                 <tr>
                     <td colspan="{{ $type === 'supplier' ? 3 : 2 }}" class="text-center py-3 text-muted">
-                        No {{ $type }} data available
+                        {{ __('messages.no_data_available_for_type', ['type' => $type]) }}
                     </td>
                 </tr>
             @endforelse

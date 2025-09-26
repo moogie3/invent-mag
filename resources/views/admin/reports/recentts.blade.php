@@ -101,7 +101,7 @@
                                                 <i class="ti ti-search me-1"></i>
                                                 {{ __('messages.apply') }}
                                             </button>
-                                            <a href="{{ route('admin.transactions') }}" class="btn btn-outline-secondary">
+                                            <a href="{{ route('admin.reports.recent-transactions') }}" class="btn btn-outline-secondary">
                                                 <i class="ti ti-x me-1"></i>
                                                 {{ __('messages.clear') }}
                                             </a>
@@ -294,7 +294,7 @@
                                             class="btn-close ms-1" style="font-size: 0.75em;"></a>
                                     </span>
                                 @endif
-                                <a href="{{ route('admin.transactions') }}"
+                                <a href="{{ route('admin.reports.recent-transactions') }}"
                                     class="btn btn-sm btn-outline-secondary ms-2">
                                     <i class="ti ti-x me-1"></i>
                                     {{ __('messages.clear_filters') }}
@@ -449,7 +449,7 @@
                                                 </p>
                                                 @if (request()->hasAny(['type', 'status', 'date_range', 'search']))
                                                     <div class="empty-action">
-                                                        <a href="{{ route('admin.transactions') }}"
+                                                        <a href="{{ route('admin.reports.recent-transactions') }}"
                                                             class="btn btn-primary">
                                                             <i class="ti ti-x me-1"></i>
                                                             {{ __('messages.clear_filters') }}

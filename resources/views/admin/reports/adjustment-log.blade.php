@@ -64,7 +64,17 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center">{{ __('messages.no_stock_adjustments_found') }}</td>
+                                        <td colspan="8" class="text-center py-5 text-muted">
+                                            <div class="empty">
+                                                <div class="empty-img">
+                                                    <i class="ti ti-file-text" style="font-size: 3rem;"></i>
+                                                </div>
+                                                <p class="empty-title">{{ __('messages.no_stock_adjustments_found') }}</p>
+                                                <p class="empty-subtitle text-muted">
+                                                    {{ __('messages.no_stock_adjustments_found_message') }}
+                                                </p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>

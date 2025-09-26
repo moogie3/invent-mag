@@ -4,7 +4,7 @@
     </div>
     <div class="card-body p-3" style="min-height: 280px;">
         <div class="row g-3">
-            @foreach ([['route' => route('admin.sales.create'), 'icon' => 'ti-receipt', 'text' => __('messages.new_sales')], ['route' => route('admin.po.create'), 'icon' => 'ti-shopping-cart', 'text' => __('messages.create_purchase_order')], ['route' => route('admin.product.create'), 'icon' => 'ti-box', 'text' => __('messages.add_product')], ['route' => route('admin.notifications'), 'icon' => 'ti-notification', 'text' => __('messages.notifications')], ['route' => route('admin.pos'), 'icon' => 'ti-http-post', 'text' => __('messages.pos_title')], ['route' => route('admin.transactions'), 'icon' => 'ti-history', 'text' => __('messages.activity_log')]] as $action)
+            @foreach ([['route' => route('admin.sales.create'), 'icon' => 'ti-receipt', 'text' => __('messages.new_sales')], ['route' => route('admin.po.create'), 'icon' => 'ti-shopping-cart', 'text' => __('messages.create_purchase_order')], ['route' => route('admin.product.create'), 'icon' => 'ti-box', 'text' => __('messages.add_product')], ['route' => route('admin.notifications'), 'icon' => 'ti-notification', 'text' => __('messages.notifications')], ['route' => route('admin.pos'), 'icon' => 'ti-http-post', 'text' => __('messages.pos_title')], ['route' => route('admin.reports.recent-transactions'), 'icon' => 'ti-history', 'text' => __('messages.activity_log')]] as $action)
                 <div class="col-6">
                     <a href="{{ $action['route'] }}"
                         class="btn btn-outline-secondary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-2">

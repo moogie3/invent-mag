@@ -34,8 +34,8 @@
                                 <div class="d-flex justify-content-between">
                                     <div class="col-md-8">
                                         <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <div class="card border-0 bg-light">
+                                            <div class="col-md-3">
+                                                <div class="card border-0 bg-blue-lt">
                                                     <div class="card-body py-3">
                                                         <div class="mb-2">
                                                             <label class="form-label text-muted mb-2 d-block">
@@ -43,19 +43,21 @@
                                                             </label>
                                                         </div>
                                                         <div class="d-flex align-items-center mb-3">
-                                                            <div class="me-3 d-flex align-items-center justify-content-center"
-                                                                style="width: 32px; height: 32px;">
+                                                            <div class="me-3 d-flex align-items-center justify-content-center badge"
+                                                                style="width: 40px; height: 40px;">
                                                                 <i class="ti ti-building-warehouse fs-3 text-primary"></i>
                                                             </div>
                                                             <div class="flex-grow-1">
-                                                                <div class="small text-muted">{{ __('messages.supplier_info_total') }}</div>
-                                                                <div class="fw-bold" id="totalSupplierCount">{{ $totalsupplier }}</div>
+                                                                <div class="small text-muted">
+                                                                    {{ __('messages.supplier_info_total') }}</div>
+                                                                <div class="fw-bold" id="totalSupplierCount">
+                                                                    {{ $totalsupplier }}</div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-4">
                                                 <div class="card border-0 bg-light">
                                                     <div class="card-body py-3">
                                                         <div class="mb-2">
@@ -69,7 +71,8 @@
                                                                 <i class="ti ti-step-out fs-3 text-danger"></i>
                                                             </div>
                                                             <div class="flex-grow-1">
-                                                                <div class="small text-muted">{{ __('messages.supplier_info_out') }}</div>
+                                                                <div class="small text-muted">
+                                                                    {{ __('messages.supplier_info_out') }}</div>
                                                                 <div class="fw-bold">{{ $outCount }}</div>
                                                             </div>
                                                         </div>
@@ -79,7 +82,8 @@
                                                                 <i class="ti ti-step-into fs-3 text-success"></i>
                                                             </div>
                                                             <div class="flex-grow-1">
-                                                                <div class="small text-muted">{{ __('messages.supplier_info_in') }}</div>
+                                                                <div class="small text-muted">
+                                                                    {{ __('messages.supplier_info_in') }}</div>
                                                                 <div class="fw-bold">{{ $inCount }}</div>
                                                             </div>
                                                         </div>
@@ -121,91 +125,105 @@
                                             <tr>
                                                 <th class="no-print"><button class="table-sort fs-4 py-3 no-print"
                                                         data-sort="sort-no">{{ __('messages.table_no') }}</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-image">{{ __('messages.table_image') }}</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-code">{{ __('messages.table_code') }}</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-name">{{ __('messages.table_name') }}</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-address">{{ __('messages.table_address') }}
-                                                </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-location">{{ __('messages.table_location') }}
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-image">{{ __('messages.table_image') }}</th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-code">{{ __('messages.table_code') }}</th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-name">{{ __('messages.table_name') }}</th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-address">{{ __('messages.table_address') }}
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-paymentterms">{{ __('messages.table_payment_terms') }}</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-email">{{ __('messages.table_email') }}</th>
-                                                <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">{{ __('messages.table_action') }}
+                                                        data-sort="sort-location">{{ __('messages.table_location') }}
+                                                </th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-paymentterms">{{ __('messages.table_payment_terms') }}
+                                                </th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-email">{{ __('messages.table_email') }}</th>
+                                                <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">
+                                                    {{ __('messages.table_action') }}
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody id="invoiceTableBody" class="table-tbody">
-    @forelse ($suppliers as $index => $supplier)
-        <tr>
-            <td class="sort-no no-print">{{ $suppliers->firstItem() + $index }}</td>
-            <td class="sort-image">
-                @if ($supplier->image == asset('img/default_placeholder.png'))
-                    <i class="ti ti-photo fs-1"
-                        style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
-                @else
-                    <img src="{{ $supplier->image }}" alt="Supplier Image"
-                        class="avatar avatar-sm"
-                        style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;">
-                @endif
-            </td>
-            <td class="sort-code">{{ $supplier->code }}</td>
-            <td class="sort-name">{{ $supplier->name }}</td>
-            <td class="sort-address">{{ $supplier->address }}</td>
-            <td class="sort-location">{{ $supplier->location }}</td>
-            <td class="sort-paymentterms">{{ $supplier->payment_terms }}</td>
-            <td class="sort-email">{{ $supplier->email }}</td>
-            <td class="no-print" style="text-align:center">
-                <div class="dropdown">
-                    <button class="btn dropdown-toggle align-text-top"
-                        data-bs-toggle="dropdown" data-bs-boundary="viewport">
-                        {{ __('messages.table_action') }}
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="#" class="dropdown-item srm-supplier-btn"
-                            data-id="{{ $supplier->id }}" data-bs-toggle="modal"
-                            data-bs-target="#srmSupplierModal">
-                            <i class="ti ti-user-search me-2"></i> {{ __('messages.supplier_action_view_srm') }}
-                        </a>
-                        <a href="#" class="dropdown-item"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editSupplierModal"
-                            data-id="{{ $supplier->id }}"
-                            data-code="{{ $supplier->code }}"
-                            data-name="{{ $supplier->name }}"
-                            data-address="{{ $supplier->address }}"
-                            data-phone_number="{{ $supplier->phone_number }}"
-                            data-location="{{ $supplier->location }}"
-                            data-payment_terms="{{ $supplier->payment_terms }}"
-                            data-image="{{ $supplier->image }}"
-                            data-email="{{ $supplier->email }}">
-                            <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
-                        </a>
-                        <button type="button" class="dropdown-item text-danger"
-                            data-bs-toggle="modal" data-bs-target="#deleteModal"
-                            onclick="setDeleteFormAction('{{ route('admin.supplier.destroy', $supplier->id) }}')">
-                            <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
-                        </button>
-                    </div>
-                </div>
-            </td>
-        </tr>
-    @empty
-        <tr>
-            <td colspan="9">
-                <div class="empty">
-                    <div class="empty-img">
-                        <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>
-                    </div>
-                    <p class="empty-title">{{ __('messages.no_suppliers_found') }}</p>
-                    <p class="empty-subtitle text-muted">
-                        {{ __('messages.it_looks_like_you_havent_added_any_suppliers_yet') }}
-                    </p>
-                </div>
-            </td>
-        </tr>
-    @endforelse
-</tbody>
+                                            @forelse ($suppliers as $index => $supplier)
+                                                <tr>
+                                                    <td class="sort-no no-print">{{ $suppliers->firstItem() + $index }}
+                                                    </td>
+                                                    <td class="sort-image">
+                                                        @if ($supplier->image == asset('img/default_placeholder.png'))
+                                                            <i class="ti ti-photo fs-1"
+                                                                style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
+                                                        @else
+                                                            <img src="{{ $supplier->image }}" alt="Supplier Image"
+                                                                class="avatar avatar-sm"
+                                                                style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;">
+                                                        @endif
+                                                    </td>
+                                                    <td class="sort-code">{{ $supplier->code }}</td>
+                                                    <td class="sort-name">{{ $supplier->name }}</td>
+                                                    <td class="sort-address">{{ $supplier->address }}</td>
+                                                    <td class="sort-location">{{ $supplier->location }}</td>
+                                                    <td class="sort-paymentterms">{{ $supplier->payment_terms }}</td>
+                                                    <td class="sort-email">{{ $supplier->email }}</td>
+                                                    <td class="no-print" style="text-align:center">
+                                                        <div class="dropdown">
+                                                            <button class="btn dropdown-toggle align-text-top"
+                                                                data-bs-toggle="dropdown" data-bs-boundary="viewport">
+                                                                {{ __('messages.table_action') }}
+                                                            </button>
+                                                            <div class="dropdown-menu">
+                                                                <a href="#" class="dropdown-item srm-supplier-btn"
+                                                                    data-id="{{ $supplier->id }}" data-bs-toggle="modal"
+                                                                    data-bs-target="#srmSupplierModal">
+                                                                    <i class="ti ti-user-search me-2"></i>
+                                                                    {{ __('messages.supplier_action_view_srm') }}
+                                                                </a>
+                                                                <a href="#" class="dropdown-item"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editSupplierModal"
+                                                                    data-id="{{ $supplier->id }}"
+                                                                    data-code="{{ $supplier->code }}"
+                                                                    data-name="{{ $supplier->name }}"
+                                                                    data-address="{{ $supplier->address }}"
+                                                                    data-phone_number="{{ $supplier->phone_number }}"
+                                                                    data-location="{{ $supplier->location }}"
+                                                                    data-payment_terms="{{ $supplier->payment_terms }}"
+                                                                    data-image="{{ $supplier->image }}"
+                                                                    data-email="{{ $supplier->email }}">
+                                                                    <i class="ti ti-edit me-2"></i>
+                                                                    {{ __('messages.edit') }}
+                                                                </a>
+                                                                <button type="button" class="dropdown-item text-danger"
+                                                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                                    onclick="setDeleteFormAction('{{ route('admin.supplier.destroy', $supplier->id) }}')">
+                                                                    <i class="ti ti-trash me-2"></i>
+                                                                    {{ __('messages.delete') }}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="9">
+                                                        <div class="empty">
+                                                            <div class="empty-img">
+                                                                <i class="ti ti-mood-sad"
+                                                                    style="font-size: 5rem; color: #ccc;"></i>
+                                                            </div>
+                                                            <p class="empty-title">{{ __('messages.no_suppliers_found') }}
+                                                            </p>
+                                                            <p class="empty-subtitle text-muted">
+                                                                {{ __('messages.it_looks_like_you_havent_added_any_suppliers_yet') }}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>

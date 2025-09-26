@@ -22,7 +22,7 @@
 @endif
 
 {{-- SCRIPT FOR RECENT TRANSACTIONS  --}}
-@if (request()->is('admin/transactions'))
+@if (request()->is('admin/reports/recent-transactions'))
     @vite('resources/js/admin/recentts.js')
 @endif
 

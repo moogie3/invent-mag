@@ -11,18 +11,19 @@
                                 </label>
                             </div>
                             <div class="d-flex align-items-center mb-3">
-                                <div class="me-3 d-flex align-items-center justify-content-center"
-                                    style="width: 32px; height: 32px;">
+                                <div class="me-3 d-flex align-items-center justify-content-center badge"
+                                    style="width: 40px; height: 40px;">
                                     <i class="ti ti-building-warehouse fs-3 text-primary"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div class="small text-muted">{{ __('messages.warehouse_info_total_warehouse') }}</div>
+                                    <div class="small text-muted">{{ __('messages.warehouse_info_total_warehouse') }}
+                                    </div>
                                     <div class="fw-bold" id="totalWarehouseCount">{{ $totalwarehouse }}</div>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-3">
-                                <div class="me-3 d-flex align-items-center justify-content-center"
-                                    style="width: 32px; height: 32px;">
+                                <div class="me-3 d-flex align-items-center justify-content-center badge"
+                                    style="width: 40px; height: 40px;">
                                     <i class="ti ti-building-store fs-3 text-success"></i>
                                 </div>
                                 <div class="flex-grow-1">
@@ -42,23 +43,27 @@
                                 </label>
                             </div>
                             <div class="d-flex align-items-center mb-3">
-                                <div class="me-3 d-flex align-items-center justify-content-center"
-                                    style="width: 32px; height: 32px;">
+                                <div class="me-3 d-flex align-items-center justify-content-center badge"
+                                    style="width: 40px; height: 40px;">
                                     <i class="ti ti-map fs-3 text-info"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div class="small text-muted">{{ __('messages.warehouse_info_store_address') }}</div>
+                                    <div class="small text-muted">{{ __('messages.warehouse_info_store_address') }}
+                                    </div>
                                     <div class="fw-bold">{{ $address }}</div>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center">
-                                <div class="me-3 d-flex align-items-center justify-content-center"
-                                    style="width: 32px; height: 32px;">
+                                <div class="me-3 d-flex align-items-center justify-content-center badge"
+                                    style="width: 40px; height: 40px;">
                                     <i class="ti ti-container fs-3 text-warning"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div class="small text-muted">{{ __('messages.warehouse_info_main_warehouse') }}</div>
-                                    <div class="fw-bold">{{ isset($mainWarehouse) ? $mainWarehouse->name : __('messages.warehouse_info_not_set') }}</div>
+                                    <div class="small text-muted">{{ __('messages.warehouse_info_main_warehouse') }}
+                                    </div>
+                                    <div class="fw-bold">
+                                        {{ isset($mainWarehouse) ? $mainWarehouse->name : __('messages.warehouse_info_not_set') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>

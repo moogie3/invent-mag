@@ -204,17 +204,12 @@ Route::prefix('admin')->group(function () {
             Route::get('/receipt/{id}', [POSController::class, 'receipt'])->name('admin.pos.receipt');
         });
 
-        // Transaction Routes
-        Route::prefix('transactions')->group(function () {
-            Route::get('/', [ReportController::class, 'recentTransactions'])->name('admin.transactions');
-            Route::post('/{id}/mark-paid', [ReportController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');
-            Route::post('/bulk-mark-paid', [ReportController::class, 'bulkMarkAsPaid']);
-        });
-
         // Reports Routes
         Route::prefix('reports')->group(function () {
             Route::get('/adjustment-log', [ReportController::class, 'adjustmentLog'])->name('admin.reports.adjustment-log');
             Route::get('/recent-transactions', [ReportController::class, 'recentTransactions'])->name('admin.reports.recent-transactions');
+            Route::post('/{id}/mark-paid', [ReportController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');
+            Route::post('/bulk-mark-paid', [ReportController::class, 'bulkMarkAsPaid']);
         });
 
         // Notification Routes

@@ -138,3 +138,23 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+document.addEventListener('ctrl-s-pressed', function () {
+    const modals = [
+        'newOpportunityModal',
+        'managePipelinesModal',
+        'editPipelineModal',
+        'editOpportunityModal'
+    ];
+
+    for (const modalId of modals) {
+        const modal = document.getElementById(modalId);
+        if (modal && modal.classList.contains('show')) {
+            const form = modal.querySelector('form');
+            if (form) {
+                form.requestSubmit();
+                break; 
+            }
+        }
+    }
+});

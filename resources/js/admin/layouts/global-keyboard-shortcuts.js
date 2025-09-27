@@ -20,40 +20,10 @@ const handleKeyboardShortcut = (event) => {
 
     // Ctrl+S / Cmd+S - Save
     if ((isMac ? event.metaKey : event.ctrlKey) && event.key === 's') {
+        console.log('Ctrl+S pressed');
         event.preventDefault();
-        
-        // POS page special handling
-        if (window.location.pathname.includes('/pos')) {
-            const event = new CustomEvent('ctrl-s-pressed');
-            document.dispatchEvent(event);
-            return;
-        }
-
-        let form;
-        let paymentButton;
-        const activeModal = document.querySelector('.modal.show');
-        if (activeModal) {
-            form = activeModal.querySelector('form');
-            paymentButton = activeModal.querySelector('#completePaymentBtn');
-        } else {
-            form = document.querySelector('form:not(#logout-form)');
-        }
-
-        if (form) {
-            setTimeout(() => {
-                if (typeof form.requestSubmit === 'function') {
-                    form.requestSubmit();
-                } else {
-                    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-                }
-            }, 100);
-            InventMagApp.showToast('Info', 'Attempting to save...', 'info');
-        } else if (paymentButton) {
-            paymentButton.click();
-            InventMagApp.showToast('Info', 'Attempting to complete payment...', 'info');
-        } else {
-            InventMagApp.showToast('Info', 'No active form to save.', 'info');
-        }
+        const customEvent = new CustomEvent('ctrl-s-pressed');
+        document.dispatchEvent(customEvent);
     }
     // Shift + ? - Show Shortcuts Modal
     else if (event.shiftKey && event.key === '?') {
@@ -92,7 +62,6 @@ const handleKeyboardShortcut = (event) => {
             const modalInstance = bootstrap.Modal.getInstance(openModal);
             if (modalInstance) {
                 modalInstance.hide();
-                InventMagApp.showToast('Info', 'Closing modal.', 'info');
             }
         }
     }

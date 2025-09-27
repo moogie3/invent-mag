@@ -347,8 +347,7 @@
                                 </div>
                                 <div class="card-footer bg-transparent mt-auto">
                                     <div class="btn-list justify-content-end">
-                                        <button type="button" class="btn btn-secondary"
-                                            onclick="resetToDefaults()">{{ __('messages.reset_to_defaults') }}</button>
+                                        <button type="button" class="btn btn-secondary" id="resetButton">{{ __('messages.reset_to_defaults') }}</button>
                                         <button type="submit" form="systemSettingsForm" class="btn btn-primary">{{ __('messages.save_settings') }}</button>
                                     </div>
                                 </div>

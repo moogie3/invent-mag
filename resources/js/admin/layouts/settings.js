@@ -82,7 +82,7 @@ function initSettingsPage() {
     const systemSettingsForm = document.getElementById('systemSettingsForm');
 
     if (systemSettingsForm) {
-        /* systemSettingsForm.addEventListener('submit', function (e) {
+        systemSettingsForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
             const formData = new FormData(systemSettingsForm);
@@ -104,15 +104,7 @@ function initSettingsPage() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update global settings object FIRST
-                    if (window.userSettings) {
-                        for (const key in data.settings) {
-                            if (Object.hasOwnProperty.call(data.settings, key)) {
-                                window.userSettings[key] = data.settings[key];
-                            }
-                        }
-                    }
-                    InventMagApp.showToast('Success', data.message, 'success');
+                    window.location.href = window.location.pathname + '?status=success&message=' + encodeURIComponent(data.message);
                 } else {
                     InventMagApp.showToast('Error', data.message || 'An error occurred.', 'error');
                 }
@@ -125,7 +117,7 @@ function initSettingsPage() {
                 saveButton.disabled = false;
                 saveButton.innerHTML = originalButtonText;
             });
-        }); */
+        });
     }
 
     const navigationTypeSelect = document.querySelector('select[name="navigation_type"]');
@@ -177,6 +169,11 @@ function initSettingsPage() {
 
         // Add event listener for changes
         navigationTypeSelect.addEventListener('change', toggleNavigationOptions);
+    }
+
+    const resetButton = document.getElementById('resetButton');
+    if (resetButton) {
+        resetButton.addEventListener('click', resetToDefaults);
     }
 }
 
@@ -265,4 +262,70 @@ function initAutoLogout(settings) {
 // Initialize settings on script load
 if (document.querySelector('meta[name="csrf-token"]')) {
     fetchSystemSettings();
+}
+
+function handlePageLoadNotifications() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const message = urlParams.get('message');
+
+    if (status && message) {
+        if (status === 'success') {
+            InventMagApp.showToast('Success', decodeURIComponent(message), 'success');
+        } else if (status === 'error') {
+            InventMagApp.showToast('Error', decodeURIComponent(message), 'error');
+        }
+
+        // Clean up the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', handlePageLoadNotifications);
+
+function resetToDefaults() {
+    const form = document.getElementById('systemSettingsForm');
+    if (form) {
+        // Interface Layout Settings
+        form.querySelector('select[name="navigation_type"]').value = 'sidebar';
+        form.querySelector('input[name="sidebar_lock"]').checked = false;
+        form.querySelector('input[name="sticky_navbar"]').checked = false;
+
+        // Theme Settings
+        form.querySelector('select[name="theme_mode"]').value = 'light';
+        form.querySelector('input[name="show_theme_toggle"]').checked = true;
+
+        // Notification Settings
+        form.querySelector('input[name="enable_sound_notifications"]').checked = true;
+        form.querySelector('input[name="enable_browser_notifications"]').checked = true;
+        form.querySelector('input[name="show_success_messages"]').checked = true;
+        form.querySelector('select[name="notification_duration"]').value = '5';
+
+        // Session & Security Settings
+        form.querySelector('select[name="auto_logout_time"]').value = '60';
+        form.querySelector('input[name="remember_last_page"]').checked = true;
+
+        // Performance Settings
+        form.querySelector('input[name="enable_animations"]').checked = true;
+        form.querySelector('input[name="lazy_load_images"]').checked = true;
+        form.querySelector('select[name="data_refresh_rate"]').value = '30';
+
+        // Language & Localization
+        form.querySelector('select[name="system_language"]').value = 'en';
+
+        // Advanced Settings
+        form.querySelector('input[name="enable_debug_mode"]').checked = false;
+        form.querySelector('input[name="enable_keyboard_shortcuts"]').checked = true;
+        form.querySelector('input[name="show_tooltips"]').checked = true;
+        form.querySelector('input[name="compact_mode"]').checked = false;
+
+        // After resetting, re-run the logic to toggle visibility of dependent options
+        const navigationTypeSelect = form.querySelector('select[name="navigation_type"]');
+        if (navigationTypeSelect) {
+            navigationTypeSelect.dispatchEvent(new Event('change'));
+        }
+
+        // Programmatically submit the form to save the default settings
+        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
 }

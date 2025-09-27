@@ -75,4 +75,14 @@ document.addEventListener("DOMContentLoaded", function () {
             expiryDateField.style.display = this.checked ? "block" : "none";
         });
     }
+
+    document.addEventListener('ctrl-s-pressed', function () {
+        if (getProducts().length === 0) {
+            InventMagApp.showToast("Warning", "Please add at least one product to the cart.", "warning");
+            return;
+        }
+        populatePaymentModal();
+        const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        paymentModal.show();
+    });
 });

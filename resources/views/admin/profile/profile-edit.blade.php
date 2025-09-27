@@ -31,7 +31,8 @@
                                                 </div>
                                                 <div class="settings-section-title">
                                                     <h3 class="mb-1">{{ __('messages.profile_picture') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.upload_and_manage_your_profile_image') }}
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.upload_and_manage_your_profile_image') }}
                                                     </p>
                                                 </div>
                                             </div>
@@ -52,7 +53,8 @@
                                                         @if (auth()->user()->avatar)
                                                             <button type="button" class="btn btn-sm btn-outline-danger"
                                                                 data-bs-toggle="modal" data-bs-target="#deleteAvatarModal">
-                                                                <i class="ti ti-trash me-1"></i>{{ __('messages.remove_current_picture') }}
+                                                                <i
+                                                                    class="ti ti-trash me-1"></i>{{ __('messages.remove_current_picture') }}
                                                             </button>
                                                         @endif
                                                     </div>
@@ -68,7 +70,9 @@
                                                 </div>
                                                 <div class="settings-section-title">
                                                     <h3 class="mb-1">{{ __('messages.business_profile') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.manage_your_business_information_and_contact_details') }}</p>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.manage_your_business_information_and_contact_details') }}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
@@ -118,7 +122,9 @@
                                                 </div>
                                                 <div class="settings-section-title">
                                                     <h3 class="mb-1">{{ __('messages.security_password') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.update_your_password_to_keep_your_account_secure') }}</p>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.update_your_password_to_keep_your_account_secure') }}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
@@ -129,11 +135,13 @@
                                                             class="form-control"
                                                             placeholder="{{ __('messages.enter_new_password_leave_empty_if_not_changing') }}"
                                                             oninput="togglePasswordModal()">
-                                                        <small class="text-muted">{{ __('messages.leave_empty_if_you_dont_want_to_change_your_password') }}</small>
+                                                        <small
+                                                            class="text-muted">{{ __('messages.leave_empty_if_you_dont_want_to_change_your_password') }}</small>
                                                     </div>
                                                     <div class="col-md-6" id="confirmPasswordContainer"
                                                         style="display: none;">
-                                                        <div class="form-label">{{ __('messages.confirm_new_password') }}</div>
+                                                        <div class="form-label">{{ __('messages.confirm_new_password') }}
+                                                        </div>
                                                         <input type="password" name="password_confirmation"
                                                             id="confirm_new_password" class="form-control"
                                                             placeholder="{{ __('messages.re_enter_new_password') }}">

@@ -33,14 +33,14 @@ export function initNewPipelineForm() {
             await fetchData();
             this.reset();
 
-            window.InventMagApp.showToast(
+            InventMagApp.showToast(
                 "Success",
                 "Pipeline created successfully!",
                 "success"
             );
         } catch (error) {
             console.error("Error creating pipeline:", error);
-            window.InventMagApp.showToast(
+            InventMagApp.showToast(
                 "Error",
                 "Failed to create pipeline. Please try again.",
                 "error"

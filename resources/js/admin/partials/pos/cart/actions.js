@@ -31,7 +31,7 @@ function addToProductList(
 
     if (existingProduct) {
         if (existingProduct.quantity + 1 > existingProduct.stock) {
-            window.InventMagApp.showToast("Warning", "Insufficient Stock", "warning");
+            InventMagApp.showToast("Warning", "Insufficient Stock", "warning");
             return;
         }
         existingProduct.quantity += 1;
@@ -39,7 +39,7 @@ function addToProductList(
             existingProduct.quantity * existingProduct.price;
     } else {
         if (1 > productStock) {
-            window.InventMagApp.showToast("Warning", "Insufficient Stock", "warning");
+            InventMagApp.showToast("Warning", "Insufficient Stock", "warning");
             return;
         }
         products.push({
@@ -133,7 +133,7 @@ export function initCartActions() {
             if (!isNaN(index)) {
                 const product = products[index];
                 if (product.quantity + 1 > product.stock) {
-                    window.InventMagApp.showToast("Warning", "Insufficient Stock", "warning");
+                    InventMagApp.showToast("Warning", "Insufficient Stock", "warning");
                     return;
                 }
                 playSuccessSound();
@@ -159,7 +159,7 @@ export function initCartActions() {
                 const product = products[index];
 
                 if (newQuantity > product.stock) {
-                    window.InventMagApp.showToast("Warning", "Insufficient Stock", "warning");
+                    InventMagApp.showToast("Warning", "Insufficient Stock", "warning");
                     quantityInput.value = product.quantity;
                     return;
                 }

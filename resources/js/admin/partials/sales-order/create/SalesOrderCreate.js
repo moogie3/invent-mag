@@ -499,7 +499,7 @@ export class SalesOrderCreate extends SalesOrderModule {
     handleSubmit(e) {
         if (this.products.length === 0) {
             e.preventDefault();
-            alert("Please add at least one product before submitting.");
+            InventMagApp.showToast("Warning", "Please add at least one product before submitting.", "warning");
             return false;
         }
 

@@ -83,17 +83,11 @@ export function initEditUserModal() {
                     editPermissionsContainer.innerHTML =
                         '<div class="text-danger">Error loading permissions</div>';
 
-                    if (typeof InventMagApp.showToast === "function") {
-                        InventMagApp.showToast(
+                    InventMagApp.showToast(
                             "Error",
                             "Failed to load user data. Please try again.",
                             "error"
                         );
-                    } else if (typeof toastr !== "undefined") {
-                        toastr.error(
-                            "Failed to load user data. Please try again."
-                        );
-                    }
                 });
         });
     });

@@ -24,17 +24,11 @@ export function fetchRolePermissions() {
         })
         .catch((error) => {
             console.error("Error fetching role permissions:", error);
-            if (typeof InventMagApp.showToast === "function") {
-                InventMagApp.showToast(
+            InventMagApp.showToast(
                     "Error",
                     "Failed to load role permissions. Some features may not work correctly.",
                     "error"
                 );
-            } else if (typeof toastr !== "undefined") {
-                toastr.error(
-                    "Failed to load role permissions. Some features may not work correctly."
-                );
-            }
             throw error;
         });
 }

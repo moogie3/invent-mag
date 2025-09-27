@@ -321,7 +321,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
         const discountType = this.elements.discount_type?.value || "fixed";
 
         if (quantity <= 0) {
-            alert("Please enter a valid quantity greater than 0.");
+            InventMagApp.showToast("Warning", "Please enter a valid quantity greater than 0.", "warning");
             return;
         }
 

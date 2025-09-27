@@ -9,13 +9,25 @@
  */
 window.InventMagApp = window.InventMagApp || {};
 
-window.InventMagApp.showToast = function (title, message, type = "info", duration) {
-    if (type === 'success' && window.userSettings && !window.userSettings.show_success_messages) {
+window.InventMagApp.showToast = function (
+    title,
+    message,
+    type = "info",
+    duration
+) {
+    if (
+        type === "success" &&
+        window.userSettings &&
+        !window.userSettings.show_success_messages
+    ) {
         return; // Do not show success messages if disabled
     }
 
-    const userDuration = window.userSettings ? parseInt(window.userSettings.notification_duration, 10) * 1000 : 4000;
-    const notificationDuration = duration !== undefined ? duration : userDuration;
+    const userDuration = window.userSettings
+        ? parseInt(window.userSettings.notification_duration, 10) * 1000
+        : 4000;
+    const notificationDuration =
+        duration !== undefined ? duration : userDuration;
 
     let container = document.getElementById("toast-container");
     if (!container) {
@@ -221,8 +233,7 @@ window.handleSessionNotifications = function () {
         } else if (errorMessage) {
             if (isAuthPage) {
                 window.showAuthModal("Error", errorMessage, "error");
-            } else {
-                window.InventMagApp.showToast("Error", errorMessage, "error");
+                InventMagApp.showToast("Error", errorMessage, "error");
             }
         }
     }

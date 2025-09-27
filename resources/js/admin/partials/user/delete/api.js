@@ -56,40 +56,22 @@ export function initDeleteUserFormSubmission() {
                         }, 300);
                     }
 
-                    if (typeof InventMagApp.showToast === "function") {
-                        InventMagApp.showToast("Success", data.message, "success");
-                    } else if (typeof toastr !== "undefined") {
-                        toastr.success(data.message);
-                    } else {
-                        alert(data.message);
-                    }
+                    InventMagApp.showToast("Success", data.message, "success");
                 } else {
-                    if (typeof InventMagApp.showToast === "function") {
-                        InventMagApp.showToast(
+                    InventMagApp.showToast(
                             "Error",
                             data.message || "Failed to delete user.",
                             "error"
                         );
-                    } else if (typeof toastr !== "undefined") {
-                        toastr.error(data.message || "Failed to delete user.");
-                    } else {
-                        alert(data.message || "Failed to delete user.");
-                    }
                 }
             })
             .catch((error) => {
                 console.error("Error deleting user:", error);
-                if (typeof InventMagApp.showToast === "function") {
-                    InventMagApp.showToast(
+                InventMagApp.showToast(
                         "Error",
                         "An error occurred while deleting the user.",
                         "error"
                     );
-                } else if (typeof toastr !== "undefined") {
-                    toastr.error("An error occurred while deleting the user.");
-                } else {
-                    alert("An error occurred while deleting the user.");
-                }
             })
             .finally(() => {
                 confirmDeleteBtn.disabled = false;

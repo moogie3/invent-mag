@@ -35,7 +35,7 @@ export async function initializeData() {
             }
         } catch (error) {
             console.error("Error parsing initial data:", error);
-            window.InventMagApp.showToast(
+            InventMagApp.showToast(
                 "Error",
                 "Error loading initial data. Please refresh the page.",
                 "error"
@@ -76,7 +76,7 @@ export async function initializeData() {
         setAllProducts(await productsResponse.json());
     } catch (error) {
         console.error("Error fetching products:", error);
-        window.InventMagApp.showToast(
+        InventMagApp.showToast(
             "Error",
             "Failed to load product data. Please refresh the page.",
             "error"
@@ -98,7 +98,7 @@ export async function fetchData() {
         renderPipelinesList();
     } catch (error) {
         console.error("Error re-fetching data:", error);
-        window.InventMagApp.showToast(
+        InventMagApp.showToast(
             "Error",
             "Failed to re-fetch data. Please try again.",
             "error"

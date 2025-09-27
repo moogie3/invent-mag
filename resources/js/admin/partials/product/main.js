@@ -174,7 +174,7 @@ export function initProductPage() {
             }
 
             if (!adjustmentAmount || adjustmentAmount < 0) {
-                alert('Please enter a valid adjustment amount.');
+                InventMagApp.showToast("Warning", 'Please enter a valid adjustment amount.', "warning");
                 return;
             }
 
@@ -229,14 +229,14 @@ export function initProductPage() {
                         modal.hide();
                     }
 
-                    window.InventMagApp.showToast('Success', data.message, 'success');
+                    InventMagApp.showToast('Success', data.message, 'success');
                 } else {
-                    window.InventMagApp.showToast('Error', data.message || 'Failed to update stock.', 'error');
+                    InventMagApp.showToast('Error', data.message || 'Failed to update stock.', 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                window.InventMagApp.showToast('Error', 'An error occurred during stock adjustment.', 'error');
+                InventMagApp.showToast('Error', 'An error occurred during stock adjustment.', 'error');
             });
         });
 

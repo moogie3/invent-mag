@@ -62,7 +62,7 @@ export function createProductItemRow(item = {}, index, containerId) {
         quantityInput.max = productStock;
         if (parseFloat(quantityInput.value) > productStock) {
             quantityInput.value = productStock;
-            window.InventMagApp.showToast(
+            InventMagApp.showToast(
                 "Warning",
                 `Quantity cannot exceed available stock (${maxStock}).`,
                 "warning"
@@ -75,7 +75,7 @@ export function createProductItemRow(item = {}, index, containerId) {
         const maxStock = parseFloat(quantityInput.max);
         if (parseFloat(quantityInput.value) > maxStock) {
             quantityInput.value = maxStock;
-            window.InventMagApp.showToast(
+            InventMagApp.showToast(
                 "Warning",
                 `Quantity cannot exceed available stock (${maxStock}).`,
                 "warning"

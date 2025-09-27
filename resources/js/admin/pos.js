@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const processPaymentBtn = document.getElementById("processPaymentBtn");
     processPaymentBtn.addEventListener("click", function () {
         if (getProducts().length === 0) {
-            alert("Please add at least one product to the cart.");
+            InventMagApp.showToast("Warning", "Please add at least one product to the cart.", "warning");
             return;
         }
         populatePaymentModal();

@@ -64,14 +64,14 @@ export function initEditOpportunityForm() {
             pipelineSelect.value = currentPipelineId;
             loadPipelineBoard(currentPipelineId);
 
-            window.InventMagApp.showToast(
+            InventMagApp.showToast(
                 "Success",
                 "Opportunity updated successfully!",
                 "success"
             );
         } catch (error) {
             console.error("Error updating opportunity:", error);
-            window.InventMagApp.showToast(
+            InventMagApp.showToast(
                 "Error",
                 "Failed to update opportunity. Please try again.",
                 "error"
@@ -153,7 +153,7 @@ export async function loadEditOpportunityModal(opportunityId) {
         ).show();
     } catch (error) {
         console.error("Error in edit opportunity fetch:", error);
-        window.InventMagApp.showToast(
+        InventMagApp.showToast(
             "Error",
             "Failed to fetch opportunity details. Please try again.",
             "error"

@@ -14,8 +14,6 @@
 {{-- Global Notification Helper --}}
 @vite('resources/js/admin/helpers/notification.js')
 
-
-
 {{-- SCRIPT FOR ADMIN POS  --}}
 @if (request()->is('admin/pos'))
     @vite('resources/js/admin/pos.js')
@@ -113,6 +111,7 @@
 {{-- SCRIPT FOR SETTINGS --}}
 @vite('resources/js/admin/layouts/settings.js')
 @vite('resources/js/admin/layouts/advanced-settings.js')
+@vite('resources/js/admin/layouts/global-keyboard-shortcuts.js')
 
 {{-- DELETE MODAL --}}
 <script>

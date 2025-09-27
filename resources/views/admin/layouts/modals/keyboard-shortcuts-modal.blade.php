@@ -2,16 +2,16 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Keyboard Shortcuts</h5>
+                <h5 class="modal-title">{{ __('messages.keyboard_shortcuts_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Here are the available keyboard shortcuts:</p>
+                <p>{{ __('messages.keyboard_shortcuts_intro') }}</p>
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th>Shortcut</th>
-                            <th>Action</th>
+                            <th>{{ __('messages.keyboard_shortcuts_shortcut_header') }}</th>
+                            <th>{{ __('messages.keyboard_shortcuts_action_header') }}</th>
                         </tr>
                     </thead>
                     <tbody id="keyboardShortcutsList">
@@ -20,7 +20,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn me-auto" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
             </div>
         </div>
     </div>

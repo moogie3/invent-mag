@@ -31,7 +31,9 @@
                                                 </div>
                                                 <div class="settings-section-title">
                                                     <h3 class="mb-1">{{ __('messages.interface_layout') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.customize_your_navigation_and_layout_preferences') }}</p>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.customize_your_navigation_and_layout_preferences') }}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
@@ -60,7 +62,8 @@
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="sidebar_lock"
                                                                 {{ auth()->user()->system_settings['sidebar_lock'] ?? false ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.enable_sidebar_lock') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.enable_sidebar_lock') }}</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6" id="navbar-options-wrapper">
@@ -69,7 +72,8 @@
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="sticky_navbar"
                                                                 {{ auth()->user()->system_settings['sticky_navbar'] ?? false ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.enable_sticky_navbar') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.enable_sticky_navbar') }}</label>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -84,7 +88,9 @@
                                                 </div>
                                                 <div class="settings-section-title">
                                                     <h3 class="mb-1">{{ __('messages.theme_configuration') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.control_the_visual_appearance_and_theme_settings') }}</p>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.control_the_visual_appearance_and_theme_settings') }}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
@@ -105,14 +111,16 @@
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.theme_toggle_visibility') }}</div>
+                                                        <div class="form-label">
+                                                            {{ __('messages.theme_toggle_visibility') }}</div>
                                                         <div class="form-check form-switch">
                                                             <input type="hidden" name="show_theme_toggle" value="0">
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="show_theme_toggle" id="showThemeToggleCheckbox"
                                                                 value="1"
                                                                 {{ auth()->user()->system_settings['show_theme_toggle'] ?? true ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.show_theme_toggle_button') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.show_theme_toggle_button') }}</label>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -127,7 +135,9 @@
                                                 </div>
                                                 <div class="settings-section-title">
                                                     <h3 class="mb-1">{{ __('messages.notifications_alerts') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.manage_notification_preferences_and_alert_settings') }}</p>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.manage_notification_preferences_and_alert_settings') }}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
@@ -137,23 +147,27 @@
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="enable_sound_notifications"
                                                                 {{ auth()->user()->system_settings['enable_sound_notifications'] ?? true ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.enable_sound_notifications') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.enable_sound_notifications') }}</label>
                                                         </div>
                                                         <div class="form-check form-switch mb-2">
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="enable_browser_notifications"
                                                                 {{ auth()->user()->system_settings['enable_browser_notifications'] ?? true ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.enable_browser_notifications') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.enable_browser_notifications') }}</label>
                                                         </div>
                                                         <div class="form-check form-switch mb-2">
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="show_success_messages"
                                                                 {{ auth()->user()->system_settings['show_success_messages'] ?? true ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.show_success_messages') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.show_success_messages') }}</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.notification_duration_seconds') }}</div>
+                                                        <div class="form-label">
+                                                            {{ __('messages.notification_duration_seconds') }}</div>
                                                         <select name="notification_duration" class="form-control"
                                                             required>
                                                             <option value="3"
@@ -182,13 +196,16 @@
                                                 </div>
                                                 <div class="settings-section-title">
                                                     <h3 class="mb-1">{{ __('messages.session_security') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.configure_session_timeout_and_security_preferences') }}</p>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.configure_session_timeout_and_security_preferences') }}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.auto_logout_time_minutes') }}</div>
+                                                        <div class="form-label">
+                                                            {{ __('messages.auto_logout_time_minutes') }}</div>
                                                         <select name="auto_logout_time" class="form-control" required>
                                                             <option value="0"
                                                                 {{ (auth()->user()->system_settings['auto_logout_time'] ?? '60') === '0' ? 'selected' : '' }}>
@@ -212,7 +229,8 @@
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="remember_last_page"
                                                                 {{ auth()->user()->system_settings['remember_last_page'] ?? true ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.remember_last_visited_page') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.remember_last_visited_page') }}</label>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -227,7 +245,9 @@
                                                 </div>
                                                 <div class="settings-section-title">
                                                     <h3 class="mb-1">{{ __('messages.performance') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.optimize_system_performance_and_resource_usage') }}</p>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.optimize_system_performance_and_resource_usage') }}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
@@ -237,17 +257,20 @@
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="enable_animations"
                                                                 {{ auth()->user()->system_settings['enable_animations'] ?? true ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.enable_ui_animations') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.enable_ui_animations') }}</label>
                                                         </div>
                                                         <div class="form-check form-switch mb-2">
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="lazy_load_images"
                                                                 {{ auth()->user()->system_settings['lazy_load_images'] ?? true ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.lazy_load_images') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.lazy_load_images') }}</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.data_refresh_rate_seconds') }}</div>
+                                                        <div class="form-label">
+                                                            {{ __('messages.data_refresh_rate_seconds') }}</div>
                                                         <select name="data_refresh_rate" class="form-control" required>
                                                             <option value="0"
                                                                 {{ (auth()->user()->system_settings['data_refresh_rate'] ?? '30') === '0' ? 'selected' : '' }}>
@@ -278,7 +301,9 @@
                                                 </div>
                                                 <div class="settings-section-title">
                                                     <h3 class="mb-1">{{ __('messages.language_localization') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.set_your_preferred_language_and_regional_settings') }}</p>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.set_your_preferred_language_and_regional_settings') }}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
@@ -306,7 +331,9 @@
                                                 </div>
                                                 <div class="settings-section-title">
                                                     <h3 class="mb-1">{{ __('messages.advanced') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.additional_options_for_power_users_and_debugging') }}</p>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.additional_options_for_power_users_and_debugging') }}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
@@ -316,13 +343,15 @@
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="enable_debug_mode"
                                                                 {{ auth()->user()->system_settings['enable_debug_mode'] ?? false ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.enable_debug_information') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.enable_debug_information') }}</label>
                                                         </div>
                                                         <div class="form-check form-switch mb-2">
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="enable_keyboard_shortcuts"
                                                                 {{ auth()->user()->system_settings['enable_keyboard_shortcuts'] ?? true ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.enable_keyboard_shortcuts') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.enable_keyboard_shortcuts') }}</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
@@ -330,18 +359,22 @@
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="show_tooltips"
                                                                 {{ auth()->user()->system_settings['show_tooltips'] ?? true ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.show_help_tooltips') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.show_help_tooltips') }}</label>
                                                         </div>
                                                         <div class="form-check form-switch mb-2">
                                                             <input class="form-check-input" type="checkbox"
                                                                 name="compact_mode"
                                                                 {{ auth()->user()->system_settings['compact_mode'] ?? false ? 'checked' : '' }}>
-                                                            <label class="form-check-label">{{ __('messages.compact_view_mode') }}</label>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.compact_view_mode') }}</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <button type="button" class="btn btn-info" id="showShortcutsModalBtn">
-                                                            <i class="ti ti-keyboard me-2"></i>{{ __('messages.view_shortcuts') }}
+                                                        <button type="button" class="btn btn-info"
+                                                            id="showShortcutsModalBtn">
+                                                            <i
+                                                                class="ti ti-keyboard me-2"></i>{{ __('messages.view_shortcuts') }}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -352,8 +385,10 @@
                                 </div>
                                 <div class="card-footer bg-transparent mt-auto">
                                     <div class="btn-list justify-content-end">
-                                        <button type="button" class="btn btn-secondary" id="resetButton">{{ __('messages.reset_to_defaults') }}</button>
-                                        <button type="submit" form="systemSettingsForm" class="btn btn-primary">{{ __('messages.save_settings') }}</button>
+                                        <button type="button" class="btn btn-secondary"
+                                            id="resetButton">{{ __('messages.reset_to_defaults') }}</button>
+                                        <button type="submit" form="systemSettingsForm"
+                                            class="btn btn-primary">{{ __('messages.save_settings') }}</button>
                                     </div>
                                 </div>
                             </div>

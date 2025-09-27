@@ -1,0 +1,183 @@
+/* ============================
+   COMPACT MODE STYLES
+   ============================ */
+
+/* 
+  This file contains all the style overrides for when compact mode is enabled.
+  The .compact-mode class is applied to the <body> tag.
+*/
+
+/* General Layout Adjustments */
+.compact-mode .page-body {
+    padding: 0.75rem;
+}
+
+.compact-mode .card {
+    margin-bottom: 0.75rem;
+}
+
+.compact-mode .card-body {
+    padding: 0.75rem;
+}
+
+.compact-mode .page-header {
+    margin-bottom: 0.75rem;
+}
+
+/* Form Element Adjustments */
+.compact-mode .form-label {
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+    font-weight: 600;
+}
+
+.compact-mode .form-control,
+.compact-mode .form-select {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    height: auto;
+}
+
+.compact-mode .input-group-text {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Table Adjustments */
+.compact-mode .table td,
+.compact-mode .table th {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.compact-mode .table-header th {
+    font-weight: 600;
+}
+
+/* Button Adjustments */
+.compact-mode .btn {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Alerts */
+.compact-mode .shadcn-alert-item {
+    padding: 8px;
+    gap: 8px;
+}
+
+.compact-mode .shadcn-avatar {
+    width: 32px;
+    height: 32px;
+}
+
+.compact-mode .shadcn-product-name {
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.compact-mode .shadcn-product-details {
+    font-size: 11px;
+    gap: 4px;
+}
+
+/* Auth */
+.compact-mode .page-center {
+    padding: 20px;
+}
+
+/* Navbar */
+.compact-mode .nav-dropdown a {
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+.compact-mode .notification-item {
+    padding: 8px 12px;
+}
+
+/* POS */
+.compact-mode #productList .list-group-item {
+    padding: 0.5rem 0.75rem;
+}
+
+/* Product */
+.compact-mode .product-card .card-title {
+    font-size: 0.8rem !important;
+}
+
+.compact-mode .product-card .card-text {
+    font-size: 0.7rem !important;
+}
+
+.compact-mode .product-image-container {
+    height: 100px;
+}
+
+/* Modals */
+.compact-mode #viewPoModal .modal-dialog,
+.compact-mode #crmCustomerModal .modal-dialog,
+.compact-mode #srmSupplierModal .modal-dialog {
+    max-width: 80%;
+}
+
+.compact-mode #viewPoModal .modal-header,
+.compact-mode #crmCustomerModal .modal-header,
+.compact-mode #srmSupplierModal .modal-header {
+    padding: 0.75rem 1rem;
+}
+
+.compact-mode #viewPoModal .modal-body,
+.compact-mode #crmCustomerModal .modal-body,
+.compact-mode #srmSupplierModal .modal-body {
+    padding: 1rem;
+}
+
+.compact-mode #viewPoModal .table th,
+.compact-mode #viewPoModal .table td {
+    padding: 0.5rem;
+}
+
+/* Accordion */
+.compact-mode .accordion-item {
+    margin-bottom: 0.25rem;
+}
+
+.compact-mode .accordion-button {
+    padding: 0.75rem 1rem;
+}
+
+.compact-mode .accordion-body {
+    padding: 1rem;
+}
+
+/* Settings */
+.compact-mode .settings-section {
+    padding: 1rem 0;
+}
+
+.compact-mode .settings-section-header {
+    margin-bottom: 1rem;
+}
+
+.compact-mode .settings-icon-wrapper {
+    width: 32px;
+    height: 32px;
+    margin-right: 0.75rem;
+}
+
+.compact-mode .settings-icon-wrapper i {
+    font-size: 1rem;
+}
+
+.compact-mode .settings-section-title h3 {
+    font-size: 1.1rem;
+}
+
+.compact-mode .settings-section-title p {
+    font-size: 0.8rem;
+}
+
+.compact-mode .settings-section-content {
+    margin-left: 44px;
+    padding: 1rem;
+}

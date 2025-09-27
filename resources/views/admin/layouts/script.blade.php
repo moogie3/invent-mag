@@ -112,6 +112,7 @@
 
 {{-- SCRIPT FOR SETTINGS --}}
 @vite('resources/js/admin/layouts/settings.js')
+@vite('resources/js/admin/layouts/advanced-settings.js')
 
 {{-- DELETE MODAL --}}
 <script>

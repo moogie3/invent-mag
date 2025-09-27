@@ -216,7 +216,7 @@ window.handleSessionNotifications = function () {
             if (isAuthPage) {
                 window.showAuthModal("Success", successMessage, "success");
             } else {
-                window.InventMagApp.showToast("Success", successMessage, "success");
+                InventMagApp.showToast("Success", successMessage, "success");
             }
         } else if (errorMessage) {
             if (isAuthPage) {

@@ -8,6 +8,7 @@ async function fetchSystemSettings() {
         const settings = await response.json();
         window.userSettings = settings;
         console.log('System settings loaded:', window.userSettings);
+        document.dispatchEvent(new Event('usersettingsloaded'));
     } catch (error) {
         console.error('Error fetching system settings:', error);
         // Fallback to default settings if fetch fails

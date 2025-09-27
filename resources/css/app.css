@@ -11,6 +11,7 @@
 @import './print-a4.css';
 @import './settings.css';
 @import './alerts.css';
+@import './compact-mode.css';
 
 /* ============================
    CSS RESET & NORMALIZATION

@@ -1,7 +1,8 @@
 import { initModals } from './modals/init.js';
 import { initProductModal, loadExpiringSoonProductsModal } from './modals/product.js'; // Import loadExpiringSoonProductsModal
 import { initBulkSelection, clearProductSelection } from './bulkActions/selection.js';
-import { initializeSearch } from './search/main.js';
+
+
 import { initializeEntriesSelector, initKeyboardShortcuts, initExport } from './events.js';
 import { bulkUpdateStock } from './bulkActions/stock.js'; // Import bulkUpdateStock
 import { bulkDeleteProducts } from './bulkActions/delete.js'; // Import bulkDeleteProducts
@@ -18,7 +19,6 @@ export function initProductPage() {
         initModals();
         initProductModal();
         initBulkSelection();
-        initializeSearch();
         initializeEntriesSelector();
         initKeyboardShortcuts();
         initExport();
@@ -67,11 +67,7 @@ export function initProductPage() {
             });
         }
 
-        const searchInput = document.getElementById("searchInput");
-        if (searchInput && !searchInput.hasAttribute("data-search-initialized")) {
-            initializeSearch();
-            searchInput.setAttribute("data-search-initialized", "true");
-        }
+        
 
         const selectAllCheckbox = document.getElementById("selectAll");
         if (

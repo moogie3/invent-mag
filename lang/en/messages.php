@@ -1022,4 +1022,5 @@ return [
     'outstanding' => 'Outstanding',
     'no_stock_adjustments_found_message' => 'No stock adjustments have been recorded yet.',
     'try_adjusting_search_or_filter' => 'Try adjusting your search or filter to find what you\'re looking for.',
+    'view_shortcuts' => 'View Shortcuts'
 ];

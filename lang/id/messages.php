@@ -1022,4 +1022,5 @@ return [
     'outstanding' => 'Terutang',
     'no_stock_adjustments_found_message' => 'Belum ada penyesuaian stok yang dicatat.',
     'try_adjusting_search_or_filter' => 'Coba sesuaikan pencarian atau filter Anda untuk menemukan apa yang Anda cari.',
+    'view_shortcuts' => 'Lihat Shortcuts'
 ];

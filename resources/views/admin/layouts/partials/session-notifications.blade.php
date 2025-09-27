@@ -9,6 +9,6 @@
     );
 @endphp
 
-<div id="session-notification-data" data-success-message="{{ session('success') }}"
-    data-error-message="{{ $errors->first() }}" data-is-auth-page="{{ json_encode($isAuthPage) }}" style="display: none;">
+<div id="session-notification-data" data-success-message="{{ session('success') ?? session('status') }}"
+    data-error-message="{{ session('error') ?? $errors->first() }}" data-is-auth-page="{{ json_encode($isAuthPage) }}" style="display: none;">
 </div>

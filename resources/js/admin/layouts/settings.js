@@ -326,7 +326,6 @@ function resetToDefaults() {
             navigationTypeSelect.dispatchEvent(new Event('change'));
         }
 
-        // Programmatically submit the form to save the default settings
-        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        InventMagApp.showToast('Success', 'Settings have been reset to their default values.', 'success');
     }
 }

@@ -339,6 +339,11 @@
                                                             <label class="form-check-label">{{ __('messages.compact_view_mode') }}</label>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <button type="button" class="btn btn-info" id="showShortcutsModalBtn">
+                                                            <i class="ti ti-keyboard me-2"></i>{{ __('messages.view_shortcuts') }}
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -359,3 +364,5 @@
         </div>
     </div>
 @endsection
+
+@include('admin.layouts.modals.keyboard-shortcuts-modal')

@@ -59,7 +59,7 @@
 </head>
 
 <body
-    class="{{ auth()->check() && (auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'navbar' ? 'layout-navbar' : ((auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'both' ? 'layout-navbar-v2' : '') }} {{ auth()->check() && (auth()->user()->system_settings['sticky_navbar'] ?? false) ? 'sticky-navbar' : '' }} {{ auth()->check() && (auth()->user()->system_settings['sidebar_lock'] ?? false) ? 'sidebar-locked' : '' }}">
+    class="{{ auth()->check() && (auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'navbar' ? 'layout-navbar' : ((auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'both' ? 'layout-navbar-v2' : '') }} {{ auth()->check() && (auth()->user()->system_settings['sticky_navbar'] ?? false) ? 'sticky-navbar' : '' }} {{ auth()->check() && (auth()->user()->system_settings['sidebar_lock'] ?? false) ? 'sidebar-locked' : '' }} {{ auth()->check() && (auth()->user()->system_settings['compact_mode'] ?? false) ? 'compact-mode' : '' }}">
 
     <div class="page-loader">
         <div class="container container-slim py-4">

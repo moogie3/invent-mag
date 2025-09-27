@@ -2,7 +2,7 @@ import { PurchaseOrderCreate } from "./partials/purchase-order/create/PurchaseOr
 import { PurchaseOrderEdit } from "./partials/purchase-order/edit/PurchaseOrderEdit.js";
 import { PurchaseOrderView } from "./partials/purchase-order/view/PurchaseOrderView.js";
 import { PurchaseOrderBulkSelection } from "./partials/purchase-order/bulkActions/PurchaseOrderBulkSelection.js";
-import { initSearch } from "./partials/purchase-order/search/main.js";
+
 import {
     bulkDeletePO,
     bulkExportPO,
@@ -73,8 +73,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         bulkActionsBar.style.display = "none";
                     }
                 }
-
-                initSearch();
             }
         } catch (error) {
             console.error("Error initializing Purchase Order App:", error);

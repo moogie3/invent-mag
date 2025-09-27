@@ -233,6 +233,7 @@ window.handleSessionNotifications = function () {
         } else if (errorMessage) {
             if (isAuthPage) {
                 window.showAuthModal("Error", errorMessage, "error");
+            } else { // <--- Added this else block
                 InventMagApp.showToast("Error", errorMessage, "error");
             }
         }

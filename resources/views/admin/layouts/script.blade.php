@@ -102,6 +102,11 @@
     @vite('resources/js/admin/currency.js')
 @endif
 
+{{-- SCRIPT FOR TAX settings --}}
+@if (request()->is('admin/settings/tax'))
+    @vite('resources/js/admin/tax.js')
+@endif
+
 {{-- SCRIPT FOR SALES PIPELINE --}}
 @if (request()->is('admin/sales-pipeline'))
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
@@ -112,6 +117,7 @@
 @vite('resources/js/admin/layouts/settings.js')
 @vite('resources/js/admin/layouts/advanced-settings.js')
 @vite('resources/js/admin/layouts/global-keyboard-shortcuts.js')
+@vite('resources/js/admin/layouts/selectable-table.js')
 
 {{-- DELETE MODAL --}}
 <script>

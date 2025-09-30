@@ -1022,5 +1022,9 @@ return [
     'outstanding' => 'Outstanding',
     'no_stock_adjustments_found_message' => 'No stock adjustments have been recorded yet.',
     'try_adjusting_search_or_filter' => 'Try adjusting your search or filter to find what you\'re looking for.',
-    'view_shortcuts' => 'View Shortcuts'
+    'view_shortcuts' => 'View Shortcuts',
+    'keyboard_shortcuts_title' => 'Shortcuts Command',
+    'keyboard_shortcuts_intro' => 'Listing all the shortcut and its action',
+    'keyboard_shortcuts_shortcut_header' => 'Shortcut',
+    'keyboard_shortcuts_action_header' => 'Action',
 ];

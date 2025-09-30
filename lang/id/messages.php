@@ -1022,5 +1022,9 @@ return [
     'outstanding' => 'Terutang',
     'no_stock_adjustments_found_message' => 'Belum ada penyesuaian stok yang dicatat.',
     'try_adjusting_search_or_filter' => 'Coba sesuaikan pencarian atau filter Anda untuk menemukan apa yang Anda cari.',
-    'view_shortcuts' => 'Lihat Shortcuts'
+    'view_shortcuts' => 'Lihat Shortcuts',
+    'keyboard_shortcuts_title' => 'Perintah Shorcut',
+    'keyboard_shortcuts_intro' => 'List seluruh shorcut dan penggunaanya',
+    'keyboard_shortcuts_shortcut_header' => 'Shortcut',
+    'keyboard_shortcuts_action_header' => 'Aksi',
 ];

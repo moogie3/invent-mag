@@ -119,6 +119,10 @@ function initSettingsPage() {
                 saveButton.innerHTML = originalButtonText;
             });
         });
+
+        window.shortcutManager.register('ctrl+s', () => {
+            systemSettingsForm.requestSubmit();
+        }, 'Save System Settings');
     }
 
     const navigationTypeSelect = document.querySelector('select[name="navigation_type"]');

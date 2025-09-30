@@ -625,3 +625,6 @@ body.layout-navbar-v2 .navbar {
     cursor: not-allowed;
 }
 
+.selected-row {
+    background-color: #dcebfd !important;
+}

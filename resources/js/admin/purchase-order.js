@@ -2,6 +2,7 @@ import { PurchaseOrderCreate } from "./partials/purchase-order/create/PurchaseOr
 import { PurchaseOrderEdit } from "./partials/purchase-order/edit/PurchaseOrderEdit.js";
 import { PurchaseOrderView } from "./partials/purchase-order/view/PurchaseOrderView.js";
 import { PurchaseOrderBulkSelection } from "./partials/purchase-order/bulkActions/PurchaseOrderBulkSelection.js";
+import { initSelectableTable } from "./layouts/selectable-table.js";
 
 import {
     bulkDeletePO,
@@ -16,6 +17,7 @@ window.bulkMarkAsPaidPO = bulkMarkAsPaidPO;
 
 // Keep the existing DOMContentLoaded initialization
 document.addEventListener("DOMContentLoaded", function () {
+    initSelectableTable();
     if (sessionStorage.getItem("purchaseOrderBulkDeleteSuccess")) {
         InventMagApp.showToast(
             "Success",
@@ -40,12 +42,24 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             if (pathname.includes("/admin/po/create")) {
                 window.poApp = new PurchaseOrderCreate();
+                window.shortcutManager.register('ctrl+s', () => {
+                    document.getElementById('invoiceForm').submit();
+                }, 'Save Purchase Order');
+                window.shortcutManager.register('alt+n', () => {
+                    document.getElementById('addProduct').click();
+                }, 'Add Product');
+                window.shortcutManager.register('alt+c', () => {
+                    document.getElementById('clearProducts').click();
+                }, 'Clear All Products');
             } else if (
                 pathname.includes("/admin/po/edit") ||
                 (pathname.includes("/admin/po") &&
                     pathname.match(/\/\d+\/edit$/))
             ) {
                 window.poApp = new PurchaseOrderEdit();
+                 window.shortcutManager.register('ctrl+s', () => {
+                    document.getElementById('edit-po-form').submit();
+                }, 'Save Purchase Order');
             } else if (
                 pathname.includes("/admin/po/modal") ||
                 (pathname.includes("/admin/po") && pathname.match(/\/\d+$/)) ||

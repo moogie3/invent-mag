@@ -3,6 +3,7 @@ import { SalesOrderEdit } from './partials/sales-order/edit/SalesOrderEdit.js';
 import { SalesOrderView } from './partials/sales-order/view/SalesOrderView.js';
 import { SalesOrderBulkSelection } from './partials/sales-order/bulkActions/SalesOrderBulkSelection.js';
 import { bulkDeleteSales, bulkExportSales, bulkMarkAsPaidSales } from './partials/sales-order/bulkActions/actions.js';
+import { initSelectableTable } from "./layouts/selectable-table.js";
 
 // Expose global functions for inline event handlers
 window.clearSalesSelection = function () {
@@ -18,6 +19,7 @@ window.bulkExportSales = bulkExportSales;
 window.bulkMarkAsPaidSales = bulkMarkAsPaidSales;
 
 document.addEventListener("DOMContentLoaded", function () {
+    initSelectableTable();
     if (sessionStorage.getItem("salesOrderBulkDeleteSuccess")) {
         InventMagApp.showToast(
             "Success",
@@ -42,11 +44,23 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             if (pathname.includes("/admin/sales/create")) {
                 window.salesApp = new SalesOrderCreate();
+                window.shortcutManager.register('ctrl+s', () => {
+                    document.getElementById('invoiceForm').submit();
+                }, 'Save Sales Order');
+                window.shortcutManager.register('alt+n', () => {
+                    document.getElementById('addProduct').click();
+                }, 'Add Product');
+                window.shortcutManager.register('alt+c', () => {
+                    document.getElementById('clearProducts').click();
+                }, 'Clear All Products');
             } else if (
                 pathname.includes("/admin/sales/edit/") ||
                 pathname.match(/\/admin\/sales\/edit\/\d+$/)
             ) {
                 window.salesApp = new SalesOrderEdit();
+                 window.shortcutManager.register('ctrl+s', () => {
+                    document.getElementById('edit-sales-form').submit();
+                }, 'Save Sales Order');
             } else if (
                 pathname.includes("/admin/sales/modal") ||
                 (pathname.includes("/admin/sales") &&

@@ -137,24 +137,29 @@ document.addEventListener("DOMContentLoaded", function () {
             container.appendChild(newItemRow);
         }
     });
-});
 
-document.addEventListener('ctrl-s-pressed', function () {
-    const modals = [
-        'newOpportunityModal',
-        'managePipelinesModal',
-        'editPipelineModal',
-        'editOpportunityModal'
-    ];
+    window.shortcutManager.register('ctrl+s', () => {
+        const modals = [
+            'newOpportunityModal',
+            'managePipelinesModal',
+            'editPipelineModal',
+            'editOpportunityModal'
+        ];
 
-    for (const modalId of modals) {
-        const modal = document.getElementById(modalId);
-        if (modal && modal.classList.contains('show')) {
-            const form = modal.querySelector('form');
-            if (form) {
-                form.requestSubmit();
-                break; 
+        for (const modalId of modals) {
+            const modal = document.getElementById(modalId);
+            if (modal && modal.classList.contains('show')) {
+                const form = modal.querySelector('form');
+                if (form) {
+                    form.requestSubmit();
+                    break;
+                }
             }
         }
-    }
+    }, 'Save Form');
+
+    window.shortcutManager.register('alt+n', () => {
+        const newOpportunityModal = new bootstrap.Modal(document.getElementById('newOpportunityModal'));
+        newOpportunityModal.show();
+    }, 'New Opportunity');
 });

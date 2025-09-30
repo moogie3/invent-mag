@@ -399,5 +399,3 @@
         </div>
     </div>
 @endsection
-
-@include('admin.layouts.modals.keyboard-shortcuts-modal')

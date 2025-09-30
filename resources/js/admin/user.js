@@ -6,6 +6,7 @@ import { initDeleteUserModal } from './partials/user/delete/main.js';
 import { initDeleteUserFormSubmission } from './partials/user/delete/api.js';
 import { editUserModal, deleteUserModal, editUserForm, editRolesContainer, editPermissionsContainer } from './partials/user/common/elements.js';
 import { resetPermissionStates } from './partials/user/rolesPermissions/sync.js';
+import { initSelectableTable } from "./layouts/selectable-table.js";
 
 document.addEventListener("DOMContentLoaded", function () {
     fetchRolePermissions()
@@ -21,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initEditUserFormSubmission();
     initDeleteUserModal();
     initDeleteUserFormSubmission();
+    initSelectableTable();
 
     document
         .getElementById("editUserModal")
@@ -38,21 +40,26 @@ document.addEventListener("DOMContentLoaded", function () {
             // confirmDeleteBtn.disabled = false;
             // confirmDeleteBtn.textContent = "Delete";
         });
-});
 
-document.addEventListener('ctrl-s-pressed', function () {
-    const createModal = document.getElementById('createUserModal');
-    const editModal = document.getElementById('editUserModal');
+    window.shortcutManager.register('ctrl+s', () => {
+        const createModal = document.getElementById('createUserModal');
+        const editModal = document.getElementById('editUserModal');
 
-    if (createModal && createModal.classList.contains('show')) {
-        const form = createModal.querySelector('form');
-        if (form) {
-            form.requestSubmit();
+        if (createModal && createModal.classList.contains('show')) {
+            const form = createModal.querySelector('form');
+            if (form) {
+                form.requestSubmit();
+            }
+        } else if (editModal && editModal.classList.contains('show')) {
+            const form = editModal.querySelector('form');
+            if (form) {
+                form.requestSubmit();
+            }
         }
-    } else if (editModal && editModal.classList.contains('show')) {
-        const form = editModal.querySelector('form');
-        if (form) {
-            form.requestSubmit();
-        }
-    }
+    }, 'Save User');
+
+    window.shortcutManager.register('alt+n', () => {
+        const createModal = new bootstrap.Modal(document.getElementById('createUserModal'));
+        createModal.show();
+    }, 'New User');
 });

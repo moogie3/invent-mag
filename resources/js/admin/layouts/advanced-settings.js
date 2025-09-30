@@ -1,5 +1,3 @@
-import { enableKeyboardShortcuts, disableKeyboardShortcuts, initShowShortcutsModalButton } from './global-keyboard-shortcuts.js';
-
 /**
  * @file This file contains the logic for the "Advanced Settings" section of the settings page.
  * It is loaded on all pages to apply the advanced settings globally.
@@ -21,11 +19,10 @@ function applyAdvancedSettings(settings) {
     // 2. Enable Keyboard Shortcuts
     if (settings.enable_keyboard_shortcuts) {
         console.log('Keyboard shortcuts are enabled.');
-        enableKeyboardShortcuts();
-        initShowShortcutsModalButton(); // Initialize the button listener
+        // The shortcutManager is always active, and the help modal is triggered by shift+? directly.
+        // No explicit initialization needed here.
     } else {
         console.log('Keyboard shortcuts are disabled.');
-        disableKeyboardShortcuts();
     }
 
     // 3. Show Tooltips

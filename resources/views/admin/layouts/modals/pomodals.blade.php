@@ -51,7 +51,8 @@
                     <div class="alert alert-warning d-flex align-items-center w-100 mb-0">
                         <i class="ti ti-alert-circle me-2 fs-4"></i>
                         <div>
-                            <strong>{{ __('messages.warning') }}</strong> {{ __('messages.po_modal_bulk_delete_warning_message') }}
+                            <strong>{{ __('messages.warning') }}</strong>
+                            {{ __('messages.po_modal_bulk_delete_warning_message') }}
                         </div>
                     </div>
                 </div>
@@ -63,11 +64,15 @@
                 </p>
 
                 <div class="bg-light p-3 rounded">
-                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> {{ __('messages.po_modal_bulk_delete_what_deleted_title') }}</h6>
+                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i>
+                        {{ __('messages.po_modal_bulk_delete_what_deleted_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">
-                        <li><i class="ti ti-check text-danger me-1"></i> {{ __('messages.po_modal_bulk_delete_item1') }}</li>
-                        <li><i class="ti ti-check text-danger me-1"></i> {{ __('messages.po_modal_bulk_delete_item2') }}</li>
-                        <li><i class="ti ti-check text-danger me-1"></i> {{ __('messages.po_modal_bulk_delete_item3') }}</li>
+                        <li><i class="ti ti-check text-danger me-1"></i>
+                            {{ __('messages.po_modal_bulk_delete_item1') }}</li>
+                        <li><i class="ti ti-check text-danger me-1"></i>
+                            {{ __('messages.po_modal_bulk_delete_item2') }}</li>
+                        <li><i class="ti ti-check text-danger me-1"></i>
+                            {{ __('messages.po_modal_bulk_delete_item3') }}</li>
                     </ul>
                 </div>
 
@@ -77,8 +82,10 @@
                         <div>
                             <strong>{{ __('messages.po_modal_bulk_delete_stock_impact_title') }}</strong>
                             <ul class="mb-0 mt-1 small">
-                                <li><strong>{{ __('messages.po_modal_bulk_delete_stock_impact_unpaid') }}</strong> {{ __('messages.po_modal_bulk_delete_stock_impact_unpaid_desc') }}</li>
-                                <li><strong>{{ __('messages.po_modal_bulk_delete_stock_impact_paid') }}</strong> {{ __('messages.po_modal_bulk_delete_stock_impact_paid_desc') }}</li>
+                                <li><strong>{{ __('messages.po_modal_bulk_delete_stock_impact_unpaid') }}</strong>
+                                    {{ __('messages.po_modal_bulk_delete_stock_impact_unpaid_desc') }}</li>
+                                <li><strong>{{ __('messages.po_modal_bulk_delete_stock_impact_paid') }}</strong>
+                                    {{ __('messages.po_modal_bulk_delete_stock_impact_paid_desc') }}</li>
                             </ul>
                         </div>
                     </div>
@@ -86,9 +93,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="ti ti-x me-1"></i>
-                        {{ __('messages.cancel') }}
-                    </button>
+                    <i class="ti ti-x me-1"></i>
+                    {{ __('messages.cancel') }}
+                </button>
                 <button type="button" class="btn btn-danger" id="confirmBulkDeleteBtn">
                     <i class="ti ti-trash me-1"></i>
                     {{ __('messages.po_modal_bulk_delete_button') }}
@@ -115,7 +122,8 @@
                     <div class="alert alert-info d-flex align-items-center w-100 mb-0">
                         <i class="ti ti-info-circle me-2 fs-4"></i>
                         <div>
-                            <strong>{{ __('messages.info') }}</strong> {{ __('messages.po_modal_bulk_mark_paid_info_message') }}
+                            <strong>{{ __('messages.info') }}</strong>
+                            {{ __('messages.po_modal_bulk_mark_paid_info_message') }}
                         </div>
                     </div>
                 </div>
@@ -127,12 +135,17 @@
                 </p>
 
                 <div class="bg-light p-3 rounded">
-                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i> {{ __('messages.po_modal_bulk_mark_paid_what_updated_title') }}</h6>
+                    <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i>
+                        {{ __('messages.po_modal_bulk_mark_paid_what_updated_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">
-                        <li><i class="ti ti-check text-success me-1"></i> {{ __('messages.po_modal_bulk_mark_paid_item1') }}</li>
-                        <li><i class="ti ti-check text-success me-1"></i> {{ __('messages.po_modal_bulk_mark_paid_item2') }}</li>
-                        <li><i class="ti ti-check text-success me-1"></i> {{ __('messages.po_modal_bulk_mark_paid_item3') }}</li>
-                        <li><i class="ti ti-check text-success me-1"></i> {{ __('messages.po_modal_bulk_mark_paid_item4') }}</li>
+                        <li><i class="ti ti-check text-success me-1"></i>
+                            {{ __('messages.po_modal_bulk_mark_paid_item1') }}</li>
+                        <li><i class="ti ti-check text-success me-1"></i>
+                            {{ __('messages.po_modal_bulk_mark_paid_item2') }}</li>
+                        <li><i class="ti ti-check text-success me-1"></i>
+                            {{ __('messages.po_modal_bulk_mark_paid_item3') }}</li>
+                        <li><i class="ti ti-check text-success me-1"></i>
+                            {{ __('messages.po_modal_bulk_mark_paid_item4') }}</li>
                     </ul>
                 </div>
 
@@ -159,7 +172,8 @@
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h4 class="modal-title"><i class="ti ti-file-invoice me-2"></i>{{ __('messages.po_modal_details_title') }}</h4>
+                <h4 class="modal-title"><i
+                        class="ti ti-file-invoice me-2"></i>{{ __('messages.po_modal_details_title') }}</h4>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -173,7 +187,8 @@
             </div>
             <div class="modal-footer">
                 <div class="text-muted me-auto">
-                    <small><i class="ti ti-info-circle me-1"></i> {{ __('messages.po_modal_details_info_message') }}</small>
+                    <small><i class="ti ti-info-circle me-1"></i>
+                        {{ __('messages.po_modal_details_info_message') }}</small>
                 </div>
                 <a href="#" class="btn btn-info" id="poModalFullView">
                     <i class="ti ti-zoom-scan me-1"></i> {{ __('messages.po_modal_details_full_view_button') }}
@@ -205,7 +220,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="{{ route('admin.po.view', $pos->id) }}" class="btn btn-primary w-100">{{ __('messages.po_modal_paid_view_invoice_button') }}</a>
+                    <a href="{{ route('admin.po.view', $pos->id) }}"
+                        class="btn btn-primary w-100">{{ __('messages.po_modal_paid_view_invoice_button') }}</a>
                 </div>
             </div>
         </div>
@@ -239,7 +255,8 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-warning text-white">
-                <h4 class="modal-title"><i class="ti ti-calendar-time me-2"></i>{{ __('messages.po_modal_expiring_title') }}</h4>
+                <h4 class="modal-title"><i
+                        class="ti ti-calendar-time me-2"></i>{{ __('messages.po_modal_expiring_title') }}</h4>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -265,7 +282,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary-lt" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
+                <button type="button" class="btn btn-secondary-lt"
+                    data-bs-dismiss="modal">{{ __('messages.close') }}</button>
             </div>
         </div>
     </div>

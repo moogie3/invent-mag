@@ -92,11 +92,22 @@ window.shortcutManager.register(
             const tbody = document.getElementById("keyboardShortcutsList");
             tbody.innerHTML = ""; // Clear previous content
 
-            window.shortcutManager.getShortcuts().forEach((shortcut) => {
+            const uniqueShortcuts = Array.from(
+                new Map(
+                    window.shortcutManager
+                        .getShortcuts()
+                        .map((s) => [s.keys, s])
+                ).values()
+            );
+
+            uniqueShortcuts.forEach((shortcut) => {
                 const row = tbody.insertRow();
                 const keyCell = row.insertCell();
                 const actionCell = row.insertCell();
-                keyCell.innerHTML = `<strong>${shortcut.keys}</strong>`;
+                keyCell.innerHTML = `<strong>${shortcut.keys
+                    .split("+")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" + ")}</strong>`;
                 actionCell.textContent = shortcut.description;
             });
             modal.show();

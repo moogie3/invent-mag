@@ -209,13 +209,7 @@ export function bulkMarkAsPaidSales() {
                 ? statusElement.textContent.trim()
                 : "";
 
-            return (
-                status === "Paid" ||
-                status.toLowerCase().includes("paid") ||
-                statusElement?.classList.contains("badge-success") ||
-                statusElement?.classList.contains("bg-success") ||
-                statusElement?.innerHTML.toLowerCase().includes("paid")
-            );
+            return statusElement?.classList.contains("bg-green-lt");
         });
 
         if (selectedPaidSales.length > 0) {
@@ -304,12 +298,7 @@ function smartSelectUnpaidOnlySales() {
 
         const status = statusElement ? statusElement.textContent.trim() : "";
 
-        const isPaid =
-            status === "Paid" ||
-            status.toLowerCase().includes("paid") ||
-            statusElement?.classList.contains("badge-success") ||
-            statusElement?.classList.contains("bg-success") ||
-            statusElement?.innerHTML.toLowerCase().includes("paid");
+        const isPaid = statusElement?.classList.contains("bg-green-lt");
 
         if (isPaid) {
             checkbox.checked = false;

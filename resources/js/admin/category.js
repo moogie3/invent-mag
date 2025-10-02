@@ -5,6 +5,11 @@ document.addEventListener("DOMContentLoaded", function () {
     handleEditCategoryModal();
     initSelectableTable();
 
+    window.shortcutManager.register('alt+n', () => {
+        const createModal = new bootstrap.Modal(document.getElementById('createCategoryModal'));
+        createModal.show();
+    }, 'New Category');
+
     window.shortcutManager.register('ctrl+s', () => {
         const createModal = document.getElementById('createCategoryModal');
         const editModal = document.getElementById('editCategoryModal');
@@ -21,9 +26,4 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     }, 'Save Category');
-
-    window.shortcutManager.register('alt+n', () => {
-        const createModal = new bootstrap.Modal(document.getElementById('createCategoryModal'));
-        createModal.show();
-    }, 'New Category');
 });

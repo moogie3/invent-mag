@@ -42,7 +42,8 @@
                         @endforeach
                     </div>
 
-                    <h3 class="card-title mt-4 fw-semibold">{{ __('user_modal_assign_direct_permissions') }}</h3>
+                    <h3 class="card-title mt-4 fw-semibold">{{ __('messages.user_modal_assign_direct_permissions') }}
+                    </h3>
                     <div class="mb-3">
                         @foreach ($permissions as $permission)
                             <label class="form-check form-check-inline">
@@ -56,8 +57,9 @@
                 </div>
                 <div class="modal-footer border-top-0 pt-0">
                     <button type="button" class="btn btn-link text-muted"
-                        data-bs-dismiss="modal">{{ __('cancel') }}</button>
-                    <button type="submit" class="btn btn-primary ms-auto">{{ __('user_modal_create_user') }}</button>
+                        data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                    <button type="submit"
+                        class="btn btn-primary ms-auto">{{ __('messages.user_modal_create_user') }}</button>
                 </div>
             </form>
         </div>

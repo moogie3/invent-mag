@@ -23,7 +23,8 @@
                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                 <h2 class="mb-0">
                                                     <i class="ti ti-users fs-2"></i>
-                                                    {{ __('messages.user_total_users') }} <strong>{{ $users->count() }}</strong>
+                                                    {{ __('messages.user_total_users') }}
+                                                    <strong>{{ $users->count() }}</strong>
                                                 </h2>
                                                 <div class="btn-list">
                                                     <a href="#" class="btn btn-primary d-none d-sm-inline-block"
@@ -133,14 +134,19 @@
                                                 <thead style="font-size: large">
                                                     <tr>
                                                         <th><button class="table-sort fs-4 py-3"
-                                                                data-sort="sort-name">{{ __('messages.table_name') }}</button></th>
+                                                                data-sort="sort-name">{{ __('messages.table_name') }}</button>
+                                                        </th>
                                                         <th><button class="table-sort fs-4 py-3"
-                                                                data-sort="sort-email">{{ __('messages.table_email') }}</button></th>
+                                                                data-sort="sort-email">{{ __('messages.table_email') }}</button>
+                                                        </th>
                                                         <th><button class="table-sort fs-4 py-3"
-                                                                data-sort="sort-roles">{{ __('messages.table_roles') }}</button></th>
+                                                                data-sort="sort-roles">{{ __('messages.table_roles') }}</button>
+                                                        </th>
                                                         <th><button class="table-sort fs-4 py-3"
-                                                                data-sort="sort-permissions">{{ __('messages.table_permissions') }}</button></th>
-                                                        <th style="width:180px;text-align:center" class="fs-4 py-3">{{ __('messages.table_action') }}
+                                                                data-sort="sort-permissions">{{ __('messages.table_permissions') }}</button>
+                                                        </th>
+                                                        <th style="width:180px;text-align:center" class="fs-4 py-3">
+                                                            {{ __('messages.table_action') }}
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -174,14 +180,16 @@
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#editUserModal"
                                                                             data-user-id="{{ $user->id }}">
-                                                                            <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
+                                                                            <i class="ti ti-edit me-2"></i>
+                                                                            {{ __('messages.edit') }}
                                                                         </a>
                                                                         <button type="button"
                                                                             class="dropdown-item text-danger delete-user-btn"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#deleteUserModal"
                                                                             data-user-id="{{ $user->id }}">
-                                                                            <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
+                                                                            <i class="ti ti-trash me-2"></i>
+                                                                            {{ __('messages.delete') }}
                                                                         </button>
                                                                     </div>
                                                                 </div>
@@ -200,7 +208,8 @@
                                                         'first' => $users->firstItem(),
                                                         'last' => $users->lastItem(),
                                                         'total' => $users->total(),
-                                                    ]) }} entries
+                                                    ]) }}
+                                                    entries
                                                 </p>
                                                 <div class="ms-auto">
                                                     {{ $users->appends(request()->query())->links('vendor.pagination.tabler') }}

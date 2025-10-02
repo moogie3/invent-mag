@@ -5,6 +5,11 @@ document.addEventListener("DOMContentLoaded", function () {
     handleEditUnitModal();
     initSelectableTable();
 
+    window.shortcutManager.register('alt+n', () => {
+        const createModal = new bootstrap.Modal(document.getElementById('createUnitModal'));
+        createModal.show();
+    }, 'New Unit');
+
     window.shortcutManager.register('ctrl+s', () => {
         const createModal = document.getElementById('createUnitModal');
         const editModal = document.getElementById('editUnitModal');
@@ -21,9 +26,4 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     }, 'Save Unit');
-
-    window.shortcutManager.register('alt+n', () => {
-        const createModal = new bootstrap.Modal(document.getElementById('createUnitModal'));
-        createModal.show();
-    }, 'New Unit');
 });

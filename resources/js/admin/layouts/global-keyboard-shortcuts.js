@@ -133,14 +133,6 @@ window.shortcutManager = new ShortcutManager();
 
 // Global shortcuts
 window.shortcutManager.register(
-    "shift+?",
-    () => {
-        window.shortcutManager.showShortcutsModal();
-    },
-    "showHelpModal"
-);
-
-window.shortcutManager.register(
     "/",
     () => {
         const searchInput = document.getElementById("searchInput");
@@ -149,6 +141,14 @@ window.shortcutManager.register(
         }
     },
     "focusSearch"
+);
+
+window.shortcutManager.register(
+    "shift+?",
+    () => {
+        window.shortcutManager.showShortcutsModal();
+    },
+    "showHelpModal"
 );
 
 window.shortcutManager.register(

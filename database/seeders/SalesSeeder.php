@@ -31,7 +31,7 @@ class SalesSeeder extends Seeder
         for ($i = 0; $i < 10; $i++) { // Create 20 sample sales
             $customer = $customers->random();
             $user = $users->random();
-            $orderDate = Carbon::now()->subDays(rand(1, 60));
+            $orderDate = Carbon::now()->subDays(rand(0, 29));
             $dueDate = $orderDate->copy()->addDays(rand(7, 30));
             $paymentType = collect(['Cash', 'Card', 'Transfer', 'eWallet', '-'])->random();
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();

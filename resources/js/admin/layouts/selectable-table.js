@@ -50,9 +50,12 @@ export function initSelectableTable() {
             let selector;
             if (actionType === 'edit') {
                 selector = 'a.dropdown-item[href*="edit"]';
+            } else if (actionType === 'delete') {
+                selector = 'button.dropdown-item[data-bs-target="#deleteUserModal"]';
             } else {
                 selector = 'button.dropdown-item[data-bs-target="#deleteModal"]';
             }
+
             const actionName = actionType === 'edit' ? 'Edit' : 'Delete';
 
             const dropdownToggle = selectedRow.querySelector('.dropdown-toggle');
@@ -77,7 +80,10 @@ export function initSelectableTable() {
                                 }
                             }
                         } else {
-                            actionButton = openDropdownMenu.querySelector(selector);
+                            actionButton = openDropdownMenu.querySelector('button.dropdown-item[data-bs-target="#deleteUserModal"]');
+                            if (!actionButton) {
+                                actionButton = openDropdownMenu.querySelector('button.dropdown-item[data-bs-target="#deleteModal"]');
+                            }
                         }
 
                         console.log("Attempting to find action button with selector:", selector, "in open dropdown:", openDropdownMenu);

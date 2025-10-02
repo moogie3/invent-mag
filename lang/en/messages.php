@@ -793,7 +793,7 @@ return [
     'notes' => 'Notes',
     'amount_summary' => 'Amount Summary',
     'order_discount' => 'Order Discount',
-    'fixed' => 'fixed',
+    'fixed' => 'Fixed',
     'grand_total' => 'Grand Total',
     'delete_sales_order' => 'Delete Sales Order',
     'this_action_cannot_be_undone_all_data_associated_with_this_sales_order_will_be_permanently_deleted' => 'This action cannot be undone. All data associated with this sales order will be permanently deleted.',
@@ -1030,4 +1030,5 @@ return [
     'shortcut_show_help_modal' => 'Show this help modal',
     'shortcut_focus_search' => 'Focus global search input',
     'shortcut_close_modal' => 'Close active modal/popup',
+    'view_sales_invoice' => 'View Sales Invoice'
 ];

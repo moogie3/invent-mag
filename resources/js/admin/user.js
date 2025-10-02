@@ -41,6 +41,11 @@ document.addEventListener("DOMContentLoaded", function () {
             // confirmDeleteBtn.textContent = "Delete";
         });
 
+    window.shortcutManager.register('alt+n', () => {
+        const createModal = new bootstrap.Modal(document.getElementById('createUserModal'));
+        createModal.show();
+    }, 'New User');
+
     window.shortcutManager.register('ctrl+s', () => {
         const createModal = document.getElementById('createUserModal');
         const editModal = document.getElementById('editUserModal');
@@ -57,9 +62,4 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     }, 'Save User');
-
-    window.shortcutManager.register('alt+n', () => {
-        const createModal = new bootstrap.Modal(document.getElementById('createUserModal'));
-        createModal.show();
-    }, 'New User');
 });

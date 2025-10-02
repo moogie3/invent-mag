@@ -1,6 +1,6 @@
 import { getProducts, setProducts, saveProductsToCache } from './state.js';
 import { renderList } from './dom.js';
-import { playSuccessSound, playDeleteSound, playDecreaseSound } from '../utils/sound.js';
+import { playSuccessPosSound, playDeleteSound, playDecreaseSound } from '../utils/sound.js';
 import { showAddToCartFeedback, updateProductCardStockDisplay } from '../utils/ui.js';
 
 const productList = document.getElementById("productList");
@@ -56,7 +56,7 @@ function addToProductList(
     setProducts(products);
     updateProductCardStockDisplay(productId, products.find(p => p.id === productId).stock - products.find(p => p.id === productId).quantity);
     showAddToCartFeedback();
-    playSuccessSound();
+    playSuccessPosSound();
     renderList();
     saveProductsToCache();
 }
@@ -136,7 +136,7 @@ export function initCartActions() {
                     InventMagApp.showToast("Warning", "Insufficient Stock", "warning");
                     return;
                 }
-                playSuccessSound();
+                playSuccessPosSound();
                 product.quantity += 1;
                 product.total = product.quantity * product.price;
                 updateProductCardStockDisplay(product.id, product.stock - product.quantity);

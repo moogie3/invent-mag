@@ -28,7 +28,7 @@ class PurchaseSeeder extends Seeder
 
         for ($i = 0; $i < 10; $i++) {
             $supplier = $suppliers->random();
-            $orderDate = Carbon::now()->subDays(rand(1, 60));
+            $orderDate = Carbon::now()->subDays(rand(0, 29));
             $dueDate = $orderDate->copy()->addDays(rand(7, 30));
             $paymentType = collect(['Cash', 'Transfer', '-'])->random();
             $status = collect(['Unpaid', 'Paid'])->random();

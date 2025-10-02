@@ -108,6 +108,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Add enhanced tooltips with staggered animation
     const addTooltips = function () {
+        // Only add tooltips if the user setting is enabled
+        if (window.userSettings && !window.userSettings.show_tooltips) {
+            return; // Do not add tooltips if disabled
+        }
+
         const navLinks = sidebar.querySelectorAll(".nav-link");
         navLinks.forEach((link, index) => {
             const titleElement = link.querySelector(".nav-link-title");
@@ -149,7 +154,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 sidebar.classList.add("collapsed");
                 mainContent.classList.add("sidebar-collapsed");
                 body.classList.remove("sidebar-open");
-                addTooltips();
+                // Only add tooltips if the setting is enabled
+                if (window.userSettings && window.userSettings.show_tooltips) {
+                    addTooltips();
+                }
             }, 50);
         } else {
             // SMOOTH opening - keep the nice opening animation
@@ -220,8 +228,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }, index * 80);
         });
 
-        // Add tooltips if sidebar is collapsed
-        if (shouldBeCollapsed) {
+        // Add tooltips if sidebar is collapsed AND the setting is enabled
+        if (shouldBeCollapsed && window.userSettings && window.userSettings.show_tooltips) {
             setTimeout(addTooltips, navItems.length * 40 + 100);
         }
 
@@ -264,7 +272,15 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // Initialize everything
-    initializeSidebar();
+    // Listen for when user settings are loaded (from settings.js)
+    document.addEventListener('usersettingsloaded', () => {
+        initializeSidebar();
+    });
+
+    // If settings are already loaded, initialize immediately
+    if (window.userSettings) {
+        initializeSidebar();
+    }
 
     // Handle clicks on parent menu items when sidebar is collapsed
     const navLinksWithChildren = sidebar.querySelectorAll('.nav-item.dropdown > .nav-link[data-bs-toggle="collapse"]');
@@ -297,7 +313,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 item.style.transitionDelay = `${idx * 100}ms`; // Stagger delay
                                 item.classList.add('visible');
                             });
-                            targetElement.removeEventListener('shown.bs.collapse', handler); // Remove listener after it fires
+                            targetElement.removeEventListener('shown.bs.collapse', handler);
                         });
 
                         bsCollapse.show(); // Explicitly show the submenu

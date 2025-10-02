@@ -27,6 +27,8 @@ async function fetchSystemSettings() {
     // Initialize features that depend on these settings
     if (window.userSettings) {
         applyPerformanceSettings(window.userSettings);
+        applyDebugSettings(window.userSettings);
+        applyTooltipSettings(window.userSettings);
         initAutoLogout(window.userSettings);
     }
 
@@ -76,6 +78,37 @@ function applyPerformanceSettings(settings) {
             document.dispatchEvent(new CustomEvent('datarefresh'));
             console.log('Dispatched datarefresh event.');
         }, refreshRate * 1000);
+    }
+}
+
+function applyDebugSettings(settings) {
+    if (settings.enable_debug_mode === true) {
+        document.body.classList.add('debug-mode');
+        console.log('Debug mode enabled.');
+    } else {
+        document.body.classList.remove('debug-mode');
+    }
+}
+
+/**
+ * Applies global tooltip settings based on user preferences.
+ * @param {object} settings - The user settings object.
+ */
+function applyTooltipSettings(settings) {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+
+    // Always destroy existing tooltips first to prevent duplicates or lingering instances
+    tooltipTriggerList.forEach(tooltipTriggerEl => {
+        const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+        if (tooltipInstance) {
+            tooltipInstance.dispose();
+        }
+    });
+
+    if (settings.show_tooltips === true) {
+        tooltipTriggerList.forEach(tooltipTriggerEl => {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     }
 }
 
@@ -332,4 +365,11 @@ function resetToDefaults() {
 
         InventMagApp.showToast('Success', 'Settings have been reset to their default values.', 'success');
     }
+}
+
+const showShortcutsModalBtn = document.getElementById('showShortcutsModalBtn');
+if (showShortcutsModalBtn) {
+    showShortcutsModalBtn.addEventListener('click', () => {
+        window.shortcutManager.showShortcutsModal();
+    });
 }

@@ -25,6 +25,10 @@ class ShortcutManager {
     }
 
     handleKeydown(event) {
+        if (window.userSettings && !window.userSettings.enable_keyboard_shortcuts) {
+            return; // Keyboard shortcuts are disabled by user setting
+        }
+
         const key = event.key.toLowerCase();
         const ctrl = this.isMac ? event.metaKey : event.ctrlKey;
         const alt = event.altKey;
@@ -93,14 +97,8 @@ class ShortcutManager {
     getShortcuts() {
         return this.shortcuts;
     }
-}
 
-window.shortcutManager = new ShortcutManager();
-
-// Global shortcuts
-window.shortcutManager.register(
-    "shift+?",
-    () => {
+    showShortcutsModal() {
         const modalElement = document.getElementById("keyboardShortcutsModal");
         if (modalElement) {
             const modal = new bootstrap.Modal(modalElement);
@@ -109,8 +107,7 @@ window.shortcutManager.register(
 
             const uniqueShortcuts = Array.from(
                 new Map(
-                    window.shortcutManager
-                        .getShortcuts()
+                    this.getShortcuts()
                         .map((s) => [s.keys, s])
                 ).values()
             );
@@ -129,6 +126,16 @@ window.shortcutManager.register(
             });
             modal.show();
         }
+    }
+}
+
+window.shortcutManager = new ShortcutManager();
+
+// Global shortcuts
+window.shortcutManager.register(
+    "shift+?",
+    () => {
+        window.shortcutManager.showShortcutsModal();
     },
     "showHelpModal"
 );

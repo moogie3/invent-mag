@@ -99,6 +99,14 @@
             console.log('show_theme_toggle setting (from base.blade.php):', showThemeToggle);
         });
     </script>
+
+    @if(isset($isDebugMode) && $isDebugMode)
+        <div style="position: fixed; bottom: 0; left: 0; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; font-size: 0.8em; z-index: 10000;">
+            <strong>Debug Mode:</strong> ON<br>
+            Current Route: {{ Route::currentRouteName() ?? 'N/A' }}<br>
+            User ID: {{ auth()->user()->id ?? 'N/A' }}
+        </div>
+    @endif
 </body>
 
 </html>

@@ -122,6 +122,25 @@ window.InventMagApp.showToast = function (
     });
 
     toast.show();
+
+    // Play sound if enabled
+    if (window.userSettings && window.userSettings.enable_sound_notifications) {
+        const audio = new Audio(`/public/audio/${type}.mp3`); // Assuming audio files are named after type (success.mp3, error.mp3, etc.)
+        audio.play().catch(e => console.error("Error playing notification sound:", e));
+    }
+
+    // Show browser notification if enabled and supported
+    if (window.userSettings && window.userSettings.enable_browser_notifications && "Notification" in window) {
+        if (Notification.permission === "granted") {
+            new Notification(title, { body: message, icon: '/public/favicon.ico' });
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    new Notification(title, { body: message, icon: '/public/favicon.ico' });
+                }
+            });
+        }
+    }
 };
 
 // Global function for confirmation modal

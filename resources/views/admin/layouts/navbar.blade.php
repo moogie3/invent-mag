@@ -84,8 +84,6 @@
 
         <!-- Right Side Icons -->
         <div class="d-flex flex-grow-1 justify-content-end align-items-center" id="navbar-right-content">
-
-
             <!-- Theme Toggle Button -->
             <div class="nav-item me-2" id="theme-toggle-navbar-container">
                 <a href="#" class="nav-link px-0" id="theme-toggle-navbar">
@@ -349,7 +347,7 @@
                         </div>
                     @endif
                 </a>
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <div class="dropdown-menu dropdown-menu-arrow">
                     <a href="{{ route('admin.setting.profile.edit') }}" class="dropdown-item">
                         <i class="ti ti-settings me-2"></i>{{ __('messages.settings') }}
                     </a>

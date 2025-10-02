@@ -1,6 +1,11 @@
 class ShortcutManager {
     constructor() {
         this.shortcuts = [];
+        this.descriptions = {
+            showHelpModal: "Showing help modal",
+            focusSearch: "Focus global search input",
+            closeModal: "Close active modal/popup",
+        };
         this.isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
         document.addEventListener("keydown", this.handleKeydown.bind(this));
     }
@@ -69,6 +74,16 @@ class ShortcutManager {
                 requiredModifiers.every((mod) => pressedModifiers.includes(mod))
             ) {
                 event.preventDefault();
+                if (shortcut.description) {
+                    const descriptionText =
+                        this.descriptions[shortcut.description] ||
+                        shortcut.description;
+                    window.InventMagApp.showToast(
+                        "Shortcut",
+                        descriptionText,
+                        "info"
+                    );
+                }
                 shortcut.callback(event);
                 return; // Stop processing other shortcuts
             }
@@ -100,6 +115,7 @@ window.shortcutManager.register(
                 ).values()
             );
 
+            const translations = tbody.dataset;
             uniqueShortcuts.forEach((shortcut) => {
                 const row = tbody.insertRow();
                 const keyCell = row.insertCell();
@@ -108,12 +124,13 @@ window.shortcutManager.register(
                     .split("+")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(" + ")}</strong>`;
-                actionCell.textContent = shortcut.description;
+                actionCell.textContent =
+                    translations[shortcut.description] || shortcut.description;
             });
             modal.show();
         }
     },
-    "Show this help modal"
+    "showHelpModal"
 );
 
 window.shortcutManager.register(
@@ -124,7 +141,7 @@ window.shortcutManager.register(
             searchInput.focus();
         }
     },
-    "Focus global search input"
+    "focusSearch"
 );
 
 window.shortcutManager.register(
@@ -138,5 +155,5 @@ window.shortcutManager.register(
             }
         }
     },
-    "Close active modal/popup"
+    "closeModal"
 );

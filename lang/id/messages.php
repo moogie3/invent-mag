@@ -1027,4 +1027,7 @@ return [
     'keyboard_shortcuts_intro' => 'List seluruh shorcut dan penggunaanya',
     'keyboard_shortcuts_shortcut_header' => 'Shortcut',
     'keyboard_shortcuts_action_header' => 'Aksi',
+    'shortcut_show_help_modal' => 'Tampilkan modal bantuan ini',
+    'shortcut_focus_search' => 'Fokus pada input pencarian global',
+    'shortcut_close_modal' => 'Tutup modal/popup aktif',
 ];

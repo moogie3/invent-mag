@@ -14,7 +14,11 @@
                             <th>{{ __('messages.keyboard_shortcuts_action_header') }}</th>
                         </tr>
                     </thead>
-                    <tbody id="keyboardShortcutsList">
+                    <tbody id="keyboardShortcutsList"
+                        data-show-help-modal="{{ __('messages.shortcut_show_help_modal') }}"
+                        data-focus-search="{{ __('messages.shortcut_focus_search') }}"
+                        data-close-modal="{{ __('messages.shortcut_close_modal') }}"
+                    >
                         <!-- Shortcuts will be loaded here dynamically -->
                     </tbody>
                 </table>

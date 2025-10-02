@@ -1027,4 +1027,7 @@ return [
     'keyboard_shortcuts_intro' => 'Listing all the shortcut and its action',
     'keyboard_shortcuts_shortcut_header' => 'Shortcut',
     'keyboard_shortcuts_action_header' => 'Action',
+    'shortcut_show_help_modal' => 'Show this help modal',
+    'shortcut_focus_search' => 'Focus global search input',
+    'shortcut_close_modal' => 'Close active modal/popup',
 ];

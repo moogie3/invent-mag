@@ -15,10 +15,14 @@
                         </tr>
                     </thead>
                     <tbody id="keyboardShortcutsList"
-                        data-show-help-modal="{{ __('messages.shortcut_show_help_modal') }}"
-                        data-focus-search="{{ __('messages.shortcut_focus_search') }}"
-                        data-close-modal="{{ __('messages.shortcut_close_modal') }}"
-                    >
+    data-show-help-modal="{{ __('messages.shortcut_show_help_modal') }}"
+    data-focus-search="{{ __('messages.shortcut_focus_search') }}"
+    data-close-modal="{{ __('messages.shortcut_close_modal') }}"
+    data-create-new-sales-order="{{ __('messages.shortcut_create_new_sales_order') }}"
+    data-create-new-purchase-order="{{ __('messages.shortcut_create_new_purchase_order') }}"
+    data-save-purchase-order="{{ __('messages.shortcut_save_purchase_order') }}"
+    data-save-sales-order="{{ __('messages.shortcut_save_sales_order') }}"
+>
                         <!-- Shortcuts will be loaded here dynamically -->
                     </tbody>
                 </table>

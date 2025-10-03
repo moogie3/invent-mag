@@ -77,54 +77,48 @@ export class SalesOrderView extends SalesOrderModule {
     }
 
     loadSalesDetails(id) {
-        if (
-            this.elements.viewSalesModalContent.innerHTML.includes(
-                "spinner-border"
-            ) ||
-            this.elements.viewSalesModalContent.innerHTML.trim() === ""
-        ) {
-            this.elements.viewSalesModalContent.innerHTML =
-                '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        // Always clear content and show spinner when loading new details
+        this.elements.viewSalesModalContent.innerHTML =
+            '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
 
-            fetch(`/admin/sales/modal-view/${id}`, {
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(
-                            `HTTP error! Status: ${response.status}`
-                        );
-                    }
-                    return response.text();
-                })
-                .then((html) => {
-                    if (this.elements.viewSalesModalContent) {
-                        this.elements.viewSalesModalContent.innerHTML = html;
-                        this.formatAllCurrencyValues();
-
-                        if (this.elements.salesModalEdit) {
-                            this.elements.salesModalEdit.href = `/admin/sales/edit/${id}`;
-                        }
-                        if (this.elements.salesModalFullView) {
-                            this.elements.salesModalFullView.href = `/admin/sales/view/${id}`;
-                        }
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error loading sales details:", error);
-                    if (this.elements.viewSalesModalContent) {
-                        this.elements.viewSalesModalContent.innerHTML =
-                            '<div class="alert alert-danger">Failed to load sales details.</div>';
-                    }
-                    InventMagApp.showToast(
-                        "Error",
-                        "Failed to load sales details.",
-                        "error"
+        fetch(`/admin/sales/modal-view/${id}`, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(
+                        `HTTP error! Status: ${response.status}`
                     );
-                });
-        }
+                }
+                return response.text();
+            })
+            .then((html) => {
+                if (this.elements.viewSalesModalContent) {
+                    this.elements.viewSalesModalContent.innerHTML = html;
+                    this.formatAllCurrencyValues();
+
+                    if (this.elements.salesModalEdit) {
+                        this.elements.salesModalEdit.href = `/admin/sales/edit/${id}`;
+                    }
+                    if (this.elements.salesModalFullView) {
+                        this.elements.salesModalFullView.href = `/admin/sales/view/${id}`;
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error("Error loading sales details:", error);
+                if (this.elements.viewSalesModalContent) {
+                    this.elements.viewSalesModalContent.innerHTML =
+                        '<div class="alert alert-danger">Failed to load sales details.</div>';
+                }
+                InventMagApp.showToast(
+                    "Error",
+                    "Failed to load sales details.",
+                    "error"
+                );
+            });
     }
 
     printModalContent() {

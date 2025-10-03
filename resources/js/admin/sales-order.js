@@ -1,8 +1,12 @@
-import { SalesOrderCreate } from './partials/sales-order/create/SalesOrderCreate.js';
-import { SalesOrderEdit } from './partials/sales-order/edit/SalesOrderEdit.js';
-import { SalesOrderView } from './partials/sales-order/view/SalesOrderView.js';
-import { SalesOrderBulkSelection } from './partials/sales-order/bulkActions/SalesOrderBulkSelection.js';
-import { bulkDeleteSales, bulkExportSales, bulkMarkAsPaidSales } from './partials/sales-order/bulkActions/actions.js';
+import { SalesOrderCreate } from "./partials/sales-order/create/SalesOrderCreate.js";
+import { SalesOrderEdit } from "./partials/sales-order/edit/SalesOrderEdit.js";
+import { SalesOrderView } from "./partials/sales-order/view/SalesOrderView.js";
+import { SalesOrderBulkSelection } from "./partials/sales-order/bulkActions/SalesOrderBulkSelection.js";
+import {
+    bulkDeleteSales,
+    bulkExportSales,
+    bulkMarkAsPaidSales,
+} from "./partials/sales-order/bulkActions/actions.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
 
 // Expose global functions for inline event handlers
@@ -12,7 +16,9 @@ window.clearSalesSelection = function () {
     }
 };
 window.getSalesSelectedIds = function () {
-    return window.salesBulkSelection ? window.salesBulkSelection.getSelectedIds() : [];
+    return window.salesBulkSelection
+        ? window.salesBulkSelection.getSelectedIds()
+        : [];
 };
 window.bulkDeleteSales = bulkDeleteSales;
 window.bulkExportSales = bulkExportSales;
@@ -44,23 +50,43 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             if (pathname.includes("/admin/sales/create")) {
                 window.salesApp = new SalesOrderCreate();
-                window.shortcutManager.register('ctrl+s', () => {
-                    document.getElementById('invoiceForm').submit();
-                }, 'Save Sales Order');
-                window.shortcutManager.register('alt+n', () => {
-                    document.getElementById('addProduct').click();
-                }, 'Add Product');
-                window.shortcutManager.register('alt+c', () => {
-                    document.getElementById('clearProducts').click();
-                }, 'Clear All Products');
+                window.shortcutManager.register(
+                    "alt+n",
+                    () => {
+                        document.getElementById("addProduct").click();
+                    },
+                    "Add Product"
+                );
+                window.shortcutManager.register(
+                    "alt+c",
+                    () => {
+                        document.getElementById("clearProducts").click();
+                    },
+                    "Clear All Products"
+                );
+                window.shortcutManager.register(
+                    "ctrl+s",
+                    () => {
+                        document.getElementById("invoiceForm").submit();
+                    },
+                    "Save Sales Order"
+                );
+                window.shortcutManager.unregister("alt+d");
+                window.shortcutManager.unregister("alt+e");
             } else if (
                 pathname.includes("/admin/sales/edit/") ||
                 pathname.match(/\/admin\/sales\/edit\/\d+$/)
             ) {
                 window.salesApp = new SalesOrderEdit();
-                 window.shortcutManager.register('ctrl+s', () => {
-                    document.getElementById('edit-sales-form').submit();
-                }, 'Save Sales Order');
+                window.shortcutManager.register(
+                    "ctrl+s",
+                    () => {
+                        document.getElementById("save-sales-button").click();
+                    },
+                    "Save Sales Order"
+                );
+                window.shortcutManager.unregister("alt+d");
+                window.shortcutManager.unregister("alt+e");
             } else if (
                 pathname.includes("/admin/sales/modal") ||
                 (pathname.includes("/admin/sales") &&
@@ -89,6 +115,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         bulkActionsBar.style.display = "none";
                     }
                 }
+
+                window.shortcutManager.register(
+                    "alt+n",
+                    () => {
+                        window.location.href = "/admin/sales/create";
+                    },
+                    "Create New Sales Order"
+                );
             }
 
             if (pathname.includes("edit") && pathname.includes("sales")) {
@@ -138,47 +172,66 @@ if (typeof window.loadSalesDetails === "undefined") {
 }
 
 // JavaScript for Sales Expiring Soon functionality
-document.addEventListener('DOMContentLoaded', function () {
-    const expiringSalesModalElement = document.getElementById('expiringSalesModal');
+document.addEventListener("DOMContentLoaded", function () {
+    const expiringSalesModalElement =
+        document.getElementById("expiringSalesModal");
     if (expiringSalesModalElement) {
-        expiringSalesModalElement.addEventListener('show.bs.modal', function () {
-            const tableBody = document.getElementById('expiringSalesTableBody');
-            tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3 text-muted">Loading expiring sales invoices...</p></td></tr>';
+        expiringSalesModalElement.addEventListener(
+            "show.bs.modal",
+            function () {
+                const tableBody = document.getElementById(
+                    "expiringSalesTableBody"
+                );
+                tableBody.innerHTML =
+                    '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3 text-muted">Loading expiring sales invoices...</p></td></tr>';
 
-            fetch('/admin/sales/expiring-soon') // This endpoint needs to be defined in web.php
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    tableBody.innerHTML = ''; // Clear loading indicator
-                    if (data.length === 0) {
-                        tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No sales invoices expiring soon.</td></tr>';
-                        return;
-                    }
+                fetch("/admin/sales/expiring-soon") // This endpoint needs to be defined in web.php
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(
+                                "Network response was not ok " +
+                                    response.statusText
+                            );
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        tableBody.innerHTML = ""; // Clear loading indicator
+                        if (data.length === 0) {
+                            tableBody.innerHTML =
+                                '<tr><td colspan="5" class="text-center py-4 text-muted">No sales invoices expiring soon.</td></tr>';
+                            return;
+                        }
 
-                    data.forEach(sale => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
+                        data.forEach((sale) => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = `
                             <td>${sale.invoice}</td>
-                            <td>${sale.customer ? sale.customer.name : 'N/A'}</td>
+                            <td>${
+                                sale.customer ? sale.customer.name : "N/A"
+                            }</td>
                             <td class="text-center">${sale.due_date}</td>
                             <td class="text-end">${sale.total}</td>
                             <td class="text-end">
-                                <a href="/admin/sales/view/${sale.id}" class="btn btn-sm btn-primary">
+                                <a href="/admin/sales/view/${
+                                    sale.id
+                                }" class="btn btn-sm btn-primary">
                                     <i class="ti ti-eye me-1"></i> View
                                 </a>
                             </td>
                         `;
-                        tableBody.appendChild(row);
+                            tableBody.appendChild(row);
+                        });
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "Error fetching expiring sales invoices:",
+                            error
+                        );
+                        tableBody.innerHTML =
+                            '<tr><td colspan="5" class="text-center py-4 text-danger">Error loading data. Please try again.</td></tr>';
                     });
-                })
-                .catch(error => {
-                    console.error('Error fetching expiring sales invoices:', error);
-                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Error loading data. Please try again.</td></tr>';
-                });
-        });
+            }
+        );
     }
 });

@@ -6,7 +6,7 @@
                 <h2 class="page-title no-print">{{ __('messages.edit_sales_order') }}</h2>
             </div>
             <div class="col text-end">
-                <button type="submit" form="edit-sales-form" class="btn btn-success">
+                <button type="submit" form="edit-sales-form" class="btn btn-success" id="save-sales-button">
                     <i class="ti ti-device-floppy me-1"></i> {{ __('messages.save_changes') }}
                 </button>
             </div>

@@ -940,7 +940,7 @@ return [
     'collection_rate' => 'Collection rate',
     'customer_crm_key_metrics_average_order_value' => 'Customer average order value',
     'product_adjustment_log_tab' => 'Adjusment Log',
-    'percentage' => 'Percentage',
+    'percentage' => '%',
     'sales_notes' => 'Sales Notes',
     'sales_subtotal' => 'Subtotal',
     'sales_fixed' => 'Fixed',

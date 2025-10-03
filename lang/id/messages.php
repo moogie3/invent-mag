@@ -560,6 +560,7 @@ return [
     'po_payment_type' => 'Jenis Pembayaran:',
     'not_available' => 'Tidak Tersedia',
     'loading' => 'Memuat...',
+    'payment_method_cash' => 'Tunai',
     'pos_tax_ppn' => 'Pajak (PPN)',
     'pos_payment_method_cash' => 'Tunai',
     'pos_payment_method_card' => 'Kartu Kredit/Debit',

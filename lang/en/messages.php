@@ -207,6 +207,8 @@ return [
     'po_modal_expiring_title' => 'Expiring Soon Purchase Orders',
     'table_invoice' => 'Invoice',
     'table_total' => 'Total',
+    'payment_method_cash' => 'Cash',
+    'payment_method_transfer' => 'Bank Transfer',
     'po_modal_expiring_info_message' => 'Purchase orders with a due date within the next 90 days are shown here.',
     'pos_order_summary_title' => 'Order Summary',
     'pos_tax_ppn' => 'Tax (PPN)',

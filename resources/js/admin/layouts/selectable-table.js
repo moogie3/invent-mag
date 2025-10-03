@@ -1,4 +1,5 @@
-export function initSelectableTable() {
+export function initSelectableTable(options = {}) {
+    const { registerEditShortcut = true, registerDeleteShortcut = true } = options;
     console.log("initSelectableTable called!");
     const tables = document.querySelectorAll(".table-vcenter");
     let selectionModeActive = false;
@@ -217,58 +218,62 @@ export function initSelectableTable() {
             }
         });
 
-        window.shortcutManager.register(
-            "alt+e",
-            () => {
-                if (!selectionModeActive) {
-                    selectionModeActive = true;
-                    lastActionType = "edit";
-                    if (rows.length > 0) {
-                        updateSelection(0); // Select the first row by default
+        if (registerEditShortcut) {
+            window.shortcutManager.register(
+                "alt+e",
+                () => {
+                    if (!selectionModeActive) {
+                        selectionModeActive = true;
+                        lastActionType = "edit";
+                        if (rows.length > 0) {
+                            updateSelection(0); // Select the first row by default
+                        }
+                        if (window.InventMagApp && window.InventMagApp.showToast) {
+                            window.InventMagApp.showToast(
+                                "Info",
+                                "Selection mode activated for Edit. Use arrow keys to navigate, Enter to confirm.",
+                                "info"
+                            );
+                        }
+                    } else if (
+                        lastActionType === "edit" &&
+                        currentRowIndex !== -1
+                    ) {
+                        // If already in edit selection mode and a row is selected, confirm action
+                        performAction(rows[currentRowIndex], "edit");
                     }
-                    if (window.InventMagApp && window.InventMagApp.showToast) {
-                        window.InventMagApp.showToast(
-                            "Info",
-                            "Selection mode activated for Edit. Use arrow keys to navigate, Enter to confirm.",
-                            "info"
-                        );
-                    }
-                } else if (
-                    lastActionType === "edit" &&
-                    currentRowIndex !== -1
-                ) {
-                    // If already in edit selection mode and a row is selected, confirm action
-                    performAction(rows[currentRowIndex], "edit");
-                }
-            },
-            "Activate Selection Mode for Edit"
-        );
+                },
+                "Activate Selection Mode for Edit"
+            );
+        }
 
-        window.shortcutManager.register(
-            "alt+d",
-            () => {
-                if (!selectionModeActive) {
-                    selectionModeActive = true;
-                    lastActionType = "delete";
-                    if (rows.length > 0) {
-                        updateSelection(0); // Select the first row by default
+        if (registerDeleteShortcut) {
+            window.shortcutManager.register(
+                "alt+d",
+                () => {
+                    if (!selectionModeActive) {
+                        selectionModeActive = true;
+                        lastActionType = "delete";
+                        if (rows.length > 0) {
+                            updateSelection(0); // Select the first row by default
+                        }
+                        if (window.InventMagApp && window.InventMagApp.showToast) {
+                            window.InventMagApp.showToast(
+                                "Info",
+                                "Selection mode activated for Delete. Use arrow keys to navigate, Enter to confirm.",
+                                "info"
+                            );
+                        }
+                    } else if (
+                        lastActionType === "delete" &&
+                        currentRowIndex !== -1
+                    ) {
+                        // If already in delete selection mode and a row is selected, confirm action
+                        performAction(rows[currentRowIndex], "delete");
                     }
-                    if (window.InventMagApp && window.InventMagApp.showToast) {
-                        window.InventMagApp.showToast(
-                            "Info",
-                            "Selection mode activated for Delete. Use arrow keys to navigate, Enter to confirm.",
-                            "info"
-                        );
-                    }
-                } else if (
-                    lastActionType === "delete" &&
-                    currentRowIndex !== -1
-                ) {
-                    // If already in delete selection mode and a row is selected, confirm action
-                    performAction(rows[currentRowIndex], "delete");
-                }
-            },
-            "Activate Selection Mode for Delete"
-        );
+                },
+                "Activate Selection Mode for Delete"
+            );
+        }
     });
 }

@@ -25,7 +25,23 @@ window.bulkExportSales = bulkExportSales;
 window.bulkMarkAsPaidSales = bulkMarkAsPaidSales;
 
 document.addEventListener("DOMContentLoaded", function () {
-    initSelectableTable();
+    const pathname = window.location.pathname;
+    if (pathname.includes("/admin/sales/edit")) {
+        initSelectableTable({
+            registerEditShortcut: false,
+            registerDeleteShortcut: false,
+        });
+        window.shortcutManager.register(
+            "ctrl+s",
+            () => {
+                document.getElementById("save-sales-button").click();
+            },
+            "Save Sales Order"
+        );
+    } else {
+        initSelectableTable();
+    }
+
     if (sessionStorage.getItem("salesOrderBulkDeleteSuccess")) {
         InventMagApp.showToast(
             "Success",

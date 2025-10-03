@@ -17,7 +17,19 @@ window.bulkMarkAsPaidPO = bulkMarkAsPaidPO;
 
 // Keep the existing DOMContentLoaded initialization
 document.addEventListener("DOMContentLoaded", function () {
-    initSelectableTable();
+    const pathname = window.location.pathname;
+    if (pathname.includes("/admin/po/edit")) {
+        initSelectableTable({ registerEditShortcut: false, registerDeleteShortcut: false });
+        window.shortcutManager.register(
+            "ctrl+s",
+            () => {
+                document.getElementById("save-po-button").click();
+            },
+            "Save Purchase Order"
+        );
+    } else {
+        initSelectableTable();
+    }
     if (sessionStorage.getItem("purchaseOrderBulkDeleteSuccess")) {
         InventMagApp.showToast(
             "Success",

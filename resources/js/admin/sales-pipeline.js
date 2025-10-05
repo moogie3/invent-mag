@@ -1,15 +1,24 @@
-import { initializeData, fetchData } from './partials/sales-pipeline/data/init.js';
-import { initNewOpportunityForm } from './partials/sales-pipeline/forms/newOpportunity.js';
-import { initNewPipelineForm } from './partials/sales-pipeline/forms/newPipeline.js';
-import { initEditPipelineForm } from './partials/sales-pipeline/forms/editPipeline.js';
-import { initNewStageForm } from './partials/sales-pipeline/forms/newStage.js';
-import { initEditOpportunityForm, loadEditOpportunityModal } from './partials/sales-pipeline/forms/editOpportunity.js';
-import { initConvertOpportunityForm } from './partials/sales-pipeline/forms/convertOpportunity.js';
-import { showConfirmationModal } from './partials/sales-pipeline/common/utils.js';
-import { SALES_PIPELINE_ROUTES, CSRF_TOKEN } from './partials/sales-pipeline/common/constants.js';
-import { allPipelines } from './partials/sales-pipeline/common/state.js';
-import { loadPipelineBoard } from './partials/sales-pipeline/ui/pipelineBoard.js';
-import { renderPipelineStages } from './partials/sales-pipeline/ui/stagesList.js';
+import {
+    initializeData,
+    fetchData,
+} from "./partials/sales-pipeline/data/init.js";
+import { initNewOpportunityForm } from "./partials/sales-pipeline/forms/newOpportunity.js";
+import { initNewPipelineForm } from "./partials/sales-pipeline/forms/newPipeline.js";
+import { initEditPipelineForm } from "./partials/sales-pipeline/forms/editPipeline.js";
+import { initNewStageForm } from "./partials/sales-pipeline/forms/newStage.js";
+import {
+    initEditOpportunityForm,
+    loadEditOpportunityModal,
+} from "./partials/sales-pipeline/forms/editOpportunity.js";
+import { initConvertOpportunityForm } from "./partials/sales-pipeline/forms/convertOpportunity.js";
+import { showConfirmationModal } from "./partials/sales-pipeline/common/utils.js";
+import {
+    SALES_PIPELINE_ROUTES,
+    CSRF_TOKEN,
+} from "./partials/sales-pipeline/common/constants.js";
+import { allPipelines } from "./partials/sales-pipeline/common/state.js";
+import { loadPipelineBoard } from "./partials/sales-pipeline/ui/pipelineBoard.js";
+import { renderPipelineStages } from "./partials/sales-pipeline/ui/stagesList.js";
 import {
     createProductItemRow,
     calculateTotalAmount,
@@ -20,7 +29,6 @@ const newStagePipelineId = document.getElementById("newStagePipelineId");
 
 document.addEventListener("DOMContentLoaded", function () {
     initializeData();
-
     initNewOpportunityForm();
     initNewPipelineForm();
     initEditPipelineForm();
@@ -138,28 +146,38 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    window.shortcutManager.register('ctrl+s', () => {
-        const modals = [
-            'newOpportunityModal',
-            'managePipelinesModal',
-            'editPipelineModal',
-            'editOpportunityModal'
-        ];
+    window.shortcutManager.register(
+        "alt+n",
+        () => {
+            const newOpportunityModal = new bootstrap.Modal(
+                document.getElementById("newOpportunityModal")
+            );
+            newOpportunityModal.show();
+        },
+        "New Opportunity"
+    );
 
-        for (const modalId of modals) {
-            const modal = document.getElementById(modalId);
-            if (modal && modal.classList.contains('show')) {
-                const form = modal.querySelector('form');
-                if (form) {
-                    form.requestSubmit();
-                    break;
+    window.shortcutManager.register(
+        "ctrl+s",
+        () => {
+            const modals = [
+                "newOpportunityModal",
+                "managePipelinesModal",
+                "editPipelineModal",
+                "editOpportunityModal",
+            ];
+
+            for (const modalId of modals) {
+                const modal = document.getElementById(modalId);
+                if (modal && modal.classList.contains("show")) {
+                    const form = modal.querySelector("form");
+                    if (form) {
+                        form.requestSubmit();
+                        break;
+                    }
                 }
             }
-        }
-    }, 'Save Form');
-
-    window.shortcutManager.register('alt+n', () => {
-        const newOpportunityModal = new bootstrap.Modal(document.getElementById('newOpportunityModal'));
-        newOpportunityModal.show();
-    }, 'New Opportunity');
+        },
+        "Save Form"
+    );
 });

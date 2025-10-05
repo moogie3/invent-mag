@@ -99,6 +99,7 @@ class ShortcutManager {
     }
 
     showShortcutsModal() {
+        console.log(this.shortcuts);
         const modalElement = document.getElementById("keyboardShortcutsModal");
         if (modalElement) {
             const modal = new bootstrap.Modal(modalElement);

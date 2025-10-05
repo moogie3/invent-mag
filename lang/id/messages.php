@@ -561,6 +561,7 @@ return [
     'not_available' => 'Tidak Tersedia',
     'loading' => 'Memuat...',
     'payment_method_cash' => 'Tunai',
+    'payment_method_transfer' => 'Transfer Bank',
     'pos_tax_ppn' => 'Pajak (PPN)',
     'pos_payment_method_cash' => 'Tunai',
     'pos_payment_method_card' => 'Kartu Kredit/Debit',
@@ -1032,5 +1033,4 @@ return [
     'shortcut_focus_search' => 'Fokus pada input pencarian global',
     'shortcut_close_modal' => 'Tutup modal/popup aktif',
     'view_sales_invoice' => 'Lihat Invoice Penjualan',
-
 ];

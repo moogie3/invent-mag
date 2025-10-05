@@ -1,4 +1,4 @@
-<form enctype="multipart/form-data" method="POST" action="{{ route('admin.product.store') }}">
+<form id="product-create-form" enctype="multipart/form-data" method="POST" action="{{ route('admin.product.store') }}">
     @csrf
     @include('admin.layouts.partials.product.create.basic-info')
     @include('admin.layouts.partials.product.create.category-supplier')

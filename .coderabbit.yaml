@@ -1,0 +1,24 @@
+review:
+  enabled: true
+  include:
+    - app/**
+    - routes/**
+    - config/**
+  exclude:
+    - vendor/**
+    - storage/**
+    - node_modules/**
+    - bootstrap/**
+    - public/**
+    - resources/**
+    - database/**
+    - tests/**
+    - .git/**
+    - .github/**
+    - dist/**
+    - build/**
+  rules:
+    enforce_code_style: true
+    detect_secrets: true
+    security_analysis: true
+    cyclomatic_complexity_check: true

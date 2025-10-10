@@ -34,6 +34,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (form) {
                     form.requestSubmit();
                 }
+                window.shortcutManager.register(
+                    "alt+n",
+                    () => {
+                        const createModal = new bootstrap.Modal(
+                            document.getElementById("createSupplierModal")
+                        );
+                        createModal.show();
+                    },
+                    "New Supplier"
+                );
             }
         },
         "Save Supplier"

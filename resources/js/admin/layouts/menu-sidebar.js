@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("usersettingsloaded", function () {
     const sidebar = document.querySelector(".sidebar");
     const sidebarToggle = document.getElementById("sidebar-toggle");
     const mainContent = document.querySelector(".main-content");
@@ -272,15 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // Initialize everything
-    // Listen for when user settings are loaded (from settings.js)
-    document.addEventListener('usersettingsloaded', () => {
-        initializeSidebar();
-    });
-
-    // If settings are already loaded, initialize immediately
-    if (window.userSettings) {
-        initializeSidebar();
-    }
+    initializeSidebar();
 
     // Handle clicks on parent menu items when sidebar is collapsed
     const navLinksWithChildren = sidebar.querySelectorAll('.nav-item.dropdown > .nav-link[data-bs-toggle="collapse"]');

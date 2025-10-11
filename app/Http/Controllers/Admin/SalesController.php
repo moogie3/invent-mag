@@ -110,6 +110,26 @@ class SalesController extends Controller
         }
     }
 
+    public function addPayment(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'payment_date' => 'required|date',
+            'payment_method' => 'required|string',
+            'notes' => 'nullable|string',
+        ]);
+
+        try {
+            $sale = Sales::findOrFail($id);
+            $this->salesService->addPayment($sale, $request->all());
+            return redirect()->route('admin.sales.view', $sale->id)->with('success', 'Payment added successfully.');
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withInput();
+        }
+    }
+
     public function getCustomerPrice(Customer $customer, Product $product)
     {
         $pastPrice = $this->salesService->getPastCustomerPriceForProduct($customer, $product);

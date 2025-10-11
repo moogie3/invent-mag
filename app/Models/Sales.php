@@ -35,7 +35,6 @@ class Sales extends Model
         'user_id',
         'order_date',
         'due_date',
-        'payment_date',
         'payment_type',
         'order_discount',
         'order_discount_type',
@@ -95,6 +94,21 @@ class Sales extends Model
         return $this->belongsTo(Tax::class, 'tax_id');
     }
 
+    public function payments()
+    {
+        return $this->morphMany(Payment::class, 'paymentable');
+    }
+
+    public function getTotalPaidAttribute()
+    {
+        return $this->payments->sum('amount');
+    }
+
+    public function getBalanceAttribute()
+    {
+        return $this->total - $this->total_paid;
+    }
+
     public function salesOpportunity(): BelongsTo
     {
         return $this->belongsTo(SalesOpportunity::class, 'sales_opportunity_id');
@@ -108,7 +122,6 @@ class Sales extends Model
         'amount_received' => 'float',
         'change_amount' => 'float',
         'is_pos' => 'boolean',
-        'payment_date' => 'datetime'
     ];
 
     // Get user timezone or fallback to app timezone

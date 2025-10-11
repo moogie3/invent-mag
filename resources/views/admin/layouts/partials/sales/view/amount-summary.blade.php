@@ -34,5 +34,13 @@
                 {{ \App\Helpers\CurrencyHelper::format($finalTotal) }}
             </div>
         </div>
+        <div class="d-flex justify-content-between text-success mb-2">
+            <span>{{ __('messages.total_paid') }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($sales->total_paid) }}</span>
+        </div>
+        <div class="d-flex justify-content-between text-danger fw-bold">
+            <span>{{ __('messages.balance') }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($sales->balance) }}</span>
+        </div>
     </div>
 </div>

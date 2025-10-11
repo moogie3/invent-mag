@@ -37,6 +37,14 @@
                 {{ \App\Helpers\CurrencyHelper::format($summary['finalTotal']) }}
             </div>
         </div>
+        <div class="d-flex justify-content-between text-success mb-2">
+            <span>{{ __('messages.total_paid') }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($pos->total_paid) }}</span>
+        </div>
+        <div class="d-flex justify-content-between text-danger fw-bold">
+            <span>{{ __('messages.balance') }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($pos->balance) }}</span>
+        </div>
         <input type="hidden" id="totalDiscountInput" name="total_discount" value="{{ $summary['orderDiscount'] }}">
     </div>
 </div>

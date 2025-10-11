@@ -87,8 +87,14 @@ class PosService
             'payment_type' => $data['payment_method'],
             'amount_received' => $data['amount_received'] ?? $grandTotal,
             'change_amount' => $data['change_amount'] ?? 0,
-            'payment_date' => now(),
             'is_pos' => true,
+        ]);
+
+        $sale->payments()->create([
+            'amount' => $grandTotal,
+            'payment_date' => now(),
+            'payment_method' => $data['payment_method'],
+            'notes' => 'Payment for POS sale ' . $invoice,
         ]);
 
         foreach ($products as $product) {

@@ -18,10 +18,18 @@
         </div>
         <hr>
         <div class="d-flex justify-content-between align-items-center">
-            <div class="fs-5"><strong>{{ __('messages.po_grand_total') }}</strong></div>
+            <div class="fs-4"><strong>{{ __('messages.po_grand_total') }}</strong></div>
             <div class="fs-3 fw-bold text-primary">
                 {{ \App\Helpers\CurrencyHelper::format($finalTotal) }}
             </div>
+        </div>
+        <div class="d-flex justify-content-between text-success mb-2">
+            <span>{{ __('messages.total_paid') }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($pos->total_paid) }}</span>
+        </div>
+        <div class="d-flex justify-content-between text-danger">
+            <span>{{ __('messages.balance') }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($pos->balance) }}</span>
         </div>
     </div>
 </div>

@@ -148,7 +148,6 @@ return [
     'po_order_date' => 'Order Date:',
     'po_due_date' => 'Due Date:',
     'po_payment_type' => 'Payment Type:',
-    'po_payment_date' => 'Payment Date:',
     'po_order_items_title' => 'Order Items',
     'table_product' => 'Product',
     'table_qty' => 'QTY',
@@ -786,7 +785,6 @@ return [
     'expiring_soon_sales_invoices' => 'Expiring Soon Sales Invoices',
     'invoice_no' => 'Invoice No.',
     'order_information' => 'Order Information',
-    'payment_date' => 'Payment Date',
     'order_items' => 'Order Items',
     'product' => 'Product',
     'sku' => 'SKU',
@@ -797,6 +795,8 @@ return [
     'order_discount' => 'Order Discount',
     'fixed' => 'Fixed',
     'grand_total' => 'Grand Total',
+    'total_paid' => 'Total Paid',
+    'balance' => 'Balance',
     'delete_sales_order' => 'Delete Sales Order',
     'this_action_cannot_be_undone_all_data_associated_with_this_sales_order_will_be_permanently_deleted' => 'This action cannot be undone. All data associated with this sales order will be permanently deleted.',
     'bulk_delete_sales_orders' => 'Bulk Delete Sales Orders',
@@ -1032,5 +1032,6 @@ return [
     'shortcut_show_help_modal' => 'Show this help modal',
     'shortcut_focus_search' => 'Focus global search input',
     'shortcut_close_modal' => 'Close active modal/popup',
-    'view_sales_invoice' => 'View Sales Invoice'
+    'view_sales_invoice' => 'View Sales Invoice',
+    'payment_date' => 'Payment Date:'
 ];

@@ -113,6 +113,26 @@ class PurchaseController extends Controller
         }
     }
 
+    public function addPayment(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'payment_date' => 'required|date',
+            'payment_method' => 'required|string',
+            'notes' => 'nullable|string',
+        ]);
+
+        try {
+            $purchase = Purchase::findOrFail($id);
+            $this->purchaseService->addPayment($purchase, $request->all());
+            return redirect()->route('admin.po.view', $purchase->id)->with('success', 'Payment added successfully.');
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withInput();
+        }
+    }
+
     public function destroy($id)
     {
         $purchase = Purchase::findOrFail($id);

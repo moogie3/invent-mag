@@ -100,7 +100,7 @@ class PurchaseService
 
     public function getPurchaseViewData($id)
     {
-        $pos = Purchase::with(['items', 'supplier'])->find($id);
+        $pos = Purchase::with(['items', 'supplier', 'payments'])->find($id);
 
         if (!$pos) {
             throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Purchase with ID {$id} not found.");
@@ -120,7 +120,7 @@ class PurchaseService
 
     public function getPurchaseForModal($id)
     {
-        return Purchase::with(['supplier', 'items.product'])->findOrFail($id);
+        return Purchase::with(['supplier', 'items.product', 'payments'])->findOrFail($id);
     }
 
     public function createPurchase(array $data): Purchase
@@ -203,7 +203,6 @@ class PurchaseService
                 'discount_total_type' => $data['discount_total_type'] ?? 'fixed',
                 'status' => $data['status'] ?? 'Unpaid',
                 'payment_type' => $data['payment_type'] ?? '-',
-                'payment_date' => ($data['status'] ?? 'Unpaid') === 'Paid' ? now() : null,
             ]);
 
             $totalAmount = 0;
@@ -236,6 +235,38 @@ class PurchaseService
 
             return $purchase;
         });
+    }
+
+    public function addPayment(Purchase $purchase, array $data): \App\Models\Payment
+    {
+        return DB::transaction(function () use ($purchase, $data) {
+            $payment = $purchase->payments()->create([
+                'amount' => $data['amount'],
+                'payment_date' => $data['payment_date'],
+                'payment_method' => $data['payment_method'],
+                'notes' => $data['notes'] ?? null,
+            ]);
+
+            $this->updatePurchaseStatus($purchase);
+
+            return $payment;
+        });
+    }
+
+    public function updatePurchaseStatus(Purchase $purchase)
+    {
+        $totalPaid = $purchase->total_paid;
+        $grandTotal = $purchase->grand_total;
+
+        if ($totalPaid >= $grandTotal) {
+            $purchase->status = 'Paid';
+        } elseif ($totalPaid > 0 && $totalPaid < $grandTotal) {
+            $purchase->status = 'Partial';
+        } else {
+            $purchase->status = 'Unpaid';
+        }
+
+        $purchase->save();
     }
 
     public function deletePurchase(Purchase $purchase): void
@@ -275,7 +306,18 @@ class PurchaseService
     {
         $updatedCount = 0;
         DB::transaction(function () use ($ids, &$updatedCount) {
-            $updatedCount = Purchase::whereIn('id', $ids)->update(['status' => 'Paid']);
+            $purchases = Purchase::whereIn('id', $ids)->get();
+            foreach ($purchases as $purchase) {
+                if ($purchase->balance > 0) {
+                    $this->addPayment($purchase, [
+                        'amount' => $purchase->balance,
+                        'payment_date' => now(),
+                        'payment_method' => 'Unknown',
+                        'notes' => 'Bulk marked as paid.',
+                    ]);
+                }
+                $updatedCount++;
+            }
         });
         return $updatedCount;
     }

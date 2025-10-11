@@ -392,10 +392,17 @@ class DashboardService
 
     private function prepareCustomerInsights()
     {
-        $avgDueDays = Sales::whereNotNull('payment_date')->whereNotNull('due_date')->select(DB::raw('AVG(DATEDIFF(payment_date, due_date)) as avg_days'))->value('avg_days') ?? 0;
+        $avgDueDays = Sales::where('sales.status', 'Paid')
+            ->whereNotNull('sales.due_date')
+            ->join('payments', function ($join) {
+                $join->on('sales.id', '=', 'payments.paymentable_id')
+                    ->where('payments.paymentable_type', Sales::class);
+            })
+            ->select(DB::raw('AVG(DATEDIFF(payments.payment_date, sales.due_date)) as avg_days'))
+            ->value('avg_days') ?? 0;
 
         $totalInvoices = Sales::count();
-        $paidInvoices = Sales::whereNotNull('payment_date')->count();
+        $paidInvoices = Sales::where('status', 'Paid')->count();
         $collectionRate = $totalInvoices > 0 ? ($paidInvoices / $totalInvoices) * 100 : 0;
 
         $paymentTermsRaw = Customer::select('payment_terms', DB::raw('count(*) as count'))->groupBy('payment_terms')->get();
@@ -609,11 +616,14 @@ class DashboardService
     private function getAverageDueDays()
     {
         $avgDays = Sales::where('status', 'Paid')
-            ->whereNotNull('payment_date')
             ->whereNotNull('due_date')
             ->get()
             ->avg(function ($sale) {
-                return $sale->payment_date->diffInDays($sale->payment_date);
+                $latestPaymentDate = $sale->payments()->latest('payment_date')->value('payment_date');
+                if ($latestPaymentDate && $sale->due_date) {
+                    return Carbon::parse($latestPaymentDate)->diffInDays($sale->due_date);
+                }
+                return 0;
             });
 
         return round($avgDays) ?? 0;

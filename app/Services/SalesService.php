@@ -69,7 +69,7 @@ class SalesService
     public function getSalesViewData($id)
     {
         /** @var \App\Models\Sales $sales */
-        $sales = Sales::with(['salesItems', 'customer'])->find($id);
+        $sales = Sales::with(['salesItems', 'customer', 'payments'])->find($id);
 
         if (strpos($sales->invoice, 'POS-') === 0) {
             return redirect()->route('admin.pos.receipt', $id);
@@ -293,7 +293,6 @@ class SalesService
                 'order_discount_type' => $orderDiscountType,
                 'status' => $data['status'] ?? 'Unpaid',
                 'payment_type' => $data['payment_type'] ?? '-',
-                'payment_date' => ($data['status'] ?? 'Unpaid') === 'Paid' ? now() : null,
             ]);
 
             foreach ($products as $productData) {
@@ -333,6 +332,38 @@ class SalesService
 
             return $sale;
         });
+    }
+
+    public function addPayment(Sales $sale, array $data): \App\Models\Payment
+    {
+        return DB::transaction(function () use ($sale, $data) {
+            $payment = $sale->payments()->create([
+                'amount' => $data['amount'],
+                'payment_date' => $data['payment_date'],
+                'payment_method' => $data['payment_method'],
+                'notes' => $data['notes'] ?? null,
+            ]);
+
+            $this->updateSaleStatus($sale);
+
+            return $payment;
+        });
+    }
+
+    public function updateSaleStatus(Sales $sale)
+    {
+        $totalPaid = $sale->total_paid;
+        $grandTotal = $sale->total;
+
+        if ($totalPaid >= $grandTotal) {
+            $sale->status = 'Paid';
+        } elseif ($totalPaid > 0 && $totalPaid < $grandTotal) {
+            $sale->status = 'Partial';
+        } else {
+            $sale->status = 'Unpaid';
+        }
+
+        $sale->save();
     }
 
     public function deleteSale(Sales $sale): void
@@ -400,17 +431,27 @@ class SalesService
 
     public function bulkMarkPaid(array $ids): int
     {
-        return Sales::whereIn('id', $ids)->update([
-            'status' => 'Paid',
-            'payment_date' => now(),
-            'amount_received' => DB::raw('total'),
-            'change_amount' => 0,
-        ]);
+        $updatedCount = 0;
+        DB::transaction(function () use ($ids, &$updatedCount) {
+            $sales = Sales::whereIn('id', $ids)->get();
+            foreach ($sales as $sale) {
+                if ($sale->balance > 0) {
+                    $this->addPayment($sale, [
+                        'amount' => $sale->balance,
+                        'payment_date' => now(),
+                        'payment_method' => 'Unknown',
+                        'notes' => 'Bulk marked as paid.',
+                    ]);
+                }
+                $updatedCount++;
+            }
+        });
+        return $updatedCount;
     }
 
     public function getSalesForModal($id)
     {
-        return Sales::with(['customer', 'salesItems.product'])->findOrFail($id);
+        return Sales::with(['customer', 'salesItems.product', 'payments'])->findOrFail($id);
     }
 
     public function getPastCustomerPriceForProduct(Customer $customer, Product $product)

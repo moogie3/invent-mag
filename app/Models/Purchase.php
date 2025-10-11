@@ -36,7 +36,6 @@ class Purchase extends Model
         'discount_total_type',
         'total',
         'status',
-        'payment_date',
     ];
 
     protected $appends = ['sub_total', 'grand_total'];
@@ -64,6 +63,21 @@ class Purchase extends Model
         return $this->items->sum('total');
     }
 
+    public function payments()
+    {
+        return $this->morphMany(Payment::class, 'paymentable');
+    }
+
+    public function getTotalPaidAttribute()
+    {
+        return $this->payments->sum('amount');
+    }
+
+    public function getBalanceAttribute()
+    {
+        return $this->grand_total - $this->total_paid;
+    }
+
     public function getGrandTotalAttribute()
     {
         $orderDiscount = \App\Helpers\PurchaseHelper::calculateDiscount(
@@ -84,7 +98,6 @@ class Purchase extends Model
     'discount_total' => 'float',
     'order_date' => 'datetime',
     'due_date' => 'datetime',
-    'payment_date' => 'datetime',
     ];
 
 }

@@ -15,13 +15,21 @@
             <div><strong>{{ __('messages.payment_type') }}:</strong></div>
             <div>{{ $sales->payment_type ?? __('messages.not_available') }}</div>
         </div>
-        @if ($sales->status === __('messages.paid'))
-            <div class="d-flex justify-content-between">
-                <div><strong>{{ __('messages.payment_date') }}:</strong></div>
+        @if ($sales->status === 'Paid' && $sales->payments->isNotEmpty())
+            <div class="d-flex justify-content-between mb-2">
+                <div><strong>{{ __('messages.payment_date') }}</strong></div>
                 <div>
-                    {{ $sales->payment_date->setTimezone(auth()->user()->timezone ?? config('app.timezone'))->format('d F Y H:i') }}
+                    {{ $sales->payments->last()->payment_date->format('d F Y H:i') }}
                 </div>
             </div>
         @endif
+        <div class="d-flex justify-content-between mb-2">
+            <div><strong>{{ __('messages.total_paid') }}</strong></div>
+            <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($sales->total_paid) }}</div>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+            <div><strong>{{ __('messages.balance') }}</strong></div>
+            <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($sales->balance) }}</div>
+        </div>
     </div>
 </div>

@@ -36,10 +36,13 @@ class SalesSeeder extends Seeder
             $paymentType = collect(['Cash', 'Card', 'Transfer', 'eWallet', '-'])->random();
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
 
+            $invoiceNumber = $i + 1; // Use loop counter for invoice number
+            $invoice = 'INV-' . str_pad($invoiceNumber, 5, '0', STR_PAD_LEFT);
+
             $sales = Sales::create([
-                'invoice' => 'INV-' . str_pad(Sales::count() + 1, 5, '0', STR_PAD_LEFT),
+                'invoice' => $invoice,
                 'customer_id' => $customer->id,
-                'user_id' => $user->id,
+                'user_id' => 1, // Assuming user with ID 1 exists
                 'order_date' => $orderDate,
                 'due_date' => $dueDate,
                 'payment_type' => $paymentType,
@@ -49,9 +52,6 @@ class SalesSeeder extends Seeder
                 'total_tax' => 0, // Will be calculated
                 'total' => 0, // Will be calculated from items
                 'status' => $status,
-                'payment_date' => ($status === 'Paid') ? $orderDate->copy()->addDays(rand(0, 5)) : null,
-                'amount_received' => ($status === 'Paid' || $status === 'Partial') ? rand(100, 1000) : 0,
-                'change_amount' => 0, // Will be calculated
                 'is_pos' => false,
             ]);
 
@@ -115,10 +115,30 @@ class SalesSeeder extends Seeder
             }
 
             $sales->update([
-                'total' => $totalSalesAmount,
+                'total' => $finalCalculatedTotal,
                 'total_tax' => $totalTaxAmount,
-                'change_amount' => $sales->amount_received > $totalSalesAmount ? $sales->amount_received - $totalSalesAmount : 0,
+                'change_amount' => 0, // No change amount for non-POS sales
             ]);
+
+            // Add payment logic
+            if ($finalCalculatedTotal > 0) { // Ensure there's an amount to pay
+                if ($status === 'Paid') {
+                    $sales->payments()->create([
+                        'amount' => $finalCalculatedTotal,
+                        'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
+                        'payment_method' => $paymentType,
+                        'notes' => 'Full payment during seeding.',
+                    ]);
+                } elseif ($status === 'Partial') {
+                    $paidAmount = rand(1, (int)($finalCalculatedTotal * 0.8)); // Pay between 1 and 80%
+                    $sales->payments()->create([
+                        'amount' => $paidAmount,
+                        'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
+                        'payment_method' => $paymentType,
+                        'notes' => 'Partial payment during seeding.',
+                    ]);
+                }
+            }
         }
     }
 }

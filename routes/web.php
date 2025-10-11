@@ -158,6 +158,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/bulk-export', [PurchaseController::class, 'bulkExport'])->name('po.bulk-export');
             Route::get('/metrics', [PurchaseController::class, 'getPurchaseMetrics'])->name('admin.po.metrics');
             Route::get('/expiring-soon', [PurchaseController::class, 'getExpiringSoonPurchases'])->name('admin.po.expiring-soon');
+            Route::post('/{id}/payment', [PurchaseController::class, 'addPayment'])->name('admin.po.add-payment');
         });
 
         // Sales Routes
@@ -177,6 +178,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
             Route::get('/metrics', [SalesController::class, 'getSalesMetrics'])->name('admin.sales.metrics');
             Route::get('/expiring-soon', [SalesController::class, 'getExpiringSoonSales'])->name('admin.sales.expiring-soon');
+            Route::post('/{id}/payment', [SalesController::class, 'addPayment'])->name('admin.sales.add-payment');
         });
 
         // Warehouse Routes

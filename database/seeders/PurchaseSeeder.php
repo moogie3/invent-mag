@@ -31,7 +31,7 @@ class PurchaseSeeder extends Seeder
             $orderDate = Carbon::now()->subDays(rand(0, 29));
             $dueDate = $orderDate->copy()->addDays(rand(7, 30));
             $paymentType = collect(['Cash', 'Transfer', '-'])->random();
-            $status = collect(['Unpaid', 'Paid'])->random();
+            $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
 
             $purchase = Purchase::create([
                 'invoice' => 'PO-' . str_pad(Purchase::count() + 1, 5, '0', STR_PAD_LEFT),
@@ -43,7 +43,6 @@ class PurchaseSeeder extends Seeder
                 'discount_total_type' => collect(['percentage', 'fixed'])->random(),
                 'total' => 0, // Will be calculated from items
                 'status' => $status,
-                'payment_date' => ($status === 'Paid') ? $orderDate->copy()->addDays(rand(0, 5)) : null,
             ]);
 
             $totalPurchaseAmount = 0;
@@ -97,6 +96,26 @@ class PurchaseSeeder extends Seeder
             }
 
             $purchase->update(['total' => $totalPurchaseAmount]);
+
+            // Add payment logic
+            if ($totalPurchaseAmount > 0) { // Ensure there's an amount to pay
+                if ($status === 'Paid') {
+                    $purchase->payments()->create([
+                        'amount' => $totalPurchaseAmount,
+                        'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
+                        'payment_method' => $paymentType,
+                        'notes' => 'Full payment during seeding.',
+                    ]);
+                } elseif ($status === 'Partial') {
+                    $paidAmount = rand(1, (int)($totalPurchaseAmount * 0.8)); // Pay between 1 and 80%
+                    $purchase->payments()->create([
+                        'amount' => $paidAmount,
+                        'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
+                        'payment_method' => $paymentType,
+                        'notes' => 'Partial payment during seeding.',
+                    ]);
+                }
+            }
         }
     }
 }

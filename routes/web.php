@@ -12,7 +12,7 @@ use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 
 // Admin Authentication Routes
-Route::prefix('admin')->group(function () {
+Route::middleware('web')->prefix('admin')->group(function () {
     // Register
     Route::get('/register', fn() => view('admin.auth.register'))->name('admin.register');
     Route::post('/register', [RegisteredUserController::class, 'store'])->name('admin.register.post');

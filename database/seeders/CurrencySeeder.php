@@ -18,6 +18,9 @@ class CurrencySeeder extends Seeder
             'decimal_separator' => ',',
             'thousand_separator' => '.',
             'decimal_places' => 0,
+            'position' => 'prefix',
+            'currency_code' => 'IDR',
+            'locale' => 'id-ID',
         ]);
     }
 }

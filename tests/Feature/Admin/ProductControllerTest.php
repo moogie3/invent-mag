@@ -8,6 +8,7 @@ use App\Models\Categories;
 use App\Models\Unit;
 use App\Models\Supplier;
 use App\Models\Warehouse;
+use App\Models\StockAdjustment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -155,5 +156,102 @@ class ProductControllerTest extends TestCase
         $response->assertSessionHas('success', 'Product deleted');
 
         $this->assertDatabaseMissing('products', ['id' => $product->id]);
+    }
+
+    /** @test */
+    public function it_can_bulk_delete_products()
+    {
+        Storage::fake('public');
+
+        $products = Product::factory()->count(3)->create();
+        $productWithImage = Product::factory()->create([
+            'image' => UploadedFile::fake()->image('product_image.jpg')->store('public/image'),
+        ]);
+
+        $idsToDelete = $products->pluck('id')->toArray();
+        $idsToDelete[] = $productWithImage->id;
+
+        $response = $this->postJson(route('product.bulk-delete'), ['ids' => $idsToDelete]);
+
+        $response->assertOk()
+                 ->assertJson([
+                     'success' => true,
+                     'message' => "Successfully deleted " . count($idsToDelete) . " product(s)",
+                 ]);
+
+        foreach ($idsToDelete as $id) {
+            $this->assertDatabaseMissing('products', ['id' => $id]);
+        }
+
+        Storage::disk('public')->assertMissing(basename($productWithImage->getRawOriginal('image')));
+    }
+
+    /** @test */
+    public function it_can_bulk_update_product_stock()
+    {
+        $products = Product::factory()->count(3)->create(['stock_quantity' => 100]);
+        $product1 = $products[0];
+        $product2 = $products[1];
+        $product3 = $products[2];
+
+        $updates = [
+            ['id' => $product1->id, 'stock_quantity' => 110], // Increase
+            ['id' => $product2->id, 'stock_quantity' => 90],  // Decrease
+            ['id' => $product3->id, 'stock_quantity' => 100], // No change
+        ];
+
+        $reason = 'Bulk update for testing';
+
+        $response = $this->postJson(route('product.bulk-update-stock'), [
+            'updates' => $updates,
+            'reason' => $reason,
+        ]);
+
+        $response->assertOk()
+                 ->assertJson([
+                     'success' => true,
+                     'message' => "Successfully updated stock for 2 product(s)", // Only 2 products changed stock
+                     'updated_count' => 2,
+                 ]);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product1->id,
+            'stock_quantity' => 110,
+        ]);
+        $this->assertDatabaseHas('products', [
+            'id' => $product2->id,
+            'stock_quantity' => 90,
+        ]);
+        $this->assertDatabaseHas('products', [
+            'id' => $product3->id,
+            'stock_quantity' => 100,
+        ]);
+
+        // Assert StockAdjustments were created
+        $this->assertDatabaseHas('stock_adjustments', [
+            'product_id' => $product1->id,
+            'adjustment_type' => 'increase',
+            'quantity_before' => 100,
+            'quantity_after' => 110,
+            'adjustment_amount' => 10,
+            'reason' => $reason,
+            'adjusted_by' => $this->user->id,
+        ]);
+
+        $this->assertDatabaseHas('stock_adjustments', [
+            'product_id' => $product2->id,
+            'adjustment_type' => 'decrease',
+            'quantity_before' => 100,
+            'quantity_after' => 90,
+            'adjustment_amount' => 10,
+            'reason' => $reason,
+            'adjusted_by' => $this->user->id,
+        ]);
+
+        // No adjustment should be recorded for product3 as stock didn't change
+        $this->assertDatabaseMissing('stock_adjustments', [
+            'product_id' => $product3->id,
+            'reason' => $reason,
+        ]);
     }
 }

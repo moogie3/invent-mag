@@ -346,6 +346,7 @@ return [
     'profile_modal_confirm_password_title' => 'Confirm Current Password',
     'profile_modal_enter_current_password' => 'Enter Current Password',
     'profile_modal_enter_current_password_placeholder' => 'Enter your current password',
+    'email_not_verified' => 'Your email is not verified.',
     'confirm' => 'Confirm',
     'profile_modal_two_factor_auth_title' => 'Two-Factor Authentication',
     'recent_modal_mark_as_paid_title' => 'Mark Transaction as Paid',
@@ -1033,5 +1034,5 @@ return [
     'shortcut_focus_search' => 'Focus global search input',
     'shortcut_close_modal' => 'Close active modal/popup',
     'view_sales_invoice' => 'View Sales Invoice',
-    'payment_date' => 'Payment Date:'
+    'resend_verification_email' => 'Resend Verification Email',
 ];

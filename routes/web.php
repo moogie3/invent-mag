@@ -42,6 +42,18 @@ Route::middleware('web')->prefix('admin')->group(function () {
         return redirect('/admin/login')->with('success', 'You just logged out!');
     })->name('admin.logout');
 
+    // Email Verification
+    Route::get('/email/verify', fn() => view('admin.auth.verify-email'))->middleware('auth')->name('verification.notice');
+
+    // Password Confirmation
+    Route::get('/confirm-password', function () {
+        return view('admin.auth.confirm-password');
+    })->middleware('auth')->name('password.confirm');
+
+    Route::post('/confirm-password', [\Laravel\Fortify\Http\Controllers\ConfirmablePasswordController::class, 'store'])
+        ->middleware('auth')
+        ->name('password.confirm.store');
+
     // Forgot Password
     Route::get('/forgot-password', fn() => view('admin.auth.forgot-password'))->name('admin.password.request');
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('admin.password.email');
@@ -241,7 +253,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             // Profile Settings
             Route::prefix('profile')->group(function () {
                 Route::get('/', [ProfileController::class, 'edit'])->name('admin.setting.profile.edit');
-                Route::put('/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update');
+                Route::put('/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update')->middleware('password.confirm');
                 Route::delete('/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
             });
 

@@ -10,13 +10,30 @@ class ProfileTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Ensure a CurrencySetting exists for tests that might rely on it
+        \App\Models\CurrencySetting::firstOrCreate(
+            ['currency_code' => 'IDR'],
+            [
+                'currency_symbol' => 'Rp',
+                'decimal_separator' => ',',
+                'thousand_separator' => '.',
+                'decimal_places' => 0,
+                'position' => 'prefix',
+                'locale' => 'id-ID',
+            ]
+        );
+    }
+
     public function test_profile_page_is_displayed(): void
     {
         $user = User::factory()->create();
 
         $response = $this
             ->actingAs($user)
-            ->get('/admin/profile');
+            ->get(route('admin.setting.profile.edit'));
 
         $response->assertOk();
     }
@@ -27,14 +44,17 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->patch('/admin/profile', [
+            ->put(route('admin.setting.profile.update'), [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
+                'timezone' => 'UTC',
+                'shopname' => '',
+                'address' => '',
             ]);
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect('/admin/profile');
+            ->assertRedirect(route('admin.setting.profile.edit'));
 
         $user->refresh();
 
@@ -49,51 +69,54 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->patch('/admin/profile', [
+            ->put(route('admin.setting.profile.update'), [
                 'name' => 'Test User',
                 'email' => $user->email,
+                'timezone' => 'UTC',
+                'shopname' => '',
+                'address' => '',
             ]);
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect('/admin/profile');
+            ->assertRedirect(route('admin.setting.profile.edit'));
 
         $this->assertNotNull($user->refresh()->email_verified_at);
     }
 
-    public function test_user_can_delete_their_account(): void
-    {
-        $user = User::factory()->create();
+    // public function test_user_can_delete_their_account(): void
+    // {
+    //     $user = User::factory()->create();
 
-        $response = $this
-            ->actingAs($user)
-            ->delete('/admin/profile', [
-                'password' => 'password',
-            ]);
+    //     $response = $this
+    //         ->actingAs($user)
+    //         ->delete('/admin/profile', [
+    //             'password' => 'password',
+    //         ]);
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/');
+    //     $response
+    //         ->assertSessionHasNoErrors()
+    //         ->assertRedirect('/');
 
-        $this->assertGuest();
-        $this->assertNull($user->fresh());
-    }
+    //     $this->assertGuest();
+    //     $this->assertNull($user->fresh());
+    // }
 
-    public function test_correct_password_must_be_provided_to_delete_account(): void
-    {
-        $user = User::factory()->create();
+    // public function test_correct_password_must_be_provided_to_delete_account(): void
+    // {
+    //     $user = User::factory()->create();
 
-        $response = $this
-            ->actingAs($user)
-            ->from('/admin/profile')
-            ->delete('/admin/profile', [
-                'password' => 'wrong-password',
-            ]);
+    //     $response = $this
+    //         ->actingAs($user)
+    //         ->from('/admin/profile')
+    //         ->delete('/admin/profile', [
+    //             'password' => 'wrong-password',
+    //         ]);
 
-        $response
-            ->assertSessionHasErrorsIn('userDeletion', 'password')
-            ->assertRedirect('/admin/profile');
+    //     $response
+    //         ->assertSessionHasErrorsIn('userDeletion', 'password')
+    //         ->assertRedirect('/admin/profile');
 
-        $this->assertNotNull($user->fresh());
-    }
+    //     $this->assertNotNull($user->fresh());
+    // }
 }

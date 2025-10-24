@@ -18,7 +18,7 @@ class PasswordUpdateTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->from('/admin/profile')
-            ->put('/admin/password', [
+            ->put(route('user-password.update'), [
                 'current_password' => 'password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
@@ -38,7 +38,7 @@ class PasswordUpdateTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->from('/admin/profile')
-            ->put('/admin/password', [
+            ->put(route('user-password.update'), [
                 'current_password' => 'wrong-password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',

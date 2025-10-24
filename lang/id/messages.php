@@ -399,6 +399,7 @@ return [
     'profile_modal_confirm_password_title' => 'Konfirmasi Kata Sandi Saat Ini',
     'profile_modal_enter_current_password' => 'Masukkan Kata Sandi Saat Ini',
     'profile_modal_enter_current_password_placeholder' => 'Masukkan kata sandi Anda saat ini',
+    'email_not_verified' => 'Email Anda belum diverifikasi.',
     'confirm' => 'Konfirmasi',
     'profile_modal_two_factor_auth_title' => 'Autentikasi Dua Faktor',
     'recent_modal_mark_as_paid_title' => 'Tandai Transaksi sebagai Lunas',
@@ -1033,4 +1034,5 @@ return [
     'shortcut_focus_search' => 'Fokus pada input pencarian global',
     'shortcut_close_modal' => 'Tutup modal/popup aktif',
     'view_sales_invoice' => 'Lihat Invoice Penjualan',
+    'resend_verification_email' => 'Kirim Ulang Email Verifikasi',
 ];

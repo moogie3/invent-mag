@@ -34,6 +34,7 @@ class FortifyServiceProvider extends ServiceProvider
     {
         $this->app->singleton(LoginResponse::class, CustomLoginResponse::class);
         $this->app->singleton(RegisterResponse::class, CustomRegisterResponse::class);
+        $this->app->singleton(\Laravel\Fortify\Contracts\PasswordResetResponse::class, \App\Http\Responses\PasswordResetResponse::class);
     }
 
     /**

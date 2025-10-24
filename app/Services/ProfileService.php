@@ -23,6 +23,10 @@ class ProfileService
             $user->avatar = $data['avatar']->store('avatars', 'public');
         }
 
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
         $user->save();
 
         if (isset($data['password']) && !empty($data['password'])) {

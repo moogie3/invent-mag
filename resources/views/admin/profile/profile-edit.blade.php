@@ -18,6 +18,11 @@
                             </div>
                             <div class="col-12 col-md-9 d-flex flex-column">
                                 <div class="card-body">
+                                    @if (session('status'))
+                                        <div class="alert alert-info mb-3">
+                                            {{ session('status') }}
+                                        </div>
+                                    @endif
                                     <form id="profileForm" action="{{ route('admin.setting.profile.update') }}"
                                         method="POST" enctype="multipart/form-data">
                                         @method('PUT')
@@ -96,8 +101,28 @@
                                                 <div class="row g-3 mt-2">
                                                     <div class="col-md-6">
                                                         <div class="form-label">{{ __('messages.email') }}</div>
-                                                        <input type="email" name="email" class="form-control"
-                                                            value="{{ auth()->user()->email }}" required>
+                                                        <div class="input-group">
+                                                            <input type="email" name="email" class="form-control"
+                                                                value="{{ auth()->user()->email }}" required>
+                                                            <span class="input-group-text">
+                                                                @if (auth()->user()->hasVerifiedEmail())
+                                                                    <i class="ti ti-circle-check text-success" title="Email Verified"></i>
+                                                                @else
+                                                                    <i class="ti ti-circle-x text-danger" title="Email Not Verified"></i>
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                        @if (!auth()->user()->hasVerifiedEmail())
+                                                            <small class="form-text text-muted mt-1">
+                                                                {{ __('messages.email_not_verified') }}
+                                                                <form id="resendVerificationForm" class="d-inline" method="POST" action="{{ route('verification.send') }}">
+                                                                    @csrf
+                                                                    <button type="button" class="btn btn-link p-0 m-0 align-baseline" onclick="document.getElementById('resendVerificationForm').submit();">
+                                                                        {{ __('messages.resend_verification_email') }}
+                                                                    </button>
+                                                                </form>
+                                                            </small>
+                                                        @endif
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-label">{{ __('messages.timezone') }}</div>

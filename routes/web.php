@@ -13,57 +13,57 @@ use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 
 // Admin Authentication Routes
 Route::middleware('web')->prefix('admin')->group(function () {
-    // Register
-    Route::get('/register', fn() => view('admin.auth.register'))->name('admin.register');
-    Route::post('/register', [RegisteredUserController::class, 'store'])->name('admin.register.post');
+    Route::middleware('guest')->group(function () {
+        // Register
+        Route::get('/register', fn() => view('admin.auth.register'))->name('admin.register');
+        Route::post('/register', [RegisteredUserController::class, 'store'])->name('admin.register.post');
 
-    // Login
-    Route::get('/login', function (Request $request) {
-        $email = $request->session()->get('attempted_email');
+        // Login
+        Route::get('/login', function (Request $request) {
+            $email = $request->session()->get('attempted_email');
 
-        if ($email) {
-            $throttleKey = Str::lower($email) . '|' . $request->ip();
+            if ($email) {
+                $throttleKey = Str::lower($email) . '|' . $request->ip();
 
-            if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
-                $seconds = RateLimiter::availableIn($throttleKey);
-                return response()->view('errors.429', ['seconds' => $seconds], 429);
+                if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+                    $seconds = RateLimiter::availableIn($throttleKey);
+                    return response()->view('errors.429', ['seconds' => $seconds], 429);
+                }
             }
-        }
 
-        return view('admin.auth.login');
-    })->name('admin.login');
+            return view('admin.auth.login');
+        })->name('admin.login');
 
-    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('admin.login.post');
+        Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('admin.login.post');
 
-    Route::post('/logout', function (Request $request) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/admin/login')->with('success', 'You just logged out!');
-    })->name('admin.logout');
+        // Forgot Password
+        Route::get('/forgot-password', fn() => view('admin.auth.forgot-password'))->name('admin.password.request');
+        Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('admin.password.email');
 
-    // Email Verification
-    Route::get('/email/verify', fn() => view('admin.auth.verify-email'))->middleware('auth')->name('verification.notice');
+        // Reset Password
+        Route::get('/reset-password/{token}', fn($token) => view('admin.auth.reset-password', ['token' => $token]))->name('admin.password.reset');
+        Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('admin.password.update');
+    });
 
-    // Password Confirmation
-    Route::get('/confirm-password', function () {
-        return view('admin.auth.confirm-password');
-    })->middleware('auth')->name('password.confirm');
+    // Email Verification Success Page
+    Route::get('/email/verified', function () {
+        return view('admin.auth.verify-email-success');
+    })->name('verification.verified');
 
-    Route::post('/confirm-password', [\Laravel\Fortify\Http\Controllers\ConfirmablePasswordController::class, 'store'])
-        ->middleware('auth')
-        ->name('password.confirm.store');
-
-    // Forgot Password
-    Route::get('/forgot-password', fn() => view('admin.auth.forgot-password'))->name('admin.password.request');
-    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('admin.password.email');
-
-    // Reset Password
-    Route::get('/reset-password/{token}', fn($token) => view('admin.auth.reset-password', ['token' => $token]))->name('admin.password.reset');
-    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('admin.password.update');
+    // Override Fortify's verification.send route to ensure correct middleware
+    Route::post('/email/verification-notification', function (Illuminate\Http\Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('status', 'verification-link-sent');
+    })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
     // Protected Admin Routes
-    Route::middleware('auth')->group(function () {
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::post('/logout', function (Request $request) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect('/admin/login')->with('success', 'You just logged out!');
+        })->name('admin.logout');
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 

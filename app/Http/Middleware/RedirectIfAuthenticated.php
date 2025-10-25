@@ -20,7 +20,6 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                dd('Authenticated!', Auth::guard($guard)->user());
                 return redirect('/admin/dashboard');
             }
         }

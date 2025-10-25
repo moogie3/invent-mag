@@ -297,5 +297,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
 });
 
 Route::get('/', function () {
-    return redirect('/admin/login');
+    if (Illuminate\Support\Facades\Auth::check()) {
+        return redirect()->route('admin.dashboard');
+    }
+    return redirect()->route('admin.login');
 });

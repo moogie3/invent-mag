@@ -11,7 +11,9 @@ class ProfileService
     public function updateUser(User $user, array $data)
     {
         $user->name = $data['name'];
-        $user->email = $data['email'];
+        if (isset($data['email'])) {
+            $user->email = $data['email'];
+        }
         $user->shopname = $data['shopname'];
         $user->address = $data['address'];
         $user->timezone = $data['timezone'];

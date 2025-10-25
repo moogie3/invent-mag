@@ -102,14 +102,23 @@
                                                     <div class="col-md-6">
                                                         <div class="form-label">{{ __('messages.email') }}</div>
                                                         <div class="input-group">
-                                                            <input type="email" name="email" class="form-control"
-                                                                value="{{ auth()->user()->email }}" required
-                                                                @if (auth()->user()->hasVerifiedEmail()) disabled @endif>
+                                                            <input type="email" name="email" class="form-control" value="{{ auth()->user()->email }}" required @if (auth()->user()->hasVerifiedEmail()) disabled @endif>
                                                             <span class="input-group-text">
-                                                                {{-- Verification status moved to its own section --}}
+                                                                @if (auth()->user()->hasVerifiedEmail())
+                                                                    <i class="ti ti-circle-check text-success" title="{{ __('messages.email_verified_message') }}"></i>
+                                                                @else
+                                                                    <i class="ti ti-circle-x text-danger" title="{{ __('messages.email_not_verified_message') }}"></i>
+                                                                @endif
                                                             </span>
                                                         </div>
-                                                        @if (auth()->user()->hasVerifiedEmail())
+                                                        @if (!auth()->user()->hasVerifiedEmail())
+                                                            <small class="form-text text-muted mt-1">
+                                                                {{ __('messages.email_not_verified_action') }}
+                                                                <a href="#" onclick="event.preventDefault(); document.getElementById('resendVerificationForm').submit();" class="btn-link">
+                                                                    {{ __('messages.resend_verification_email') }}
+                                                                </a>
+                                                            </small>
+                                                        @else
                                                             <small class="form-text text-muted mt-1">
                                                                 {{ __('messages.email_change_info_verified') }}
                                                             </small>
@@ -169,37 +178,12 @@
 
                                     </form>
 
-                                    {{-- Email Verification Status Section --}}
-                                    <div class="settings-section mb-5">
-                                        <div class="settings-section-header">
-                                            <div class="settings-icon-wrapper">
-                                                <i class="ti ti-mail"></i>
-                                            </div>
-                                            <div class="settings-section-title">
-                                                <h3 class="mb-1">{{ __('messages.email_verification') }}</h3>
-                                                <p class="text-muted mb-0 small">
-                                                    @if (auth()->user()->hasVerifiedEmail())
-                                                        <i class="ti ti-circle-check text-success me-1"></i> {{ __('messages.email_verified_message') }}
-                                                    @else
-                                                        <i class="ti ti-circle-x text-danger me-1"></i> {{ __('messages.email_not_verified_message') }}
-                                                    @endif
-                                                </p>
-                                            </div>
-                                        </div>
-                                        @if (!auth()->user()->hasVerifiedEmail())
-                                            <div class="settings-section-content">
-                                                <small class="form-text text-muted mt-1">
-                                                    {{ __('messages.email_not_verified_action') }}
-                                                    <form id="resendVerificationForm" class="d-inline" method="POST" action="{{ route('verification.send') }}">
-                                                        @csrf
-                                                        <button type="button" class="btn btn-link p-0 m-0 align-baseline" onclick="this.form.submit();">
-                                                            {{ __('messages.resend_verification_email') }}
-                                                        </button>
-                                                    </form>
-                                                </small>
-                                            </div>
-                                        @endif
-                                    </div>
+                                    {{-- The form for resending verification email, triggered by JS --}}
+                                    @if (!auth()->user()->hasVerifiedEmail())
+                                    <form id="resendVerificationForm" class="d-none" method="POST" action="{{ route('verification.send') }}">
+                                        @csrf
+                                    </form>
+                                    @endif
                                 </div>
                                 <div class="card-footer bg-transparent mt-auto">
                                     <div class="btn-list justify-content-end">

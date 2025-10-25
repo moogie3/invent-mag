@@ -23,7 +23,7 @@
         {
             $request->validate([
                 'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email,' . Auth::id(),
+                'email' => 'sometimes|email|unique:users,email,' . Auth::id(),
                 'shopname' => 'nullable|string',
                 'address' => 'nullable|string',
                 'timezone' => 'required|string|in:' . implode(',', timezone_identifiers_list()),

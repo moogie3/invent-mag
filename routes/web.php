@@ -56,14 +56,15 @@ Route::middleware('web')->prefix('admin')->group(function () {
         return back()->with('status', 'verification-link-sent');
     })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
+    Route::post('/logout', function (Request $request) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/admin/login')->with('success', 'You just logged out!');
+    })->middleware('auth')->name('admin.logout');
+
     // Protected Admin Routes
     Route::middleware(['auth', 'verified'])->group(function () {
-        Route::post('/logout', function (Request $request) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-            return redirect('/admin/login')->with('success', 'You just logged out!');
-        })->name('admin.logout');
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 

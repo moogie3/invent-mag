@@ -4,7 +4,6 @@ const sounds = {
     successpos: new Audio("/audio/successpos.mp3"),
     delete: new Audio("/audio/delete.mp3"),
     decrease: new Audio("/audio/decrease.mp3"),
-    cash: new Audio("/audio/cash.mp3"),
     info: new Audio("/audio/info.mp3"),
     warning: new Audio("/audio/warning.mp3"),
     error: new Audio("/audio/error.mp3"),
@@ -31,10 +30,6 @@ export function playDeleteSound() {
 
 export function playDecreaseSound() {
     playSound(sounds.decrease);
-}
-
-export function playCashSound() {
-    playSound(sounds.cash);
 }
 
 export function playNotificationSound(type) {

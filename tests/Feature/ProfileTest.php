@@ -13,6 +13,7 @@ class ProfileTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        dd(class_exists(\App\Models\CurrencySetting::class));
         // Ensure a CurrencySetting exists for tests that might rely on it
         \App\Models\CurrencySetting::firstOrCreate(
             ['currency_code' => 'IDR'],

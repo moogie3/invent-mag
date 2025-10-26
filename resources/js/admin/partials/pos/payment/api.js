@@ -1,5 +1,4 @@
 import { grandTotal } from '../cart/totals.js';
-import { playCashSound } from '../utils/sound.js';
 import { clearCart } from '../cart/actions.js';
 
 const completePaymentBtn = document.getElementById("completePaymentBtn");
@@ -11,7 +10,6 @@ const paymentModal = new bootstrap.Modal(
 );
 
 function completePayment() {
-    playCashSound();
     completePaymentBtn.disabled = true;
 
     const paymentMethodMap = {

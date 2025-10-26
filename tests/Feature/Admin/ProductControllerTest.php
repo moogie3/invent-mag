@@ -39,6 +39,10 @@ class ProductControllerTest extends TestCase
 
         $response = $this->withViewErrors([])->get(route('admin.product'));
 
+        if ($response->status() !== 200) {
+            $response->dump();
+        }
+
         $response->assertStatus(200);
         $response->assertViewIs('admin.product.index');
     }

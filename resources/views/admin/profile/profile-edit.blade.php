@@ -156,7 +156,7 @@
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
                                                         <div class="form-label">{{ __('messages.new_password') }}</div>
-                                                        <input type="password" name="password" id=".new_password"
+                                                        <input type="password" name="password" id="new_password"
                                                             class="form-control"
                                                             placeholder="{{ __('messages.enter_new_password_leave_empty_if_not_changing') }}"
                                                             oninput="togglePasswordModal()">

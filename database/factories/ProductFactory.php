@@ -22,6 +22,7 @@ class ProductFactory extends Factory
     {
         return [
             'code' => $this->faker->unique()->ean8,
+            'barcode' => $this->faker->unique()->ean13,
             'name' => $this->faker->word,
             'description' => $this->faker->sentence,
             'image' => null,

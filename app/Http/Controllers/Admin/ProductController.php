@@ -130,6 +130,7 @@ class ProductController extends Controller
 
         $request->validate([
             'code' => 'string',
+            'barcode' => 'nullable|string|unique:products,barcode,' . $product->id,
             'name' => 'string',
             'stock_quantity' => 'integer',
             'low_stock_threshold' => 'nullable|integer|min:1',
@@ -305,5 +306,17 @@ class ProductController extends Controller
                 'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
+    }
+
+    public function searchByBarcode(Request $request)
+    {
+        $request->validate(['barcode' => 'required|string']);
+        $product = $this->productService->searchByBarcode($request->barcode);
+
+        if ($product) {
+            return response()->json($product);
+        }
+
+        return response()->json(['message' => 'Product not found'], 404);
     }
 }

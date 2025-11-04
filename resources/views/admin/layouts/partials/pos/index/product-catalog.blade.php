@@ -6,11 +6,23 @@
             </h4>
         </div>
         <div class="card-body">
-            <div class="input-group mb-4">
-                <span class="input-group-text">
-                    <i class="ti ti-search"></i>
-                </span>
-                <input type="text" class="form-control" id="searchProduct" placeholder="{{ __('messages.search_products') }}">
+            <div class="row g-2 mb-4">
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="ti ti-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchProduct" placeholder="{{ __('messages.search_products') }}">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="ti ti-barcode"></i>
+                        </span>
+                        <input type="text" class="form-control" id="barcodeScannerInput" placeholder="{{ __('messages.scan_barcode') }}">
+                    </div>
+                </div>
             </div>
             <div class="row g-2" id="productGrid">
                 @if ($products->isEmpty())

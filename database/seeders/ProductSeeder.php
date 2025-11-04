@@ -25,10 +25,13 @@ class ProductSeeder extends Seeder
             return;
         }
 
+        $faker = \Faker\Factory::create();
+
         DB::table('products')->insert([
             // Near low stock, no expiry
             [
                 'code' => 'TR11',
+                'barcode' => $faker->unique()->ean13(),
                 'name' => 'Near Low Stock Capacitor',
                 'stock_quantity' => 9, // low_stock_threshold is 10, so this is low stock
                 'low_stock_threshold' => 10,
@@ -47,6 +50,7 @@ class ProductSeeder extends Seeder
             // Expired product
             [
                 'code' => 'TR12',
+                'barcode' => $faker->unique()->ean13(),
                 'name' => 'Expired Diode',
                 'stock_quantity' => 15,
                 'low_stock_threshold' => 10,
@@ -65,6 +69,7 @@ class ProductSeeder extends Seeder
             // About to expire in 10 days
             [
                 'code' => 'TR13',
+                'barcode' => $faker->unique()->ean13(),
                 'name' => 'Near Expiry Crystal Oscillator',
                 'stock_quantity' => 50,
                 'low_stock_threshold' => 20,
@@ -83,8 +88,8 @@ class ProductSeeder extends Seeder
             // Near low stock and about to expire in 3 days
             [
                 'code' => 'TR14',
+                'barcode' => $faker->unique()->ean13(),
                 'name' => 'Low Stock LED',
-                
                 'stock_quantity' => 0,
                 'low_stock_threshold' => 5,
                 'price' => 90.00,
@@ -102,6 +107,7 @@ class ProductSeeder extends Seeder
             // Stock is fine, expired long ago (should NOT show low stock)
             [
                 'code' => 'TR15',
+                'barcode' => $faker->unique()->ean13(),
                 'name' => 'Expired Voltage Regulator',
                 'stock_quantity' => 0,
                 'low_stock_threshold' => 10,

@@ -243,7 +243,8 @@ class ProductService
 
         $productsQuery->where(function ($q) use ($query) {
             $q->where('name', 'LIKE', "%{$query}%")
-              ->orWhere('code', 'LIKE', "%{$query}%");
+              ->orWhere('code', 'LIKE', "%{$query}%")
+              ->orWhere('barcode', 'LIKE', "%{$query}%");
 
             $q->orWhereHas('category', function ($cat) use ($query) {
                 $cat->where('name', 'LIKE', "%{$query}%");
@@ -258,6 +259,11 @@ class ProductService
             ->orderBy('name', 'asc')
             ->limit(50)
             ->get();
+    }
+
+    public function searchByBarcode(string $barcode)
+    {
+        return Product::with('unit')->where('barcode', $barcode)->first();
     }
 
     public function getExpiringSoonPOItems()

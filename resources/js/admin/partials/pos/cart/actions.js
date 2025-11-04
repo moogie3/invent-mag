@@ -19,7 +19,7 @@ function updateProductPrice(index, newPrice) {
     renderList();
 }
 
-function addToProductList(
+export function addToProductList(
     productId,
     productName,
     productPrice,

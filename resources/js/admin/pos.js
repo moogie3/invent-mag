@@ -46,6 +46,33 @@ document.addEventListener("DOMContentLoaded", function () {
         populatePaymentModal();
     });
 
+    const barcodeInput = document.getElementById("barcodeScannerInput");
+
+    if (barcodeInput) {
+        barcodeInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                const barcode = this.value.trim();
+                if (barcode) {
+                    fetch(`/admin/product/search-by-barcode?barcode=${barcode}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Product not found');
+                            }
+                            return response.json();
+                        })
+                        .then(product => {
+                            addToProductList(product.id, product.name, product.selling_price, product.unit.symbol, product.stock_quantity);
+                            this.value = '';
+                        })
+                        .catch(error => {
+                            InventMagApp.showToast("Error", "Product not found for the given barcode.", "error");
+                        });
+                }
+            }
+        });
+    }
+
     const searchInput = document.getElementById("searchProduct");
     const productCards = document.querySelectorAll("#productGrid .col-md-4");
 

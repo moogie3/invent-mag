@@ -89,6 +89,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::post('/bulk-update-stock', [ProductController::class, 'bulkUpdateStock'])->name('product.bulk-update-stock');
             Route::post('/adjust-stock', [ProductController::class, 'adjustStock'])->name('admin.product.adjust-stock');
             Route::get('/search', [ProductController::class, 'search'])->name('admin.product.search');
+            Route::get('/search-by-barcode', [ProductController::class, 'searchByBarcode'])->name('admin.product.search-by-barcode');
             Route::get('/metrics', [ProductController::class, 'getProductMetrics'])->name('admin.product.metrics');
             Route::get('/expiring-soon', [ProductController::class, 'getExpiringSoonProducts'])->name('admin.product.expiring-soon');
         });

@@ -247,6 +247,7 @@ class PurchaseService
                 'notes' => $data['notes'] ?? null,
             ]);
 
+            $purchase->load('payments'); // Refresh the payments relationship
             $this->updatePurchaseStatus($purchase);
 
             return $payment;
@@ -306,7 +307,7 @@ class PurchaseService
     {
         $updatedCount = 0;
         DB::transaction(function () use ($ids, &$updatedCount) {
-            $purchases = Purchase::whereIn('id', $ids)->get();
+            $purchases = Purchase::whereIn('id', $ids)->with('payments', 'items')->get(); // Added with('items') // Added with('payments')
             foreach ($purchases as $purchase) {
                 if ($purchase->balance > 0) {
                     $this->addPayment($purchase, [
@@ -316,6 +317,7 @@ class PurchaseService
                         'notes' => 'Bulk marked as paid.',
                     ]);
                 }
+                $purchase->refresh(); // Refresh the purchase model to get the latest status
                 $updatedCount++;
             }
         });

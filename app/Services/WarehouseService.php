@@ -58,10 +58,9 @@ class WarehouseService
 
     public function setMainWarehouse(Warehouse $warehouse)
     {
-        Warehouse::where('is_main', true)->update(['is_main' => false]);
+        Warehouse::where('is_main', true)->update(['is_main' => false]); // Unsets all existing main warehouses
         $warehouse->is_main = true;
         $warehouse->save();
-
         return ['success' => true, 'message' => 'Main warehouse updated successfully.'];
     }
 

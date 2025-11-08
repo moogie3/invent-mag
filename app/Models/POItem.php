@@ -43,4 +43,10 @@ class POItem extends Model
             ->where('expiry_date', '<=', $thirtyDaysFromNow)
             ->get();
     }
+
+    // Explicitly define the factory for the model
+    protected static function newFactory()
+    {
+        return \Database\Factories\POItemFactory::new();
+    }
 }

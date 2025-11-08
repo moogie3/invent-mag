@@ -192,9 +192,11 @@ class SalesService
             ]);
 
             foreach ($products as $productData) {
+                $product = Product::find($productData['product_id']); // Find product to get its name
                 SalesItem::create([
                     'sales_id' => $sale->id,
                     'product_id' => $productData['product_id'],
+                    'name' => $product->name, // Added product name
                     'quantity' => $productData['quantity'],
                     'customer_price' => $productData['customer_price'],
                     'discount' => $productData['discount'] ?? 0,
@@ -296,9 +298,11 @@ class SalesService
             ]);
 
             foreach ($products as $productData) {
+                $product = Product::find($productData['product_id']); // Find product to get its name
                 SalesItem::create([
                     'sales_id' => $sale->id,
                     'product_id' => $productData['product_id'],
+                    'name' => $product->name, // Added product name
                     'quantity' => $productData['quantity'],
                     'customer_price' => $productData['customer_price'],
                     'discount' => $productData['discount'] ?? 0,
@@ -344,7 +348,9 @@ class SalesService
                 'notes' => $data['notes'] ?? null,
             ]);
 
+            $sale->load('payments'); // Refresh the payments relationship
             $this->updateSaleStatus($sale);
+            $sale->refresh(); // Added refresh to ensure latest status is available
 
             return $payment;
         });
@@ -433,7 +439,7 @@ class SalesService
     {
         $updatedCount = 0;
         DB::transaction(function () use ($ids, &$updatedCount) {
-            $sales = Sales::whereIn('id', $ids)->get();
+            $sales = Sales::whereIn('id', $ids)->with('payments')->get(); // Added with('payments')
             foreach ($sales as $sale) {
                 if ($sale->balance > 0) {
                     $this->addPayment($sale, [
@@ -443,6 +449,7 @@ class SalesService
                         'notes' => 'Bulk marked as paid.',
                     ]);
                 }
+                $sale->refresh(); // Refresh the sale model to get the latest status
                 $updatedCount++;
             }
         });
@@ -465,12 +472,12 @@ class SalesService
 
         $pastPrice = 0;
 
-        if ($latestSale) {
-            $saleItem = $latestSale->salesItems()->where('product_id', $product->id)->first();
-            if ($saleItem) {
-                $pastPrice = floor($saleItem->customer_price);
+            if ($latestSale) {
+                $saleItem = $latestSale->salesItems()->where('product_id', $product->id)->first();
+                if ($saleItem) {
+                    $pastPrice = $saleItem->customer_price; // Removed floor()
+                }
             }
-        }
 
         return $pastPrice;
     }

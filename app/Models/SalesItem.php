@@ -28,4 +28,10 @@ class SalesItem extends Model
     public function sale(){
         return $this->belongsTo(Sales::class , 'sales_id');
     }
+
+    // Explicitly define the factory for the model
+    protected static function newFactory()
+    {
+        return \Database\Factories\SalesItemFactory::new();
+    }
 }

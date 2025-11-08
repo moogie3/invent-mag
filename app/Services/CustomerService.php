@@ -123,7 +123,7 @@ class CustomerService
     private function storeImage($image): string
     {
         $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-        $image->storeAs('public/image', $imageName);
+        $image->storeAs('public/image', $imageName, 'public'); // Explicitly specify the 'public' disk
         return $imageName;
     }
 

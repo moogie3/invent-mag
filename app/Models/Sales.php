@@ -124,6 +124,12 @@ class Sales extends Model
         'is_pos' => 'boolean',
     ];
 
+    // Explicitly define the factory for the model
+    protected static function newFactory()
+    {
+        return \Database\Factories\SalesFactory::new();
+    }
+
     // Get user timezone or fallback to app timezone
     protected function getUserTimezone()
     {

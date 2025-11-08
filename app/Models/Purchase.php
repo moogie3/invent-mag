@@ -100,4 +100,9 @@ class Purchase extends Model
     'due_date' => 'datetime',
     ];
 
+    // Explicitly define the factory for the model
+    protected static function newFactory()
+    {
+        return \Database\Factories\PurchaseFactory::new();
+    }
 }

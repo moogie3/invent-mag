@@ -13,7 +13,6 @@ class ProfileTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        dd(class_exists(\App\Models\CurrencySetting::class));
         // Ensure a CurrencySetting exists for tests that might rely on it
         \App\Models\CurrencySetting::firstOrCreate(
             ['currency_code' => 'IDR'],
@@ -43,6 +42,8 @@ class ProfileTest extends TestCase
     {
         $user = User::factory()->create();
 
+        $this->withoutMiddleware(\Illuminate\Auth\Middleware\RequirePassword::class);
+
         $response = $this
             ->actingAs($user)
             ->put(route('admin.setting.profile.update'), [
@@ -67,6 +68,8 @@ class ProfileTest extends TestCase
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
     {
         $user = User::factory()->create();
+
+        $this->withoutMiddleware(\Illuminate\Auth\Middleware\RequirePassword::class);
 
         $response = $this
             ->actingAs($user)

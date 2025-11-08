@@ -47,7 +47,7 @@ class CurrencyHelper
     /**
      * Default fallback settings
      */
-    protected static function getDefaultSettings()
+    public static function getDefaultSettings()
     {
         return (object) [
             'currency_code' => 'IDR',
@@ -66,6 +66,14 @@ class CurrencyHelper
     public static function clearSettingsCache()
     {
         self::$settings = null;
+    }
+
+    /**
+     * Set settings for testing purposes.
+     */
+    public static function setSettingsForTesting($settings)
+    {
+        self::$settings = $settings;
     }
 
     /**

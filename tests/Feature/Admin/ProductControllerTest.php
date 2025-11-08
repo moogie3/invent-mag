@@ -9,6 +9,9 @@ use App\Models\Unit;
 use App\Models\Supplier;
 use App\Models\Warehouse;
 use App\Models\StockAdjustment;
+use Database\Seeders\CurrencySeeder;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +26,15 @@ class ProductControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['auth.defaults.guard' => 'web']);
+
+        $this->seed(CurrencySeeder::class);
+        $this->seed(PermissionSeeder::class);
+        $this->seed(RolePermissionSeeder::class);
+
         $this->user = User::factory()->create();
+        $this->user->assignRole('superuser');
+
         $this->actingAs($this->user);
 
         // Create a main warehouse to avoid errors in views

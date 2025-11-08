@@ -2,10 +2,9 @@
 
 namespace Tests\Unit;
 
+use stdClass;
 use Tests\TestCase;
 use App\Helpers\CurrencyHelper;
-use App\Models\CurrencySetting;
-use Mockery;
 
 class CurrencyHelperTest extends TestCase
 {
@@ -17,32 +16,22 @@ class CurrencyHelperTest extends TestCase
         CurrencyHelper::clearSettingsCache();
     }
 
-    protected function tearDown(): void
-    {
-        Mockery::close(); // Close Mockery after each test
-        parent::tearDown();
-    }
-
     /**
      * A basic unit test example.
      */
     public function test_format_method_with_default_settings(): void
     {
-        // Arrange: Set up any necessary data or conditions.
-        // For this test, we'll mock the CurrencySetting model
-        // to ensure we're using predictable default settings.
-        // This prevents the test from relying on actual database data.
-        $mock = Mockery::mock('alias:App\\Models\\CurrencySetting'); // Use alias for static methods
-        $mock->shouldReceive('first')->andReturn((object) [
-            'currency_symbol' => 'Rp',
-            'decimal_places' => 0,
-            'decimal_separator' => ',',
-            'thousand_separator' => '.',
-            'position' => 'prefix'
-        ]);
+        // Arrange: Set up predictable settings for the test.
+        $settings = new stdClass();
+        $settings->currency_symbol = 'Rp';
+        $settings->decimal_places = 0;
+        $settings->decimal_separator = ',';
+        $settings->thousand_separator = '.';
+        $settings->position = 'prefix';
+        CurrencyHelper::setSettingsForTesting($settings);
 
         $amount = 1234567;
-        $expectedFormattedAmount = 'Rp 1.234.567'; // Based on default settings
+        $expectedFormattedAmount = 'Rp 1.234.567'; // Based on settings above
 
         // Act: Call the method you want to test.
         $actualFormattedAmount = CurrencyHelper::format($amount);
@@ -56,18 +45,18 @@ class CurrencyHelperTest extends TestCase
      */
     public function test_format_method_with_custom_settings(): void
     {
-        // Arrange: Mock CurrencySetting to return custom settings
-        $mock = Mockery::mock('alias:App\\Models\\CurrencySetting'); // Use alias for static methods
-        $mock->shouldReceive('first')->andReturn((object) [
-            'currency_symbol' => '$',
-            'decimal_places' => 2,
-            'decimal_separator' => '.',
-            'thousand_separator' => ',',
-            'position' => 'prefix'
-        ]);
+        // Arrange: Set up predictable custom settings for the test.
+        $settings = new stdClass();
+        $settings->currency_symbol = '$';
+        $settings->decimal_places = 2;
+        $settings->decimal_separator = '.';
+        $settings->thousand_separator = ',';
+        $settings->position = 'prefix';
+        $settings->locale = 'en-US';
+        CurrencyHelper::setSettingsForTesting($settings);
 
         $amount = 1234567.89;
-        $expectedFormattedAmount = '$ 1,234,567.89'; // Based on custom settings
+        $expectedFormattedAmount = '$ 1,234,567.89'; // Based on settings above
 
         // Act
         $actualFormattedAmount = CurrencyHelper::format($amount);

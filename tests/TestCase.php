@@ -5,6 +5,8 @@ namespace Tests;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Contracts\Console\Kernel;
+use App\Models\CurrencySetting;
+use App\Helpers\CurrencyHelper;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -37,6 +39,16 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Ensure a default currency setting exists for tests
+        if (CurrencySetting::count() === 0) {
+            CurrencySetting::create((array) CurrencyHelper::getDefaultSettings());
+        }
         $this->seed();
+    }
+
+    protected function tearDown(): void
+    {
+        \App\Helpers\CurrencyHelper::clearSettingsCache();
+        parent::tearDown();
     }
 }

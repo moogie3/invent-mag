@@ -54,6 +54,12 @@ class SalesController extends Controller
 
     public function view($id)
     {
+        $sale = Sales::findOrFail($id);
+
+        if ($sale->is_pos) {
+            return redirect()->route('admin.pos.receipt', $id);
+        }
+
         $data = $this->salesService->getSalesViewData($id);
 
         return view('admin.sales.sales-view', $data);

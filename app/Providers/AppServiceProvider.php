@@ -35,7 +35,9 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // customize the login view
-        if (! app()->environment('testing')) {
+        if (app()->environment('testing')) {
+            // Do nothing for testing environment
+        } else {
             View::composer(['admin.purchase.*', 'admin.dashboard'], function ($view) {
                 $purchaseOrders = Purchase::where('due_date', '<=', now()->addDays(7))
                     ->where('status', '!=', 'Paid')

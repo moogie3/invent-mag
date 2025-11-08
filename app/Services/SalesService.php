@@ -71,10 +71,6 @@ class SalesService
         /** @var \App\Models\Sales $sales */
         $sales = Sales::with(['salesItems', 'customer', 'payments'])->find($id);
 
-        if (strpos($sales->invoice, 'POS-') === 0) {
-            return redirect()->route('admin.pos.receipt', $id);
-        }
-
         $customer = Customer::all();
         $tax = Tax::first();
 

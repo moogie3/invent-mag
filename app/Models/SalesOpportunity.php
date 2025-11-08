@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SalesOpportunity extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'customer_id',
         'sales_pipeline_id',
@@ -62,5 +65,15 @@ class SalesOpportunity extends Model
         }
 
         return parent::save($options);
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\SalesOpportunityFactory::new();
     }
 }

@@ -247,11 +247,23 @@ class PurchaseControllerTest extends TestCase
 
     public function test_it_can_bulk_mark_paid_purchases()
     {
-        $purchases = PurchaseFactory::new()->hasItems(1)->count(3)->create([
-            'supplier_id' => $this->supplier->id,
-            'status' => 'Unpaid',
-            'total' => 100, // Ensure total is positive
-        ]);
+        $purchases = PurchaseFactory::new()
+            ->count(3)
+            ->has(POItemFactory::new()->state([
+                'price' => 100,
+                'quantity' => 1,
+                'discount' => 0,
+                'total' => 100,
+            ]), 'items')
+            ->create([
+                'supplier_id' => $this->supplier->id,
+                'status' => 'Unpaid',
+                'discount_total' => 0,
+            ]);
+
+        foreach($purchases as $purchase) {
+            $purchase->update(['total' => $purchase->grand_total]);
+        }
 
         $idsToMarkPaid = $purchases->pluck('id')->toArray();
 

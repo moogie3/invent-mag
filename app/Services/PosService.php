@@ -98,11 +98,16 @@ class PosService
         ]);
 
         foreach ($products as $product) {
+            $productModel = Product::find($product['id']);
+            if (!$productModel) {
+                continue;
+            }
             $productSubtotal = $product['price'] * $product['quantity'];
 
             SalesItem::create([
                 'sales_id' => $sale->id,
                 'product_id' => $product['id'],
+                'name' => $productModel->name, // Added product name
                 'quantity' => $product['quantity'],
                 'customer_price' => $product['price'],
                 'discount' => 0,
@@ -110,15 +115,12 @@ class PosService
                 'total' => $productSubtotal,
             ]);
 
-            $productModel = Product::find($product['id']);
-            if ($productModel) {
-                if (isset($productModel->stock_quantity)) {
-                    $productModel->decrement('stock_quantity', $product['quantity']);
-                } elseif (isset($productModel->quantity)) {
-                    $productModel->decrement('quantity', $product['quantity']);
-                } elseif (isset($productModel->stock)) {
-                    $productModel->decrement('stock', $product['quantity']);
-                }
+            if (isset($productModel->stock_quantity)) {
+                $productModel->decrement('stock_quantity', $product['quantity']);
+            } elseif (isset($productModel->quantity)) {
+                $productModel->decrement('quantity', $product['quantity']);
+            } elseif (isset($productModel->stock)) {
+                $productModel->decrement('stock', $product['quantity']);
             }
         }
 

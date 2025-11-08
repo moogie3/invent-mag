@@ -202,7 +202,7 @@ class CrmService
             ->with(['product', 'sale'])
             ->get();
 
-        return $salesItems->groupBy('product.name')
+        $productHistory = $salesItems->groupBy('product.name')
             ->map(function ($items, $productName) {
                 $history = $items->sortByDesc('sale.order_date')->map(function ($item) {
                     return [
@@ -223,6 +223,8 @@ class CrmService
             })
             ->sortBy('product_name')
             ->values();
+
+        return $productHistory;
     }
 
     public function getSupplierProductHistory($id)

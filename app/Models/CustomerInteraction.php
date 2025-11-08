@@ -26,4 +26,14 @@ class CustomerInteraction extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\CustomerInteractionFactory::new();
+    }
 }

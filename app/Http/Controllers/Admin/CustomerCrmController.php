@@ -38,8 +38,6 @@ class CustomerCrmController extends Controller
     {
         $productHistory = $this->crmService->getCustomerProductHistory($id);
 
-        return response()->json([
-            'product_history' => $productHistory,
-        ]);
+        return response()->json($productHistory);
     }
 }

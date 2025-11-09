@@ -184,6 +184,7 @@ class SalesControllerTest extends TestCase
         $sale = SalesFactory::new()->create([
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
+            'is_pos' => false,
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
 

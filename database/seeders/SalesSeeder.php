@@ -75,7 +75,6 @@ class SalesSeeder extends Seeder
 
                     $salesItemsData[] = [
                         'product_id' => $product->id,
-                        'name' => $product->name, // Added product name
                         'quantity' => $quantity,
                         'customer_price' => $customerPrice,
                         'discount' => 0,

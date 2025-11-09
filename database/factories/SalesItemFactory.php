@@ -26,7 +26,6 @@ class SalesItemFactory extends Factory
         return [
             'sales_id' => Sales::factory(), // Will be overridden by test
             'product_id' => $product->id,
-            'name' => $product->name,
             'quantity' => $quantity,
             'discount' => 0,
             'discount_type' => 'fixed',

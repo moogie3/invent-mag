@@ -48,7 +48,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function tearDown(): void
     {
-        \App\Helpers\CurrencyHelper::clearSettingsCache();
+        CurrencyHelper::clearSettingsCache();
         parent::tearDown();
     }
 }

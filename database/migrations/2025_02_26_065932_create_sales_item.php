@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sales_id')->constrained('sales')->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->string('name'); // Added name column
             $table->integer('quantity');
             $table->decimal('discount', 10);
             $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage');
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sales_item');
+        Schema::dropIfExists('sales_items');
     }
 };

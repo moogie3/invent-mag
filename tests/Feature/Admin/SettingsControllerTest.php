@@ -58,7 +58,7 @@ class SettingsControllerTest extends TestCase
             'sticky_navbar' => true,
         ];
 
-        $response = $this->actingAs($this->adminUser)->post(route('admin.setting.update'), $settingsData);
+        $response = $this->actingAs($this->adminUser)->put(route('admin.setting.update'), $settingsData);
 
         $response->assertRedirect(route('admin.setting.index'));
         $response->assertSessionHas('success', 'System settings updated successfully.');
@@ -80,9 +80,9 @@ class SettingsControllerTest extends TestCase
             'system_language' => 'fr', // Invalid value
         ];
 
-        $response = $this->actingAs($this->adminUser)->post(route('admin.setting.update'), $settingsData);
+        $response = $this->actingAs($this->adminUser)->putJson(route('admin.setting.update'), $settingsData);
 
-        $response->assertSessionHasErrors([
+        $response->assertStatus(422)->assertJsonValidationErrors([
             'navigation_type',
             'theme_mode',
             'notification_duration',
@@ -101,7 +101,7 @@ class SettingsControllerTest extends TestCase
         ];
         $this->adminUser->save();
 
-        $response = $this->actingAs($this->adminUser)->get(route('admin.setting.get-settings'));
+        $response = $this->actingAs($this->adminUser)->get(route('admin.api.settings'));
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -115,7 +115,7 @@ class SettingsControllerTest extends TestCase
 
     public function test_update_theme_mode_successfully()
     {
-        $response = $this->actingAs($this->adminUser)->post(route('admin.setting.update-theme-mode'), [
+        $response = $this->actingAs($this->adminUser)->put(route('admin.setting.update-theme-mode'), [
             'theme_mode' => 'dark'
         ]);
 
@@ -132,10 +132,10 @@ class SettingsControllerTest extends TestCase
 
     public function test_update_theme_mode_with_invalid_data_returns_validation_errors()
     {
-        $response = $this->actingAs($this->adminUser)->post(route('admin.setting.update-theme-mode'), [
-            'theme_mode' => 'invalid'
-        ]);
+        $response = $this->actingAs($this->adminUser)->putJson(route('admin.setting.update-theme-mode'), [
+                'theme_mode' => 'invalid'
+            ]);
 
-        $response->assertSessionHasErrors(['theme_mode']);
-    }
+            $response->assertStatus(422)->assertJsonValidationErrors(['theme_mode']);
+        }
 }

@@ -53,7 +53,14 @@ class UnitController extends Controller
         ]);
 
         $unit = Unit::find($id);
-        $this->unitService->updateUnit($unit, $request->all());
+        $result = $this->unitService->updateUnit($unit, $request->all());
+
+        if (!$result['success']) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
+            }
+            return back()->withErrors(['name' => $result['message']])->withInput();
+        }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Unit updated successfully.']);

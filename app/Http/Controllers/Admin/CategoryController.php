@@ -53,7 +53,14 @@ class CategoryController extends Controller
         ]);
 
         $category = Categories::find($id);
-        $this->categoryService->updateCategory($category, $request->except('_token'));
+        $result = $this->categoryService->updateCategory($category, $request->except('_token'));
+
+        if (!$result['success']) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
+            }
+            return back()->withErrors(['name' => $result['message']])->withInput();
+        }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Category updated successfully.']);

@@ -27,23 +27,40 @@ class DashboardService
         $monthlySales = Sales::where('status', 'Paid')->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
         $outCountUnpaid = $this->getPurchaseCountByLocation('OUT', 'Unpaid');
         $inCountUnpaid = $this->getPurchaseCountbyLocation('IN', 'Unpaid');
-        $recentSales = collect(); // Temporarily empty
-        $recentPurchases = collect(); // Temporarily empty
+        $recentSales = Sales::with('customer')->orderBy('created_at', 'desc')->limit(3)->get();
+        $recentPurchases = Purchase::with('supplier')->orderBy('created_at', 'desc')->limit(3)->get();
 
         $keyMetrics = $this->formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid, $inCountUnpaid);
-        $financialItems = []; // Temporarily empty
-        $invoiceStatusData = []; // Temporarily empty
-        $customerInsights = []; // Temporarily empty
-        $customerAnalytics = []; // Temporarily empty
-        $supplierAnalytics = []; // Temporarily empty
-        $recentTransactions = collect(); // Temporarily empty
-        $topCategories = collect(); // Temporarily empty
-        $monthlyData = collect(); // Temporarily empty
-        $lowStockProducts = collect(); // Temporarily empty
-        $expiringSoonItems = collect(); // Temporarily empty
+        $financialItems = $this->prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue);
+        $invoiceStatusData = $this->prepareInvoiceStatusData();
+        $customerInsights = $this->prepareCustomerInsights();
+        $customerAnalytics = $this->getCustomerAnalytics($dates);
+        $supplierAnalytics = $this->getSupplierAnalytics($dates);
+        $recentTransactions = $this->getRecentTransactions($dates, $reportType);
+        $topCategories = $this->getTopCategories($dates);
+        $monthlyData = $this->getMonthlyData($dates, $categoryId);
+        $lowStockProducts = Product::getLowStockProducts();
+        $expiringSoonItems = \App\Models\POItem::getExpiringSoonItems();
 
-        $salesData = collect(); // Temporarily empty
-        $purchaseData = collect(); // Temporarily empty
+        $salesData = Sales::selectRaw('
+            DATE_FORMAT(order_date, "%b") as month,
+            MONTH(order_date) as month_num,
+            SUM(total) as total
+        ')
+            ->whereYear('order_date', now()->year)
+            ->groupBy(DB::raw('MONTH(order_date)'), DB::raw('DATE_FORMAT(order_date, "%b")'))
+            ->orderBy('month_num')
+            ->get();
+
+        $purchaseData = Purchase::selectRaw('
+            DATE_FORMAT(order_date, "%b") as month,
+            MONTH(order_date) as month_num,
+            SUM(total) as total
+        ')
+            ->whereYear('order_date', now()->year)
+            ->groupBy(DB::raw('MONTH(order_date)'), DB::raw('DATE_FORMAT(order_date, "%b")'))
+            ->orderBy('month_num')
+            ->get();
 
         return [
             'topCategories' => $topCategories,
@@ -55,25 +72,25 @@ class DashboardService
             'customerAnalytics' => $customerAnalytics,
             'supplierAnalytics' => $supplierAnalytics,
             'recentTransactions' => $recentTransactions,
-            'topSellingProducts' => collect(), // Temporarily empty
+            'topSellingProducts' => $this->getTopSellingProducts(),
             'recentSales' => $recentSales,
             'recentPurchases' => $recentPurchases,
-            'lowStockCount' => 0, // Temporarily 0
+            'lowStockCount' => $lowStockProducts->count(),
             'lowStockProducts' => $lowStockProducts,
             'expiringSoonItems' => $expiringSoonItems,
             'totalliability' => $totalLiability,
             'countliability' => $unpaidLiability,
-            'paidDebtMonthly' => 0, // Temporarily 0
+            'paidDebtMonthly' => $this->getPaidDebtMonthly(),
             'countRevenue' => $unpaidRevenue,
             'countSales' => $monthlySales,
-            'liabilitypaymentMonthly' => 0, // Temporarily 0
-            'inCount' => 0, // Temporarily 0
-            'outCount' => 0, // Temporarily 0
+            'liabilitypaymentMonthly' => $this->getLiabilityPaymentsMonthly(),
+            'inCount' => $this->getPurchaseCountByLocation('IN'),
+            'outCount' => $this->getPurchaseCountByLocation('OUT'),
             'inCountUnpaid' => $inCountUnpaid,
             'outCountUnpaid' => $outCountUnpaid,
             'totalRevenue' => $totalRevenue,
-            'avgDueDays' => 0, // Temporarily 0
-            'collectionRate' => 0, // Temporarily 0
+            'avgDueDays' => $this->getAverageDueDays(),
+            'collectionRate' => $this->getCollectionRate(),
             'keyMetrics' => $keyMetrics,
             'financialItems' => $financialItems,
             'invoiceStatusData' => $invoiceStatusData,

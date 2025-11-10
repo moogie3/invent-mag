@@ -76,9 +76,9 @@ class CrmService
         $supplier = Supplier::with(['interactions.user'])->findOrFail($id);
 
         $allPurchases = $supplier->purchases()->with('items.product')->get();
-        $lifetimeValue = $allPurchases->sum('total_amount');
+        $lifetimeValue = $allPurchases->sum('total');
         $totalPurchasesCount = $allPurchases->count();
-        $averageOrderValue = $totalPurchasesCount > 0 ? $lifetimeValue / $totalPurchasesCount : 0;
+        $averagePurchaseValue = $totalPurchasesCount > 0 ? $lifetimeValue / $totalPurchasesCount : 0;
 
         $categoryCounts = [];
         $productQuantities = [];
@@ -122,7 +122,7 @@ class CrmService
             'supplier' => $supplier,
             'lifetimeValue' => $lifetimeValue,
             'totalPurchasesCount' => $totalPurchasesCount,
-            'averageOrderValue' => $averageOrderValue,
+            'averagePurchaseValue' => $averagePurchaseValue,
             'favoriteCategory' => $favoriteCategory,
             'lastPurchaseDate' => $allPurchases->max('order_date'),
             'lastInteractionDate' => $lastInteractionDate,
@@ -149,12 +149,12 @@ class CrmService
                     'due_date' => $purchase->due_date,
                     'payment_method' => $purchase->payment_type,
                     'status' => $purchase->status,
-                    'total_amount' => $purchase->grand_total,
+                    'total' => $purchase->total,
                     'discount_amount' => $purchase->discount_total,
-                    'purchase_items' => $purchase->items->map(function ($item) {
+                    'items' => $purchase->items->map(function ($item) {
                         return [
                             'id' => $item->id,
-                            'product' => $item->product,
+                            'product_name' => $item->product->name,
                             'quantity' => $item->quantity,
                             'price' => $item->price,
                             'total' => $item->total,

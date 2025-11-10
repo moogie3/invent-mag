@@ -50,7 +50,6 @@ class ReportController extends Controller
         if ($request->get('export') === 'excel') {
             return $this->exportTransactions($request, $filters);
         }
-
         return view('admin.reports.recentts', array_merge(compact('transactions', 'summary'), $filters));
     }
 

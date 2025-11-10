@@ -33,10 +33,10 @@
                                             <label class="form-label">{{ __('messages.transaction_type') }}</label>
                                             <select name="type" class="form-select">
                                                 <option value="">{{ __('messages.all_types') }}</option>
-                                                <option value="sale" {{ request('type') == 'sale' ? 'selected' : '' }}>
+                                                <option value="sale" {{ $type == 'sale' ? 'selected' : '' }}>
                                                     {{ __('messages.sales') }}</option>
                                                 <option value="purchase"
-                                                    {{ request('type') == 'purchase' ? 'selected' : '' }}>
+                                                    {{ $type == 'purchase' ? 'selected' : '' }}>
                                                     {{ __('messages.purchasing') }}</option>
                                             </select>
                                         </div>
@@ -44,13 +44,13 @@
                                             <label class="form-label">{{ __('messages.payment_status') }}</label>
                                             <select name="status" class="form-select">
                                                 <option value="">{{ __('messages.all_status') }}</option>
-                                                <option value="Paid" {{ request('status') == 'Paid' ? 'selected' : '' }}>
+                                                <option value="Paid" {{ $status == 'Paid' ? 'selected' : '' }}>
                                                     {{ __('messages.paid') }}</option>
                                                 <option value="Partial"
-                                                    {{ request('status') == 'Partial' ? 'selected' : '' }}>
+                                                    {{ $status == 'Partial' ? 'selected' : '' }}>
                                                     {{ __('messages.partial') }}</option>
                                                 <option value="Unpaid"
-                                                    {{ request('status') == 'Unpaid' ? 'selected' : '' }}>
+                                                    {{ $status == 'Unpaid' ? 'selected' : '' }}>
                                                     {{ __('messages.unpaid') }}</option>
                                             </select>
                                         </div>
@@ -58,41 +58,41 @@
                                             <label class="form-label">{{ __('messages.date_range') }}</label>
                                             <select name="date_range" class="form-select">
                                                 <option value="all"
-                                                    {{ request('date_range') == 'all' ? 'selected' : '' }}>
+                                                    {{ $date_range == 'all' ? 'selected' : '' }}>
                                                     {{ __('messages.all_time') }}</option>
                                                 <option value="today"
-                                                    {{ request('date_range') == 'today' ? 'selected' : '' }}>
+                                                    {{ $date_range == 'today' ? 'selected' : '' }}>
                                                     {{ __('messages.today') }}</option>
                                                 <option value="this_week"
-                                                    {{ request('date_range') == 'this_week' ? 'selected' : '' }}>
+                                                    {{ $date_range == 'this_week' ? 'selected' : '' }}>
                                                     {{ __('messages.this_week') }}
                                                 </option>
                                                 <option value="this_month"
-                                                    {{ request('date_range') == 'this_month' ? 'selected' : '' }}>
+                                                    {{ $date_range == 'this_month' ? 'selected' : '' }}>
                                                     {{ __('messages.this_month') }}
                                                 </option>
                                                 <option value="last_month"
-                                                    {{ request('date_range') == 'last_month' ? 'selected' : '' }}>
+                                                    {{ $date_range == 'last_month' ? 'selected' : '' }}>
                                                     {{ __('messages.last_month') }}
                                                 </option>
                                                 <option value="custom"
-                                                    {{ request('date_range') == 'custom' ? 'selected' : '' }}>
+                                                    {{ $date_range == 'custom' ? 'selected' : '' }}>
                                                     {{ __('messages.custom_range') }}
                                                 </option>
                                             </select>
                                         </div>
                                         <div id="customDateRange" class="mb-3"
-                                            style="display: {{ request('date_range') == 'custom' ? 'block' : 'none' }};">
+                                            style="display: {{ $date_range == 'custom' ? 'block' : 'none' }};">
                                             <div class="row">
                                                 <div class="col">
                                                     <label class="form-label">{{ __('messages.from') }}</label>
                                                     <input type="date" name="start_date" class="form-control"
-                                                        value="{{ request('start_date') }}">
+                                                        value="{{ $start_date }}">
                                                 </div>
                                                 <div class="col">
                                                     <label class="form-label">{{ __('messages.to') }}</label>
                                                     <input type="date" name="end_date" class="form-control"
-                                                        value="{{ request('end_date') }}">
+                                                        value="{{ $end_date }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -252,7 +252,7 @@
                             <div class="input-group input-group-md" style="max-width: 300px;">
                                 <input type="text" class="form-control"
                                     placeholder="{{ __('messages.search_transactions') }}" id="searchInput"
-                                    value="{{ request('search') }}">
+                                    value="{{ $search }}">
                                 <button class="btn btn-outline-secondary" type="button" onclick="searchTransactions()">
                                     <i class="ti ti-search"></i>
                                 </button>
@@ -261,35 +261,35 @@
                     </div>
 
                     <!-- Active Filters Display -->
-                    @if (request()->hasAny(['type', 'status', 'date_range', 'search']))
+                    @if ($type || $status || ($date_range && $date_range != 'all') || $search)
                         <div class="card-body border-bottom py-2">
                             <div class="d-flex align-items-center gap-2 flex-wrap">
                                 <span class="text-muted small">{{ __('messages.active_filters') }}</span>
-                                @if (request('type'))
+                                @if ($type)
                                     <span class="badge bg-primary-lt">
-                                        {{ __('messages.type') }}: {{ ucfirst(request('type')) }}
+                                        {{ __('messages.type') }}: {{ ucfirst($type) }}
                                         <a href="{{ request()->fullUrlWithQuery(['type' => null]) }}"
                                             class="btn-close ms-1" style="font-size: 0.75em;"></a>
                                     </span>
                                 @endif
-                                @if (request('status'))
+                                @if ($status)
                                     <span class="badge bg-info-lt">
-                                        {{ __('messages.status') }}: {{ request('status') }}
+                                        {{ __('messages.status') }}: {{ $status }}
                                         <a href="{{ request()->fullUrlWithQuery(['status' => null]) }}"
                                             class="btn-close ms-1" style="font-size: 0.75em;"></a>
                                     </span>
                                 @endif
-                                @if (request('date_range') && request('date_range') != 'all')
+                                @if ($date_range && $date_range != 'all')
                                     <span class="badge bg-warning-lt">
                                         {{ __('messages.period') }}:
-                                        {{ ucfirst(str_replace('_', ' ', request('date_range'))) }}
+                                        {{ ucfirst(str_replace('_', ' ', $date_range)) }}
                                         <a href="{{ request()->fullUrlWithQuery(['date_range' => null, 'start_date' => null, 'end_date' => null]) }}"
                                             class="btn-close ms-1" style="font-size: 0.75em;"></a>
                                     </span>
                                 @endif
-                                @if (request('search'))
+                                @if ($search)
                                     <span class="badge bg-secondary-lt">
-                                        {{ __('messages.search_label') }} "{{ request('search') }}"
+                                        {{ __('messages.search_label') }} "{{ $search }}"
                                         <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}"
                                             class="btn-close ms-1" style="font-size: 0.75em;"></a>
                                     </span>
@@ -311,38 +311,38 @@
                                         <input class="form-check-input" type="checkbox" id="selectAll">
                                     </th>
                                     <th>
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'type', 'direction' => request('sort') == 'type' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
-                                            class="table-sort {{ request('sort') == 'type' ? 'table-sort-' . request('direction', 'asc') : '' }}">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'type', 'direction' => $sort == 'type' && $direction == 'asc' ? 'desc' : 'asc']) }}"
+                                            class="table-sort {{ $sort == 'type' ? 'table-sort-' . $direction : '' }}">
                                             {{ __('messages.type') }}
                                         </a>
                                     </th>
                                     <th>
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'invoice', 'direction' => request('sort') == 'invoice' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
-                                            class="table-sort {{ request('sort') == 'invoice' ? 'table-sort-' . request('direction', 'asc') : '' }}">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'invoice', 'direction' => $sort == 'invoice' && $direction == 'asc' ? 'desc' : 'asc']) }}"
+                                            class="table-sort {{ $sort == 'invoice' ? 'table-sort-' . $direction : '' }}">
                                             {{ __('messages.invoice') }}
                                         </a>
                                     </th>
                                     <th>
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'customer_supplier', 'direction' => request('sort') == 'customer_supplier' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
-                                            class="table-sort {{ request('sort') == 'customer_supplier' ? 'table-sort-' . request('direction', 'asc') : '' }}">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'customer_supplier', 'direction' => $sort == 'customer_supplier' && $direction == 'asc' ? 'desc' : 'asc']) }}"
+                                            class="table-sort {{ $sort == 'customer_supplier' ? 'table-sort-' . $direction : '' }}">
                                             {{ __('messages.customer_supplier') }}
                                         </a>
                                     </th>
                                     <th>
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'date', 'direction' => request('sort') == 'date' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
-                                            class="table-sort {{ request('sort') == 'date' ? 'table-sort-' . request('direction', 'asc') : '' }}">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'date', 'direction' => $sort == 'date' && $direction == 'asc' ? 'desc' : 'asc']) }}"
+                                            class="table-sort {{ $sort == 'date' ? 'table-sort-' . $direction : '' }}">
                                             {{ __('messages.date') }}
                                         </a>
                                     </th>
                                     <th class="text-end">
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'amount', 'direction' => request('sort') == 'amount' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
-                                            class="table-sort {{ request('sort') == 'amount' ? 'table-sort-' . request('direction', 'asc') : '' }}">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'amount', 'direction' => $sort == 'amount' && $direction == 'asc' ? 'desc' : 'asc']) }}"
+                                            class="table-sort {{ $sort == 'amount' ? 'table-sort-' . $direction : '' }}">
                                             {{ __('messages.amount') }}
                                         </a>
                                     </th>
                                     <th class="text-center">
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => request('sort') == 'status' && request('direction') == 'asc' ? 'desc' : 'asc']) }}"
-                                            class="table-sort {{ request('sort') == 'status' ? 'table-sort-' . request('direction', 'asc') : '' }}">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => $sort == 'status' && $direction == 'asc' ? 'desc' : 'asc']) }}"
+                                            class="table-sort {{ $sort == 'status' ? 'table-sort-' . $direction : '' }}">
                                             {{ __('messages.status') }}
                                         </a>
                                     </th>

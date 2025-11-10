@@ -225,7 +225,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/adjustment-log', [ReportController::class, 'adjustmentLog'])->name('admin.reports.adjustment-log');
             Route::get('/recent-transactions', [ReportController::class, 'recentTransactions'])->name('admin.reports.recent-transactions');
             Route::post('/{id}/mark-paid', [ReportController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');
-            Route::post('/bulk-mark-paid', [ReportController::class, 'bulkMarkAsPaid']);
+            Route::post('/bulk-mark-paid', [ReportController::class, 'bulkMarkAsPaid'])->name('admin.transactions.bulk-mark-paid');
         });
 
         // Notification Routes

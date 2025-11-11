@@ -62,6 +62,26 @@ class SupplierCrmControllerTest extends TestCase
             ]);
     }
 
+    public function test_show_handles_service_level_exception()
+    {
+        // $this->withoutExceptionHandling(); // Temporarily disable exception handling
+
+        $supplier = Supplier::factory()->create();
+        $errorMessage = 'Failed to load SRM data: Service exception.';
+
+        // Mock the CrmService to throw an exception
+        $mockService = \Mockery::mock(\App\Services\CrmService::class);
+        $mockService->shouldReceive('getSupplierCrmData')
+                    ->once()
+                    ->andThrow(new \Exception('Service exception.'));
+        $this->app->instance(\App\Services\CrmService::class, $mockService);
+
+        $response = $this->getJson("/admin/suppliers/{$supplier->id}/srm-details");
+
+        $response->assertStatus(500) // Internal Server Error
+            ->assertJson(['error' => $errorMessage]);
+    }
+
     public function test_it_can_store_a_supplier_interaction()
     {
         $supplier = Supplier::factory()->create();
@@ -82,6 +102,47 @@ class SupplierCrmControllerTest extends TestCase
             'type' => 'Call',
             'notes' => 'Called supplier to discuss new product line.',
         ]);
+    }
+
+    public function test_store_interaction_with_invalid_data_returns_validation_errors()
+    {
+        $supplier = Supplier::factory()->create();
+
+        $invalidInteractionData = [
+            'type' => '', // Required
+            'notes' => '', // Required
+            'interaction_date' => 'not-a-date', // Invalid date
+        ];
+
+        $response = $this->postJson("/admin/suppliers/{$supplier->id}/interactions", $invalidInteractionData);
+
+        $response->assertStatus(422) // Unprocessable Entity for validation errors
+            ->assertJsonValidationErrors(['type', 'notes', 'interaction_date']);
+    }
+
+    public function test_store_interaction_handles_service_level_exception()
+    {
+        // $this->withoutExceptionHandling(); // Temporarily disable exception handling
+
+        $supplier = Supplier::factory()->create();
+        $interactionData = [
+            'type' => 'Call',
+            'notes' => 'Called supplier to follow up on a sale.',
+            'interaction_date' => now()->format('Y-m-d'),
+        ];
+        $errorMessage = 'Service interaction failed.';
+
+        // Mock the CrmService to throw an exception
+        $mockService = \Mockery::mock(\App\Services\CrmService::class);
+        $mockService->shouldReceive('storeSupplierInteraction')
+                    ->once()
+                    ->andThrow(new \Exception($errorMessage));
+        $this->app->instance(\App\Services\CrmService::class, $mockService);
+
+        $response = $this->postJson("/admin/suppliers/{$supplier->id}/interactions", $interactionData);
+
+        $response->assertStatus(500) // Internal Server Error
+            ->assertJson(['message' => $errorMessage]);
     }
 
     public function test_it_can_get_supplier_historical_purchases()
@@ -119,6 +180,26 @@ class SupplierCrmControllerTest extends TestCase
                     ]
                 ],
             ]);
+    }
+
+    public function test_get_historical_purchases_handles_service_level_exception()
+    {
+        // $this->withoutExceptionHandling(); // Temporarily disable exception handling
+
+        $supplier = Supplier::factory()->create();
+        $errorMessage = 'Service historical purchases failed.';
+
+        // Mock the CrmService to throw an exception
+        $mockService = \Mockery::mock(\App\Services\CrmService::class);
+        $mockService->shouldReceive('getSupplierHistoricalPurchases')
+                    ->once()
+                    ->andThrow(new \Exception($errorMessage));
+        $this->app->instance(\App\Services\CrmService::class, $mockService);
+
+        $response = $this->getJson("/admin/suppliers/{$supplier->id}/historical-purchases");
+
+        $response->assertStatus(500) // Internal Server Error
+            ->assertJson(['message' => $errorMessage]);
     }
 
     public function test_it_can_get_supplier_product_history()
@@ -174,5 +255,25 @@ class SupplierCrmControllerTest extends TestCase
                     ],
                 ],
             ]);
+    }
+
+    public function test_get_product_history_handles_service_level_exception()
+    {
+        // $this->withoutExceptionHandling(); // Temporarily disable exception handling
+
+        $supplier = Supplier::factory()->create();
+        $errorMessage = 'Service product history failed.';
+
+        // Mock the CrmService to throw an exception
+        $mockService = \Mockery::mock(\App\Services\CrmService::class);
+        $mockService->shouldReceive('getSupplierProductHistory')
+                    ->once()
+                    ->andThrow(new \Exception($errorMessage));
+        $this->app->instance(\App\Services\CrmService::class, $mockService);
+
+        $response = $this->getJson("/admin/suppliers/{$supplier->id}/product-history");
+
+        $response->assertStatus(500) // Internal Server Error
+            ->assertJson(['message' => $errorMessage]);
     }
 }

@@ -91,7 +91,14 @@ class CustomerController extends Controller
         ]);
 
         $customer = Customer::findOrFail($id);
-        $this->customerService->updateCustomer($customer, $request->all());
+        $result = $this->customerService->updateCustomer($customer, $request->all()); // Get the result
+
+        if (!$result['success']) { // Check for service-level error
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $result['message']], 422);
+            }
+            return back()->with('error', $result['message'])->withInput(); // Redirect with error
+        }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Customer updated successfully.']);
@@ -102,7 +109,11 @@ class CustomerController extends Controller
     public function destroy($id)
     {
         $customer = Customer::findOrFail($id);
-        $this->customerService->deleteCustomer($customer);
+        $result = $this->customerService->deleteCustomer($customer); // Get the result
+
+        if (!$result['success']) { // Check for service-level error
+            return redirect()->route('admin.customer')->with('error', $result['message']);
+        }
 
         return redirect()->route('admin.customer')->with('success', 'Customer deleted');
     }

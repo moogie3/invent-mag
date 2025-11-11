@@ -75,6 +75,47 @@ class CustomerCrmControllerTest extends TestCase
         ]);
     }
 
+    public function test_store_interaction_with_invalid_data_returns_validation_errors()
+    {
+        $customer = Customer::factory()->create();
+
+        $invalidInteractionData = [
+            'type' => '', // Required
+            'notes' => '', // Required
+            'interaction_date' => 'not-a-date', // Invalid date
+        ];
+
+        $response = $this->postJson("/admin/customers/{$customer->id}/interactions", $invalidInteractionData);
+
+        $response->assertStatus(422) // Unprocessable Entity for validation errors
+            ->assertJsonValidationErrors(['type', 'notes', 'interaction_date']);
+    }
+
+    public function test_store_interaction_handles_service_level_exception()
+    {
+        // $this->withoutExceptionHandling(); // Temporarily disable exception handling
+
+        $customer = Customer::factory()->create();
+        $interactionData = [
+            'type' => 'Call',
+            'notes' => 'Called customer to follow up on a sale.',
+            'interaction_date' => now()->format('Y-m-d'),
+        ];
+        $errorMessage = 'Service interaction failed.';
+
+        // Mock the CrmService to throw an exception
+        $mockService = \Mockery::mock(\App\Services\CrmService::class);
+        $mockService->shouldReceive('storeCustomerInteraction')
+                    ->once()
+                    ->andThrow(new \Exception($errorMessage));
+        $this->app->instance(\App\Services\CrmService::class, $mockService);
+
+        $response = $this->postJson("/admin/customers/{$customer->id}/interactions", $interactionData);
+
+        $response->assertStatus(500) // Internal Server Error
+            ->assertJson(['message' => $errorMessage]);
+    }
+
     public function test_it_can_get_customer_product_history()
     {
         $customer = Customer::factory()->create();

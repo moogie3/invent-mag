@@ -67,7 +67,7 @@ class SupplierController extends Controller
             'name' => 'required',
             'address' => 'required',
             'phone_number' => 'required',
-            'location' => 'required',
+            'location' => 'required|in:IN,OUT',
             'payment_terms' => 'required',
             'email' => 'nullable|email',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',

@@ -59,11 +59,24 @@ class SalesPipelineService
 
     public function reorderStages(SalesPipeline $pipeline, array $stages): void
     {
-        foreach ($stages as $stageData) {
-            PipelineStage::where('id', $stageData['id'])
-                ->where('sales_pipeline_id', $pipeline->id)
-                ->update(['position' => $stageData['position']]);
-        }
+        DB::transaction(function () use ($pipeline, $stages) {
+            // Step 1: Temporarily set positions to a non-conflicting value
+            // We'll use a large number to avoid conflicts with existing positions
+            $tempPositionOffset = 1000000; // A sufficiently large offset
+
+            foreach ($stages as $stageData) {
+                PipelineStage::where('id', $stageData['id'])
+                    ->where('sales_pipeline_id', $pipeline->id)
+                    ->update(['position' => $stageData['id'] + $tempPositionOffset]);
+            }
+
+            // Step 2: Update to final positions
+            foreach ($stages as $stageData) {
+                PipelineStage::where('id', $stageData['id'])
+                    ->where('sales_pipeline_id', $pipeline->id)
+                    ->update(['position' => $stageData['position']]);
+            }
+        });
     }
 
     public function createOpportunity(array $data): SalesOpportunity

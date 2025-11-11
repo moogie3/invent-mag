@@ -22,26 +22,33 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $entries = $request->input('entries', 10);
-        $products = $this->productService->getPaginatedProducts($entries);
-        $totalproduct = Product::count();
-        $lowStockCount = Product::lowStockCount();
-        $expiringSoonCount = $this->productService->getExpiringSoonPOItemsCount();
-        $totalcategory = Categories::count();
+        try {
+            $entries = $request->input('entries', 10);
+            $products = $this->productService->getPaginatedProducts($entries);
+            $totalproduct = Product::count();
+            $lowStockCount = Product::lowStockCount();
+            $expiringSoonCount = $this->productService->getExpiringSoonPOItemsCount();
+            $totalcategory = Categories::count();
 
-        $formData = $this->productService->getProductFormData();
+            $formData = $this->productService->getProductFormData();
 
-        $lowStockProducts = Product::getLowStockProducts();
-        $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
+            $lowStockProducts = Product::getLowStockProducts();
+            $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
 
-        return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts') + $formData);
+            return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts') + $formData);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error loading products. Please try again.');
+        }
     }
 
     public function create()
     {
-        $formData = $this->productService->getProductFormData();
-
-        return view('admin.product.product-create', $formData);
+        try {
+            $formData = $this->productService->getProductFormData();
+            return view('admin.product.product-create', $formData);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.product')->with('error', 'Error loading form. Please try again.');
+        }
     }
 
     public function modalView($id)
@@ -92,9 +99,14 @@ class ProductController extends Controller
             'has_expiry' => 'sometimes|boolean',
         ]);
 
-        $this->productService->createProduct($request->all());
-
-        return redirect()->route('admin.product')->with('success', 'Product created');
+        try {
+            $this->productService->createProduct($request->all());
+            return redirect()->route('admin.product')->with('success', 'Product created');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error creating product. Please try again.');
+        }
     }
 
     public function quickCreate(Request $request)
@@ -115,13 +127,21 @@ class ProductController extends Controller
             'has_expiry' => 'nullable|sometimes|boolean',
         ]);
 
-        $product = $this->productService->quickCreateProduct($request->all());
+        try {
+            $product = $this->productService->quickCreateProduct($request->all());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product created successfully',
-            'product' => $product,
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Product created successfully',
+                'product' => $product,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating product. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)
@@ -145,17 +165,26 @@ class ProductController extends Controller
             'has_expiry' => 'sometimes|boolean',
         ]);
 
-        $this->productService->updateProduct($product, $request->all());
-
-        return redirect()->route('admin.product')->with('success', 'Product updated successfully');
+        try {
+            $this->productService->updateProduct($product, $request->all());
+            return redirect()->route('admin.product')->with('success', 'Product updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error updating product. Please try again.');
+        }
     }
 
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
-        $this->productService->deleteProduct($product);
-
-        return redirect()->route('admin.product')->with('success', 'Product deleted');
+        try {
+            $product = Product::findOrFail($id);
+            $this->productService->deleteProduct($product);
+            return redirect()->route('admin.product')->with('success', 'Product deleted');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error deleting product. Please try again.');
+        }
     }
 
     public function getProductMetrics()
@@ -271,23 +300,39 @@ class ProductController extends Controller
 
     public function search(Request $request)
     {
-        $query = trim($request->get('q', ''));
+        try {
+            $query = trim($request->get('q', ''));
 
-        if (empty($query)) {
-            // If the query is empty, return all products
-            $products = Product::all();
-        } else {
-            // Otherwise, perform the search
-            $products = $this->productService->searchProducts($query);
+            if (empty($query)) {
+                // If the query is empty, return all products
+                $products = Product::all();
+            } else {
+                // Otherwise, perform the search
+                $products = $this->productService->searchProducts($query);
+            }
+
+            return response()->json($products);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error searching products.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
         }
-
-        return response()->json($products);
     }
 
     public function getExpiringSoonProducts()
     {
-        $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
-        return response()->json($expiringSoonProducts);
+        try {
+            $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
+            return response()->json($expiringSoonProducts);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching expiring products.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
     }
 
     public function getAdjustmentLog($id)
@@ -310,13 +355,21 @@ class ProductController extends Controller
 
     public function searchByBarcode(Request $request)
     {
-        $request->validate(['barcode' => 'required|string']);
-        $product = $this->productService->searchByBarcode($request->barcode);
+        try {
+            $request->validate(['barcode' => 'required|string']);
+            $product = $this->productService->searchByBarcode($request->barcode);
 
-        if ($product) {
-            return response()->json($product);
+            if ($product) {
+                return response()->json($product);
+            }
+
+            return response()->json(['message' => 'Product not found'], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error searching by barcode.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
         }
-
-        return response()->json(['message' => 'Product not found'], 404);
     }
 }

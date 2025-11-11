@@ -299,4 +299,112 @@ class SalesControllerTest extends TestCase
         $response->assertOk()
                  ->assertJson(['past_price' => 123.45]);
     }
+
+    public function test_get_sales_metrics_returns_json()
+    {
+        $expectedMetrics = [
+            'totalSales' => 10,
+            'totalPaid' => 5,
+            'totalUnpaid' => 5,
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\SalesService::class);
+        $mockService->shouldReceive('getSalesMetrics')
+                    ->once()
+                    ->andReturn($expectedMetrics);
+        $this->app->instance(\App\Services\SalesService::class, $mockService);
+
+        $response = $this->get(route('admin.sales.metrics'));
+
+        $response->assertStatus(200);
+        $response->assertJson($expectedMetrics);
+    }
+
+    public function test_get_expiring_soon_sales_returns_json()
+    {
+        $expectedSales = [
+            ['id' => 1, 'name' => 'Sale 1'],
+            ['id' => 2, 'name' => 'Sale 2'],
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\SalesService::class);
+        $mockService->shouldReceive('getExpiringSales')
+                    ->once()
+                    ->andReturn($expectedSales);
+        $this->app->instance(\App\Services\SalesService::class, $mockService);
+
+        $response = $this->get(route('admin.sales.expiring-soon'));
+
+        $response->assertStatus(200);
+        $response->assertJson($expectedSales);
+    }
+
+    public function test_modal_views_returns_view()
+    {
+        $sale = SalesFactory::new()->create();
+        $mockService = \Mockery::mock(\App\Services\SalesService::class);
+        $mockService->shouldReceive('getSalesForModal')
+                    ->once()
+                    ->with($sale->id)
+                    ->andReturn($sale);
+        $this->app->instance(\App\Services\SalesService::class, $mockService);
+
+        $response = $this->get(route('admin.sales.modal-view', $sale->id));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.layouts.modals.salesmodals-view');
+        $response->assertViewHas('sales', $sale);
+    }
+
+    public function test_modal_views_handles_not_found()
+    {
+        $mockService = \Mockery::mock(\App\Services\SalesService::class);
+        $mockService->shouldReceive('getSalesForModal')
+                    ->once()
+                    ->with(999)
+                    ->andThrow(new \Illuminate\Database\Eloquent\ModelNotFoundException());
+        $this->app->instance(\App\Services\SalesService::class, $mockService);
+
+        $response = $this->get(route('admin.sales.modal-view', 999));
+
+        $response->assertStatus(404);
+    }
+
+    public function test_store_sale_with_invalid_data_returns_validation_errors()
+    {
+        $invalidData = [
+            'invoice' => 'duplicate-invoice', // unique
+            'customer_id' => 999, // not exists
+            'order_date' => 'not-a-date', // invalid date
+            'due_date' => 'not-a-date', // invalid date
+            'products' => 'not-a-json-string', // invalid json
+            'discount_total' => -10, // min:0
+            'discount_total_type' => 'invalid', // in:fixed,percentage
+        ];
+
+        $response = $this->post(route('admin.sales.store'), $invalidData);
+
+        $response->assertSessionHasErrors(['customer_id', 'order_date', 'due_date', 'products', 'discount_total', 'discount_total_type']);
+        $response->assertStatus(302); // Redirect back on validation error
+    }
+
+    public function test_update_sale_with_invalid_data_returns_validation_errors()
+    {
+        $sale = SalesFactory::new()->create();
+
+        $invalidData = [
+            'invoice' => 'duplicate-invoice', // unique
+            'customer_id' => 999, // not exists
+            'order_date' => 'not-a-date', // invalid date
+            'due_date' => 'not-a-date', // invalid date
+            'products' => 'not-a-json-string', // invalid json
+            'discount_total' => -10, // min:0
+            'discount_total_type' => 'invalid', // in:fixed,percentage
+        ];
+
+        $response = $this->put(route('admin.sales.update', $sale->id), $invalidData);
+
+        $response->assertSessionHasErrors(['customer_id', 'order_date', 'due_date', 'products', 'discount_total', 'discount_total_type']);
+        $response->assertStatus(302); // Redirect back on validation error
+    }
 }

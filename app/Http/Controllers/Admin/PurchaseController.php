@@ -103,6 +103,16 @@ class PurchaseController extends Controller
     {
         $purchase = Purchase::findOrFail($id);
 
+        $request->validate([
+            'invoice' => 'required|string|unique:po,invoice,' . $purchase->id,
+            'supplier_id' => 'required|exists:suppliers,id',
+            'order_date' => 'required|date',
+            'due_date' => 'required|date',
+            'products' => 'required|json',
+            'discount_total' => 'nullable|numeric',
+            'discount_total_type' => 'nullable|in:fixed,percentage',
+        ]);
+
         try {
             $this->purchaseService->updatePurchase($purchase, $request->all());
             return redirect()->route('admin.po.view', $purchase->id)->with('success', 'Purchase order updated successfully.');

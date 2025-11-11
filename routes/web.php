@@ -221,6 +221,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::put('/update/{id}', [POSController::class, 'update'])->name('admin.pos.update');
             Route::delete('/destroy/{id}', [POSController::class, 'destroy'])->name('admin.pos.destroy');
             Route::get('/receipt/{id}', [POSController::class, 'receipt'])->name('admin.pos.receipt');
+            Route::get('/print-receipt/{id}', [POSController::class, 'printReceipt'])->name('admin.pos.print-receipt');
         });
 
         // Reports Routes

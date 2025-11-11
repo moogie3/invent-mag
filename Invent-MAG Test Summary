@@ -17,15 +17,13 @@
    13. CustomerControllerTest: Comprehensive Coverage (All public methods now covered, including getMetrics, quickCreate (success, validation, service-level error), getHistoricalPurchases, and service-level error isolation for store, update, and destroy).
    14. CustomerCrmControllerTest: Comprehensive Coverage (All public methods now covered, including show, storeInteraction (success, validation, service-level exception), and getProductHistory).
    15. SupplierControllerTest: Comprehensive Coverage (All public methods now covered, including getMetrics, explicit validation error tests for store/update, and service-level error isolation for store, update, and destroy).
+   16. SupplierCrmControllerTest: Comprehensive Coverage (All public methods now covered, including show, storeInteraction (success, validation, service-level exception), and getProductHistory).
+   17. POSControllerTest: Comprehensive Coverage (All public methods now covered, including index, store, receipt, and print receipt button).
+   18. PurchaseControllerTest: Comprehensive Coverage (All public methods now covered, including getExpiringSoonPurchases, modalView, getPurchaseMetrics, explicit validation error tests for store, update, addPayment, and service-level error isolation).
 
   Non-Comprehensive Tests (Significant Gaps):
 
-   1. POSControllerTest: Good for index, store, receipt (including validation and service-level errors for store). printReceipt is not covered.
-   2. PurchaseControllerTest: Good for basic CRUD and bulk actions. Lacks coverage for getExpiringSoonPurchases, modalView, getPurchaseMetrics, explicit
-      validation error tests for store, update, addPayment, and service-level error isolation.
-   3. SalesControllerTest: Good for basic CRUD and bulk actions. Lacks coverage for getExpiringSoonSales, modalViews, getSalesMetrics, explicit validation
+   1. SalesControllerTest: Good for basic CRUD and bulk actions. Lacks coverage for getExpiringSoonSales, modalViews, getSalesMetrics, explicit validation
       error tests for store, update, addPayment, and service-level error isolation.
-   4. SalesPipelineControllerTest: Partial coverage for basic CRUD. Lacks coverage for many API endpoints, explicit validation error tests for store/update
+   2. SalesPipelineControllerTest: Partial coverage for basic CRUD. Lacks coverage for many API endpoints, explicit validation error tests for store/update
       methods, and service-level error isolation.
-   5. SupplierCrmControllerTest: Good for success paths. Lacks validation error tests for storeInteraction and explicit service-level error/edge case
-      tests.

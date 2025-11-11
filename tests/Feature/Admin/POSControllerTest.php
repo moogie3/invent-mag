@@ -231,4 +231,19 @@ class POSControllerTest extends TestCase
 
         $response->assertRedirect(route('admin.pos.receipt', $sale->id));
     }
+
+    public function test_it_can_display_print_receipt_button()
+    {
+        $sale = SalesFactory::new()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+            'is_pos' => true,
+        ]);
+        SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
+
+        $response = $this->get(route('admin.pos.receipt', $sale->id));
+
+        $response->assertStatus(200);
+        $response->assertSee('Print Receipt');
+    }
 }

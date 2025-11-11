@@ -283,4 +283,201 @@ class PurchaseControllerTest extends TestCase
             ]);
         }
     }
+
+    public function test_get_purchase_metrics_returns_json()
+    {
+        $expectedMetrics = [
+            'totalPurchases' => 10,
+            'totalPaid' => 5,
+            'totalUnpaid' => 5,
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService->shouldReceive('getPurchaseMetrics')
+                    ->once()
+                    ->andReturn($expectedMetrics);
+        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+
+        $response = $this->get(route('admin.po.metrics'));
+
+        $response->assertStatus(200);
+        $response->assertJson($expectedMetrics);
+    }
+
+    public function test_get_expiring_soon_purchases_returns_json()
+    {
+        $expectedPurchases = [
+            ['id' => 1, 'name' => 'Purchase 1'],
+            ['id' => 2, 'name' => 'Purchase 2'],
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService->shouldReceive('getExpiringPurchases')
+                    ->once()
+                    ->andReturn($expectedPurchases);
+        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+
+        $response = $this->get(route('admin.po.expiring-soon'));
+
+        $response->assertStatus(200);
+        $response->assertJson($expectedPurchases);
+    }
+
+    public function test_modal_view_returns_view()
+    {
+        $purchase = PurchaseFactory::new()->create();
+        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService->shouldReceive('getPurchaseForModal')
+                    ->once()
+                    ->with($purchase->id)
+                    ->andReturn($purchase);
+        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+
+        $response = $this->get(route('admin.po.modal-view', $purchase->id));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.layouts.modals.pomodals-view');
+        $response->assertViewHas('pos', $purchase);
+    }
+
+    public function test_modal_view_handles_not_found()
+    {
+        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService->shouldReceive('getPurchaseForModal')
+                    ->once()
+                    ->with(999)
+                    ->andThrow(new \Illuminate\Database\Eloquent\ModelNotFoundException());
+        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+
+        $response = $this->get(route('admin.po.modal-view', 999));
+
+        $response->assertStatus(404);
+    }
+
+    public function test_store_purchase_with_invalid_data_returns_validation_errors()
+    {
+        $invalidData = [
+            'invoice' => '', // required
+            'supplier_id' => 999, // not exists
+            'order_date' => 'not-a-date', // invalid date
+            'due_date' => 'not-a-date', // invalid date
+            'products' => 'not-a-json-string', // invalid json
+        ];
+
+        $response = $this->post(route('admin.po.store'), $invalidData);
+
+        $response->assertSessionHasErrors(['invoice', 'supplier_id', 'order_date', 'due_date', 'products']);
+        $response->assertStatus(302); // Redirect back on validation error
+    }
+
+    public function test_update_purchase_with_invalid_data_returns_validation_errors()
+    {
+        $purchase = PurchaseFactory::new()->create();
+
+        $invalidData = [
+            'invoice' => '', // required
+            'supplier_id' => 999, // not exists
+            'order_date' => 'not-a-date', // invalid date
+            'due_date' => 'not-a-date', // invalid date
+            'products' => 'not-a-json-string', // invalid json
+        ];
+
+        $response = $this->put(route('admin.po.update', $purchase->id), $invalidData);
+
+        $response->assertSessionHasErrors(['invoice', 'supplier_id', 'order_date', 'due_date', 'products']);
+        $response->assertStatus(302); // Redirect back on validation error
+    }
+
+    public function test_add_payment_with_invalid_data_returns_validation_errors()
+    {
+        $purchase = PurchaseFactory::new()->create();
+
+        $invalidData = [
+            'amount' => 'not-a-number', // invalid number
+            'payment_date' => 'not-a-date', // invalid date
+            'payment_method' => '', // required
+        ];
+
+        $response = $this->post(route('admin.po.add-payment', $purchase->id), $invalidData);
+
+        $response->assertSessionHasErrors(['amount', 'payment_date', 'payment_method']);
+        $response->assertStatus(302); // Redirect back on validation error
+    }
+
+    public function test_store_purchase_handles_service_level_exception()
+    {
+        $purchaseData = [
+            'invoice' => 'PO-12345',
+            'supplier_id' => $this->supplier->id,
+            'order_date' => Carbon::now()->format('Y-m-d'),
+            'due_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
+            'products' => json_encode([
+                [
+                    'product_id' => $this->product->id,
+                    'quantity' => 5,
+                    'price' => $this->product->price,
+                    'total' => $this->product->price * 5,
+                    'expiry_date' => Carbon::now()->addDays(30)->format('Y-m-d'),
+                ],
+            ]),
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService->shouldReceive('createPurchase')
+                    ->once()
+                    ->andThrow(new \Exception('Service exception'));
+        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+
+        $response = $this->post(route('admin.po.store'), $purchaseData);
+
+        $response->assertSessionHasErrors(['error']);
+        $response->assertStatus(302);
+    }
+
+    public function test_update_purchase_handles_service_level_exception()
+    {
+        $purchase = PurchaseFactory::new()->create();
+        $updateData = [
+            'invoice' => $purchase->invoice,
+            'supplier_id' => $this->supplier->id,
+            'order_date' => Carbon::now()->format('Y-m-d'),
+            'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
+            'products' => json_encode([
+                [
+                    'product_id' => $this->product->id,
+                    'quantity' => 3,
+                    'price' => $this->product->price,
+                    'total' => $this->product->price * 3,
+                    'expiry_date' => Carbon::now()->addDays(60)->format('Y-m-d'),
+                ],
+            ]),
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService->shouldReceive('updatePurchase')
+                    ->once()
+                    ->andThrow(new \Exception('Service exception'));
+        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+
+        $response = $this->put(route('admin.po.update', $purchase->id), $updateData);
+
+        $response->assertSessionHasErrors(['error']);
+        $response->assertStatus(302);
+    }
+
+    public function test_destroy_purchase_handles_service_level_exception()
+    {
+        $purchase = PurchaseFactory::new()->create();
+
+        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService->shouldReceive('deletePurchase')
+                    ->once()
+                    ->andThrow(new \Exception('Service exception'));
+        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+
+        $response = $this->delete(route('admin.po.destroy', $purchase->id));
+
+        $response->assertSessionHas('error', 'Error deleting purchase order. Please try again.');
+        $response->assertRedirect(route('admin.po'));
+    }
 }

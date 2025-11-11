@@ -103,8 +103,17 @@ class SalesController extends Controller
 
     public function update(Request $request, $id)
     {
-
         $sale = Sales::findOrFail($id);
+
+        $request->validate([
+            'invoice' => 'nullable|string|unique:sales,invoice,' . $sale->id,
+            'customer_id' => 'required|exists:customers,id',
+            'order_date' => 'required|date',
+            'due_date' => 'required|date',
+            'products' => 'required|json',
+            'discount_total' => 'nullable|numeric|min:0',
+            'discount_total_type' => 'nullable|in:fixed,percentage',
+        ]);
 
         try {
             $this->salesService->updateSale($sale, $request->all());

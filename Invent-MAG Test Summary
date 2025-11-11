@@ -502,36 +502,50 @@
 │  > so in summary, which file is not covered and which is covering all  │
 ╰────────────────────────────────────────────────────────────────────────╯
 
-✦ Based on the analysis of controllers in app/Http/Controllers/Admin/ and their corresponding feature tests in tests/Feature/Admin/:
+ased on my analysis of the test files, here is a summary of their coverage:
 
-  Controllers with Comprehensive Test Coverage (or near comprehensive, including validation and error handling):
+  Good Coverage Tests
 
-
-   * DashboardController (tests/Feature/Admin/DashboardControllerTest.php)
-   * ProfileController (tests/Feature/Admin/ProfileControllerTest.php)
-   * ReportController (tests/Feature/Admin/ReportControllerTest.php)
-   * SettingsController (tests/Feature/Admin/SettingsControllerTest.php)
-   * TaxController (tests/Feature/Admin/TaxControllerTest.php)
-   * UnitController (tests/Feature/Admin/UnitControllerTest.php)
-
-  Controllers with Partial Test Coverage (missing tests for validation errors, service-level errors, or specific API endpoints):
+  These tests are comprehensive, covering multiple controller actions, validation, error handling, and both success and failure scenarios.
 
 
-   * CategoryController (tests/Feature/Admin/CategoryControllerTest.php) - This was the one we were about to improve.
-   * CurrencyController (tests/Feature/Admin/CurrencyControllerTest.php)
-   * CustomerController (tests/Feature/Admin/CustomerControllerTest.php)
-   * CustomerCrmController (tests/Feature/Admin/CustomerCrmControllerTest.php)
-   * NotificationController (tests/Feature/Admin/NotificationControllerTest.php)
-   * POSController (tests/Feature/Admin/POSControllerTest.php)
-   * ProductController (tests/Feature/Admin/ProductControllerTest.php)
-   * PurchaseController (tests/Feature/Admin/PurchaseControllerTest.php)
-   * SalesController (tests/Feature/Admin/SalesControllerTest.php)
-   * SalesPipelineController (tests/Feature/Admin/SalesPipelineControllerTest.php)
-   * SupplierController (tests/Feature/Admin/SupplierControllerTest.php)
-   * SupplierCrmController (tests/Feature/Admin/SupplierCrmControllerTest.php)
-   * UserController (tests/Feature/Admin/UserControllerTest.php)
-   * WarehouseController (tests/Feature/Admin/WarehouseControllerTest.php)
+   * `CategoryControllerTest.php` (for `CategoryController`): Excellent coverage of CRUD actions, including validation and service error handling by
+     using mocks.
+   * `CurrencyControllerTest.php` (for `CurrencyController`): Good coverage for its specific purpose, testing the edit/update flow, validation, and
+     service errors.
+   * `DashboardControllerTest.php` (for `DashboardController`): Good coverage, effectively mocking a complex service and testing the main view, AJAX
+     endpoints, and authentication.
+   * `NotificationControllerTest.php` (for `NotificationController`): Comprehensive coverage of all notification-related actions, including various
+     scenarios for viewing a notification.
+   * `ProductControllerTest.php` (for `ProductController`): Very good coverage, testing a wide range of features including all CRUD actions and bulk
+     operations.
+   * `ProfileControllerTest.php` (for `ProfileController`): Excellent coverage, testing updates, validation, AJAX requests, and avatar deletion.
+   * `PurchaseControllerTest.php` (for `PurchaseController`): Good coverage due to the breadth of features tested, including CRUD, payments, and bulk
+     actions.
+   * `ReportControllerTest.php` (for `ReportController`): Good coverage, testing different reports, exports, and bulk actions with proper service
+     mocking.
+   * `SalesControllerTest.php` (for `SalesController`): Good coverage, similar to purchases, it tests a wide array of features including CRUD, payments,
+     and bulk operations.
+   * `SettingsControllerTest.php` (for `SettingsController`): Good coverage of updating and retrieving settings, including validation and specific
+     actions like changing the theme.
+   * `TaxControllerTest.php` (for `TaxController`): Good coverage for its scope, testing index, update, and validation.
+   * `UnitControllerTest.php` (for `UnitController`): Excellent coverage of CRUD actions, including validation and handling of service-level errors.
+
+  Not Good Coverage Tests
+
+  These tests are often limited to "happy path" scenarios and lack comprehensive checks for validation, authorization, or edge cases.
 
 
-  All controllers within the specified scope (app/Http/Controllers/Admin/) have a corresponding test file in tests/Feature/Admin/. There were no
-  controllers found without any test file.
+   * `CustomerControllerTest.php` (for `CustomerController`): Lacks tests for validation and other failure cases.
+   * `CustomerCrmControllerTest.php` (for `CustomerCrmController`): Lacks validation testing and checks for edge cases, like a customer with no sales
+     history.
+   * `POSControllerTest.php` (for `POSController`): Lacks testing for validation (e.g., insufficient stock) and other critical failure scenarios in a
+     transaction.
+   * `SalesPipelineControllerTest.php` (for `SalesPipelineController`): Only tests the "happy path" and is missing all validation and error handling
+     tests.
+   * `SupplierControllerTest.php` (for `SupplierController`): Lacks tests for validation and other failure cases.
+   * `SupplierCrmControllerTest.php` (for `SupplierCrmController`): Lacks validation testing and checks for edge cases, like a supplier with no purchase
+     history.
+   * `UserControllerTest.php` (for `UserController`): Incomplete. It is missing tests for updating and deleting users.
+   * `WarehouseControllerTest.php` (for `WarehouseController`): Lacks tests for validation and failure cases (e.g., deleting a warehouse that contains
+     stock).

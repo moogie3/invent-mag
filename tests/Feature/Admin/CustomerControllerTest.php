@@ -72,6 +72,22 @@ class CustomerControllerTest extends TestCase
         $this->assertNotNull($customer->getRawOriginal('image'));
     }
 
+    public function test_store_customer_with_invalid_data_returns_validation_errors()
+    {
+        $invalidData = [
+            'name' => '', // Required
+            'email' => 'not-an-email', // Invalid email
+            'phone_number' => '', // Required
+            'address' => '', // Required
+            'image' => UploadedFile::fake()->create('document.pdf', 1000, 'application/pdf'), // Invalid file type
+        ];
+
+        $response = $this->post(route('admin.customer.store'), $invalidData);
+
+        $response->assertSessionHasErrors(['name', 'email', 'phone_number', 'address', 'image']);
+        $response->assertStatus(302); // Redirect back on validation error
+    }
+
     public function test_it_can_update_a_customer()
     {
         $customer = Customer::factory()->create();
@@ -96,6 +112,38 @@ class CustomerControllerTest extends TestCase
         ]);
     }
 
+    public function test_update_customer_with_invalid_data_returns_validation_errors()
+    {
+        $customer = Customer::factory()->create();
+        $invalidData = [
+            'name' => '', // Required
+            'email' => 'not-an-email', // Invalid email
+            'phone_number' => '', // Required
+            'address' => '', // Required
+        ];
+
+        $response = $this->put(route('admin.customer.update', $customer->id), $invalidData);
+
+        $response->assertSessionHasErrors(['name', 'email', 'phone_number', 'address']);
+        $response->assertStatus(302);
+    }
+
+    public function test_update_handles_non_existent_customer()
+    {
+        $nonExistentId = 9999;
+        $updateData = [
+            'name' => 'Jane Doe',
+            'email' => 'jane.doe@example.com',
+            'address' => '456 Oak Ave',
+            'phone_number' => '555-5678',
+            'payment_terms' => 'Net 30', // Added to pass validation
+        ];
+
+        $response = $this->put(route('admin.customer.update', $nonExistentId), $updateData);
+
+        $response->assertNotFound();
+    }
+
     public function test_it_can_delete_a_customer()
     {
         $customer = Customer::factory()->create();
@@ -106,5 +154,14 @@ class CustomerControllerTest extends TestCase
         $response->assertSessionHas('success', 'Customer deleted');
 
         $this->assertDatabaseMissing('customers', ['id' => $customer->id]);
+    }
+
+    public function test_delete_handles_non_existent_customer()
+    {
+        $nonExistentId = 9999;
+
+        $response = $this->delete(route('admin.customer.destroy', $nonExistentId));
+
+        $response->assertNotFound();
     }
 }

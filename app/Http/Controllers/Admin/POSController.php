@@ -46,7 +46,7 @@ class POSController extends Controller
 
             $sale = $this->posService->createSale($request->all());
 
-            if ($request->ajax()) {
+            if ($request->wantsJson()) {
                 return response()->json(['success' => true, 'message' => 'Transaction completed successfully.', 'sale_id' => $sale->id]);
             }
 

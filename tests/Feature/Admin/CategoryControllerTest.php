@@ -41,13 +41,14 @@ class CategoryControllerTest extends TestCase
 
     public function test_it_can_display_the_category_index_page()
     {
+        // Use create() instead of make() to have persisted models
         $categories = Categories::factory()->count(3)->create();
         $perPage = 10;
         $currentPage = 1;
         $total = $categories->count();
 
         $paginatedCategories = new LengthAwarePaginator(
-            $categories->forPage($currentPage, $perPage),
+            $categories,
             $total,
             $perPage,
             $currentPage,
@@ -79,18 +80,18 @@ class CategoryControllerTest extends TestCase
             'description' => 'A new category.',
         ];
 
+        // Use a created model for the return value to ensure it has an ID and timestamps
+        $createdCategory = Categories::factory()->create($categoryData);
+
         $this->categoryServiceMock->shouldReceive('createCategory')
             ->once()
             ->with(Mockery::subset($categoryData))
-            ->andReturn(['success' => true, 'category' => Categories::factory()->make($categoryData)]);
+            ->andReturn(['success' => true, 'category' => $createdCategory]);
 
         $response = $this->post(route('admin.setting.category.store'), $categoryData);
 
         $response->assertRedirect(route('admin.setting.category'));
         $response->assertSessionHas('success', 'Category created');
-
-        // We no longer assert database has since the service is mocked
-        // $this->assertDatabaseHas('categories', $categoryData);
     }
 
     public function test_store_category_with_invalid_data_returns_validation_errors()
@@ -146,32 +147,6 @@ class CategoryControllerTest extends TestCase
 
         $response->assertRedirect(route('admin.setting.category'));
         $response->assertSessionHas('success', 'Category updated');
-
-        // We no longer assert database has since the service is mocked
-        // $this->assertDatabaseHas('categories', [
-        //     'id' => $category->id,
-        //     'name' => 'Updated Category Name',
-        // ]);
-    }
-
-    public function test_it_can_delete_a_category()
-    {
-        $category = Categories::factory()->create();
-
-        $this->categoryServiceMock->shouldReceive('deleteCategory')
-            ->once()
-            ->with(Mockery::on(function ($arg) use ($category) {
-                return $arg->id === $category->id;
-            }))
-            ->andReturn(['success' => true]);
-
-        $response = $this->delete(route('admin.setting.category.destroy', $category->id));
-
-        $response->assertRedirect(route('admin.setting.category'));
-        $response->assertSessionHas('success', 'Category deleted');
-
-        // We no longer assert database missing since the service is mocked
-        // $this->assertDatabaseMissing('categories', ['id' => $category->id]);
     }
 
     public function test_update_category_with_invalid_data_returns_validation_errors()
@@ -209,5 +184,28 @@ class CategoryControllerTest extends TestCase
 
         $response->assertSessionHasErrors(['name' => 'Category update failed.']);
         $response->assertStatus(302);
+    }
+
+    public function test_it_can_delete_a_category()
+    {
+        $category = Categories::factory()->create();
+
+        $this->categoryServiceMock->shouldReceive('deleteCategory')
+            ->once()
+            ->with(Mockery::on(function ($arg) use ($category) {
+                return $arg->id === $category->id;
+            }))
+            ->andReturn(['success' => true]);
+
+        $response = $this->delete(route('admin.setting.category.destroy', $category->id));
+
+        $response->assertRedirect(route('admin.setting.category'));
+        $response->assertSessionHas('success', 'Category deleted');
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 }

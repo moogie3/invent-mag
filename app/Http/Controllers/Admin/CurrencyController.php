@@ -36,7 +36,14 @@ class CurrencyController extends Controller
             'locale' => 'required|string|max:10',
         ]);
 
-        $this->currencyService->updateCurrency($request->all());
+        $result = $this->currencyService->updateCurrency($request->all());
+
+        if (!$result['success']) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
+            }
+            return back()->withErrors(['error' => $result['message']])->withInput();
+        }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Currency settings updated successfully.']);

@@ -16,6 +16,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
+use Mockery;
 
 class ProductControllerTest extends TestCase
 {
@@ -268,5 +269,195 @@ class ProductControllerTest extends TestCase
             'product_id' => $product3->id,
             'reason' => $reason,
         ]);
+    }
+
+    /** @test */
+    public function it_can_get_product_data_for_modal_view()
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->getJson(route('admin.product.modal-view', $product->id));
+
+        $response->assertOk();
+        $response->assertJson([
+            'id' => $product->id,
+            'name' => $product->name,
+            'formatted_selling_price' => \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price)
+        ]);
+    }
+
+    /** @test */
+    public function modal_view_returns_404_for_non_existent_product()
+    {
+        $nonExistentId = 9999;
+        $response = $this->getJson(route('admin.product.modal-view', $nonExistentId));
+
+        $response->assertNotFound();
+        $response->assertJson(['error' => 'Product not found']);
+    }
+
+    /** @test */
+    public function it_can_quick_create_a_product()
+    {
+        $category = Categories::factory()->create();
+        $unit = Unit::factory()->create();
+        $supplier = Supplier::factory()->create();
+        $warehouse = Warehouse::factory()->create(); // Create a warehouse
+
+        $productData = [
+            'code' => 'QC001',
+            'name' => 'Quick Create Product',
+            'stock_quantity' => 50,
+            'price' => 5000,
+            'selling_price' => 7500,
+            'category_id' => $category->id,
+            'units_id' => $unit->id,
+            'supplier_id' => $supplier->id,
+            'warehouse_id' => $warehouse->id,
+            'description' => 'Quick create product description', // Add description
+        ];
+
+        $response = $this->postJson(route('admin.product.quickCreate'), $productData);
+
+        $response->assertOk();
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Product created successfully',
+        ]);
+        $response->assertJsonStructure(['product' => ['id', 'name']]);
+
+        $this->assertDatabaseHas('products', [
+            'code' => 'QC001',
+            'name' => 'Quick Create Product',
+        ]);
+    }
+
+    /** @test */
+    public function quick_create_returns_validation_errors_for_invalid_data()
+    {
+        $invalidData = [
+            'code' => '', // required
+            'name' => '', // required
+            'stock_quantity' => 'not-a-number', // integer
+            'price' => 'not-a-number', // numeric
+            'selling_price' => 'not-a-number', // numeric
+            'category_id' => 999, // not exists
+            'units_id' => 999, // not exists
+            'supplier_id' => 999, // not exists
+        ];
+
+        $response = $this->postJson(route('admin.product.quickCreate'), $invalidData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['code', 'name', 'stock_quantity', 'price', 'selling_price', 'category_id', 'units_id', 'supplier_id']);
+    }
+
+    /** @test */
+    public function it_can_adjust_stock_for_a_product()
+    {
+        $product = Product::factory()->create(['stock_quantity' => 100]);
+        $reason = 'Found extra items during stock take';
+
+        $adjustmentData = [
+            'product_id' => $product->id,
+            'adjustment_amount' => 10,
+            'adjustment_type' => 'increase',
+            'reason' => $reason,
+        ];
+
+        $response = $this->postJson(route('admin.product.adjust-stock'), $adjustmentData);
+
+        $response->assertOk();
+        $response->assertJson(['success' => true, 'message' => 'Stock adjusted successfully.']);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock_quantity' => 110,
+        ]);
+
+        $this->assertDatabaseHas('stock_adjustments', [
+            'product_id' => $product->id,
+            'adjustment_type' => 'increase',
+            'adjustment_amount' => 10,
+            'reason' => $reason,
+            'adjusted_by' => $this->user->id,
+        ]);
+    }
+
+    /** @test */
+    public function it_can_decrease_stock_for_a_product()
+    {
+        $product = Product::factory()->create(['stock_quantity' => 100]);
+        $reason = 'Damaged items removed from stock';
+
+        $adjustmentData = [
+            'product_id' => $product->id,
+            'adjustment_amount' => 20,
+            'adjustment_type' => 'decrease',
+            'reason' => $reason,
+        ];
+
+        $response = $this->postJson(route('admin.product.adjust-stock'), $adjustmentData);
+
+        $response->assertOk();
+        $response->assertJson(['success' => true, 'message' => 'Stock adjusted successfully.']);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock_quantity' => 80,
+        ]);
+
+        $this->assertDatabaseHas('stock_adjustments', [
+            'product_id' => $product->id,
+            'adjustment_type' => 'decrease',
+            'adjustment_amount' => 20,
+            'reason' => $reason,
+            'adjusted_by' => $this->user->id,
+        ]);
+    }
+
+    /** @test */
+    public function adjust_stock_handles_service_exception()
+    {
+        $product = Product::factory()->create(['stock_quantity' => 100]);
+        $productServiceMock = Mockery::mock(\App\Services\ProductService::class);
+        $this->app->instance(\App\Services\ProductService::class, $productServiceMock);
+
+        $errorMessage = 'Service failed to adjust stock.';
+        $productServiceMock->shouldReceive('adjustProductStock')
+                           ->andThrow(new \Exception($errorMessage));
+
+        $adjustmentData = [
+            'product_id' => $product->id,
+            'adjustment_amount' => 5,
+            'adjustment_type' => 'increase',
+            'reason' => 'Test exception',
+        ];
+
+        $response = $this->postJson(route('admin.product.adjust-stock'), $adjustmentData);
+
+        $response->assertStatus(500);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'Error adjusting stock: ' . $errorMessage,
+        ]);
+    }
+
+    /** @test */
+    public function adjust_stock_returns_validation_errors_for_invalid_data()
+    {
+        $product = Product::factory()->create();
+
+        $invalidData = [
+            'product_id' => 9999, // Non-existent product
+            'adjustment_amount' => 0, // Less than 1
+            'adjustment_type' => 'invalid_type', // Not in: increase, decrease, correction
+            'reason' => str_repeat('a', 501), // Too long
+        ];
+
+        $response = $this->postJson(route('admin.product.adjust-stock'), $invalidData);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['product_id', 'adjustment_amount', 'adjustment_type', 'reason']);
     }
 }

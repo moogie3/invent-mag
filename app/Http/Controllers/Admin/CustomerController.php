@@ -90,7 +90,7 @@ class CustomerController extends Controller
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
-        $customer = Customer::find($id);
+        $customer = Customer::findOrFail($id);
         $this->customerService->updateCustomer($customer, $request->all());
 
         if ($request->ajax()) {
@@ -101,7 +101,7 @@ class CustomerController extends Controller
 
     public function destroy($id)
     {
-        $customer = Customer::find($id);
+        $customer = Customer::findOrFail($id);
         $this->customerService->deleteCustomer($customer);
 
         return redirect()->route('admin.customer')->with('success', 'Customer deleted');

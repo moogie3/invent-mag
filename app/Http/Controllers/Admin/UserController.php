@@ -43,9 +43,10 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
-    public function show(string $id)
+    public function show(User $user)
     {
-        //
+        $data = $this->userService->getUserEditData($user);
+        return response()->json($data);
     }
 
     public function edit(User $user)

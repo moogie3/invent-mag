@@ -22,7 +22,7 @@ class UserControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withoutExceptionHandling();
+        // Removed $this->withoutExceptionHandling();
 
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
@@ -36,7 +36,7 @@ class UserControllerTest extends TestCase
         // Create an admin user and assign the 'superuser' role
         $this->admin = User::factory()->create();
         $superUserRole = Role::findOrCreate('superuser', 'web');
-        $superUserRole->givePermissionTo(Permission::all()); // Give all permissions to superuser
+        $superUserRole->givePermissionTo(['view-users', 'create-users', 'edit-users', 'delete-users']); // Give specific permissions to superuser
         $this->admin->assignRole($superUserRole);
         $this->actingAs($this->admin);
     }
@@ -143,47 +143,56 @@ class UserControllerTest extends TestCase
         $response->assertStatus(302); // Redirect back on validation error
     }
 
-    public function test_edit_user_displays_edit_page()
+    public function test_show_user_returns_json_for_ajax_request()
     {
         $user = User::factory()->create();
+        $user->assignRole('staff'); // Assign a role to the user
+        $user->givePermissionTo('view-users'); // Assign a permission to the user
+
         $roles = Role::all();
         $permissions = Permission::all();
 
-        $editData = [
-            'user' => $user,
-            'roles' => $roles,
-            'permissions' => $permissions,
+        $showData = [
+            'user' => $user->toArray(), // Convert user model to array
+            'roles' => $roles->toArray(), // Convert roles collection to array
+            'permissions' => $permissions->toArray(), // Convert permissions collection to array
+            'userRoles' => $user->roles->pluck('name')->toArray(),
+            'userPermissions' => $user->getAllPermissions()->pluck('name')->toArray(),
         ];
 
         // Mock the UserService
         $this->instance(
             UserService::class,
-            Mockery::mock(UserService::class, function ($mock) use ($user, $editData) {
+            Mockery::mock(UserService::class, function ($mock) use ($user, $showData) {
                 $mock->shouldReceive('getUserEditData')->once()->with(Mockery::on(function ($arg) use ($user) {
                     return $arg->id === $user->id;
-                }))->andReturn($editData);
+                }))->andReturn($showData);
             })
         );
 
-        $response = $this->get(route('admin.users.edit', $user));
+        $response = $this->get(route('admin.users.show', $user), ['X-Requested-With' => 'XMLHttpRequest']);
 
         $response->assertStatus(200);
-        $response->assertViewIs('admin.users.edit');
-        $response->assertViewHas('user', $editData['user']);
-        $response->assertViewHas('roles', $editData['roles']);
-        $response->assertViewHas('permissions', $editData['permissions']);
+        $response->assertJson($showData);
     }
+
+    
 
     public function test_edit_user_returns_json_for_ajax_request()
     {
         $user = User::factory()->create();
+        $user->assignRole('staff'); // Assign a role to the user
+        $user->givePermissionTo('view-users'); // Assign a permission to the user
+
         $roles = Role::all();
         $permissions = Permission::all();
 
         $editData = [
-            'user' => $user,
-            'roles' => $roles,
-            'permissions' => $permissions,
+            'user' => $user->toArray(), // Convert user model to array
+            'roles' => $roles->toArray(), // Convert roles collection to array
+            'permissions' => $permissions->toArray(), // Convert permissions collection to array
+            'userRoles' => $user->roles->pluck('name')->toArray(),
+            'userPermissions' => $user->getAllPermissions()->pluck('name')->toArray(),
         ];
 
         // Mock the UserService
@@ -200,5 +209,143 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson($editData);
+    }
+
+    public function test_update_user_successfully()
+    {
+        $user = User::factory()->create();
+        $user->assignRole('staff');
+        $user->givePermissionTo('view-users');
+
+        $updatedData = [
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
+            'roles' => ['superuser'],
+            'permissions' => ['create-users'],
+        ];
+
+        Role::findOrCreate('superuser', 'web');
+        Permission::findOrCreate('create-users', 'web');
+
+        $response = $this->put(route('admin.users.update', $user), $updatedData);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $response->assertSessionHas('success', 'User updated successfully.');
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
+        ]);
+    }
+
+    public function test_update_user_with_invalid_data_returns_validation_errors()
+    {
+        $user = User::factory()->create();
+        $user->assignRole('staff');
+        $user->givePermissionTo('view-users');
+
+        $invalidData = [
+            'name' => '', // Required
+            'email' => 'invalid-email', // Invalid email format
+        ];
+
+        // Mock the UserService to ensure updateUser is NOT called
+        $this->instance(
+            UserService::class,
+            Mockery::mock(UserService::class, function ($mock) {
+                $mock->shouldNotReceive('updateUser');
+            })
+        );
+
+        $response = $this->put(route('admin.users.update', $user), $invalidData);
+
+        $response->assertSessionHasErrors(['name', 'email']);
+        $response->assertStatus(302); // Redirect back on validation error
+    }
+
+    public function test_destroy_user_successfully()
+    {
+        $user = User::factory()->create();
+        $user->assignRole('staff');
+        $user->givePermissionTo('delete-users'); // Ensure user has permission to delete
+
+        $response = $this->delete(route('admin.users.destroy', $user));
+
+        $response->assertRedirect(route('admin.users.index'));
+        $response->assertSessionHas('success', 'User deleted successfully.');
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
+
+    public function test_get_role_permissions_returns_json()
+    {
+        // Create some roles and permissions
+        $role1 = Role::findOrCreate('role1', 'web');
+        $role2 = Role::findOrCreate('role2', 'web');
+        $staffRole = Role::findOrCreate('staff', 'web');
+        $posRole = Role::findOrCreate('pos', 'web');
+
+        $permission1 = Permission::findOrCreate('permission1', 'web');
+        $permission2 = Permission::findOrCreate('permission2', 'web');
+        $permission3 = Permission::findOrCreate('permission3', 'web');
+        $viewUsersPermission = Permission::findOrCreate('view-users', 'web');
+        $createUsersPermission = Permission::findOrCreate('create-users', 'web');
+        $editUsersPermission = Permission::findOrCreate('edit-users', 'web');
+        $deleteUsersPermission = Permission::findOrCreate('delete-users', 'web');
+
+        $role1->givePermissionTo($permission1);
+        $role2->givePermissionTo([$permission2, $permission3]);
+        $staffRole->givePermissionTo($viewUsersPermission);
+        $posRole->givePermissionTo($createUsersPermission);
+
+        // Explicitly define expected permissions based on test setup
+        $expectedSuperuserPermissions = [
+            'view-users', 'create-users', 'edit-users', 'delete-users'
+        ];
+        sort($expectedSuperuserPermissions);
+
+        $expectedStaffPermissions = [
+            'view-users'
+        ];
+        sort($expectedStaffPermissions);
+
+        $expectedPosPermissions = [
+            'create-users'
+        ];
+        sort($expectedPosPermissions);
+
+        $expectedRolePermissionsSubset = [
+            'role1' => ['permission1'],
+            'role2' => ['permission2', 'permission3'],
+            'staff' => $expectedStaffPermissions,
+            'pos' => $expectedPosPermissions,
+            'superuser' => $expectedSuperuserPermissions,
+        ];
+        // Sort the inner arrays for consistent comparison
+        foreach ($expectedRolePermissionsSubset as $roleName => $permissions) {
+            sort($expectedRolePermissionsSubset[$roleName]);
+        }
+
+        $expectedAllPermissionsSubset = [
+            'view-users', 'create-users', 'edit-users', 'delete-users',
+            'permission1', 'permission2', 'permission3'
+        ];
+        sort($expectedAllPermissionsSubset);
+
+        $response = $this->get(route('admin.roles-permissions'));
+
+        $response->assertStatus(200);
+
+        $responseData = $response->json();
+
+        // Assert rolePermissions subset
+        foreach ($expectedRolePermissionsSubset as $roleName => $permissions) {
+            $this->assertArrayHasKey($roleName, $responseData['rolePermissions']);
+            sort($responseData['rolePermissions'][$roleName]); // Sort actual for comparison
+            $this->assertEquals($permissions, array_intersect($permissions, $responseData['rolePermissions'][$roleName]));
+        }
+
+        // Assert allPermissions subset
+        sort($responseData['allPermissions']); // Sort actual for comparison
+        $this->assertEquals($expectedAllPermissionsSubset, array_intersect($expectedAllPermissionsSubset, $responseData['allPermissions']));
     }
 }

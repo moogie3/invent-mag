@@ -1,37 +1,34 @@
-Controllers with Comprehensive Tests:
+✦ Here's the summary of all test files in tests/Feature/Admin/, categorized by comprehensiveness:
 
+  Comprehensive Tests:
 
-   * CategoryControllerTest: Excellent coverage, including success paths, validation, service-level errors, and proper mocking.
-   * CurrencyControllerTest: Excellent coverage, including success paths, validation, service-level errors, and proper mocking.
-   * DashboardControllerTest: Excellent coverage for its index method, including various scenarios, AJAX requests, authentication, and proper mocking.
-   * NotificationControllerTest: Excellent coverage for all public methods, including success paths, view method scenarios, and proper mocking.
-   * ProfileControllerTest: Excellent coverage, including success paths, validation, service-level errors, AJAX handling, and proper mocking.
-   * ReportControllerTest: Excellent coverage, including success paths, specific error cases, and proper mocking.
-   * SettingsControllerTest: Excellent coverage, including success paths, validation, and default settings handling.
-   * TaxControllerTest: Excellent coverage, including success paths, validation, and proper mocking.
-   * UnitControllerTest: Excellent coverage, including success paths, validation, service-level errors, and proper mocking.
-   * ProductControllerTest: Very good coverage for most methods and validation scenarios. Lacks service mocking for isolated service-level error testing.
+   1. CategoryControllerTest: Excellent coverage (success, validation, service-level errors, mocking).
+   2. CurrencyControllerTest: Excellent coverage (success, validation, service-level errors, mocking).
+   3. DashboardControllerTest: Excellent coverage for index (data retrieval, AJAX, auth, mocking).
+   4. NotificationControllerTest: Excellent coverage for public methods (success, view scenarios, mocking).
+   5. ProfileControllerTest: Excellent coverage (success, validation, service-level errors, AJAX, mocking).
+   6. ReportControllerTest: Excellent coverage (success, specific errors, mocking).
+   7. SettingsControllerTest: Excellent coverage (success, validation, default settings).
+   8. TaxControllerTest: Excellent coverage (success, validation, mocking).
+   9. UnitControllerTest: Excellent coverage (success, validation, service-level errors, mocking).
+   10. ProductControllerTest: Excellent and comprehensive coverage (success, validation, extensive service-level errors, mocking, API endpoints).
+   11. UserControllerTest: Comprehensive Coverage (All public methods now covered: index, store, show, edit (AJAX), update, destroy, getRolePermissions).
+   12. WarehouseControllerTest: Comprehensive Coverage (All public methods now covered, including explicit validation error tests for store/update, and service-level error isolation for store, update, destroy, and unsetMain).
 
-  Controllers with Non-Comprehensive Tests (Significant Gaps):
+  Non-Comprehensive Tests (Significant Gaps):
 
-
-   * CustomerControllerTest: Good for basic CRUD, validation, and non-existent customers. Lacks coverage for getMetrics, quickCreate,
-     getHistoricalPurchases, and service-level error isolation.
-   * CustomerCrmControllerTest: Covers success paths for show, storeInteraction, getProductHistory. Lacks getHistoricalPurchases coverage, validation
-     error tests for storeInteraction, and service-level error/edge case tests.
-   * POSControllerTest: Good for index, store, receipt, including validation and service-level error handling for store. printReceipt is not covered.
-   * PurchaseControllerTest: Good for basic CRUD and bulk actions. Lacks coverage for getExpiringSoonPurchases, modalView, getPurchaseMetrics, explicit
-     validation error tests for store, update, addPayment, and service-level error isolation.
-   * SalesControllerTest: Good for basic CRUD and bulk actions. Lacks coverage for getExpiringSoonSales, modalViews, getSalesMetrics, explicit validation
-     error tests for store, update, addPayment, and service-level error isolation.
-   * SalesPipelineControllerTest: Covers basic CRUD for pipelines, stages, and opportunities. Lacks coverage for many API endpoints (indexPipelines,
-     reorderStages, indexOpportunities, showOpportunity, moveOpportunity, showConvertForm, convertToSalesOrder), explicit validation error tests for
-     store/update methods, and service-level error isolation.
-   * SupplierControllerTest: Covers basic CRUD. Lacks coverage for getMetrics, explicit validation error tests for store/update, and service-level error
-     isolation.
-   * SupplierCrmControllerTest: Good for success paths of all methods. Lacks validation error tests for storeInteraction and explicit service-level
-     error/edge case tests.
-   * UserControllerTest: Covers index, store, edit (including validation for store and AJAX for edit). Lacks coverage for show, update, destroy,
-     getRolePermissions, and comprehensive validation/service-level error handling for update/destroy.
-   * WarehouseControllerTest: Good for basic CRUD and main warehouse management. Lacks explicit validation error tests for store/update, and service-level
-     error isolation.
+   1. CustomerControllerTest: Good for basic CRUD, validation, non-existent customers. Lacks coverage for getMetrics, quickCreate, getHistoricalPurchases,
+      and service-level error isolation.
+   2. CustomerCrmControllerTest: Partial coverage for success paths. Lacks getHistoricalPurchases, validation error tests for storeInteraction, and
+      explicit service-level error/edge case tests.
+   3. POSControllerTest: Good for index, store, receipt (including validation and service-level errors for store). printReceipt is not covered.
+   4. PurchaseControllerTest: Good for basic CRUD and bulk actions. Lacks coverage for getExpiringSoonPurchases, modalView, getPurchaseMetrics, explicit
+      validation error tests for store, update, addPayment, and service-level error isolation.
+   5. SalesControllerTest: Good for basic CRUD and bulk actions. Lacks coverage for getExpiringSoonSales, modalViews, getSalesMetrics, explicit validation
+      error tests for store, update, addPayment, and service-level error isolation.
+   6. SalesPipelineControllerTest: Partial coverage for basic CRUD. Lacks coverage for many API endpoints, explicit validation error tests for store/update
+      methods, and service-level error isolation.
+   7. SupplierControllerTest: Partial coverage for basic CRUD. Lacks coverage for getMetrics, explicit validation error tests for store/update, and
+      service-level error isolation.
+   8. SupplierCrmControllerTest: Good for success paths. Lacks validation error tests for storeInteraction and explicit service-level error/edge case
+      tests.

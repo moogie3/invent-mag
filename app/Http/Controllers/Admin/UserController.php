@@ -38,9 +38,12 @@ class UserController extends Controller
             'permissions' => 'nullable|array',
         ]);
 
-        $this->userService->createUser($request->all());
-
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        try {
+            $this->userService->createUser($request->all());
+            return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error creating user: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function show(User $user)
@@ -70,35 +73,49 @@ class UserController extends Controller
             'permissions' => 'nullable|array',
         ]);
 
-        $this->userService->updateUser($user, $request->all());
+        try {
+            $this->userService->updateUser($user, $request->all());
 
-        if (request()->ajax()) {
-            $user->load('roles', 'permissions');
-            return response()->json([
-                'success' => true,
-                'message' => 'User updated successfully.',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'roles' => $user->getRoleNames(),
-                    'permissions' => $user->getAllPermissions()->pluck('name'),
-                ],
-            ]);
+            if (request()->ajax()) {
+                $user->load('roles', 'permissions');
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User updated successfully.',
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'roles' => $user->getRoleNames(),
+                        'permissions' => $user->getAllPermissions()->pluck('name'),
+                    ],
+                ]);
+            }
+
+            return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        } catch (\Exception $e) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Error updating user: ' . $e->getMessage()], 500);
+            }
+            return back()->with('error', 'Error updating user: ' . $e->getMessage())->withInput();
         }
-
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
-        $this->userService->deleteUser($user);
+        try {
+            $this->userService->deleteUser($user);
 
-        if (request()->ajax()) {
-            return response()->json(['success' => true, 'message' => 'User deleted successfully.']);
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'User deleted successfully.']);
+            }
+
+            return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Error deleting user: ' . $e->getMessage()], 500);
+            }
+            return redirect()->route('admin.users.index')->with('error', 'Error deleting user: ' . $e->getMessage());
         }
-
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
 
     public function getRolePermissions()

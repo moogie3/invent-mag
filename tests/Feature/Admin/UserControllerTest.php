@@ -238,6 +238,27 @@ class UserControllerTest extends TestCase
         ]);
     }
 
+    public function test_update_user_successfully_via_ajax()
+    {
+        $user = User::factory()->create();
+        $updatedData = [
+            'name' => 'Updated AJAX Name',
+            'email' => 'updatedajax@example.com',
+            'roles' => [],
+            'permissions' => [],
+        ];
+
+        $mockService = Mockery::mock(UserService::class);
+        $mockService->shouldReceive('updateUser')->once();
+        $this->app->instance(UserService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('PUT', route('admin.users.update', $user), $updatedData);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'User updated successfully.']);
+    }
+
     public function test_update_user_with_invalid_data_returns_validation_errors()
     {
         $user = User::factory()->create();
@@ -274,6 +295,100 @@ class UserControllerTest extends TestCase
         $response->assertRedirect(route('admin.users.index'));
         $response->assertSessionHas('success', 'User deleted successfully.');
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
+
+    public function test_destroy_user_successfully_via_ajax()
+    {
+        $user = User::factory()->create();
+
+        $mockService = Mockery::mock(UserService::class);
+        $mockService->shouldReceive('deleteUser')->once();
+        $this->app->instance(UserService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('DELETE', route('admin.users.destroy', $user));
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'User deleted successfully.']);
+    }
+
+    public function test_store_handles_service_exception()
+    {
+        $userData = [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ];
+
+        $mockService = Mockery::mock(UserService::class);
+        $mockService->shouldReceive('createUser')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(UserService::class, $mockService);
+
+        $response = $this->post(route('admin.users.store'), $userData);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+    }
+
+    public function test_update_handles_service_exception()
+    {
+        $user = User::factory()->create();
+        $updatedData = ['name' => 'New Name', 'email' => 'new@example.com'];
+
+        $mockService = Mockery::mock(UserService::class);
+        $mockService->shouldReceive('updateUser')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(UserService::class, $mockService);
+
+        $response = $this->put(route('admin.users.update', $user), $updatedData);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+    }
+
+    public function test_update_handles_service_exception_via_ajax()
+    {
+        $user = User::factory()->create();
+        $updatedData = ['name' => 'New Name', 'email' => 'new@example.com'];
+
+        $mockService = Mockery::mock(UserService::class);
+        $mockService->shouldReceive('updateUser')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(UserService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('PUT', route('admin.users.update', $user), $updatedData);
+
+        $response->assertStatus(500)
+            ->assertJson(['success' => false]);
+    }
+
+    public function test_destroy_handles_service_exception()
+    {
+        $user = User::factory()->create();
+
+        $mockService = Mockery::mock(UserService::class);
+        $mockService->shouldReceive('deleteUser')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(UserService::class, $mockService);
+
+        $response = $this->delete(route('admin.users.destroy', $user));
+
+        $response->assertRedirect(route('admin.users.index'));
+        $response->assertSessionHas('error');
+    }
+
+    public function test_destroy_handles_service_exception_via_ajax()
+    {
+        $user = User::factory()->create();
+
+        $mockService = Mockery::mock(UserService::class);
+        $mockService->shouldReceive('deleteUser')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(UserService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('DELETE', route('admin.users.destroy', $user));
+
+        $response->assertStatus(500)
+            ->assertJson(['success' => false]);
     }
 
     public function test_get_role_permissions_returns_json()

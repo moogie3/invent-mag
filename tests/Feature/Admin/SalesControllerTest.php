@@ -407,4 +407,102 @@ class SalesControllerTest extends TestCase
         $response->assertSessionHasErrors(['customer_id', 'order_date', 'due_date', 'products', 'discount_total', 'discount_total_type']);
         $response->assertStatus(302); // Redirect back on validation error
     }
+
+    public function test_store_handles_service_exception()
+    {
+        $salesData = [
+            'invoice' => 'INV-12345',
+            'customer_id' => $this->customer->id,
+            'order_date' => Carbon::now()->format('Y-m-d'),
+            'due_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
+            'products' => json_encode([['product_id' => $this->product->id, 'quantity' => 1, 'customer_price' => 100, 'total' => 100]]),
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\SalesService::class);
+        $mockService->shouldReceive('createSale')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(\App\Services\SalesService::class, $mockService);
+
+        $response = $this->post(route('admin.sales.store'), $salesData);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('error');
+    }
+
+    public function test_update_handles_service_exception()
+    {
+        $sale = SalesFactory::new()->create();
+        $updateData = [
+            'invoice' => $sale->invoice,
+            'customer_id' => $this->customer->id,
+            'order_date' => Carbon::now()->format('Y-m-d'),
+            'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
+            'products' => json_encode([['product_id' => $this->product->id, 'quantity' => 1, 'customer_price' => 100, 'total' => 100]]),
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\SalesService::class);
+        $mockService->shouldReceive('updateSale')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(\App\Services\SalesService::class, $mockService);
+
+        $response = $this->put(route('admin.sales.update', $sale->id), $updateData);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('error');
+    }
+
+    public function test_add_payment_handles_service_exception()
+    {
+        $sale = SalesFactory::new()->create();
+        $paymentData = [
+            'amount' => 50,
+            'payment_date' => Carbon::now()->format('Y-m-d'),
+            'payment_method' => 'cash',
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\SalesService::class);
+        $mockService->shouldReceive('addPayment')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(\App\Services\SalesService::class, $mockService);
+
+        $response = $this->post(route('admin.sales.add-payment', $sale->id), $paymentData);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('error');
+    }
+
+    public function test_bulk_delete_handles_service_exception()
+    {
+        $mockService = \Mockery::mock(\App\Services\SalesService::class);
+        $mockService->shouldReceive('bulkDeleteSales')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(\App\Services\SalesService::class, $mockService);
+
+        $response = $this->postJson(route('sales.bulk-delete'), ['ids' => [1, 2]]);
+
+        $response->assertStatus(500)
+            ->assertJson(['success' => false, 'message' => 'Error deleting sales orders. Please try again.']);
+    }
+
+    public function test_bulk_mark_paid_handles_service_exception()
+    {
+        $mockService = \Mockery::mock(\App\Services\SalesService::class);
+        $mockService->shouldReceive('bulkMarkPaid')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(\App\Services\SalesService::class, $mockService);
+
+        $response = $this->postJson(route('sales.bulk-mark-paid'), ['ids' => [1, 2]]);
+
+        $response->assertStatus(500)
+            ->assertJson(['success' => false, 'message' => 'An error occurred while updating sales orders.']);
+    }
+
+    public function test_destroy_handles_service_exception()
+    {
+        $sale = SalesFactory::new()->create();
+
+        $mockService = \Mockery::mock(\App\Services\SalesService::class);
+        $mockService->shouldReceive('deleteSale')->once()->andThrow(new \Exception('Service Error'));
+        $this->app->instance(\App\Services\SalesService::class, $mockService);
+
+        $response = $this->delete(route('admin.sales.destroy', $sale->id));
+
+        $response->assertRedirect(route('admin.sales'));
+        $response->assertSessionHas('error', 'Error deleting sales order. Please try again.');
+    }
 }

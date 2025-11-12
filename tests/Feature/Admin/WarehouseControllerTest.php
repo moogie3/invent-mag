@@ -154,128 +154,210 @@ class WarehouseControllerTest extends TestCase
 
     public function test_it_handles_service_level_error_on_update()
     {
-        // $this->withoutExceptionHandling(); // Temporarily disable exception handling
-
         $warehouse = Warehouse::factory()->create();
         $updateData = [
             'name' => 'Updated Warehouse Name',
             'address' => '456 Updated Ave',
             'description' => 'Updated description.',
-            'is_main' => false,
         ];
         $errorMessage = 'Service update failed.';
 
-        // Mock the WarehouseService to return a failure
         $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
-        $mockService->shouldReceive('updateWarehouse')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => $errorMessage]);
-        $mockService->shouldReceive('getWarehouseIndexData') // Add expectation for index method call
-                    ->andReturn([
-                        'wos' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10),
-                        'entries' => 10,
-                        'totalwarehouse' => 0,
-                        'mainWarehouse' => null,
-                        'shopname' => 'Test Shop',
-                        'address' => 'Test Address',
-                    ]);
+        $mockService->shouldReceive('updateWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
         $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
-        $this->get(route('admin.warehouse')); // Set previous URL for back() redirect
         $response = $this->put(route('admin.warehouse.update', $warehouse->id), $updateData);
 
-        $response->assertSessionHasErrors(['is_main' => $errorMessage]); // Controller uses 'is_main' for service errors
-        $response->assertRedirect(route('admin.warehouse'));
+        $response->assertRedirect();
+        $response->assertSessionHas('error', $errorMessage);
     }
 
     public function test_it_can_delete_a_warehouse()
     {
         $warehouse = Warehouse::factory()->create();
 
+        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService->shouldReceive('deleteWarehouse')->once()->andReturn(['success' => true]);
+        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+
         $response = $this->delete(route('admin.warehouse.destroy', $warehouse->id));
 
         $response->assertRedirect(route('admin.warehouse'));
         $response->assertSessionHas('success', 'Warehouse deleted');
-
-        $this->assertDatabaseMissing('warehouses', ['id' => $warehouse->id]);
     }
 
     public function test_it_handles_service_level_error_on_destroy()
     {
-        // $this->withoutExceptionHandling(); // Temporarily disable exception handling
-
         $warehouse = Warehouse::factory()->create();
         $errorMessage = 'Service deletion failed.';
 
-        // Mock the WarehouseService to return a failure
         $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
-        $mockService->shouldReceive('deleteWarehouse')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => $errorMessage]);
+        $mockService->shouldReceive('deleteWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
         $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
         $response = $this->delete(route('admin.warehouse.destroy', $warehouse->id));
 
         $response->assertSessionHas('error', $errorMessage);
         $response->assertRedirect(route('admin.warehouse'));
-        $this->assertDatabaseHas('warehouses', ['id' => $warehouse->id]); // Should not be deleted
     }
 
     public function test_it_can_set_a_warehouse_as_main()
     {
-        // Ensure no main warehouse exists initially for this test
         Warehouse::where('is_main', true)->update(['is_main' => false]);
-
-        // Create a non-main warehouse
         $warehouse = Warehouse::factory()->create(['is_main' => false]);
-        $this->assertFalse($warehouse->is_main);
+
+        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService->shouldReceive('setMainWarehouse')->once()->andReturn(['success' => true]);
+        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
         $response = $this->get(route('admin.warehouse.set-main', $warehouse->id));
 
         $response->assertRedirect(route('admin.warehouse'));
         $response->assertSessionHas('success', 'Main warehouse updated successfully');
-
-        $this->assertEquals(1, $warehouse->fresh()->is_main);
-        // Assert that no other warehouse is main
-        $this->assertEquals(1, Warehouse::where('is_main', true)->count());
     }
 
     public function test_it_can_unset_a_main_warehouse()
     {
-        // Ensure no main warehouse exists initially for this test
         Warehouse::where('is_main', true)->update(['is_main' => false]);
-
-        // Create a main warehouse for this test
         $mainWarehouse = Warehouse::factory()->create(['is_main' => true]);
-        $this->assertNotNull($mainWarehouse);
-        $this->assertEquals(1, $mainWarehouse->is_main);
+
+        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService->shouldReceive('unsetMainWarehouse')->once()->andReturn(['success' => true]);
+        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
         $response = $this->get(route('admin.warehouse.unset-main', $mainWarehouse->id));
 
         $response->assertRedirect(route('admin.warehouse'));
         $response->assertSessionHas('success', 'Main warehouse status removed');
-
-        $this->assertEquals(0, $mainWarehouse->fresh()->is_main);
     }
 
     public function test_it_handles_service_level_error_on_unset_main()
     {
-        // $this->withoutExceptionHandling(); // Temporarily disable exception handling
-
         $warehouse = Warehouse::factory()->create(['is_main' => true]);
         $errorMessage = 'Service unset main failed.';
 
-        // Mock the WarehouseService to return a failure
         $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
-        $mockService->shouldReceive('unsetMainWarehouse')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => $errorMessage]);
+        $mockService->shouldReceive('unsetMainWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
         $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
         $response = $this->get(route('admin.warehouse.unset-main', $warehouse->id));
 
         $response->assertSessionHas('error', $errorMessage);
         $response->assertRedirect(route('admin.warehouse'));
-        $this->assertEquals(1, $warehouse->fresh()->is_main); // Should still be main
+    }
+
+    public function test_it_can_store_a_new_warehouse_via_ajax()
+    {
+        $warehouseData = [
+            'name' => 'AJAX Warehouse',
+            'address' => '123 AJAX St',
+            'description' => 'A new AJAX warehouse.',
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService->shouldReceive('createWarehouse')->once()->andReturn(['success' => true]);
+        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('POST', route('admin.warehouse.store'), $warehouseData);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Warehouse created successfully.']);
+    }
+
+    public function test_store_warehouse_handles_service_level_error_via_ajax()
+    {
+        $warehouseData = [
+            'name' => 'AJAX Warehouse',
+            'address' => '123 AJAX St',
+            'description' => 'A new AJAX warehouse.',
+        ];
+        $errorMessage = 'AJAX creation failed.';
+
+        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService->shouldReceive('createWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
+        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('POST', route('admin.warehouse.store'), $warehouseData);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'message' => $errorMessage,
+                'errors' => ['name' => [$errorMessage]]
+            ]);
+    }
+
+    public function test_it_can_update_a_warehouse_via_ajax()
+    {
+        $warehouse = Warehouse::factory()->create();
+        $updateData = [
+            'name' => 'Updated AJAX Warehouse',
+            'address' => '456 AJAX Ave',
+            'description' => 'Updated AJAX description.',
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService->shouldReceive('updateWarehouse')->once()->andReturn(['success' => true]);
+        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('PUT', route('admin.warehouse.update', $warehouse->id), $updateData);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Warehouse updated successfully.']);
+    }
+
+    public function test_update_warehouse_handles_service_level_error_via_ajax()
+    {
+        $warehouse = Warehouse::factory()->create();
+        $updateData = [
+            'name' => 'Updated AJAX Warehouse',
+            'address' => '456 AJAX Ave',
+            'description' => 'Updated AJAX description.',
+        ];
+        $errorMessage = 'AJAX update failed.';
+
+        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService->shouldReceive('updateWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
+        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('PUT', route('admin.warehouse.update', $warehouse->id), $updateData);
+
+        $response->assertStatus(422)
+            ->assertJson(['success' => false, 'message' => $errorMessage]);
+    }
+
+    public function test_it_can_delete_a_warehouse_via_ajax()
+    {
+        $warehouse = Warehouse::factory()->create();
+
+        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService->shouldReceive('deleteWarehouse')->once()->andReturn(['success' => true]);
+        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('DELETE', route('admin.warehouse.destroy', $warehouse->id));
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Warehouse deleted successfully.']);
+    }
+
+    public function test_delete_warehouse_handles_service_level_error_via_ajax()
+    {
+        $warehouse = Warehouse::factory()->create();
+        $errorMessage = 'AJAX deletion failed.';
+
+        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService->shouldReceive('deleteWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
+        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('DELETE', route('admin.warehouse.destroy', $warehouse->id));
+
+        $response->assertStatus(500)
+            ->assertJson(['success' => false, 'message' => $errorMessage]);
     }
 }

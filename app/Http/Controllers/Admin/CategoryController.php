@@ -68,11 +68,21 @@ class CategoryController extends Controller
         return redirect()->route('admin.setting.category')->with('success', 'Category updated');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $category = Categories::find($id);
-        $this->categoryService->deleteCategory($category);
+        $result = $this->categoryService->deleteCategory($category);
 
+        if (!$result['success']) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $result['message']], 500);
+            }
+            return redirect()->route('admin.setting.category')->with('error', $result['message']);
+        }
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Category deleted successfully.']);
+        }
         return redirect()->route('admin.setting.category')->with('success', 'Category deleted');
     }
 }

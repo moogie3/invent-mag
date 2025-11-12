@@ -203,6 +203,140 @@ class CategoryControllerTest extends TestCase
         $response->assertSessionHas('success', 'Category deleted');
     }
 
+    public function test_it_can_store_a_new_category_via_ajax()
+    {
+        $categoryData = [
+            'name' => 'AJAX Category',
+            'description' => 'An AJAX category.',
+        ];
+
+        $this->categoryServiceMock->shouldReceive('createCategory')
+            ->once()
+            ->with(Mockery::subset($categoryData))
+            ->andReturn(['success' => true]);
+
+        $response = $this->withHeaders([
+            'X-Requested-With' => 'XMLHttpRequest'
+        ])->json('POST', route('admin.setting.category.store'), $categoryData);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Category created successfully.']);
+    }
+
+    public function test_store_category_handles_service_level_error_via_ajax()
+    {
+        $categoryData = [
+            'name' => 'AJAX Category',
+            'description' => 'An AJAX category.',
+        ];
+
+        $this->categoryServiceMock->shouldReceive('createCategory')
+            ->once()
+            ->with(Mockery::subset($categoryData))
+            ->andReturn(['success' => false, 'message' => 'AJAX creation failed.']);
+
+        $response = $this->withHeaders([
+            'X-Requested-With' => 'XMLHttpRequest'
+        ])->json('POST', route('admin.setting.category.store'), $categoryData);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'message' => 'AJAX creation failed.',
+                'errors' => ['name' => ['AJAX creation failed.']]
+            ]);
+    }
+
+    public function test_it_can_update_a_category_via_ajax()
+    {
+        $category = Categories::factory()->create();
+        $updateData = [
+            'name' => 'Updated AJAX Category',
+            'description' => 'Updated AJAX description.',
+        ];
+
+        $this->categoryServiceMock->shouldReceive('updateCategory')
+            ->once()
+            ->andReturn(['success' => true]);
+
+        $response = $this->withHeaders([
+            'X-Requested-With' => 'XMLHttpRequest'
+        ])->json('PUT', route('admin.setting.category.update', $category->id), $updateData);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Category updated successfully.']);
+    }
+
+    public function test_update_category_handles_service_level_error_via_ajax()
+    {
+        $category = Categories::factory()->create();
+        $updateData = [
+            'name' => 'Updated AJAX Category',
+            'description' => 'Updated AJAX description.',
+        ];
+
+        $this->categoryServiceMock->shouldReceive('updateCategory')
+            ->once()
+            ->andReturn(['success' => false, 'message' => 'AJAX update failed.']);
+
+        $response = $this->withHeaders([
+            'X-Requested-With' => 'XMLHttpRequest'
+        ])->json('PUT', route('admin.setting.category.update', $category->id), $updateData);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'message' => 'AJAX update failed.',
+                'errors' => ['name' => ['AJAX update failed.']]
+            ]);
+    }
+
+    public function test_it_can_delete_a_category_via_ajax()
+    {
+        $category = Categories::factory()->create();
+
+        $this->categoryServiceMock->shouldReceive('deleteCategory')
+            ->once()
+            ->andReturn(['success' => true]);
+
+        $response = $this->withHeaders([
+            'X-Requested-With' => 'XMLHttpRequest'
+        ])->json('DELETE', route('admin.setting.category.destroy', $category->id));
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Category deleted successfully.']);
+    }
+
+    public function test_destroy_category_handles_service_level_error()
+    {
+        $category = Categories::factory()->create();
+
+        $this->categoryServiceMock->shouldReceive('deleteCategory')
+            ->once()
+            ->andReturn(['success' => false, 'message' => 'Deletion failed.']);
+
+        // Web request
+        $response = $this->delete(route('admin.setting.category.destroy', $category->id));
+        $response->assertRedirect(route('admin.setting.category'));
+        $response->assertSessionHas('error', 'Deletion failed.');
+    }
+
+    public function test_destroy_category_handles_service_level_error_via_ajax()
+    {
+        $category = Categories::factory()->create();
+
+        $this->categoryServiceMock->shouldReceive('deleteCategory')
+            ->once()
+            ->andReturn(['success' => false, 'message' => 'AJAX deletion failed.']);
+
+        // AJAX request
+        $response = $this->withHeaders([
+            'X-Requested-With' => 'XMLHttpRequest'
+        ])->json('DELETE', route('admin.setting.category.destroy', $category->id));
+        $response->assertStatus(500)
+            ->assertJson(['success' => false, 'message' => 'AJAX deletion failed.']);
+    }
+
     protected function tearDown(): void
     {
         Mockery::close();

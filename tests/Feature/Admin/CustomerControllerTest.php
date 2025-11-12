@@ -353,4 +353,123 @@ class CustomerControllerTest extends TestCase
 
         $response->assertNotFound();
     }
+
+    public function test_it_can_store_a_new_customer_via_ajax()
+    {
+        $customerData = [
+            'name' => 'AJAX Customer',
+            'address' => '123 AJAX St',
+            'phone_number' => '555-9999',
+            'payment_terms' => 'On Receipt',
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService->shouldReceive('createCustomer')->once()->andReturn(['success' => true]);
+        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('POST', route('admin.customer.store'), $customerData);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Customer created successfully.']);
+    }
+
+    public function test_store_customer_handles_service_level_error_via_ajax()
+    {
+        $customerData = [
+            'name' => 'AJAX Customer',
+            'address' => '123 AJAX St',
+            'phone_number' => '555-9999',
+            'payment_terms' => 'On Receipt',
+        ];
+        $errorMessage = 'AJAX creation failed.';
+
+        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService->shouldReceive('createCustomer')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
+        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('POST', route('admin.customer.store'), $customerData);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'message' => $errorMessage,
+                'errors' => ['name' => [$errorMessage]]
+            ]);
+    }
+
+    public function test_it_can_update_a_customer_via_ajax()
+    {
+        $customer = Customer::factory()->create();
+        $updateData = [
+            'name' => 'Updated AJAX Customer',
+            'address' => '456 AJAX Ave',
+            'phone_number' => '555-8888',
+            'payment_terms' => 'Net 15',
+        ];
+
+        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService->shouldReceive('updateCustomer')->once()->andReturn(['success' => true]);
+        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('PUT', route('admin.customer.update', $customer->id), $updateData);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Customer updated successfully.']);
+    }
+
+    public function test_update_customer_handles_service_level_error_via_ajax()
+    {
+        $customer = Customer::factory()->create();
+        $updateData = [
+            'name' => 'Updated AJAX Customer',
+            'address' => '456 AJAX Ave',
+            'phone_number' => '555-8888',
+            'payment_terms' => 'Net 15',
+        ];
+        $errorMessage = 'AJAX update failed.';
+
+        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService->shouldReceive('updateCustomer')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
+        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('PUT', route('admin.customer.update', $customer->id), $updateData);
+
+        $response->assertStatus(422)
+            ->assertJson(['success' => false, 'message' => $errorMessage]);
+    }
+
+    public function test_it_can_delete_a_customer_via_ajax()
+    {
+        $customer = Customer::factory()->create();
+
+        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService->shouldReceive('deleteCustomer')->once()->andReturn(['success' => true]);
+        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('DELETE', route('admin.customer.destroy', $customer->id));
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Customer deleted successfully.']);
+    }
+
+    public function test_delete_customer_handles_service_level_error_via_ajax()
+    {
+        $customer = Customer::factory()->create();
+        $errorMessage = 'AJAX deletion failed.';
+
+        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService->shouldReceive('deleteCustomer')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
+        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('DELETE', route('admin.customer.destroy', $customer->id));
+
+        $response->assertStatus(500)
+            ->assertJson(['success' => false, 'message' => $errorMessage]);
+    }
 }

@@ -106,15 +106,21 @@ class CustomerController extends Controller
         return redirect()->route('admin.customer')->with('success', 'Customer updated');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $customer = Customer::findOrFail($id);
         $result = $this->customerService->deleteCustomer($customer); // Get the result
 
         if (!$result['success']) { // Check for service-level error
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $result['message']], 500);
+            }
             return redirect()->route('admin.customer')->with('error', $result['message']);
         }
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Customer deleted successfully.']);
+        }
         return redirect()->route('admin.customer')->with('success', 'Customer deleted');
     }
 

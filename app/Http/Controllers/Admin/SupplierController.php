@@ -76,20 +76,51 @@ class SupplierController extends Controller
             'image.mimes' => 'The image must be a file of type: jpeg, jpg, png.',
         ]);
 
-        $supplier = Supplier::find($id);
-        $this->supplierService->updateSupplier($supplier, $request->all());
+        try {
+            $supplier = Supplier::findOrFail($id);
+            $result = $this->supplierService->updateSupplier($supplier, $request->all());
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Supplier updated successfully.']);
+            if (!$result['success']) {
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $result['message']], 422);
+                }
+                return back()->with('error', $result['message'])->withInput();
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Supplier updated successfully.']);
+            }
+            return redirect()->route('admin.supplier')->with('success', 'Supplier updated');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'An unexpected error occurred.'], 500);
+            }
+            return back()->with('error', 'An unexpected error occurred.')->withInput();
         }
-        return redirect()->route('admin.supplier')->with('success', 'Supplier updated');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $supplier = Supplier::find($id);
-        $this->supplierService->deleteSupplier($supplier);
+        try {
+            $supplier = Supplier::findOrFail($id);
+            $result = $this->supplierService->deleteSupplier($supplier);
 
-        return redirect()->route('admin.supplier')->with('success', 'Supplier deleted');
+            if (!$result['success']) {
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $result['message']], 500);
+                }
+                return redirect()->route('admin.supplier')->with('error', $result['message']);
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Supplier deleted successfully.']);
+            }
+            return redirect()->route('admin.supplier')->with('success', 'Supplier deleted');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'An unexpected error occurred.'], 500);
+            }
+            return redirect()->route('admin.supplier')->with('error', 'An unexpected error occurred.');
+        }
     }
 }

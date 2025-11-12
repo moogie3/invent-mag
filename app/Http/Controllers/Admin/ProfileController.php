@@ -40,19 +40,28 @@
                 return redirect()->back()->withErrors(['current_password' => $result['message']]);
             }
 
-            
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Profile updated successfully!']);
+            }
 
             return redirect()->route('admin.setting.profile.edit')->with('success', 'Profile updated successfully!');
         }
 
         public function deleteAvatar(Request $request)
         {
-            $this->profileService->deleteAvatar(Auth::user());
+            try {
+                $this->profileService->deleteAvatar(Auth::user());
 
-            if ($request->ajax()) {
-                return response()->json(['success' => true, 'message' => 'Avatar deleted successfully!']);
+                if ($request->ajax()) {
+                    return response()->json(['success' => true, 'message' => 'Avatar deleted successfully!']);
+                }
+
+                return redirect()->back()->with('success', 'Avatar deleted successfully!');
+            } catch (\Exception $e) {
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => 'Failed to delete avatar.'], 500);
+                }
+                return redirect()->back()->with('error', 'Failed to delete avatar.');
             }
-
-            return redirect()->back()->with('success', 'Avatar deleted successfully!');
         }
     }

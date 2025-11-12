@@ -121,6 +121,23 @@ class ProfileControllerTest extends TestCase
         $response->assertJson(['success' => false, 'message' => 'Incorrect password']);
     }
 
+    public function test_update_handles_ajax_request_on_success()
+    {
+        $this->withoutMiddleware();
+        $updateData = ['name' => 'New Name', 'email' => 'new@example.com', 'timezone' => 'UTC'];
+
+        $this->profileServiceMock->shouldReceive('updateUser')
+            ->once()
+            ->andReturn(['success' => true]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->put(route('admin.setting.profile.update'), $updateData);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true, 'message' => 'Profile updated successfully!']);
+    }
+
     
     public function test_delete_avatar_deletes_avatar_successfully()
     {
@@ -149,6 +166,36 @@ class ProfileControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true, 'message' => 'Avatar deleted successfully!']);
+    }
+
+    public function test_delete_avatar_handles_service_exception_for_web_request()
+    {
+        $this->withoutMiddleware();
+        $this->profileServiceMock->shouldReceive('deleteAvatar')
+            ->once()
+            ->with($this->adminUser)
+            ->andThrow(new \Exception('Failed to delete'));
+
+        $response = $this->actingAs($this->adminUser)->delete(route('admin.setting.profile.delete-avatar'));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error', 'Failed to delete avatar.');
+    }
+
+    public function test_delete_avatar_handles_service_exception_for_ajax_request()
+    {
+        $this->withoutMiddleware();
+        $this->profileServiceMock->shouldReceive('deleteAvatar')
+            ->once()
+            ->with($this->adminUser)
+            ->andThrow(new \Exception('Failed to delete'));
+
+        $response = $this->actingAs($this->adminUser)
+            ->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->delete(route('admin.setting.profile.delete-avatar'));
+
+        $response->assertStatus(500);
+        $response->assertJson(['success' => false, 'message' => 'Failed to delete avatar.']);
     }
 
     protected function tearDown(): void

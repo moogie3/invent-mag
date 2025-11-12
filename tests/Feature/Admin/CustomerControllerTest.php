@@ -220,32 +220,7 @@ class CustomerControllerTest extends TestCase
         ]);
     }
 
-    public function test_get_historical_purchases_returns_json()
-    {
-        $customer = Customer::factory()->create();
-        $expectedPurchases = [
-            ['id' => 1, 'date' => '2023-01-01', 'total' => 100.00],
-            ['id' => 2, 'date' => '2023-02-15', 'total' => 250.50],
-        ];
-
-        // Mock the CustomerService
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
-        $mockService->shouldReceive('getHistoricalPurchases')
-                    ->once()
-                    ->with(\Mockery::on(function ($argCustomer) use ($customer) {
-                        return $argCustomer->id === $customer->id;
-                    }))
-                    ->andReturn($expectedPurchases);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
-
-        $response = $this->get(route('admin.customer.historical-purchases', $customer->id));
-
-        $response->assertStatus(200);
-        $response->assertJson([
-            'success' => true,
-            'historical_purchases' => $expectedPurchases,
-        ]);
-    }
+    
 
     public function test_it_can_update_a_customer()
     {

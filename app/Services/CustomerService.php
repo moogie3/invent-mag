@@ -71,54 +71,7 @@ class CustomerService
         return ['success' => true, 'message' => 'Customer deleted successfully.'];
     }
 
-    public function getHistoricalPurchases(Customer $customer)
-    {
-        $sales = Sales::where('customer_id', $customer->id)
-            ->with('salesItems.product')
-            ->orderBy('order_date', 'desc')
-            ->get();
-
-        $historicalPurchases = [];
-        $latestProductPrices = [];
-
-        foreach ($sales as $sale) {
-            foreach ($sale->salesItems as $item) {
-                if ($item->product) {
-                    $productId = $item->product->id;
-                    $purchaseDate = $sale->order_date;
-
-                    $historicalPurchases[] = [
-                        'sale_id' => $sale->id,
-                        'invoice' => $sale->invoice,
-                        'order_date' => $purchaseDate,
-                        'product_id' => $productId,
-                        'product_name' => $item->product->name,
-                        'quantity' => $item->quantity,
-                        'price_at_purchase' => $item->price,
-                        'line_total' => $item->total,
-                    ];
-
-                    if (!isset($latestProductPrices[$productId]) || $purchaseDate > $latestProductPrices[$productId]['date']) {
-                        $latestProductPrices[$productId] = [
-                            'price' => $item->price,
-                            'date' => $purchaseDate,
-                        ];
-                    }
-                }
-            }
-        }
-
-        foreach ($historicalPurchases as &$purchase) {
-            $productId = $purchase['product_id'];
-            if (isset($latestProductPrices[$productId])) {
-                $purchase['customer_latest_price'] = $latestProductPrices[$productId]['price'];
-            } else {
-                $purchase['customer_latest_price'] = $purchase['price_at_purchase'];
-            }
-        }
-
-        return $historicalPurchases;
-    }
+    
 
     private function storeImage($image): string
     {

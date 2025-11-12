@@ -118,13 +118,5 @@ class CustomerController extends Controller
         return redirect()->route('admin.customer')->with('success', 'Customer deleted');
     }
 
-    public function getHistoricalPurchases(Customer $customer)
-    {
-        $historicalPurchases = $this->customerService->getHistoricalPurchases($customer);
-
-        return response()->json([
-            'success' => true,
-            'historical_purchases' => $historicalPurchases,
-        ]);
-    }
+    
 }

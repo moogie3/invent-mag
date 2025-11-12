@@ -82,16 +82,21 @@ class CurrencyHelper
     public static function formatWithPosition($amount)
     {
         $settings = self::getSettings();
+        $isNegative = $amount < 0;
+        $absoluteAmount = abs($amount);
+
         $formatted = number_format(
-            (float) $amount,
+            (float) $absoluteAmount, // Use absolute amount here
             $settings->decimal_places,
             $settings->decimal_separator,
             $settings->thousand_separator
         );
 
-        return $settings->position === 'prefix'
+        $result = $settings->position === 'prefix'
             ? $settings->currency_symbol . ' ' . $formatted
             : $formatted . ' ' . $settings->currency_symbol;
+
+        return $isNegative ? '-' . $result : $result;
     }
 
     public static function formatDate($date)

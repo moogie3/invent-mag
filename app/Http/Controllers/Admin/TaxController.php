@@ -30,8 +30,19 @@ class TaxController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $this->taxService->updateTax($validated);
+        try {
+            $this->taxService->updateTax($validated);
 
-        return redirect()->back()->with('success', 'Tax settings updated successfully!');
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Tax settings updated successfully!']);
+            }
+
+            return redirect()->back()->with('success', 'Tax settings updated successfully!');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Error updating tax settings: ' . $e->getMessage()], 500);
+            }
+            return redirect()->back()->with('error', 'Error updating tax settings: ' . $e->getMessage());
+        }
     }
 }

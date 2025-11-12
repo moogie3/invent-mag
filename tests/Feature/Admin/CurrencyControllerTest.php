@@ -9,6 +9,7 @@ use Database\Seeders\CurrencySeeder;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Mockery;
 use Tests\TestCase;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -18,13 +19,12 @@ class CurrencyControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
-    protected $currencyServiceMock;
+    protected CurrencyService $currencyService;
+    protected array $validData;
 
     protected function setUp(): void
     {
         parent::setUp();
-        config(['auth.defaults.guard' => 'web']);
-
         $this->seed(CurrencySeeder::class);
         $this->seed(PermissionSeeder::class);
         $this->seed(RolePermissionSeeder::class);
@@ -34,40 +34,9 @@ class CurrencyControllerTest extends TestCase
 
         $this->actingAs($this->user);
 
-        // Mock the CurrencyService
-        $this->currencyServiceMock = Mockery::mock(CurrencyService::class);
-        $this->app->instance(CurrencyService::class, $this->currencyServiceMock);
-    }
+        $this->currencyService = $this->app->make(CurrencyService::class);
 
-    public function test_it_can_display_the_currency_edit_page()
-    {
-        $currencySetting = CurrencySetting::factory()->create();
-        $currencyData = [
-            'setting' => $currencySetting,
-            'entries' => 10,
-            'units' => new LengthAwarePaginator(collect([]), 0, 10),
-            'totalunit' => 0,
-            'predefinedCurrencies' => [
-                ['name' => 'United States Dollar', 'code' => 'USD', 'locale' => 'en-US', 'symbol' => '$'],
-            ],
-        ];
-
-        $this->currencyServiceMock->shouldReceive('getCurrencyEditData')
-            ->once()
-            ->andReturn($currencyData);
-
-        $response = $this->get(route('admin.setting.currency.edit'));
-
-        $response->assertStatus(200);
-        $response->assertViewIs('admin.currency.currency-edit');
-        $response->assertViewHas('setting', $currencyData['setting']);
-        $response->assertViewHas('entries', $currencyData['entries']);
-        $response->assertViewHas('predefinedCurrencies', $currencyData['predefinedCurrencies']);
-    }
-
-    public function test_it_can_update_currency_settings()
-    {
-        $updateData = [
+        $this->validData = [
             'currency_symbol' => '$',
             'decimal_separator' => '.',
             'thousand_separator' => ',',
@@ -76,37 +45,88 @@ class CurrencyControllerTest extends TestCase
             'currency_code' => 'USD',
             'locale' => 'en_US',
         ];
+    }
 
-        $this->currencyServiceMock->shouldReceive('updateCurrency')
-            ->once()
-            ->with(Mockery::subset($updateData))
-            ->andReturn(['success' => true]);
+    // Test group for viewing currency settings
+    public function test_admin_can_view_currency_settings_page()
+    {
+        $response = $this->get(route('admin.setting.currency.edit'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.currency.currency-edit');
+        $response->assertViewHasAll(['setting', 'entries', 'predefinedCurrencies']);
+    }
+
+    public function test_unauthorized_user_is_forbidden_from_currency_settings_page()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $response = $this->get(route('admin.setting.currency.edit'));
+        $response->assertStatus(403);
+    }
+
+    // Test group for updating currency settings
+    public function test_admin_can_update_currency_settings()
+    {
+        $initialSetting = CurrencySetting::first();
+        $updateData = [
+            'currency_symbol' => 'Rp',
+            'decimal_separator' => ',',
+            'thousand_separator' => '.',
+            'decimal_places' => 2,
+            'position' => 'prefix',
+            'currency_code' => 'IDR',
+            'locale' => 'id_ID',
+        ];
 
         $response = $this->post(route('admin.setting.currency.update'), $updateData);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('admin.setting.currency.edit'));
         $response->assertSessionHas('success', 'Currency settings updated successfully.');
 
-        // We no longer assert database has since the service is mocked
-        // $this->assertDatabaseHas('currency_settings', $updateData);
+        $this->assertDatabaseHas('currency_settings', array_merge(['id' => $initialSetting->id], $updateData));
     }
 
-    public function test_update_currency_settings_with_invalid_data_returns_validation_errors()
+    public function test_admin_can_update_currency_settings_via_ajax()
+    {
+        $initialSetting = CurrencySetting::first();
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->post(route('admin.setting.currency.update'), $this->validData);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true, 'message' => 'Currency settings updated successfully.']);
+
+        $this->assertDatabaseHas('currency_settings', array_merge(['id' => $initialSetting->id], $this->validData));
+    }
+
+    public function test_unauthorized_user_cannot_update_currency_settings()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $response = $this->post(route('admin.setting.currency.update'), $this->validData);
+
+        $response->assertStatus(403);
+    }
+
+    // Test group for validation
+    public function test_currency_update_fails_with_invalid_data()
     {
         $invalidData = [
-            'currency_symbol' => 'TOOLONG', // Max 5
-            'decimal_separator' => '..', // Max 1
-            'thousand_separator' => '..', // Max 1
-            'decimal_places' => 5, // Max 4
-            'position' => 'invalid', // Not in: prefix,suffix
-            'currency_code' => 'TOOLONG', // Max 3
-            'locale' => 'TOOLONGTOOLONG', // Max 10
+            'currency_symbol' => 'TOOLONG',
+            'decimal_separator' => '..',
+            'thousand_separator' => '..',
+            'decimal_places' => 99,
+            'position' => 'invalid_position',
+            'currency_code' => 'INVALID',
+            'locale' => 'invalid_locale_string_too_long',
         ];
-
-        $this->currencyServiceMock->shouldNotReceive('updateCurrency');
 
         $response = $this->post(route('admin.setting.currency.update'), $invalidData);
 
+        $response->assertStatus(302);
         $response->assertSessionHasErrors([
             'currency_symbol',
             'decimal_separator',
@@ -116,98 +136,44 @@ class CurrencyControllerTest extends TestCase
             'currency_code',
             'locale',
         ]);
-        $response->assertStatus(302); // Redirect back on validation error
     }
 
-    public function test_update_currency_settings_handles_service_level_error()
+    public function test_currency_update_fails_with_invalid_data_via_ajax()
     {
-        $updateData = [
-            'currency_symbol' => '
-            'decimal_separator' => '.',
-            'thousand_separator' => ',',
-            'decimal_places' => 2,
-            'position' => 'prefix',
-            'currency_code' => 'USD',
-            'locale' => 'en_US',
-        ];
-
-        $this->currencyServiceMock->shouldReceive('updateCurrency')
-            ->once()
-            ->with(Mockery::subset($updateData))
-            ->andReturn(['success' => false, 'message' => 'Currency update failed.']);
-
-        $response = $this->post(route('admin.setting.currency.update'), $updateData);
-
-        $response->assertSessionHasErrors(['error' => 'Currency update failed.']); // Assuming generic error key
-        $response->assertStatus(302);
-    }
-
-    public function test_it_can_update_currency_settings_via_ajax()
-    {
-        $updateData = [
-            'currency_symbol' => '
-},
-            'decimal_separator' => ',',
-            'thousand_separator' => '.',
-            'decimal_places' => 2,
-            'position' => 'suffix',
-            'currency_code' => 'EUR',
-            'locale' => 'de_DE',
-        ];
-
-        $this->currencyServiceMock->shouldReceive('updateCurrency')
-            ->once()
-            ->with(Mockery::subset($updateData))
-            ->andReturn(['success' => true]);
+        $invalidData = array_merge($this->validData, ['currency_symbol' => 'TOOLONG']);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
-            ->json('POST', route('admin.setting.currency.update'), $updateData);
+            ->post(route('admin.setting.currency.update'), $invalidData);
 
-        $response->assertStatus(200)
-            ->assertJson(['success' => true, 'message' => 'Currency settings updated successfully.']);
-    }
-},
-            'decimal_separator' => '.',
-            'thousand_separator' => ',',
-            'decimal_places' => 2,
-            'position' => 'prefix',
-            'currency_code' => 'USD',
-            'locale' => 'en_US',
-        ];
-
-        $this->currencyServiceMock->shouldReceive('updateCurrency')
-            ->once()
-            ->with(Mockery::subset($updateData))
-            ->andReturn(['success' => false, 'message' => 'Currency update failed.']);
-
-        $response = $this->post(route('admin.setting.currency.update'), $updateData);
-
-        $response->assertSessionHasErrors(['error' => 'Currency update failed.']); // Assuming generic error key
-        $response->assertStatus(302);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['currency_symbol']);
     }
 
-    public function test_it_can_update_currency_settings_via_ajax()
+    // Test group for service layer robustness using mocks
+    public function test_it_handles_service_exception_on_update()
     {
-        $updateData = [
-            'currency_symbol' => '
-},
-            'decimal_separator' => ',',
-            'thousand_separator' => '.',
-            'decimal_places' => 2,
-            'position' => 'suffix',
-            'currency_code' => 'EUR',
-            'locale' => 'de_DE',
-        ];
+        $currencyServiceMock = Mockery::mock(CurrencyService::class);
+        $this->app->instance(CurrencyService::class, $currencyServiceMock);
 
-        $this->currencyServiceMock->shouldReceive('updateCurrency')
-            ->once()
-            ->with(Mockery::subset($updateData))
-            ->andReturn(['success' => true]);
+        $currencyServiceMock->shouldReceive('updateCurrency')->andThrow(new \Exception('Service error'));
+
+        $response = $this->post(route('admin.setting.currency.update'), $this->validData);
+
+        $response->assertRedirect(route('admin.setting.currency.edit'));
+        $response->assertSessionHas('error');
+    }
+
+    public function test_it_handles_service_exception_on_update_via_ajax()
+    {
+        $currencyServiceMock = Mockery::mock(CurrencyService::class);
+        $this->app->instance(CurrencyService::class, $currencyServiceMock);
+
+        $currencyServiceMock->shouldReceive('updateCurrency')->andThrow(new \Exception('Service error'));
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
-            ->json('POST', route('admin.setting.currency.update'), $updateData);
+            ->post(route('admin.setting.currency.update'), $this->validData);
 
-        $response->assertStatus(200)
-            ->assertJson(['success' => true, 'message' => 'Currency settings updated successfully.']);
+        $response->assertStatus(500);
+        $response->assertJson(['success' => false]);
     }
 }

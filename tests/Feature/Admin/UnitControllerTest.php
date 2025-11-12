@@ -196,4 +196,165 @@ class UnitControllerTest extends TestCase
         $response->assertSessionHasErrors(['name' => 'Update service error']);
         $response->assertStatus(302);
     }
+
+    public function test_it_can_store_a_new_unit_via_ajax()
+    {
+        $unitData = [
+            'name' => 'AJAX Unit',
+            'symbol' => 'AJX',
+        ];
+
+        $this->instance(
+            UnitService::class,
+            Mockery::mock(UnitService::class, function ($mock) use ($unitData) {
+                $mock->shouldReceive('createUnit')->once()->with($unitData)->andReturn(['success' => true]);
+            })
+        );
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('POST', route('admin.setting.unit.store'), $unitData);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Unit created successfully.']);
+    }
+
+    public function test_store_unit_handles_service_level_error_via_ajax()
+    {
+        $unitData = [
+            'name' => 'AJAX Unit',
+            'symbol' => 'AJX',
+        ];
+        $errorMessage = 'AJAX creation failed.';
+
+        $this->instance(
+            UnitService::class,
+            Mockery::mock(UnitService::class, function ($mock) use ($unitData, $errorMessage) {
+                $mock->shouldReceive('createUnit')->once()->with($unitData)->andReturn(['success' => false, 'message' => $errorMessage]);
+            })
+        );
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('POST', route('admin.setting.unit.store'), $unitData);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'message' => $errorMessage,
+                'errors' => ['name' => [$errorMessage]]
+            ]);
+    }
+
+    public function test_it_can_update_a_unit_via_ajax()
+    {
+        $unit = Unit::factory()->create();
+        $updateData = [
+            'name' => 'Updated AJAX Unit',
+            'symbol' => 'UAJ',
+        ];
+
+        $this->instance(
+            UnitService::class,
+            Mockery::mock(UnitService::class, function ($mock) use ($unit, $updateData) {
+                $mock->shouldReceive('updateUnit')->once()->with(Mockery::on(function ($arg) use ($unit) {
+                    return $arg->id === $unit->id;
+                }), $updateData)->andReturn(['success' => true]);
+            })
+        );
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('PUT', route('admin.setting.unit.update', $unit->id), $updateData);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Unit updated successfully.']);
+    }
+
+    public function test_update_unit_handles_service_level_error_via_ajax()
+    {
+        $unit = Unit::factory()->create();
+        $updateData = [
+            'name' => 'Updated AJAX Unit',
+            'symbol' => 'UAJ',
+        ];
+        $errorMessage = 'AJAX update failed.';
+
+        $this->instance(
+            UnitService::class,
+            Mockery::mock(UnitService::class, function ($mock) use ($unit, $updateData, $errorMessage) {
+                $mock->shouldReceive('updateUnit')->once()->with(Mockery::on(function ($arg) use ($unit) {
+                    return $arg->id === $unit->id;
+                }), $updateData)->andReturn(['success' => false, 'message' => $errorMessage]);
+            })
+        );
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('PUT', route('admin.setting.unit.update', $unit->id), $updateData);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'success' => false,
+                'message' => $errorMessage,
+                'errors' => ['name' => [$errorMessage]]
+            ]);
+    }
+
+    public function test_it_can_delete_a_unit_via_ajax()
+    {
+        $unit = Unit::factory()->create();
+
+        $this->instance(
+            UnitService::class,
+            Mockery::mock(UnitService::class, function ($mock) use ($unit) {
+                $mock->shouldReceive('deleteUnit')->once()->with(Mockery::on(function ($arg) use ($unit) {
+                    return $arg->id === $unit->id;
+                }))->andReturn(['success' => true]);
+            })
+        );
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('DELETE', route('admin.setting.unit.destroy', $unit->id));
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Unit deleted successfully.']);
+    }
+
+    public function test_destroy_unit_handles_service_level_error()
+    {
+        $unit = Unit::factory()->create();
+        $errorMessage = 'Deletion failed.';
+
+        $this->instance(
+            UnitService::class,
+            Mockery::mock(UnitService::class, function ($mock) use ($unit, $errorMessage) {
+                $mock->shouldReceive('deleteUnit')->once()->with(Mockery::on(function ($arg) use ($unit) {
+                    return $arg->id === $unit->id;
+                }))->andReturn(['success' => false, 'message' => $errorMessage]);
+            })
+        );
+
+        $response = $this->delete(route('admin.setting.unit.destroy', $unit->id));
+
+        $response->assertRedirect(route('admin.setting.unit'));
+        $response->assertSessionHas('error', $errorMessage);
+    }
+
+    public function test_destroy_unit_handles_service_level_error_via_ajax()
+    {
+        $unit = Unit::factory()->create();
+        $errorMessage = 'AJAX deletion failed.';
+
+        $this->instance(
+            UnitService::class,
+            Mockery::mock(UnitService::class, function ($mock) use ($unit, $errorMessage) {
+                $mock->shouldReceive('deleteUnit')->once()->with(Mockery::on(function ($arg) use ($unit) {
+                    return $arg->id === $unit->id;
+                }))->andReturn(['success' => false, 'message' => $errorMessage]);
+            })
+        );
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('DELETE', route('admin.setting.unit.destroy', $unit->id));
+
+        $response->assertStatus(500)
+            ->assertJson(['success' => false, 'message' => $errorMessage]);
+    }
 }

@@ -95,4 +95,62 @@ class TaxControllerTest extends TestCase
         $response->assertSessionHasErrors(['name', 'rate', 'is_active']);
         $response->assertStatus(302); // Redirect back on validation error
     }
+
+    public function test_update_tax_settings_successfully_via_ajax()
+    {
+        $updatedData = [
+            'name' => 'New Tax AJAX',
+            'rate' => 12.3,
+            'is_active' => false,
+        ];
+
+        $mockService = \Mockery::mock(TaxService::class);
+        $mockService->shouldReceive('updateTax')->once()->with($updatedData);
+        $this->app->instance(TaxService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('POST', route('admin.setting.tax.update'), $updatedData);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true, 'message' => 'Tax settings updated successfully!']);
+    }
+
+    public function test_update_tax_settings_handles_service_exception()
+    {
+        $updatedData = [
+            'name' => 'New Tax',
+            'rate' => 15.5,
+            'is_active' => true,
+        ];
+        $errorMessage = 'Service error during tax update.';
+
+        $mockService = \Mockery::mock(TaxService::class);
+        $mockService->shouldReceive('updateTax')->once()->with($updatedData)->andThrow(new \Exception($errorMessage));
+        $this->app->instance(TaxService::class, $mockService);
+
+        $response = $this->post(route('admin.setting.tax.update'), $updatedData);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error', 'Error updating tax settings: ' . $errorMessage);
+    }
+
+    public function test_update_tax_settings_handles_service_exception_via_ajax()
+    {
+        $updatedData = [
+            'name' => 'New Tax AJAX',
+            'rate' => 12.3,
+            'is_active' => false,
+        ];
+        $errorMessage = 'AJAX service error during tax update.';
+
+        $mockService = \Mockery::mock(TaxService::class);
+        $mockService->shouldReceive('updateTax')->once()->with($updatedData)->andThrow(new \Exception($errorMessage));
+        $this->app->instance(TaxService::class, $mockService);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->json('POST', route('admin.setting.tax.update'), $updatedData);
+
+        $response->assertStatus(500)
+            ->assertJson(['success' => false, 'message' => 'Error updating tax settings: ' . $errorMessage]);
+    }
 }

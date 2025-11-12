@@ -251,7 +251,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
         // Settings Routes
         Route::prefix('settings')->group(function () {
             // Currency Settings
-            Route::prefix('currency')->group(function () {
+            Route::prefix('currency')->middleware(['role:superuser'])->group(function () {
                 Route::get('/', [CurrencyController::class, 'edit'])->name('admin.setting.currency.edit');
                 Route::post('/update', [CurrencyController::class, 'update'])->name('admin.setting.currency.update');
             });

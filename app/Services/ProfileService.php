@@ -45,7 +45,7 @@ class ProfileService
     public function deleteAvatar(User $user)
     {
         if ($user->avatar) {
-            Storage::delete('public/' . $user->avatar);
+            Storage::disk('public')->delete($user->avatar);
             $user->avatar = null;
             $user->save();
         }

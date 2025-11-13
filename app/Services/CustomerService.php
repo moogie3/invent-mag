@@ -26,9 +26,9 @@ class CustomerService
             $data['image'] = $this->storeImage($data['image']);
         }
 
-        Customer::create($data);
+        $customer = Customer::create($data);
 
-        return ['success' => true, 'message' => 'Customer created successfully.'];
+        return ['success' => true, 'message' => 'Customer created successfully.', 'customer' => $customer];
     }
 
     public function quickCreateCustomer(array $data)

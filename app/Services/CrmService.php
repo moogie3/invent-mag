@@ -190,13 +190,13 @@ class CrmService
                         'product_id' => $productId,
                         'product_name' => $item->product->name,
                         'quantity' => $item->quantity,
-                        'price_at_purchase' => $item->price,
+                        'price_at_purchase' => $item->customer_price,
                         'line_total' => $item->total,
                     ];
 
                     if (!isset($latestProductPrices[$productId]) || $purchaseDate > $latestProductPrices[$productId]['date']) {
                         $latestProductPrices[$productId] = [
-                            'price' => $item->price,
+                            'price' => $item->customer_price,
                             'date' => $purchaseDate,
                         ];
                     }

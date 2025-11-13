@@ -46,20 +46,21 @@ class NotificationService
 
     protected function getPurchaseNotifications(Carbon $today): Collection
     {
-        return Purchase::where('due_date', '<=', Carbon::now()->addDays(7))
+        return Purchase::with('payments')->where('due_date', '<=', Carbon::now()->addDays(7))
             ->orderBy('due_date', 'asc')
             ->get()
             ->map(function ($po) use ($today) {
+                $paymentDate = $po->payments->max('payment_date');
                 $daysRemaining = (int) $today->diffInDays($po->due_date, false);
-                $statusInfo = $this->getStatusInfo($po->status, $po->due_date, $po->payment_date);
-                $showNotification = $po->status !== 'Paid' || ($po->payment_date && $today->isSameDay($po->payment_date));
+                $statusInfo = $this->getStatusInfo($po->status, $po->due_date, $paymentDate);
+                $showNotification = $po->status !== 'Paid' || ($paymentDate && $today->isSameDay($paymentDate));
 
                 return [
                     'id' => 'po::' . $po->id,
                     'title' => "Due Purchase: PO #{$po->id}",
                     'description' => "Due on {$po->due_date->format('M d, Y')}",
                     'due_date' => $po->due_date,
-                    'payment_date' => $po->payment_date,
+                    'payment_date' => $paymentDate,
                     'status' => $po->status,
                     'urgency' => $this->getUrgencyLevel($daysRemaining),
                     'days_remaining' => $daysRemaining,
@@ -76,20 +77,21 @@ class NotificationService
 
     protected function getSalesNotifications(Carbon $today): Collection
     {
-        return Sales::where('due_date', '<=', Carbon::now()->addDays(7))
+        return Sales::with('payments')->where('due_date', '<=', Carbon::now()->addDays(7))
             ->orderBy('due_date', 'asc')
             ->get()
             ->map(function ($sale) use ($today) {
+                $paymentDate = $sale->payments->max('payment_date');
                 $daysRemaining = (int) $today->diffInDays($sale->due_date, false);
-                $statusInfo = $this->getStatusInfo($sale->status, $sale->due_date, $sale->payment_date);
-                $showNotification = $sale->status !== 'Paid' || ($sale->payment_date && $today->isSameDay($sale->payment_date));
+                $statusInfo = $this->getStatusInfo($sale->status, $sale->due_date, $paymentDate);
+                $showNotification = $sale->status !== 'Paid' || ($paymentDate && $today->isSameDay($paymentDate));
 
                 return [
                     'id' => 'sale::' . $sale->id,
                     'title' => "Due Invoice: #{$sale->invoice}",
                     'description' => "Due on {$sale->due_date->format('M d, Y')}",
                     'due_date' => $sale->due_date,
-                    'payment_date' => $sale->payment_date,
+                    'payment_date' => $paymentDate,
                     'status' => $sale->status,
                     'urgency' => $this->getUrgencyLevel($daysRemaining),
                     'days_remaining' => $daysRemaining,

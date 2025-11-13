@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\CustomerInteraction;
+use App\Models\SupplierInteraction;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CustomerInteractionFactory extends Factory
+class SupplierInteractionFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = CustomerInteraction::class;
+    protected $model = SupplierInteraction::class;
 
     /**
      * Define the model's default state.
@@ -22,7 +22,7 @@ class CustomerInteractionFactory extends Factory
     public function definition()
     {
         return [
-            'customer_id' => \App\Models\Customer::factory(),
+            'supplier_id' => \App\Models\Supplier::factory(),
             'user_id' => \App\Models\User::factory(),
             'type' => $this->faker->randomElement(['call', 'email', 'meeting', 'note']),
             'notes' => $this->faker->paragraph,

@@ -42,23 +42,26 @@ class DashboardService
         $lowStockProducts = Product::getLowStockProducts();
         $expiringSoonItems = \App\Models\POItem::getExpiringSoonItems();
 
-        $salesData = Sales::selectRaw('
-            DATE_FORMAT(order_date, "%b") as month,
-            MONTH(order_date) as month_num,
+        $monthFormat = DB::connection()->getDriverName() === 'sqlite' ? "strftime('%b', order_date)" : "DATE_FORMAT(order_date, '%b')";
+        $monthNumFormat = DB::connection()->getDriverName() === 'sqlite' ? "strftime('%m', order_date)" : "MONTH(order_date)";
+
+        $salesData = Sales::selectRaw("
+            $monthFormat as month,
+            $monthNumFormat as month_num,
             SUM(total) as total
-        ')
+        ")
             ->whereYear('order_date', now()->year)
-            ->groupBy(DB::raw('MONTH(order_date)'), DB::raw('DATE_FORMAT(order_date, "%b")'))
+            ->groupBy(DB::raw($monthNumFormat), DB::raw($monthFormat))
             ->orderBy('month_num')
             ->get();
 
-        $purchaseData = Purchase::selectRaw('
-            DATE_FORMAT(order_date, "%b") as month,
-            MONTH(order_date) as month_num,
+        $purchaseData = Purchase::selectRaw("
+            $monthFormat as month,
+            $monthNumFormat as month_num,
             SUM(total) as total
-        ')
+        ")
             ->whereYear('order_date', now()->year)
-            ->groupBy(DB::raw('MONTH(order_date)'), DB::raw('DATE_FORMAT(order_date, "%b")'))
+            ->groupBy(DB::raw($monthNumFormat), DB::raw($monthFormat))
             ->orderBy('month_num')
             ->get();
 
@@ -392,13 +395,17 @@ class DashboardService
 
     private function prepareCustomerInsights()
     {
+        $dateDiffRaw = DB::connection()->getDriverName() === 'sqlite'
+            ? 'julianday(payments.payment_date) - julianday(sales.due_date)'
+            : 'DATEDIFF(payments.payment_date, sales.due_date)';
+
         $avgDueDays = Sales::where('sales.status', 'Paid')
             ->whereNotNull('sales.due_date')
             ->join('payments', function ($join) {
                 $join->on('sales.id', '=', 'payments.paymentable_id')
                     ->where('payments.paymentable_type', Sales::class);
             })
-            ->select(DB::raw('AVG(DATEDIFF(payments.payment_date, sales.due_date)) as avg_days'))
+            ->select(DB::raw("AVG($dateDiffRaw) as avg_days"))
             ->value('avg_days') ?? 0;
 
         $totalInvoices = Sales::count();

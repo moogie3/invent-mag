@@ -12,6 +12,8 @@ abstract class TestCase extends BaseTestCase
 {
     use RefreshDatabase;
 
+    protected bool $seedDatabase = true;
+
     /**
      * Creates the application.
      *
@@ -43,7 +45,9 @@ abstract class TestCase extends BaseTestCase
         if (CurrencySetting::count() === 0) {
             CurrencySetting::create((array) CurrencyHelper::getDefaultSettings());
         }
-        $this->seed();
+        if ($this->seedDatabase) {
+            $this->seed();
+        }
     }
 
     protected function tearDown(): void

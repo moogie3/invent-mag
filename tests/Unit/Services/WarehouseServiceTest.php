@@ -134,10 +134,14 @@ class WarehouseServiceTest extends TestCase
 
         $result = $this->warehouseService->setMainWarehouse($newMainWarehouse);
 
-        $this->assertTrue($result['success']);
+        $this->assertEquals(true, $result['success']);
+        // Refresh models to get the latest state from the database
+        $oldMainWarehouse->refresh();
+        $newMainWarehouse->refresh();
+
         // Assert that the database state is correct
-        $this->assertTrue(DB::table('warehouses')->where('id', $newMainWarehouse->id)->value('is_main'));
-        $this->assertFalse(DB::table('warehouses')->where('id', $oldMainWarehouse->id)->value('is_main'));
+        $this->assertEquals(true, $newMainWarehouse->is_main);
+        $this->assertEquals(false, $oldMainWarehouse->is_main);
     }
 
     #[Test]
@@ -146,9 +150,11 @@ class WarehouseServiceTest extends TestCase
         $mainWarehouse = Warehouse::factory()->create(['is_main' => true]);
         $result = $this->warehouseService->unsetMainWarehouse($mainWarehouse);
 
-        $this->assertTrue($result['success']);
+        $this->assertEquals(true, $result['success']);
+        // Refresh model to get the latest state from the database
+        $mainWarehouse->refresh();
         // Assert that the database state is correct
-        $this->assertFalse(DB::table('warehouses')->where('id', $mainWarehouse->id)->value('is_main'));
+        $this->assertEquals(false, $mainWarehouse->is_main);
     }
 
     #[Test]
@@ -157,7 +163,7 @@ class WarehouseServiceTest extends TestCase
         $warehouse = Warehouse::factory()->create(['is_main' => false]);
         $result = $this->warehouseService->unsetMainWarehouse($warehouse);
 
-        $this->assertFalse($result['success']);
+        $this->assertEquals(false, $result['success']);
         $this->assertEquals('This is not the main warehouse.', $result['message']);
     }
 }

@@ -12,7 +12,7 @@ abstract class TestCase extends BaseTestCase
 {
     use RefreshDatabase;
 
-    protected bool $seedDatabase = true;
+    protected bool $seedDatabase = false;
 
     /**
      * Creates the application.
@@ -41,10 +41,6 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Ensure a default currency setting exists for tests
-        if (CurrencySetting::count() === 0) {
-            CurrencySetting::create((array) CurrencyHelper::getDefaultSettings());
-        }
         if ($this->seedDatabase) {
             $this->seed();
         }

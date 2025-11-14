@@ -19,15 +19,14 @@ class POItemFactory extends Factory
      */
     public function definition(): array
     {
-        $product = Product::factory()->create();
         $quantity = $this->faker->numberBetween(1, 100);
-        $price = $product->price;
+        $price = $this->faker->randomFloat(2, 10, 200);
         $total = $quantity * $price;
         $expiryDate = $this->faker->boolean(70) ? $this->faker->dateTimeBetween('now', '+1 year')->format('Y-m-d H:i:s') : null;
 
         return [
             'po_id' => Purchase::factory(),
-            'product_id' => $product->id,
+            'product_id' => Product::factory(),
             'quantity' => $quantity,
             'price' => $price,
             'discount' => $this->faker->randomFloat(2, 0, 10),
@@ -36,5 +35,14 @@ class POItemFactory extends Factory
             'expiry_date' => $expiryDate,
             'remaining_quantity' => $quantity,
         ];
+    }
+
+    public function forPurchase(Purchase $purchase)
+    {
+        return $this->state(function (array $attributes) use ($purchase) {
+            return [
+                'po_id' => $purchase->id,
+            ];
+        });
     }
 }

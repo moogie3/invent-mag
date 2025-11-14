@@ -37,4 +37,13 @@ class PurchaseFactory extends Factory
     {
         return $this->has(POItemFactory::new()->count($count), 'items');
     }
+
+    public function forSupplier(Supplier $supplier)
+    {
+        return $this->state(function (array $attributes) use ($supplier) {
+            return [
+                'supplier_id' => $supplier->id,
+            ];
+        });
+    }
 }

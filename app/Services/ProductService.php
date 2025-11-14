@@ -45,7 +45,7 @@ class ProductService
         if (isset($data['image'])) {
             $image = $data['image'];
             $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/image', $imageName);
+            $image->storeAs('image', $imageName, 'public');
             $data['image'] = $imageName;
         }
 
@@ -76,15 +76,14 @@ class ProductService
         }
 
         if (isset($data['image'])) {
-            $oldImagePath = 'public/image/' . basename($product->image);
-
-            if (!empty($product->image) && Storage::exists($oldImagePath)) {
-                Storage::delete($oldImagePath);
+            $oldImageName = $product->getRawOriginal('image');
+            if (!empty($oldImageName)) {
+                Storage::disk('public')->delete('image/' . $oldImageName);
             }
 
             $image = $data['image'];
             $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/image', $imageName);
+            $image->storeAs('image', $imageName, 'public');
             $data['image'] = $imageName;
         }
 
@@ -95,8 +94,9 @@ class ProductService
 
     public function deleteProduct(Product $product)
     {
-        if (!empty($product->image)) {
-            Storage::delete('public/image/' . basename($product->image));
+        $imageName = $product->getRawOriginal('image');
+        if (!empty($imageName)) {
+            Storage::disk('public')->delete('image/' . $imageName);
         }
 
         $product->delete();
@@ -115,11 +115,12 @@ class ProductService
             }
 
             foreach ($products as $product) {
-                if (!empty($product->image)) {
-                    $imagePath = 'public/image/' . basename($product->image);
+                $imageName = $product->getRawOriginal('image');
+                if (!empty($imageName)) {
+                    $imagePath = 'image/' . $imageName;
 
-                    if (Storage::exists($imagePath)) {
-                        Storage::delete($imagePath);
+                    if (Storage::disk('public')->exists($imagePath)) {
+                        Storage::disk('public')->delete($imagePath);
                         $imagesDeleted++;
                     }
                 }

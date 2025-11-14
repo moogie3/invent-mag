@@ -208,4 +208,61 @@ class DashboardServiceTest extends TestCase
         $this->assertEquals(Carbon::now()->startOfMonth(), $dates['start']);
         $this->assertEquals(Carbon::now()->endOfMonth(), $dates['end']);
     }
+
+    #[Test]
+    public function it_can_get_chart_data_for_sales()
+    {
+        // 1. Setup data
+        Sales::factory()->create(['order_date' => now()->subDays(5), 'total' => 100]);
+        Sales::factory()->create(['order_date' => now()->subDays(2), 'total' => 200]);
+        Sales::factory()->create(['order_date' => now()->subDays(2), 'total' => 50]);
+
+        // 2. Call the service method for a 7-day period
+        $chartData = $this->dashboardService->getChartData('7days', 'sales');
+
+        // 3. Assertions
+        $this->assertArrayHasKey('labels', $chartData);
+        $this->assertArrayHasKey('data', $chartData);
+        $this->assertArrayHasKey('formatted', $chartData);
+
+        // Expected data based on setup
+        $expectedLabels = [
+            now()->subDays(5)->toDateString(),
+            now()->subDays(2)->toDateString(),
+        ];
+        $expectedData = [100, 250]; // 200 + 50 on the same day
+        $expectedFormattedData = ['100', '250'];
+
+        $this->assertEquals($expectedLabels, $chartData['labels']);
+        $this->assertEquals($expectedData, $chartData['data']);
+        $this->assertEquals($expectedFormattedData, $chartData['formatted']);
+    }
+
+    #[Test]
+    public function it_can_get_chart_data_for_purchases()
+    {
+        // 1. Setup data
+        Purchase::factory()->create(['order_date' => now()->subDays(10), 'total' => 150]);
+        Purchase::factory()->create(['order_date' => now()->subDays(1), 'total' => 300]);
+
+        // 2. Call the service method for a 30-day period
+        $chartData = $this->dashboardService->getChartData('30days', 'purchases');
+
+        // 3. Assertions
+        $this->assertArrayHasKey('labels', $chartData);
+        $this->assertArrayHasKey('data', $chartData);
+        $this->assertArrayHasKey('formatted', $chartData);
+
+        // Expected data based on setup
+        $expectedLabels = [
+            now()->subDays(10)->toDateString(),
+            now()->subDays(1)->toDateString(),
+        ];
+        $expectedData = [150, 300];
+        $expectedFormattedData = ['150', '300'];
+
+        $this->assertEquals($expectedLabels, $chartData['labels']);
+        $this->assertEquals($expectedData, $chartData['data']);
+        $this->assertEquals($expectedFormattedData, $chartData['formatted']);
+    }
 }

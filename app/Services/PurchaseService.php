@@ -21,6 +21,9 @@ class PurchaseService
 
         if (isset($filters['month']) && $filters['month']) {
             $query->whereMonth('order_date', $filters['month']);
+            if (!isset($filters['year'])) { // If year is not specified, default to current year
+                $query->whereYear('order_date', Carbon::now()->year);
+            }
         }
 
         if (isset($filters['year']) && $filters['year']) {
@@ -58,11 +61,11 @@ class PurchaseService
                 }
             }
 
-            if ($p->created_at->isCurrentMonth()) {
+            if ($p->order_date->isCurrentMonth()) {
                 $totalMonthly += $p->total_amount;
             }
 
-            if ($p->status === 'Paid' && $p->updated_at->isCurrentMonth()) {
+            if ($p->status === 'Paid' && $p->order_date->isCurrentMonth()) {
                 $paymentMonthly += $p->total_amount;
             }
         }
@@ -345,7 +348,7 @@ class PurchaseService
             ->where('status', 'Unpaid')
             ->sum('total');
 
-        $totalMonthly = Purchase::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
+        $totalMonthly = Purchase::whereMonth('order_date', now()->month)->whereYear('order_date', now()->year)->sum('total');
         $paymentMonthly = Purchase::whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->where('status', 'Paid')->sum('total');
 
         return [

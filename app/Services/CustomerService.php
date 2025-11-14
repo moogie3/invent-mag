@@ -49,21 +49,23 @@ class CustomerService
     public function updateCustomer(Customer $customer, array $data)
     {
         if (isset($data['image'])) {
-            if ($customer->image) {
-                Storage::delete('public/image/' . basename($customer->image));
+            $oldImage = $customer->getRawOriginal('image');
+            if ($oldImage) {
+                Storage::disk('public')->delete('image/' . $oldImage);
             }
             $data['image'] = $this->storeImage($data['image']);
         }
 
         $customer->update($data);
 
-        return ['success' => true, 'message' => 'Customer updated successfully.'];
+        return ['success' => true, 'message' => 'Customer updated successfully.', 'customer' => $customer];
     }
 
     public function deleteCustomer(Customer $customer)
     {
-        if ($customer->image) {
-            Storage::delete('public/image/' . basename($customer->image));
+        $image = $customer->getRawOriginal('image');
+        if ($image) {
+            Storage::disk('public')->delete('image/' . $image);
         }
 
         $customer->delete();
@@ -76,7 +78,7 @@ class CustomerService
     private function storeImage($image): string
     {
         $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-        $image->storeAs('public/image', $imageName, 'public'); // Explicitly specify the 'public' disk
+        $image->storeAs('image', $imageName, 'public');
         return $imageName;
     }
 

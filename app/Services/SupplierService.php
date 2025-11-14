@@ -35,8 +35,9 @@ class SupplierService
     public function updateSupplier(Supplier $supplier, array $data)
     {
         if (isset($data['image'])) {
-            if ($supplier->image) {
-                Storage::delete('public/image/' . basename($supplier->image));
+            $oldImage = $supplier->getRawOriginal('image');
+            if ($oldImage) {
+                Storage::disk('public')->delete('image/' . $oldImage);
             }
             $data['image'] = $this->storeImage($data['image']);
         }
@@ -48,8 +49,9 @@ class SupplierService
 
     public function deleteSupplier(Supplier $supplier)
     {
-        if ($supplier->image) {
-            Storage::delete('public/image/' . basename($supplier->image));
+        $image = $supplier->getRawOriginal('image');
+        if ($image) {
+            Storage::disk('public')->delete('image/' . $image);
         }
 
         $supplier->delete();
@@ -60,7 +62,7 @@ class SupplierService
     private function storeImage($image): string
     {
         $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-        $image->storeAs('public/image', $imageName);
+        $image->storeAs('image', $imageName, 'public');
         return $imageName;
     }
 

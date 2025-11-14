@@ -58,20 +58,26 @@ class WarehouseService
 
     public function setMainWarehouse(Warehouse $warehouse)
     {
-        Warehouse::where('is_main', true)->update(['is_main' => false]); // Unsets all existing main warehouses
-        $warehouse->is_main = true;
-        $warehouse->save();
-        return ['success' => true, 'message' => 'Main warehouse updated successfully.'];
+        return \DB::transaction(function () use ($warehouse) {
+            Warehouse::where('is_main', true)->update(['is_main' => false]); // Unsets all existing main warehouses
+            $warehouse->is_main = true;
+            $warehouse->save();
+            $warehouse->refresh(); // Refresh the model
+            return ['success' => true, 'message' => 'Main warehouse updated successfully.'];
+        });
     }
 
     public function unsetMainWarehouse(Warehouse $warehouse)
     {
-        if ($warehouse->is_main) {
-            $warehouse->is_main = false;
-            $warehouse->save();
-            return ['success' => true, 'message' => 'Main warehouse status removed.'];
-        }
+        return \DB::transaction(function () use ($warehouse) {
+            if ($warehouse->is_main) {
+                $warehouse->is_main = false;
+                $warehouse->save();
+                $warehouse->refresh(); // Refresh the model
+                return ['success' => true, 'message' => 'Main warehouse status removed.'];
+            }
 
-        return ['success' => false, 'message' => 'This is not the main warehouse.'];
+            return ['success' => false, 'message' => 'This is not the main warehouse.'];
+        });
     }
 }

@@ -82,7 +82,7 @@ class CustomerServiceTest extends TestCase
         $this->assertTrue($result['success']);
         $this->assertEquals('Customer created successfully.', $result['message']);
         $this->assertDatabaseHas('customers', ['name' => 'Jane Doe', 'email' => 'jane.doe@example.com']);
-        Storage::disk('public')->assertExists('image/' . basename($result['customer']->image));
+        Storage::disk('public')->assertExists('image/' . $result['customer']->getRawOriginal('image'));
     }
 
     #[Test]
@@ -125,10 +125,15 @@ class CustomerServiceTest extends TestCase
     #[Test]
     public function it_can_update_a_customer_successfully_without_image_change()
     {
+        Storage::fake('public');
+        $oldFile = UploadedFile::fake()->image('old_avatar.jpg');
+        $oldFileName = 'old_image.jpg';
+        Storage::disk('public')->putFileAs('image', $oldFile, $oldFileName);
+
         $customer = Customer::factory()->create([
             'name' => 'Old Name',
             'email' => 'old@example.com',
-            'image' => 'old_image.jpg',
+            'image' => $oldFileName,
         ]);
 
         $updatedData = [
@@ -141,7 +146,7 @@ class CustomerServiceTest extends TestCase
         $this->assertEquals('Customer updated successfully.', $result['message']);
         $this->assertDatabaseHas('customers', ['id' => $customer->id, 'name' => 'New Name', 'email' => 'new@example.com']);
         $this->assertDatabaseMissing('customers', ['id' => $customer->id, 'name' => 'Old Name']);
-        Storage::disk('public')->assertExists('image/old_image.jpg'); // Old image should still exist
+        Storage::disk('public')->assertExists('image/' . $oldFileName); // Old image should still exist
     }
 
     #[Test]
@@ -169,7 +174,7 @@ class CustomerServiceTest extends TestCase
         $this->assertEquals('Customer updated successfully.', $result['message']);
         $this->assertDatabaseHas('customers', ['id' => $customer->id, 'name' => 'Updated Image Customer']);
         Storage::disk('public')->assertMissing('image/' . $oldFileName); // Old image should be deleted
-        Storage::disk('public')->assertExists('image/' . basename($result['customer']->image)); // New image should exist
+        Storage::disk('public')->assertExists('image/' . $result['customer']->getRawOriginal('image')); // New image should exist
     }
 
     #[Test]

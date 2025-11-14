@@ -19,7 +19,6 @@ class CategoryServiceTest extends TestCase
         parent::setUp();
         $this->categoryService = new CategoryService();
         \App\Models\Categories::truncate(); // Explicitly clear the table
-        dump('Categories count in setUp: ' . \App\Models\Categories::count());
     }
 
     #[Test]

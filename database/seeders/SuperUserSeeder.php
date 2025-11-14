@@ -2,27 +2,29 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class SuperUserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * @return void
      */
-    public function run(): void
+    public function run()
     {
-        // Create the superuser role if it doesn't exist
-        $superUserRole = Role::firstOrCreate(['name' => 'superuser']);
+        $user = User::create([
+            'name' => 'Super User',
+            'email' => 'superuser@example.com',
+            'password' => bcrypt('password'),
+        ]);
 
-        // Find the first user and assign the superuser role
-        // You might want to create a specific user for this or use an existing admin user
-        $user = User::first(); // Get the first user, adjust as needed
+        $role = Role::where('name', 'superuser')->first();
 
-        if ($user) {
-            $user->assignRole($superUserRole);
+        if ($role) {
+            $user->assignRole($role);
         }
     }
 }

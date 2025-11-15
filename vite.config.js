@@ -1,8 +1,14 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
 import path from "path";
 
 export default defineConfig({
+    test: {
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: 'tests/js/setup.js',
+    },
     plugins: [
         laravel({
             input: [

@@ -1,88 +1,174 @@
-# Invent-MAG : Advanced Inventory Management System  
+# Invent-MAG: Advanced Inventory & CRM Management System
+
+![Screenshot of Invent-MAG](screenshot.png)
 
 **Version:** 1.0  
 **Author:** moogie3  
 **License:** MIT  
 
+---
 
+## 📘 Introduction
 
-## 📘 Introduction  
-Invent-Mag is a full-featured Inventory Management System built to streamline and optimize warehouse operations.  
-The system enables efficient stock tracking, purchase order management, reporting, and user access control.  
-It is designed for businesses that require precise stock control, multi-user access, and real-time data insights.  
+Invent-MAG is a comprehensive, full-featured Inventory Management and Customer Relationship Management (CRM) system designed to streamline and optimize business operations. Built with a modern Laravel 11 stack, it provides robust tools for efficient stock tracking, sophisticated purchase and sales order management, real-time reporting, and granular user access control. This system is ideal for businesses requiring precise stock control, multi-user collaboration, and insightful data analytics to drive informed decisions.
 
+---
 
+## ✨ Key Features
 
-## 🔹 Key Features  
+Invent-MAG offers a powerful suite of functionalities to manage your business efficiently:
 
-✅ **Product & Stock Management** – Add, update, delete, and categorize inventory items.  
-✅ **Stock Transactions**         – Track inflow (purchases) and outflow (sales/usage).  
-✅ **Purchase Order Management**  – Create, approve, and receive supplier orders.  
-✅ **Reporting & Analytics**      – Generate stock level reports and transaction logs.  
-✅ **Multi-User Access**          – Role-based authentication for Admin, Manager, and Staff.  
-✅ **Modern Tech Stack**          – Built using Laravel 11 and MySQL for high performance and scalability.  
+*   **Product & Stock Management:**
+    *   Add, update, delete, and categorize inventory items with detailed product information.
+    *   Track stock levels across multiple warehouses.
+    *   Implement low-stock threshold alerts for proactive inventory planning.
+    *   Manage stock adjustments (inflow/outflow) with clear reason codes.
+*   **Purchase Order Management:**
+    *   Create, manage, and track purchase orders from suppliers.
+    *   Streamline the order approval process.
+    *   Efficiently receive and reconcile stock upon order completion.
+*   **Sales Order & Point of Sale (POS):**
+    *   Generate and manage sales orders for customers.
+    *   Integrated Point of Sale (POS) interface for quick and easy transactions.
+    *   Track sales history and customer purchase patterns.
+*   **Customer Relationship Management (CRM):**
+    *   Manage customer profiles and interaction history.
+    *   Track sales opportunities and manage sales pipelines.
+    *   Analyze customer purchase history and preferences.
+*   **Supplier Relationship Management (SRM):**
+    *   Maintain detailed supplier profiles and interaction logs.
+    *   Track purchase history from each supplier.
+*   **Reporting & Analytics:**
+    *   Generate real-time stock level reports, transaction logs, and financial summaries.
+    *   Export reports to CSV/PDF for further analysis.
+    *   Dashboard with key metrics for quick business insights.
+*   **Multi-User Access & Security:**
+    *   Role-based authentication and authorization (Admin, Manager, Staff) powered by Laravel Fortify and Spatie Laravel Permission.
+    *   Secure user management with robust input validation and CSRF protection.
+*   **Modern & Scalable Architecture:**
+    *   Built on the robust Laravel 11 framework with a clean MVC design pattern.
+    *   Utilizes MySQL for high performance and data integrity.
 
+---
 
+## 🚀 Technology Stack
 
-## 🛠️ System Architecture  
+Invent-MAG is built using a powerful and modern technology stack:
 
-Invent-Mag follows the **MVC (Model-View-Controller)** design pattern for a clean separation of concerns, making it scalable and maintainable.  
+*   **Backend:**
+    *   [**Laravel 11**](https://laravel.com/) (PHP Framework)
+    *   **PHP 8.2+**
+    *   [**Laravel Fortify**](https://laravel.com/docs/11.x/fortify) for authentication scaffolding.
+    *   [**Laravel Sanctum**](https://laravel.com/docs/11.x/sanctum) for API authentication.
+    *   [**Spatie Laravel Permission**](https://spatie.be/docs/laravel-permission/v6) for role and permission management.
+    *   [**PHPUnit 11.0.1+**](https://phpunit.de/) for backend testing.
+*   **Frontend:**
+    *   **Blade Templates**
+    *   [**Alpine.js 3.4.2+**](https://alpinejs.dev/) for declarative JavaScript.
+    *   [**Tailwind CSS 3.1.0+**](https://tailwindcss.com/) for utility-first styling.
+    *   [**Vite 6.0+**](https://vitejs.dev/) for a fast development build experience.
+    *   [**Axios 1.7.4+**](https://axios-http.com/) for HTTP requests.
+    *   [**Vitest 4.0.9+**](https://vitest.dev/) for frontend testing.
+*   **Database:**
+    *   **MySQL** (Recommended)
+    *   SQLite (for development/testing)
 
-📌 **Backend:** Laravel 11 (PHP Framework)  
-📌 **Frontend:** Blade Templates with Tailwind CSS  
-📌 **Database:** MySQL  
-📌 **Authentication:** Laravel Fortify  
-📌 **Storage:** Local & Cloud-based file management  
+---
 
+## ⚙️ Getting Started
 
+Follow these steps to set up and run Invent-MAG on your local machine.
 
-## 📊 Core Features & Functionality  
+### Prerequisites
 
+Ensure you have the following installed:
 
+*   **PHP 8.2+**
+*   **Composer**
+*   **Node.js (LTS recommended)**
+*   **NPM or Yarn**
+*   **MySQL (or another compatible database)**
 
-### 1️⃣ **User Roles & Permissions**  
-| Role    | Capabilities |
-|---------|-------------|
-| Admin   | Full access: Manage users, products, stock, orders, and reports. |
+### Installation Steps
 
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/moogie3/invent-mag.git
+    cd invent-mag
+    ```
 
+2.  **Install PHP Dependencies:**
+    ```bash
+    composer install
+    ```
 
-### 2️⃣ **Stock Management**  
-- **Add New Products** – Define product name, SKU, category, and supplier.  
-- **Stock Adjustment** – Record inflow and outflow transactions with reason codes.  
-- **Threshold Alerts** – Low stock notifications for better inventory planning.  
+3.  **Install JavaScript Dependencies:**
+    ```bash
+    npm install
+    # or yarn install
+    ```
 
+4.  **Environment Configuration:**
+    *   Copy the example environment file:
+        ```bash
+        cp .env.example .env
+        ```
+    *   Generate an application key:
+        ```bash
+        php artisan key:generate
+        ```
+    *   Configure your database connection in the `.env` file. For MySQL, ensure `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` are correctly set.
 
+5.  **Run Database Migrations and Seeders:**
+    ```bash
+    php artisan migrate --seed
+    ```
+    This will create the necessary database tables and populate them with initial data (including a superuser account).
 
-### 3️⃣ **Purchase Orders**  
-- **Create Purchase Orders** – Select suppliers, items, and quantities.  
-- **Order Approval Process** – Managers approve before processing.  
-- **Receive & Reconcile Stock** – Update inventory upon order completion.  
+6.  **Build Frontend Assets:**
+    ```bash
+    npm run build
+    ```
+    This compiles your CSS and JavaScript assets for production. For development, you can run `npm run dev` to watch for changes.
 
+7.  **Serve the Application:**
+    ```bash
+    php artisan serve
+    ```
+    The application will typically be available at `http://127.0.0.1:8000`.
 
+---
 
-### 4️⃣ **Reporting & Analytics**  
-- **Stock Reports** – View real-time inventory levels.  
-- **Transaction History** – Log every stock movement.  
-- **Export to CSV/PDF** – Generate downloadable reports.  
+## 🧪 Running Tests
 
+Invent-MAG includes a comprehensive test suite for both backend and frontend to ensure reliability and maintainability.
 
+### Backend Tests (PHPUnit)
 
-## 🔒 Security & Authentication  
+To run the PHPUnit tests for the Laravel backend:
 
-✅ **Laravel Fortify** – Implements secure authentication (Login, Register, Forgot Password).  
-✅ **CSRF Protection** – All forms secured with Cross-Site Request Forgery protection.  
-✅ **Role-Based Access** – Different user permissions enforced at the database level.  
-✅ **Input Validation** – Prevents SQL injection and cross-site scripting attacks.  
+```bash
+php artisan test
+```
 
+### Frontend Tests (Vitest)
 
+To run the Vitest tests for the JavaScript frontend:
 
-## 📩 Support & Contributions  
+```bash
+npm run test:js
+```
 
-If you encounter any issues, feel free to submit an issue on GitHub or contact me directly.  
-Pull requests are welcome! 😊  
+---
 
+## 🤝 Support & Contributions
 
+If you encounter any issues, feel free to submit an issue on GitHub. Pull requests are welcome!
 
-## 📜 License  
-Invent-Mag is open-source and licensed under the **MIT License**.  
+---
+
+## 📜 License
+
+Invent-MAG is software licensed under the **MIT License**. See the `LICENSE` file for more details.
+
+---

@@ -5,14 +5,11 @@ namespace Tests\Unit\Services;
 use App\Models\Purchase;
 use App\Models\Sales;
 use App\Services\TransactionService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class TransactionServiceTest extends TestCase
+class TransactionServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected TransactionService $transactionService;
 
     protected function setUp(): void

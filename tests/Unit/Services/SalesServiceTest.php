@@ -8,15 +8,12 @@ use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\User;
 use App\Services\SalesService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Support\Facades\Auth;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class SalesServiceTest extends TestCase
+class SalesServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected SalesService $salesService;
     protected User $user;
 

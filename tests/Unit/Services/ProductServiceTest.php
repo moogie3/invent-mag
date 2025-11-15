@@ -11,16 +11,13 @@ use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\ProductService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class ProductServiceTest extends TestCase
+class ProductServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected ProductService $productService;
 
     protected function setUp(): void

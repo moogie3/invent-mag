@@ -5,19 +5,13 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use App\Models\CurrencySetting;
 use App\Services\CurrencyService;
-use Database\Seeders\CurrencySeeder;
-use Database\Seeders\PermissionSeeder;
-use Database\Seeders\RolePermissionSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Mockery;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class CurrencyControllerTest extends TestCase
+class CurrencyControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase;
-
     protected User $user;
     protected CurrencyService $currencyService;
     protected array $validData;
@@ -25,9 +19,6 @@ class CurrencyControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(CurrencySeeder::class);
-        $this->seed(PermissionSeeder::class);
-        $this->seed(RolePermissionSeeder::class);
 
         $this->user = User::factory()->create();
         $this->user->assignRole('superuser');

@@ -4,16 +4,13 @@ namespace Tests\Unit\Services;
 
 use App\Models\Customer;
 use App\Services\CustomerService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-class CustomerServiceTest extends TestCase
+class CustomerServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected CustomerService $customerService;
 
     protected function setUp(): void

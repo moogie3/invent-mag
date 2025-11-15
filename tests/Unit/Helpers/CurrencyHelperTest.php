@@ -4,14 +4,11 @@ namespace Tests\Unit\Helpers;
 
 use App\Helpers\CurrencyHelper;
 use App\Models\CurrencySetting;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use Carbon\Carbon;
 
-class CurrencyHelperTest extends TestCase
+class CurrencyHelperTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected function setUp(): void
     {
         parent::setUp();

@@ -4,17 +4,16 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Services\ProfileService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Spatie\Permission\Models\Role;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class ProfileControllerTest extends TestCase
+class ProfileControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase, WithFaker;
+    use WithFaker;
 
     protected $adminUser;
     protected $profileServiceMock;

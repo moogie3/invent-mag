@@ -4,9 +4,9 @@ namespace Tests\Unit\Helpers;
 
 use App\Helpers\ProductHelper;
 use Carbon\Carbon;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 
-class ProductHelperTest extends TestCase
+class ProductHelperTest extends BaseUnitTestCase
 {
     /**
      * @test

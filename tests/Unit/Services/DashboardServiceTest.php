@@ -12,15 +12,12 @@ use App\Models\SalesItem;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Services\DashboardService;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Carbon\Carbon;
 
-class DashboardServiceTest extends TestCase
+class DashboardServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected DashboardService $dashboardService;
 
     protected function setUp(): void

@@ -4,15 +4,14 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Services\NotificationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Mockery;
 use Spatie\Permission\Models\Role;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class NotificationControllerTest extends TestCase
+class NotificationControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase, WithFaker;
+    use WithFaker;
 
     protected $adminUser;
     protected $notificationServiceMock;

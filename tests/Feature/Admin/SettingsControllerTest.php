@@ -3,14 +3,13 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Spatie\Permission\Models\Role;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class SettingsControllerTest extends TestCase
+class SettingsControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase, WithFaker;
+    use WithFaker;
 
     protected $adminUser;
 

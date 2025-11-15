@@ -4,14 +4,13 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Services\DashboardService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 use Mockery;
 
-class DashboardControllerTest extends TestCase
+class DashboardControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase, WithFaker;
+    use WithFaker;
 
     protected $adminUser;
 

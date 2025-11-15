@@ -9,18 +9,12 @@ use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Warehouse;
 use Database\Factories\SalesFactory;
-use Database\Seeders\CurrencySeeder;
-use Database\Seeders\PermissionSeeder;
-use Database\Seeders\RolePermissionSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 use Carbon\Carbon;
 
-class SalesControllerTest extends TestCase
+class SalesControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase;
-
     protected User $user;
     protected Customer $customer;
     protected Product $product;
@@ -29,10 +23,6 @@ class SalesControllerTest extends TestCase
     {
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
-
-        $this->seed(CurrencySeeder::class);
-        $this->seed(PermissionSeeder::class);
-        $this->seed(RolePermissionSeeder::class);
 
         $this->user = User::factory()->create();
         $this->user->assignRole('superuser');

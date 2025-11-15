@@ -7,14 +7,11 @@ use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Services\PurchaseService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Support\Facades\Auth;
-use Tests\TestCase;
 
-class PurchaseServiceTest extends TestCase
+class PurchaseServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected PurchaseService $purchaseService;
     protected User $user;
 

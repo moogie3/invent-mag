@@ -11,21 +11,21 @@ use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\User;
 use App\Services\PosService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Support\Facades\Auth;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class PosServiceTest extends TestCase
+class PosServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected PosService $posService;
+    protected User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->posService = new PosService();
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
         Product::truncate();
         Customer::truncate();
         Categories::truncate();

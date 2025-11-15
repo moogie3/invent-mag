@@ -7,26 +7,16 @@ use App\Models\Supplier;
 use App\Models\Purchase;
 use App\Models\POItem;
 use App\Models\Product;
-use Database\Seeders\CurrencySeeder;
-use Database\Seeders\PermissionSeeder;
-use Database\Seeders\RolePermissionSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class SupplierCrmControllerTest extends TestCase
+class SupplierCrmControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase;
-
     protected User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
-
-        $this->seed(CurrencySeeder::class);
-        $this->seed(PermissionSeeder::class);
-        $this->seed(RolePermissionSeeder::class);
 
         $this->user = User::factory()->create();
         $this->user->assignRole('superuser');

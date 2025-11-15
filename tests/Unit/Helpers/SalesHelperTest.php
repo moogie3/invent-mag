@@ -4,9 +4,9 @@ namespace Tests\Unit\Helpers;
 
 use App\Helpers\SalesHelper;
 use Carbon\Carbon;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 
-class SalesHelperTest extends TestCase
+class SalesHelperTest extends BaseUnitTestCase
 {
     // Test cases for calculateTotal (reused from PurchaseHelperTest)
     /** @test */

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin;
 
 use App\Models\Categories;
 use App\Models\Product;
@@ -9,17 +9,16 @@ use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\ProductService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class ProductControllerTest extends TestCase
+class ProductControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase, WithFaker;
+    use WithFaker;
 
     protected $user;
 

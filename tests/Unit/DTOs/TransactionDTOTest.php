@@ -3,10 +3,10 @@
 namespace Tests\Unit\DTOs;
 
 use App\DTOs\TransactionDTO;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use Carbon\Carbon;
 
-class TransactionDTOTest extends TestCase
+class TransactionDTOTest extends BaseUnitTestCase
 {
     /** @test */
     public function it_constructs_with_all_provided_data()

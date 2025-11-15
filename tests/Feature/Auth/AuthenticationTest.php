@@ -3,12 +3,10 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class AuthenticationTest extends TestCase
+class AuthenticationTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase;
 
     public function test_login_screen_can_be_rendered(): void
     {

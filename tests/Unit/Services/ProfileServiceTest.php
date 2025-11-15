@@ -4,17 +4,14 @@ namespace Tests\Unit\Services;
 
 use App\Models\User;
 use App\Services\ProfileService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class ProfileServiceTest extends TestCase
+class ProfileServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected ProfileService $profileService;
 
     protected function setUp(): void

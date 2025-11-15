@@ -5,16 +5,15 @@ namespace Tests\Feature\Admin;
 use App\Models\Tax;
 use App\Models\User;
 use App\Services\TaxService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Mockery;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class TaxControllerTest extends TestCase
+class TaxControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase, WithFaker;
+    use WithFaker;
 
     protected $admin;
 

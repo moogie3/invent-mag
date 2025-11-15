@@ -9,14 +9,11 @@ use App\Models\Sales;
 use App\Models\SalesOpportunity;
 use App\Models\SalesPipeline;
 use App\Services\SalesPipelineService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class SalesPipelineServiceTest extends TestCase
+class SalesPipelineServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected SalesPipelineService $salesPipelineService;
 
     protected function setUp(): void

@@ -4,23 +4,31 @@ namespace Tests\Unit\Services;
 
 use App\Models\User;
 use App\Services\UserService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class UserServiceTest extends TestCase
+class UserServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected UserService $userService;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->userService = new UserService();
-        $this->artisan('db:seed'); // Call the main DatabaseSeeder
+
+        // Ensure roles and permissions exist for tests that need them
+        Role::findOrCreate('superuser', 'web');
+        Role::findOrCreate('staff', 'web');
+        Role::findOrCreate('pos', 'web');
+        Permission::findOrCreate('view-users', 'web');
+        Permission::findOrCreate('create-users', 'web');
+        Permission::findOrCreate('edit-users', 'web');
+        Permission::findOrCreate('delete-users', 'web');
+        Permission::findOrCreate('permission1', 'web');
+        Permission::findOrCreate('permission2', 'web');
+        Permission::findOrCreate('permission3', 'web');
     }
 
     #[Test]
@@ -38,7 +46,7 @@ class UserServiceTest extends TestCase
         $this->assertArrayHasKey('users', $data);
         $this->assertArrayHasKey('roles', $data);
         $this->assertArrayHasKey('permissions', $data);
-        $this->assertCount(5, $data['users']); // 1 from UserSeeder + 1 from SuperUserSeeder + 3 created here
+        $this->assertCount(3, $data['users']); // Now only expects the 3 users created in this test
     }
 
     #[Test]

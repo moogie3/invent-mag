@@ -5,14 +5,11 @@ namespace Tests\Unit\Services;
 use App\Models\CurrencySetting;
 use App\Models\Unit;
 use App\Services\CurrencyService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class CurrencyServiceTest extends TestCase
+class CurrencyServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected CurrencyService $currencyService;
 
     protected function setUp(): void

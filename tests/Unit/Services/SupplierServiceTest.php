@@ -4,16 +4,13 @@ namespace Tests\Unit\Services;
 
 use App\Models\Supplier;
 use App\Services\SupplierService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class SupplierServiceTest extends TestCase
+class SupplierServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected SupplierService $supplierService;
 
     protected function setUp(): void

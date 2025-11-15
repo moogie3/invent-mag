@@ -10,18 +10,12 @@ use App\Models\POItem;
 use App\Models\Warehouse;
 use Database\Factories\PurchaseFactory;
 use Database\Factories\POItemFactory;
-use Database\Seeders\CurrencySeeder;
-use Database\Seeders\PermissionSeeder;
-use Database\Seeders\RolePermissionSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 use Carbon\Carbon;
 
-class PurchaseControllerTest extends TestCase
+class PurchaseControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase;
-
     protected User $user;
     protected Supplier $supplier;
     protected Product $product;
@@ -30,10 +24,6 @@ class PurchaseControllerTest extends TestCase
     {
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
-
-        $this->seed(CurrencySeeder::class);
-        $this->seed(PermissionSeeder::class);
-        $this->seed(RolePermissionSeeder::class);
 
         $this->user = User::factory()->create();
         $this->user->assignRole('superuser');

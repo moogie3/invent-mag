@@ -4,14 +4,11 @@ namespace Tests\Unit\Services;
 
 use App\Models\Tax;
 use App\Services\TaxService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class TaxServiceTest extends TestCase
+class TaxServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected TaxService $taxService;
 
     protected function setUp(): void

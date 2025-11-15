@@ -2,15 +2,12 @@
 
 namespace Tests\Feature\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class RegistrationTest extends TestCase
+class RegistrationTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase;
-
     protected function setUp(): void
     {
         parent::setUp();

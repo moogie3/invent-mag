@@ -5,18 +5,12 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use App\Models\Categories;
 use App\Services\CategoryService;
-use Database\Seeders\CurrencySeeder;
-use Database\Seeders\PermissionSeeder;
-use Database\Seeders\RolePermissionSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class CategoryControllerTest extends TestCase
+class CategoryControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase;
-
     protected User $user;
     protected $categoryServiceMock;
 
@@ -24,10 +18,6 @@ class CategoryControllerTest extends TestCase
     {
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
-
-        $this->seed(CurrencySeeder::class);
-        $this->seed(PermissionSeeder::class);
-        $this->seed(RolePermissionSeeder::class);
 
         $this->user = User::factory()->create();
         $this->user->assignRole('superuser');

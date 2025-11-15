@@ -4,16 +4,15 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Services\TransactionService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Spatie\Permission\Models\Role;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class ReportControllerTest extends TestCase
+class ReportControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase, WithFaker;
+    use WithFaker;
 
     protected $adminUser;
     protected $transactionServiceMock;

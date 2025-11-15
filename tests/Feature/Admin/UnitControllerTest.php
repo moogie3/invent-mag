@@ -5,17 +5,16 @@ namespace Tests\Feature\Admin;
 use App\Models\Unit;
 use App\Models\User;
 use App\Services\UnitService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Mockery;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class UnitControllerTest extends TestCase
+class UnitControllerTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase, WithFaker;
+    use WithFaker;
 
     protected $admin;
 

@@ -4,14 +4,12 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
-use Tests\TestCase;
+use Tests\Feature\BaseFeatureTestCase;
 
-class EmailVerificationTest extends TestCase
+class EmailVerificationTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase;
 
     public function test_email_verification_screen_can_be_rendered(): void
     {

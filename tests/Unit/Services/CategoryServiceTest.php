@@ -4,14 +4,11 @@ namespace Tests\Unit\Services;
 
 use App\Models\Categories;
 use App\Services\CategoryService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class CategoryServiceTest extends TestCase
+class CategoryServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected CategoryService $categoryService;
 
     protected function setUp(): void

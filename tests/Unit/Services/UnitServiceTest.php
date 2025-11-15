@@ -4,14 +4,11 @@ namespace Tests\Unit\Services;
 
 use App\Models\Unit;
 use App\Services\UnitService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class UnitServiceTest extends TestCase
+class UnitServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected UnitService $unitService;
 
     protected bool $seedDatabase = false; // Disable seeding for this test class

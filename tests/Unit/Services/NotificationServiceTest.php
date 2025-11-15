@@ -9,14 +9,11 @@ use App\Models\Sales;
 use App\Models\Payment;
 use App\Services\NotificationService;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class NotificationServiceTest extends TestCase
+class NotificationServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected NotificationService $notificationService;
 
     protected function setUp(): void

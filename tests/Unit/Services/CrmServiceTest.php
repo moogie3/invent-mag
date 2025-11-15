@@ -14,15 +14,12 @@ use App\Models\Supplier;
 use App\Models\SupplierInteraction;
 use App\Models\User;
 use App\Services\CrmService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Support\Facades\Auth;
 
-class CrmServiceTest extends TestCase
+class CrmServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected CrmService $crmService;
 
     protected function setUp(): void

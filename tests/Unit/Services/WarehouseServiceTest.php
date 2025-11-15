@@ -5,15 +5,12 @@ namespace Tests\Unit\Services;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\WarehouseService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Support\Facades\DB;
 
-class WarehouseServiceTest extends TestCase
+class WarehouseServiceTest extends BaseUnitTestCase
 {
-    use RefreshDatabase;
-
     protected WarehouseService $warehouseService;
 
     protected function setUp(): void

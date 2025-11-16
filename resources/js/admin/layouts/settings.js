@@ -158,6 +158,8 @@ function initSettingsPage() {
         }, 'Save System Settings');
     }
 
+    
+
     const navigationTypeSelect = document.querySelector('select[name="navigation_type"]');
     if (navigationTypeSelect) {
         const navbarOptionsWrapper = document.getElementById('navbar-options-wrapper');

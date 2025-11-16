@@ -10,9 +10,15 @@ const sounds = {
 };
 
 function playSound(audioElement) {
-    if (audioElement && window.userSettings && window.userSettings.enable_sound_notifications) {
+    if (
+        audioElement &&
+        window.userSettings &&
+        window.userSettings.enable_sound_notifications
+    ) {
         audioElement.currentTime = 0; // Rewind to the start
-        audioElement.play().catch((e) => { /* // console.error("Error playing sound:", e) */ });
+        audioElement.play().catch((e) => {
+            console.error("Error playing sound:", e);
+        });
     }
 }
 

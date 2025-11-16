@@ -1,5 +1,5 @@
-import { grandTotal } from '../cart/totals.js';
-import { clearCart } from '../cart/actions.js';
+import { grandTotal } from "../cart/totals.js";
+import { clearCart } from "../cart/actions.js";
 
 const completePaymentBtn = document.getElementById("completePaymentBtn");
 const invoiceForm = document.getElementById("invoiceForm");
@@ -63,9 +63,21 @@ function completePayment() {
             "X-CSRF-TOKEN": document
                 .querySelector('meta[name="csrf-token"]')
                 .getAttribute("content"),
+            "Accept": "application/json", // Add this line
         },
     })
-        .then((response) => response.json())
+        .then((response) => {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return response.text().then((text) => {
+                    throw new Error(
+                        `Expected JSON, but received ${contentType || "unknown"}: ${text}`
+                    );
+                });
+            }
+        })
         .then((data) => {
             if (data.success) {
                 InventMagApp.showToast("Success", data.message, "success");
@@ -78,11 +90,11 @@ function completePayment() {
                     data.message || "Failed to process payment.",
                     "error"
                 );
-                // // console.error("Payment error:", data.errors);
+                console.error("Payment error:", data.errors);
             }
         })
         .catch((error) => {
-            // // console.error("Error processing payment:", error);
+            console.error("Error processing payment:", error);
             InventMagApp.showToast(
                 "Error",
                 "An error occurred while processing payment. Please check the console for details.",

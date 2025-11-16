@@ -10,7 +10,9 @@ use App\Models\Categories;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Services\PosService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
 
 class POSController extends Controller
 {
@@ -29,6 +31,13 @@ class POSController extends Controller
 
     public function store(Request $request)
     {
+        if (!Auth::check()) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Unauthenticated.'], 401);
+            }
+            return redirect()->route('admin.login');
+        }
+
         try {
             $request->validate([
                 'transaction_date' => 'required|date',
@@ -53,7 +62,7 @@ class POSController extends Controller
             return redirect()->route('admin.pos.receipt', $sale->id)->with('success', 'Transaction completed successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $e->errors()], 422);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Something went wrong: ' . $e->getMessage()], 500);
         }
     }

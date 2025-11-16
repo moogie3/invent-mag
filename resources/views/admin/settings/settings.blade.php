@@ -323,37 +323,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Chart of Accounts Template -->
-                                        <div class="settings-section mb-5">
-                                            <div class="settings-section-header">
-                                                <div class="settings-icon-wrapper">
-                                                    <i class="ti ti-file-text"></i>
-                                                </div>
-                                                <div class="settings-section-title">
-                                                    <h3 class="mb-1">{{ __('messages.chart_of_accounts_template') }}</h3>
-                                                    <p class="text-muted mb-0 small">
-                                                        {{ __('messages.apply_a_coa_template_to_get_started') }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="settings-section-content">
-                                                <form action="{{ route('admin.setting.apply-coa-template') }}" method="POST" onsubmit="return confirm('{{ __('messages.are_you_sure_apply_template') }}');">
-                                                    @csrf
-                                                    <div class="row g-3">
-                                                        <div class="col-md-4">
-                                                            <div class="form-label">{{ __('messages.select_template') }}</div>
-                                                            <select name="template" class="form-select" required>
-                                                                <option value="universal.json">{{ __('messages.universal_coa') }}</option>
-                                                                <option value="indonesian.json">{{ __('messages.indonesian_coa') }}</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-4 d-flex align-items-end">
-                                                            <button type="submit" class="btn btn-warning">{{ __('messages.apply_template') }}</button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
+                                        
 
                                         <!-- Advanced Settings -->
                                         <div class="settings-section mb-4">

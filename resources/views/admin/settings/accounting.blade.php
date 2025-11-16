@@ -21,6 +21,34 @@
                                 <div class="card-body">
                                     <form action="{{ route('admin.setting.accounting.update') }}" method="POST">
                                         @csrf
+                                        <!-- Chart of Accounts Template -->
+                                        <div class="settings-section mb-5">
+                                            <div class="settings-section-header">
+                                                <div class="settings-icon-wrapper">
+                                                    <i class="ti ti-file-text"></i>
+                                                </div>
+                                                <div class="settings-section-title">
+                                                    <h3 class="mb-1">{{ __('messages.chart_of_accounts_template') }}</h3>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.apply_a_coa_template_to_get_started') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="settings-section-content">
+                                                <div class="row g-3">
+                                                    <div class="col-md-4">
+                                                        <div class="form-label">{{ __('messages.select_template') }}</div>
+                                                        <select name="template" id="coaTemplateSelect" class="form-select" required>
+                                                            <option value="universal.json" @if($activeCoaTemplate == 'universal.json') selected @endif>{{ __('messages.universal_coa') }}</option>
+                                                            <option value="indonesian.json" @if($activeCoaTemplate == 'indonesian.json') selected @endif>{{ __('messages.indonesian_coa') }}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4 d-flex align-items-end">
+                                                        <button type="button" id="applyCoaTemplateBtn" class="btn btn-warning">{{ __('messages.apply_template') }}</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <!-- Accounting Integration Settings -->
                                         <div class="settings-section mb-5">
                                             <div class="settings-section-header">
@@ -121,3 +149,33 @@
         </div>
     </div>
 @endsection
+
+<div class="modal modal-blur fade" id="coaTemplateConfirmationModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-warning"></div>
+            <div class="modal-body text-center py-4">
+                <i class="ti ti-alert-triangle icon mb-2 text-warning icon-lg"></i>
+                <h3>{{ __('messages.are_you_sure') }}</h3>
+                <div class="text-muted" id="coaTemplateConfirmationModalMessage"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col">
+                            <a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                {{ __('messages.cancel') }}
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a href="#" class="btn btn-warning w-100" id="coaTemplateConfirmationModalConfirmBtn">
+                                {{ __('messages.confirm') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -102,6 +102,11 @@
     @vite('resources/js/admin/currency.js')
 @endif
 
+{{-- SCRIPT FOR ACCOUNTING settings --}}
+@if (request()->is('admin/settings/accounting'))
+    @vite('resources/js/admin/accounting.js')
+@endif
+
 {{-- SCRIPT FOR TAX settings --}}
 @if (request()->is('admin/settings/tax'))
     @vite('resources/js/admin/tax.js')

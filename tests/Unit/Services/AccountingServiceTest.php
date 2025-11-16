@@ -32,8 +32,8 @@ class AccountingServiceTest extends TestCase
         $date = Carbon::now();
 
         $transactions = [
-            ['account_name' => 'Accounts Receivable', 'type' => 'debit', 'amount' => 100.00],
-            ['account_name' => 'Sales Revenue', 'type' => 'credit', 'amount' => 100.00],
+            ['account_name' => 'accounting.accounts.accounts_receivable.name', 'type' => 'debit', 'amount' => 100.00],
+            ['account_name' => 'accounting.accounts.sales_revenue.name', 'type' => 'credit', 'amount' => 100.00],
         ];
 
         $journalEntry = $this->accountingService->createJournalEntry(
@@ -53,14 +53,14 @@ class AccountingServiceTest extends TestCase
 
         $this->assertDatabaseHas('transactions', [
             'journal_entry_id' => $journalEntry->id,
-            'account_id' => Account::where('name', 'Accounts Receivable')->first()->id,
+            'account_id' => Account::where('name', 'accounting.accounts.accounts_receivable.name')->first()->id,
             'type' => 'debit',
             'amount' => 100.00,
         ]);
 
         $this->assertDatabaseHas('transactions', [
             'journal_entry_id' => $journalEntry->id,
-            'account_id' => Account::where('name', 'Sales Revenue')->first()->id,
+            'account_id' => Account::where('name', 'accounting.accounts.sales_revenue.name')->first()->id,
             'type' => 'credit',
             'amount' => 100.00,
         ]);

@@ -73,7 +73,7 @@
                                                 @endif
                                                 <td
                                                     style="padding-left: {{ $transaction->type == 'credit' ? '2rem' : '0.5rem' }};">
-                                                    {{ $transaction->account->name }}
+                                                    {{ __($transaction->account->name) }}
                                                 </td>
                                                 <td class="text-end">
                                                     @if ($transaction->type == 'debit')

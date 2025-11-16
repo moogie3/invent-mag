@@ -53,7 +53,7 @@ export function initProductPage() {
                         loadExpiringSoonProductsModal(data);
                     })
                     .catch(error => {
-                        console.error('Error fetching expiring products:', error);
+                        // // console.error('Error fetching expiring products:', error);
                         if (tableBody) {
                             tableBody.innerHTML = `
                                 <tr>
@@ -231,7 +231,7 @@ export function initProductPage() {
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                // // console.error('Error:', error);
                 InventMagApp.showToast('Error', 'An error occurred during stock adjustment.', 'error');
             });
         });

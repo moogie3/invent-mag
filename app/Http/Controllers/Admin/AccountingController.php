@@ -16,8 +16,7 @@ class AccountingController extends Controller
      */
     public function chartOfAccounts()
     {
-        $accounts = Account::orderBy('code')->get()->groupBy('type');
-        return view('admin.accounting.chart-of-accounts', compact('accounts'));
+        return redirect()->route('admin.accounting.accounts.index');
     }
 
     /**
@@ -151,5 +150,75 @@ class AccountingController extends Controller
             'totalCredits',
             'endDate'
         ));
+    }
+
+    public function accountsIndex()
+    {
+        $accounts = Account::with('children')->whereNull('parent_id')->orderBy('code')->get();
+        return view('admin.accounting.accounts.index', compact('accounts'));
+    }
+
+    public function accountsCreate()
+    {
+        $accounts = Account::orderBy('name')->get();
+        return view('admin.accounting.accounts.create', compact('accounts'));
+    }
+
+    public function accountsStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:255|unique:accounts,code',
+            'type' => 'required|in:asset,liability,equity,revenue,expense',
+            'parent_id' => 'nullable|exists:accounts,id',
+        ]);
+
+        $level = 0;
+        if ($request->parent_id) {
+            $parent = Account::find($request->parent_id);
+            $level = $parent->level + 1;
+        }
+
+        Account::create($request->all() + ['level' => $level]);
+
+        return redirect()->route('admin.accounting.accounts.index')->with('success', 'Account created successfully.');
+    }
+
+    public function accountsEdit(Account $account)
+    {
+        $accounts = Account::where('id', '!=', $account->id)->orderBy('name')->get();
+        return view('admin.accounting.accounts.edit', compact('account', 'accounts'));
+    }
+
+    public function accountsUpdate(Request $request, Account $account)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:255|unique:accounts,code,' . $account->id,
+            'type' => 'required|in:asset,liability,equity,revenue,expense',
+            'parent_id' => 'nullable|exists:accounts,id',
+        ]);
+
+        $level = 0;
+        if ($request->parent_id) {
+            $parent = Account::find($request->parent_id);
+            $level = $parent->level + 1;
+        }
+
+        $account->update($request->all() + ['level' => $level]);
+
+        return redirect()->route('admin.accounting.accounts.index')->with('success', 'Account updated successfully.');
+    }
+
+    public function accountsDestroy(Account $account)
+    {
+        // Add logic to prevent deletion if account has transactions
+        if ($account->transactions()->exists() || $account->children()->exists()) {
+            return redirect()->route('admin.accounting.accounts.index')->with('error', 'Account cannot be deleted because it has transactions or child accounts.');
+        }
+
+        $account->delete();
+
+        return redirect()->route('admin.accounting.accounts.index')->with('success', 'Account deleted successfully.');
     }
 }

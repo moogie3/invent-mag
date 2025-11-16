@@ -58,7 +58,7 @@ export class SalesOrderModule {
     safeGetElement(id) {
         const element = document.getElementById(id);
         if (!element) {
-            console.warn(`Element with ID '${id}' not found`);
+            // console.warn(`Element with ID '${id}' not found`);
         }
         return element;
     }

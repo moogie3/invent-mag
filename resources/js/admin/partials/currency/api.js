@@ -56,15 +56,15 @@ export function handleFormSubmission() {
                                 "Failed to update currency settings.",
                             "error"
                         );
-                        console.error(
-                            "Error updating currency settings:",
-                            data.errors
-                        );
+                        // console.error(
+                        //     "Error updating currency settings:",
+                        //     data.errors
+                        // );
                         restoreOriginalValues();
                     }
                 })
                 .catch((error) => {
-                    console.error("Error updating currency settings:", error);
+                    // console.error("Error updating currency settings:", error);
                     InventMagApp.showToast(
                         "Error",
                         "An error occurred while updating currency settings. Please check the console for details.",

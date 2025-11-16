@@ -70,7 +70,7 @@ export function initEditOpportunityForm() {
                 "success"
             );
         } catch (error) {
-            console.error("Error updating opportunity:", error);
+            // // console.error("Error updating opportunity:", error);
             InventMagApp.showToast(
                 "Error",
                 "Failed to update opportunity. Please try again.",
@@ -87,10 +87,10 @@ export async function loadEditOpportunityModal(opportunityId) {
         );
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            console.error(
-                `Server error fetching opportunity: Status ${response.status} - ${response.statusText}`,
-                errorData
-            );
+            // // console.error(
+            //     `Server error fetching opportunity: Status ${response.status} - ${response.statusText}`,
+            //     errorData
+            // );
             throw new Error("Failed to fetch opportunity");
         }
         const opportunity = await response.json();
@@ -152,7 +152,7 @@ export async function loadEditOpportunityModal(opportunityId) {
             document.getElementById("editOpportunityModal")
         ).show();
     } catch (error) {
-        console.error("Error in edit opportunity fetch:", error);
+        // // console.error("Error in edit opportunity fetch:", error);
         InventMagApp.showToast(
             "Error",
             "Failed to fetch opportunity details. Please try again.",

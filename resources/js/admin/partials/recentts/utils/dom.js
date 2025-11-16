@@ -5,7 +5,7 @@ export function updateBulkActions() {
     const selectedCount = document.getElementById("selectedCount");
     const selectAll = document.getElementById("selectAll");
     const count = checkedBoxes.length;
-    console.log('updateBulkActions called, checked count:', count);
+    // // console.log('updateBulkActions called, checked count:', count);
 
     if (selectedCount) selectedCount.textContent = count;
 

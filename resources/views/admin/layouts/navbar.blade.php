@@ -15,8 +15,8 @@
         <nav class="nav-dropdown d-none d-md-flex" id="nav-dropdown">
             <ul class="d-flex gap-3">
                 @foreach ($navigationItems as $item)
-                    {{-- Check if the item has a special key, e.g., 'reports' --}}
-                    @if (isset($item['key']) && $item['key'] === 'reports')
+                    {{-- Check if the item has a special key, e.g., 'reports' or 'accounting' --}}
+                    @if (isset($item['key']) && in_array($item['key'], ['reports', 'accounting']))
                         <li class="nav-item dropdown" id="{{ $item['key'] }}-nav-item">
                             <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}"
                                 data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"

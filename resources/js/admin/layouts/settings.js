@@ -7,10 +7,10 @@ async function fetchSystemSettings() {
         }
         const settings = await response.json();
         window.userSettings = settings;
-        console.log('System settings loaded:', window.userSettings);
+        // console.log('System settings loaded:', window.userSettings);
         document.dispatchEvent(new Event('usersettingsloaded'));
     } catch (error) {
-        console.error('Error fetching system settings:', error);
+        // console.error('Error fetching system settings:', error);
         // Fallback to default settings if fetch fails
         window.userSettings = {
             enable_sound_notifications: true,
@@ -76,7 +76,7 @@ function applyPerformanceSettings(settings) {
     if (refreshRate > 0) {
         window.dataRefreshInterval = setInterval(() => {
             document.dispatchEvent(new CustomEvent('datarefresh'));
-            console.log('Dispatched datarefresh event.');
+            // console.log('Dispatched datarefresh event.');
         }, refreshRate * 1000);
     }
 }
@@ -84,7 +84,7 @@ function applyPerformanceSettings(settings) {
 function applyDebugSettings(settings) {
     if (settings.enable_debug_mode === true) {
         document.body.classList.add('debug-mode');
-        console.log('Debug mode enabled.');
+        // console.log('Debug mode enabled.');
     } else {
         document.body.classList.remove('debug-mode');
     }
@@ -144,7 +144,7 @@ function initSettingsPage() {
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                // console.error('Error:', error);
                 InventMagApp.showToast('Error', 'An unexpected error occurred.', 'error');
             })
             .finally(() => {

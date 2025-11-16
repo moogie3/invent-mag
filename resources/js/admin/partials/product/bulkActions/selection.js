@@ -99,7 +99,7 @@ export function initBulkSelection() {
                 setTimeout(tryInit, 300);
                 return;
             }
-            console.warn("Bulk selection elements not found");
+            // console.warn("Bulk selection elements not found");
             return;
         }
 

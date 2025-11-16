@@ -85,8 +85,11 @@ class DashboardServiceTest extends BaseUnitTestCase
             'status' => 'Unpaid',
             'due_date' => now()->subDay() // Overdue
         ]);
+        // This POItem expires soon (within 30 days)
         POItem::factory()->create(['po_id' => $purchase2->id, 'product_id' => $product->id, 'quantity' => 8, 'price' => 10, 'expiry_date' => now()->addDays(5)]);
 
+        // This POItem does not expire soon (outside 30 days)
+        POItem::factory()->create(['po_id' => $purchase2->id, 'product_id' => $product->id, 'quantity' => 10, 'price' => 10, 'expiry_date' => now()->addDays(60)]);
 
         // 2. Call the service method
         $data = $this->dashboardService->getDashboardData();

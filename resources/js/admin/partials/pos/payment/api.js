@@ -78,11 +78,11 @@ function completePayment() {
                     data.message || "Failed to process payment.",
                     "error"
                 );
-                console.error("Payment error:", data.errors);
+                // // console.error("Payment error:", data.errors);
             }
         })
         .catch((error) => {
-            console.error("Error processing payment:", error);
+            // // console.error("Error processing payment:", error);
             InventMagApp.showToast(
                 "Error",
                 "An error occurred while processing payment. Please check the console for details.",

@@ -1,7 +1,7 @@
 import { updateBulkActions } from '../utils/dom.js';
 
 export function initBulkSelection() {
-    console.log('initBulkSelection called');
+    // // console.log('initBulkSelection called');
     const selectAll = document.getElementById("selectAll");
     const rowCheckboxes = document.querySelectorAll(".row-checkbox");
 

@@ -21,7 +21,7 @@ export function loadProductsFromCache() {
             // Use the setProducts function to ensure a copy is stored
             setProducts(JSON.parse(cachedProducts));
         } catch (e) {
-            console.error("Failed to parse cached products from localStorage:", e);
+            // // console.error("Failed to parse cached products from localStorage:", e);
             // If parsing fails, reset to a clean state
             setProducts([]);
         }

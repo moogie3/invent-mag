@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\User;
+use App\Models\Account; // Added
 use App\Services\AccountingService;
 use App\Services\PurchaseService;
 use Tests\Unit\BaseUnitTestCase;
@@ -24,7 +25,27 @@ class PurchaseServiceTest extends BaseUnitTestCase
         parent::setUp();
         $this->accountingServiceMock = Mockery::mock(AccountingService::class);
         $this->purchaseService = new PurchaseService($this->accountingServiceMock);
-        $this->user = User::factory()->create();
+        
+        // Seed the accounts
+        $this->seed(\Database\Seeders\AccountSeeder::class);
+
+        // Retrieve SAK-compliant accounts from the seeder
+        $cash = Account::where('name', 'accounting.accounts.cash.name')->first();
+        $accountsPayable = Account::where('name', 'accounting.accounts.accounts_payable.name')->first();
+        $inventory = Account::where('name', 'accounting.accounts.inventory.name')->first();
+
+        // Ensure accounts exist
+        $this->assertNotNull($cash, 'Cash account not found in seeder.');
+        $this->assertNotNull($accountsPayable, 'Accounts Payable account not found in seeder.');
+        $this->assertNotNull($inventory, 'Inventory account not found in seeder.');
+
+        $this->user = User::factory()->create([
+            'accounting_settings' => [
+                'accounts_payable_account_id' => $accountsPayable->id,
+                'inventory_account_id' => $inventory->id,
+                'cash_account_id' => $cash->id,
+            ]
+        ]);
         $this->actingAs($this->user);
     }
 
@@ -136,16 +157,20 @@ class PurchaseServiceTest extends BaseUnitTestCase
 
         $finalTotal = 200;
 
+        $accountingSettings = $this->user->accounting_settings;
+        $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+        $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
+
         $this->accountingServiceMock
             ->shouldReceive('createJournalEntry')
             ->once()
             ->with(
                 "Purchase Order #INV-001",
                 Mockery::any(),
-                Mockery::on(function ($transactions) use ($finalTotal) {
+                Mockery::on(function ($transactions) use ($finalTotal, $inventoryAccountName, $accountsPayableAccountName) {
                     $this->assertCount(2, $transactions);
-                    $this->assertEquals($finalTotal, $this->findTransactionAmount($transactions, 'Inventory', 'debit'));
-                    $this->assertEquals($finalTotal, $this->findTransactionAmount($transactions, 'Accounts Payable', 'credit'));
+                    $this->assertEquals($finalTotal, $this->findTransactionAmount($transactions, $inventoryAccountName, 'debit'));
+                    $this->assertEquals($finalTotal, $this->findTransactionAmount($transactions, $accountsPayableAccountName, 'credit'));
                     return true;
                 }),
                 Mockery::type(Purchase::class)
@@ -170,9 +195,13 @@ class PurchaseServiceTest extends BaseUnitTestCase
                 "Payment for PO #PO-123",
                 Mockery::any(),
                 Mockery::on(function ($transactions) {
+                    $accountingSettings = Auth::user()->accounting_settings;
+                    $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
+                    $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;
+
                     $this->assertCount(2, $transactions);
-                    $this->assertEquals(500, $this->findTransactionAmount($transactions, 'Accounts Payable', 'debit'));
-                    $this->assertEquals(500, $this->findTransactionAmount($transactions, 'Cash', 'credit'));
+                    $this->assertEquals(500, $this->findTransactionAmount($transactions, $accountsPayableAccountName, 'debit'));
+                    $this->assertEquals(500, $this->findTransactionAmount($transactions, $cashAccountName, 'credit'));
                     return true;
                 }),
                 Mockery::any() // Payment model

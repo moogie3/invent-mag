@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->string('timezone')->nullable();
             $table->json('system_settings')->nullable();
+            $table->json('accounting_settings')->nullable();
             $table->timestamps();
         });
 

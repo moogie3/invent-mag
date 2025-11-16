@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\User;
+use App\Models\Account; // Added
 use App\Services\AccountingService;
 use App\Services\SalesService;
 use Tests\Unit\BaseUnitTestCase;
@@ -26,7 +27,33 @@ class SalesServiceTest extends BaseUnitTestCase
         parent::setUp();
         $this->accountingServiceMock = Mockery::mock(AccountingService::class);
         $this->salesService = new SalesService($this->accountingServiceMock);
-        $this->user = User::factory()->create();
+        
+        // Seed the accounts
+        $this->seed(\Database\Seeders\AccountSeeder::class);
+
+        // Retrieve SAK-compliant accounts from the seeder
+        $cash = Account::where('name', 'accounting.accounts.cash.name')->first();
+        $accountsReceivable = Account::where('name', 'accounting.accounts.accounts_receivable.name')->first();
+        $salesRevenue = Account::where('name', 'accounting.accounts.sales_revenue.name')->first();
+        $costOfGoodsSold = Account::where('name', 'accounting.accounts.cost_of_goods_sold.name')->first();
+        $inventory = Account::where('name', 'accounting.accounts.inventory.name')->first();
+
+        // Ensure accounts exist
+        $this->assertNotNull($cash, 'Cash account not found in seeder.');
+        $this->assertNotNull($accountsReceivable, 'Accounts Receivable account not found in seeder.');
+        $this->assertNotNull($salesRevenue, 'Sales Revenue account not found in seeder.');
+        $this->assertNotNull($costOfGoodsSold, 'Cost of Goods Sold account not found in seeder.');
+        $this->assertNotNull($inventory, 'Inventory account not found in seeder.');
+
+        $this->user = User::factory()->create([
+            'accounting_settings' => [
+                'cash_account_id' => $cash->id,
+                'accounts_receivable_account_id' => $accountsReceivable->id,
+                'sales_revenue_account_id' => $salesRevenue->id,
+                'cost_of_goods_sold_account_id' => $costOfGoodsSold->id,
+                'inventory_account_id' => $inventory->id,
+            ]
+        ]);
         $this->actingAs($this->user);
     }
 
@@ -144,18 +171,24 @@ class SalesServiceTest extends BaseUnitTestCase
         $grandTotal = 200; // 2 * 100
         $cogs = 100; // 2 * 50
 
+        $accountingSettings = $this->user->accounting_settings;
+        $salesRevenueAccountName = Account::find($accountingSettings['sales_revenue_account_id'])->name;
+        $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+        $costOfGoodsSoldAccountName = Account::find($accountingSettings['cost_of_goods_sold_account_id'])->name;
+        $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+
         $this->accountingServiceMock
             ->shouldReceive('createJournalEntry')
             ->once()
             ->with(
                 Mockery::any(), // description
                 Mockery::any(), // date
-                Mockery::on(function ($transactions) use ($grandTotal, $cogs) {
+                Mockery::on(function ($transactions) use ($grandTotal, $cogs, $salesRevenueAccountName, $accountsReceivableAccountName, $costOfGoodsSoldAccountName, $inventoryAccountName) {
                     $this->assertCount(4, $transactions);
-                    $this->assertEquals($grandTotal, $this->findTransactionAmount($transactions, 'Accounts Receivable', 'debit'));
-                    $this->assertEquals($grandTotal, $this->findTransactionAmount($transactions, 'Sales Revenue', 'credit'));
-                    $this->assertEquals($cogs, $this->findTransactionAmount($transactions, 'Cost of Goods Sold', 'debit'));
-                    $this->assertEquals($cogs, $this->findTransactionAmount($transactions, 'Inventory', 'credit'));
+                    $this->assertEquals($grandTotal, $this->findTransactionAmount($transactions, $accountsReceivableAccountName, 'debit'));
+                    $this->assertEquals($grandTotal, $this->findTransactionAmount($transactions, $salesRevenueAccountName, 'credit'));
+                    $this->assertEquals($cogs, $this->findTransactionAmount($transactions, $costOfGoodsSoldAccountName, 'debit'));
+                    $this->assertEquals($cogs, $this->findTransactionAmount($transactions, $inventoryAccountName, 'credit'));
                     return true;
                 }),
                 Mockery::type(Sales::class)
@@ -181,9 +214,13 @@ class SalesServiceTest extends BaseUnitTestCase
                 "Payment for Sale #{$sale->invoice}",
                 Mockery::any(),
                 Mockery::on(function ($transactions) {
+                    $accountingSettings = Auth::user()->accounting_settings;
+                    $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;
+                    $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+
                     $this->assertCount(2, $transactions);
-                    $this->assertEquals(500, $this->findTransactionAmount($transactions, 'Cash', 'debit'));
-                    $this->assertEquals(500, $this->findTransactionAmount($transactions, 'Accounts Receivable', 'credit'));
+                    $this->assertEquals(500, $this->findTransactionAmount($transactions, $cashAccountName, 'debit'));
+                    $this->assertEquals(500, $this->findTransactionAmount($transactions, $accountsReceivableAccountName, 'credit'));
                     return true;
                 }),
                 Mockery::any() // Payment model

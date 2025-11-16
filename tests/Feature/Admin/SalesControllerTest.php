@@ -27,6 +27,29 @@ class SalesControllerTest extends BaseFeatureTestCase
         $this->user = User::factory()->create();
         $this->user->assignRole('superuser');
 
+        // Retrieve SAK-compliant accounts from the seeder
+        $cash = \App\Models\Account::where('name', 'accounting.accounts.cash.name')->first();
+        $accountsReceivable = \App\Models\Account::where('name', 'accounting.accounts.accounts_receivable.name')->first();
+        $salesRevenue = \App\Models\Account::where('name', 'accounting.accounts.sales_revenue.name')->first();
+        $costOfGoodsSold = \App\Models\Account::where('name', 'accounting.accounts.cost_of_goods_sold.name')->first();
+        $inventory = \App\Models\Account::where('name', 'accounting.accounts.inventory.name')->first();
+
+        // Ensure accounts exist
+        $this->assertNotNull($cash, 'Cash account not found in seeder.');
+        $this->assertNotNull($accountsReceivable, 'Accounts Receivable account not found in seeder.');
+        $this->assertNotNull($salesRevenue, 'Sales Revenue account not found in seeder.');
+        $this->assertNotNull($costOfGoodsSold, 'Cost of Goods Sold account not found in seeder.');
+        $this->assertNotNull($inventory, 'Inventory account not found in seeder.');
+
+        $this->user->accounting_settings = [
+            'cash_account_id' => $cash->id,
+            'accounts_receivable_account_id' => $accountsReceivable->id,
+            'sales_revenue_account_id' => $salesRevenue->id,
+            'cost_of_goods_sold_account_id' => $costOfGoodsSold->id,
+            'inventory_account_id' => $inventory->id,
+        ];
+        $this->user->save();
+
         $this->actingAs($this->user);
 
         Warehouse::factory()->create(['is_main' => true]);

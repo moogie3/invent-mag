@@ -28,6 +28,23 @@ class PurchaseControllerTest extends BaseFeatureTestCase
         $this->user = User::factory()->create();
         $this->user->assignRole('superuser');
 
+        // Retrieve SAK-compliant accounts from the seeder
+        $cash = \App\Models\Account::where('name', 'accounting.accounts.cash.name')->first();
+        $accountsPayable = \App\Models\Account::where('name', 'accounting.accounts.accounts_payable.name')->first();
+        $inventory = \App\Models\Account::where('name', 'accounting.accounts.inventory.name')->first();
+
+        // Ensure accounts exist
+        $this->assertNotNull($cash, 'Cash account not found in seeder.');
+        $this->assertNotNull($accountsPayable, 'Accounts Payable account not found in seeder.');
+        $this->assertNotNull($inventory, 'Inventory account not found in seeder.');
+
+        $this->user->accounting_settings = [
+            'cash_account_id' => $cash->id,
+            'accounts_payable_account_id' => $accountsPayable->id,
+            'inventory_account_id' => $inventory->id,
+        ];
+        $this->user->save();
+
         $this->actingAs($this->user);
 
         Warehouse::factory()->create(['is_main' => true]);

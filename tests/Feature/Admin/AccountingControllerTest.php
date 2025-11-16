@@ -22,6 +22,7 @@ class AccountingControllerTest extends TestCase
         $this->seed(\Database\Seeders\AccountSeeder::class);
         $permission = Permission::create(['name' => 'view-accounting']);
         $role = Role::create(['name' => 'accountant'])->givePermissionTo($permission);
+        
         $this->user = User::factory()->create();
         $this->user->assignRole($role);
 
@@ -33,9 +34,7 @@ class AccountingControllerTest extends TestCase
     {
         $response = $this->get(route('admin.accounting.chart'));
 
-        $response->assertOk();
-        $response->assertViewIs('admin.accounting.chart-of-accounts');
-        $response->assertViewHas('accounts');
+        $response->assertRedirect(route('admin.accounting.accounts.index'));
     }
 
     /** @test */
@@ -63,7 +62,7 @@ class AccountingControllerTest extends TestCase
     /** @test */
     public function it_can_filter_the_general_ledger()
     {
-        $account = Account::where('name', 'Cash')->first();
+        $account = Account::where('name', 'accounting.accounts.cash.name')->first();
         JournalEntry::factory()->hasTransactions(1, ['account_id' => $account->id])->create();
 
         $response = $this->get(route('admin.accounting.ledger', [
@@ -82,9 +81,9 @@ class AccountingControllerTest extends TestCase
     public function it_can_display_the_trial_balance()
     {
         // Create some transactions to ensure balances exist
-        $cash = Account::where('name', 'Cash')->first();
-        $salesRevenue = Account::where('name', 'Sales Revenue')->first();
-        $ar = Account::where('name', 'Accounts Receivable')->first();
+        $cash = Account::where('name', 'accounting.accounts.cash.name')->first();
+        $salesRevenue = Account::where('name', 'accounting.accounts.sales_revenue.name')->first();
+        $ar = Account::where('name', 'accounting.accounts.accounts_receivable.name')->first();
 
         $sale = \App\Models\Sales::factory()->create();
         $payment = \App\Models\Payment::factory()->for($sale, 'paymentable')->create(['amount' => 100]);
@@ -126,5 +125,153 @@ class AccountingControllerTest extends TestCase
 
         $this->assertEquals($totalDebits, $totalCredits);
         $this->assertGreaterThan(0, $totalDebits); // Ensure some transactions were processed
+    }
+
+    /** @test */
+    public function it_can_display_the_accounts_index_page()
+    {
+        $response = $this->get(route('admin.accounting.accounts.index'));
+
+        $response->assertOk();
+        $response->assertViewIs('admin.accounting.accounts.index');
+        $response->assertViewHas('accounts');
+    }
+
+    /** @test */
+    public function it_can_display_the_accounts_create_page()
+    {
+        $response = $this->get(route('admin.accounting.accounts.create'));
+
+        $response->assertOk();
+        $response->assertViewIs('admin.accounting.accounts.create');
+        $response->assertViewHas('accounts');
+    }
+
+    /** @test */
+    public function it_can_store_a_new_account()
+    {
+        $parentAccount = Account::where('code', '1000')->first(); // Assets
+        $this->assertNotNull($parentAccount, 'Parent account with code 1000 not found.');
+
+        $response = $this->post(route('admin.accounting.accounts.store'), [
+            'name' => 'Test Account',
+            'code' => '9000',
+            'type' => 'asset',
+            'parent_id' => $parentAccount->id,
+            'description' => 'A test account',
+        ]);
+
+        $response->assertRedirect(route('admin.accounting.accounts.index'));
+        $response->assertSessionHas('success', 'Account created successfully.');
+        $this->assertDatabaseHas('accounts', [
+            'name' => 'Test Account',
+            'code' => '9000',
+            'type' => 'asset',
+            'parent_id' => $parentAccount->id,
+            'level' => $parentAccount->level + 1,
+        ]);
+    }
+
+    /** @test */
+    public function it_validates_account_store_request()
+    {
+        $response = $this->post(route('admin.accounting.accounts.store'), [
+            'name' => '',
+            'code' => '',
+            'type' => 'invalid_type',
+        ]);
+
+        $response->assertSessionHasErrors(['name', 'code', 'type']);
+    }
+
+    /** @test */
+    public function it_can_display_the_accounts_edit_page()
+    {
+        $account = Account::factory()->create();
+
+        $response = $this->get(route('admin.accounting.accounts.edit', $account));
+
+        $response->assertOk();
+        $response->assertViewIs('admin.accounting.accounts.edit');
+        $response->assertViewHas('account', $account);
+        $response->assertViewHas('accounts');
+    }
+
+    /** @test */
+    public function it_can_update_an_account()
+    {
+        $account = Account::factory()->create(['name' => 'Old Name', 'code' => 'OLD1', 'type' => 'asset']);
+        $parentAccount = Account::where('code', '1000')->first(); // Assets
+
+        $response = $this->put(route('admin.accounting.accounts.update', $account), [
+            'name' => 'Updated Name',
+            'code' => 'UPD1',
+            'type' => 'liability',
+            'parent_id' => $parentAccount->id,
+            'description' => 'Updated description',
+        ]);
+
+        $response->assertRedirect(route('admin.accounting.accounts.index'));
+        $response->assertSessionHas('success', 'Account updated successfully.');
+        $this->assertDatabaseHas('accounts', [
+            'id' => $account->id,
+            'name' => 'Updated Name',
+            'code' => 'UPD1',
+            'type' => 'liability',
+            'parent_id' => $parentAccount->id,
+            'level' => $parentAccount->level + 1,
+        ]);
+    }
+
+    /** @test */
+    public function it_validates_account_update_request()
+    {
+        $account = Account::factory()->create();
+
+        $response = $this->put(route('admin.accounting.accounts.update', $account), [
+            'name' => '',
+            'code' => '',
+            'type' => 'invalid_type',
+        ]);
+
+        $response->assertSessionHasErrors(['name', 'code', 'type']);
+    }
+
+    /** @test */
+    public function it_can_delete_an_account()
+    {
+        $account = Account::factory()->create();
+
+        $response = $this->delete(route('admin.accounting.accounts.destroy', $account));
+
+        $response->assertRedirect(route('admin.accounting.accounts.index'));
+        $response->assertSessionHas('success', 'Account deleted successfully.');
+        $this->assertDatabaseMissing('accounts', ['id' => $account->id]);
+    }
+
+    /** @test */
+    public function it_cannot_delete_account_with_transactions()
+    {
+        $account = Account::where('name', 'accounting.accounts.cash.name')->first();
+        JournalEntry::factory()->hasTransactions(1, ['account_id' => $account->id])->create();
+
+        $response = $this->delete(route('admin.accounting.accounts.destroy', $account));
+
+        $response->assertRedirect(route('admin.accounting.accounts.index'));
+        $response->assertSessionHas('error', 'Account cannot be deleted because it has transactions or child accounts.');
+        $this->assertDatabaseHas('accounts', ['id' => $account->id]);
+    }
+
+    /** @test */
+    public function it_cannot_delete_account_with_children()
+    {
+        $parent = Account::where('code', '1000')->first(); // Assets
+        $child = Account::factory()->create(['parent_id' => $parent->id]);
+
+        $response = $this->delete(route('admin.accounting.accounts.destroy', $parent));
+
+        $response->assertRedirect(route('admin.accounting.accounts.index'));
+        $response->assertSessionHas('error', 'Account cannot be deleted because it has transactions or child accounts.');
+        $this->assertDatabaseHas('accounts', ['id' => $parent->id]);
     }
 }

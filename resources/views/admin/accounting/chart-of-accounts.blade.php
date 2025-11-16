@@ -48,9 +48,9 @@
                                     @foreach ($accountGroup as $account)
                                         <tr>
                                             <td>{{ $account->code }}</td>
-                                            <td>{{ $account->name }}</td>
-                                            <td>{{ ucfirst($account->type) }}</td>
-                                            <td class="text-muted">{{ $account->description }}</td>
+                                            <td>{{ __($account->name) }}</td>
+                                            <td>{{ __(ucfirst($account->type)) }}</td>
+                                            <td class="text-muted">{{ __($account->description) }}</td>
                                         </tr>
                                     @endforeach
                                 @endforeach

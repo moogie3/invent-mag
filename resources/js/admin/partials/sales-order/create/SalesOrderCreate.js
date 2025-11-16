@@ -192,7 +192,7 @@ export class SalesOrderCreate extends SalesOrderModule {
                 this.updateStockDisplay(); // Update stock display after data is fetched
             })
             .catch(error => {
-                console.error('Error fetching product details:', error);
+                // // console.error('Error fetching product details:', error);
                 this.elements.priceField.value = "";
                 this.elements.sellingPriceField.value = "";
                 this.elements.customerPriceField.value = "";
@@ -337,7 +337,7 @@ export class SalesOrderCreate extends SalesOrderModule {
                 }
             })
             .catch((error) => {
-                console.error("Error fetching past price:", error);
+                // console.error("Error fetching past price:", error);
                 this.elements.pastPriceField.value = "0";
             });
     }
@@ -398,7 +398,7 @@ export class SalesOrderCreate extends SalesOrderModule {
             !this.elements.quantity ||
             !this.elements.customerPriceField
         ) {
-            console.warn("Required form elements not found for adding product");
+            // console.warn("Required form elements not found for adding product");
             return;
         }
 

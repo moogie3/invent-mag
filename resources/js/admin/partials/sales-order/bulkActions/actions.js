@@ -25,7 +25,7 @@ function performBulkDeleteSales(selectedIds, confirmButton, modal) {
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     if (!csrfToken) {
-        console.error("CSRF token not found");
+        // // console.error("CSRF token not found");
         InventMagApp.showToast(
             "Error",
             "Security token not found. Please refresh the page.",
@@ -65,7 +65,7 @@ function performBulkDeleteSales(selectedIds, confirmButton, modal) {
             }
         })
         .catch((error) => {
-            console.error("Error:", error);
+            // // console.error("Error:", error);
             InventMagApp.showToast(
                 "Error",
                 "An error occurred while deleting sales orders.",
@@ -75,6 +75,7 @@ function performBulkDeleteSales(selectedIds, confirmButton, modal) {
         .finally(() => {
             confirmButton.innerHTML = originalText;
             confirmButton.disabled = false;
+            modal.hide();
         });
 }
 
@@ -338,7 +339,7 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
     if (!csrfToken) {
-        console.error("CSRF token not found");
+        // // console.error("CSRF token not found");
         InventMagApp.showToast(
             "Error",
             "Security token not found. Please refresh the page.",
@@ -378,7 +379,7 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
             }
         })
         .catch((error) => {
-            console.error("Error:", error);
+            // // console.error("Error:", error);
             InventMagApp.showToast(
                 "Error",
                 "An error occurred while updating sales orders.",

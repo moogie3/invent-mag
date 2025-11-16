@@ -84,23 +84,23 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (!response.ok) {
-                console.error('Failed to save theme setting:', response.statusText);
+                // console.error('Failed to save theme setting:', response.statusText);
             }
             return response.json();
         })
         .then(data => {
             if (data.success) {
-                console.log('Theme setting saved successfully.');
+                // console.log('Theme setting saved successfully.');
                 const event = new CustomEvent('themeModeUpdated', {
                     detail: { themeMode: newTheme }
                 });
                 document.dispatchEvent(event);
             } else {
-                console.error('Error saving theme setting:', data.message);
+                // console.error('Error saving theme setting:', data.message);
             }
         })
         .catch(error => {
-            console.error('Error sending AJAX request for theme setting:', error);
+            // console.error('Error sending AJAX request for theme setting:', error);
         });
     }
 

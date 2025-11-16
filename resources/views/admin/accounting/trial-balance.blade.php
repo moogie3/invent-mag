@@ -51,7 +51,7 @@
                             @forelse($reportData as $item)
                                 <tr>
                                     <td class="text-muted">{{ $item['code'] }}</td>
-                                    <td>{{ $item['name'] }}</td>
+                                    <td>{{ __($item['name']) }}</td>
                                     <td class="text-end">
                                         {{ $item['debit'] > 0 ? \App\Helpers\CurrencyHelper::format($item['debit']) : '-' }}
                                     </td>

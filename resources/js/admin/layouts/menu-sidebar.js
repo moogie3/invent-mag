@@ -5,7 +5,7 @@ document.addEventListener("usersettingsloaded", function () {
     const body = document.body;
 
     if (!sidebar || !mainContent) {
-        console.error("Required elements not found!");
+        // console.error("Required elements not found!");
         return;
     }
 

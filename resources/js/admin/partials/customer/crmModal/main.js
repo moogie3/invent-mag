@@ -19,7 +19,7 @@ export function initCrmCustomerModal() {
 
             crmState.customerId = button.getAttribute("data-id");
             if (!crmState.customerId) {
-                console.error("Customer ID not found");
+                // // console.error("Customer ID not found");
                 showErrorState("Customer ID not found");
                 return;
             }
@@ -70,7 +70,7 @@ function loadProductHistory(id) {
         productHistoryContent.innerHTML = ''; // Clear content, loading state is handled by ui.js
         hideNoProductHistoryMessage();
     } else {
-        console.error("Element with ID 'productHistoryContent' not found!");
+        // // console.error("Element with ID 'productHistoryContent' not found!");
         return;
     }
 
@@ -172,13 +172,13 @@ function loadProductHistory(id) {
                     showNoProductHistoryMessage();
                 }
             } else {
-                console.error(
-                    "Element with ID 'crmProductHistoryContent' was null after fetch!"
-                );
+                // // console.error(
+                //     "Element with ID 'crmProductHistoryContent' was null after fetch!"
+                // );
             }
         })
         .catch((error) => {
-            console.error("Fetch error in loadProductHistory:", error);
+            // // console.error("Fetch error in loadProductHistory:", error);
             if (productHistoryContent) {
                 productHistoryContent.innerHTML = `
         <div class="text-center py-5">

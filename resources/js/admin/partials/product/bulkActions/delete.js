@@ -82,7 +82,7 @@ function performBulkDelete(ids, button, modal) {
             }
         })
         .catch((error) => {
-            console.error("Delete error:", error);
+            // // console.error("Delete error:", error);
             InventMagApp.showToast(
                 "Error",
                 "An error occurred while deleting products.",

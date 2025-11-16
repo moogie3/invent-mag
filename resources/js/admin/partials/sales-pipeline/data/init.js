@@ -34,7 +34,7 @@ export async function initializeData() {
                 setAllCustomers(JSON.parse(customersData));
             }
         } catch (error) {
-            console.error("Error parsing initial data:", error);
+            // // console.error("Error parsing initial data:", error);
             InventMagApp.showToast(
                 "Error",
                 "Error loading initial data. Please refresh the page.",
@@ -47,7 +47,7 @@ export async function initializeData() {
     if (allPipelines.length > 0) {
         renderPipelinesSelect();
     } else {
-        console.warn("No pipelines found");
+        // console.warn("No pipelines found");
     }
 
     renderPipelinesList();
@@ -63,7 +63,7 @@ export async function initializeData() {
         populateCustomerSelect(opportunityCustomerSelect);
         populateCustomerSelect(editOpportunityCustomerSelect);
     } else {
-        console.warn("No customers found");
+        // console.warn("No customers found");
     }
 
     try {
@@ -75,7 +75,7 @@ export async function initializeData() {
         }
         setAllProducts(await productsResponse.json());
     } catch (error) {
-        console.error("Error fetching products:", error);
+        // // console.error("Error fetching products:", error);
         InventMagApp.showToast(
             "Error",
             "Failed to load product data. Please refresh the page.",
@@ -97,7 +97,7 @@ export async function fetchData() {
         renderPipelinesSelect(false);
         renderPipelinesList();
     } catch (error) {
-        console.error("Error re-fetching data:", error);
+        // // console.error("Error re-fetching data:", error);
         InventMagApp.showToast(
             "Error",
             "Failed to re-fetch data. Please try again.",

@@ -29,7 +29,7 @@ function setupQuickCreateProductForm() {
 
         const url = form.getAttribute("action");
         if (!url) {
-            console.error("Form action URL is missing");
+            // // console.error("Form action URL is missing");
             InventMagApp.showToast("Error", "Form configuration error", "error");
             return;
         }
@@ -38,7 +38,7 @@ function setupQuickCreateProductForm() {
             'meta[name="csrf-token"]'
         )?.content;
         if (!csrfToken) {
-            console.error("CSRF token not found");
+            // // console.error("CSRF token not found");
             InventMagApp.showToast("Error", "Security token missing", "error");
             return;
         }
@@ -82,11 +82,11 @@ function setupQuickCreateProductForm() {
                         data.message || "Failed to create product",
                         "error"
                     );
-                    console.error("Error response:", data);
+                    // // console.error("Error response:", data);
                 }
             })
             .catch((error) => {
-                console.error("Error:", error);
+                // // console.error("Error:", error);
                 InventMagApp.showToast(
                     "Error",
                     "An error occurred while creating the product",

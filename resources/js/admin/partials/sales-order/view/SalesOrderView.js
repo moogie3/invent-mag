@@ -108,7 +108,7 @@ export class SalesOrderView extends SalesOrderModule {
                 }
             })
             .catch((error) => {
-                console.error("Error loading sales details:", error);
+                // // console.error("Error loading sales details:", error);
                 if (this.elements.viewSalesModalContent) {
                     this.elements.viewSalesModalContent.innerHTML =
                         '<div class="alert alert-danger">Failed to load sales details.</div>';

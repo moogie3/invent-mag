@@ -61,7 +61,7 @@ export function initConvertOpportunityForm() {
                     }
                 })
                 .catch((error) => {
-                    console.error("Error:", error);
+                    // // console.error("Error:", error);
                     const convertModal = bootstrap.Modal.getInstance(
                         document.getElementById("convertOpportunityModal")
                     );

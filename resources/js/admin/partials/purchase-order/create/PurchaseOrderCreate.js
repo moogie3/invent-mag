@@ -52,7 +52,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
 
     initFlatpickr() {
         if (typeof flatpickr === "undefined") {
-            console.warn("Flatpickr library not loaded");
+            // console.warn("Flatpickr library not loaded");
             return;
         }
 
@@ -74,10 +74,10 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                     }
                 );
             } catch (error) {
-                console.warn(
-                    "Failed to initialize order date flatpickr:",
-                    error
-                );
+                // console.warn(
+                //     "Failed to initialize order date flatpickr:",
+                //     error
+                // );
             }
         }
 
@@ -88,7 +88,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                     flatpickrConfig
                 );
             } catch (error) {
-                console.warn("Failed to initialize due date flatpickr:", error);
+                // console.warn("Failed to initialize due date flatpickr:", error);
             }
         }
     }
@@ -312,7 +312,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             !this.elements.quantity ||
             !this.elements.new_price
         ) {
-            console.warn("Required form elements not found for adding product");
+            // console.warn("Required form elements not found for adding product");
             return;
         }
 

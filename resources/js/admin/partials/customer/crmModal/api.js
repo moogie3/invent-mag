@@ -11,7 +11,7 @@ import { getStatusBadgeHtml } from "../utils/status.js";
 
 export function loadCrmData(id, page, append = false) {
     if (!id) {
-        console.error("Customer ID is required");
+        // console.error("Customer ID is required");
         showErrorState("Customer ID is required");
         return;
     }
@@ -48,7 +48,7 @@ export function loadCrmData(id, page, append = false) {
             }
         })
         .catch((error) => {
-            console.error("Error loading CRM data:", error);
+            // console.error("Error loading CRM data:", error);
             InventMagApp.showToast(
                 "Error",
                 `Failed to load CRM data: ${error.message}`,

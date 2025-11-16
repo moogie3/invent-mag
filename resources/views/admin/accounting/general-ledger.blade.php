@@ -33,7 +33,7 @@
                                 <option value="">{{ __('messages.select_an_account') }}</option>
                                 @foreach ($accounts as $account)
                                     <option value="{{ $account->id }}" @if ($selectedAccount && $selectedAccount->id == $account->id) selected @endif>
-                                        {{ $account->name }} ({{ $account->code }})
+                                        {{ __($account->name) }} ({{ $account->code }})
                                     </option>
                                 @endforeach
                             </select>
@@ -58,7 +58,7 @@
             @if ($selectedAccount)
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">{{ __('messages.ledger_for') }} {{ $selectedAccount->name }}</h3>
+                        <h3 class="card-title">{{ __('messages.ledger_for') }} {{ __($selectedAccount->name) }}</h3>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-vcenter card-table">

@@ -239,7 +239,7 @@ function handleBulkStockUpdate() {
 
     const csrf = document.querySelector('meta[name="csrf-token"]');
     if (!csrf) {
-        console.error("CSRF token not found.");
+        // // console.error("CSRF token not found.");
         InventMagApp.showToast("Error", "Security token not found.", "error");
         resetButton(confirmBtn, original);
         return;
@@ -379,7 +379,7 @@ function handleBulkStockUpdate() {
             }
         })
         .catch((error) => {
-            console.error("Fetch or processing error:", error);
+            // // console.error("Fetch or processing error:", error);
             InventMagApp.showToast(
                 "Error",
                 `An error occurred while updating stock: ${error.message}`,

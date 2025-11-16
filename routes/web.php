@@ -298,6 +298,9 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/', [SettingsController::class, 'index'])->name('admin.setting.index');
             Route::put('/', [SettingsController::class, 'update'])->name('admin.setting.update');
             Route::put('/update-theme-mode', [SettingsController::class, 'updateThemeMode'])->name('admin.setting.update-theme-mode');
+            Route::post('/apply-coa-template', [SettingsController::class, 'applyCoaTemplate'])->name('admin.setting.apply-coa-template');
+            Route::get('/accounting', [SettingsController::class, 'accounting'])->name('admin.setting.accounting');
+            Route::post('/accounting', [SettingsController::class, 'updateAccounting'])->name('admin.setting.accounting.update');
         });
 
         // Accounting Routes
@@ -307,6 +310,14 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/journal', [\App\Http\Controllers\Admin\AccountingController::class, 'journal'])->name('admin.accounting.journal');
             Route::get('/general-ledger', [\App\Http\Controllers\Admin\AccountingController::class, 'generalLedger'])->name('admin.accounting.ledger');
             Route::get('/trial-balance', [\App\Http\Controllers\Admin\AccountingController::class, 'trialBalance'])->name('admin.accounting.trial_balance');
+
+            // COA Management
+            Route::get('/accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsIndex'])->name('admin.accounting.accounts.index');
+            Route::get('/accounts/create', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsCreate'])->name('admin.accounting.accounts.create');
+            Route::post('/accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsStore'])->name('admin.accounting.accounts.store');
+            Route::get('/accounts/{account}/edit', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsEdit'])->name('admin.accounting.accounts.edit');
+            Route::put('/accounts/{account}', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsUpdate'])->name('admin.accounting.accounts.update');
+            Route::delete('/accounts/{account}', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsDestroy'])->name('admin.accounting.accounts.destroy');
         });
     });
 });

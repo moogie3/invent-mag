@@ -15,6 +15,7 @@ use App\Helpers\SalesHelper;
 use App\Helpers\CurrencyHelper;
 use App\Models\Customer;
 use Carbon\Carbon;
+use App\Models\Account;
 
 class SalesService
 {
@@ -234,12 +235,21 @@ class SalesService
                 }
             }
 
+            // Get accounting settings from the user
+            $accountingSettings = Auth::user()->accounting_settings;
+
+            // Retrieve account names using the IDs from settings
+            $salesRevenueAccountName = Account::find($accountingSettings['sales_revenue_account_id'])->name;
+            $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+            $costOfGoodsSoldAccountName = Account::find($accountingSettings['cost_of_goods_sold_account_id'])->name;
+            $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+
             // Create Journal Entry for the sale
             $transactions = [
-                ['account_name' => 'Accounts Receivable', 'type' => 'debit', 'amount' => $grandTotal],
-                ['account_name' => 'Sales Revenue', 'type' => 'credit', 'amount' => $grandTotal],
-                ['account_name' => 'Cost of Goods Sold', 'type' => 'debit', 'amount' => $totalCostOfGoods],
-                ['account_name' => 'Inventory', 'type' => 'credit', 'amount' => $totalCostOfGoods],
+                ['account_name' => $accountsReceivableAccountName, 'type' => 'debit', 'amount' => $grandTotal],
+                ['account_name' => $salesRevenueAccountName, 'type' => 'credit', 'amount' => $grandTotal],
+                ['account_name' => $costOfGoodsSoldAccountName, 'type' => 'debit', 'amount' => $totalCostOfGoods],
+                ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalCostOfGoods],
             ];
 
             $this->accountingService->createJournalEntry(
@@ -377,10 +387,17 @@ class SalesService
             $this->updateSaleStatus($sale);
             $sale->refresh();
 
+            // Get accounting settings from the user
+            $accountingSettings = Auth::user()->accounting_settings;
+
+            // Retrieve account names using the IDs from settings
+            $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;
+            $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+
             // Create Journal Entry for the payment
             $transactions = [
-                ['account_name' => 'Cash', 'type' => 'debit', 'amount' => $data['amount']],
-                ['account_name' => 'Accounts Receivable', 'type' => 'credit', 'amount' => $data['amount']],
+                ['account_name' => $cashAccountName, 'type' => 'debit', 'amount' => $data['amount']],
+                ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $data['amount']],
             ];
 
             $this->accountingService->createJournalEntry(

@@ -76,7 +76,7 @@ export function confirmBulkMarkAsPaid() {
             }
         })
         .catch((error) => {
-            console.error("Error:", error);
+            // // console.error("Error:", error);
             InventMagApp.showToast(
                 "Error",
                 "An error occurred while updating the transactions.",

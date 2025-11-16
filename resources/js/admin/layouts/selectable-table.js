@@ -1,6 +1,6 @@
 export function initSelectableTable(options = {}) {
     const { registerEditShortcut = true, registerDeleteShortcut = true } = options;
-    console.log("initSelectableTable called!");
+    // console.log("initSelectableTable called!");
     const tables = document.querySelectorAll(".table-vcenter");
     let selectionModeActive = false;
     let lastActionType = null; // 'edit' or 'delete'
@@ -75,7 +75,7 @@ export function initSelectableTable(options = {}) {
 
             const dropdownToggle =
                 selectedRow.querySelector(".dropdown-toggle");
-            console.log("Dropdown toggle found:", dropdownToggle);
+            // console.log("Dropdown toggle found:", dropdownToggle);
 
             if (dropdownToggle) {
                 const bsDropdown = new bootstrap.Dropdown(dropdownToggle);
@@ -85,7 +85,7 @@ export function initSelectableTable(options = {}) {
                     const openDropdownMenu = document.querySelector(
                         ".dropdown-menu.show"
                     );
-                    console.log("Open dropdown menu found:", openDropdownMenu);
+                    // console.log("Open dropdown menu found:", openDropdownMenu);
 
                     if (openDropdownMenu) {
                         let actionButton = null;
@@ -116,13 +116,13 @@ export function initSelectableTable(options = {}) {
                             }
                         }
 
-                        console.log(
-                            "Attempting to find action button with selector:",
-                            selector,
-                            "in open dropdown:",
-                            openDropdownMenu
-                        );
-                        console.log("Found action button:", actionButton);
+                        // console.log(
+                        //     "Attempting to find action button with selector:",
+                        //     selector,
+                        //     "in open dropdown:",
+                        //     openDropdownMenu
+                        // );
+                        // console.log("Found action button:", actionButton);
 
                         if (actionButton) {
                             if (actionType === "edit") {
@@ -151,9 +151,9 @@ export function initSelectableTable(options = {}) {
                             }
                         }
                     } else {
-                        console.error(
-                            "No open dropdown menu found after showing dropdown toggle."
-                        );
+                        // console.error(
+                        //     "No open dropdown menu found after showing dropdown toggle."
+                        // );
                         if (
                             window.InventMagApp &&
                             window.InventMagApp.showToast

@@ -42,7 +42,7 @@ export function extractProductDataFromRow(row) {
             low_stock_threshold: lowStockThreshold,
         };
     } catch (error) {
-        console.error("Error extracting product data:", error);
+        // // console.error("Error extracting product data:", error);
         return null;
     }
 }

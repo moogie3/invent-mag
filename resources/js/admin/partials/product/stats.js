@@ -68,5 +68,5 @@ export function fetchProductMetrics() {
         .then(data => {
             updateProductStats(data);
         })
-        .catch(error => console.error('Error fetching product metrics:', error));
+        .catch(error => { /* // console.error('Error fetching product metrics:', error) */ });
 }

@@ -31,7 +31,7 @@ export class PurchaseOrderModule {
         try {
             return document.getElementById(id);
         } catch (error) {
-            console.warn(`Element with ID '${id}' not found:`, error);
+            // console.warn(`Element with ID '${id}' not found:`, error);
             return null;
         }
     }

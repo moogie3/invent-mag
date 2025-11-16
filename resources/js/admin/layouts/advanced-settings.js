@@ -13,16 +13,16 @@ function applyAdvancedSettings(settings) {
         // TODO: Implement the desired debug mode functionality.
         // This could involve logging specific data to the console,
         // displaying a debug overlay, or other debugging tools.
-        console.log('Debug mode is enabled. No specific functionality has been implemented yet.');
+        // console.log('Debug mode is enabled. No specific functionality has been implemented yet.');
     }
 
     // 2. Enable Keyboard Shortcuts
     if (settings.enable_keyboard_shortcuts) {
-        console.log('Keyboard shortcuts are enabled.');
+        // console.log('Keyboard shortcuts are enabled.');
         // The shortcutManager is always active, and the help modal is triggered by shift+? directly.
         // No explicit initialization needed here.
     } else {
-        console.log('Keyboard shortcuts are disabled.');
+        // console.log('Keyboard shortcuts are disabled.');
     }
 
     // 3. Show Tooltips

@@ -12,6 +12,7 @@ use App\Helpers\CurrencyHelper;
 use App\Models\Supplier;
 use App\Models\User;
 use Carbon\Carbon;
+use App\Models\Account;
 
 class PurchaseService
 {
@@ -180,10 +181,17 @@ class PurchaseService
             $finalTotal = $totalAmount - $orderDiscount;
             $purchase->update(['total' => $finalTotal]);
 
+            // Get accounting settings from the user
+            $accountingSettings = Auth::user()->accounting_settings;
+
+            // Retrieve account names using the IDs from settings
+            $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+            $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
+
             // Create Journal Entry for the purchase
             $transactions = [
-                ['account_name' => 'Inventory', 'type' => 'debit', 'amount' => $finalTotal],
-                ['account_name' => 'Accounts Payable', 'type' => 'credit', 'amount' => $finalTotal],
+                ['account_name' => $inventoryAccountName, 'type' => 'debit', 'amount' => $finalTotal],
+                ['account_name' => $accountsPayableAccountName, 'type' => 'credit', 'amount' => $finalTotal],
             ];
 
             $this->accountingService->createJournalEntry(
@@ -269,10 +277,17 @@ class PurchaseService
             $purchase->load('payments'); // Refresh the payments relationship
             $this->updatePurchaseStatus($purchase);
 
+            // Get accounting settings from the user
+            $accountingSettings = Auth::user()->accounting_settings;
+
+            // Retrieve account names using the IDs from settings
+            $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
+            $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;
+
             // Create Journal Entry for the payment
             $transactions = [
-                ['account_name' => 'Accounts Payable', 'type' => 'debit', 'amount' => $data['amount']],
-                ['account_name' => 'Cash', 'type' => 'credit', 'amount' => $data['amount']],
+                ['account_name' => $accountsPayableAccountName, 'type' => 'debit', 'amount' => $data['amount']],
+                ['account_name' => $cashAccountName, 'type' => 'credit', 'amount' => $data['amount']],
             ];
 
             $this->accountingService->createJournalEntry(

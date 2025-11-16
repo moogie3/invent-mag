@@ -42,13 +42,13 @@ export class PurchaseOrderView extends PurchaseOrderModule {
         if (this.elements.deleteForm) {
             this.elements.deleteForm.action = url;
         } else {
-            console.error("Delete form element not found");
+            // // console.error("Delete form element not found");
         }
     }
 
     loadPoDetails(id) {
         if (!this.elements.viewPoModalContent) {
-            console.error("Modal content element not found");
+            // // console.error("Modal content element not found");
             return;
         }
 

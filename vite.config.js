@@ -6,8 +6,8 @@ import path from "path";
 export default defineConfig({
     test: {
         globals: true,
-        environment: 'jsdom',
-        setupFiles: 'tests/js/setup.js',
+        environment: "jsdom",
+        setupFiles: "tests/js/setup.js",
     },
     plugins: [
         laravel({
@@ -42,6 +42,7 @@ export default defineConfig({
                 "resources/js/menu-sidebar.js",
                 "resources/js/admin/layouts/theme-toggle.js",
                 "resources/js/admin/layouts/theme-visibility.js",
+                "resources/js/admin/layouts/theme-initializer.js",
             ],
             refresh: true,
         }),

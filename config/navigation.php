@@ -57,6 +57,38 @@ return [
             'permission' => 'view-warehouse',
         ],
         [
+            'title' => 'messages.accounting',
+            'icon' => 'ti ti-calculator',
+            'permission' => 'view-accounting',
+            'key' => 'accounting',
+            'children' => [
+                [
+                    'title' => 'messages.ledger',
+                    'route' => 'admin.accounting.ledger',
+                    'permission' => 'view-accounting',
+                    'icon' => 'ti ti-book',
+                ],
+                [
+                    'title' => 'messages.journal',
+                    'route' => 'admin.accounting.journal',
+                    'permission' => 'view-accounting',
+                    'icon' => 'ti ti-notebook',
+                ],
+                [
+                    'title' => 'messages.coa',
+                    'route' => 'admin.accounting.chart',
+                    'permission' => 'view-accounting',
+                    'icon' => 'ti ti-list-details',
+                ],
+                [
+                    'title' => 'messages.trialbalance',
+                    'route' => 'admin.accounting.trial_balance',
+                    'permission' => 'view-accounting',
+                    'icon' => 'ti ti-scale',
+                ],
+            ],
+        ],
+        [
             'title' => 'messages.reports',
             'icon' => 'ti ti-report',
             'permission' => 'view-reports',

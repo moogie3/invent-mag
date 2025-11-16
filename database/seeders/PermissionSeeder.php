@@ -78,5 +78,8 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'manage-sales-pipelines']);
         Permission::firstOrCreate(['name' => 'manage-pipeline-stages']);
         Permission::firstOrCreate(['name' => 'manage-sales-opportunities']);
+
+        // Accounting Permissions
+        Permission::firstOrCreate(['name' => 'view-accounting']);
     }
 }

@@ -81,12 +81,19 @@ class Purchase extends Model
 
     public function getGrandTotalAttribute()
     {
-        $orderDiscount = \App\Helpers\PurchaseHelper::calculateDiscount(
-            $this->sub_total,
-            $this->discount_total,
-            $this->discount_total_type
-        );
-        return $this->sub_total - $orderDiscount;
+        // If the items relationship is loaded, calculate precisely.
+        if ($this->relationLoaded('items')) {
+            $subTotal = $this->items->sum('total');
+            $orderDiscount = \App\Helpers\PurchaseHelper::calculateDiscount(
+                $subTotal,
+                $this->discount_total,
+                $this->discount_total_type
+            );
+            return $subTotal - $orderDiscount;
+        }
+        
+        // Otherwise, fall back to the stored total, which is sufficient for most cases.
+        return $this->attributes['total'];
     }
 
     public function getTotalAmountAttribute()
@@ -105,5 +112,15 @@ class Purchase extends Model
     protected static function newFactory()
     {
         return \Database\Factories\PurchaseFactory::new();
+    }
+
+    /**
+     * Get the path to view the model.
+     *
+     * @return string
+     */
+    public function path(): string
+    {
+        return route('admin.po.view', $this);
     }
 }

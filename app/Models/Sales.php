@@ -189,5 +189,13 @@ class Sales extends Model
             ->setTimezone('UTC');
     }
 
-    
+    /**
+     * Get the path to view the model.
+     *
+     * @return string
+     */
+    public function path(): string
+    {
+        return route('admin.sales.view', $this);
+    }
 }

@@ -26,4 +26,17 @@ class Payment extends Model
     {
         return $this->morphTo();
     }
+
+    /**
+     * Get the path to view the model.
+     *
+     * @return string
+     */
+    public function path(): string
+    {
+        if ($this->paymentable) {
+            return $this->paymentable->path();
+        }
+        return '#'; // Fallback if no paymentable is found
+    }
 }

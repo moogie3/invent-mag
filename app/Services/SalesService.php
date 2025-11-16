@@ -18,6 +18,13 @@ use Carbon\Carbon;
 
 class SalesService
 {
+    protected AccountingService $accountingService;
+
+    public function __construct(AccountingService $accountingService)
+    {
+        $this->accountingService = $accountingService;
+    }
+
     public function getSalesIndexData(array $filters, int $entries)
     {
         $query = Sales::with(['product', 'customer', 'user']);
@@ -187,12 +194,16 @@ class SalesService
                 'is_pos' => false,
             ]);
 
+            $totalCostOfGoods = 0;
+
             foreach ($products as $productData) {
-                $product = Product::find($productData['product_id']); // Find product to get its name
+                $product = Product::find($productData['product_id']);
+                $totalCostOfGoods += $product->price * $productData['quantity'];
+
                 SalesItem::create([
                     'sales_id' => $sale->id,
                     'product_id' => $productData['product_id'],
-                    'name' => $product->name, // Added product name
+                    'name' => $product->name,
                     'quantity' => $productData['quantity'],
                     'customer_price' => $productData['customer_price'],
                     'discount' => $productData['discount'] ?? 0,
@@ -200,7 +211,6 @@ class SalesService
                     'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed'),
                 ]);
 
-                $product = Product::find($productData['product_id']);
                 if ($product) {
                     $product->decrement('stock_quantity', $productData['quantity']);
 
@@ -224,6 +234,21 @@ class SalesService
                 }
             }
 
+            // Create Journal Entry for the sale
+            $transactions = [
+                ['account_name' => 'Accounts Receivable', 'type' => 'debit', 'amount' => $grandTotal],
+                ['account_name' => 'Sales Revenue', 'type' => 'credit', 'amount' => $grandTotal],
+                ['account_name' => 'Cost of Goods Sold', 'type' => 'debit', 'amount' => $totalCostOfGoods],
+                ['account_name' => 'Inventory', 'type' => 'credit', 'amount' => $totalCostOfGoods],
+            ];
+
+            $this->accountingService->createJournalEntry(
+                "Sale Invoice #{$sale->invoice}",
+                Carbon::parse($data['order_date']),
+                $transactions,
+                $sale
+            );
+
             return $sale;
         });
     }
@@ -231,6 +256,10 @@ class SalesService
     public function updateSale(Sales $sale, array $data): Sales
     {
         return DB::transaction(function () use ($sale, $data) {
+            // Note: Proper accounting for updates is complex.
+            // A simple approach is to create a reversing entry and then a new entry.
+            // For now, this is left as a future improvement.
+            
             $products = json_decode($data['products'], true);
             if (!$products || !is_array($products)) {
                 throw new \Exception('Invalid product data');
@@ -346,7 +375,20 @@ class SalesService
 
             $sale->load('payments'); // Refresh the payments relationship
             $this->updateSaleStatus($sale);
-            $sale->refresh(); // Added refresh to ensure latest status is available
+            $sale->refresh();
+
+            // Create Journal Entry for the payment
+            $transactions = [
+                ['account_name' => 'Cash', 'type' => 'debit', 'amount' => $data['amount']],
+                ['account_name' => 'Accounts Receivable', 'type' => 'credit', 'amount' => $data['amount']],
+            ];
+
+            $this->accountingService->createJournalEntry(
+                "Payment for Sale #{$sale->invoice}",
+                Carbon::parse($data['payment_date']),
+                $transactions,
+                $payment
+            );
 
             return $payment;
         });
@@ -371,6 +413,9 @@ class SalesService
     public function deleteSale(Sales $sale): void
     {
         DB::transaction(function () use ($sale) {
+            // Note: Proper accounting for deletions would require a reversing journal entry.
+            // This is left as a future improvement.
+
             foreach ($sale->salesItems as $item) {
                 $product = Product::find($item->product_id);
                 if ($product) {
@@ -403,30 +448,7 @@ class SalesService
         DB::transaction(function () use ($ids) {
             $sales = Sales::whereIn('id', $ids)->with('salesItems')->get();
             foreach ($sales as $sale) {
-                foreach ($sale->salesItems as $item) {
-                    $product = Product::find($item->product_id);
-                    if ($product) {
-                        $product->increment('stock_quantity', $item->quantity);
-
-                        // Revert remaining quantity
-                        $poItems = POItem::where('product_id', $product->id)
-                            ->orderBy('expiry_date', 'desc')
-                            ->get();
-
-                        $quantityToIncrement = $item->quantity;
-
-                        foreach ($poItems as $poItem) {
-                            if ($quantityToIncrement <= 0) {
-                                break;
-                            }
-
-                            $increment = min($poItem->quantity - $poItem->remaining_quantity, $quantityToIncrement);
-                            $poItem->increment('remaining_quantity', $increment);
-                            $quantityToIncrement -= $increment;
-                        }
-                    }
-                }
-                $sale->delete();
+                $this->deleteSale($sale);
             }
         });
     }

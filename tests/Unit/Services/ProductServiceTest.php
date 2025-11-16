@@ -267,19 +267,40 @@ class ProductServiceTest extends BaseUnitTestCase
     #[Test]
     public function it_can_search_products()
     {
-        Product::factory()->create(['name' => 'Laptop', 'code' => 'LP-01']);
-        Product::factory()->create(['name' => 'Mouse', 'barcode' => '123456789']);
-        $category = Categories::factory()->create(['name' => 'Electronics']);
-        Product::factory()->create(['name' => 'Keyboard', 'category_id' => $category->id]);
+        // Be specific with related model names to avoid accidental matches
+        $supplier1 = Supplier::factory()->create(['name' => 'Supplier A']);
+        $category1 = Categories::factory()->create(['name' => 'Category X']);
+        $category2 = Categories::factory()->create(['name' => 'Electronics']);
 
+        Product::factory()->create([
+            'name' => 'Laptop',
+            'code' => 'LP-01',
+            'supplier_id' => $supplier1->id,
+            'category_id' => $category1->id,
+        ]);
+        Product::factory()->create([
+            'name' => 'Mouse',
+            'barcode' => '123456789',
+            'supplier_id' => $supplier1->id,
+            'category_id' => $category1->id,
+        ]);
+        Product::factory()->create([
+            'name' => 'Keyboard',
+            'supplier_id' => $supplier1->id,
+            'category_id' => $category2->id,
+        ]);
+
+        // Search by product name
         $results = $this->productService->searchProducts('Lap');
         $this->assertCount(1, $results);
         $this->assertEquals('Laptop', $results->first()->name);
 
+        // Search by barcode
         $results = $this->productService->searchProducts('12345');
         $this->assertCount(1, $results);
         $this->assertEquals('Mouse', $results->first()->name);
 
+        // Search by category name
         $results = $this->productService->searchProducts('Elec');
         $this->assertCount(1, $results);
         $this->assertEquals('Keyboard', $results->first()->name);

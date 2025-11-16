@@ -7,20 +7,25 @@ use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\User;
+use App\Services\AccountingService;
 use App\Services\SalesService;
 use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Support\Facades\Auth;
+use Mockery;
+use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
 
 class SalesServiceTest extends BaseUnitTestCase
 {
     protected SalesService $salesService;
     protected User $user;
+    protected MockInterface $accountingServiceMock;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->salesService = new SalesService();
+        $this->accountingServiceMock = Mockery::mock(AccountingService::class);
+        $this->salesService = new SalesService($this->accountingServiceMock);
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
     }
@@ -100,7 +105,7 @@ class SalesServiceTest extends BaseUnitTestCase
     public function it_can_create_a_sale()
     {
         $customer = Customer::factory()->create();
-        $product = Product::factory()->create(['stock_quantity' => 10]);
+        $product = Product::factory()->create(['stock_quantity' => 10, 'price' => 50]);
         $products = json_encode([
             ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
         ]);
@@ -111,6 +116,8 @@ class SalesServiceTest extends BaseUnitTestCase
             'due_date' => now()->addMonth()->toDateString(),
         ];
 
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
         $sale = $this->salesService->createSale($data);
 
         $this->assertInstanceOf(Sales::class, $sale);
@@ -118,6 +125,73 @@ class SalesServiceTest extends BaseUnitTestCase
         $this->assertDatabaseHas('sales_items', ['sales_id' => $sale->id, 'product_id' => $product->id]);
         $this->assertEquals(8, $product->fresh()->stock_quantity);
     }
+
+    #[Test]
+    public function it_creates_a_journal_entry_on_sale_creation()
+    {
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->create(['stock_quantity' => 10, 'price' => 50]); // Purchase price = 50
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100], // Selling price = 100
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $customer->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonth()->toDateString(),
+        ];
+
+        $grandTotal = 200; // 2 * 100
+        $cogs = 100; // 2 * 50
+
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                Mockery::any(), // description
+                Mockery::any(), // date
+                Mockery::on(function ($transactions) use ($grandTotal, $cogs) {
+                    $this->assertCount(4, $transactions);
+                    $this->assertEquals($grandTotal, $this->findTransactionAmount($transactions, 'Accounts Receivable', 'debit'));
+                    $this->assertEquals($grandTotal, $this->findTransactionAmount($transactions, 'Sales Revenue', 'credit'));
+                    $this->assertEquals($cogs, $this->findTransactionAmount($transactions, 'Cost of Goods Sold', 'debit'));
+                    $this->assertEquals($cogs, $this->findTransactionAmount($transactions, 'Inventory', 'credit'));
+                    return true;
+                }),
+                Mockery::type(Sales::class)
+            );
+
+        $this->salesService->createSale($data);
+    }
+
+    #[Test]
+    public function it_creates_a_journal_entry_on_payment()
+    {
+        $sale = Sales::factory()->create(['total' => 1000]);
+        $data = [
+            'amount' => 500,
+            'payment_date' => now()->toDateString(),
+            'payment_method' => 'Cash',
+        ];
+
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                "Payment for Sale #{$sale->invoice}",
+                Mockery::any(),
+                Mockery::on(function ($transactions) {
+                    $this->assertCount(2, $transactions);
+                    $this->assertEquals(500, $this->findTransactionAmount($transactions, 'Cash', 'debit'));
+                    $this->assertEquals(500, $this->findTransactionAmount($transactions, 'Accounts Receivable', 'credit'));
+                    return true;
+                }),
+                Mockery::any() // Payment model
+            );
+
+        $this->salesService->addPayment($sale, $data);
+    }
+
 
     #[Test]
     public function it_can_update_a_sale()
@@ -158,6 +232,8 @@ class SalesServiceTest extends BaseUnitTestCase
             'payment_date' => now()->toDateString(),
             'payment_method' => 'Cash',
         ];
+
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
 
         $this->salesService->addPayment($sale, $data);
 
@@ -220,6 +296,8 @@ class SalesServiceTest extends BaseUnitTestCase
         $sales = Sales::factory()->count(3)->create(['total' => 100, 'status' => 'Unpaid']);
         $ids = $sales->pluck('id')->toArray();
 
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->times(3);
+
         $count = $this->salesService->bulkMarkPaid($ids);
 
         $this->assertEquals(3, $count);
@@ -271,5 +349,15 @@ class SalesServiceTest extends BaseUnitTestCase
         $expiringSales = $this->salesService->getExpiringSales();
 
         $this->assertCount(1, $expiringSales);
+    }
+
+    private function findTransactionAmount(array $transactions, string $accountName, string $type): ?float
+    {
+        foreach ($transactions as $transaction) {
+            if ($transaction['account_name'] === $accountName && $transaction['type'] === $type) {
+                return $transaction['amount'];
+            }
+        }
+        return null;
     }
 }

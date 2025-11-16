@@ -6,19 +6,24 @@ use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\User;
+use App\Services\AccountingService;
 use App\Services\PurchaseService;
 use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Support\Facades\Auth;
+use Mockery;
+use Mockery\MockInterface;
 
 class PurchaseServiceTest extends BaseUnitTestCase
 {
     protected PurchaseService $purchaseService;
     protected User $user;
+    protected MockInterface $accountingServiceMock;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->purchaseService = new PurchaseService();
+        $this->accountingServiceMock = Mockery::mock(AccountingService::class);
+        $this->purchaseService = new PurchaseService($this->accountingServiceMock);
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
     }
@@ -104,12 +109,76 @@ class PurchaseServiceTest extends BaseUnitTestCase
             ]),
         ];
 
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
         $purchase = $this->purchaseService->createPurchase($purchaseData);
 
         $this->assertDatabaseHas('po', ['invoice' => 'INV-001']);
         $this->assertDatabaseHas('po_items', ['po_id' => $purchase->id, 'product_id' => $product1->id]);
         $this->assertEquals(12, Product::find($product1->id)->stock_quantity);
         $this->assertEquals(8, Product::find($product2->id)->stock_quantity);
+    }
+
+    public function test_it_creates_a_journal_entry_on_purchase_creation()
+    {
+        $supplier = Supplier::factory()->create();
+        $product1 = Product::factory()->create();
+
+        $purchaseData = [
+            'invoice' => 'INV-001',
+            'supplier_id' => $supplier->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addDays(30)->toDateString(),
+            'products' => json_encode([
+                ['product_id' => $product1->id, 'quantity' => 2, 'price' => 100],
+            ]),
+        ];
+
+        $finalTotal = 200;
+
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                "Purchase Order #INV-001",
+                Mockery::any(),
+                Mockery::on(function ($transactions) use ($finalTotal) {
+                    $this->assertCount(2, $transactions);
+                    $this->assertEquals($finalTotal, $this->findTransactionAmount($transactions, 'Inventory', 'debit'));
+                    $this->assertEquals($finalTotal, $this->findTransactionAmount($transactions, 'Accounts Payable', 'credit'));
+                    return true;
+                }),
+                Mockery::type(Purchase::class)
+            );
+
+        $this->purchaseService->createPurchase($purchaseData);
+    }
+
+    public function test_it_creates_a_journal_entry_on_payment()
+    {
+        $purchase = Purchase::factory()->create(['invoice' => 'PO-123']);
+        $paymentData = [
+            'amount' => 500,
+            'payment_date' => now()->toDateString(),
+            'payment_method' => 'Cash',
+        ];
+
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                "Payment for PO #PO-123",
+                Mockery::any(),
+                Mockery::on(function ($transactions) {
+                    $this->assertCount(2, $transactions);
+                    $this->assertEquals(500, $this->findTransactionAmount($transactions, 'Accounts Payable', 'debit'));
+                    $this->assertEquals(500, $this->findTransactionAmount($transactions, 'Cash', 'credit'));
+                    return true;
+                }),
+                Mockery::any() // Payment model
+            );
+
+        $this->purchaseService->addPayment($purchase, $paymentData);
     }
 
     public function test_update_purchase()
@@ -146,58 +215,37 @@ class PurchaseServiceTest extends BaseUnitTestCase
 
     public function test_add_payment()
     {
-        $purchase = Purchase::factory()->hasItems(1, ['price' => 1000, 'quantity' => 1])->create();
+        $purchase = Purchase::factory()->create(['total' => 1000]);
         $paymentData = [
             'amount' => 500,
             'payment_date' => now()->toDateString(),
             'payment_method' => 'Cash',
         ];
 
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
         $this->purchaseService->addPayment($purchase, $paymentData);
-        $purchase->refresh(); // Refresh the purchase model after status update
-        $this->assertDatabaseHas('payments', ['paymentable_id' => $purchase->id, 'amount' => 500]);
-        $this->assertEquals('Partial', $purchase->status);
+        $this->assertEquals('Partial', $purchase->fresh()->status);
     }
 
     public function test_update_purchase_status()
     {
-        $supplier = Supplier::factory()->create();
-        $product = Product::factory()->create(['stock_quantity' => 10]);
-
-        $purchaseData = [
-            'invoice' => 'INV-001',
-            'supplier_id' => $supplier->id,
-            'order_date' => now()->toDateString(),
-            'due_date' => now()->addDays(30)->toDateString(),
-            'discount_total' => 0,
-            'discount_total_type' => 'fixed',
-            'products' => json_encode([
-                ['product_id' => $product->id, 'quantity' => 1, 'price' => 1000],
-            ]),
-        ];
-        $purchase = $this->purchaseService->createPurchase($purchaseData);
-        $purchase->refresh(); // Ensure all calculated fields are fresh
+        $purchase = Purchase::factory()->create(['total' => 1000]);
 
         // Test Partial
         $purchase->payments()->create(['amount' => 500, 'payment_date' => now()->toDateString(), 'payment_method' => 'Cash']);
-        $purchase->load('payments'); // Reload payments relationship
         $this->purchaseService->updatePurchaseStatus($purchase);
-        $purchase->refresh();
-        $this->assertEquals('Partial', $purchase->status);
+        $this->assertEquals('Partial', $purchase->fresh()->status);
 
         // Test Paid
         $purchase->payments()->create(['amount' => 500, 'payment_date' => now()->toDateString(), 'payment_method' => 'Cash']);
-        $purchase->load('payments'); // Reload payments relationship
         $this->purchaseService->updatePurchaseStatus($purchase);
-        $purchase->refresh();
-        $this->assertEquals('Paid', $purchase->status);
+        $this->assertEquals('Paid', $purchase->fresh()->status);
 
         // Test Unpaid
         $purchase->payments()->delete();
-        $purchase->load('payments'); // Reload payments relationship
         $this->purchaseService->updatePurchaseStatus($purchase);
-        $purchase->refresh();
-        $this->assertEquals('Unpaid', $purchase->status);
+        $this->assertEquals('Unpaid', $purchase->fresh()->status);
     }
 
     public function test_delete_purchase()
@@ -230,6 +278,8 @@ class PurchaseServiceTest extends BaseUnitTestCase
     {
         $supplier = Supplier::factory()->create();
         $product = Product::factory()->create(['stock_quantity' => 10]);
+
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->times(6); // 3 for creation, 3 for payment
 
         $purchases = collect();
         for ($i = 0; $i < 3; $i++) {
@@ -294,5 +344,15 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $expiringPurchases = $this->purchaseService->getExpiringPurchases();
 
         $this->assertCount(1, $expiringPurchases);
+    }
+
+    private function findTransactionAmount(array $transactions, string $accountName, string $type): ?float
+    {
+        foreach ($transactions as $transaction) {
+            if ($transaction['account_name'] === $accountName && $transaction['type'] === $type) {
+                return $transaction['amount'];
+            }
+        }
+        return null;
     }
 }

@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\User; // Add this line
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role; // Add this line
 
 class UserSeeder extends Seeder
 {
@@ -14,7 +16,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('users')->insert([
+        $user = User::create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('password'),
@@ -22,5 +24,10 @@ class UserSeeder extends Seeder
             'created_at' => now(),
             'updated_at'=> now()
         ]);
+
+        $role = Role::where('name', 'superuser')->first();
+        if ($role) {
+            $user->assignRole($role);
+        }
     }
 }

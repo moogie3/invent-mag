@@ -15,6 +15,13 @@ use Carbon\Carbon;
 
 class PurchaseService
 {
+    protected AccountingService $accountingService;
+
+    public function __construct(AccountingService $accountingService)
+    {
+        $this->accountingService = $accountingService;
+    }
+
     public function getPurchaseIndexData(array $filters, int $entries)
     {
         $query = Purchase::with(['items', 'supplier', 'user']);
@@ -148,9 +155,7 @@ class PurchaseService
             ]);
 
             $totalAmount = 0;
-            $subtotal = 0;
             foreach ($products as $productData) {
-                $subtotal += $productData['price'] * $productData['quantity'];
                 $itemTotal = PurchaseHelper::calculateTotal($productData['price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed');
                 POItem::create([
                     'po_id' => $purchase->id,
@@ -174,6 +179,19 @@ class PurchaseService
             $orderDiscount = PurchaseHelper::calculateDiscount($totalAmount, $purchase->discount_total, $purchase->discount_total_type);
             $finalTotal = $totalAmount - $orderDiscount;
             $purchase->update(['total' => $finalTotal]);
+
+            // Create Journal Entry for the purchase
+            $transactions = [
+                ['account_name' => 'Inventory', 'type' => 'debit', 'amount' => $finalTotal],
+                ['account_name' => 'Accounts Payable', 'type' => 'credit', 'amount' => $finalTotal],
+            ];
+
+            $this->accountingService->createJournalEntry(
+                "Purchase Order #{$purchase->invoice}",
+                Carbon::parse($data['order_date']),
+                $transactions,
+                $purchase
+            );
 
             return $purchase;
         });
@@ -209,9 +227,7 @@ class PurchaseService
             ]);
 
             $totalAmount = 0;
-            $subtotal = 0;
             foreach ($products as $productData) {
-                $subtotal += $productData['price'] * $productData['quantity'];
                 $itemTotal = PurchaseHelper::calculateTotal($productData['price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed');
                 POItem::create([
                     'po_id' => $purchase->id,
@@ -253,12 +269,26 @@ class PurchaseService
             $purchase->load('payments'); // Refresh the payments relationship
             $this->updatePurchaseStatus($purchase);
 
+            // Create Journal Entry for the payment
+            $transactions = [
+                ['account_name' => 'Accounts Payable', 'type' => 'debit', 'amount' => $data['amount']],
+                ['account_name' => 'Cash', 'type' => 'credit', 'amount' => $data['amount']],
+            ];
+
+            $this->accountingService->createJournalEntry(
+                "Payment for PO #{$purchase->invoice}",
+                Carbon::parse($data['payment_date']),
+                $transactions,
+                $payment
+            );
+
             return $payment;
         });
     }
 
     public function updatePurchaseStatus(Purchase $purchase)
     {
+        $purchase->load('payments'); // Always get the latest payments
         $totalPaid = $purchase->total_paid;
         $grandTotal = $purchase->grand_total;
 
@@ -293,15 +323,7 @@ class PurchaseService
         DB::transaction(function () use ($ids) {
             $purchases = Purchase::whereIn('id', $ids)->with('items')->get();
             foreach ($purchases as $purchase) {
-                foreach ($purchase->items as $item) {
-                    $product = Product::find($item->product_id);
-                    if ($product) {
-                        $product->decrement('stock_quantity', $item->quantity);
-                    }
-                    // Delete the POItem as well
-                    $item->delete();
-                }
-                $purchase->delete();
+                $this->deletePurchase($purchase);
             }
         });
     }

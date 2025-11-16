@@ -299,6 +299,15 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::put('/', [SettingsController::class, 'update'])->name('admin.setting.update');
             Route::put('/update-theme-mode', [SettingsController::class, 'updateThemeMode'])->name('admin.setting.update-theme-mode');
         });
+
+        // Accounting Routes
+        Route::prefix('accounting')->group(function () {
+            Route::get('/', fn() => redirect()->route('admin.accounting.ledger'));
+            Route::get('/chart-of-accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'chartOfAccounts'])->name('admin.accounting.chart');
+            Route::get('/journal', [\App\Http\Controllers\Admin\AccountingController::class, 'journal'])->name('admin.accounting.journal');
+            Route::get('/general-ledger', [\App\Http\Controllers\Admin\AccountingController::class, 'generalLedger'])->name('admin.accounting.ledger');
+            Route::get('/trial-balance', [\App\Http\Controllers\Admin\AccountingController::class, 'trialBalance'])->name('admin.accounting.trial_balance');
+        });
     });
 });
 

@@ -10,6 +10,8 @@ use App\Models\Product;
 use App\Models\SalesItem;
 use Carbon\Carbon;
 
+use Illuminate\Support\Facades\Schema;
+
 class SalesSeeder extends Seeder
 {
     /**
@@ -19,6 +21,11 @@ class SalesSeeder extends Seeder
      */
     public function run()
     {
+        Schema::disableForeignKeyConstraints();
+        Sales::truncate();
+        SalesItem::truncate();
+        Schema::enableForeignKeyConstraints();
+
         $customers = Customer::all();
         $users = User::all();
         $products = Product::all();
@@ -28,10 +35,10 @@ class SalesSeeder extends Seeder
             return;
         }
 
-        for ($i = 0; $i < 10; $i++) { // Create 20 sample sales
+        for ($i = 0; $i < 100; $i++) { // Create 100 sample sales
             $customer = $customers->random();
             $user = $users->random();
-            $orderDate = Carbon::now()->subDays(rand(0, 29));
+            $orderDate = Carbon::now()->subMonths(rand(0, 11))->subDays(rand(0, 29)); // Sales over the last 12 months
             $dueDate = $orderDate->copy()->addDays(rand(7, 30));
             $paymentType = collect(['Cash', 'Card', 'Transfer', 'eWallet', '-'])->random();
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();

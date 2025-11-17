@@ -1,9 +1,29 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <script>
     let currencySettings = @json(\App\Helpers\CurrencyHelper::getSettings());
     let performanceChart;
     let currentChartType = 'sales';
     let currentPeriod = '30days';
+
+    function formatCurrency(value) {
+        if (value === null || value === undefined) {
+            return '';
+        }
+        const isNegative = value < 0;
+        const absoluteValue = Math.abs(value);
+
+        const formatted = new Intl.NumberFormat(currencySettings.locale, {
+            minimumFractionDigits: currencySettings.decimal_places,
+            maximumFractionDigits: currencySettings.decimal_places
+        }).format(absoluteValue);
+
+        const result = currencySettings.position === 'prefix'
+            ? `${currencySettings.currency_symbol} ${formatted}`
+            : `${formatted} ${currencySettings.currency_symbol}`;
+
+        return isNegative ? `-${result}` : result;
+    }
 
     const chartData = {
         sales: {
@@ -16,6 +36,12 @@
             data: @json($purchaseChartData ?? []),
             formatted: @json(collect($purchaseChartData ?? [])->map(fn($val) => \App\Helpers\CurrencyHelper::format($val)))
         }
+    };
+
+    const salesForecastData = {
+        labels: @json($salesForecast['labels'] ?? []),
+        historical: @json($salesForecast['historical'] ?? []),
+        forecast: @json($salesForecast['forecast'] ?? [])
     };
 
     const chartConfigs = {
@@ -81,8 +107,94 @@
         });
     }
 
+    function createSalesForecastChart() {
+        if (salesForecastData.labels.length === 0) {
+            return;
+        }
+
+        const forecastCtx = document.getElementById('sales-forecast-chart').getContext('2d');
+
+        new Chart(forecastCtx, {
+            type: 'line',
+            data: {
+                labels: salesForecastData.labels,
+                datasets: [
+                    {
+                        label: '{{ __('messages.historical_sales') }}',
+                        data: salesForecastData.historical,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                    },
+                    {
+                        label: '{{ __('messages.forecasted_sales') }}',
+                        data: salesForecastData.forecast,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: true,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += formatCurrency(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'month',
+                            parser: 'yyyy-MM',
+                            displayFormats: {
+                                month: 'MMM yyyy'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return formatCurrency(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     function initChart() {
-        performanceChart = createChart('sales');
+        if (document.getElementById('performanceChart')) {
+            performanceChart = createChart('sales');
+        }
+        if (document.getElementById('sales-forecast-chart')) {
+            createSalesForecastChart();
+        }
     }
 
     function switchChart(type) {

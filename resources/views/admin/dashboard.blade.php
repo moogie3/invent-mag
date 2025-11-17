@@ -10,11 +10,19 @@
         <!-- Page Body -->
         <div class="page-body">
             <div class="container-xl">
-                <!-- Key Metrics Cards -->
-                @include('admin.layouts.partials.dashboard.key-metrics')
+                <div class="row row-deck row-cards">
+                    <!-- Key Metrics Cards -->
+                    @include('admin.layouts.partials.dashboard.key-metrics')
 
-                <!-- Main Content Section -->
-                @include('admin.layouts.partials.dashboard.main-content')
+                    <!-- Sales Forecast Chart -->
+                    @include('admin.layouts.partials.dashboard.sales-forecast')
+
+                    <!-- Accounting Summary -->
+                    @include('admin.layouts.partials.dashboard.accounting-summary')
+
+                    <!-- Main Content Section -->
+                    @include('admin.layouts.partials.dashboard.main-content')
+                </div>
             </div>
         </div>
     </div>

@@ -1104,4 +1104,8 @@ return [
     'inventory_account' => 'Akun Persediaan',
     'accounts_payable_account' => 'Akun Hutang',
     'cash_account' => 'Akun Kas',
+    'sales_forecast' => 'Prakiraan Penjualan',
+    'historical_sales' => 'Penjualan Historis',
+    'forecasted_sales' => 'Prakiraan Penjualan',
+    'accounting_summary' => 'Ringkasan Akuntansi',
 ];

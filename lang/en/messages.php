@@ -1107,4 +1107,8 @@ return [
     'inventory_account' => 'Inventory Account',
     'accounts_payable_account' => 'Accounts Payable Account',
     'cash_account' => 'Cash Account',
+    'sales_forecast' => 'Sales Forecast',
+    'historical_sales' => 'Historical Sales',
+    'forecasted_sales' => 'Forecasted Sales',
+    'accounting_summary' => 'Accounting Summary',
 ];

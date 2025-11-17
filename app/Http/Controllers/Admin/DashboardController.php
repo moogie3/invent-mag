@@ -4,15 +4,20 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\DashboardService;
+use App\Services\SalesForecastService;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     protected $dashboardService;
+    protected $salesForecastService;
 
-    public function __construct(DashboardService $dashboardService)
-    {
+    public function __construct(
+        DashboardService $dashboardService,
+        SalesForecastService $salesForecastService
+    ) {
         $this->dashboardService = $dashboardService;
+        $this->salesForecastService = $salesForecastService;
     }
 
     public function index(Request $request)
@@ -33,6 +38,28 @@ class DashboardController extends Controller
         }
 
         $data = $this->dashboardService->getDashboardData($dates, $reportType, $categoryId);
+
+        $forecastData = $this->salesForecastService->generateForecast();
+
+        if (!empty($forecastData['labels'])) {
+            $historicalCount = count($forecastData['historical']);
+            $labelsCount = count($forecastData['labels']);
+
+            $historicalSeries = array_pad($forecastData['historical'], $labelsCount, null);
+            $forecastSeries = array_merge(array_fill(0, $historicalCount, null), $forecastData['forecast']);
+
+            $data['salesForecast'] = [
+                'labels' => $forecastData['labels'],
+                'historical' => $historicalSeries,
+                'forecast' => $forecastSeries,
+            ];
+        } else {
+            $data['salesForecast'] = [
+                'labels' => [],
+                'historical' => [],
+                'forecast' => [],
+            ];
+        }
 
         return view('admin.dashboard', $data);
     }

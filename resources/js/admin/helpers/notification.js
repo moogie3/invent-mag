@@ -1,4 +1,4 @@
-import { playNotificationSound } from '../partials/pos/utils/sound.js';
+import { playNotificationSound, playSuccessSound, playErrorSound } from '../utils/sound.js';
 
 /**
  * Displays a modern, minimal toast notification.
@@ -188,13 +188,20 @@ window.showConfirmModal = function (title, message, onConfirm) {
     confirmModal.show();
 };
 
-// Global function for authentication page modals (success/error)
+    // Global function for authentication page modals (success/error)
 window.showAuthModal = function (title, message, type) {
     const iconClass =
         type === "success"
             ? "ti ti-check text-success"
             : "ti ti-alert-circle text-danger";
     const modalStatusClass = type === "success" ? "bg-success" : "bg-danger";
+
+    // Play sound based on type
+    if (type === "success") {
+        playSuccessSound();
+    } else if (type === "error") {
+        playErrorSound();
+    }
 
     const authModalHtml = `
         <div class="modal modal-blur fade" id="statusModal" tabindex="-1" role="dialog" aria-hidden="true">

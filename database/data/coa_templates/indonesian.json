@@ -1,205 +1,325 @@
 [
+    {
+        "name": "Aset",
+        "code": "1000",
+        "type": "asset",
+        "children": [
             {
-                "name": "Aset",
-                "code": "1000",
+                "name": "Aset Lancar",
+                "code": "1100",
                 "type": "asset",
                 "children": [
                     {
-                        "name": "Aset Lancar",
-                        "code": "1100",
+                        "name": "Kas",
+                        "code": "1110",
                         "type": "asset",
-                        "children": [
-                            {
-                                "name": "Kas dan Setara Kas",
-                                "code": "1101",
-                                "type": "asset",
-                                "children": []
-                            },
-                            {
-                                "name": "Piutang Usaha",
-                                "code": "1102",
-                                "type": "asset",
-                                "children": []
-                            },
-                            {
-                                "name": "Persediaan",
-                                "code": "1103",
-                                "type": "asset",
-                                "children": []
-                            },
-                            {
-                                "name": "Beban Dibayar di Muka",
-                                "code": "1104",
-                                "type": "asset",
-                                "children": []
-                            }
-                        ]
+                        "children": []
                     },
                     {
-                        "name": "Aset Tetap",
-                        "code": "1200",
+                        "name": "Bank",
+                        "code": "1120",
                         "type": "asset",
-                        "children": [
-                            {
-                                "name": "Tanah",
-                                "code": "1201",
-                                "type": "asset",
-                                "children": []
-                            },
-                            {
-                                "name": "Bangunan",
-                                "code": "1202",
-                                "type": "asset",
-                                "children": []
-                            },
-                            {
-                                "name": "Kendaraan",
-                                "code": "1203",
-                                "type": "asset",
-                                "children": []
-                            },
-                            {
-                                "name": "Akumulasi Penyusutan",
-                                "code": "1209",
-                                "type": "asset",
-                                "children": []
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Liabilitas",
-                "code": "2000",
-                "type": "liability",
-                "children": [
-                    {
-                        "name": "Liabilitas Jangka Pendek",
-                        "code": "2100",
-                        "type": "liability",
-                        "children": [
-                            {
-                                "name": "Utang Usaha",
-                                "code": "2101",
-                                "type": "liability",
-                                "children": []
-                            },
-                            {
-                                "name": "Beban Akrual",
-                                "code": "2102",
-                                "type": "liability",
-                                "children": []
-                            },
-                            {
-                                "name": "Pinjaman Jangka Pendek",
-                                "code": "2103",
-                                "type": "liability",
-                                "children": []
-                            }
-                        ]
-                    },
-                    {
-                        "name": "Liabilitas Jangka Panjang",
-                        "code": "2200",
-                        "type": "liability",
-                        "children": [
-                            {
-                                "name": "Utang Bank Jangka Panjang",
-                                "code": "2201",
-                                "type": "liability",
-                                "children": []
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "name": "Ekuitas",
-                "code": "3000",
-                "type": "equity",
-                "children": [
-                    {
-                        "name": "Modal Pemilik",
-                        "code": "3101",
-                        "type": "equity",
                         "children": []
                     },
                     {
-                        "name": "Laba Ditahan",
-                        "code": "3102",
-                        "type": "equity",
-                        "children": []
-                    }
-                ]
-            },
-            {
-                "name": "Pendapatan",
-                "code": "4000",
-                "type": "revenue",
-                "children": [
-                    {
-                        "name": "Pendapatan Penjualan",
-                        "code": "4101",
-                        "type": "revenue",
+                        "name": "Piutang Usaha",
+                        "code": "1130",
+                        "type": "asset",
                         "children": []
                     },
                     {
-                        "name": "Pendapatan Jasa",
-                        "code": "4102",
-                        "type": "revenue",
+                        "name": "Penyisihan Piutang Tak Tertagih",
+                        "code": "1135",
+                        "type": "asset",
+                        "children": []
+                    },
+                    {
+                        "name": "Persediaan",
+                        "code": "1140",
+                        "type": "asset",
+                        "children": []
+                    },
+                    {
+                        "name": "Beban Dibayar di Muka",
+                        "code": "1150",
+                        "type": "asset",
+                        "children": []
+                    },
+                    {
+                        "name": "PPN Masukan",
+                        "code": "1160",
+                        "type": "asset",
                         "children": []
                     }
                 ]
             },
             {
-                "name": "Harga Pokok Penjualan (Kategori)",
-                "code": "5000",
-                "type": "expense",
+                "name": "Aset Tetap",
+                "code": "1200",
+                "type": "asset",
                 "children": [
                     {
-                        "name": "Harga Pokok Penjualan",
-                        "code": "5101",
-                        "type": "expense",
+                        "name": "Tanah",
+                        "code": "1210",
+                        "type": "asset",
                         "children": []
-                    }
-                ]
-            },
-            {
-                "name": "Beban",
-                "code": "6000",
-                "type": "expense",
-                "children": [
+                    },
                     {
-                        "name": "Beban Operasional",
-                        "code": "6100",
-                        "type": "expense",
-                        "children": [
-                            {
-                                "name": "Beban Gaji dan Upah",
-                                "code": "6101",
-                                "type": "expense",
-                                "children": []
-                            },
-                            {
-                                "name": "Beban Sewa",
-                                "code": "6102",
-                                "type": "expense",
-                                "children": []
-                            },
-                            {
-                                "name": "Beban Utilitas",
-                                "code": "6103",
-                                "type": "expense",
-                                "children": []
-                            },
-                            {
-                                "name": "Beban Pemasaran",
-                                "code": "6104",
-                                "type": "expense",
-                                "children": []
-                            }
-                        ]
+                        "name": "Bangunan",
+                        "code": "1220",
+                        "type": "asset",
+                        "children": []
+                    },
+                    {
+                        "name": "Akumulasi Penyusutan Bangunan",
+                        "code": "1225",
+                        "type": "asset",
+                        "children": []
+                    },
+                    {
+                        "name": "Peralatan",
+                        "code": "1230",
+                        "type": "asset",
+                        "children": []
+                    },
+                    {
+                        "name": "Akumulasi Penyusutan Peralatan",
+                        "code": "1235",
+                        "type": "asset",
+                        "children": []
                     }
                 ]
             }
         ]
+    },
+    {
+        "name": "Liabilitas",
+        "code": "2000",
+        "type": "liability",
+        "children": [
+            {
+                "name": "Liabilitas Jangka Pendek",
+                "code": "2100",
+                "type": "liability",
+                "children": [
+                    {
+                        "name": "Utang Usaha",
+                        "code": "2110",
+                        "type": "liability",
+                        "children": []
+                    },
+                    {
+                        "name": "Beban Akrual",
+                        "code": "2120",
+                        "type": "liability",
+                        "children": []
+                    },
+                    {
+                        "name": "Utang Gaji",
+                        "code": "2130",
+                        "type": "liability",
+                        "children": []
+                    },
+                    {
+                        "name": "PPN Keluaran",
+                        "code": "2140",
+                        "type": "liability",
+                        "children": []
+                    },
+                    {
+                        "name": "Utang Pajak",
+                        "code": "2150",
+                        "type": "liability",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "Liabilitas Jangka Panjang",
+                "code": "2200",
+                "type": "liability",
+                "children": [
+                    {
+                        "name": "Utang Bank Jangka Panjang",
+                        "code": "2210",
+                        "type": "liability",
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Ekuitas",
+        "code": "3000",
+        "type": "equity",
+        "children": [
+            {
+                "name": "Modal Disetor",
+                "code": "3100",
+                "type": "equity",
+                "children": []
+            },
+            {
+                "name": "Laba Ditahan",
+                "code": "3200",
+                "type": "equity",
+                "children": []
+            },
+            {
+                "name": "Laba Tahun Berjalan",
+                "code": "3300",
+                "type": "equity",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "Pendapatan",
+        "code": "4000",
+        "type": "revenue",
+        "children": [
+            {
+                "name": "Pendapatan Penjualan",
+                "code": "4100",
+                "type": "revenue",
+                "children": []
+            },
+            {
+                "name": "Retur Penjualan",
+                "code": "4110",
+                "type": "revenue",
+                "children": []
+            },
+            {
+                "name": "Diskon Penjualan",
+                "code": "4120",
+                "type": "revenue",
+                "children": []
+            },
+            {
+                "name": "Pendapatan Jasa",
+                "code": "4200",
+                "type": "revenue",
+                "children": []
+            },
+            {
+                "name": "Pendapatan Lain-lain",
+                "code": "4300",
+                "type": "revenue",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "Kategori Harga Pokok Penjualan",
+        "code": "5000",
+        "type": "expense",
+        "children": [
+            {
+                "name": "Pembelian",
+                "code": "5100",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Beban Angkut Pembelian",
+                "code": "5110",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Retur Pembelian",
+                "code": "5120",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Diskon Pembelian",
+                "code": "5130",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Harga Pokok Penjualan",
+                "code": "5200",
+                "type": "expense",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "Beban Operasional",
+        "code": "6000",
+        "type": "expense",
+        "children": [
+            {
+                "name": "Beban Gaji dan Upah",
+                "code": "6100",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Beban Sewa",
+                "code": "6110",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Beban Utilitas",
+                "code": "6120",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Beban Pemasaran dan Iklan",
+                "code": "6130",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Beban Penyusutan",
+                "code": "6140",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Beban Perlengkapan Kantor",
+                "code": "6150",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Beban Perjalanan Dinas",
+                "code": "6160",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Beban Lain-lain Operasional",
+                "code": "6170",
+                "type": "expense",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "Beban Non-Operasional",
+        "code": "7000",
+        "type": "expense",
+        "children": [
+            {
+                "name": "Beban Bunga",
+                "code": "7100",
+                "type": "expense",
+                "children": []
+            },
+            {
+                "name": "Beban Pajak Penghasilan",
+                "code": "7200",
+                "type": "expense",
+                "children": []
+            }
+        ]
+    }
+]

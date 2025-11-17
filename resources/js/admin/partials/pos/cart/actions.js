@@ -1,6 +1,6 @@
 import { getProducts, setProducts, saveProductsToCache } from './state.js';
 import { renderList } from './dom.js';
-import { playSuccessPosSound, playDeleteSound, playDecreaseSound } from '../utils/sound.js';
+import { playSuccessPosSound, playDeleteSound, playDecreaseSound } from '../../../utils/sound.js';
 import { showAddToCartFeedback, updateProductCardStockDisplay } from '../utils/ui.js';
 
 // --- Core Logic Functions (Exported for Testability) ---

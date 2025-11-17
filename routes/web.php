@@ -259,7 +259,9 @@ Route::middleware('web')->prefix('admin')->group(function () {
             // Profile Settings
             Route::prefix('profile')->group(function () {
                 Route::get('/', [ProfileController::class, 'edit'])->name('admin.setting.profile.edit');
-                Route::put('/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update')->middleware('password.confirm');
+                Route::put('/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update');
+                Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('admin.setting.profile.update-password')->middleware('password.confirm');
+                Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('admin.setting.profile.update-password')->middleware('password.confirm');
                 Route::delete('/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
             });
 

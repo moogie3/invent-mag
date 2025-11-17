@@ -170,13 +170,15 @@ class AccountingController extends Controller
             Log::debug('Before Account::create. Current Transaction Level: ' . DB::transactionLevel());
             try {
                 Log::debug('Attempting to create account: ' . json_encode($accountData));
-                $account = Account::create([
-                    'name' => $accountData['name'],
-                    'code' => $accountData['code'],
-                    'type' => $accountData['type'],
-                    'parent_id' => $parentId,
-                    'level' => $level,
-                ]);
+                $account = Account::updateOrCreate(
+                    ['code' => $accountData['code']], // Find by code
+                    [
+                        'name' => $accountData['name'],
+                        'type' => $accountData['type'],
+                        'parent_id' => $parentId,
+                        'level' => $level,
+                    ]
+                );
                 Log::debug('Account created successfully. Current Transaction Level: ' . DB::transactionLevel());
             } catch (\Exception $e) {
                 Log::error('Error creating account: ' . $e->getMessage() . ' for data: ' . json_encode($accountData) . '. Current Transaction Level: ' . DB::transactionLevel());

@@ -27,17 +27,16 @@
                 'shopname' => 'nullable|string',
                 'address' => 'nullable|string',
                 'timezone' => 'required|string|in:' . implode(',', timezone_identifiers_list()),
-                'password' => 'nullable|min:6|confirmed',
                 'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
-            $result = $this->profileService->updateUser(Auth::user(), $request->all());
+            $result = $this->profileService->updateUser(Auth::user(), $request->except(['password', 'password_confirmation']));
 
             if (!$result['success']) {
                 if ($request->ajax()) {
                     return response()->json(['success' => false, 'message' => $result['message']], 422);
                 }
-                return redirect()->back()->withErrors(['current_password' => $result['message']]);
+                return redirect()->back()->withErrors(['profile_update_error' => $result['message']]);
             }
 
             if ($request->ajax()) {
@@ -45,6 +44,28 @@
             }
 
             return redirect()->route('admin.setting.profile.edit')->with('success', 'Profile updated successfully!');
+        }
+
+        public function updatePassword(Request $request)
+        {
+            $request->validate([
+                'password' => 'required|string|min:6|confirmed',
+            ]);
+
+            $result = $this->profileService->updateUser(Auth::user(), $request->only(['password', 'password_confirmation']));
+
+            if (!$result['success']) {
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $result['message']], 422);
+                }
+                return redirect()->back()->withErrors(['password_update_error' => $result['message']]);
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Password updated successfully!']);
+            }
+
+            return redirect()->route('admin.setting.profile.edit')->with('success', 'Password updated successfully!');
         }
 
         public function deleteAvatar(Request $request)

@@ -1048,6 +1048,7 @@ return [
     'chart_of_accounts_summary' => 'Daftar semua akun keuangan yang digunakan untuk mengklasifikasikan transaksi.',
     'coa' => 'Bagan Akun',
     'all_accounts' => 'Semua Akun',
+    'update_password' => 'Update Password',
     'asset' => 'Aset',
     'liability' => 'Kewajiban',
     'equity' => 'Ekuitas',

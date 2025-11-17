@@ -13,11 +13,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (applyCoaTemplateBtn) {
         applyCoaTemplateBtn.addEventListener("click", function () {
             const templateSelect = document.getElementById("coaTemplateSelect");
-            const selectedTemplate = templateSelect.value;
+            const selectedOption = templateSelect.options[templateSelect.selectedIndex];
+            const selectedTemplateDisplayName = selectedOption.textContent;
+            const selectedTemplateValue = templateSelect.value;
             const originalButtonText = this.innerHTML;
 
             // Set modal message
-            coaTemplateConfirmationModalMessage.innerHTML = `Are you sure you want to apply the <strong>${selectedTemplate}</strong> Chart of Accounts template? This will overwrite existing accounts and cannot be undone.`;
+            coaTemplateConfirmationModalMessage.innerHTML = `Are you sure you want to apply the <strong>${selectedTemplateDisplayName}</strong> Chart of Accounts template? This will overwrite existing accounts and cannot be undone.`;
             coaTemplateConfirmationModal.show();
 
             // Handle confirmation
@@ -38,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        template: selectedTemplate,
+                        template: selectedTemplateValue,
                     }),
                 })
                     .then((response) => response.json())

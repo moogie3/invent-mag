@@ -12,6 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 
 {{-- Global Notification Helper --}}
+@vite('resources/js/admin/utils/sound.js')
 @vite('resources/js/admin/helpers/notification.js')
 
 {{-- SCRIPT FOR ADMIN POS  --}}

@@ -1095,6 +1095,7 @@ return [
     'apply_a_coa_template_to_get_started' => 'Apply a CoA template to get started',
     'select_template' => 'Select Template',
     'apply_template' => 'Apply Template',
+    'update_password' => 'Update Password',
     'are_you_sure_apply_template' => 'Are you sure you want to apply this CoA template? This will overwrite existing accounts.',
     'accounting_settings' => 'Accounting Settings',
     'accounting_integration' => 'Accounting Integration',

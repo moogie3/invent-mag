@@ -13,10 +13,8 @@
                 <div class="row row-deck row-cards">
                     <!-- Key Metrics Cards -->
                     @include('admin.layouts.partials.dashboard.key-metrics')
-
                     <!-- Sales Forecast Chart -->
                     @include('admin.layouts.partials.dashboard.sales-forecast')
-
                     <!-- Accounting Summary -->
                     @include('admin.layouts.partials.dashboard.accounting-summary')
 

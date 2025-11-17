@@ -336,31 +336,89 @@ class DashboardService
     {
         $operatingExpenses = $totalLiability - $unpaidLiability;
 
+        // Previous month
+        $lastMonthStart = now()->subMonth()->startOfMonth();
+        $lastMonthEnd = now()->subMonth()->endOfMonth();
+
+        $prevMonthPaidLiabilities = Purchase::whereBetween('updated_at', [$lastMonthStart, $lastMonthEnd])->where('status', 'Paid')->sum('total');
+        $prevMonthReceivablePaid = Sales::whereBetween('updated_at', [$lastMonthStart, $lastMonthEnd])->where('status', 'Paid')->sum('total');
+        $prevMonthTotalLiability = Purchase::where('order_date', '<=', $lastMonthEnd)->sum('total');
+        $prevMonthUnpaidLiability = Purchase::where('order_date', '<=', $lastMonthEnd)->where('status', 'Unpaid')->sum('total');
+        $prevMonthOperatingExpenses = $prevMonthTotalLiability - $prevMonthUnpaidLiability;
+        $prevMonthTotalRevenue = Sales::whereBetween('order_date', [$lastMonthStart, $lastMonthEnd])->sum('total');
+        $prevNetProfit = $prevMonthTotalRevenue - $prevMonthOperatingExpenses;
+
+        // New metrics
+        $cogs = $this->getTotalPurchases(['start' => now()->startOfMonth(), 'end' => now()->endOfMonth()]); // Cost of Goods Sold for current month
+        $grossProfit = $totalRevenue - $cogs;
+        $operatingIncome = $grossProfit - $operatingExpenses;
+
+        // Previous month for new metrics
+        $prevMonthCogs = $this->getTotalPurchases(['start' => $lastMonthStart, 'end' => $lastMonthEnd]);
+        $prevGrossProfit = $prevMonthTotalRevenue - $prevMonthCogs;
+        $prevOperatingIncome = $prevGrossProfit - $prevMonthOperatingExpenses;
+
+
+        $paidLiabilities = $this->getLiabilityPaymentsMonthly();
+        $receivablePaid = $this->getPaidDebtMonthly();
+        $netProfit = $totalRevenue - $operatingExpenses;
+
+        $paidLiabilitiesChange = $prevMonthPaidLiabilities > 0 ? (($paidLiabilities - $prevMonthPaidLiabilities) / $prevMonthPaidLiabilities) * 100 : 0;
+        $receivablePaidChange = $prevMonthReceivablePaid > 0 ? (($receivablePaid - $prevMonthReceivablePaid) / $prevMonthReceivablePaid) * 100 : 0;
+        $operatingExpensesChange = $prevMonthOperatingExpenses > 0 ? (($operatingExpenses - $prevMonthOperatingExpenses) / $prevMonthOperatingExpenses) * 100 : 0;
+        $netProfitChange = $prevNetProfit > 0 ? (($netProfit - $prevNetProfit) / $prevNetProfit) * 100 : 0;
+        $grossProfitChange = $prevGrossProfit > 0 ? (($grossProfit - $prevGrossProfit) / $prevGrossProfit) * 100 : 0;
+        $operatingIncomeChange = $prevOperatingIncome > 0 ? (($operatingIncome - $prevOperatingIncome) / $prevOperatingIncome) * 100 : 0;
+
+
         return [
             [
                 'label' => __('messages.total_liabilities'),
                 'value' => $totalLiability,
-                'icon' => 'ti-wallet',
+                'icon' => 'ti-receipt-2',
+                'change' => 0,
             ],
             [
                 'label' => __('messages.this_month_paid_liabilities'),
-                'value' => $this->getLiabilityPaymentsMonthly(),
-                'icon' => 'ti-calendar',
+                'value' => $paidLiabilities,
+                'icon' => 'ti-calendar-check',
+                'change' => $paidLiabilitiesChange,
             ],
             [
                 'label' => __('messages.total_account_receivable'),
                 'value' => $totalRevenue,
-                'icon' => 'ti-report-money',
+                'icon' => 'ti-file-invoice',
+                'change' => 0,
             ],
             [
                 'label' => __('messages.this_month_receivable_paid'),
-                'value' => $this->getPaidDebtMonthly(),
-                'icon' => 'ti-coin',
+                'value' => $receivablePaid,
+                'icon' => 'ti-cash',
+                'change' => $receivablePaidChange,
             ],
             [
                 'label' => __('messages.operating_expenses'),
                 'value' => $operatingExpenses,
-                'icon' => 'ti-shopping-cart',
+                'icon' => 'ti-shopping-cart-cog',
+                'change' => $operatingExpensesChange,
+            ],
+            [
+                'label' => __('messages.net_profit'),
+                'value' => $netProfit,
+                'icon' => 'ti-chart-infographic',
+                'change' => $netProfitChange,
+            ],
+            [
+                'label' => __('messages.gross_profit'),
+                'value' => $grossProfit,
+                'icon' => 'ti-moneybag',
+                'change' => $grossProfitChange,
+            ],
+            [
+                'label' => __('messages.operating_income'),
+                'value' => $operatingIncome,
+                'icon' => 'ti-building-bank',
+                'change' => $operatingIncomeChange,
             ],
         ];
     }

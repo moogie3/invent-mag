@@ -1111,4 +1111,7 @@ return [
     'historical_sales' => 'Historical Sales',
     'forecasted_sales' => 'Forecasted Sales',
     'accounting_summary' => 'Accounting Summary',
+    'net_profit' => 'Net Profit',
+    'gross_profit' => 'Gross Profit',
+    'operating_income' => 'Operating Income',
 ];

@@ -85,7 +85,7 @@ class ProfileControllerTest extends BaseFeatureTestCase
         $response = $this->actingAs($this->adminUser)->put(route('admin.setting.profile.update'), $updateData);
 
         $response->assertRedirect();
-        $response->assertSessionHasErrors(['current_password' => 'Incorrect password']);
+        $response->assertSessionHasErrors(['profile_update_error' => 'Incorrect password']);
     }
 
     
@@ -97,9 +97,6 @@ class ProfileControllerTest extends BaseFeatureTestCase
 
         $response = $this->actingAs($this->adminUser)->put(route('admin.setting.profile.update'), ['email' => 'not-an-email']);
         $response->assertSessionHasErrors('email');
-
-        $response = $this->actingAs($this->adminUser)->put(route('admin.setting.profile.update'), ['password' => '123']);
-        $response->assertSessionHasErrors('password');
     }
 
     

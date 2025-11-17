@@ -26,6 +26,24 @@
         <div class="page-body mt-4">
             <div class="card">
                 <div class="card-body">
+                    <form action="{{ route('admin.accounting.journal') }}" method="GET" class="mb-4">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label for="start_date" class="form-label">{{ __('messages.start_date') }}</label>
+                                <input type="date" id="start_date" name="start_date" class="form-control"
+                                    value="{{ $startDate }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="end_date" class="form-label">{{ __('messages.end_date') }}</label>
+                                <input type="date" id="end_date" name="end_date" class="form-control"
+                                    value="{{ $endDate }}">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">{{ __('messages.filter') }}</button>
+                            </div>
+                        </div>
+                    </form>
+
                     @if ($entries->isEmpty())
                         <div class="empty">
                             <div class="empty-icon">

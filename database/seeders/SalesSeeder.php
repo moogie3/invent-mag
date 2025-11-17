@@ -8,12 +8,20 @@ use App\Models\Customer;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\SalesItem;
+use App\Services\AccountingService;
 use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Schema;
 
 class SalesSeeder extends Seeder
 {
+    protected $accountingService;
+
+    public function __construct(AccountingService $accountingService)
+    {
+        $this->accountingService = $accountingService;
+    }
+    
     /**
      * Run the database seeds.
      *
@@ -64,12 +72,14 @@ class SalesSeeder extends Seeder
 
             $totalSalesAmount = 0;
             $totalTaxAmount = 0;
+            $totalCostOfGoods = 0;
             $salesItemsData = [];
             $attempts = 0;
             $maxAttempts = 100; // Prevent infinite loops
 
             do {
                 $totalSalesAmount = 0;
+                $totalCostOfGoods = 0;
                 $salesItemsData = [];
                 $numberOfItems = rand(1, 5);
 
@@ -79,6 +89,7 @@ class SalesSeeder extends Seeder
                     $customerPrice = $product->selling_price;
                     $total = $quantity * $customerPrice;
                     $totalSalesAmount += $total;
+                    $totalCostOfGoods += $quantity * $product->price;
 
                     $salesItemsData[] = [
                         'product_id' => $product->id,
@@ -127,11 +138,13 @@ class SalesSeeder extends Seeder
                 'change_amount' => 0, // No change amount for non-POS sales
             ]);
 
+            $paidAmount = 0;
             // Add payment logic
             if ($finalCalculatedTotal > 0) { // Ensure there's an amount to pay
                 if ($status === 'Paid') {
+                    $paidAmount = $finalCalculatedTotal;
                     $sales->payments()->create([
-                        'amount' => $finalCalculatedTotal,
+                        'amount' => $paidAmount,
                         'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
                         'payment_method' => $paymentType,
                         'notes' => 'Full payment during seeding.',
@@ -145,6 +158,40 @@ class SalesSeeder extends Seeder
                         'notes' => 'Partial payment during seeding.',
                     ]);
                 }
+            }
+
+            // Create Journal Entry for the sale
+            try {
+                // 1. Record the revenue and accounts receivable
+                $revenueTransactions = [
+                    ['account_name' => 'accounting.accounts.accounts_receivable.name', 'type' => 'debit', 'amount' => $finalCalculatedTotal],
+                    ['account_name' => 'accounting.accounts.sales_revenue.name', 'type' => 'credit', 'amount' => $totalSalesAmount],
+                ];
+                if ($totalTaxAmount > 0) {
+                    $revenueTransactions[] = ['account_name' => 'accounting.accounts.output_vat.name', 'type' => 'credit', 'amount' => $totalTaxAmount];
+                }
+                $this->accountingService->createJournalEntry("Sale - Invoice {$sales->invoice}", $orderDate, $revenueTransactions, $sales);
+
+                // 2. Record the cost of goods sold
+                if ($totalCostOfGoods > 0) {
+                    $cogsTransactions = [
+                        ['account_name' => 'accounting.accounts.cost_of_goods_sold.name', 'type' => 'debit', 'amount' => $totalCostOfGoods],
+                        ['account_name' => 'accounting.accounts.inventory.name', 'type' => 'credit', 'amount' => $totalCostOfGoods],
+                    ];
+                    $this->accountingService->createJournalEntry("COGS for Invoice {$sales->invoice}", $orderDate, $cogsTransactions, $sales);
+                }
+
+                // 3. Record the payment, if any
+                if ($paidAmount > 0) {
+                    $paymentTransactions = [
+                        ['account_name' => 'accounting.accounts.cash.name', 'type' => 'debit', 'amount' => $paidAmount],
+                        ['account_name' => 'accounting.accounts.accounts_receivable.name', 'type' => 'credit', 'amount' => $paidAmount],
+                    ];
+                    $this->accountingService->createJournalEntry("Payment for Invoice {$sales->invoice}", $orderDate, $paymentTransactions, $sales);
+                }
+
+            } catch (\Exception $e) {
+                $this->command->error("Failed to create journal entry for sale {$sales->invoice}: " . $e->getMessage());
             }
         }
     }

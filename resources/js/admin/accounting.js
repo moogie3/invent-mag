@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const originalButtonText = this.innerHTML;
 
             // Set modal message
-            coaTemplateConfirmationModalMessage.innerHTML = `Are you sure you want to apply the <strong>${selectedTemplateDisplayName}</strong> Chart of Accounts template? This will overwrite existing accounts and cannot be undone.`;
+            coaTemplateConfirmationModalMessage.innerHTML = `Are you sure you want to apply the <strong>${selectedTemplateDisplayName}</strong> Chart of Accounts template? This will overwrite existing accounts, <strong>delete all historical journal entries and transactions</strong>, and cannot be undone.`;
             coaTemplateConfirmationModal.show();
 
             // Handle confirmation

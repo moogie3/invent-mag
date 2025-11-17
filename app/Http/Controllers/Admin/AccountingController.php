@@ -204,12 +204,22 @@ class AccountingController extends Controller
      */
     public function journal(Request $request)
     {
-        $entries = JournalEntry::with('transactions.account')
-            ->latest('date')
-            ->latest('id')
-            ->paginate(20);
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
+        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-        return view('admin.accounting.journal', compact('entries'));
+        $query = JournalEntry::with('transactions.account')->latest('date')->latest('id');
+
+        if ($startDate) {
+            $query->where('date', '>=', $startDate);
+        }
+
+        if ($endDate) {
+            $query->where('date', '<=', $endDate);
+        }
+
+        $entries = $query->paginate(20)->withQueryString();
+
+        return view('admin.accounting.journal', compact('entries', 'startDate', 'endDate'));
     }
 
     /**

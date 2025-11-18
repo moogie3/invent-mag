@@ -19,11 +19,6 @@ async function fetchSystemSettings() {
         };
     }
 
-    // Once settings are loaded, check for and display any session-based notifications.
-    if (window.handleSessionNotifications) {
-        window.handleSessionNotifications();
-    }
-
     // Initialize features that depend on these settings
     if (window.userSettings) {
         applyPerformanceSettings(window.userSettings);
@@ -304,7 +299,13 @@ if (document.querySelector('meta[name="csrf-token"]')) {
     fetchSystemSettings();
 }
 
-function handlePageLoadNotifications() {
+document.addEventListener('DOMContentLoaded', () => {
+    // Handle session-based notifications immediately on DOM load
+    if (window.handleSessionNotifications) {
+        window.handleSessionNotifications();
+    }
+
+    // Also handle notifications passed via URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status');
     const message = urlParams.get('message');
@@ -319,9 +320,7 @@ function handlePageLoadNotifications() {
         // Clean up the URL
         window.history.replaceState({}, document.title, window.location.pathname);
     }
-}
-
-document.addEventListener('DOMContentLoaded', handlePageLoadNotifications);
+});
 
 function resetToDefaults() {
     const form = document.getElementById('systemSettingsForm');

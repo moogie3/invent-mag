@@ -53,7 +53,7 @@
                                     <div class="fw-bold">{{ $address }}</div>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center mb-3">
                                 <div class="me-3 d-flex align-items-center justify-content-center badge"
                                     style="width: 40px; height: 40px;">
                                     <i class="ti ti-container fs-3 text-warning"></i>

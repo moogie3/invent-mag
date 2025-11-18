@@ -147,6 +147,7 @@ return [
     'po_order_information_title' => 'Order Information',
     'po_order_date' => 'Order Date:',
     'po_due_date' => 'Due Date:',
+    'po_payment_date' => 'Payment Date:',
     'po_payment_type' => 'Payment Type:',
     'po_order_items_title' => 'Order Items',
     'table_product' => 'Product',

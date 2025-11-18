@@ -277,6 +277,9 @@ return [
     'pos_low_stock_threshold' => 'Ambang Batas Stok Rendah',
     'pos_default_10' => 'Default (10)',
     'pos_low_stock_threshold_hint' => 'Biarkan kosong untuk menggunakan default sistem (10)',
+    'barcode' => 'Barcode',
+    'enter_barcode' => 'Masukkan barcode',
+    'scan_barcode' => 'Pindai Barcode',
     'product_modal_bulk_delete_message_part2' => 'produk dan semua data terkait.',
     'product_modal_bulk_delete_item1' => 'Catatan produk',
     'product_modal_bulk_delete_item2' => 'Gambar dan lampiran produk',
@@ -1108,4 +1111,8 @@ return [
     'historical_sales' => 'Penjualan Historis',
     'forecasted_sales' => 'Prakiraan Penjualan',
     'accounting_summary' => 'Ringkasan Akuntansi',
+    'total_paid' => 'Total Dibayar',
+    'net_profit' => 'Laba Bersih',
+    'gross_profit' => 'Laba Kotor',
+    'operating_income' => 'Pendapatan Operasional',
 ];

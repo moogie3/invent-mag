@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Unit;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class UnitSeeder extends Seeder
 {
@@ -14,25 +13,19 @@ class UnitSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('units')->insert([
-            [
-                'name' => 'Pieces',
-                'symbol' => 'PCS',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Roll',
-                'symbol' => 'Roll',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],[
-                'name' => 'Meters',
-                'symbol' => 'M',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+        Unit::updateOrCreate(
+            ['name' => 'Pieces'],
+            ['symbol' => 'PCS']
+        );
 
-        ]);
+        Unit::updateOrCreate(
+            ['name' => 'Roll'],
+            ['symbol' => 'Roll']
+        );
+
+        Unit::updateOrCreate(
+            ['name' => 'Meters'],
+            ['symbol' => 'M']
+        );
     }
 }

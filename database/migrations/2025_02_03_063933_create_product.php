@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('code');
             $table->string('barcode')->unique()->nullable();
             $table->string('name');
+            $table->index('name');
             $table->integer('stock_quantity');
             $table->integer('low_stock_threshold')->nullable();
             $table->double('price');

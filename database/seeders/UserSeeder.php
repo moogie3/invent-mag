@@ -16,14 +16,16 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::create([
-            'name' => 'admin',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('password'),
-            'avatar' => '',
-            'created_at' => now(),
-            'updated_at'=> now()
-        ]);
+        $user = User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'admin',
+                'password' => Hash::make('password'),
+                'avatar' => '',
+                'created_at' => now(),
+                'updated_at'=> now()
+            ]
+        );
 
         $role = Role::where('name', 'superuser')->first();
         if ($role) {

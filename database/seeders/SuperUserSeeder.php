@@ -15,11 +15,13 @@ class SuperUserSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::create([
-            'name' => 'Super User',
-            'email' => 'superuser@example.com',
-            'password' => bcrypt('password'),
-        ]);
+        $user = User::updateOrCreate(
+            ['email' => 'superuser@example.com'],
+            [
+                'name' => 'Super User',
+                'password' => bcrypt('password'),
+            ]
+        );
 
         $role = Role::where('name', 'superuser')->first();
 

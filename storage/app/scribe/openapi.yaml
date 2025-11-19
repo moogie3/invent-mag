@@ -1,0 +1,2820 @@
+openapi: 3.0.3
+info:
+  title: 'Invent-MAG API Documentation'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+tags:
+  -
+    name: Accounts
+    description: "\nAPIs for managing accounts"
+  -
+    name: Categories
+    description: "\nAPIs for managing categories"
+  -
+    name: 'Currency Settings'
+    description: "\nAPIs for managing currency settings"
+  -
+    name: 'Customer Interactions'
+    description: "\nAPIs for managing customer interactions"
+  -
+    name: Customers
+    description: "\nAPIs for managing customers"
+  -
+    name: 'Journal Entries'
+    description: "\nAPIs for managing journal entries"
+  -
+    name: POS
+    description: "\nAPIs for managing Point of Sale"
+  -
+    name: Payments
+    description: "\nAPIs for managing payments"
+  -
+    name: 'Pipeline Stages'
+    description: "\nAPIs for managing pipeline stages"
+  -
+    name: Products
+    description: "\nAPIs for managing products"
+  -
+    name: 'Purchase Order Items'
+    description: "\nAPIs for managing purchase order items"
+  -
+    name: 'Purchase Orders'
+    description: "\nAPIs for managing purchase orders"
+  -
+    name: Roles
+    description: "\nAPIs for managing roles"
+  -
+    name: 'Sales Items'
+    description: "\nAPIs for managing sales items"
+  -
+    name: 'Sales Opportunities'
+    description: "\nAPIs for managing sales opportunities"
+  -
+    name: 'Sales Opportunity Items'
+    description: "\nAPIs for managing sales opportunity items"
+  -
+    name: 'Sales Orders'
+    description: "\nAPIs for managing sales orders"
+  -
+    name: 'Sales Pipelines'
+    description: "\nAPIs for managing sales pipelines"
+  -
+    name: 'Stock Adjustments'
+    description: "\nAPIs for managing stock adjustments"
+  -
+    name: 'Supplier Interactions'
+    description: "\nAPIs for managing supplier interactions"
+  -
+    name: Suppliers
+    description: "\nAPIs for managing suppliers"
+  -
+    name: Taxes
+    description: "\nAPIs for managing taxes"
+  -
+    name: Transactions
+    description: "\nAPIs for managing transactions"
+  -
+    name: Units
+    description: "\nAPIs for managing units"
+  -
+    name: Users
+    description: "\nAPIs for managing users"
+  -
+    name: Warehouses
+    description: "\nAPIs for managing warehouses"
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: 'You can retrieve your token by visiting your dashboard and clicking <b>Generate API token</b>.'
+security:
+  -
+    default: []
+paths:
+  /api/v1/accounts:
+    get:
+      summary: 'Display a listing of the accounts.'
+      operationId: displayAListingOfTheAccounts
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of accounts to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of accounts to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Accounts
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Accounts
+      security: []
+  '/api/v1/accounts/{id}':
+    get:
+      summary: 'Display the specified account.'
+      operationId: displayTheSpecifiedAccount
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Accounts
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Accounts
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Accounts
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the account.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: account
+        description: 'The ID of the account.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/categories:
+    get:
+      summary: 'Display a listing of the categories.'
+      operationId: displayAListingOfTheCategories
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of categories to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of categories to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Categories
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Categories
+      security: []
+  '/api/v1/categories/{id}':
+    get:
+      summary: 'Display the specified category.'
+      operationId: displayTheSpecifiedCategory
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Categories
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Categories
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Categories
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the category.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: category
+        description: 'The ID of the category.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/currency-settings:
+    get:
+      summary: 'Display a listing of the currency settings.'
+      operationId: displayAListingOfTheCurrencySettings
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of settings to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of settings to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Currency Settings'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Currency Settings'
+      security: []
+  '/api/v1/currency-settings/{id}':
+    get:
+      summary: 'Display the specified currency setting.'
+      operationId: displayTheSpecifiedCurrencySetting
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Currency Settings'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Currency Settings'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Currency Settings'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the currency setting.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: currency_setting
+        description: 'The ID of the currency setting.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/customer-interactions:
+    get:
+      summary: 'Display a listing of the customer interactions.'
+      operationId: displayAListingOfTheCustomerInteractions
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of interactions to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of interactions to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Customer Interactions'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Customer Interactions'
+      security: []
+  '/api/v1/customer-interactions/{id}':
+    get:
+      summary: 'Display the specified customer interaction.'
+      operationId: displayTheSpecifiedCustomerInteraction
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Customer Interactions'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Customer Interactions'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Customer Interactions'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the customer interaction.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: customer_interaction
+        description: 'The ID of the customer interaction.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/customers:
+    get:
+      summary: 'Display a listing of the customers.'
+      operationId: displayAListingOfTheCustomers
+      description: 'Retrieves a paginated list of customers. You can specify the number of customers per page.'
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of customers to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of customers to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Customers
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Customers
+      security: []
+  '/api/v1/customers/{id}':
+    get:
+      summary: 'Display the specified customer.'
+      operationId: displayTheSpecifiedCustomer
+      description: 'Retrieves a single customer by its ID.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Customers
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Customers
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Customers
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the customer.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/journal-entries:
+    get:
+      summary: 'Display a listing of the journal entries.'
+      operationId: displayAListingOfTheJournalEntries
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of entries to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of entries to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Journal Entries'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Journal Entries'
+      security: []
+  '/api/v1/journal-entries/{id}':
+    get:
+      summary: 'Display the specified journal entry.'
+      operationId: displayTheSpecifiedJournalEntry
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Journal Entries'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Journal Entries'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Journal Entries'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the journal entry.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: journal_entry
+        description: 'The ID of the journal entry.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/pos:
+    get:
+      summary: 'Display a listing of the resource.'
+      operationId: displayAListingOfTheResource
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - POS
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - POS
+      security: []
+  '/api/v1/pos/{id}':
+    get:
+      summary: 'Display the specified resource.'
+      operationId: displayTheSpecifiedResource
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - POS
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - POS
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - POS
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the po.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: po
+        description: 'The ID of the resource.'
+        example: consequatur
+        required: true
+        schema:
+          type: string
+  /api/v1/payments:
+    get:
+      summary: 'Display a listing of the payments.'
+      operationId: displayAListingOfThePayments
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of payments to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of payments to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Payments
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Payments
+      security: []
+  '/api/v1/payments/{id}':
+    get:
+      summary: 'Display the specified payment.'
+      operationId: displayTheSpecifiedPayment
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Payments
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Payments
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Payments
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the payment.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: payment
+        description: 'The ID of the payment.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/pipeline-stages:
+    get:
+      summary: 'Display a listing of the pipeline stages.'
+      operationId: displayAListingOfThePipelineStages
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of stages to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of stages to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Pipeline Stages'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Pipeline Stages'
+      security: []
+  '/api/v1/pipeline-stages/{id}':
+    get:
+      summary: 'Display the specified pipeline stage.'
+      operationId: displayTheSpecifiedPipelineStage
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Pipeline Stages'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Pipeline Stages'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Pipeline Stages'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the pipeline stage.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: pipeline_stage
+        description: 'The ID of the pipeline stage.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/products:
+    get:
+      summary: 'Display a listing of the products.'
+      operationId: displayAListingOfTheProducts
+      description: 'Retrieves a paginated list of products. You can specify the number of products per page.'
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of products to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of products to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Products
+      security: []
+    post:
+      summary: 'Create a new product.'
+      operationId: createANewProduct
+      description: 'Creates a new product with the provided data.'
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "{\n \"data\": {\n     \"id\": 1,\n     \"name\": \"Laptop Pro\",\n     \"code\": \"LP-001\",\n     \"price\": 1200.50,\n     \"selling_price\": 1499.99,\n     \"stock_quantity\": 50,\n     \"description\": \"A powerful new laptop.\",\n     \"category\": { ... },\n     \"supplier\": { ... },\n     \"unit\": { ... },\n     \"warehouse\": { ... }\n }\n}"
+        422:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '{ "message": "The given data was invalid.", "errors": { ... } }'
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the product.'
+                  example: '"Laptop Pro"'
+                  nullable: false
+                code:
+                  type: string
+                  description: 'A unique code for the product.'
+                  example: '"LP-001"'
+                  nullable: false
+                price:
+                  type: number
+                  description: 'The cost price of the product.'
+                  example: 1200.5
+                  nullable: false
+                selling_price:
+                  type: number
+                  description: 'The selling price of the product.'
+                  example: 1499.99
+                  nullable: false
+                category_id:
+                  type: integer
+                  description: 'The ID of the category.'
+                  example: 1
+                  nullable: false
+                supplier_id:
+                  type: integer
+                  description: 'The ID of the supplier.'
+                  example: 1
+                  nullable: true
+                units_id:
+                  type: integer
+                  description: 'The ID of the unit.'
+                  example: 1
+                  nullable: false
+                warehouse_id:
+                  type: integer
+                  description: 'The ID of the warehouse.'
+                  example: 1
+                  nullable: true
+                stock_quantity:
+                  type: number
+                  description: 'The initial stock quantity.'
+                  example: 50.0
+                  nullable: true
+                description:
+                  type: string
+                  description: 'A description for the product.'
+                  example: 'Dolores dolorum amet iste laborum eius est dolor.'
+                  nullable: true
+              required:
+                - name
+                - code
+                - price
+                - selling_price
+                - category_id
+                - units_id
+      security: []
+  '/api/v1/products/{id}':
+    get:
+      summary: 'Display the specified product.'
+      operationId: displayTheSpecifiedProduct
+      description: 'Retrieves a single product by its ID.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Products
+      security: []
+    put:
+      summary: 'Update the specified product.'
+      operationId: updateTheSpecifiedProduct
+      description: 'Updates a product with the provided data.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "{\n \"data\": {\n     \"id\": 1,\n     \"name\": \"Laptop Pro v2\",\n     \"code\": \"LP-001\",\n     \"price\": 1250.00,\n     ...\n }\n}"
+        422:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '{ "message": "The given data was invalid.", "errors": { ... } }'
+      tags:
+        - Products
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the product.'
+                  example: '"Laptop Pro v2"'
+                  nullable: false
+                code:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: amniihfqcoynlazghdtqt
+                  nullable: false
+                price:
+                  type: number
+                  description: 'The cost price of the product.'
+                  example: 1250.0
+                  nullable: false
+                selling_price:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 80
+                  nullable: false
+                category_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the categories table.'
+                  example: null
+                  nullable: false
+                supplier_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the suppliers table.'
+                  example: null
+                  nullable: true
+                units_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the units table.'
+                  example: null
+                  nullable: false
+                warehouse_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the warehouses table.'
+                  example: null
+                  nullable: true
+                stock_quantity:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 6
+                  nullable: true
+                description:
+                  type: string
+                  description: ''
+                  example: 'Dolores dolorum amet iste laborum eius est dolor.'
+                  nullable: true
+      security: []
+    delete:
+      summary: 'Delete the specified product.'
+      operationId: deleteTheSpecifiedProduct
+      description: 'Deletes a single product by its ID.'
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: string
+                example: ''
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Not Found.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Not Found.'
+      tags:
+        - Products
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the product.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: product
+        description: 'The ID of the product.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/po-items:
+    get:
+      summary: 'Display a listing of the purchase order items.'
+      operationId: displayAListingOfThePurchaseOrderItems
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of items to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of items to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Purchase Order Items'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Order Items'
+      security: []
+  '/api/v1/po-items/{id}':
+    get:
+      summary: 'Display the specified purchase order item.'
+      operationId: displayTheSpecifiedPurchaseOrderItem
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Purchase Order Items'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Order Items'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Order Items'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the po item.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: po_item
+        description: 'The ID of the purchase order item.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/purchases:
+    get:
+      summary: 'Display a listing of the purchase orders.'
+      operationId: displayAListingOfThePurchaseOrders
+      description: 'Retrieves a paginated list of purchase orders.'
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of purchase orders to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of purchase orders to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Purchase Orders'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Orders'
+      security: []
+  '/api/v1/purchases/{id}':
+    get:
+      summary: 'Display the specified purchase order.'
+      operationId: displayTheSpecifiedPurchaseOrder
+      description: 'Retrieves a single purchase order by its ID.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Purchase Orders'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Orders'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Orders'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: purchase
+        description: 'The ID of the purchase order.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/roles:
+    get:
+      summary: 'Display a listing of the roles.'
+      operationId: displayAListingOfTheRoles
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of roles to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of roles to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Roles
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Roles
+      security: []
+  '/api/v1/roles/{id}':
+    get:
+      summary: 'Display the specified role.'
+      operationId: displayTheSpecifiedRole
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Roles
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Roles
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Roles
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the role.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: role
+        description: 'The ID of the role.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/sales-items:
+    get:
+      summary: 'Display a listing of the sales items.'
+      operationId: displayAListingOfTheSalesItems
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of items to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of items to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Items'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Items'
+      security: []
+  '/api/v1/sales-items/{id}':
+    get:
+      summary: 'Display the specified sales item.'
+      operationId: displayTheSpecifiedSalesItem
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Items'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Items'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Items'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sales item.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: sales_item
+        description: 'The ID of the sales item.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/sales-opportunities:
+    get:
+      summary: 'Display a listing of the sales opportunities.'
+      operationId: displayAListingOfTheSalesOpportunities
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of opportunities to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of opportunities to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Opportunities'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunities'
+      security: []
+  '/api/v1/sales-opportunities/{id}':
+    get:
+      summary: 'Display the specified sales opportunity.'
+      operationId: displayTheSpecifiedSalesOpportunity
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Opportunities'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunities'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunities'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sales opportunity.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: sales_opportunity
+        description: 'The ID of the sales opportunity.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/sales-opportunity-items:
+    get:
+      summary: 'Display a listing of the sales opportunity items.'
+      operationId: displayAListingOfTheSalesOpportunityItems
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of items to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of items to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Opportunity Items'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunity Items'
+      security: []
+  '/api/v1/sales-opportunity-items/{id}':
+    get:
+      summary: 'Display the specified sales opportunity item.'
+      operationId: displayTheSpecifiedSalesOpportunityItem
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Opportunity Items'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunity Items'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunity Items'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sales opportunity item.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: sales_opportunity_item
+        description: 'The ID of the sales opportunity item.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/sales:
+    get:
+      summary: 'Display a listing of the sales orders.'
+      operationId: displayAListingOfTheSalesOrders
+      description: 'Retrieves a paginated list of sales orders.'
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of sales orders to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of sales orders to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Orders'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Orders'
+      security: []
+  '/api/v1/sales/{id}':
+    get:
+      summary: 'Display the specified sales order.'
+      operationId: displayTheSpecifiedSalesOrder
+      description: 'Retrieves a single sales order by its ID.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Orders'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Orders'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Orders'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sale.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: sale
+        description: 'The ID of the sales order.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/sales-pipelines:
+    get:
+      summary: 'Display a listing of the sales pipelines.'
+      operationId: displayAListingOfTheSalesPipelines
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of pipelines to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of pipelines to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Pipelines'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Pipelines'
+      security: []
+  '/api/v1/sales-pipelines/{id}':
+    get:
+      summary: 'Display the specified sales pipeline.'
+      operationId: displayTheSpecifiedSalesPipeline
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Pipelines'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Pipelines'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Pipelines'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sales pipeline.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: sales_pipeline
+        description: 'The ID of the sales pipeline.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/stock-adjustments:
+    get:
+      summary: 'Display a listing of the stock adjustments.'
+      operationId: displayAListingOfTheStockAdjustments
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of adjustments to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of adjustments to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Stock Adjustments'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Stock Adjustments'
+      security: []
+  '/api/v1/stock-adjustments/{id}':
+    get:
+      summary: 'Display the specified stock adjustment.'
+      operationId: displayTheSpecifiedStockAdjustment
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Stock Adjustments'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Stock Adjustments'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Stock Adjustments'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the stock adjustment.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: stock_adjustment
+        description: 'The ID of the stock adjustment.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/supplier-interactions:
+    get:
+      summary: 'Display a listing of the supplier interactions.'
+      operationId: displayAListingOfTheSupplierInteractions
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of interactions to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of interactions to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Supplier Interactions'
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Supplier Interactions'
+      security: []
+  '/api/v1/supplier-interactions/{id}':
+    get:
+      summary: 'Display the specified supplier interaction.'
+      operationId: displayTheSpecifiedSupplierInteraction
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Supplier Interactions'
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Supplier Interactions'
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Supplier Interactions'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the supplier interaction.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: supplier_interaction
+        description: 'The ID of the supplier interaction.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/suppliers:
+    get:
+      summary: 'Display a listing of the suppliers.'
+      operationId: displayAListingOfTheSuppliers
+      description: 'Retrieves a paginated list of suppliers.'
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of suppliers to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of suppliers to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Suppliers
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Suppliers
+      security: []
+  '/api/v1/suppliers/{id}':
+    get:
+      summary: 'Display the specified supplier.'
+      operationId: displayTheSpecifiedSupplier
+      description: 'Retrieves a single supplier by its ID.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Suppliers
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Suppliers
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Suppliers
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the supplier.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: supplier
+        description: 'The ID of the supplier.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/taxes:
+    get:
+      summary: 'Display a listing of the taxes.'
+      operationId: displayAListingOfTheTaxes
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of taxes to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of taxes to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Taxes
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Taxes
+      security: []
+  '/api/v1/taxes/{id}':
+    get:
+      summary: 'Display the specified tax.'
+      operationId: displayTheSpecifiedTax
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Taxes
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Taxes
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Taxes
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the tax.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: tax
+        description: 'The ID of the tax.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/transactions:
+    get:
+      summary: 'Display a listing of the transactions.'
+      operationId: displayAListingOfTheTransactions
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of transactions to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of transactions to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Transactions
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Transactions
+      security: []
+  '/api/v1/transactions/{id}':
+    get:
+      summary: 'Display the specified transaction.'
+      operationId: displayTheSpecifiedTransaction
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Transactions
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Transactions
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Transactions
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the transaction.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: transaction
+        description: 'The ID of the transaction.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/units:
+    get:
+      summary: 'Display a listing of the units.'
+      operationId: displayAListingOfTheUnits
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of units to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of units to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Units
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Units
+      security: []
+  '/api/v1/units/{id}':
+    get:
+      summary: 'Display the specified unit.'
+      operationId: displayTheSpecifiedUnit
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Units
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Units
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Units
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the unit.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: unit
+        description: 'The ID of the unit.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/users:
+    get:
+      summary: 'Display a listing of the users.'
+      operationId: displayAListingOfTheUsers
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of users to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of users to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Users
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Users
+      security: []
+  '/api/v1/users/{id}':
+    get:
+      summary: 'Display the specified user.'
+      operationId: displayTheSpecifiedUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Users
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Users
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Users
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the user.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: user
+        description: 'The ID of the user.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/warehouses:
+    get:
+      summary: 'Display a listing of the warehouses.'
+      operationId: displayAListingOfTheWarehouses
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of warehouses to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of warehouses to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Warehouses
+      security: []
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Warehouses
+      security: []
+  '/api/v1/warehouses/{id}':
+    get:
+      summary: 'Display the specified warehouse.'
+      operationId: displayTheSpecifiedWarehouse
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Warehouses
+      security: []
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Warehouses
+      security: []
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Warehouses
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the warehouse.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: warehouse
+        description: 'The ID of the warehouse.'
+        example: '1'
+        required: true
+        schema:
+          type: string

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code');
             $table->string('name');
+            $table->index('name');
             $table->string('address');
             $table->string('phone_number');
             $table->enum('location', ['IN','OUT']);
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('supplier');
+        Schema::dropIfExists('suppliers');
     }
 };

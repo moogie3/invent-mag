@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\CurrencySetting;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class CurrencySeeder extends Seeder
 {
@@ -13,14 +13,17 @@ class CurrencySeeder extends Seeder
      */
     public function run(): void
     {
-            DB::table('currency_settings')->insert([
-            'currency_symbol' => 'Rp',
-            'decimal_separator' => ',',
-            'thousand_separator' => '.',
-            'decimal_places' => 0,
-            'position' => 'prefix',
-            'currency_code' => 'IDR',
-            'locale' => 'id-ID',
-        ]);
+        CurrencySetting::updateOrCreate(
+            ['id' => 1], // Assuming there is only one setting row
+            [
+                'currency_symbol' => 'Rp',
+                'decimal_separator' => ',',
+                'thousand_separator' => '.',
+                'decimal_places' => 0,
+                'position' => 'prefix',
+                'currency_code' => 'IDR',
+                'locale' => 'id-ID',
+            ]
+        );
     }
 }

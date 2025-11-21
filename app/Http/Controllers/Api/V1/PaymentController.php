@@ -28,10 +28,23 @@ class PaymentController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @response 201 scenario="Success"
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'paymentable_id' => 'required|integer',
+            'paymentable_type' => 'required|string',
+            'amount' => 'required|numeric',
+            'payment_date' => 'required|date',
+            'payment_method' => 'required|string',
+            'notes' => 'nullable|string',
+        ]);
+
+        $payment = Payment::create($validated);
+
+        return new PaymentResource($payment);
     }
 
     /**
@@ -46,17 +59,34 @@ class PaymentController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @response 200 scenario="Success"
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Payment $payment)
     {
-        //
+        $validated = $request->validate([
+            'paymentable_id' => 'required|integer',
+            'paymentable_type' => 'required|string',
+            'amount' => 'required|numeric',
+            'payment_date' => 'required|date',
+            'payment_method' => 'required|string',
+            'notes' => 'nullable|string',
+        ]);
+
+        $payment->update($validated);
+
+        return new PaymentResource($payment);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @response 204 scenario="Success"
      */
-    public function destroy(string $id)
+    public function destroy(Payment $payment)
     {
-        //
+        $payment->delete();
+
+        return response()->noContent();
     }
 }

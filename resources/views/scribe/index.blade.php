@@ -647,7 +647,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: November 20, 2025</li>
+        <li>Last updated: November 21, 2025</li>
     </ul>
 </div>
 
@@ -741,8 +741,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 0,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: null
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 2,
@@ -754,19 +753,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 1,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 1,
-                &quot;parent_id&quot;: null,
-                &quot;name&quot;: &quot;accounting.accounts.assets.name&quot;,
-                &quot;code&quot;: &quot;1000&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 0,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 3,
@@ -778,19 +765,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 2,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
-                &quot;code&quot;: &quot;1100&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 4,
@@ -802,19 +777,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 2,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
-                &quot;code&quot;: &quot;1100&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 5,
@@ -826,19 +789,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 2,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
-                &quot;code&quot;: &quot;1100&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 6,
@@ -850,19 +801,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 2,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
-                &quot;code&quot;: &quot;1100&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 7,
@@ -874,19 +813,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 2,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
-                &quot;code&quot;: &quot;1100&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 8,
@@ -898,19 +825,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 2,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
-                &quot;code&quot;: &quot;1100&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 9,
@@ -922,19 +837,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 2,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
-                &quot;code&quot;: &quot;1100&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 10,
@@ -946,19 +849,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 1,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 1,
-                &quot;parent_id&quot;: null,
-                &quot;name&quot;: &quot;accounting.accounts.assets.name&quot;,
-                &quot;code&quot;: &quot;1000&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 0,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 11,
@@ -970,19 +861,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 10,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
-                &quot;code&quot;: &quot;1200&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 12,
@@ -994,19 +873,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 10,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
-                &quot;code&quot;: &quot;1200&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 13,
@@ -1018,19 +885,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 10,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
-                &quot;code&quot;: &quot;1200&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 14,
@@ -1042,19 +897,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 10,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
-                &quot;code&quot;: &quot;1200&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 15,
@@ -1066,19 +909,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 10,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
-                &quot;code&quot;: &quot;1200&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 16,
@@ -1090,8 +921,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 0,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: null
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 17,
@@ -1103,19 +933,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 1,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 16,
-                &quot;parent_id&quot;: null,
-                &quot;name&quot;: &quot;accounting.accounts.liabilities.name&quot;,
-                &quot;code&quot;: &quot;2000&quot;,
-                &quot;type&quot;: &quot;liability&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 0,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 18,
@@ -1127,19 +945,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 17,
-                &quot;parent_id&quot;: 16,
-                &quot;name&quot;: &quot;accounting.accounts.current_liabilities.name&quot;,
-                &quot;code&quot;: &quot;2100&quot;,
-                &quot;type&quot;: &quot;liability&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 19,
@@ -1151,19 +957,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 17,
-                &quot;parent_id&quot;: 16,
-                &quot;name&quot;: &quot;accounting.accounts.current_liabilities.name&quot;,
-                &quot;code&quot;: &quot;2100&quot;,
-                &quot;type&quot;: &quot;liability&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 20,
@@ -1175,19 +969,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 17,
-                &quot;parent_id&quot;: 16,
-                &quot;name&quot;: &quot;accounting.accounts.current_liabilities.name&quot;,
-                &quot;code&quot;: &quot;2100&quot;,
-                &quot;type&quot;: &quot;liability&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 21,
@@ -1199,19 +981,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 1,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 16,
-                &quot;parent_id&quot;: null,
-                &quot;name&quot;: &quot;accounting.accounts.liabilities.name&quot;,
-                &quot;code&quot;: &quot;2000&quot;,
-                &quot;type&quot;: &quot;liability&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 0,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 22,
@@ -1223,19 +993,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 2,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 21,
-                &quot;parent_id&quot;: 16,
-                &quot;name&quot;: &quot;accounting.accounts.long_term_liabilities.name&quot;,
-                &quot;code&quot;: &quot;2200&quot;,
-                &quot;type&quot;: &quot;liability&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 23,
@@ -1247,8 +1005,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 0,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: null
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 24,
@@ -1260,19 +1017,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 1,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 23,
-                &quot;parent_id&quot;: null,
-                &quot;name&quot;: &quot;accounting.accounts.equity.name&quot;,
-                &quot;code&quot;: &quot;3000&quot;,
-                &quot;type&quot;: &quot;equity&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 0,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         },
         {
             &quot;id&quot;: 25,
@@ -1284,19 +1029,7 @@ access-control-allow-origin: *
             &quot;level&quot;: 1,
             &quot;is_active&quot;: true,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;parent&quot;: {
-                &quot;id&quot;: 23,
-                &quot;parent_id&quot;: null,
-                &quot;name&quot;: &quot;accounting.accounts.equity.name&quot;,
-                &quot;code&quot;: &quot;3000&quot;,
-                &quot;type&quot;: &quot;equity&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 0,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         }
     ],
     &quot;links&quot;: {
@@ -1454,7 +1187,16 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/accounts" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"vmqeopfuudtdsufvyvddq\",
+    \"code\": \"amniihfqcoynlazghdtqt\",
+    \"type\": \"qxbajwbpilpmufinllwlo\",
+    \"description\": \"Dolores dolorum amet iste laborum eius est dolor.\",
+    \"level\": 17,
+    \"is_active\": false
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -1468,15 +1210,32 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "vmqeopfuudtdsufvyvddq",
+    "code": "amniihfqcoynlazghdtqt",
+    "type": "qxbajwbpilpmufinllwlo",
+    "description": "Dolores dolorum amet iste laborum eius est dolor.",
+    "level": 17,
+    "is_active": false
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-accounts">
-</span>
+            <blockquote>
+            <p>Example response (201, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-accounts" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-accounts"></span>:
@@ -1560,7 +1319,102 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>parent_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="parent_id"                data-endpoint="POSTapi-v1-accounts"
+               value=""
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the accounts table.</p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-accounts"
+               value="vmqeopfuudtdsufvyvddq"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>vmqeopfuudtdsufvyvddq</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="code"                data-endpoint="POSTapi-v1-accounts"
+               value="amniihfqcoynlazghdtqt"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>amniihfqcoynlazghdtqt</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="type"                data-endpoint="POSTapi-v1-accounts"
+               value="qxbajwbpilpmufinllwlo"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>qxbajwbpilpmufinllwlo</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="POSTapi-v1-accounts"
+               value="Dolores dolorum amet iste laborum eius est dolor."
+               data-component="body">
+    <br>
+<p>Example: <code>Dolores dolorum amet iste laborum eius est dolor.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>level</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="level"                data-endpoint="POSTapi-v1-accounts"
+               value="17"
+               data-component="body">
+    <br>
+<p>Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_active</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-v1-accounts" style="display: none">
+            <input type="radio" name="is_active"
+                   value="true"
+                   data-endpoint="POSTapi-v1-accounts"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-v1-accounts" style="display: none">
+            <input type="radio" name="is_active"
+                   value="false"
+                   data-endpoint="POSTapi-v1-accounts"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Example: <code>false</code></p>
+        </div>
+        </form>
 
                     <h2 id="accounts-GETapi-v1-accounts--id-">Display the specified account.</h2>
 
@@ -1624,34 +1478,7 @@ access-control-allow-origin: *
         &quot;level&quot;: 0,
         &quot;is_active&quot;: true,
         &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-        &quot;parent&quot;: null,
-        &quot;children&quot;: [
-            {
-                &quot;id&quot;: 2,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
-                &quot;code&quot;: &quot;1100&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            {
-                &quot;id&quot;: 10,
-                &quot;parent_id&quot;: 1,
-                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
-                &quot;code&quot;: &quot;1200&quot;,
-                &quot;type&quot;: &quot;asset&quot;,
-                &quot;description&quot;: null,
-                &quot;level&quot;: 1,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
-        ]
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
     }
 }</code>
  </pre>
@@ -1783,7 +1610,15 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/accounts/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"vmqeopfuudtdsufvyvddq\",
+    \"type\": \"amniihfqcoynlazghdtqt\",
+    \"description\": \"Dolores dolorum amet iste laborum eius est dolor.\",
+    \"level\": 17,
+    \"is_active\": true
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -1797,15 +1632,31 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "vmqeopfuudtdsufvyvddq",
+    "type": "amniihfqcoynlazghdtqt",
+    "description": "Dolores dolorum amet iste laborum eius est dolor.",
+    "level": 17,
+    "is_active": true
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-accounts--id-">
-</span>
+            <blockquote>
+            <p>Example response (200, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-accounts--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-accounts--id-"></span>:
@@ -1906,7 +1757,102 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the account. Example: <code>1</code></p>
             </div>
-                    </form>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>parent_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="parent_id"                data-endpoint="PUTapi-v1-accounts--id-"
+               value=""
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the accounts table.</p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-accounts--id-"
+               value="vmqeopfuudtdsufvyvddq"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>vmqeopfuudtdsufvyvddq</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="code"                data-endpoint="PUTapi-v1-accounts--id-"
+               value=""
+               data-component="body">
+    <br>
+
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="type"                data-endpoint="PUTapi-v1-accounts--id-"
+               value="amniihfqcoynlazghdtqt"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>amniihfqcoynlazghdtqt</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="PUTapi-v1-accounts--id-"
+               value="Dolores dolorum amet iste laborum eius est dolor."
+               data-component="body">
+    <br>
+<p>Example: <code>Dolores dolorum amet iste laborum eius est dolor.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>level</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="level"                data-endpoint="PUTapi-v1-accounts--id-"
+               value="17"
+               data-component="body">
+    <br>
+<p>Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_active</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <label data-endpoint="PUTapi-v1-accounts--id-" style="display: none">
+            <input type="radio" name="is_active"
+                   value="true"
+                   data-endpoint="PUTapi-v1-accounts--id-"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="PUTapi-v1-accounts--id-" style="display: none">
+            <input type="radio" name="is_active"
+                   value="false"
+                   data-endpoint="PUTapi-v1-accounts--id-"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Example: <code>true</code></p>
+        </div>
+        </form>
 
                     <h2 id="accounts-DELETEapi-v1-accounts--id-">Remove the specified resource from storage.</h2>
 
@@ -1947,7 +1893,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-accounts--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-accounts--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-accounts--id-"></span>:
@@ -2314,7 +2266,12 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/categories" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"vmqeopfuudtdsufvyvddq\",
+    \"description\": \"Dolores dolorum amet iste laborum eius est dolor.\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -2328,15 +2285,28 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "vmqeopfuudtdsufvyvddq",
+    "description": "Dolores dolorum amet iste laborum eius est dolor."
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-categories">
-</span>
+            <blockquote>
+            <p>Example response (201, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-categories" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-categories"></span>:
@@ -2420,7 +2390,44 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-categories"
+               value="vmqeopfuudtdsufvyvddq"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>vmqeopfuudtdsufvyvddq</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="POSTapi-v1-categories"
+               value="Dolores dolorum amet iste laborum eius est dolor."
+               data-component="body">
+    <br>
+<p>Example: <code>Dolores dolorum amet iste laborum eius est dolor.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>parent_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="parent_id"                data-endpoint="POSTapi-v1-categories"
+               value=""
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the categories table.</p>
+        </div>
+        </form>
 
                     <h2 id="categories-GETapi-v1-categories--id-">Display the specified category.</h2>
 
@@ -2611,15 +2618,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/v1/categories/consequatur" \
+    "http://localhost:8000/api/v1/categories/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"vmqeopfuudtdsufvyvddq\",
+    \"description\": \"Dolores dolorum amet iste laborum eius est dolor.\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/categories/consequatur"
+    "http://localhost:8000/api/v1/categories/1"
 );
 
 const headers = {
@@ -2628,15 +2640,28 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "vmqeopfuudtdsufvyvddq",
+    "description": "Dolores dolorum amet iste laborum eius est dolor."
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-categories--id-">
-</span>
+            <blockquote>
+            <p>Example response (200, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-categories--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-categories--id-"></span>:
@@ -2727,17 +2752,54 @@ You can check the Dev Tools console for debugging information.</code></pre>
                         <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="PUTapi-v1-categories--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the category. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
  &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="id"                data-endpoint="PUTapi-v1-categories--id-"
-               value="consequatur"
-               data-component="url">
+                              name="name"                data-endpoint="PUTapi-v1-categories--id-"
+               value="vmqeopfuudtdsufvyvddq"
+               data-component="body">
     <br>
-<p>The ID of the category. Example: <code>consequatur</code></p>
-            </div>
-                    </form>
+<p>Must not be greater than 255 characters. Example: <code>vmqeopfuudtdsufvyvddq</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="PUTapi-v1-categories--id-"
+               value="Dolores dolorum amet iste laborum eius est dolor."
+               data-component="body">
+    <br>
+<p>Example: <code>Dolores dolorum amet iste laborum eius est dolor.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>parent_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="parent_id"                data-endpoint="PUTapi-v1-categories--id-"
+               value=""
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the categories table.</p>
+        </div>
+        </form>
 
                     <h2 id="categories-DELETEapi-v1-categories--id-">Remove the specified resource from storage.</h2>
 
@@ -2753,7 +2815,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost:8000/api/v1/categories/consequatur" \
+    "http://localhost:8000/api/v1/categories/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2761,7 +2823,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/categories/consequatur"
+    "http://localhost:8000/api/v1/categories/1"
 );
 
 const headers = {
@@ -2778,7 +2840,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-categories--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-categories--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-categories--id-"></span>:
@@ -2865,15 +2933,15 @@ You can check the Dev Tools console for debugging information.</code></pre>
                         <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
+<small>integer</small>&nbsp;
  &nbsp;
  &nbsp;
-                <input type="text" style="display: none"
-                              name="id"                data-endpoint="DELETEapi-v1-categories--id-"
-               value="consequatur"
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="DELETEapi-v1-categories--id-"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the category. Example: <code>consequatur</code></p>
+<p>The ID of the category. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -3103,7 +3171,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/currency-settings" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"currency_symbol\": \"vmqeopfuudtdsufvyvddq\",
+    \"decimal_separator\": \"a\",
+    \"thousand_separator\": \"m\",
+    \"decimal_places\": 17,
+    \"position\": \"mqeopfuudtdsufvyvddqa\",
+    \"currency_code\": \"mniihfqcoynlazghdtqtq\",
+    \"locale\": \"tg_TJ\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -3117,15 +3195,33 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "currency_symbol": "vmqeopfuudtdsufvyvddq",
+    "decimal_separator": "a",
+    "thousand_separator": "m",
+    "decimal_places": 17,
+    "position": "mqeopfuudtdsufvyvddqa",
+    "currency_code": "mniihfqcoynlazghdtqtq",
+    "locale": "tg_TJ"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-currency-settings">
-</span>
+            <blockquote>
+            <p>Example response (201, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-currency-settings" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-currency-settings"></span>:
@@ -3209,7 +3305,92 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>currency_symbol</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="currency_symbol"                data-endpoint="POSTapi-v1-currency-settings"
+               value="vmqeopfuudtdsufvyvddq"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>vmqeopfuudtdsufvyvddq</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>decimal_separator</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="decimal_separator"                data-endpoint="POSTapi-v1-currency-settings"
+               value="a"
+               data-component="body">
+    <br>
+<p>Must not be greater than 1 character. Example: <code>a</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>thousand_separator</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="thousand_separator"                data-endpoint="POSTapi-v1-currency-settings"
+               value="m"
+               data-component="body">
+    <br>
+<p>Must not be greater than 1 character. Example: <code>m</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>decimal_places</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="decimal_places"                data-endpoint="POSTapi-v1-currency-settings"
+               value="17"
+               data-component="body">
+    <br>
+<p>Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>position</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="position"                data-endpoint="POSTapi-v1-currency-settings"
+               value="mqeopfuudtdsufvyvddqa"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>mqeopfuudtdsufvyvddqa</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>currency_code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="currency_code"                data-endpoint="POSTapi-v1-currency-settings"
+               value="mniihfqcoynlazghdtqtq"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>mniihfqcoynlazghdtqtq</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>locale</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="locale"                data-endpoint="POSTapi-v1-currency-settings"
+               value="tg_TJ"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>tg_TJ</code></p>
+        </div>
+        </form>
 
                     <h2 id="currency-settings-GETapi-v1-currency-settings--id-">Display the specified currency setting.</h2>
 
@@ -3405,7 +3586,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/currency-settings/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"currency_symbol\": \"vmqeopfuudtdsufvyvddq\",
+    \"decimal_separator\": \"a\",
+    \"thousand_separator\": \"m\",
+    \"decimal_places\": 17,
+    \"position\": \"mqeopfuudtdsufvyvddqa\",
+    \"currency_code\": \"mniihfqcoynlazghdtqtq\",
+    \"locale\": \"tg_TJ\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -3419,15 +3610,33 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "currency_symbol": "vmqeopfuudtdsufvyvddq",
+    "decimal_separator": "a",
+    "thousand_separator": "m",
+    "decimal_places": 17,
+    "position": "mqeopfuudtdsufvyvddqa",
+    "currency_code": "mniihfqcoynlazghdtqtq",
+    "locale": "tg_TJ"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-currency-settings--id-">
-</span>
+            <blockquote>
+            <p>Example response (200, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-currency-settings--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-currency-settings--id-"></span>:
@@ -3528,7 +3737,92 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the currency setting. Example: <code>1</code></p>
             </div>
-                    </form>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>currency_symbol</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="currency_symbol"                data-endpoint="PUTapi-v1-currency-settings--id-"
+               value="vmqeopfuudtdsufvyvddq"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>vmqeopfuudtdsufvyvddq</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>decimal_separator</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="decimal_separator"                data-endpoint="PUTapi-v1-currency-settings--id-"
+               value="a"
+               data-component="body">
+    <br>
+<p>Must not be greater than 1 character. Example: <code>a</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>thousand_separator</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="thousand_separator"                data-endpoint="PUTapi-v1-currency-settings--id-"
+               value="m"
+               data-component="body">
+    <br>
+<p>Must not be greater than 1 character. Example: <code>m</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>decimal_places</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="decimal_places"                data-endpoint="PUTapi-v1-currency-settings--id-"
+               value="17"
+               data-component="body">
+    <br>
+<p>Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>position</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="position"                data-endpoint="PUTapi-v1-currency-settings--id-"
+               value="mqeopfuudtdsufvyvddqa"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>mqeopfuudtdsufvyvddqa</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>currency_code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="currency_code"                data-endpoint="PUTapi-v1-currency-settings--id-"
+               value="mniihfqcoynlazghdtqtq"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>mniihfqcoynlazghdtqtq</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>locale</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="locale"                data-endpoint="PUTapi-v1-currency-settings--id-"
+               value="tg_TJ"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>tg_TJ</code></p>
+        </div>
+        </form>
 
                     <h2 id="currency-settings-DELETEapi-v1-currency-settings--id-">Remove the specified resource from storage.</h2>
 
@@ -3569,7 +3863,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-currency-settings--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-currency-settings--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-currency-settings--id-"></span>:
@@ -3731,27 +4031,6 @@ access-control-allow-origin: *
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: [
-        {
-            &quot;id&quot;: 1,
-            &quot;customer_id&quot;: 1,
-            &quot;user_id&quot;: 1,
-            &quot;type&quot;: &quot;email&quot;,
-            &quot;notes&quot;: &quot;Dolores nobis architecto id illum. Ducimus similique optio qui ut nemo voluptas. A vitae hic tenetur et atque iusto. Doloremque illo quod accusantium dolor in inventore.&quot;,
-            &quot;interaction_date&quot;: &quot;2025-03-25T00:00:00.000000Z&quot;,
-            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
-            &quot;customer&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Walk In Customer&quot;,
-                &quot;address&quot;: &quot;-&quot;,
-                &quot;phone_number&quot;: &quot;0&quot;,
-                &quot;email&quot;: &quot;-&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;payment_terms&quot;: &quot;0&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
-        },
         {
             &quot;id&quot;: 2,
             &quot;customer_id&quot;: 2,
@@ -4265,8 +4544,8 @@ access-control-allow-origin: *
         ],
         &quot;path&quot;: &quot;http://localhost:8000/api/v1/customer-interactions&quot;,
         &quot;per_page&quot;: 25,
-        &quot;to&quot;: 24,
-        &quot;total&quot;: 24
+        &quot;to&quot;: 23,
+        &quot;total&quot;: 23
     }
 }</code>
  </pre>
@@ -4386,7 +4665,15 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/customer-interactions" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"customer_id\": \"consequatur\",
+    \"user_id\": \"consequatur\",
+    \"type\": \"mqeopfuudtdsufvyvddqa\",
+    \"notes\": \"consequatur\",
+    \"interaction_date\": \"2025-11-21T05:52:55\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -4400,15 +4687,31 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "customer_id": "consequatur",
+    "user_id": "consequatur",
+    "type": "mqeopfuudtdsufvyvddqa",
+    "notes": "consequatur",
+    "interaction_date": "2025-11-21T05:52:55"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-customer-interactions">
-</span>
+            <blockquote>
+            <p>Example response (201, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-customer-interactions" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-customer-interactions"></span>:
@@ -4492,7 +4795,68 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>customer_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="customer_id"                data-endpoint="POSTapi-v1-customer-interactions"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the customers table. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>user_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="user_id"                data-endpoint="POSTapi-v1-customer-interactions"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the users table. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="type"                data-endpoint="POSTapi-v1-customer-interactions"
+               value="mqeopfuudtdsufvyvddqa"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>mqeopfuudtdsufvyvddqa</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>notes</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="notes"                data-endpoint="POSTapi-v1-customer-interactions"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>interaction_date</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="interaction_date"                data-endpoint="POSTapi-v1-customer-interactions"
+               value="2025-11-21T05:52:55"
+               data-component="body">
+    <br>
+<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+        </div>
+        </form>
 
                     <h2 id="customer-interactions-GETapi-v1-customer-interactions--id-">Display the specified customer interaction.</h2>
 
@@ -4508,7 +4872,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/v1/customer-interactions/1" \
+    --get "http://localhost:8000/api/v1/customer-interactions/2" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4516,7 +4880,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/customer-interactions/1"
+    "http://localhost:8000/api/v1/customer-interactions/2"
 );
 
 const headers = {
@@ -4547,22 +4911,22 @@ access-control-allow-origin: *
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: 1,
-        &quot;customer_id&quot;: 1,
+        &quot;id&quot;: 2,
+        &quot;customer_id&quot;: 2,
         &quot;user_id&quot;: 1,
-        &quot;type&quot;: &quot;email&quot;,
-        &quot;notes&quot;: &quot;Dolores nobis architecto id illum. Ducimus similique optio qui ut nemo voluptas. A vitae hic tenetur et atque iusto. Doloremque illo quod accusantium dolor in inventore.&quot;,
-        &quot;interaction_date&quot;: &quot;2025-03-25T00:00:00.000000Z&quot;,
+        &quot;type&quot;: &quot;call&quot;,
+        &quot;notes&quot;: &quot;Amet corporis atque accusantium facere maxime. Iure nihil sit in sit natus molestiae. Libero consequuntur quae temporibus. Ipsam dolor nesciunt neque magni dicta autem.&quot;,
+        &quot;interaction_date&quot;: &quot;2024-12-07T00:00:00.000000Z&quot;,
         &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
         &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
         &quot;customer&quot;: {
-            &quot;id&quot;: 1,
-            &quot;name&quot;: &quot;Walk In Customer&quot;,
-            &quot;address&quot;: &quot;-&quot;,
-            &quot;phone_number&quot;: &quot;0&quot;,
-            &quot;email&quot;: &quot;-&quot;,
+            &quot;id&quot;: 2,
+            &quot;name&quot;: &quot;Budi Santoso&quot;,
+            &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+            &quot;phone_number&quot;: &quot;081234567890&quot;,
+            &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
             &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;payment_terms&quot;: &quot;0&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
             &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
             &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
         }
@@ -4661,10 +5025,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="GETapi-v1-customer-interactions--id-"
-               value="1"
+               value="2"
                data-component="url">
     <br>
-<p>The ID of the customer interaction. Example: <code>1</code></p>
+<p>The ID of the customer interaction. Example: <code>2</code></p>
             </div>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>customer_interaction</code></b>&nbsp;&nbsp;
@@ -4694,15 +5058,23 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/v1/customer-interactions/1" \
+    "http://localhost:8000/api/v1/customer-interactions/2" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"customer_id\": \"consequatur\",
+    \"user_id\": \"consequatur\",
+    \"type\": \"mqeopfuudtdsufvyvddqa\",
+    \"notes\": \"consequatur\",
+    \"interaction_date\": \"2025-11-21T05:52:55\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/customer-interactions/1"
+    "http://localhost:8000/api/v1/customer-interactions/2"
 );
 
 const headers = {
@@ -4711,15 +5083,31 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "customer_id": "consequatur",
+    "user_id": "consequatur",
+    "type": "mqeopfuudtdsufvyvddqa",
+    "notes": "consequatur",
+    "interaction_date": "2025-11-21T05:52:55"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-customer-interactions--id-">
-</span>
+            <blockquote>
+            <p>Example response (200, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-customer-interactions--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-customer-interactions--id-"></span>:
@@ -4815,12 +5203,73 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="PUTapi-v1-customer-interactions--id-"
-               value="1"
+               value="2"
                data-component="url">
     <br>
-<p>The ID of the customer interaction. Example: <code>1</code></p>
+<p>The ID of the customer interaction. Example: <code>2</code></p>
             </div>
-                    </form>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>customer_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="customer_id"                data-endpoint="PUTapi-v1-customer-interactions--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the customers table. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>user_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="user_id"                data-endpoint="PUTapi-v1-customer-interactions--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the users table. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="type"                data-endpoint="PUTapi-v1-customer-interactions--id-"
+               value="mqeopfuudtdsufvyvddqa"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>mqeopfuudtdsufvyvddqa</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>notes</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="notes"                data-endpoint="PUTapi-v1-customer-interactions--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>interaction_date</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="interaction_date"                data-endpoint="PUTapi-v1-customer-interactions--id-"
+               value="2025-11-21T05:52:55"
+               data-component="body">
+    <br>
+<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+        </div>
+        </form>
 
                     <h2 id="customer-interactions-DELETEapi-v1-customer-interactions--id-">Remove the specified resource from storage.</h2>
 
@@ -4836,7 +5285,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost:8000/api/v1/customer-interactions/1" \
+    "http://localhost:8000/api/v1/customer-interactions/2" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4844,7 +5293,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/customer-interactions/1"
+    "http://localhost:8000/api/v1/customer-interactions/2"
 );
 
 const headers = {
@@ -4861,7 +5310,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-customer-interactions--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-customer-interactions--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-customer-interactions--id-"></span>:
@@ -4953,10 +5408,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="DELETEapi-v1-customer-interactions--id-"
-               value="1"
+               value="2"
                data-component="url">
     <br>
-<p>The ID of the customer interaction. Example: <code>1</code></p>
+<p>The ID of the customer interaction. Example: <code>2</code></p>
             </div>
                     </form>
 
@@ -5023,17 +5478,6 @@ access-control-allow-origin: *
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: [
-        {
-            &quot;id&quot;: 1,
-            &quot;name&quot;: &quot;Walk In Customer&quot;,
-            &quot;address&quot;: &quot;-&quot;,
-            &quot;phone_number&quot;: &quot;0&quot;,
-            &quot;email&quot;: &quot;-&quot;,
-            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;payment_terms&quot;: &quot;0&quot;,
-            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-        },
         {
             &quot;id&quot;: 2,
             &quot;name&quot;: &quot;Budi Santoso&quot;,
@@ -5154,6 +5598,28 @@ access-control-allow-origin: *
             &quot;payment_terms&quot;: &quot;45&quot;,
             &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
             &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 13,
+            &quot;name&quot;: &quot;John Doe&quot;,
+            &quot;address&quot;: &quot;123 Main St&quot;,
+            &quot;phone_number&quot;: &quot;555-1234&quot;,
+            &quot;email&quot;: &quot;john.doe@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;Net 30&quot;,
+            &quot;created_at&quot;: &quot;2025-11-21T02:29:19.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T02:29:19.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 14,
+            &quot;name&quot;: &quot;John Doe&quot;,
+            &quot;address&quot;: &quot;123 Main St&quot;,
+            &quot;phone_number&quot;: &quot;555-1234&quot;,
+            &quot;email&quot;: &quot;john.doe2@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;Net 30&quot;,
+            &quot;created_at&quot;: &quot;2025-11-21T02:33:44.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T02:33:44.000000Z&quot;
         }
     ],
     &quot;links&quot;: {
@@ -5185,8 +5651,8 @@ access-control-allow-origin: *
         ],
         &quot;path&quot;: &quot;http://localhost:8000/api/v1/customers&quot;,
         &quot;per_page&quot;: 25,
-        &quot;to&quot;: 12,
-        &quot;total&quot;: 12
+        &quot;to&quot;: 13,
+        &quot;total&quot;: 13
     }
 }</code>
  </pre>
@@ -5522,7 +5988,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/v1/customers/1" \
+    --get "http://localhost:8000/api/v1/customers/2" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5530,7 +5996,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/customers/1"
+    "http://localhost:8000/api/v1/customers/2"
 );
 
 const headers = {
@@ -5561,13 +6027,13 @@ access-control-allow-origin: *
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: 1,
-        &quot;name&quot;: &quot;Walk In Customer&quot;,
-        &quot;address&quot;: &quot;-&quot;,
-        &quot;phone_number&quot;: &quot;0&quot;,
-        &quot;email&quot;: &quot;-&quot;,
+        &quot;id&quot;: 2,
+        &quot;name&quot;: &quot;Budi Santoso&quot;,
+        &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+        &quot;phone_number&quot;: &quot;081234567890&quot;,
+        &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
         &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-        &quot;payment_terms&quot;: &quot;0&quot;,
+        &quot;payment_terms&quot;: &quot;45&quot;,
         &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
         &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
     }
@@ -5665,10 +6131,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="GETapi-v1-customers--id-"
-               value="1"
+               value="2"
                data-component="url">
     <br>
-<p>The ID of the customer. Example: <code>1</code></p>
+<p>The ID of the customer. Example: <code>2</code></p>
             </div>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>customer</code></b>&nbsp;&nbsp;
@@ -5698,7 +6164,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/v1/customers/1" \
+    "http://localhost:8000/api/v1/customers/2" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -5714,7 +6180,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/customers/1"
+    "http://localhost:8000/api/v1/customers/2"
 );
 
 const headers = {
@@ -5849,10 +6315,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="PUTapi-v1-customers--id-"
-               value="1"
+               value="2"
                data-component="url">
     <br>
-<p>The ID of the customer. Example: <code>1</code></p>
+<p>The ID of the customer. Example: <code>2</code></p>
             </div>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>customer</code></b>&nbsp;&nbsp;
@@ -5943,7 +6409,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost:8000/api/v1/customers/1" \
+    "http://localhost:8000/api/v1/customers/2" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5951,7 +6417,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/customers/1"
+    "http://localhost:8000/api/v1/customers/2"
 );
 
 const headers = {
@@ -6066,10 +6532,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="DELETEapi-v1-customers--id-"
-               value="1"
+               value="2"
                data-component="url">
     <br>
-<p>The ID of the customer. Example: <code>1</code></p>
+<p>The ID of the customer. Example: <code>2</code></p>
             </div>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>customer</code></b>&nbsp;&nbsp;
@@ -6135,7 +6601,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-journal-entries">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -6147,7 +6613,1656 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;date&quot;: &quot;2025-10-27T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Purchase of goods, invoice PO-00001&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;sourceable_id&quot;: 1,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 1,
+                    &quot;journal_entry_id&quot;: 1,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;1260.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 2,
+                    &quot;journal_entry_id&quot;: 1,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;1260.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;date&quot;: &quot;2025-11-01T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Purchase of goods, invoice PO-00002&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;sourceable_id&quot;: 2,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 3,
+                    &quot;journal_entry_id&quot;: 2,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;1260.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 4,
+                    &quot;journal_entry_id&quot;: 2,
+                    &quot;account_id&quot;: 18,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;1260.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 18,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                        &quot;code&quot;: &quot;2110&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;date&quot;: &quot;2025-11-18T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Purchase of goods, invoice PO-00003&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;sourceable_id&quot;: 3,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 5,
+                    &quot;journal_entry_id&quot;: 3,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;5400.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 6,
+                    &quot;journal_entry_id&quot;: 3,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;2260.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 7,
+                    &quot;journal_entry_id&quot;: 3,
+                    &quot;account_id&quot;: 18,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;3140.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 18,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                        &quot;code&quot;: &quot;2110&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;date&quot;: &quot;2025-10-24T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Purchase of goods, invoice PO-00004&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;sourceable_id&quot;: 4,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 8,
+                    &quot;journal_entry_id&quot;: 4,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;4200.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 9,
+                    &quot;journal_entry_id&quot;: 4,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;2764.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 10,
+                    &quot;journal_entry_id&quot;: 4,
+                    &quot;account_id&quot;: 18,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;1436.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 18,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                        &quot;code&quot;: &quot;2110&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;date&quot;: &quot;2025-10-30T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Purchase of goods, invoice PO-00005&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;sourceable_id&quot;: 5,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 11,
+                    &quot;journal_entry_id&quot;: 5,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;3930.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 12,
+                    &quot;journal_entry_id&quot;: 5,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;1569.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 13,
+                    &quot;journal_entry_id&quot;: 5,
+                    &quot;account_id&quot;: 18,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;2361.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 18,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                        &quot;code&quot;: &quot;2110&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;date&quot;: &quot;2025-11-11T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Purchase of goods, invoice PO-00006&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;sourceable_id&quot;: 6,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 14,
+                    &quot;journal_entry_id&quot;: 6,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;6040.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 15,
+                    &quot;journal_entry_id&quot;: 6,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;6040.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;date&quot;: &quot;2025-10-27T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Purchase of goods, invoice PO-00007&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;sourceable_id&quot;: 7,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 16,
+                    &quot;journal_entry_id&quot;: 7,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;4980.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 17,
+                    &quot;journal_entry_id&quot;: 7,
+                    &quot;account_id&quot;: 18,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;4980.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 18,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                        &quot;code&quot;: &quot;2110&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;date&quot;: &quot;2025-10-24T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Purchase of goods, invoice PO-00008&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;sourceable_id&quot;: 8,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 18,
+                    &quot;journal_entry_id&quot;: 8,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;360.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 19,
+                    &quot;journal_entry_id&quot;: 8,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;360.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;date&quot;: &quot;2025-11-12T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Purchase of goods, invoice PO-00009&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;sourceable_id&quot;: 9,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 20,
+                    &quot;journal_entry_id&quot;: 9,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;5400.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 21,
+                    &quot;journal_entry_id&quot;: 9,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;4238.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 22,
+                    &quot;journal_entry_id&quot;: 9,
+                    &quot;account_id&quot;: 18,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;1162.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 18,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                        &quot;code&quot;: &quot;2110&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;date&quot;: &quot;2025-11-16T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Purchase of goods, invoice PO-00010&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;sourceable_id&quot;: 10,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 23,
+                    &quot;journal_entry_id&quot;: 10,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;7400.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 24,
+                    &quot;journal_entry_id&quot;: 10,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;1044.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 25,
+                    &quot;journal_entry_id&quot;: 10,
+                    &quot;account_id&quot;: 18,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;6356.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 18,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                        &quot;code&quot;: &quot;2110&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;date&quot;: &quot;2024-12-22T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Sale - Invoice INV-00001&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 1,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 26,
+                    &quot;journal_entry_id&quot;: 11,
+                    &quot;account_id&quot;: 5,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;8493.32&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_receivable.name&quot;,
+                        &quot;code&quot;: &quot;1130&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_receivable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 27,
+                    &quot;journal_entry_id&quot;: 11,
+                    &quot;account_id&quot;: 27,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;7721.20&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 27,
+                        &quot;parent_id&quot;: 26,
+                        &quot;name&quot;: &quot;accounting.accounts.sales_revenue.name&quot;,
+                        &quot;code&quot;: &quot;4100&quot;,
+                        &quot;type&quot;: &quot;revenue&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.sales_revenue.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 28,
+                    &quot;journal_entry_id&quot;: 11,
+                    &quot;account_id&quot;: 20,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;772.12&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 20,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.output_vat.name&quot;,
+                        &quot;code&quot;: &quot;2130&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.output_vat.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 12,
+            &quot;date&quot;: &quot;2024-12-22T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;COGS for Invoice INV-00001&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 1,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 29,
+                    &quot;journal_entry_id&quot;: 12,
+                    &quot;account_id&quot;: 35,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;4290.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 35,
+                        &quot;parent_id&quot;: 30,
+                        &quot;name&quot;: &quot;accounting.accounts.cost_of_goods_sold.name&quot;,
+                        &quot;code&quot;: &quot;5200&quot;,
+                        &quot;type&quot;: &quot;expense&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cost_of_goods_sold.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 30,
+                    &quot;journal_entry_id&quot;: 12,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;4290.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 13,
+            &quot;date&quot;: &quot;2025-03-01T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Sale - Invoice INV-00002&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 2,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 31,
+                    &quot;journal_entry_id&quot;: 13,
+                    &quot;account_id&quot;: 5,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;1496.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_receivable.name&quot;,
+                        &quot;code&quot;: &quot;1130&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_receivable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 32,
+                    &quot;journal_entry_id&quot;: 13,
+                    &quot;account_id&quot;: 27,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;1360.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 27,
+                        &quot;parent_id&quot;: 26,
+                        &quot;name&quot;: &quot;accounting.accounts.sales_revenue.name&quot;,
+                        &quot;code&quot;: &quot;4100&quot;,
+                        &quot;type&quot;: &quot;revenue&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.sales_revenue.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 33,
+                    &quot;journal_entry_id&quot;: 13,
+                    &quot;account_id&quot;: 20,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;136.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 20,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.output_vat.name&quot;,
+                        &quot;code&quot;: &quot;2130&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.output_vat.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 14,
+            &quot;date&quot;: &quot;2025-03-01T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;COGS for Invoice INV-00002&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 2,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 34,
+                    &quot;journal_entry_id&quot;: 14,
+                    &quot;account_id&quot;: 35,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;720.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 35,
+                        &quot;parent_id&quot;: 30,
+                        &quot;name&quot;: &quot;accounting.accounts.cost_of_goods_sold.name&quot;,
+                        &quot;code&quot;: &quot;5200&quot;,
+                        &quot;type&quot;: &quot;expense&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cost_of_goods_sold.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 35,
+                    &quot;journal_entry_id&quot;: 14,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;720.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 15,
+            &quot;date&quot;: &quot;2025-03-01T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Payment for Invoice INV-00002&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 2,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 36,
+                    &quot;journal_entry_id&quot;: 15,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;326.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 37,
+                    &quot;journal_entry_id&quot;: 15,
+                    &quot;account_id&quot;: 5,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;326.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_receivable.name&quot;,
+                        &quot;code&quot;: &quot;1130&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_receivable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 16,
+            &quot;date&quot;: &quot;2025-09-21T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Sale - Invoice INV-00003&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 3,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 38,
+                    &quot;journal_entry_id&quot;: 16,
+                    &quot;account_id&quot;: 5,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;7252.08&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_receivable.name&quot;,
+                        &quot;code&quot;: &quot;1130&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_receivable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 39,
+                    &quot;journal_entry_id&quot;: 16,
+                    &quot;account_id&quot;: 27,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;6592.80&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 27,
+                        &quot;parent_id&quot;: 26,
+                        &quot;name&quot;: &quot;accounting.accounts.sales_revenue.name&quot;,
+                        &quot;code&quot;: &quot;4100&quot;,
+                        &quot;type&quot;: &quot;revenue&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.sales_revenue.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 40,
+                    &quot;journal_entry_id&quot;: 16,
+                    &quot;account_id&quot;: 20,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;659.28&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 20,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.output_vat.name&quot;,
+                        &quot;code&quot;: &quot;2130&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.output_vat.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 17,
+            &quot;date&quot;: &quot;2025-09-21T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;COGS for Invoice INV-00003&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 3,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 41,
+                    &quot;journal_entry_id&quot;: 17,
+                    &quot;account_id&quot;: 35,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;4360.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 35,
+                        &quot;parent_id&quot;: 30,
+                        &quot;name&quot;: &quot;accounting.accounts.cost_of_goods_sold.name&quot;,
+                        &quot;code&quot;: &quot;5200&quot;,
+                        &quot;type&quot;: &quot;expense&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cost_of_goods_sold.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 42,
+                    &quot;journal_entry_id&quot;: 17,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;4360.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 18,
+            &quot;date&quot;: &quot;2025-09-21T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Payment for Invoice INV-00003&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 3,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 43,
+                    &quot;journal_entry_id&quot;: 18,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;7252.08&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 44,
+                    &quot;journal_entry_id&quot;: 18,
+                    &quot;account_id&quot;: 5,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;7252.08&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_receivable.name&quot;,
+                        &quot;code&quot;: &quot;1130&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_receivable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 19,
+            &quot;date&quot;: &quot;2025-02-14T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Sale - Invoice INV-00004&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 4,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 45,
+                    &quot;journal_entry_id&quot;: 19,
+                    &quot;account_id&quot;: 5,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;1808.40&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_receivable.name&quot;,
+                        &quot;code&quot;: &quot;1130&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_receivable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 46,
+                    &quot;journal_entry_id&quot;: 19,
+                    &quot;account_id&quot;: 27,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;1644.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 27,
+                        &quot;parent_id&quot;: 26,
+                        &quot;name&quot;: &quot;accounting.accounts.sales_revenue.name&quot;,
+                        &quot;code&quot;: &quot;4100&quot;,
+                        &quot;type&quot;: &quot;revenue&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.sales_revenue.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 47,
+                    &quot;journal_entry_id&quot;: 19,
+                    &quot;account_id&quot;: 20,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;164.40&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 20,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.output_vat.name&quot;,
+                        &quot;code&quot;: &quot;2130&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.output_vat.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 20,
+            &quot;date&quot;: &quot;2025-02-14T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;COGS for Invoice INV-00004&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 4,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 48,
+                    &quot;journal_entry_id&quot;: 20,
+                    &quot;account_id&quot;: 35,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;900.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 35,
+                        &quot;parent_id&quot;: 30,
+                        &quot;name&quot;: &quot;accounting.accounts.cost_of_goods_sold.name&quot;,
+                        &quot;code&quot;: &quot;5200&quot;,
+                        &quot;type&quot;: &quot;expense&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cost_of_goods_sold.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 49,
+                    &quot;journal_entry_id&quot;: 20,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;900.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 21,
+            &quot;date&quot;: &quot;2025-11-12T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Sale - Invoice INV-00005&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 5,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 50,
+                    &quot;journal_entry_id&quot;: 21,
+                    &quot;account_id&quot;: 5,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;1197.90&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_receivable.name&quot;,
+                        &quot;code&quot;: &quot;1130&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_receivable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 51,
+                    &quot;journal_entry_id&quot;: 21,
+                    &quot;account_id&quot;: 27,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;1089.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 27,
+                        &quot;parent_id&quot;: 26,
+                        &quot;name&quot;: &quot;accounting.accounts.sales_revenue.name&quot;,
+                        &quot;code&quot;: &quot;4100&quot;,
+                        &quot;type&quot;: &quot;revenue&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.sales_revenue.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 52,
+                    &quot;journal_entry_id&quot;: 21,
+                    &quot;account_id&quot;: 20,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;108.90&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 20,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.output_vat.name&quot;,
+                        &quot;code&quot;: &quot;2130&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.output_vat.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 22,
+            &quot;date&quot;: &quot;2025-11-12T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;COGS for Invoice INV-00005&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 5,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 53,
+                    &quot;journal_entry_id&quot;: 22,
+                    &quot;account_id&quot;: 35,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;600.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 35,
+                        &quot;parent_id&quot;: 30,
+                        &quot;name&quot;: &quot;accounting.accounts.cost_of_goods_sold.name&quot;,
+                        &quot;code&quot;: &quot;5200&quot;,
+                        &quot;type&quot;: &quot;expense&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cost_of_goods_sold.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 54,
+                    &quot;journal_entry_id&quot;: 22,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;600.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 23,
+            &quot;date&quot;: &quot;2025-07-08T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Sale - Invoice INV-00006&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 6,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 55,
+                    &quot;journal_entry_id&quot;: 23,
+                    &quot;account_id&quot;: 5,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;958.65&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_receivable.name&quot;,
+                        &quot;code&quot;: &quot;1130&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_receivable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 56,
+                    &quot;journal_entry_id&quot;: 23,
+                    &quot;account_id&quot;: 27,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;871.50&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 27,
+                        &quot;parent_id&quot;: 26,
+                        &quot;name&quot;: &quot;accounting.accounts.sales_revenue.name&quot;,
+                        &quot;code&quot;: &quot;4100&quot;,
+                        &quot;type&quot;: &quot;revenue&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.sales_revenue.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 57,
+                    &quot;journal_entry_id&quot;: 23,
+                    &quot;account_id&quot;: 20,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;87.15&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 20,
+                        &quot;parent_id&quot;: 17,
+                        &quot;name&quot;: &quot;accounting.accounts.output_vat.name&quot;,
+                        &quot;code&quot;: &quot;2130&quot;,
+                        &quot;type&quot;: &quot;liability&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.output_vat.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 24,
+            &quot;date&quot;: &quot;2025-07-08T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;COGS for Invoice INV-00006&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 6,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 58,
+                    &quot;journal_entry_id&quot;: 24,
+                    &quot;account_id&quot;: 35,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;540.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 35,
+                        &quot;parent_id&quot;: 30,
+                        &quot;name&quot;: &quot;accounting.accounts.cost_of_goods_sold.name&quot;,
+                        &quot;code&quot;: &quot;5200&quot;,
+                        &quot;type&quot;: &quot;expense&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cost_of_goods_sold.description&quot;,
+                        &quot;level&quot;: 1,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 59,
+                    &quot;journal_entry_id&quot;: 24,
+                    &quot;account_id&quot;: 7,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;540.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                        &quot;code&quot;: &quot;1140&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 25,
+            &quot;date&quot;: &quot;2025-07-08T00:00:00.000000Z&quot;,
+            &quot;description&quot;: &quot;Payment for Invoice INV-00006&quot;,
+            &quot;sourceable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;sourceable_id&quot;: 6,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;transactions&quot;: [
+                {
+                    &quot;id&quot;: 60,
+                    &quot;journal_entry_id&quot;: 25,
+                    &quot;account_id&quot;: 3,
+                    &quot;type&quot;: &quot;debit&quot;,
+                    &quot;amount&quot;: &quot;619.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                        &quot;code&quot;: &quot;1110&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 61,
+                    &quot;journal_entry_id&quot;: 25,
+                    &quot;account_id&quot;: 5,
+                    &quot;type&quot;: &quot;credit&quot;,
+                    &quot;amount&quot;: &quot;619.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+                    &quot;account&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;parent_id&quot;: 2,
+                        &quot;name&quot;: &quot;accounting.accounts.accounts_receivable.name&quot;,
+                        &quot;code&quot;: &quot;1130&quot;,
+                        &quot;type&quot;: &quot;asset&quot;,
+                        &quot;description&quot;: &quot;accounting.accounts.accounts_receivable.description&quot;,
+                        &quot;level&quot;: 2,
+                        &quot;is_active&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ]
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=22&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=2&quot;
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 22,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=2&quot;,
+                &quot;label&quot;: &quot;2&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=3&quot;,
+                &quot;label&quot;: &quot;3&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=4&quot;,
+                &quot;label&quot;: &quot;4&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=5&quot;,
+                &quot;label&quot;: &quot;5&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=6&quot;,
+                &quot;label&quot;: &quot;6&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=7&quot;,
+                &quot;label&quot;: &quot;7&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=8&quot;,
+                &quot;label&quot;: &quot;8&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=9&quot;,
+                &quot;label&quot;: &quot;9&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=10&quot;,
+                &quot;label&quot;: &quot;10&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;...&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=21&quot;,
+                &quot;label&quot;: &quot;21&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=22&quot;,
+                &quot;label&quot;: &quot;22&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/journal-entries?page=2&quot;,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/journal-entries&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 25,
+        &quot;total&quot;: 546
+    }
 }</code>
  </pre>
     </span>
@@ -6266,7 +8381,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/journal-entries" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"date\": \"2025-11-21T05:52:55\",
+    \"description\": \"Dolores dolorum amet iste laborum eius est dolor.\",
+    \"sourceable_id\": 17,
+    \"sourceable_type\": \"consequatur\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -6280,15 +8402,30 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "date": "2025-11-21T05:52:55",
+    "description": "Dolores dolorum amet iste laborum eius est dolor.",
+    "sourceable_id": 17,
+    "sourceable_type": "consequatur"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-journal-entries">
-</span>
+            <blockquote>
+            <p>Example response (201, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-journal-entries" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-journal-entries"></span>:
@@ -6372,7 +8509,56 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>date</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="date"                data-endpoint="POSTapi-v1-journal-entries"
+               value="2025-11-21T05:52:55"
+               data-component="body">
+    <br>
+<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="POSTapi-v1-journal-entries"
+               value="Dolores dolorum amet iste laborum eius est dolor."
+               data-component="body">
+    <br>
+<p>Example: <code>Dolores dolorum amet iste laborum eius est dolor.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sourceable_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sourceable_id"                data-endpoint="POSTapi-v1-journal-entries"
+               value="17"
+               data-component="body">
+    <br>
+<p>Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sourceable_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="sourceable_type"                data-endpoint="POSTapi-v1-journal-entries"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+        </form>
 
                     <h2 id="journal-entries-GETapi-v1-journal-entries--id-">Display the specified journal entry.</h2>
 
@@ -6414,7 +8600,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-journal-entries--id-">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -6426,7 +8612,59 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;date&quot;: &quot;2025-10-27T00:00:00.000000Z&quot;,
+        &quot;description&quot;: &quot;Purchase of goods, invoice PO-00001&quot;,
+        &quot;sourceable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+        &quot;sourceable_id&quot;: 1,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;transactions&quot;: [
+            {
+                &quot;id&quot;: 1,
+                &quot;journal_entry_id&quot;: 1,
+                &quot;account_id&quot;: 7,
+                &quot;type&quot;: &quot;debit&quot;,
+                &quot;amount&quot;: &quot;1260.00&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;account&quot;: {
+                    &quot;id&quot;: 7,
+                    &quot;parent_id&quot;: 2,
+                    &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                    &quot;code&quot;: &quot;1140&quot;,
+                    &quot;type&quot;: &quot;asset&quot;,
+                    &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                    &quot;level&quot;: 2,
+                    &quot;is_active&quot;: true,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            },
+            {
+                &quot;id&quot;: 2,
+                &quot;journal_entry_id&quot;: 1,
+                &quot;account_id&quot;: 3,
+                &quot;type&quot;: &quot;credit&quot;,
+                &quot;amount&quot;: &quot;1260.00&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;account&quot;: {
+                    &quot;id&quot;: 3,
+                    &quot;parent_id&quot;: 2,
+                    &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                    &quot;code&quot;: &quot;1110&quot;,
+                    &quot;type&quot;: &quot;asset&quot;,
+                    &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                    &quot;level&quot;: 2,
+                    &quot;is_active&quot;: true,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            }
+        ]
+    }
 }</code>
  </pre>
     </span>
@@ -6557,7 +8795,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/journal-entries/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"date\": \"2025-11-21T05:52:55\",
+    \"description\": \"Dolores dolorum amet iste laborum eius est dolor.\",
+    \"sourceable_id\": 17,
+    \"sourceable_type\": \"consequatur\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -6571,15 +8816,30 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "date": "2025-11-21T05:52:55",
+    "description": "Dolores dolorum amet iste laborum eius est dolor.",
+    "sourceable_id": 17,
+    "sourceable_type": "consequatur"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-journal-entries--id-">
-</span>
+            <blockquote>
+            <p>Example response (200, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-journal-entries--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-journal-entries--id-"></span>:
@@ -6680,7 +8940,56 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the journal entry. Example: <code>1</code></p>
             </div>
-                    </form>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>date</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="date"                data-endpoint="PUTapi-v1-journal-entries--id-"
+               value="2025-11-21T05:52:55"
+               data-component="body">
+    <br>
+<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="PUTapi-v1-journal-entries--id-"
+               value="Dolores dolorum amet iste laborum eius est dolor."
+               data-component="body">
+    <br>
+<p>Example: <code>Dolores dolorum amet iste laborum eius est dolor.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sourceable_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sourceable_id"                data-endpoint="PUTapi-v1-journal-entries--id-"
+               value="17"
+               data-component="body">
+    <br>
+<p>Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sourceable_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="sourceable_type"                data-endpoint="PUTapi-v1-journal-entries--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+        </form>
 
                     <h2 id="journal-entries-DELETEapi-v1-journal-entries--id-">Remove the specified resource from storage.</h2>
 
@@ -6721,7 +9030,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-journal-entries--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-journal-entries--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-journal-entries--id-"></span>:
@@ -6838,7 +9153,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/v1/pos" \
+    --get "http://localhost:8000/api/v1/pos?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -6848,6 +9163,12 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <pre><code class="language-javascript">const url = new URL(
     "http://localhost:8000/api/v1/pos"
 );
+
+const params = {
+    "per_page": "25",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
     "Authorization": "Bearer {YOUR_API_TOKEN}",
@@ -6876,7 +9197,340 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;data&quot;: []
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;invoice&quot;: &quot;PO-00001&quot;,
+            &quot;supplier_id&quot;: 2,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-27T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-10T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;discount_total&quot;: &quot;25.00&quot;,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 1260,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;invoice&quot;: &quot;PO-00002&quot;,
+            &quot;supplier_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-01T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-24T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: &quot;49.00&quot;,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 1260,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;invoice&quot;: &quot;PO-00003&quot;,
+            &quot;supplier_id&quot;: 3,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-18T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-15T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: &quot;31.00&quot;,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 5400,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;invoice&quot;: &quot;PO-00004&quot;,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-24T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-05T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;discount_total&quot;: &quot;14.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 4200,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;invoice&quot;: &quot;PO-00005&quot;,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-30T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-10T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: &quot;31.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 3930,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;invoice&quot;: &quot;PO-00006&quot;,
+            &quot;supplier_id&quot;: 4,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-11T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-21T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: &quot;28.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 6040,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;invoice&quot;: &quot;PO-00007&quot;,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-27T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: &quot;25.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 4980,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;invoice&quot;: &quot;PO-00008&quot;,
+            &quot;supplier_id&quot;: 4,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-24T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-16T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: &quot;1.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 360,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;invoice&quot;: &quot;PO-00009&quot;,
+            &quot;supplier_id&quot;: 3,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-12T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-10T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: &quot;45.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 5400,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;invoice&quot;: &quot;PO-00010&quot;,
+            &quot;supplier_id&quot;: 3,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-16T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-24T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: &quot;3.00&quot;,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 7400,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;invoice&quot;: &quot;PO-00011&quot;,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-14T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-10T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: &quot;35.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 1400,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 12,
+            &quot;invoice&quot;: &quot;PO-00012&quot;,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-26T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-15T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: &quot;29.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 3510,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 13,
+            &quot;invoice&quot;: &quot;PO-00013&quot;,
+            &quot;supplier_id&quot;: 7,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-12T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-08T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: &quot;8.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 8660,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 14,
+            &quot;invoice&quot;: &quot;PO-00014&quot;,
+            &quot;supplier_id&quot;: 6,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-07T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-26T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;discount_total&quot;: &quot;36.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 540,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 15,
+            &quot;invoice&quot;: &quot;PO-00015&quot;,
+            &quot;supplier_id&quot;: 8,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-25T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-04T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: &quot;41.00&quot;,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 6000,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 16,
+            &quot;invoice&quot;: &quot;PO-00016&quot;,
+            &quot;supplier_id&quot;: 7,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-11T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-18T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: &quot;37.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 950,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 17,
+            &quot;invoice&quot;: &quot;PO-00017&quot;,
+            &quot;supplier_id&quot;: 2,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-14T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-11T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: &quot;14.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 7000,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 18,
+            &quot;invoice&quot;: &quot;PO-00018&quot;,
+            &quot;supplier_id&quot;: 9,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-17T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-04T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: &quot;37.00&quot;,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 900,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 19,
+            &quot;invoice&quot;: &quot;PO-00019&quot;,
+            &quot;supplier_id&quot;: 9,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-16T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-26T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;discount_total&quot;: &quot;3.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 1800,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 20,
+            &quot;invoice&quot;: &quot;PO-00020&quot;,
+            &quot;supplier_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-09T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-16T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: &quot;43.00&quot;,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 1900,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/pos?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/pos?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/pos?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/pos&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 20,
+        &quot;total&quot;: 20
+    }
 }</code>
  </pre>
     </span>
@@ -6963,7 +9617,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                            <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>per_page</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="per_page"                data-endpoint="GETapi-v1-pos"
+               value="25"
+               data-component="query">
+    <br>
+<p>The number of items to return per page. Defaults to 15. Example: <code>25</code></p>
+            </div>
+                </form>
 
                     <h2 id="pos-POSTapi-v1-pos">Store a newly created resource in storage.</h2>
 
@@ -6982,7 +9649,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/pos" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"invoice\": \"INV-2023-001\",
+    \"supplier_id\": 1,
+    \"order_date\": \"2023-10-26\",
+    \"due_date\": \"2023-11-26\",
+    \"payment_type\": \"Cash\",
+    \"total\": \"1500.00\",
+    \"status\": \"Pending\",
+    \"payment_date\": \"2023-10-26\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -6996,15 +9674,48 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "invoice": "INV-2023-001",
+    "supplier_id": 1,
+    "order_date": "2023-10-26",
+    "due_date": "2023-11-26",
+    "payment_type": "Cash",
+    "total": "1500.00",
+    "status": "Pending",
+    "payment_date": "2023-10-26"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-pos">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;invoice&quot;: &quot;INV-2023-001&quot;,
+        &quot;supplier_id&quot;: 1,
+        &quot;order_date&quot;: &quot;2023-10-26&quot;,
+        &quot;due_date&quot;: &quot;2023-11-26&quot;,
+        &quot;payment_type&quot;: &quot;Cash&quot;,
+        &quot;total&quot;: 1500,
+        &quot;status&quot;: &quot;Pending&quot;,
+        &quot;payment_date&quot;: &quot;2023-10-26&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-pos" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-pos"></span>:
@@ -7088,7 +9799,104 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>invoice</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="invoice"                data-endpoint="POSTapi-v1-pos"
+               value="INV-2023-001"
+               data-component="body">
+    <br>
+<p>The invoice number. Example: <code>INV-2023-001</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>supplier_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="supplier_id"                data-endpoint="POSTapi-v1-pos"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the supplier. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>order_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="order_date"                data-endpoint="POSTapi-v1-pos"
+               value="2023-10-26"
+               data-component="body">
+    <br>
+<p>The date of the order. Example: <code>2023-10-26</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>due_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="due_date"                data-endpoint="POSTapi-v1-pos"
+               value="2023-11-26"
+               data-component="body">
+    <br>
+<p>The due date of the payment. Example: <code>2023-11-26</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_type"                data-endpoint="POSTapi-v1-pos"
+               value="Cash"
+               data-component="body">
+    <br>
+<p>The payment type (e.g., Cash, Credit Card). Example: <code>Cash</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="total"                data-endpoint="POSTapi-v1-pos"
+               value="1500.00"
+               data-component="body">
+    <br>
+<p>The total amount of the purchase order. Example: <code>1500.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>status</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="status"                data-endpoint="POSTapi-v1-pos"
+               value="Pending"
+               data-component="body">
+    <br>
+<p>The status of the purchase order (e.g., Pending, Paid). Example: <code>Pending</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_date"                data-endpoint="POSTapi-v1-pos"
+               value="2023-10-26"
+               data-component="body">
+    <br>
+<p>The date of payment. Example: <code>2023-10-26</code></p>
+        </div>
+        </form>
 
                     <h2 id="pos-GETapi-v1-pos--id-">Display the specified resource.</h2>
 
@@ -7284,15 +10092,26 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/v1/pos/consequatur" \
+    "http://localhost:8000/api/v1/pos/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"invoice\": \"INV-2023-002\",
+    \"supplier_id\": 2,
+    \"order_date\": \"2023-10-27\",
+    \"due_date\": \"2023-11-27\",
+    \"payment_type\": \"Credit Card\",
+    \"total\": \"2000.00\",
+    \"status\": \"Paid\",
+    \"payment_date\": \"2023-10-27\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/pos/consequatur"
+    "http://localhost:8000/api/v1/pos/1"
 );
 
 const headers = {
@@ -7301,15 +10120,48 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "invoice": "INV-2023-002",
+    "supplier_id": 2,
+    "order_date": "2023-10-27",
+    "due_date": "2023-11-27",
+    "payment_type": "Credit Card",
+    "total": "2000.00",
+    "status": "Paid",
+    "payment_date": "2023-10-27"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-pos--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;invoice&quot;: &quot;INV-2023-002&quot;,
+        &quot;supplier_id&quot;: 2,
+        &quot;order_date&quot;: &quot;2023-10-27&quot;,
+        &quot;due_date&quot;: &quot;2023-11-27&quot;,
+        &quot;payment_type&quot;: &quot;Credit Card&quot;,
+        &quot;total&quot;: 2000,
+        &quot;status&quot;: &quot;Paid&quot;,
+        &quot;payment_date&quot;: &quot;2023-10-27&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-pos--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-pos--id-"></span>:
@@ -7400,17 +10252,126 @@ You can check the Dev Tools console for debugging information.</code></pre>
                         <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
+<small>integer</small>&nbsp;
  &nbsp;
  &nbsp;
-                <input type="text" style="display: none"
-                              name="id"                data-endpoint="PUTapi-v1-pos--id-"
-               value="consequatur"
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="PUTapi-v1-pos--id-"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the po. Example: <code>consequatur</code></p>
+<p>The ID of the po. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>po</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="po"                data-endpoint="PUTapi-v1-pos--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the purchase order. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>invoice</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="invoice"                data-endpoint="PUTapi-v1-pos--id-"
+               value="INV-2023-002"
+               data-component="body">
+    <br>
+<p>The invoice number. Example: <code>INV-2023-002</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>supplier_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="supplier_id"                data-endpoint="PUTapi-v1-pos--id-"
+               value="2"
+               data-component="body">
+    <br>
+<p>The ID of the supplier. Example: <code>2</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>order_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="order_date"                data-endpoint="PUTapi-v1-pos--id-"
+               value="2023-10-27"
+               data-component="body">
+    <br>
+<p>The date of the order. Example: <code>2023-10-27</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>due_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="due_date"                data-endpoint="PUTapi-v1-pos--id-"
+               value="2023-11-27"
+               data-component="body">
+    <br>
+<p>The due date of the payment. Example: <code>2023-11-27</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_type"                data-endpoint="PUTapi-v1-pos--id-"
+               value="Credit Card"
+               data-component="body">
+    <br>
+<p>The payment type (e.g., Cash, Credit Card). Example: <code>Credit Card</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="total"                data-endpoint="PUTapi-v1-pos--id-"
+               value="2000.00"
+               data-component="body">
+    <br>
+<p>The total amount of the purchase order. Example: <code>2000.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>status</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="status"                data-endpoint="PUTapi-v1-pos--id-"
+               value="Paid"
+               data-component="body">
+    <br>
+<p>The status of the purchase order (e.g., Pending, Paid). Example: <code>Paid</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_date"                data-endpoint="PUTapi-v1-pos--id-"
+               value="2023-10-27"
+               data-component="body">
+    <br>
+<p>The date of payment. Example: <code>2023-10-27</code></p>
+        </div>
+        </form>
 
                     <h2 id="pos-DELETEapi-v1-pos--id-">Remove the specified resource from storage.</h2>
 
@@ -7426,7 +10387,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost:8000/api/v1/pos/consequatur" \
+    "http://localhost:8000/api/v1/pos/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7434,7 +10395,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/pos/consequatur"
+    "http://localhost:8000/api/v1/pos/1"
 );
 
 const headers = {
@@ -7451,7 +10412,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-pos--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-pos--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-pos--id-"></span>:
@@ -7538,15 +10505,27 @@ You can check the Dev Tools console for debugging information.</code></pre>
                         <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
+<small>integer</small>&nbsp;
  &nbsp;
  &nbsp;
-                <input type="text" style="display: none"
-                              name="id"                data-endpoint="DELETEapi-v1-pos--id-"
-               value="consequatur"
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="DELETEapi-v1-pos--id-"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the po. Example: <code>consequatur</code></p>
+<p>The ID of the po. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>po</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="po"                data-endpoint="DELETEapi-v1-pos--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the purchase order to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -10074,7 +13053,16 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/payments" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"paymentable_id\": 17,
+    \"paymentable_type\": \"consequatur\",
+    \"amount\": 11613.31890586000008624978363513946533203125,
+    \"payment_date\": \"2025-11-21T05:52:55\",
+    \"payment_method\": \"consequatur\",
+    \"notes\": \"consequatur\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -10088,15 +13076,32 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "paymentable_id": 17,
+    "paymentable_type": "consequatur",
+    "amount": 11613.31890586000008624978363513946533203125,
+    "payment_date": "2025-11-21T05:52:55",
+    "payment_method": "consequatur",
+    "notes": "consequatur"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-payments">
-</span>
+            <blockquote>
+            <p>Example response (201, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-payments" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-payments"></span>:
@@ -10180,7 +13185,80 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>paymentable_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="paymentable_id"                data-endpoint="POSTapi-v1-payments"
+               value="17"
+               data-component="body">
+    <br>
+<p>Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>paymentable_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="paymentable_type"                data-endpoint="POSTapi-v1-payments"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="amount"                data-endpoint="POSTapi-v1-payments"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_date</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_date"                data-endpoint="POSTapi-v1-payments"
+               value="2025-11-21T05:52:55"
+               data-component="body">
+    <br>
+<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_method</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_method"                data-endpoint="POSTapi-v1-payments"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>notes</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="notes"                data-endpoint="POSTapi-v1-payments"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+        </form>
 
                     <h2 id="payments-GETapi-v1-payments--id-">Display the specified payment.</h2>
 
@@ -10408,7 +13486,16 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/payments/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"paymentable_id\": 17,
+    \"paymentable_type\": \"consequatur\",
+    \"amount\": 11613.31890586000008624978363513946533203125,
+    \"payment_date\": \"2025-11-21T05:52:55\",
+    \"payment_method\": \"consequatur\",
+    \"notes\": \"consequatur\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -10422,15 +13509,32 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "paymentable_id": 17,
+    "paymentable_type": "consequatur",
+    "amount": 11613.31890586000008624978363513946533203125,
+    "payment_date": "2025-11-21T05:52:55",
+    "payment_method": "consequatur",
+    "notes": "consequatur"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-payments--id-">
-</span>
+            <blockquote>
+            <p>Example response (200, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-payments--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-payments--id-"></span>:
@@ -10531,7 +13635,80 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the payment. Example: <code>1</code></p>
             </div>
-                    </form>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>paymentable_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="paymentable_id"                data-endpoint="PUTapi-v1-payments--id-"
+               value="17"
+               data-component="body">
+    <br>
+<p>Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>paymentable_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="paymentable_type"                data-endpoint="PUTapi-v1-payments--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="amount"                data-endpoint="PUTapi-v1-payments--id-"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_date</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_date"                data-endpoint="PUTapi-v1-payments--id-"
+               value="2025-11-21T05:52:55"
+               data-component="body">
+    <br>
+<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_method</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_method"                data-endpoint="PUTapi-v1-payments--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>notes</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="notes"                data-endpoint="PUTapi-v1-payments--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+        </form>
 
                     <h2 id="payments-DELETEapi-v1-payments--id-">Remove the specified resource from storage.</h2>
 
@@ -10572,7 +13749,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-payments--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-payments--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-payments--id-"></span>:
@@ -10884,7 +14067,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/pipeline-stages" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"sales_pipeline_id\": \"consequatur\",
+    \"name\": \"mqeopfuudtdsufvyvddqa\",
+    \"position\": 17,
+    \"is_closed\": true
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -10898,15 +14088,30 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "sales_pipeline_id": "consequatur",
+    "name": "mqeopfuudtdsufvyvddqa",
+    "position": 17,
+    "is_closed": true
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-pipeline-stages">
-</span>
+            <blockquote>
+            <p>Example response (201, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-pipeline-stages" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-pipeline-stages"></span>:
@@ -10990,7 +14195,66 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_pipeline_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="sales_pipeline_id"                data-endpoint="POSTapi-v1-pipeline-stages"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the sales_pipelines table. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-pipeline-stages"
+               value="mqeopfuudtdsufvyvddqa"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>mqeopfuudtdsufvyvddqa</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>position</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="position"                data-endpoint="POSTapi-v1-pipeline-stages"
+               value="17"
+               data-component="body">
+    <br>
+<p>Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_closed</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-v1-pipeline-stages" style="display: none">
+            <input type="radio" name="is_closed"
+                   value="true"
+                   data-endpoint="POSTapi-v1-pipeline-stages"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-v1-pipeline-stages" style="display: none">
+            <input type="radio" name="is_closed"
+                   value="false"
+                   data-endpoint="POSTapi-v1-pipeline-stages"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Example: <code>true</code></p>
+        </div>
+        </form>
 
                     <h2 id="pipeline-stages-GETapi-v1-pipeline-stages--id-">Display the specified pipeline stage.</h2>
 
@@ -11175,7 +14439,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/pipeline-stages/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"sales_pipeline_id\": \"consequatur\",
+    \"name\": \"mqeopfuudtdsufvyvddqa\",
+    \"position\": 17,
+    \"is_closed\": false
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -11189,15 +14460,30 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "sales_pipeline_id": "consequatur",
+    "name": "mqeopfuudtdsufvyvddqa",
+    "position": 17,
+    "is_closed": false
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-pipeline-stages--id-">
-</span>
+            <blockquote>
+            <p>Example response (200, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-pipeline-stages--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-pipeline-stages--id-"></span>:
@@ -11298,7 +14584,66 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the pipeline stage. Example: <code>17</code></p>
             </div>
-                    </form>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_pipeline_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="sales_pipeline_id"                data-endpoint="PUTapi-v1-pipeline-stages--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the sales_pipelines table. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-pipeline-stages--id-"
+               value="mqeopfuudtdsufvyvddqa"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>mqeopfuudtdsufvyvddqa</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>position</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="position"                data-endpoint="PUTapi-v1-pipeline-stages--id-"
+               value="17"
+               data-component="body">
+    <br>
+<p>Example: <code>17</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_closed</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <label data-endpoint="PUTapi-v1-pipeline-stages--id-" style="display: none">
+            <input type="radio" name="is_closed"
+                   value="true"
+                   data-endpoint="PUTapi-v1-pipeline-stages--id-"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="PUTapi-v1-pipeline-stages--id-" style="display: none">
+            <input type="radio" name="is_closed"
+                   value="false"
+                   data-endpoint="PUTapi-v1-pipeline-stages--id-"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Example: <code>false</code></p>
+        </div>
+        </form>
 
                     <h2 id="pipeline-stages-DELETEapi-v1-pipeline-stages--id-">Remove the specified resource from storage.</h2>
 
@@ -11339,7 +14684,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-pipeline-stages--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-pipeline-stages--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-pipeline-stages--id-"></span>:
@@ -13254,6 +16605,45 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-po-items">
             <blockquote>
+            <p>Example response (200, OK):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;po_id&quot;: 1,
+            &quot;product_id&quot;: 1,
+            &quot;quantity&quot;: 10,
+            &quot;price&quot;: &quot;100.00&quot;,
+            &quot;discount&quot;: &quot;0.00&quot;,
+            &quot;discount_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: &quot;1000.00&quot;,
+            &quot;expiry_date&quot;: null,
+            &quot;remaining_quantity&quot;: 10,
+            &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;/api/v1/po-items?page=1&quot;,
+        &quot;last&quot;: &quot;/api/v1/po-items?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;path&quot;: &quot;/api/v1/po-items&quot;,
+        &quot;per_page&quot;: 15,
+        &quot;to&quot;: 1,
+        &quot;total&quot;: 1
+    }
+}</code>
+ </pre>
+            <blockquote>
             <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
@@ -13385,7 +16775,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/po-items" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"po_id\": \"consequatur\",
+    \"product_id\": \"consequatur\",
+    \"quantity\": 11613.31890586000008624978363513946533203125,
+    \"price\": 11613.31890586000008624978363513946533203125,
+    \"discount\": 11613.31890586000008624978363513946533203125,
+    \"discount_type\": \"consequatur\",
+    \"total\": 11613.31890586000008624978363513946533203125,
+    \"expiry_date\": \"2025-11-21T05:52:55\",
+    \"remaining_quantity\": 11613.31890586000008624978363513946533203125
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -13399,15 +16801,35 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "po_id": "consequatur",
+    "product_id": "consequatur",
+    "quantity": 11613.31890586000008624978363513946533203125,
+    "price": 11613.31890586000008624978363513946533203125,
+    "discount": 11613.31890586000008624978363513946533203125,
+    "discount_type": "consequatur",
+    "total": 11613.31890586000008624978363513946533203125,
+    "expiry_date": "2025-11-21T05:52:55",
+    "remaining_quantity": 11613.31890586000008624978363513946533203125
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-po-items">
-</span>
+            <blockquote>
+            <p>Example response (201, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-po-items" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-po-items"></span>:
@@ -13491,7 +16913,116 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>po_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="po_id"                data-endpoint="POSTapi-v1-po-items"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the po table. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>product_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="product_id"                data-endpoint="POSTapi-v1-po-items"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the products table. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="quantity"                data-endpoint="POSTapi-v1-po-items"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>price</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="price"                data-endpoint="POSTapi-v1-po-items"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="discount"                data-endpoint="POSTapi-v1-po-items"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="discount_type"                data-endpoint="POSTapi-v1-po-items"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="total"                data-endpoint="POSTapi-v1-po-items"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>expiry_date</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="expiry_date"                data-endpoint="POSTapi-v1-po-items"
+               value="2025-11-21T05:52:55"
+               data-component="body">
+    <br>
+<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>remaining_quantity</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="remaining_quantity"                data-endpoint="POSTapi-v1-po-items"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+        </form>
 
                     <h2 id="purchase-order-items-GETapi-v1-po-items--id-">Display the specified purchase order item.</h2>
 
@@ -13532,6 +17063,26 @@ fetch(url, {
 </span>
 
 <span id="example-responses-GETapi-v1-po-items--id-">
+            <blockquote>
+            <p>Example response (200, OK):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: 1,
+    &quot;po_id&quot;: 1,
+    &quot;product_id&quot;: 1,
+    &quot;quantity&quot;: 10,
+    &quot;price&quot;: &quot;100.00&quot;,
+    &quot;discount&quot;: &quot;0.00&quot;,
+    &quot;discount_type&quot;: &quot;fixed&quot;,
+    &quot;total&quot;: &quot;1000.00&quot;,
+    &quot;expiry_date&quot;: null,
+    &quot;remaining_quantity&quot;: 10,
+    &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
+    &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
+}</code>
+ </pre>
             <blockquote>
             <p>Example response (500):</p>
         </blockquote>
@@ -13676,7 +17227,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/po-items/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"po_id\": \"consequatur\",
+    \"product_id\": \"consequatur\",
+    \"quantity\": 11613.31890586000008624978363513946533203125,
+    \"price\": 11613.31890586000008624978363513946533203125,
+    \"discount\": 11613.31890586000008624978363513946533203125,
+    \"discount_type\": \"consequatur\",
+    \"total\": 11613.31890586000008624978363513946533203125,
+    \"expiry_date\": \"2025-11-21T05:52:55\",
+    \"remaining_quantity\": 11613.31890586000008624978363513946533203125
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -13690,15 +17253,35 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "po_id": "consequatur",
+    "product_id": "consequatur",
+    "quantity": 11613.31890586000008624978363513946533203125,
+    "price": 11613.31890586000008624978363513946533203125,
+    "discount": 11613.31890586000008624978363513946533203125,
+    "discount_type": "consequatur",
+    "total": 11613.31890586000008624978363513946533203125,
+    "expiry_date": "2025-11-21T05:52:55",
+    "remaining_quantity": 11613.31890586000008624978363513946533203125
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-po-items--id-">
-</span>
+            <blockquote>
+            <p>Example response (200, Success):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;"></code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-po-items--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-po-items--id-"></span>:
@@ -13799,7 +17382,116 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the po item. Example: <code>1</code></p>
             </div>
-                    </form>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>po_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="po_id"                data-endpoint="PUTapi-v1-po-items--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the po table. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>product_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="product_id"                data-endpoint="PUTapi-v1-po-items--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the products table. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="quantity"                data-endpoint="PUTapi-v1-po-items--id-"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>price</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="price"                data-endpoint="PUTapi-v1-po-items--id-"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="discount"                data-endpoint="PUTapi-v1-po-items--id-"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="discount_type"                data-endpoint="PUTapi-v1-po-items--id-"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="total"                data-endpoint="PUTapi-v1-po-items--id-"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>expiry_date</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="expiry_date"                data-endpoint="PUTapi-v1-po-items--id-"
+               value="2025-11-21T05:52:55"
+               data-component="body">
+    <br>
+<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>remaining_quantity</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="remaining_quantity"                data-endpoint="PUTapi-v1-po-items--id-"
+               value="11613.31890586"
+               data-component="body">
+    <br>
+<p>Example: <code>11613.31890586</code></p>
+        </div>
+        </form>
 
                     <h2 id="purchase-order-items-DELETEapi-v1-po-items--id-">Remove the specified resource from storage.</h2>
 
@@ -13840,7 +17532,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-po-items--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-po-items--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-po-items--id-"></span>:
@@ -15289,7 +18987,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/purchases" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"invoice\": \"INV-2023-001\",
+    \"supplier_id\": 1,
+    \"user_id\": 1,
+    \"order_date\": \"2023-10-26\",
+    \"due_date\": \"2023-11-26\",
+    \"payment_type\": \"Cash\",
+    \"discount_total\": \"5.00\",
+    \"discount_total_type\": \"fixed\",
+    \"total\": \"1500.00\",
+    \"status\": \"Pending\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -15303,15 +19014,52 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "invoice": "INV-2023-001",
+    "supplier_id": 1,
+    "user_id": 1,
+    "order_date": "2023-10-26",
+    "due_date": "2023-11-26",
+    "payment_type": "Cash",
+    "discount_total": "5.00",
+    "discount_total_type": "fixed",
+    "total": "1500.00",
+    "status": "Pending"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-purchases">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;invoice&quot;: &quot;INV-2023-001&quot;,
+        &quot;supplier_id&quot;: 1,
+        &quot;user_id&quot;: 1,
+        &quot;order_date&quot;: &quot;2023-10-26&quot;,
+        &quot;due_date&quot;: &quot;2023-11-26&quot;,
+        &quot;payment_type&quot;: &quot;Cash&quot;,
+        &quot;discount_total&quot;: 5,
+        &quot;discount_total_type&quot;: &quot;fixed&quot;,
+        &quot;total&quot;: 1500,
+        &quot;status&quot;: &quot;Pending&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-purchases" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-purchases"></span>:
@@ -15395,7 +19143,128 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>invoice</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="invoice"                data-endpoint="POSTapi-v1-purchases"
+               value="INV-2023-001"
+               data-component="body">
+    <br>
+<p>The invoice number. Example: <code>INV-2023-001</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>supplier_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="supplier_id"                data-endpoint="POSTapi-v1-purchases"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the supplier. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>user_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="user_id"                data-endpoint="POSTapi-v1-purchases"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the user. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>order_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="order_date"                data-endpoint="POSTapi-v1-purchases"
+               value="2023-10-26"
+               data-component="body">
+    <br>
+<p>The date of the order. Example: <code>2023-10-26</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>due_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="due_date"                data-endpoint="POSTapi-v1-purchases"
+               value="2023-11-26"
+               data-component="body">
+    <br>
+<p>The due date of the payment. Example: <code>2023-11-26</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_type"                data-endpoint="POSTapi-v1-purchases"
+               value="Cash"
+               data-component="body">
+    <br>
+<p>The payment type (e.g., Cash, Credit Card). Example: <code>Cash</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount_total</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="discount_total"                data-endpoint="POSTapi-v1-purchases"
+               value="5.00"
+               data-component="body">
+    <br>
+<p>The total discount applied. Example: <code>5.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount_total_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="discount_total_type"                data-endpoint="POSTapi-v1-purchases"
+               value="fixed"
+               data-component="body">
+    <br>
+<p>The type of discount (e.g., percentage, fixed). Example: <code>fixed</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="total"                data-endpoint="POSTapi-v1-purchases"
+               value="1500.00"
+               data-component="body">
+    <br>
+<p>The total amount of the purchase order. Example: <code>1500.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>status</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="status"                data-endpoint="POSTapi-v1-purchases"
+               value="Pending"
+               data-component="body">
+    <br>
+<p>The status of the purchase order (e.g., Pending, Paid). Example: <code>Pending</code></p>
+        </div>
+        </form>
 
                     <h2 id="purchase-orders-GETapi-v1-purchases--id-">Display the specified purchase order.</h2>
 
@@ -15626,7 +19495,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/purchases/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"invoice\": \"INV-2023-002\",
+    \"supplier_id\": 2,
+    \"user_id\": 1,
+    \"order_date\": \"2023-10-27\",
+    \"due_date\": \"2023-11-27\",
+    \"payment_type\": \"Credit Card\",
+    \"discount_total\": \"10.00\",
+    \"discount_total_type\": \"percentage\",
+    \"total\": \"2000.00\",
+    \"status\": \"Paid\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -15640,15 +19522,52 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "invoice": "INV-2023-002",
+    "supplier_id": 2,
+    "user_id": 1,
+    "order_date": "2023-10-27",
+    "due_date": "2023-11-27",
+    "payment_type": "Credit Card",
+    "discount_total": "10.00",
+    "discount_total_type": "percentage",
+    "total": "2000.00",
+    "status": "Paid"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-purchases--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;invoice&quot;: &quot;INV-2023-002&quot;,
+        &quot;supplier_id&quot;: 2,
+        &quot;user_id&quot;: 1,
+        &quot;order_date&quot;: &quot;2023-10-27&quot;,
+        &quot;due_date&quot;: &quot;2023-11-27&quot;,
+        &quot;payment_type&quot;: &quot;Credit Card&quot;,
+        &quot;discount_total&quot;: 10,
+        &quot;discount_total_type&quot;: &quot;percentage&quot;,
+        &quot;total&quot;: 2000,
+        &quot;status&quot;: &quot;Paid&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-purchases--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-purchases--id-"></span>:
@@ -15749,7 +19668,140 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the purchase. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>purchase</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="purchase"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the purchase order. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>invoice</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="invoice"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="INV-2023-002"
+               data-component="body">
+    <br>
+<p>The invoice number. Example: <code>INV-2023-002</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>supplier_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="supplier_id"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="2"
+               data-component="body">
+    <br>
+<p>The ID of the supplier. Example: <code>2</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>user_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="user_id"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the user. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>order_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="order_date"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="2023-10-27"
+               data-component="body">
+    <br>
+<p>The date of the order. Example: <code>2023-10-27</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>due_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="due_date"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="2023-11-27"
+               data-component="body">
+    <br>
+<p>The due date of the payment. Example: <code>2023-11-27</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_type"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="Credit Card"
+               data-component="body">
+    <br>
+<p>The payment type (e.g., Cash, Credit Card). Example: <code>Credit Card</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount_total</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="discount_total"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="10.00"
+               data-component="body">
+    <br>
+<p>The total discount applied. Example: <code>10.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount_total_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="discount_total_type"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="percentage"
+               data-component="body">
+    <br>
+<p>The type of discount (e.g., percentage, fixed). Example: <code>percentage</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="total"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="2000.00"
+               data-component="body">
+    <br>
+<p>The total amount of the purchase order. Example: <code>2000.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>status</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="status"                data-endpoint="PUTapi-v1-purchases--id-"
+               value="Paid"
+               data-component="body">
+    <br>
+<p>The status of the purchase order (e.g., Pending, Paid). Example: <code>Paid</code></p>
+        </div>
+        </form>
 
                     <h2 id="purchase-orders-DELETEapi-v1-purchases--id-">Remove the specified resource from storage.</h2>
 
@@ -15790,7 +19842,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-purchases--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-purchases--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-purchases--id-"></span>:
@@ -15887,6 +19945,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the purchase. Example: <code>1</code></p>
             </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>purchase</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="purchase"                data-endpoint="DELETEapi-v1-purchases--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the purchase order to delete. Example: <code>1</code></p>
+            </div>
                     </form>
 
                 <h1 id="roles">Roles</h1>
@@ -15938,6 +20008,37 @@ fetch(url, {
 </span>
 
 <span id="example-responses-GETapi-v1-roles">
+            <blockquote>
+            <p>Example response (200, OK):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;Admin&quot;,
+            &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;/api/v1/roles?page=1&quot;,
+        &quot;last&quot;: &quot;/api/v1/roles?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;path&quot;: &quot;/api/v1/roles&quot;,
+        &quot;per_page&quot;: 15,
+        &quot;to&quot;: 1,
+        &quot;total&quot;: 1
+    }
+}</code>
+ </pre>
             <blockquote>
             <p>Example response (500):</p>
         </blockquote>
@@ -16070,7 +20171,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/roles" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"Admin\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -16084,15 +20189,34 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "Admin"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-roles">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Admin&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-roles" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-roles"></span>:
@@ -16176,7 +20300,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-roles"
+               value="Admin"
+               data-component="body">
+    <br>
+<p>The name of the role. Example: <code>Admin</code></p>
+        </div>
+        </form>
 
                     <h2 id="roles-GETapi-v1-roles--id-">Display the specified role.</h2>
 
@@ -16217,6 +20354,18 @@ fetch(url, {
 </span>
 
 <span id="example-responses-GETapi-v1-roles--id-">
+            <blockquote>
+            <p>Example response (200, OK):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;Admin&quot;,
+    &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
+    &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
+}</code>
+ </pre>
             <blockquote>
             <p>Example response (500):</p>
         </blockquote>
@@ -16361,7 +20510,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/roles/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"Editor\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -16375,15 +20528,34 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "Editor"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-roles--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Editor&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-roles--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-roles--id-"></span>:
@@ -16484,7 +20656,32 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the role. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>role</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="role"                data-endpoint="PUTapi-v1-roles--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the role. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-roles--id-"
+               value="Editor"
+               data-component="body">
+    <br>
+<p>The name of the role. Example: <code>Editor</code></p>
+        </div>
+        </form>
 
                     <h2 id="roles-DELETEapi-v1-roles--id-">Remove the specified resource from storage.</h2>
 
@@ -16525,7 +20722,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-roles--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-roles--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-roles--id-"></span>:
@@ -16622,6 +20825,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the role. Example: <code>1</code></p>
             </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>role</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="role"                data-endpoint="DELETEapi-v1-roles--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the role to delete. Example: <code>1</code></p>
+            </div>
                     </form>
 
                 <h1 id="sales-items">Sales Items</h1>
@@ -16673,6 +20888,43 @@ fetch(url, {
 </span>
 
 <span id="example-responses-GETapi-v1-sales-items">
+            <blockquote>
+            <p>Example response (200, OK):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;sales_id&quot;: 1,
+            &quot;product_id&quot;: 1,
+            &quot;quantity&quot;: 5,
+            &quot;discount&quot;: &quot;0.00&quot;,
+            &quot;discount_type&quot;: &quot;fixed&quot;,
+            &quot;customer_price&quot;: &quot;100.00&quot;,
+            &quot;total&quot;: &quot;500.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;/api/v1/sales-items?page=1&quot;,
+        &quot;last&quot;: &quot;/api/v1/sales-items?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;path&quot;: &quot;/api/v1/sales-items&quot;,
+        &quot;per_page&quot;: 15,
+        &quot;to&quot;: 1,
+        &quot;total&quot;: 1
+    }
+}</code>
+ </pre>
             <blockquote>
             <p>Example response (500):</p>
         </blockquote>
@@ -16805,7 +21057,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/sales-items" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"sales_id\": 1,
+    \"product_id\": 1,
+    \"quantity\": 5,
+    \"discount\": \"0.00\",
+    \"discount_type\": \"fixed\",
+    \"customer_price\": \"100.00\",
+    \"total\": \"500.00\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -16819,15 +21081,46 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "sales_id": 1,
+    "product_id": 1,
+    "quantity": 5,
+    "discount": "0.00",
+    "discount_type": "fixed",
+    "customer_price": "100.00",
+    "total": "500.00"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-sales-items">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;sales_id&quot;: 1,
+        &quot;product_id&quot;: 1,
+        &quot;quantity&quot;: 5,
+        &quot;discount&quot;: 0,
+        &quot;discount_type&quot;: &quot;fixed&quot;,
+        &quot;customer_price&quot;: 100,
+        &quot;total&quot;: 500,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-sales-items" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-sales-items"></span>:
@@ -16911,7 +21204,92 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_id"                data-endpoint="POSTapi-v1-sales-items"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the sales order. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>product_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="product_id"                data-endpoint="POSTapi-v1-sales-items"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the product. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="quantity"                data-endpoint="POSTapi-v1-sales-items"
+               value="5"
+               data-component="body">
+    <br>
+<p>The quantity of the product. Example: <code>5</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="discount"                data-endpoint="POSTapi-v1-sales-items"
+               value="0.00"
+               data-component="body">
+    <br>
+<p>The discount applied to the item. Example: <code>0.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="discount_type"                data-endpoint="POSTapi-v1-sales-items"
+               value="fixed"
+               data-component="body">
+    <br>
+<p>The type of discount (e.g., percentage, fixed). Example: <code>fixed</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>customer_price</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="customer_price"                data-endpoint="POSTapi-v1-sales-items"
+               value="100.00"
+               data-component="body">
+    <br>
+<p>The price charged to the customer. Example: <code>100.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="total"                data-endpoint="POSTapi-v1-sales-items"
+               value="500.00"
+               data-component="body">
+    <br>
+<p>The total amount for the item. Example: <code>500.00</code></p>
+        </div>
+        </form>
 
                     <h2 id="sales-items-GETapi-v1-sales-items--id-">Display the specified sales item.</h2>
 
@@ -16952,6 +21330,24 @@ fetch(url, {
 </span>
 
 <span id="example-responses-GETapi-v1-sales-items--id-">
+            <blockquote>
+            <p>Example response (200, OK):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: 1,
+    &quot;sales_id&quot;: 1,
+    &quot;product_id&quot;: 1,
+    &quot;quantity&quot;: 5,
+    &quot;discount&quot;: &quot;0.00&quot;,
+    &quot;discount_type&quot;: &quot;fixed&quot;,
+    &quot;customer_price&quot;: &quot;100.00&quot;,
+    &quot;total&quot;: &quot;500.00&quot;,
+    &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
+    &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
+}</code>
+ </pre>
             <blockquote>
             <p>Example response (500):</p>
         </blockquote>
@@ -17096,7 +21492,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/sales-items/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"sales_id\": 1,
+    \"product_id\": 1,
+    \"quantity\": 10,
+    \"discount\": \"0.00\",
+    \"discount_type\": \"fixed\",
+    \"customer_price\": \"100.00\",
+    \"total\": \"1000.00\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -17110,15 +21516,46 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "sales_id": 1,
+    "product_id": 1,
+    "quantity": 10,
+    "discount": "0.00",
+    "discount_type": "fixed",
+    "customer_price": "100.00",
+    "total": "1000.00"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-sales-items--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;sales_id&quot;: 1,
+        &quot;product_id&quot;: 1,
+        &quot;quantity&quot;: 10,
+        &quot;discount&quot;: 0,
+        &quot;discount_type&quot;: &quot;fixed&quot;,
+        &quot;customer_price&quot;: 100,
+        &quot;total&quot;: 1000,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-sales-items--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-sales-items--id-"></span>:
@@ -17219,7 +21656,104 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the sales item. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>sales_item</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_item"                data-endpoint="PUTapi-v1-sales-items--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the sales item. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_id"                data-endpoint="PUTapi-v1-sales-items--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the sales order. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>product_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="product_id"                data-endpoint="PUTapi-v1-sales-items--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the product. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="quantity"                data-endpoint="PUTapi-v1-sales-items--id-"
+               value="10"
+               data-component="body">
+    <br>
+<p>The quantity of the product. Example: <code>10</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="discount"                data-endpoint="PUTapi-v1-sales-items--id-"
+               value="0.00"
+               data-component="body">
+    <br>
+<p>The discount applied to the item. Example: <code>0.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>discount_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="discount_type"                data-endpoint="PUTapi-v1-sales-items--id-"
+               value="fixed"
+               data-component="body">
+    <br>
+<p>The type of discount (e.g., percentage, fixed). Example: <code>fixed</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>customer_price</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="customer_price"                data-endpoint="PUTapi-v1-sales-items--id-"
+               value="100.00"
+               data-component="body">
+    <br>
+<p>The price charged to the customer. Example: <code>100.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="total"                data-endpoint="PUTapi-v1-sales-items--id-"
+               value="1000.00"
+               data-component="body">
+    <br>
+<p>The total amount for the item. Example: <code>1000.00</code></p>
+        </div>
+        </form>
 
                     <h2 id="sales-items-DELETEapi-v1-sales-items--id-">Remove the specified resource from storage.</h2>
 
@@ -17260,7 +21794,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-sales-items--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-sales-items--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-sales-items--id-"></span>:
@@ -17356,6 +21896,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the sales item. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>sales_item</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_item"                data-endpoint="DELETEapi-v1-sales-items--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the sales item to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -17572,7 +22124,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/sales-opportunities" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"customer_id\": 1,
+    \"sales_pipeline_id\": 1,
+    \"pipeline_stage_id\": 1,
+    \"name\": \"New Client Project\",
+    \"description\": \"Develop a new e-commerce platform.\",
+    \"amount\": \"50000.00\",
+    \"expected_close_date\": \"2024-12-31\",
+    \"status\": \"Open\",
+    \"sales_id\": 1
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -17586,15 +22150,50 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "customer_id": 1,
+    "sales_pipeline_id": 1,
+    "pipeline_stage_id": 1,
+    "name": "New Client Project",
+    "description": "Develop a new e-commerce platform.",
+    "amount": "50000.00",
+    "expected_close_date": "2024-12-31",
+    "status": "Open",
+    "sales_id": 1
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-sales-opportunities">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;customer_id&quot;: 1,
+        &quot;sales_pipeline_id&quot;: 1,
+        &quot;pipeline_stage_id&quot;: 1,
+        &quot;name&quot;: &quot;New Client Project&quot;,
+        &quot;description&quot;: &quot;Develop a new e-commerce platform.&quot;,
+        &quot;amount&quot;: 50000,
+        &quot;expected_close_date&quot;: &quot;2024-12-31&quot;,
+        &quot;status&quot;: &quot;Open&quot;,
+        &quot;sales_id&quot;: 1,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-sales-opportunities" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-sales-opportunities"></span>:
@@ -17678,7 +22277,116 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>customer_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="customer_id"                data-endpoint="POSTapi-v1-sales-opportunities"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the customer. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_pipeline_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_pipeline_id"                data-endpoint="POSTapi-v1-sales-opportunities"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the sales pipeline. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>pipeline_stage_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="pipeline_stage_id"                data-endpoint="POSTapi-v1-sales-opportunities"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the pipeline stage. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-sales-opportunities"
+               value="New Client Project"
+               data-component="body">
+    <br>
+<p>The name of the sales opportunity. Example: <code>New Client Project</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="POSTapi-v1-sales-opportunities"
+               value="Develop a new e-commerce platform."
+               data-component="body">
+    <br>
+<p>A description of the sales opportunity. Example: <code>Develop a new e-commerce platform.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="amount"                data-endpoint="POSTapi-v1-sales-opportunities"
+               value="50000.00"
+               data-component="body">
+    <br>
+<p>The estimated amount of the opportunity. Example: <code>50000.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>expected_close_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="expected_close_date"                data-endpoint="POSTapi-v1-sales-opportunities"
+               value="2024-12-31"
+               data-component="body">
+    <br>
+<p>The expected close date of the opportunity. Example: <code>2024-12-31</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>status</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="status"                data-endpoint="POSTapi-v1-sales-opportunities"
+               value="Open"
+               data-component="body">
+    <br>
+<p>The status of the opportunity (e.g., Open, Won, Lost). Example: <code>Open</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_id"                data-endpoint="POSTapi-v1-sales-opportunities"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the associated sales record. Example: <code>1</code></p>
+        </div>
+        </form>
 
                     <h2 id="sales-opportunities-GETapi-v1-sales-opportunities--id-">Display the specified sales opportunity.</h2>
 
@@ -17863,7 +22571,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/sales-opportunities/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"customer_id\": 1,
+    \"sales_pipeline_id\": 1,
+    \"pipeline_stage_id\": 1,
+    \"name\": \"New Client Project\",
+    \"description\": \"Develop a new e-commerce platform.\",
+    \"amount\": \"50000.00\",
+    \"expected_close_date\": \"2024-12-31\",
+    \"status\": \"Open\",
+    \"sales_id\": 1
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -17877,15 +22597,50 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "customer_id": 1,
+    "sales_pipeline_id": 1,
+    "pipeline_stage_id": 1,
+    "name": "New Client Project",
+    "description": "Develop a new e-commerce platform.",
+    "amount": "50000.00",
+    "expected_close_date": "2024-12-31",
+    "status": "Open",
+    "sales_id": 1
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-sales-opportunities--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;customer_id&quot;: 1,
+        &quot;sales_pipeline_id&quot;: 1,
+        &quot;pipeline_stage_id&quot;: 1,
+        &quot;name&quot;: &quot;New Client Project&quot;,
+        &quot;description&quot;: &quot;Develop a new e-commerce platform.&quot;,
+        &quot;amount&quot;: 50000,
+        &quot;expected_close_date&quot;: &quot;2024-12-31&quot;,
+        &quot;status&quot;: &quot;Open&quot;,
+        &quot;sales_id&quot;: 1,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-sales-opportunities--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-sales-opportunities--id-"></span>:
@@ -17986,7 +22741,128 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the sales opportunity. Example: <code>17</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>sales_opportunity</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_opportunity"                data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the sales opportunity. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>customer_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="customer_id"                data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the customer. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_pipeline_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_pipeline_id"                data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the sales pipeline. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>pipeline_stage_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="pipeline_stage_id"                data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the pipeline stage. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="New Client Project"
+               data-component="body">
+    <br>
+<p>The name of the sales opportunity. Example: <code>New Client Project</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="Develop a new e-commerce platform."
+               data-component="body">
+    <br>
+<p>A description of the sales opportunity. Example: <code>Develop a new e-commerce platform.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="amount"                data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="50000.00"
+               data-component="body">
+    <br>
+<p>The estimated amount of the opportunity. Example: <code>50000.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>expected_close_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="expected_close_date"                data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="2024-12-31"
+               data-component="body">
+    <br>
+<p>The expected close date of the opportunity. Example: <code>2024-12-31</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>status</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="status"                data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="Open"
+               data-component="body">
+    <br>
+<p>The status of the opportunity (e.g., Open, Won, Lost). Example: <code>Open</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_id"                data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the associated sales record. Example: <code>1</code></p>
+        </div>
+        </form>
 
                     <h2 id="sales-opportunities-DELETEapi-v1-sales-opportunities--id-">Remove the specified resource from storage.</h2>
 
@@ -18027,7 +22903,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-sales-opportunities--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-sales-opportunities--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-sales-opportunities--id-"></span>:
@@ -18123,6 +23005,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the sales opportunity. Example: <code>17</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>sales_opportunity</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_opportunity"                data-endpoint="DELETEapi-v1-sales-opportunities--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the sales opportunity to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -18339,7 +23233,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/sales-opportunity-items" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"sales_opportunity_id\": 1,
+    \"product_id\": 1,
+    \"quantity\": 5,
+    \"price\": \"100.00\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -18353,15 +23254,40 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "sales_opportunity_id": 1,
+    "product_id": 1,
+    "quantity": 5,
+    "price": "100.00"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-sales-opportunity-items">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;sales_opportunity_id&quot;: 1,
+        &quot;product_id&quot;: 1,
+        &quot;quantity&quot;: 5,
+        &quot;price&quot;: 100,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-sales-opportunity-items" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-sales-opportunity-items"></span>:
@@ -18445,7 +23371,56 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_opportunity_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_opportunity_id"                data-endpoint="POSTapi-v1-sales-opportunity-items"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the sales opportunity. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>product_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="product_id"                data-endpoint="POSTapi-v1-sales-opportunity-items"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the product. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="quantity"                data-endpoint="POSTapi-v1-sales-opportunity-items"
+               value="5"
+               data-component="body">
+    <br>
+<p>The quantity of the product. Example: <code>5</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>price</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="price"                data-endpoint="POSTapi-v1-sales-opportunity-items"
+               value="100.00"
+               data-component="body">
+    <br>
+<p>The price of the product. Example: <code>100.00</code></p>
+        </div>
+        </form>
 
                     <h2 id="sales-opportunity-items-GETapi-v1-sales-opportunity-items--id-">Display the specified sales opportunity item.</h2>
 
@@ -18630,7 +23605,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/sales-opportunity-items/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"sales_opportunity_id\": 1,
+    \"product_id\": 1,
+    \"quantity\": 10,
+    \"price\": \"100.00\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -18644,15 +23626,40 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "sales_opportunity_id": 1,
+    "product_id": 1,
+    "quantity": 10,
+    "price": "100.00"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-sales-opportunity-items--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;sales_opportunity_id&quot;: 1,
+        &quot;product_id&quot;: 1,
+        &quot;quantity&quot;: 10,
+        &quot;price&quot;: 100,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-sales-opportunity-items--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-sales-opportunity-items--id-"></span>:
@@ -18753,7 +23760,68 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the sales opportunity item. Example: <code>17</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>sales_opportunity_item</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_opportunity_item"                data-endpoint="PUTapi-v1-sales-opportunity-items--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the sales opportunity item. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_opportunity_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_opportunity_id"                data-endpoint="PUTapi-v1-sales-opportunity-items--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the sales opportunity. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>product_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="product_id"                data-endpoint="PUTapi-v1-sales-opportunity-items--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the product. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="quantity"                data-endpoint="PUTapi-v1-sales-opportunity-items--id-"
+               value="10"
+               data-component="body">
+    <br>
+<p>The quantity of the product. Example: <code>10</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>price</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="price"                data-endpoint="PUTapi-v1-sales-opportunity-items--id-"
+               value="100.00"
+               data-component="body">
+    <br>
+<p>The price of the product. Example: <code>100.00</code></p>
+        </div>
+        </form>
 
                     <h2 id="sales-opportunity-items-DELETEapi-v1-sales-opportunity-items--id-">Remove the specified resource from storage.</h2>
 
@@ -18794,7 +23862,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-sales-opportunity-items--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-sales-opportunity-items--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-sales-opportunity-items--id-"></span>:
@@ -18890,6 +23964,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the sales opportunity item. Example: <code>17</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>sales_opportunity_item</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_opportunity_item"                data-endpoint="DELETEapi-v1-sales-opportunity-items--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the sales opportunity item to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -19330,17 +24416,7 @@ access-control-allow-origin: *
                     }
                 }
             ],
-            &quot;customer&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Walk In Customer&quot;,
-                &quot;address&quot;: &quot;-&quot;,
-                &quot;phone_number&quot;: &quot;0&quot;,
-                &quot;email&quot;: &quot;-&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;payment_terms&quot;: &quot;0&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
+            &quot;customer&quot;: null,
             &quot;user&quot;: {
                 &quot;id&quot;: 1,
                 &quot;name&quot;: &quot;admin&quot;,
@@ -21433,17 +26509,7 @@ access-control-allow-origin: *
                     }
                 }
             ],
-            &quot;customer&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Walk In Customer&quot;,
-                &quot;address&quot;: &quot;-&quot;,
-                &quot;phone_number&quot;: &quot;0&quot;,
-                &quot;email&quot;: &quot;-&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;payment_terms&quot;: &quot;0&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
+            &quot;customer&quot;: null,
             &quot;user&quot;: {
                 &quot;id&quot;: 1,
                 &quot;name&quot;: &quot;admin&quot;,
@@ -22344,7 +27410,26 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/sales" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"invoice\": \"INV-SALES-001\",
+    \"customer_id\": 1,
+    \"user_id\": 1,
+    \"order_date\": \"2023-10-26\",
+    \"due_date\": \"2023-11-26\",
+    \"payment_type\": \"Cash\",
+    \"order_discount\": \"5.00\",
+    \"order_discount_type\": \"fixed\",
+    \"total\": \"1500.00\",
+    \"status\": \"Pending\",
+    \"tax_rate\": \"0.05\",
+    \"total_tax\": \"75.00\",
+    \"amount_received\": \"1575.00\",
+    \"change_amount\": \"0.00\",
+    \"is_pos\": true,
+    \"sales_opportunity_id\": 1
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -22358,15 +27443,64 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "invoice": "INV-SALES-001",
+    "customer_id": 1,
+    "user_id": 1,
+    "order_date": "2023-10-26",
+    "due_date": "2023-11-26",
+    "payment_type": "Cash",
+    "order_discount": "5.00",
+    "order_discount_type": "fixed",
+    "total": "1500.00",
+    "status": "Pending",
+    "tax_rate": "0.05",
+    "total_tax": "75.00",
+    "amount_received": "1575.00",
+    "change_amount": "0.00",
+    "is_pos": true,
+    "sales_opportunity_id": 1
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-sales">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;invoice&quot;: &quot;INV-SALES-001&quot;,
+        &quot;customer_id&quot;: 1,
+        &quot;user_id&quot;: 1,
+        &quot;order_date&quot;: &quot;2023-10-26&quot;,
+        &quot;due_date&quot;: &quot;2023-11-26&quot;,
+        &quot;payment_type&quot;: &quot;Cash&quot;,
+        &quot;order_discount&quot;: 5,
+        &quot;order_discount_type&quot;: &quot;fixed&quot;,
+        &quot;total&quot;: 1500,
+        &quot;status&quot;: &quot;Pending&quot;,
+        &quot;tax_rate&quot;: 0.05000000000000000277555756156289135105907917022705078125,
+        &quot;total_tax&quot;: 75,
+        &quot;amount_received&quot;: 1575,
+        &quot;change_amount&quot;: 0,
+        &quot;is_pos&quot;: true,
+        &quot;sales_opportunity_id&quot;: 1,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-sales" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-sales"></span>:
@@ -22450,7 +27584,210 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>invoice</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="invoice"                data-endpoint="POSTapi-v1-sales"
+               value="INV-SALES-001"
+               data-component="body">
+    <br>
+<p>The invoice number. Example: <code>INV-SALES-001</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>customer_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="customer_id"                data-endpoint="POSTapi-v1-sales"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the customer. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>user_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="user_id"                data-endpoint="POSTapi-v1-sales"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the user. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>order_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="order_date"                data-endpoint="POSTapi-v1-sales"
+               value="2023-10-26"
+               data-component="body">
+    <br>
+<p>The date of the order. Example: <code>2023-10-26</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>due_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="due_date"                data-endpoint="POSTapi-v1-sales"
+               value="2023-11-26"
+               data-component="body">
+    <br>
+<p>The due date of the payment. Example: <code>2023-11-26</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_type"                data-endpoint="POSTapi-v1-sales"
+               value="Cash"
+               data-component="body">
+    <br>
+<p>The payment type (e.g., Cash, Credit Card). Example: <code>Cash</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>order_discount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="order_discount"                data-endpoint="POSTapi-v1-sales"
+               value="5.00"
+               data-component="body">
+    <br>
+<p>The total discount applied. Example: <code>5.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>order_discount_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="order_discount_type"                data-endpoint="POSTapi-v1-sales"
+               value="fixed"
+               data-component="body">
+    <br>
+<p>The type of discount (e.g., percentage, fixed). Example: <code>fixed</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="total"                data-endpoint="POSTapi-v1-sales"
+               value="1500.00"
+               data-component="body">
+    <br>
+<p>The total amount of the sales order. Example: <code>1500.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>status</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="status"                data-endpoint="POSTapi-v1-sales"
+               value="Pending"
+               data-component="body">
+    <br>
+<p>The status of the sales order (e.g., Pending, Paid). Example: <code>Pending</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>tax_rate</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="tax_rate"                data-endpoint="POSTapi-v1-sales"
+               value="0.05"
+               data-component="body">
+    <br>
+<p>The tax rate applied. Example: <code>0.05</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total_tax</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="total_tax"                data-endpoint="POSTapi-v1-sales"
+               value="75.00"
+               data-component="body">
+    <br>
+<p>The total tax amount. Example: <code>75.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount_received</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="amount_received"                data-endpoint="POSTapi-v1-sales"
+               value="1575.00"
+               data-component="body">
+    <br>
+<p>The amount received. Example: <code>1575.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>change_amount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="change_amount"                data-endpoint="POSTapi-v1-sales"
+               value="0.00"
+               data-component="body">
+    <br>
+<p>The change amount. Example: <code>0.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_pos</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-v1-sales" style="display: none">
+            <input type="radio" name="is_pos"
+                   value="true"
+                   data-endpoint="POSTapi-v1-sales"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-v1-sales" style="display: none">
+            <input type="radio" name="is_pos"
+                   value="false"
+                   data-endpoint="POSTapi-v1-sales"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Is this a point of sale transaction. Example: <code>true</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_opportunity_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_opportunity_id"                data-endpoint="POSTapi-v1-sales"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the sales opportunity. Example: <code>1</code></p>
+        </div>
+        </form>
 
                     <h2 id="sales-orders-GETapi-v1-sales--id-">Display the specified sales order.</h2>
 
@@ -22776,15 +28113,34 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/v1/sales/consequatur" \
+    "http://localhost:8000/api/v1/sales/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"invoice\": \"INV-SALES-002\",
+    \"customer_id\": 2,
+    \"user_id\": 1,
+    \"order_date\": \"2023-10-27\",
+    \"due_date\": \"2023-11-27\",
+    \"payment_type\": \"Credit Card\",
+    \"order_discount\": \"10.00\",
+    \"order_discount_type\": \"percentage\",
+    \"total\": \"2000.00\",
+    \"status\": \"Paid\",
+    \"tax_rate\": \"0.05\",
+    \"total_tax\": \"100.00\",
+    \"amount_received\": \"2000.00\",
+    \"change_amount\": \"0.00\",
+    \"is_pos\": false,
+    \"sales_opportunity_id\": 1
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/sales/consequatur"
+    "http://localhost:8000/api/v1/sales/1"
 );
 
 const headers = {
@@ -22793,15 +28149,64 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "invoice": "INV-SALES-002",
+    "customer_id": 2,
+    "user_id": 1,
+    "order_date": "2023-10-27",
+    "due_date": "2023-11-27",
+    "payment_type": "Credit Card",
+    "order_discount": "10.00",
+    "order_discount_type": "percentage",
+    "total": "2000.00",
+    "status": "Paid",
+    "tax_rate": "0.05",
+    "total_tax": "100.00",
+    "amount_received": "2000.00",
+    "change_amount": "0.00",
+    "is_pos": false,
+    "sales_opportunity_id": 1
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-sales--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;invoice&quot;: &quot;INV-SALES-002&quot;,
+        &quot;customer_id&quot;: 2,
+        &quot;user_id&quot;: 1,
+        &quot;order_date&quot;: &quot;2023-10-27&quot;,
+        &quot;due_date&quot;: &quot;2023-11-27&quot;,
+        &quot;payment_type&quot;: &quot;Credit Card&quot;,
+        &quot;order_discount&quot;: 10,
+        &quot;order_discount_type&quot;: &quot;percentage&quot;,
+        &quot;total&quot;: 2000,
+        &quot;status&quot;: &quot;Paid&quot;,
+        &quot;tax_rate&quot;: 0.05000000000000000277555756156289135105907917022705078125,
+        &quot;total_tax&quot;: 100,
+        &quot;amount_received&quot;: 2000,
+        &quot;change_amount&quot;: 0,
+        &quot;is_pos&quot;: false,
+        &quot;sales_opportunity_id&quot;: 1,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-sales--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-sales--id-"></span>:
@@ -22892,17 +28297,232 @@ You can check the Dev Tools console for debugging information.</code></pre>
                         <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
+<small>integer</small>&nbsp;
  &nbsp;
  &nbsp;
-                <input type="text" style="display: none"
-                              name="id"                data-endpoint="PUTapi-v1-sales--id-"
-               value="consequatur"
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="PUTapi-v1-sales--id-"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the sale. Example: <code>consequatur</code></p>
+<p>The ID of the sale. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>sale</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sale"                data-endpoint="PUTapi-v1-sales--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the sales order. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>invoice</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="invoice"                data-endpoint="PUTapi-v1-sales--id-"
+               value="INV-SALES-002"
+               data-component="body">
+    <br>
+<p>The invoice number. Example: <code>INV-SALES-002</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>customer_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="customer_id"                data-endpoint="PUTapi-v1-sales--id-"
+               value="2"
+               data-component="body">
+    <br>
+<p>The ID of the customer. Example: <code>2</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>user_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="user_id"                data-endpoint="PUTapi-v1-sales--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the user. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>order_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="order_date"                data-endpoint="PUTapi-v1-sales--id-"
+               value="2023-10-27"
+               data-component="body">
+    <br>
+<p>The date of the order. Example: <code>2023-10-27</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>due_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="due_date"                data-endpoint="PUTapi-v1-sales--id-"
+               value="2023-11-27"
+               data-component="body">
+    <br>
+<p>The due date of the payment. Example: <code>2023-11-27</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_type"                data-endpoint="PUTapi-v1-sales--id-"
+               value="Credit Card"
+               data-component="body">
+    <br>
+<p>The payment type (e.g., Cash, Credit Card). Example: <code>Credit Card</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>order_discount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="order_discount"                data-endpoint="PUTapi-v1-sales--id-"
+               value="10.00"
+               data-component="body">
+    <br>
+<p>The total discount applied. Example: <code>10.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>order_discount_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="order_discount_type"                data-endpoint="PUTapi-v1-sales--id-"
+               value="percentage"
+               data-component="body">
+    <br>
+<p>The type of discount (e.g., percentage, fixed). Example: <code>percentage</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="total"                data-endpoint="PUTapi-v1-sales--id-"
+               value="2000.00"
+               data-component="body">
+    <br>
+<p>The total amount of the sales order. Example: <code>2000.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>status</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="status"                data-endpoint="PUTapi-v1-sales--id-"
+               value="Paid"
+               data-component="body">
+    <br>
+<p>The status of the sales order (e.g., Pending, Paid). Example: <code>Paid</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>tax_rate</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="tax_rate"                data-endpoint="PUTapi-v1-sales--id-"
+               value="0.05"
+               data-component="body">
+    <br>
+<p>The tax rate applied. Example: <code>0.05</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total_tax</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="total_tax"                data-endpoint="PUTapi-v1-sales--id-"
+               value="100.00"
+               data-component="body">
+    <br>
+<p>The total tax amount. Example: <code>100.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount_received</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="amount_received"                data-endpoint="PUTapi-v1-sales--id-"
+               value="2000.00"
+               data-component="body">
+    <br>
+<p>The amount received. Example: <code>2000.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>change_amount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="change_amount"                data-endpoint="PUTapi-v1-sales--id-"
+               value="0.00"
+               data-component="body">
+    <br>
+<p>The change amount. Example: <code>0.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_pos</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="PUTapi-v1-sales--id-" style="display: none">
+            <input type="radio" name="is_pos"
+                   value="true"
+                   data-endpoint="PUTapi-v1-sales--id-"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="PUTapi-v1-sales--id-" style="display: none">
+            <input type="radio" name="is_pos"
+                   value="false"
+                   data-endpoint="PUTapi-v1-sales--id-"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Is this a point of sale transaction. Example: <code>false</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>sales_opportunity_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_opportunity_id"                data-endpoint="PUTapi-v1-sales--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the sales opportunity. Example: <code>1</code></p>
+        </div>
+        </form>
 
                     <h2 id="sales-orders-DELETEapi-v1-sales--id-">Remove the specified resource from storage.</h2>
 
@@ -22918,7 +28538,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost:8000/api/v1/sales/consequatur" \
+    "http://localhost:8000/api/v1/sales/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -22926,7 +28546,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/sales/consequatur"
+    "http://localhost:8000/api/v1/sales/1"
 );
 
 const headers = {
@@ -22943,7 +28563,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-sales--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-sales--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-sales--id-"></span>:
@@ -23030,15 +28656,27 @@ You can check the Dev Tools console for debugging information.</code></pre>
                         <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
+<small>integer</small>&nbsp;
  &nbsp;
  &nbsp;
-                <input type="text" style="display: none"
-                              name="id"                data-endpoint="DELETEapi-v1-sales--id-"
-               value="consequatur"
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="DELETEapi-v1-sales--id-"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the sale. Example: <code>consequatur</code></p>
+<p>The ID of the sale. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>sale</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sale"                data-endpoint="DELETEapi-v1-sales--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the sales order to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -23255,7 +28893,13 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/sales-pipelines" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"Initial Sales Pipeline\",
+    \"description\": \"Pipeline for initial customer contact.\",
+    \"is_default\": false
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -23269,15 +28913,38 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "Initial Sales Pipeline",
+    "description": "Pipeline for initial customer contact.",
+    "is_default": false
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-sales-pipelines">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Initial Sales Pipeline&quot;,
+        &quot;description&quot;: &quot;Pipeline for initial customer contact.&quot;,
+        &quot;is_default&quot;: false,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-sales-pipelines" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-sales-pipelines"></span>:
@@ -23361,7 +29028,54 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-sales-pipelines"
+               value="Initial Sales Pipeline"
+               data-component="body">
+    <br>
+<p>The name of the sales pipeline. Example: <code>Initial Sales Pipeline</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="POSTapi-v1-sales-pipelines"
+               value="Pipeline for initial customer contact."
+               data-component="body">
+    <br>
+<p>A description of the sales pipeline. Example: <code>Pipeline for initial customer contact.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_default</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-v1-sales-pipelines" style="display: none">
+            <input type="radio" name="is_default"
+                   value="true"
+                   data-endpoint="POSTapi-v1-sales-pipelines"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-v1-sales-pipelines" style="display: none">
+            <input type="radio" name="is_default"
+                   value="false"
+                   data-endpoint="POSTapi-v1-sales-pipelines"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Is this the default pipeline. Example: <code>false</code></p>
+        </div>
+        </form>
 
                     <h2 id="sales-pipelines-GETapi-v1-sales-pipelines--id-">Display the specified sales pipeline.</h2>
 
@@ -23546,7 +29260,13 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/sales-pipelines/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"New Sales Pipeline\",
+    \"description\": \"Pipeline for new leads.\",
+    \"is_default\": true
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -23560,15 +29280,38 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "New Sales Pipeline",
+    "description": "Pipeline for new leads.",
+    "is_default": true
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-sales-pipelines--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;New Sales Pipeline&quot;,
+        &quot;description&quot;: &quot;Pipeline for new leads.&quot;,
+        &quot;is_default&quot;: true,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-sales-pipelines--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-sales-pipelines--id-"></span>:
@@ -23669,7 +29412,66 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the sales pipeline. Example: <code>17</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>sales_pipeline</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_pipeline"                data-endpoint="PUTapi-v1-sales-pipelines--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the sales pipeline. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-sales-pipelines--id-"
+               value="New Sales Pipeline"
+               data-component="body">
+    <br>
+<p>The name of the sales pipeline. Example: <code>New Sales Pipeline</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="PUTapi-v1-sales-pipelines--id-"
+               value="Pipeline for new leads."
+               data-component="body">
+    <br>
+<p>A description of the sales pipeline. Example: <code>Pipeline for new leads.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_default</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="PUTapi-v1-sales-pipelines--id-" style="display: none">
+            <input type="radio" name="is_default"
+                   value="true"
+                   data-endpoint="PUTapi-v1-sales-pipelines--id-"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="PUTapi-v1-sales-pipelines--id-" style="display: none">
+            <input type="radio" name="is_default"
+                   value="false"
+                   data-endpoint="PUTapi-v1-sales-pipelines--id-"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Is this the default pipeline. Example: <code>true</code></p>
+        </div>
+        </form>
 
                     <h2 id="sales-pipelines-DELETEapi-v1-sales-pipelines--id-">Remove the specified resource from storage.</h2>
 
@@ -23710,7 +29512,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-sales-pipelines--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-sales-pipelines--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-sales-pipelines--id-"></span>:
@@ -23806,6 +29614,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the sales pipeline. Example: <code>17</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>sales_pipeline</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="sales_pipeline"                data-endpoint="DELETEapi-v1-sales-pipelines--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the sales pipeline to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -24022,7 +29842,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/stock-adjustments" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"product_id\": 1,
+    \"adjustment_type\": \"decrease\",
+    \"quantity_before\": \"100.00\",
+    \"quantity_after\": \"90.00\",
+    \"adjustment_amount\": \"10.00\",
+    \"reason\": \"Damaged goods.\",
+    \"adjusted_by\": 1
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -24036,15 +29866,46 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "product_id": 1,
+    "adjustment_type": "decrease",
+    "quantity_before": "100.00",
+    "quantity_after": "90.00",
+    "adjustment_amount": "10.00",
+    "reason": "Damaged goods.",
+    "adjusted_by": 1
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-stock-adjustments">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;product_id&quot;: 1,
+        &quot;adjustment_type&quot;: &quot;decrease&quot;,
+        &quot;quantity_before&quot;: 100,
+        &quot;quantity_after&quot;: 90,
+        &quot;adjustment_amount&quot;: 10,
+        &quot;reason&quot;: &quot;Damaged goods.&quot;,
+        &quot;adjusted_by&quot;: 1,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-stock-adjustments" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-stock-adjustments"></span>:
@@ -24128,7 +29989,92 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>product_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="product_id"                data-endpoint="POSTapi-v1-stock-adjustments"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the product. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>adjustment_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="adjustment_type"                data-endpoint="POSTapi-v1-stock-adjustments"
+               value="decrease"
+               data-component="body">
+    <br>
+<p>The type of adjustment (e.g., increase, decrease). Example: <code>decrease</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity_before</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="quantity_before"                data-endpoint="POSTapi-v1-stock-adjustments"
+               value="100.00"
+               data-component="body">
+    <br>
+<p>The quantity before adjustment. Example: <code>100.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity_after</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="quantity_after"                data-endpoint="POSTapi-v1-stock-adjustments"
+               value="90.00"
+               data-component="body">
+    <br>
+<p>The quantity after adjustment. Example: <code>90.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>adjustment_amount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="adjustment_amount"                data-endpoint="POSTapi-v1-stock-adjustments"
+               value="10.00"
+               data-component="body">
+    <br>
+<p>The amount of adjustment. Example: <code>10.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>reason</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="reason"                data-endpoint="POSTapi-v1-stock-adjustments"
+               value="Damaged goods."
+               data-component="body">
+    <br>
+<p>A reason for the adjustment. Example: <code>Damaged goods.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>adjusted_by</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="adjusted_by"                data-endpoint="POSTapi-v1-stock-adjustments"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the user who made the adjustment. Example: <code>1</code></p>
+        </div>
+        </form>
 
                     <h2 id="stock-adjustments-GETapi-v1-stock-adjustments--id-">Display the specified stock adjustment.</h2>
 
@@ -24313,7 +30259,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/stock-adjustments/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"product_id\": 1,
+    \"adjustment_type\": \"increase\",
+    \"quantity_before\": \"100.00\",
+    \"quantity_after\": \"110.00\",
+    \"adjustment_amount\": \"10.00\",
+    \"reason\": \"Inventory count discrepancy.\",
+    \"adjusted_by\": 1
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -24327,15 +30283,46 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "product_id": 1,
+    "adjustment_type": "increase",
+    "quantity_before": "100.00",
+    "quantity_after": "110.00",
+    "adjustment_amount": "10.00",
+    "reason": "Inventory count discrepancy.",
+    "adjusted_by": 1
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-stock-adjustments--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;product_id&quot;: 1,
+        &quot;adjustment_type&quot;: &quot;increase&quot;,
+        &quot;quantity_before&quot;: 100,
+        &quot;quantity_after&quot;: 110,
+        &quot;adjustment_amount&quot;: 10,
+        &quot;reason&quot;: &quot;Inventory count discrepancy.&quot;,
+        &quot;adjusted_by&quot;: 1,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-stock-adjustments--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-stock-adjustments--id-"></span>:
@@ -24436,7 +30423,104 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the stock adjustment. Example: <code>17</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>stock_adjustment</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="stock_adjustment"                data-endpoint="PUTapi-v1-stock-adjustments--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the stock adjustment. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>product_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="product_id"                data-endpoint="PUTapi-v1-stock-adjustments--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the product. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>adjustment_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="adjustment_type"                data-endpoint="PUTapi-v1-stock-adjustments--id-"
+               value="increase"
+               data-component="body">
+    <br>
+<p>The type of adjustment (e.g., increase, decrease). Example: <code>increase</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity_before</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="quantity_before"                data-endpoint="PUTapi-v1-stock-adjustments--id-"
+               value="100.00"
+               data-component="body">
+    <br>
+<p>The quantity before adjustment. Example: <code>100.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quantity_after</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="quantity_after"                data-endpoint="PUTapi-v1-stock-adjustments--id-"
+               value="110.00"
+               data-component="body">
+    <br>
+<p>The quantity after adjustment. Example: <code>110.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>adjustment_amount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="adjustment_amount"                data-endpoint="PUTapi-v1-stock-adjustments--id-"
+               value="10.00"
+               data-component="body">
+    <br>
+<p>The amount of adjustment. Example: <code>10.00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>reason</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="reason"                data-endpoint="PUTapi-v1-stock-adjustments--id-"
+               value="Inventory count discrepancy."
+               data-component="body">
+    <br>
+<p>A reason for the adjustment. Example: <code>Inventory count discrepancy.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>adjusted_by</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="adjusted_by"                data-endpoint="PUTapi-v1-stock-adjustments--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the user who made the adjustment. Example: <code>1</code></p>
+        </div>
+        </form>
 
                     <h2 id="stock-adjustments-DELETEapi-v1-stock-adjustments--id-">Remove the specified resource from storage.</h2>
 
@@ -24477,7 +30561,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-stock-adjustments--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-stock-adjustments--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-stock-adjustments--id-"></span>:
@@ -24573,6 +30663,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the stock adjustment. Example: <code>17</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>stock_adjustment</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="stock_adjustment"                data-endpoint="DELETEapi-v1-stock-adjustments--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the stock adjustment to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -25273,7 +31375,15 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/supplier-interactions" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"supplier_id\": 1,
+    \"user_id\": 1,
+    \"type\": \"Email\",
+    \"notes\": \"Sent follow-up email.\",
+    \"interaction_date\": \"2023-10-26\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -25287,15 +31397,42 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "supplier_id": 1,
+    "user_id": 1,
+    "type": "Email",
+    "notes": "Sent follow-up email.",
+    "interaction_date": "2023-10-26"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-supplier-interactions">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;supplier_id&quot;: 1,
+        &quot;user_id&quot;: 1,
+        &quot;type&quot;: &quot;Email&quot;,
+        &quot;notes&quot;: &quot;Sent follow-up email.&quot;,
+        &quot;interaction_date&quot;: &quot;2023-10-26&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-supplier-interactions" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-supplier-interactions"></span>:
@@ -25379,7 +31516,68 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>supplier_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="supplier_id"                data-endpoint="POSTapi-v1-supplier-interactions"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the supplier. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>user_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="user_id"                data-endpoint="POSTapi-v1-supplier-interactions"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the user. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="type"                data-endpoint="POSTapi-v1-supplier-interactions"
+               value="Email"
+               data-component="body">
+    <br>
+<p>The type of interaction (e.g., Call, Email, Meeting). Example: <code>Email</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>notes</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="notes"                data-endpoint="POSTapi-v1-supplier-interactions"
+               value="Sent follow-up email."
+               data-component="body">
+    <br>
+<p>Notes about the interaction. Example: <code>Sent follow-up email.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>interaction_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="interaction_date"                data-endpoint="POSTapi-v1-supplier-interactions"
+               value="2023-10-26"
+               data-component="body">
+    <br>
+<p>The date of the interaction. Example: <code>2023-10-26</code></p>
+        </div>
+        </form>
 
                     <h2 id="supplier-interactions-GETapi-v1-supplier-interactions--id-">Display the specified supplier interaction.</h2>
 
@@ -25586,7 +31784,15 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/supplier-interactions/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"supplier_id\": 1,
+    \"user_id\": 1,
+    \"type\": \"Call\",
+    \"notes\": \"Discussed new product line.\",
+    \"interaction_date\": \"2023-10-27\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -25600,15 +31806,42 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "supplier_id": 1,
+    "user_id": 1,
+    "type": "Call",
+    "notes": "Discussed new product line.",
+    "interaction_date": "2023-10-27"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-supplier-interactions--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;supplier_id&quot;: 1,
+        &quot;user_id&quot;: 1,
+        &quot;type&quot;: &quot;Call&quot;,
+        &quot;notes&quot;: &quot;Discussed new product line.&quot;,
+        &quot;interaction_date&quot;: &quot;2023-10-27&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-supplier-interactions--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-supplier-interactions--id-"></span>:
@@ -25709,7 +31942,80 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the supplier interaction. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>supplier_interaction</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="supplier_interaction"                data-endpoint="PUTapi-v1-supplier-interactions--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the supplier interaction. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>supplier_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="supplier_id"                data-endpoint="PUTapi-v1-supplier-interactions--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the supplier. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>user_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="user_id"                data-endpoint="PUTapi-v1-supplier-interactions--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the user. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="type"                data-endpoint="PUTapi-v1-supplier-interactions--id-"
+               value="Call"
+               data-component="body">
+    <br>
+<p>The type of interaction (e.g., Call, Email, Meeting). Example: <code>Call</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>notes</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="notes"                data-endpoint="PUTapi-v1-supplier-interactions--id-"
+               value="Discussed new product line."
+               data-component="body">
+    <br>
+<p>Notes about the interaction. Example: <code>Discussed new product line.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>interaction_date</code></b>&nbsp;&nbsp;
+<small>date</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="interaction_date"                data-endpoint="PUTapi-v1-supplier-interactions--id-"
+               value="2023-10-27"
+               data-component="body">
+    <br>
+<p>The date of the interaction. Example: <code>2023-10-27</code></p>
+        </div>
+        </form>
 
                     <h2 id="supplier-interactions-DELETEapi-v1-supplier-interactions--id-">Remove the specified resource from storage.</h2>
 
@@ -25750,7 +32056,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-supplier-interactions--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-supplier-interactions--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-supplier-interactions--id-"></span>:
@@ -25846,6 +32158,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the supplier interaction. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>supplier_interaction</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="supplier_interaction"                data-endpoint="DELETEapi-v1-supplier-interactions--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the supplier interaction to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -26193,7 +32517,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/suppliers" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"code\": \"SUP-001\",
+    \"name\": \"Supplier A\",
+    \"address\": \"123 Main St\",
+    \"phone_number\": \"555-1234\",
+    \"location\": \"London\",
+    \"payment_terms\": \"Net 30\",
+    \"email\": \"supplierA@example.com\",
+    \"image\": \"http:\\/\\/example.com\\/image1.jpg\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -26207,15 +32542,48 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "code": "SUP-001",
+    "name": "Supplier A",
+    "address": "123 Main St",
+    "phone_number": "555-1234",
+    "location": "London",
+    "payment_terms": "Net 30",
+    "email": "supplierA@example.com",
+    "image": "http:\/\/example.com\/image1.jpg"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-suppliers">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;code&quot;: &quot;SUP-001&quot;,
+        &quot;name&quot;: &quot;Supplier A&quot;,
+        &quot;address&quot;: &quot;123 Main St&quot;,
+        &quot;phone_number&quot;: &quot;555-1234&quot;,
+        &quot;location&quot;: &quot;London&quot;,
+        &quot;payment_terms&quot;: &quot;Net 30&quot;,
+        &quot;email&quot;: &quot;supplierA@example.com&quot;,
+        &quot;image&quot;: &quot;http://example.com/image1.jpg&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-suppliers" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-suppliers"></span>:
@@ -26299,7 +32667,104 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="code"                data-endpoint="POSTapi-v1-suppliers"
+               value="SUP-001"
+               data-component="body">
+    <br>
+<p>The unique code for the supplier. Example: <code>SUP-001</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-suppliers"
+               value="Supplier A"
+               data-component="body">
+    <br>
+<p>The name of the supplier. Example: <code>Supplier A</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="address"                data-endpoint="POSTapi-v1-suppliers"
+               value="123 Main St"
+               data-component="body">
+    <br>
+<p>The address of the supplier. Example: <code>123 Main St</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>phone_number</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="phone_number"                data-endpoint="POSTapi-v1-suppliers"
+               value="555-1234"
+               data-component="body">
+    <br>
+<p>The phone number of the supplier. Example: <code>555-1234</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>location</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="location"                data-endpoint="POSTapi-v1-suppliers"
+               value="London"
+               data-component="body">
+    <br>
+<p>The location of the supplier. Example: <code>London</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_terms</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_terms"                data-endpoint="POSTapi-v1-suppliers"
+               value="Net 30"
+               data-component="body">
+    <br>
+<p>The payment terms with the supplier. Example: <code>Net 30</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-v1-suppliers"
+               value="supplierA@example.com"
+               data-component="body">
+    <br>
+<p>The email address of the supplier. Example: <code>supplierA@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>image</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="image"                data-endpoint="POSTapi-v1-suppliers"
+               value="http://example.com/image1.jpg"
+               data-component="body">
+    <br>
+<p>The URL or path to the supplier's image. Example: <code>http://example.com/image1.jpg</code></p>
+        </div>
+        </form>
 
                     <h2 id="suppliers-GETapi-v1-suppliers--id-">Display the specified supplier.</h2>
 
@@ -26496,7 +32961,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/suppliers/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"code\": \"SUP-002\",
+    \"name\": \"Supplier B\",
+    \"address\": \"456 Oak Ave\",
+    \"phone_number\": \"555-5678\",
+    \"location\": \"New York\",
+    \"payment_terms\": \"Net 60\",
+    \"email\": \"supplierb@example.com\",
+    \"image\": \"http:\\/\\/example.com\\/image2.jpg\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -26510,15 +32986,48 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "code": "SUP-002",
+    "name": "Supplier B",
+    "address": "456 Oak Ave",
+    "phone_number": "555-5678",
+    "location": "New York",
+    "payment_terms": "Net 60",
+    "email": "supplierb@example.com",
+    "image": "http:\/\/example.com\/image2.jpg"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-suppliers--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;code&quot;: &quot;SUP-002&quot;,
+        &quot;name&quot;: &quot;Supplier B&quot;,
+        &quot;address&quot;: &quot;456 Oak Ave&quot;,
+        &quot;phone_number&quot;: &quot;555-5678&quot;,
+        &quot;location&quot;: &quot;New York&quot;,
+        &quot;payment_terms&quot;: &quot;Net 60&quot;,
+        &quot;email&quot;: &quot;supplierb@example.com&quot;,
+        &quot;image&quot;: &quot;http://example.com/image2.jpg&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-suppliers--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-suppliers--id-"></span>:
@@ -26619,7 +33128,116 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the supplier. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>supplier</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="supplier"                data-endpoint="PUTapi-v1-suppliers--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the supplier. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>code</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="code"                data-endpoint="PUTapi-v1-suppliers--id-"
+               value="SUP-002"
+               data-component="body">
+    <br>
+<p>The unique code for the supplier. Example: <code>SUP-002</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-suppliers--id-"
+               value="Supplier B"
+               data-component="body">
+    <br>
+<p>The name of the supplier. Example: <code>Supplier B</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="address"                data-endpoint="PUTapi-v1-suppliers--id-"
+               value="456 Oak Ave"
+               data-component="body">
+    <br>
+<p>The address of the supplier. Example: <code>456 Oak Ave</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>phone_number</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="phone_number"                data-endpoint="PUTapi-v1-suppliers--id-"
+               value="555-5678"
+               data-component="body">
+    <br>
+<p>The phone number of the supplier. Example: <code>555-5678</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>location</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="location"                data-endpoint="PUTapi-v1-suppliers--id-"
+               value="New York"
+               data-component="body">
+    <br>
+<p>The location of the supplier. Example: <code>New York</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_terms</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_terms"                data-endpoint="PUTapi-v1-suppliers--id-"
+               value="Net 60"
+               data-component="body">
+    <br>
+<p>The payment terms with the supplier. Example: <code>Net 60</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="PUTapi-v1-suppliers--id-"
+               value="supplierb@example.com"
+               data-component="body">
+    <br>
+<p>The email address of the supplier. Example: <code>supplierb@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>image</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="image"                data-endpoint="PUTapi-v1-suppliers--id-"
+               value="http://example.com/image2.jpg"
+               data-component="body">
+    <br>
+<p>The URL or path to the supplier's image. Example: <code>http://example.com/image2.jpg</code></p>
+        </div>
+        </form>
 
                     <h2 id="suppliers-DELETEapi-v1-suppliers--id-">Remove the specified resource from storage.</h2>
 
@@ -26660,7 +33278,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-suppliers--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-suppliers--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-suppliers--id-"></span>:
@@ -26756,6 +33380,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the supplier. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>supplier</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="supplier"                data-endpoint="DELETEapi-v1-suppliers--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the supplier to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -26972,7 +33608,13 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/taxes" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"Sales Tax\",
+    \"rate\": \"0.05\",
+    \"is_active\": true
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -26986,15 +33628,38 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "Sales Tax",
+    "rate": "0.05",
+    "is_active": true
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-taxes">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Sales Tax&quot;,
+        &quot;rate&quot;: 0.05000000000000000277555756156289135105907917022705078125,
+        &quot;is_active&quot;: true,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-taxes" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-taxes"></span>:
@@ -27078,7 +33743,54 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-taxes"
+               value="Sales Tax"
+               data-component="body">
+    <br>
+<p>The name of the tax. Example: <code>Sales Tax</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>rate</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="rate"                data-endpoint="POSTapi-v1-taxes"
+               value="0.05"
+               data-component="body">
+    <br>
+<p>The tax rate. Example: <code>0.05</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_active</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-v1-taxes" style="display: none">
+            <input type="radio" name="is_active"
+                   value="true"
+                   data-endpoint="POSTapi-v1-taxes"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-v1-taxes" style="display: none">
+            <input type="radio" name="is_active"
+                   value="false"
+                   data-endpoint="POSTapi-v1-taxes"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Is the tax active. Example: <code>true</code></p>
+        </div>
+        </form>
 
                     <h2 id="taxes-GETapi-v1-taxes--id-">Display the specified tax.</h2>
 
@@ -27263,7 +33975,13 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/taxes/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"VAT\",
+    \"rate\": \"0.10\",
+    \"is_active\": true
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -27277,15 +33995,38 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "VAT",
+    "rate": "0.10",
+    "is_active": true
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-taxes--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;VAT&quot;,
+        &quot;rate&quot;: 0.1000000000000000055511151231257827021181583404541015625,
+        &quot;is_active&quot;: true,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-taxes--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-taxes--id-"></span>:
@@ -27386,7 +34127,66 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the tax. Example: <code>17</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>tax</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="tax"                data-endpoint="PUTapi-v1-taxes--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the tax. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-taxes--id-"
+               value="VAT"
+               data-component="body">
+    <br>
+<p>The name of the tax. Example: <code>VAT</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>rate</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="rate"                data-endpoint="PUTapi-v1-taxes--id-"
+               value="0.10"
+               data-component="body">
+    <br>
+<p>The tax rate. Example: <code>0.10</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_active</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="PUTapi-v1-taxes--id-" style="display: none">
+            <input type="radio" name="is_active"
+                   value="true"
+                   data-endpoint="PUTapi-v1-taxes--id-"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="PUTapi-v1-taxes--id-" style="display: none">
+            <input type="radio" name="is_active"
+                   value="false"
+                   data-endpoint="PUTapi-v1-taxes--id-"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Is the tax active. Example: <code>true</code></p>
+        </div>
+        </form>
 
                     <h2 id="taxes-DELETEapi-v1-taxes--id-">Remove the specified resource from storage.</h2>
 
@@ -27427,7 +34227,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-taxes--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-taxes--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-taxes--id-"></span>:
@@ -27524,6 +34330,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the tax. Example: <code>17</code></p>
             </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>tax</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="tax"                data-endpoint="DELETEapi-v1-taxes--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the tax to delete. Example: <code>1</code></p>
+            </div>
                     </form>
 
                 <h1 id="transactions">Transactions</h1>
@@ -27576,7 +34394,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-transactions">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -27588,7 +34406,625 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;journal_entry_id&quot;: 1,
+            &quot;account_id&quot;: 7,
+            &quot;type&quot;: &quot;debit&quot;,
+            &quot;amount&quot;: &quot;1260.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 7,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                &quot;code&quot;: &quot;1140&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;journal_entry_id&quot;: 1,
+            &quot;account_id&quot;: 3,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;1260.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 3,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                &quot;code&quot;: &quot;1110&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;journal_entry_id&quot;: 2,
+            &quot;account_id&quot;: 7,
+            &quot;type&quot;: &quot;debit&quot;,
+            &quot;amount&quot;: &quot;1260.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 7,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                &quot;code&quot;: &quot;1140&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;journal_entry_id&quot;: 2,
+            &quot;account_id&quot;: 18,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;1260.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 18,
+                &quot;parent_id&quot;: 17,
+                &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                &quot;code&quot;: &quot;2110&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;journal_entry_id&quot;: 3,
+            &quot;account_id&quot;: 7,
+            &quot;type&quot;: &quot;debit&quot;,
+            &quot;amount&quot;: &quot;5400.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 7,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                &quot;code&quot;: &quot;1140&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;journal_entry_id&quot;: 3,
+            &quot;account_id&quot;: 3,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;2260.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 3,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                &quot;code&quot;: &quot;1110&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;journal_entry_id&quot;: 3,
+            &quot;account_id&quot;: 18,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;3140.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 18,
+                &quot;parent_id&quot;: 17,
+                &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                &quot;code&quot;: &quot;2110&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;journal_entry_id&quot;: 4,
+            &quot;account_id&quot;: 7,
+            &quot;type&quot;: &quot;debit&quot;,
+            &quot;amount&quot;: &quot;4200.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 7,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                &quot;code&quot;: &quot;1140&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;journal_entry_id&quot;: 4,
+            &quot;account_id&quot;: 3,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;2764.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 3,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                &quot;code&quot;: &quot;1110&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;journal_entry_id&quot;: 4,
+            &quot;account_id&quot;: 18,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;1436.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 18,
+                &quot;parent_id&quot;: 17,
+                &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                &quot;code&quot;: &quot;2110&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;journal_entry_id&quot;: 5,
+            &quot;account_id&quot;: 7,
+            &quot;type&quot;: &quot;debit&quot;,
+            &quot;amount&quot;: &quot;3930.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 7,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                &quot;code&quot;: &quot;1140&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 12,
+            &quot;journal_entry_id&quot;: 5,
+            &quot;account_id&quot;: 3,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;1569.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 3,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                &quot;code&quot;: &quot;1110&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 13,
+            &quot;journal_entry_id&quot;: 5,
+            &quot;account_id&quot;: 18,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;2361.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 18,
+                &quot;parent_id&quot;: 17,
+                &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                &quot;code&quot;: &quot;2110&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 14,
+            &quot;journal_entry_id&quot;: 6,
+            &quot;account_id&quot;: 7,
+            &quot;type&quot;: &quot;debit&quot;,
+            &quot;amount&quot;: &quot;6040.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 7,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                &quot;code&quot;: &quot;1140&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 15,
+            &quot;journal_entry_id&quot;: 6,
+            &quot;account_id&quot;: 3,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;6040.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 3,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                &quot;code&quot;: &quot;1110&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 16,
+            &quot;journal_entry_id&quot;: 7,
+            &quot;account_id&quot;: 7,
+            &quot;type&quot;: &quot;debit&quot;,
+            &quot;amount&quot;: &quot;4980.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 7,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                &quot;code&quot;: &quot;1140&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 17,
+            &quot;journal_entry_id&quot;: 7,
+            &quot;account_id&quot;: 18,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;4980.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 18,
+                &quot;parent_id&quot;: 17,
+                &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                &quot;code&quot;: &quot;2110&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 18,
+            &quot;journal_entry_id&quot;: 8,
+            &quot;account_id&quot;: 7,
+            &quot;type&quot;: &quot;debit&quot;,
+            &quot;amount&quot;: &quot;360.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 7,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                &quot;code&quot;: &quot;1140&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 19,
+            &quot;journal_entry_id&quot;: 8,
+            &quot;account_id&quot;: 3,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;360.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 3,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                &quot;code&quot;: &quot;1110&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 20,
+            &quot;journal_entry_id&quot;: 9,
+            &quot;account_id&quot;: 7,
+            &quot;type&quot;: &quot;debit&quot;,
+            &quot;amount&quot;: &quot;5400.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 7,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                &quot;code&quot;: &quot;1140&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 21,
+            &quot;journal_entry_id&quot;: 9,
+            &quot;account_id&quot;: 3,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;4238.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 3,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                &quot;code&quot;: &quot;1110&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 22,
+            &quot;journal_entry_id&quot;: 9,
+            &quot;account_id&quot;: 18,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;1162.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 18,
+                &quot;parent_id&quot;: 17,
+                &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                &quot;code&quot;: &quot;2110&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 23,
+            &quot;journal_entry_id&quot;: 10,
+            &quot;account_id&quot;: 7,
+            &quot;type&quot;: &quot;debit&quot;,
+            &quot;amount&quot;: &quot;7400.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 7,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+                &quot;code&quot;: &quot;1140&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 24,
+            &quot;journal_entry_id&quot;: 10,
+            &quot;account_id&quot;: 3,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;1044.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 3,
+                &quot;parent_id&quot;: 2,
+                &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+                &quot;code&quot;: &quot;1110&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 25,
+            &quot;journal_entry_id&quot;: 10,
+            &quot;account_id&quot;: 18,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;amount&quot;: &quot;6356.00&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;account&quot;: {
+                &quot;id&quot;: 18,
+                &quot;parent_id&quot;: 17,
+                &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+                &quot;code&quot;: &quot;2110&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+                &quot;level&quot;: 2,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/transactions?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/transactions?page=52&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: &quot;http://localhost:8000/api/v1/transactions?page=2&quot;
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 52,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=2&quot;,
+                &quot;label&quot;: &quot;2&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=3&quot;,
+                &quot;label&quot;: &quot;3&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=4&quot;,
+                &quot;label&quot;: &quot;4&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=5&quot;,
+                &quot;label&quot;: &quot;5&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=6&quot;,
+                &quot;label&quot;: &quot;6&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=7&quot;,
+                &quot;label&quot;: &quot;7&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=8&quot;,
+                &quot;label&quot;: &quot;8&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=9&quot;,
+                &quot;label&quot;: &quot;9&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=10&quot;,
+                &quot;label&quot;: &quot;10&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;...&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=51&quot;,
+                &quot;label&quot;: &quot;51&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=52&quot;,
+                &quot;label&quot;: &quot;52&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/transactions?page=2&quot;,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/transactions&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 25,
+        &quot;total&quot;: 1297
+    }
 }</code>
  </pre>
     </span>
@@ -27707,7 +35143,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/transactions" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"journal_entry_id\": 1,
+    \"account_id\": 1,
+    \"type\": \"credit\",
+    \"amount\": \"50.00\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -27721,15 +35164,40 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "journal_entry_id": 1,
+    "account_id": 1,
+    "type": "credit",
+    "amount": "50.00"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-transactions">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;journal_entry_id&quot;: 1,
+        &quot;account_id&quot;: 1,
+        &quot;type&quot;: &quot;credit&quot;,
+        &quot;amount&quot;: 50,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-transactions" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-transactions"></span>:
@@ -27813,7 +35281,56 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>journal_entry_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="journal_entry_id"                data-endpoint="POSTapi-v1-transactions"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the journal entry. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>account_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="account_id"                data-endpoint="POSTapi-v1-transactions"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the account. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="type"                data-endpoint="POSTapi-v1-transactions"
+               value="credit"
+               data-component="body">
+    <br>
+<p>The type of transaction (e.g., debit, credit). Example: <code>credit</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="amount"                data-endpoint="POSTapi-v1-transactions"
+               value="50.00"
+               data-component="body">
+    <br>
+<p>The amount of the transaction. Example: <code>50.00</code></p>
+        </div>
+        </form>
 
                     <h2 id="transactions-GETapi-v1-transactions--id-">Display the specified transaction.</h2>
 
@@ -27855,7 +35372,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-transactions--id-">
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -27867,7 +35384,27 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;journal_entry_id&quot;: 1,
+        &quot;account_id&quot;: 7,
+        &quot;type&quot;: &quot;debit&quot;,
+        &quot;amount&quot;: &quot;1260.00&quot;,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;account&quot;: {
+            &quot;id&quot;: 7,
+            &quot;parent_id&quot;: 2,
+            &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+            &quot;code&quot;: &quot;1140&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        }
+    }
 }</code>
  </pre>
     </span>
@@ -27998,7 +35535,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/transactions/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"journal_entry_id\": 1,
+    \"account_id\": 1,
+    \"type\": \"debit\",
+    \"amount\": \"100.00\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -28012,15 +35556,40 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "journal_entry_id": 1,
+    "account_id": 1,
+    "type": "debit",
+    "amount": "100.00"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-transactions--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;journal_entry_id&quot;: 1,
+        &quot;account_id&quot;: 1,
+        &quot;type&quot;: &quot;debit&quot;,
+        &quot;amount&quot;: 100,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-transactions--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-transactions--id-"></span>:
@@ -28121,7 +35690,68 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the transaction. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>transaction</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="transaction"                data-endpoint="PUTapi-v1-transactions--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the transaction. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>journal_entry_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="journal_entry_id"                data-endpoint="PUTapi-v1-transactions--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the journal entry. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>account_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="account_id"                data-endpoint="PUTapi-v1-transactions--id-"
+               value="1"
+               data-component="body">
+    <br>
+<p>The ID of the account. Example: <code>1</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="type"                data-endpoint="PUTapi-v1-transactions--id-"
+               value="debit"
+               data-component="body">
+    <br>
+<p>The type of transaction (e.g., debit, credit). Example: <code>debit</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="amount"                data-endpoint="PUTapi-v1-transactions--id-"
+               value="100.00"
+               data-component="body">
+    <br>
+<p>The amount of the transaction. Example: <code>100.00</code></p>
+        </div>
+        </form>
 
                     <h2 id="transactions-DELETEapi-v1-transactions--id-">Remove the specified resource from storage.</h2>
 
@@ -28162,7 +35792,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-transactions--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-transactions--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-transactions--id-"></span>:
@@ -28258,6 +35894,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the transaction. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>transaction</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="transaction"                data-endpoint="DELETEapi-v1-transactions--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the transaction to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -28496,7 +36144,12 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/units" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"Piece\",
+    \"symbol\": \"pc\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -28510,15 +36163,36 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "Piece",
+    "symbol": "pc"
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-units">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Piece&quot;,
+        &quot;symbol&quot;: &quot;pc&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-units" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-units"></span>:
@@ -28602,7 +36276,32 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-units"
+               value="Piece"
+               data-component="body">
+    <br>
+<p>The name of the unit. Example: <code>Piece</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>symbol</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="symbol"                data-endpoint="POSTapi-v1-units"
+               value="pc"
+               data-component="body">
+    <br>
+<p>The symbol of the unit. Example: <code>pc</code></p>
+        </div>
+        </form>
 
                     <h2 id="units-GETapi-v1-units--id-">Display the specified unit.</h2>
 
@@ -28793,7 +36492,12 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/units/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"Kilogram\",
+    \"symbol\": \"kg\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -28807,15 +36511,36 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "Kilogram",
+    "symbol": "kg"
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-units--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Kilogram&quot;,
+        &quot;symbol&quot;: &quot;kg&quot;,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-units--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-units--id-"></span>:
@@ -28916,7 +36641,44 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the unit. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>unit</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="unit"                data-endpoint="PUTapi-v1-units--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the unit. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-units--id-"
+               value="Kilogram"
+               data-component="body">
+    <br>
+<p>The name of the unit. Example: <code>Kilogram</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>symbol</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="symbol"                data-endpoint="PUTapi-v1-units--id-"
+               value="kg"
+               data-component="body">
+    <br>
+<p>The symbol of the unit. Example: <code>kg</code></p>
+        </div>
+        </form>
 
                     <h2 id="units-DELETEapi-v1-units--id-">Remove the specified resource from storage.</h2>
 
@@ -28957,7 +36719,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-units--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-units--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-units--id-"></span>:
@@ -29053,6 +36821,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the unit. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>unit</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="unit"                data-endpoint="DELETEapi-v1-units--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the unit to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -29336,7 +37116,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/users" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"John Doe\",
+    \"shopname\": \"John\'s Shop\",
+    \"address\": \"123 Main St\",
+    \"email\": \"john.doe@example.com\",
+    \"password\": \"password123\",
+    \"avatar\": \"http:\\/\\/example.com\\/avatar1.jpg\",
+    \"timezone\": \"Asia\\/Jakarta\",
+    \"system_settings\": null,
+    \"accounting_settings\": null
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -29350,15 +37142,53 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "John Doe",
+    "shopname": "John's Shop",
+    "address": "123 Main St",
+    "email": "john.doe@example.com",
+    "password": "password123",
+    "avatar": "http:\/\/example.com\/avatar1.jpg",
+    "timezone": "Asia\/Jakarta",
+    "system_settings": null,
+    "accounting_settings": null
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-users">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;John Doe&quot;,
+        &quot;shopname&quot;: &quot;John&#039;s Shop&quot;,
+        &quot;address&quot;: &quot;123 Main St&quot;,
+        &quot;email&quot;: &quot;john.doe@example.com&quot;,
+        &quot;avatar&quot;: &quot;http://example.com/avatar1.jpg&quot;,
+        &quot;timezone&quot;: &quot;Asia/Jakarta&quot;,
+        &quot;system_settings&quot;: {
+            &quot;theme&quot;: &quot;light&quot;
+        },
+        &quot;accounting_settings&quot;: {
+            &quot;currency&quot;: &quot;IDR&quot;
+        },
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-users" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-users"></span>:
@@ -29442,7 +37272,120 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-users"
+               value="John Doe"
+               data-component="body">
+    <br>
+<p>The name of the user. Example: <code>John Doe</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>shopname</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="shopname"                data-endpoint="POSTapi-v1-users"
+               value="John's Shop"
+               data-component="body">
+    <br>
+<p>The shop name of the user. Example: <code>John's Shop</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="address"                data-endpoint="POSTapi-v1-users"
+               value="123 Main St"
+               data-component="body">
+    <br>
+<p>The address of the user. Example: <code>123 Main St</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-v1-users"
+               value="john.doe@example.com"
+               data-component="body">
+    <br>
+<p>The email address of the user. Example: <code>john.doe@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>password</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="password"                data-endpoint="POSTapi-v1-users"
+               value="password123"
+               data-component="body">
+    <br>
+<p>The password for the user. Example: <code>password123</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>avatar</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="avatar"                data-endpoint="POSTapi-v1-users"
+               value="http://example.com/avatar1.jpg"
+               data-component="body">
+    <br>
+<p>The URL or path to the user's avatar. Example: <code>http://example.com/avatar1.jpg</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>timezone</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="timezone"                data-endpoint="POSTapi-v1-users"
+               value="Asia/Jakarta"
+               data-component="body">
+    <br>
+<p>The timezone of the user. Example: <code>Asia/Jakarta</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>system_settings</code></b>&nbsp;&nbsp;
+<small>string[]</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="system_settings[0]"                data-endpoint="POSTapi-v1-users"
+               data-component="body">
+        <input type="text" style="display: none"
+               name="system_settings[1]"                data-endpoint="POSTapi-v1-users"
+               data-component="body">
+    <br>
+<p>System settings for the user.</p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>accounting_settings</code></b>&nbsp;&nbsp;
+<small>string[]</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="accounting_settings[0]"                data-endpoint="POSTapi-v1-users"
+               data-component="body">
+        <input type="text" style="display: none"
+               name="accounting_settings[1]"                data-endpoint="POSTapi-v1-users"
+               data-component="body">
+    <br>
+<p>Accounting settings for the user.</p>
+        </div>
+        </form>
 
                     <h2 id="users-GETapi-v1-users--id-">Display the specified user.</h2>
 
@@ -29659,7 +37602,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/users/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"Jane Doe\",
+    \"shopname\": \"Jane\'s Shop\",
+    \"address\": \"456 Oak Ave\",
+    \"email\": \"jane.doe@example.com\",
+    \"password\": \"newpassword123\",
+    \"avatar\": \"http:\\/\\/example.com\\/avatar2.jpg\",
+    \"timezone\": \"America\\/New_York\",
+    \"system_settings\": null,
+    \"accounting_settings\": null
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -29673,15 +37628,53 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "Jane Doe",
+    "shopname": "Jane's Shop",
+    "address": "456 Oak Ave",
+    "email": "jane.doe@example.com",
+    "password": "newpassword123",
+    "avatar": "http:\/\/example.com\/avatar2.jpg",
+    "timezone": "America\/New_York",
+    "system_settings": null,
+    "accounting_settings": null
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-users--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Jane Doe&quot;,
+        &quot;shopname&quot;: &quot;Jane&#039;s Shop&quot;,
+        &quot;address&quot;: &quot;456 Oak Ave&quot;,
+        &quot;email&quot;: &quot;jane.doe@example.com&quot;,
+        &quot;avatar&quot;: &quot;http://example.com/avatar2.jpg&quot;,
+        &quot;timezone&quot;: &quot;America/New_York&quot;,
+        &quot;system_settings&quot;: {
+            &quot;theme&quot;: &quot;dark&quot;
+        },
+        &quot;accounting_settings&quot;: {
+            &quot;currency&quot;: &quot;USD&quot;
+        },
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-users--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-users--id-"></span>:
@@ -29782,7 +37775,132 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the user. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>user</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="user"                data-endpoint="PUTapi-v1-users--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the user. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-users--id-"
+               value="Jane Doe"
+               data-component="body">
+    <br>
+<p>The name of the user. Example: <code>Jane Doe</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>shopname</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="shopname"                data-endpoint="PUTapi-v1-users--id-"
+               value="Jane's Shop"
+               data-component="body">
+    <br>
+<p>The shop name of the user. Example: <code>Jane's Shop</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="address"                data-endpoint="PUTapi-v1-users--id-"
+               value="456 Oak Ave"
+               data-component="body">
+    <br>
+<p>The address of the user. Example: <code>456 Oak Ave</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="PUTapi-v1-users--id-"
+               value="jane.doe@example.com"
+               data-component="body">
+    <br>
+<p>The email address of the user. Example: <code>jane.doe@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>password</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="password"                data-endpoint="PUTapi-v1-users--id-"
+               value="newpassword123"
+               data-component="body">
+    <br>
+<p>The password for the user. Example: <code>newpassword123</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>avatar</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="avatar"                data-endpoint="PUTapi-v1-users--id-"
+               value="http://example.com/avatar2.jpg"
+               data-component="body">
+    <br>
+<p>The URL or path to the user's avatar. Example: <code>http://example.com/avatar2.jpg</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>timezone</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="timezone"                data-endpoint="PUTapi-v1-users--id-"
+               value="America/New_York"
+               data-component="body">
+    <br>
+<p>The timezone of the user. Example: <code>America/New_York</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>system_settings</code></b>&nbsp;&nbsp;
+<small>string[]</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="system_settings[0]"                data-endpoint="PUTapi-v1-users--id-"
+               data-component="body">
+        <input type="text" style="display: none"
+               name="system_settings[1]"                data-endpoint="PUTapi-v1-users--id-"
+               data-component="body">
+    <br>
+<p>System settings for the user.</p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>accounting_settings</code></b>&nbsp;&nbsp;
+<small>string[]</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="accounting_settings[0]"                data-endpoint="PUTapi-v1-users--id-"
+               data-component="body">
+        <input type="text" style="display: none"
+               name="accounting_settings[1]"                data-endpoint="PUTapi-v1-users--id-"
+               data-component="body">
+    <br>
+<p>Accounting settings for the user.</p>
+        </div>
+        </form>
 
                     <h2 id="users-DELETEapi-v1-users--id-">Remove the specified resource from storage.</h2>
 
@@ -29823,7 +37941,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-users--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-users--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-users--id-"></span>:
@@ -29919,6 +38043,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the user. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>user</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="user"                data-endpoint="DELETEapi-v1-users--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the user to delete. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -30163,7 +38299,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/warehouses" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"Secondary Warehouse\",
+    \"address\": \"456 Storage Rd\",
+    \"description\": \"Overflow storage.\",
+    \"is_main\": false
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -30177,15 +38320,40 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "Secondary Warehouse",
+    "address": "456 Storage Rd",
+    "description": "Overflow storage.",
+    "is_main": false
+};
+
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-warehouses">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Secondary Warehouse&quot;,
+        &quot;address&quot;: &quot;456 Storage Rd&quot;,
+        &quot;description&quot;: &quot;Overflow storage.&quot;,
+        &quot;is_main&quot;: false,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-warehouses" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-warehouses"></span>:
@@ -30269,7 +38437,66 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-warehouses"
+               value="Secondary Warehouse"
+               data-component="body">
+    <br>
+<p>The name of the warehouse. Example: <code>Secondary Warehouse</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="address"                data-endpoint="POSTapi-v1-warehouses"
+               value="456 Storage Rd"
+               data-component="body">
+    <br>
+<p>The address of the warehouse. Example: <code>456 Storage Rd</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="POSTapi-v1-warehouses"
+               value="Overflow storage."
+               data-component="body">
+    <br>
+<p>A description of the warehouse. Example: <code>Overflow storage.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_main</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-v1-warehouses" style="display: none">
+            <input type="radio" name="is_main"
+                   value="true"
+                   data-endpoint="POSTapi-v1-warehouses"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-v1-warehouses" style="display: none">
+            <input type="radio" name="is_main"
+                   value="false"
+                   data-endpoint="POSTapi-v1-warehouses"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Is this the main warehouse. Example: <code>false</code></p>
+        </div>
+        </form>
 
                     <h2 id="warehouses-GETapi-v1-warehouses--id-">Display the specified warehouse.</h2>
 
@@ -30462,7 +38689,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     "http://localhost:8000/api/v1/warehouses/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"Main Warehouse\",
+    \"address\": \"123 Warehouse St\",
+    \"description\": \"Primary storage facility.\",
+    \"is_main\": true
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -30476,15 +38710,40 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "name": "Main Warehouse",
+    "address": "123 Warehouse St",
+    "description": "Primary storage facility.",
+    "is_main": true
+};
+
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-warehouses--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Main Warehouse&quot;,
+        &quot;address&quot;: &quot;123 Warehouse St&quot;,
+        &quot;description&quot;: &quot;Primary storage facility.&quot;,
+        &quot;is_main&quot;: true,
+        &quot;created_at&quot;: &quot;2023-10-26T12:00:00.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2023-10-27T12:00:00.000000Z&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-warehouses--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-warehouses--id-"></span>:
@@ -30585,7 +38844,78 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the warehouse. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>warehouse</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="warehouse"                data-endpoint="PUTapi-v1-warehouses--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the warehouse. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-warehouses--id-"
+               value="Main Warehouse"
+               data-component="body">
+    <br>
+<p>The name of the warehouse. Example: <code>Main Warehouse</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="address"                data-endpoint="PUTapi-v1-warehouses--id-"
+               value="123 Warehouse St"
+               data-component="body">
+    <br>
+<p>The address of the warehouse. Example: <code>123 Warehouse St</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="PUTapi-v1-warehouses--id-"
+               value="Primary storage facility."
+               data-component="body">
+    <br>
+<p>A description of the warehouse. Example: <code>Primary storage facility.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_main</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="PUTapi-v1-warehouses--id-" style="display: none">
+            <input type="radio" name="is_main"
+                   value="true"
+                   data-endpoint="PUTapi-v1-warehouses--id-"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="PUTapi-v1-warehouses--id-" style="display: none">
+            <input type="radio" name="is_main"
+                   value="false"
+                   data-endpoint="PUTapi-v1-warehouses--id-"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Is this the main warehouse. Example: <code>true</code></p>
+        </div>
+        </form>
 
                     <h2 id="warehouses-DELETEapi-v1-warehouses--id-">Remove the specified resource from storage.</h2>
 
@@ -30626,7 +38956,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-warehouses--id-">
-</span>
+            <blockquote>
+            <p>Example response (204, Success):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-warehouses--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-warehouses--id-"></span>:
@@ -30722,6 +39058,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the warehouse. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>warehouse</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="warehouse"                data-endpoint="DELETEapi-v1-warehouses--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the warehouse to delete. Example: <code>1</code></p>
             </div>
                     </form>
 

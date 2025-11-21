@@ -48,6 +48,45 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: |-
+          {
+              "data": [
+                  {
+                      "id": 1,
+                      "po_id": 1,
+                      "product_id": 1,
+                      "quantity": 10,
+                      "price": "100.00",
+                      "discount": "0.00",
+                      "discount_type": "fixed",
+                      "total": "1000.00",
+                      "expiry_date": null,
+                      "remaining_quantity": 10,
+                      "created_at": "2025-11-21T08:30:00.000000Z",
+                      "updated_at": "2025-11-21T08:30:00.000000Z"
+                  }
+              ],
+              "links": {
+                  "first": "/api/v1/po-items?page=1",
+                  "last": "/api/v1/po-items?page=1",
+                  "prev": null,
+                  "next": null
+              },
+              "meta": {
+                  "current_page": 1,
+                  "from": 1,
+                  "last_page": 1,
+                  "path": "/api/v1/po-items",
+                  "per_page": 15,
+                  "to": 1,
+                  "total": 1
+              }
+          }
+        headers: []
+        description: OK
+      -
+        custom: []
         status: 500
         content: |-
           {
@@ -91,10 +130,124 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      po_id:
+        custom: []
+        name: po_id
+        description: 'The <code>id</code> of an existing record in the po table.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      product_id:
+        custom: []
+        name: product_id
+        description: 'The <code>id</code> of an existing record in the products table.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      quantity:
+        custom: []
+        name: quantity
+        description: ''
+        required: true
+        example: 11613.31890586
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: ''
+        required: true
+        example: 11613.31890586
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      discount:
+        custom: []
+        name: discount
+        description: ''
+        required: false
+        example: 11613.31890586
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      discount_type:
+        custom: []
+        name: discount_type
+        description: ''
+        required: false
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      total:
+        custom: []
+        name: total
+        description: ''
+        required: true
+        example: 11613.31890586
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      expiry_date:
+        custom: []
+        name: expiry_date
+        description: 'Must be a valid date.'
+        required: false
+        example: '2025-11-21T05:52:55'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      remaining_quantity:
+        custom: []
+        name: remaining_quantity
+        description: ''
+        required: false
+        example: 11613.31890586
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      po_id: consequatur
+      product_id: consequatur
+      quantity: 11613.31890586
+      price: 11613.31890586
+      discount: 11613.31890586
+      discount_type: consequatur
+      total: 11613.31890586
+      expiry_date: '2025-11-21T05:52:55'
+      remaining_quantity: 11613.31890586
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers
@@ -158,6 +311,26 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: |-
+          {
+              "id": 1,
+              "po_id": 1,
+              "product_id": 1,
+              "quantity": 10,
+              "price": "100.00",
+              "discount": "0.00",
+              "discount_type": "fixed",
+              "total": "1000.00",
+              "expiry_date": null,
+              "remaining_quantity": 10,
+              "created_at": "2025-11-21T08:30:00.000000Z",
+              "updated_at": "2025-11-21T08:30:00.000000Z"
+          }
+        headers: []
+        description: OK
+      -
+        custom: []
         status: 500
         content: |-
           {
@@ -214,10 +387,124 @@ endpoints:
       id: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      po_id:
+        custom: []
+        name: po_id
+        description: 'The <code>id</code> of an existing record in the po table.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      product_id:
+        custom: []
+        name: product_id
+        description: 'The <code>id</code> of an existing record in the products table.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      quantity:
+        custom: []
+        name: quantity
+        description: ''
+        required: true
+        example: 11613.31890586
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: ''
+        required: true
+        example: 11613.31890586
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      discount:
+        custom: []
+        name: discount
+        description: ''
+        required: false
+        example: 11613.31890586
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      discount_type:
+        custom: []
+        name: discount_type
+        description: ''
+        required: false
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      total:
+        custom: []
+        name: total
+        description: ''
+        required: true
+        example: 11613.31890586
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      expiry_date:
+        custom: []
+        name: expiry_date
+        description: 'Must be a valid date.'
+        required: false
+        example: '2025-11-21T05:52:55'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      remaining_quantity:
+        custom: []
+        name: remaining_quantity
+        description: ''
+        required: false
+        example: 11613.31890586
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      po_id: consequatur
+      product_id: consequatur
+      quantity: 11613.31890586
+      price: 11613.31890586
+      discount: 11613.31890586
+      discount_type: consequatur
+      total: 11613.31890586
+      expiry_date: '2025-11-21T05:52:55'
+      remaining_quantity: 11613.31890586
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers
@@ -266,7 +553,13 @@ endpoints:
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

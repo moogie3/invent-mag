@@ -88,10 +88,64 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      sales_pipeline_id:
+        custom: []
+        name: sales_pipeline_id
+        description: 'The <code>id</code> of an existing record in the sales_pipelines table.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: mqeopfuudtdsufvyvddqa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      position:
+        custom: []
+        name: position
+        description: ''
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      is_closed:
+        custom: []
+        name: is_closed
+        description: ''
+        required: true
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      sales_pipeline_id: consequatur
+      name: mqeopfuudtdsufvyvddqa
+      position: 17
+      is_closed: true
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers
@@ -211,10 +265,64 @@ endpoints:
       id: 17
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      sales_pipeline_id:
+        custom: []
+        name: sales_pipeline_id
+        description: 'The <code>id</code> of an existing record in the sales_pipelines table.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: mqeopfuudtdsufvyvddqa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      position:
+        custom: []
+        name: position
+        description: ''
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      is_closed:
+        custom: []
+        name: is_closed
+        description: ''
+        required: true
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      sales_pipeline_id: consequatur
+      name: mqeopfuudtdsufvyvddqa
+      position: 17
+      is_closed: false
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers
@@ -263,7 +371,13 @@ endpoints:
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

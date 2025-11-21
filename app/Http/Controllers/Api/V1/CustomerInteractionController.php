@@ -28,10 +28,22 @@ class CustomerInteractionController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @response 201 scenario="Success"
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'user_id' => 'required|exists:users,id',
+            'type' => 'required|string|max:255',
+            'notes' => 'nullable|string',
+            'interaction_date' => 'required|date',
+        ]);
+
+        $customer_interaction = CustomerInteraction::create($validated);
+
+        return new CustomerInteractionResource($customer_interaction);
     }
 
     /**
@@ -46,17 +58,33 @@ class CustomerInteractionController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @response 200 scenario="Success"
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, CustomerInteraction $customer_interaction)
     {
-        //
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'user_id' => 'required|exists:users,id',
+            'type' => 'required|string|max:255',
+            'notes' => 'nullable|string',
+            'interaction_date' => 'required|date',
+        ]);
+
+        $customer_interaction->update($validated);
+
+        return new CustomerInteractionResource($customer_interaction);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @response 204 scenario="Success"
      */
-    public function destroy(string $id)
+    public function destroy(CustomerInteraction $customer_interaction)
     {
-        //
+        $customer_interaction->delete();
+
+        return response()->noContent();
     }
 }

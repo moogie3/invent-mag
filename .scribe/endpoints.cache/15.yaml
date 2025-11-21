@@ -88,10 +88,140 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      customer_id:
+        custom: []
+        name: customer_id
+        description: 'The ID of the customer.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sales_pipeline_id:
+        custom: []
+        name: sales_pipeline_id
+        description: 'The ID of the sales pipeline.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      pipeline_stage_id:
+        custom: []
+        name: pipeline_stage_id
+        description: 'The ID of the pipeline stage.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the sales opportunity.'
+        required: true
+        example: 'New Client Project'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the sales opportunity.'
+        required: false
+        example: 'Develop a new e-commerce platform.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'The estimated amount of the opportunity.'
+        required: false
+        example: '50000.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      expected_close_date:
+        custom: []
+        name: expected_close_date
+        description: 'The expected close date of the opportunity.'
+        required: false
+        example: '2024-12-31'
+        type: date
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+        required: false
+        example: Open
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sales_id:
+        custom: []
+        name: sales_id
+        description: 'The ID of the associated sales record.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      customer_id: 1
+      sales_pipeline_id: 1
+      pipeline_stage_id: 1
+      name: 'New Client Project'
+      description: 'Develop a new e-commerce platform.'
+      amount: '50000.00'
+      expected_close_date: '2024-12-31'
+      status: Open
+      sales_id: 1
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "customer_id": 1,
+                  "sales_pipeline_id": 1,
+                  "pipeline_stage_id": 1,
+                  "name": "New Client Project",
+                  "description": "Develop a new e-commerce platform.",
+                  "amount": 50000.00,
+                  "expected_close_date": "2024-12-31",
+                  "status": "Open",
+                  "sales_id": 1,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-26T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -207,14 +337,156 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      sales_opportunity:
+        custom: []
+        name: sales_opportunity
+        description: 'The ID of the sales opportunity.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 17
+      sales_opportunity: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      customer_id:
+        custom: []
+        name: customer_id
+        description: 'The ID of the customer.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sales_pipeline_id:
+        custom: []
+        name: sales_pipeline_id
+        description: 'The ID of the sales pipeline.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      pipeline_stage_id:
+        custom: []
+        name: pipeline_stage_id
+        description: 'The ID of the pipeline stage.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the sales opportunity.'
+        required: true
+        example: 'New Client Project'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the sales opportunity.'
+        required: false
+        example: 'Develop a new e-commerce platform.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'The estimated amount of the opportunity.'
+        required: false
+        example: '50000.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      expected_close_date:
+        custom: []
+        name: expected_close_date
+        description: 'The expected close date of the opportunity.'
+        required: false
+        example: '2024-12-31'
+        type: date
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+        required: false
+        example: Open
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sales_id:
+        custom: []
+        name: sales_id
+        description: 'The ID of the associated sales record.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      customer_id: 1
+      sales_pipeline_id: 1
+      pipeline_stage_id: 1
+      name: 'New Client Project'
+      description: 'Develop a new e-commerce platform.'
+      amount: '50000.00'
+      expected_close_date: '2024-12-31'
+      status: Open
+      sales_id: 1
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "customer_id": 1,
+                  "sales_pipeline_id": 1,
+                  "pipeline_stage_id": 1,
+                  "name": "New Client Project",
+                  "description": "Develop a new e-commerce platform.",
+                  "amount": 50000.00,
+                  "expected_close_date": "2024-12-31",
+                  "status": "Open",
+                  "sales_id": 1,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-27T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -256,14 +528,32 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      sales_opportunity:
+        custom: []
+        name: sales_opportunity
+        description: 'The ID of the sales opportunity to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 17
+      sales_opportunity: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

@@ -88,10 +88,62 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the sales pipeline.'
+        required: true
+        example: 'Initial Sales Pipeline'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the sales pipeline.'
+        required: false
+        example: 'Pipeline for initial customer contact.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      is_default:
+        custom: []
+        name: is_default
+        description: 'Is this the default pipeline.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: 'Initial Sales Pipeline'
+      description: 'Pipeline for initial customer contact.'
+      is_default: false
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "name": "Initial Sales Pipeline",
+                  "description": "Pipeline for initial customer contact.",
+                  "is_default": false,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-26T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -207,14 +259,78 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      sales_pipeline:
+        custom: []
+        name: sales_pipeline
+        description: 'The ID of the sales pipeline.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 17
+      sales_pipeline: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the sales pipeline.'
+        required: true
+        example: 'New Sales Pipeline'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the sales pipeline.'
+        required: false
+        example: 'Pipeline for new leads.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      is_default:
+        custom: []
+        name: is_default
+        description: 'Is this the default pipeline.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: 'New Sales Pipeline'
+      description: 'Pipeline for new leads.'
+      is_default: true
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "name": "New Sales Pipeline",
+                  "description": "Pipeline for new leads.",
+                  "is_default": true,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-27T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -256,14 +372,32 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      sales_pipeline:
+        custom: []
+        name: sales_pipeline
+        description: 'The ID of the sales pipeline to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 17
+      sales_pipeline: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

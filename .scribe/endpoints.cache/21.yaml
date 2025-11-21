@@ -88,10 +88,62 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the tax.'
+        required: true
+        example: 'Sales Tax'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      rate:
+        custom: []
+        name: rate
+        description: 'The tax rate.'
+        required: true
+        example: '0.05'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      is_active:
+        custom: []
+        name: is_active
+        description: 'Is the tax active.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: 'Sales Tax'
+      rate: '0.05'
+      is_active: true
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "name": "Sales Tax",
+                  "rate": 0.05,
+                  "is_active": true,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-26T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -207,14 +259,78 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      tax:
+        custom: []
+        name: tax
+        description: 'The ID of the tax.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 17
+      tax: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the tax.'
+        required: true
+        example: VAT
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      rate:
+        custom: []
+        name: rate
+        description: 'The tax rate.'
+        required: true
+        example: '0.10'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      is_active:
+        custom: []
+        name: is_active
+        description: 'Is the tax active.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: VAT
+      rate: '0.10'
+      is_active: true
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "name": "VAT",
+                  "rate": 0.10,
+                  "is_active": true,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-27T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -256,14 +372,32 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      tax:
+        custom: []
+        name: tax
+        description: 'The ID of the tax to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 17
+      tax: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

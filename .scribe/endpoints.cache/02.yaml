@@ -88,10 +88,100 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      currency_symbol:
+        custom: []
+        name: currency_symbol
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: vmqeopfuudtdsufvyvddq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      decimal_separator:
+        custom: []
+        name: decimal_separator
+        description: 'Must not be greater than 1 character.'
+        required: true
+        example: a
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      thousand_separator:
+        custom: []
+        name: thousand_separator
+        description: 'Must not be greater than 1 character.'
+        required: true
+        example: m
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      decimal_places:
+        custom: []
+        name: decimal_places
+        description: ''
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      position:
+        custom: []
+        name: position
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: mqeopfuudtdsufvyvddqa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      currency_code:
+        custom: []
+        name: currency_code
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: mniihfqcoynlazghdtqtq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      locale:
+        custom: []
+        name: locale
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: tg_TJ
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      currency_symbol: vmqeopfuudtdsufvyvddq
+      decimal_separator: a
+      thousand_separator: m
+      decimal_places: 17
+      position: mqeopfuudtdsufvyvddqa
+      currency_code: mniihfqcoynlazghdtqtq
+      locale: tg_TJ
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers
@@ -208,10 +298,100 @@ endpoints:
       id: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      currency_symbol:
+        custom: []
+        name: currency_symbol
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: vmqeopfuudtdsufvyvddq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      decimal_separator:
+        custom: []
+        name: decimal_separator
+        description: 'Must not be greater than 1 character.'
+        required: true
+        example: a
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      thousand_separator:
+        custom: []
+        name: thousand_separator
+        description: 'Must not be greater than 1 character.'
+        required: true
+        example: m
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      decimal_places:
+        custom: []
+        name: decimal_places
+        description: ''
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      position:
+        custom: []
+        name: position
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: mqeopfuudtdsufvyvddqa
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      currency_code:
+        custom: []
+        name: currency_code
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: mniihfqcoynlazghdtqtq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      locale:
+        custom: []
+        name: locale
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: tg_TJ
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      currency_symbol: vmqeopfuudtdsufvyvddq
+      decimal_separator: a
+      thousand_separator: m
+      decimal_places: 17
+      position: mqeopfuudtdsufvyvddqa
+      currency_code: mniihfqcoynlazghdtqtq
+      locale: tg_TJ
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers
@@ -260,7 +440,13 @@ endpoints:
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

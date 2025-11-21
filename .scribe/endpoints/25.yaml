@@ -86,10 +86,75 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the warehouse.'
+        required: true
+        example: 'Secondary Warehouse'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'The address of the warehouse.'
+        required: false
+        example: '456 Storage Rd'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the warehouse.'
+        required: false
+        example: 'Overflow storage.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      is_main:
+        custom: []
+        name: is_main
+        description: 'Is this the main warehouse.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: 'Secondary Warehouse'
+      address: '456 Storage Rd'
+      description: 'Overflow storage.'
+      is_main: false
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "name": "Secondary Warehouse",
+                  "address": "456 Storage Rd",
+                  "description": "Overflow storage.",
+                  "is_main": false,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-26T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -202,14 +267,91 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      warehouse:
+        custom: []
+        name: warehouse
+        description: 'The ID of the warehouse.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 1
+      warehouse: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the warehouse.'
+        required: true
+        example: 'Main Warehouse'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'The address of the warehouse.'
+        required: false
+        example: '123 Warehouse St'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the warehouse.'
+        required: false
+        example: 'Primary storage facility.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      is_main:
+        custom: []
+        name: is_main
+        description: 'Is this the main warehouse.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: 'Main Warehouse'
+      address: '123 Warehouse St'
+      description: 'Primary storage facility.'
+      is_main: true
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "name": "Main Warehouse",
+                  "address": "123 Warehouse St",
+                  "description": "Primary storage facility.",
+                  "is_main": true,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-27T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -251,14 +393,32 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      warehouse:
+        custom: []
+        name: warehouse
+        description: 'The ID of the warehouse to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 1
+      warehouse: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

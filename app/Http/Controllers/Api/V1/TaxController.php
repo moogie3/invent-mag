@@ -28,10 +28,33 @@ class TaxController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @bodyParam name string required The name of the tax. Example: Sales Tax
+     * @bodyParam rate numeric required The tax rate. Example: 0.05
+     * @bodyParam is_active boolean Is the tax active. Example: true
+     *
+     * @response 201 {
+     *     "data": {
+     *         "id": 1,
+     *         "name": "Sales Tax",
+     *         "rate": 0.05,
+     *         "is_active": true,
+     *         "created_at": "2023-10-26T12:00:00.000000Z",
+     *         "updated_at": "2023-10-26T12:00:00.000000Z"
+     *     }
+     * }
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'rate' => 'required|numeric',
+            'is_active' => 'boolean',
+        ]);
+
+        $tax = Tax::create($validated);
+
+        return new TaxResource($tax);
     }
 
     /**
@@ -46,17 +69,47 @@ class TaxController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @urlParam tax integer required The ID of the tax. Example: 1
+     * @bodyParam name string required The name of the tax. Example: VAT
+     * @bodyParam rate numeric required The tax rate. Example: 0.10
+     * @bodyParam is_active boolean Is the tax active. Example: true
+     *
+     * @response 200 {
+     *     "data": {
+     *         "id": 1,
+     *         "name": "VAT",
+     *         "rate": 0.10,
+     *         "is_active": true,
+     *         "created_at": "2023-10-26T12:00:00.000000Z",
+     *         "updated_at": "2023-10-27T12:00:00.000000Z"
+     *     }
+     * }
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Tax $tax)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'rate' => 'required|numeric',
+            'is_active' => 'boolean',
+        ]);
+
+        $tax->update($validated);
+
+        return new TaxResource($tax);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @urlParam tax integer required The ID of the tax to delete. Example: 1
+     *
+     * @response 204 scenario="Success"
      */
-    public function destroy(string $id)
+    public function destroy(Tax $tax)
     {
-        //
+        $tax->delete();
+
+        return response()->noContent();
     }
 }

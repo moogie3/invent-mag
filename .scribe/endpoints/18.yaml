@@ -86,10 +86,114 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      product_id:
+        custom: []
+        name: product_id
+        description: 'The ID of the product.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      adjustment_type:
+        custom: []
+        name: adjustment_type
+        description: 'The type of adjustment (e.g., increase, decrease).'
+        required: true
+        example: decrease
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      quantity_before:
+        custom: []
+        name: quantity_before
+        description: 'The quantity before adjustment.'
+        required: true
+        example: '100.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      quantity_after:
+        custom: []
+        name: quantity_after
+        description: 'The quantity after adjustment.'
+        required: true
+        example: '90.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      adjustment_amount:
+        custom: []
+        name: adjustment_amount
+        description: 'The amount of adjustment.'
+        required: true
+        example: '10.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      reason:
+        custom: []
+        name: reason
+        description: 'A reason for the adjustment.'
+        required: false
+        example: 'Damaged goods.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      adjusted_by:
+        custom: []
+        name: adjusted_by
+        description: 'The ID of the user who made the adjustment.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      product_id: 1
+      adjustment_type: decrease
+      quantity_before: '100.00'
+      quantity_after: '90.00'
+      adjustment_amount: '10.00'
+      reason: 'Damaged goods.'
+      adjusted_by: 1
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "product_id": 1,
+                  "adjustment_type": "decrease",
+                  "quantity_before": 100.00,
+                  "quantity_after": 90.00,
+                  "adjustment_amount": 10.00,
+                  "reason": "Damaged goods.",
+                  "adjusted_by": 1,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-26T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -205,14 +309,130 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      stock_adjustment:
+        custom: []
+        name: stock_adjustment
+        description: 'The ID of the stock adjustment.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 17
+      stock_adjustment: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      product_id:
+        custom: []
+        name: product_id
+        description: 'The ID of the product.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      adjustment_type:
+        custom: []
+        name: adjustment_type
+        description: 'The type of adjustment (e.g., increase, decrease).'
+        required: true
+        example: increase
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      quantity_before:
+        custom: []
+        name: quantity_before
+        description: 'The quantity before adjustment.'
+        required: true
+        example: '100.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      quantity_after:
+        custom: []
+        name: quantity_after
+        description: 'The quantity after adjustment.'
+        required: true
+        example: '110.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      adjustment_amount:
+        custom: []
+        name: adjustment_amount
+        description: 'The amount of adjustment.'
+        required: true
+        example: '10.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      reason:
+        custom: []
+        name: reason
+        description: 'A reason for the adjustment.'
+        required: false
+        example: 'Inventory count discrepancy.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      adjusted_by:
+        custom: []
+        name: adjusted_by
+        description: 'The ID of the user who made the adjustment.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      product_id: 1
+      adjustment_type: increase
+      quantity_before: '100.00'
+      quantity_after: '110.00'
+      adjustment_amount: '10.00'
+      reason: 'Inventory count discrepancy.'
+      adjusted_by: 1
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "product_id": 1,
+                  "adjustment_type": "increase",
+                  "quantity_before": 100.00,
+                  "quantity_after": 110.00,
+                  "adjustment_amount": 10.00,
+                  "reason": "Inventory count discrepancy.",
+                  "adjusted_by": 1,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-27T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -254,14 +474,32 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      stock_adjustment:
+        custom: []
+        name: stock_adjustment
+        description: 'The ID of the stock adjustment to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 17
+      stock_adjustment: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

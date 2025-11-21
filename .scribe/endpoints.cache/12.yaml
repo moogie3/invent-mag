@@ -48,6 +48,37 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: |-
+          {
+              "data": [
+                  {
+                      "id": 1,
+                      "name": "Admin",
+                      "created_at": "2025-11-21T08:30:00.000000Z",
+                      "updated_at": "2025-11-21T08:30:00.000000Z"
+                  }
+              ],
+              "links": {
+                  "first": "/api/v1/roles?page=1",
+                  "last": "/api/v1/roles?page=1",
+                  "prev": null,
+                  "next": null
+              },
+              "meta": {
+                  "current_page": 1,
+                  "from": 1,
+                  "last_page": 1,
+                  "path": "/api/v1/roles",
+                  "per_page": 15,
+                  "to": 1,
+                  "total": 1
+              }
+          }
+        headers: []
+        description: OK
+      -
+        custom: []
         status: 500
         content: |-
           {
@@ -91,10 +122,36 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the role.'
+        required: true
+        example: Admin
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: Admin
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "name": "Admin",
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-26T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -158,6 +215,18 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: |-
+          {
+              "id": 1,
+              "name": "Admin",
+              "created_at": "2025-11-21T08:30:00.000000Z",
+              "updated_at": "2025-11-21T08:30:00.000000Z"
+          }
+        headers: []
+        description: OK
+      -
+        custom: []
         status: 500
         content: |-
           {
@@ -210,14 +279,52 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      role:
+        custom: []
+        name: role
+        description: 'The ID of the role.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 1
+      role: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the role.'
+        required: true
+        example: Editor
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: Editor
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "name": "Editor",
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-27T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -259,14 +366,32 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      role:
+        custom: []
+        name: role
+        description: 'The ID of the role to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 1
+      role: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

@@ -86,10 +86,88 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      supplier_id:
+        custom: []
+        name: supplier_id
+        description: 'The ID of the supplier.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      user_id:
+        custom: []
+        name: user_id
+        description: 'The ID of the user.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'The type of interaction (e.g., Call, Email, Meeting).'
+        required: true
+        example: Email
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      notes:
+        custom: []
+        name: notes
+        description: 'Notes about the interaction.'
+        required: false
+        example: 'Sent follow-up email.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      interaction_date:
+        custom: []
+        name: interaction_date
+        description: 'The date of the interaction.'
+        required: true
+        example: '2023-10-26'
+        type: date
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      supplier_id: 1
+      user_id: 1
+      type: Email
+      notes: 'Sent follow-up email.'
+      interaction_date: '2023-10-26'
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "supplier_id": 1,
+                  "user_id": 1,
+                  "type": "Email",
+                  "notes": "Sent follow-up email.",
+                  "interaction_date": "2023-10-26",
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-26T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -202,14 +280,104 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      supplier_interaction:
+        custom: []
+        name: supplier_interaction
+        description: 'The ID of the supplier interaction.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 1
+      supplier_interaction: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      supplier_id:
+        custom: []
+        name: supplier_id
+        description: 'The ID of the supplier.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      user_id:
+        custom: []
+        name: user_id
+        description: 'The ID of the user.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'The type of interaction (e.g., Call, Email, Meeting).'
+        required: true
+        example: Call
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      notes:
+        custom: []
+        name: notes
+        description: 'Notes about the interaction.'
+        required: false
+        example: 'Discussed new product line.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      interaction_date:
+        custom: []
+        name: interaction_date
+        description: 'The date of the interaction.'
+        required: true
+        example: '2023-10-27'
+        type: date
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      supplier_id: 1
+      user_id: 1
+      type: Call
+      notes: 'Discussed new product line.'
+      interaction_date: '2023-10-27'
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "supplier_id": 1,
+                  "user_id": 1,
+                  "type": "Call",
+                  "notes": "Discussed new product line.",
+                  "interaction_date": "2023-10-27",
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-27T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -251,14 +419,32 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      supplier_interaction:
+        custom: []
+        name: supplier_interaction
+        description: 'The ID of the supplier interaction to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 1
+      supplier_interaction: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

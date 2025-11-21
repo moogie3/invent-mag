@@ -33,10 +33,24 @@ class AccountController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @response 201 scenario="Success"
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'parent_id' => 'nullable|exists:accounts,id',
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:255|unique:accounts,code',
+            'type' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'level' => 'required|integer',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $account = Account::create($validated);
+
+        return new AccountResource($account);
     }
 
     /**
@@ -51,17 +65,35 @@ class AccountController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @response 200 scenario="Success"
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Account $account)
     {
-        //
+        $validated = $request->validate([
+            'parent_id' => 'nullable|exists:accounts,id',
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:255|unique:accounts,code,' . $account->id,
+            'type' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'level' => 'required|integer',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $account->update($validated);
+
+        return new AccountResource($account);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @response 204 scenario="Success"
      */
-    public function destroy(string $id)
+    public function destroy(Account $account)
     {
-        //
+        $account->delete();
+
+        return response()->noContent();
     }
 }

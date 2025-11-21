@@ -89,10 +89,114 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      sales_id:
+        custom: []
+        name: sales_id
+        description: 'The ID of the sales order.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      product_id:
+        custom: []
+        name: product_id
+        description: 'The ID of the product.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      quantity:
+        custom: []
+        name: quantity
+        description: 'The quantity of the product.'
+        required: true
+        example: 5
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount:
+        custom: []
+        name: discount
+        description: 'The discount applied to the item.'
+        required: false
+        example: '0.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      discount_type:
+        custom: []
+        name: discount_type
+        description: 'The type of discount (e.g., percentage, fixed).'
+        required: false
+        example: fixed
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      customer_price:
+        custom: []
+        name: customer_price
+        description: 'The price charged to the customer.'
+        required: false
+        example: '100.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      total:
+        custom: []
+        name: total
+        description: 'The total amount for the item.'
+        required: true
+        example: '500.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      sales_id: 1
+      product_id: 1
+      quantity: 5
+      discount: '0.00'
+      discount_type: fixed
+      customer_price: '100.00'
+      total: '500.00'
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "sales_id": 1,
+                  "product_id": 1,
+                  "quantity": 5,
+                  "discount": 0.00,
+                  "discount_type": "fixed",
+                  "customer_price": 100.00,
+                  "total": 500.00,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-26T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -208,14 +312,130 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      sales_item:
+        custom: []
+        name: sales_item
+        description: 'The ID of the sales item.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 1
+      sales_item: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      sales_id:
+        custom: []
+        name: sales_id
+        description: 'The ID of the sales order.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      product_id:
+        custom: []
+        name: product_id
+        description: 'The ID of the product.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      quantity:
+        custom: []
+        name: quantity
+        description: 'The quantity of the product.'
+        required: true
+        example: 10
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount:
+        custom: []
+        name: discount
+        description: 'The discount applied to the item.'
+        required: false
+        example: '0.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      discount_type:
+        custom: []
+        name: discount_type
+        description: 'The type of discount (e.g., percentage, fixed).'
+        required: false
+        example: fixed
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      customer_price:
+        custom: []
+        name: customer_price
+        description: 'The price charged to the customer.'
+        required: false
+        example: '100.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      total:
+        custom: []
+        name: total
+        description: 'The total amount for the item.'
+        required: true
+        example: '1000.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      sales_id: 1
+      product_id: 1
+      quantity: 10
+      discount: '0.00'
+      discount_type: fixed
+      customer_price: '100.00'
+      total: '1000.00'
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "sales_id": 1,
+                  "product_id": 1,
+                  "quantity": 10,
+                  "discount": 0.00,
+                  "discount_type": "fixed",
+                  "customer_price": 100.00,
+                  "total": 1000.00,
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-27T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -257,14 +477,32 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      sales_item:
+        custom: []
+        name: sales_item
+        description: 'The ID of the sales item to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 1
+      sales_item: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

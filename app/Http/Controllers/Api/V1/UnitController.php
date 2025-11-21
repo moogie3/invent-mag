@@ -28,10 +28,30 @@ class UnitController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @bodyParam name string required The name of the unit. Example: Piece
+     * @bodyParam symbol string required The symbol of the unit. Example: pc
+     *
+     * @response 201 {
+     *     "data": {
+     *         "id": 1,
+     *         "name": "Piece",
+     *         "symbol": "pc",
+     *         "created_at": "2023-10-26T12:00:00.000000Z",
+     *         "updated_at": "2023-10-26T12:00:00.000000Z"
+     *     }
+     * }
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'symbol' => 'required|string|max:255',
+        ]);
+
+        $unit = Unit::create($validated);
+
+        return new UnitResource($unit);
     }
 
     /**
@@ -46,17 +66,44 @@ class UnitController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @urlParam unit integer required The ID of the unit. Example: 1
+     * @bodyParam name string required The name of the unit. Example: Kilogram
+     * @bodyParam symbol string required The symbol of the unit. Example: kg
+     *
+     * @response 200 {
+     *     "data": {
+     *         "id": 1,
+     *         "name": "Kilogram",
+     *         "symbol": "kg",
+     *         "created_at": "2023-10-26T12:00:00.000000Z",
+     *         "updated_at": "2023-10-27T12:00:00.000000Z"
+     *     }
+     * }
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Unit $unit)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'symbol' => 'required|string|max:255',
+        ]);
+
+        $unit->update($validated);
+
+        return new UnitResource($unit);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @urlParam unit integer required The ID of the unit to delete. Example: 1
+     *
+     * @response 204 scenario="Success"
      */
-    public function destroy(string $id)
+    public function destroy(Unit $unit)
     {
-        //
+        $unit->delete();
+
+        return response()->noContent();
     }
 }

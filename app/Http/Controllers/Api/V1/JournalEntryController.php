@@ -22,16 +22,27 @@ class JournalEntryController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->query('per_page', 15);
-        $entries = JournalEntry::with('account')->paginate($perPage);
+        $entries = JournalEntry::with('transactions.account')->paginate($perPage);
         return JournalEntryResource::collection($entries);
     }
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @response 201 scenario="Success"
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'description' => 'required|string',
+            'sourceable_id' => 'nullable|integer',
+            'sourceable_type' => 'nullable|string',
+        ]);
+
+        $journalEntry = JournalEntry::create($validated);
+
+        return new JournalEntryResource($journalEntry);
     }
 
     /**
@@ -41,22 +52,37 @@ class JournalEntryController extends Controller
      */
     public function show(JournalEntry $journal_entry)
     {
-        return new JournalEntryResource($journal_entry->load('account'));
+        return new JournalEntryResource($journal_entry->load('transactions.account'));
     }
 
     /**
      * Update the specified resource in storage.
+     *
+     * @response 200 scenario="Success"
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, JournalEntry $journal_entry)
     {
-        //
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'description' => 'required|string',
+            'sourceable_id' => 'nullable|integer',
+            'sourceable_type' => 'nullable|string',
+        ]);
+
+        $journal_entry->update($validated);
+
+        return new JournalEntryResource($journal_entry);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @response 204 scenario="Success"
      */
-    public function destroy(string $id)
+    public function destroy(JournalEntry $journal_entry)
     {
-        //
+        $journal_entry->delete();
+
+        return response()->noContent();
     }
 }

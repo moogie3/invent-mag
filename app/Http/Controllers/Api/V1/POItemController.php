@@ -28,10 +28,26 @@ class POItemController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @response 201 scenario="Success"
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'po_id' => 'required|exists:po,id',
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|numeric',
+            'price' => 'required|numeric',
+            'discount' => 'nullable|numeric',
+            'discount_type' => 'nullable|string',
+            'total' => 'required|numeric',
+            'expiry_date' => 'nullable|date',
+            'remaining_quantity' => 'nullable|numeric',
+        ]);
+
+        $po_item = POItem::create($validated);
+
+        return new POItemResource($po_item);
     }
 
     /**
@@ -46,17 +62,37 @@ class POItemController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @response 200 scenario="Success"
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, POItem $po_item)
     {
-        //
+        $validated = $request->validate([
+            'po_id' => 'required|exists:po,id',
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|numeric',
+            'price' => 'required|numeric',
+            'discount' => 'nullable|numeric',
+            'discount_type' => 'nullable|string',
+            'total' => 'required|numeric',
+            'expiry_date' => 'nullable|date',
+            'remaining_quantity' => 'nullable|numeric',
+        ]);
+
+        $po_item->update($validated);
+
+        return new POItemResource($po_item);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @response 204 scenario="Success"
      */
-    public function destroy(string $id)
+    public function destroy(POItem $po_item)
     {
-        //
+        $po_item->delete();
+
+        return response()->noContent();
     }
 }

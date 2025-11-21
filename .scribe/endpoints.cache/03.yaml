@@ -49,7 +49,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":7,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":8,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":9,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":10,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":11,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":12,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}],"links":{"first":"http:\/\/localhost:8000\/api\/v1\/customers?page=1","last":"http:\/\/localhost:8000\/api\/v1\/customers?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/customers?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost:8000\/api\/v1\/customers","per_page":25,"to":12,"total":12}}'
+        content: '{"data":[{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":7,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":8,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":9,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":10,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":11,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":12,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":13,"name":"John Doe","address":"123 Main St","phone_number":"555-1234","email":"john.doe@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"Net 30","created_at":"2025-11-21T02:29:19.000000Z","updated_at":"2025-11-21T02:29:19.000000Z"},{"id":14,"name":"John Doe","address":"123 Main St","phone_number":"555-1234","email":"john.doe2@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"Net 30","created_at":"2025-11-21T02:33:44.000000Z","updated_at":"2025-11-21T02:33:44.000000Z"}],"links":{"first":"http:\/\/localhost:8000\/api\/v1\/customers?page=1","last":"http:\/\/localhost:8000\/api\/v1\/customers?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/customers?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost:8000\/api\/v1\/customers","per_page":25,"to":13,"total":13}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -203,7 +203,7 @@ endpoints:
         name: id
         description: 'The ID of the customer.'
         required: true
-        example: 1
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -221,7 +221,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 2
       customer: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -232,7 +232,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}}'
+        content: '{"data":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -274,7 +274,7 @@ endpoints:
         name: id
         description: 'The ID of the customer.'
         required: true
-        example: 1
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -292,7 +292,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 2
       customer: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -408,7 +408,7 @@ endpoints:
         name: id
         description: 'The ID of the customer.'
         required: true
-        example: 1
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -426,7 +426,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 2
       customer: 1
     queryParameters: []
     cleanQueryParameters: []

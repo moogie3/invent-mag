@@ -28,10 +28,24 @@ class CurrencySettingController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @response 201 scenario="Success"
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'currency_symbol' => 'required|string|max:255',
+            'decimal_separator' => 'required|string|max:1',
+            'thousand_separator' => 'required|string|max:1',
+            'decimal_places' => 'required|integer',
+            'position' => 'required|string|max:255',
+            'currency_code' => 'required|string|max:255',
+            'locale' => 'required|string|max:255',
+        ]);
+
+        $currency_setting = CurrencySetting::create($validated);
+
+        return new CurrencySettingResource($currency_setting);
     }
 
     /**
@@ -46,17 +60,35 @@ class CurrencySettingController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @response 200 scenario="Success"
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, CurrencySetting $currency_setting)
     {
-        //
+        $validated = $request->validate([
+            'currency_symbol' => 'required|string|max:255',
+            'decimal_separator' => 'required|string|max:1',
+            'thousand_separator' => 'required|string|max:1',
+            'decimal_places' => 'required|integer',
+            'position' => 'required|string|max:255',
+            'currency_code' => 'required|string|max:255',
+            'locale' => 'required|string|max:255',
+        ]);
+
+        $currency_setting->update($validated);
+
+        return new CurrencySettingResource($currency_setting);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @response 204 scenario="Success"
      */
-    public function destroy(string $id)
+    public function destroy(CurrencySetting $currency_setting)
     {
-        //
+        $currency_setting->delete();
+
+        return response()->noContent();
     }
 }

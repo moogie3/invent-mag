@@ -28,10 +28,21 @@ class PipelineStageController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @response 201 scenario="Success"
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'sales_pipeline_id' => 'required|exists:sales_pipelines,id',
+            'name' => 'required|string|max:255',
+            'position' => 'required|integer',
+            'is_closed' => 'required|boolean',
+        ]);
+
+        $pipeline_stage = PipelineStage::create($validated);
+
+        return new PipelineStageResource($pipeline_stage);
     }
 
     /**
@@ -46,17 +57,32 @@ class PipelineStageController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @response 200 scenario="Success"
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, PipelineStage $pipeline_stage)
     {
-        //
+        $validated = $request->validate([
+            'sales_pipeline_id' => 'required|exists:sales_pipelines,id',
+            'name' => 'required|string|max:255',
+            'position' => 'required|integer',
+            'is_closed' => 'required|boolean',
+        ]);
+
+        $pipeline_stage->update($validated);
+
+        return new PipelineStageResource($pipeline_stage);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @response 204 scenario="Success"
      */
-    public function destroy(string $id)
+    public function destroy(PipelineStage $pipeline_stage)
     {
-        //
+        $pipeline_stage->delete();
+
+        return response()->noContent();
     }
 }

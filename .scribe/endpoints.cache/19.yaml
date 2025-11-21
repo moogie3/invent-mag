@@ -88,10 +88,127 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      code:
+        custom: []
+        name: code
+        description: 'The unique code for the supplier.'
+        required: true
+        example: SUP-001
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the supplier.'
+        required: true
+        example: 'Supplier A'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'The address of the supplier.'
+        required: false
+        example: '123 Main St'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      phone_number:
+        custom: []
+        name: phone_number
+        description: 'The phone number of the supplier.'
+        required: false
+        example: 555-1234
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      location:
+        custom: []
+        name: location
+        description: 'The location of the supplier.'
+        required: false
+        example: London
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      payment_terms:
+        custom: []
+        name: payment_terms
+        description: 'The payment terms with the supplier.'
+        required: false
+        example: 'Net 30'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'The email address of the supplier.'
+        required: false
+        example: supplierA@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      image:
+        custom: []
+        name: image
+        description: "The URL or path to the supplier's image."
+        required: false
+        example: 'http://example.com/image1.jpg'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      code: SUP-001
+      name: 'Supplier A'
+      address: '123 Main St'
+      phone_number: 555-1234
+      location: London
+      payment_terms: 'Net 30'
+      email: supplierA@example.com
+      image: 'http://example.com/image1.jpg'
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "code": "SUP-001",
+                  "name": "Supplier A",
+                  "address": "123 Main St",
+                  "phone_number": "555-1234",
+                  "location": "London",
+                  "payment_terms": "Net 30",
+                  "email": "supplierA@example.com",
+                  "image": "http://example.com/image1.jpg",
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-26T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -204,14 +321,143 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      supplier:
+        custom: []
+        name: supplier
+        description: 'The ID of the supplier.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 1
+      supplier: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      code:
+        custom: []
+        name: code
+        description: 'The unique code for the supplier.'
+        required: true
+        example: SUP-002
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the supplier.'
+        required: true
+        example: 'Supplier B'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'The address of the supplier.'
+        required: false
+        example: '456 Oak Ave'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      phone_number:
+        custom: []
+        name: phone_number
+        description: 'The phone number of the supplier.'
+        required: false
+        example: 555-5678
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      location:
+        custom: []
+        name: location
+        description: 'The location of the supplier.'
+        required: false
+        example: 'New York'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      payment_terms:
+        custom: []
+        name: payment_terms
+        description: 'The payment terms with the supplier.'
+        required: false
+        example: 'Net 60'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'The email address of the supplier.'
+        required: false
+        example: supplierb@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      image:
+        custom: []
+        name: image
+        description: "The URL or path to the supplier's image."
+        required: false
+        example: 'http://example.com/image2.jpg'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      code: SUP-002
+      name: 'Supplier B'
+      address: '456 Oak Ave'
+      phone_number: 555-5678
+      location: 'New York'
+      payment_terms: 'Net 60'
+      email: supplierb@example.com
+      image: 'http://example.com/image2.jpg'
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "code": "SUP-002",
+                  "name": "Supplier B",
+                  "address": "456 Oak Ave",
+                  "phone_number": "555-5678",
+                  "location": "New York",
+                  "payment_terms": "Net 60",
+                  "email": "supplierb@example.com",
+                  "image": "http://example.com/image2.jpg",
+                  "created_at": "2023-10-26T12:00:00.000000Z",
+                  "updated_at": "2023-10-27T12:00:00.000000Z"
+              }
+          }
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -253,14 +499,32 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      supplier:
+        custom: []
+        name: supplier
+        description: 'The ID of the supplier to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: 1
+      supplier: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
     responseFields: []
     auth:
       - headers

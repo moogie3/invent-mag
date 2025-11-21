@@ -165,4 +165,77 @@
     </div>
 </div>
 </form>
+
+<form id="apiTokenForm" action="{{ route('admin.setting.profile.token') }}" method="POST">
+    @csrf
+    <!-- API Token Section -->
+    <div class="settings-section mt-4">
+        <div class="settings-section-header">
+            <div class="settings-icon-wrapper">
+                <i class="ti ti-key"></i>
+            </div>
+            <div class="settings-section-title">
+                <h3 class="mb-1">{{ __('messages.api_token') }}</h3>
+                <p class="text-muted mb-0 small">
+                    {{ __('messages.generate_and_manage_your_api_token') }}
+                </p>
+            </div>
+        </div>
+        <div class="settings-section-content">
+            @if (session('api_token'))
+                <div class="alert alert-info" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <i class="ti ti-info-circle me-2"></i>
+                        </div>
+                        <div>
+                            <h4 class="alert-title">{{ __('messages.your_new_api_token') }}</h4>
+                            <div class="text-muted">{{ __('messages.copy_your_new_api_token_now') }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="apiTokenValue" value="{{ session('api_token') }}" readonly>
+                    <button class="btn" type="button" onclick="copyToken()">{{ __('messages.copy') }}</button>
+                </div>
+            @elseif ($hasApiToken)
+                <div class="alert alert-success" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <i class="ti ti-check me-2"></i>
+                        </div>
+                        <div>
+                            <h4 class="alert-title">{{ __('messages.api_token_exists') }}</h4>
+                            <div class="text-muted">{{ __('messages.api_token_exists_info') }}</div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <p class="text-muted">{{ __('messages.no_api_token_generated_yet') }}</p>
+            @endif
+        </div>
+    </div>
+    <div class="card-footer bg-transparent mt-auto">
+        <div class="btn-list justify-content-end">
+            <button type="submit" class="btn btn-success">{{ __('messages.generate_new_token') }}</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    function copyToken() {
+        const tokenInput = document.getElementById('apiTokenValue');
+        tokenInput.select();
+        tokenInput.setSelectionRange(0, 99999); // For mobile devices
+        document.execCommand('copy');
+        
+        // Optional: Provide feedback to the user
+        const originalButtonText = document.querySelector('#apiTokenForm .btn-list button').innerText;
+        const copyButton = document.querySelector('#apiTokenValue + .btn');
+        copyButton.innerText = '{{ __('messages.copied') }}';
+        setTimeout(() => {
+            copyButton.innerText = '{{ __('messages.copy') }}';
+        }, 2000);
+    }
+</script>
 </div>

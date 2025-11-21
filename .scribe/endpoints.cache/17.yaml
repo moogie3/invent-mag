@@ -20,9 +20,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Display a listing of the sales pipelines.'
       description: ''
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -47,15 +48,18 @@ endpoints:
     responses:
       -
         custom: []
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: '{"data":[],"links":{"first":"http:\/\/localhost:8000\/api\/v1\/sales-pipelines?page=1","last":"http:\/\/localhost:8000\/api\/v1\/sales-pipelines?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":null,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/sales-pipelines?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost:8000\/api\/v1\/sales-pipelines","per_page":25,"to":null,"total":0}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -74,9 +78,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Store a newly created resource in storage.'
       description: ''
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -88,7 +93,10 @@ endpoints:
     fileParameters: []
     responses: []
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -107,9 +115,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Display the specified sales pipeline.'
       description: ''
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -146,15 +155,21 @@ endpoints:
     responses:
       -
         custom: []
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 404
+        content: |-
+          {
+              "message": "No query results for model [App\\Models\\SalesPipeline] 17"
+          }
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -174,9 +189,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Update the specified resource in storage.'
       description: ''
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -200,7 +216,10 @@ endpoints:
     fileParameters: []
     responses: []
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -219,9 +238,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Remove the specified resource from storage.'
       description: ''
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -245,7 +265,10 @@ endpoints:
     fileParameters: []
     responses: []
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null

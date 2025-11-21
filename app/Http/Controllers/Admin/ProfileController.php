@@ -16,7 +16,9 @@
 
         public function edit()
         {
-            return view('admin.profile.profile-edit');
+            $user = Auth::user();
+            $hasApiToken = $user->tokens()->exists();
+            return view('admin.profile.profile-edit', compact('hasApiToken'));
         }
 
         public function update(Request $request)
@@ -84,5 +86,18 @@
                 }
                 return redirect()->back()->with('error', 'Failed to delete avatar.');
             }
+        }
+
+        public function generateApiToken(Request $request)
+        {
+            $user = $request->user();
+    
+            // Revoke all existing tokens
+            $user->tokens()->delete();
+    
+            // Create a new token
+            $token = $user->createToken('api-token')->plainTextToken;
+    
+            return redirect()->route('admin.setting.profile.edit')->with('api_token', $token);
         }
     }

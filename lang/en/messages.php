@@ -1115,4 +1115,15 @@ return [
     'net_profit' => 'Net Profit',
     'gross_profit' => 'Gross Profit',
     'operating_income' => 'Operating Income',
+
+    'api_token' => 'API Token',
+    'generate_and_manage_your_api_token' => 'Generate and manage your API token for external service access.',
+    'your_new_api_token' => 'Your New API Token',
+    'copy_your_new_api_token_now' => 'Please copy your new API token now. You will not be able to see it again.',
+    'copy' => 'Copy',
+    'copied' => 'Copied!',
+    'no_api_token_generated_yet' => 'You have not generated an API token yet.',
+    'generate_new_token' => 'Generate New Token',
+    'api_token_exists' => 'API Token Exists',
+    'api_token_exists_info' => 'An API token has already been generated for your account. Generating a new token will revoke the existing one.',
 ];

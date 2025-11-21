@@ -263,6 +263,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('admin.setting.profile.update-password')->middleware('password.confirm');
                 Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('admin.setting.profile.update-password')->middleware('password.confirm');
                 Route::delete('/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
+                Route::post('/token', [ProfileController::class, 'generateApiToken'])->name('admin.setting.profile.token');
             });
 
             // Tax Settings

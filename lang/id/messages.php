@@ -1115,4 +1115,15 @@ return [
     'net_profit' => 'Laba Bersih',
     'gross_profit' => 'Laba Kotor',
     'operating_income' => 'Pendapatan Operasional',
+
+    'api_token' => 'Token API',
+    'generate_and_manage_your_api_token' => 'Buat dan kelola token API Anda untuk akses layanan eksternal.',
+    'your_new_api_token' => 'Token API Baru Anda',
+    'copy_your_new_api_token_now' => 'Harap salin token API baru Anda sekarang. Anda tidak akan dapat melihatnya lagi.',
+    'copy' => 'Salin',
+    'copied' => 'Tersalin!',
+    'no_api_token_generated_yet' => 'Anda belum membuat token API.',
+    'generate_new_token' => 'Buat Token Baru',
+    'api_token_exists' => 'Token API Sudah Ada',
+    'api_token_exists_info' => 'Token API sudah dibuat untuk akun Anda. Membuat token baru akan mencabut token yang sudah ada.',
 ];

@@ -163,16 +163,16 @@
                                 <a href="#customers-GETapi-v1-customers">Display a listing of the customers.</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="customers-POSTapi-v1-customers">
-                                <a href="#customers-POSTapi-v1-customers">Store a newly created resource in storage.</a>
+                                <a href="#customers-POSTapi-v1-customers">Create a new customer.</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="customers-GETapi-v1-customers--id-">
                                 <a href="#customers-GETapi-v1-customers--id-">Display the specified customer.</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="customers-PUTapi-v1-customers--id-">
-                                <a href="#customers-PUTapi-v1-customers--id-">Update the specified resource in storage.</a>
+                                <a href="#customers-PUTapi-v1-customers--id-">Update the specified customer.</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="customers-DELETEapi-v1-customers--id-">
-                                <a href="#customers-DELETEapi-v1-customers--id-">Remove the specified resource from storage.</a>
+                                <a href="#customers-DELETEapi-v1-customers--id-">Delete the specified customer.</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -647,7 +647,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: November 19, 2025</li>
+        <li>Last updated: November 20, 2025</li>
     </ul>
 </div>
 
@@ -664,7 +664,7 @@
 You can switch the language used with the tabs at the top right (or from the nav menu at the top left on mobile).&lt;/aside&gt;</code></pre>
 
         <h1 id="authenticating-requests">Authenticating requests</h1>
-<p>To authenticate requests, include an <strong><code>Authorization</code></strong> header with the value <strong><code>"Bearer {YOUR_AUTH_KEY}"</code></strong>.</p>
+<p>To authenticate requests, include an <strong><code>Authorization</code></strong> header with the value <strong><code>"Bearer {YOUR_API_TOKEN}"</code></strong>.</p>
 <p>All authenticated endpoints are marked with a <code>requires authentication</code> badge in the documentation below.</p>
 <p>You can retrieve your token by visiting your dashboard and clicking <b>Generate API token</b>.</p>
 
@@ -675,6 +675,7 @@ You can switch the language used with the tabs at the top right (or from the nav
                                 <h2 id="accounts-GETapi-v1-accounts">Display a listing of the accounts.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -686,6 +687,7 @@ You can switch the language used with the tabs at the top right (or from the nav
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/accounts?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -702,6 +704,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -715,7 +718,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-accounts">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -727,7 +730,612 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;parent_id&quot;: null,
+            &quot;name&quot;: &quot;accounting.accounts.assets.name&quot;,
+            &quot;code&quot;: &quot;1000&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: null,
+            &quot;level&quot;: 0,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: null
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;parent_id&quot;: 1,
+            &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
+            &quot;code&quot;: &quot;1100&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: null,
+            &quot;level&quot;: 1,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 1,
+                &quot;parent_id&quot;: null,
+                &quot;name&quot;: &quot;accounting.accounts.assets.name&quot;,
+                &quot;code&quot;: &quot;1000&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 0,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;parent_id&quot;: 2,
+            &quot;name&quot;: &quot;accounting.accounts.cash.name&quot;,
+            &quot;code&quot;: &quot;1110&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.cash.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 2,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
+                &quot;code&quot;: &quot;1100&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;parent_id&quot;: 2,
+            &quot;name&quot;: &quot;accounting.accounts.bank.name&quot;,
+            &quot;code&quot;: &quot;1120&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.bank.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 2,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
+                &quot;code&quot;: &quot;1100&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;parent_id&quot;: 2,
+            &quot;name&quot;: &quot;accounting.accounts.accounts_receivable.name&quot;,
+            &quot;code&quot;: &quot;1130&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.accounts_receivable.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 2,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
+                &quot;code&quot;: &quot;1100&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;parent_id&quot;: 2,
+            &quot;name&quot;: &quot;accounting.accounts.allowance_for_doubtful_accounts.name&quot;,
+            &quot;code&quot;: &quot;1135&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.allowance_for_doubtful_accounts.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 2,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
+                &quot;code&quot;: &quot;1100&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;parent_id&quot;: 2,
+            &quot;name&quot;: &quot;accounting.accounts.inventory.name&quot;,
+            &quot;code&quot;: &quot;1140&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.inventory.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 2,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
+                &quot;code&quot;: &quot;1100&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;parent_id&quot;: 2,
+            &quot;name&quot;: &quot;accounting.accounts.prepaid_expenses.name&quot;,
+            &quot;code&quot;: &quot;1150&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.prepaid_expenses.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 2,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
+                &quot;code&quot;: &quot;1100&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;parent_id&quot;: 2,
+            &quot;name&quot;: &quot;accounting.accounts.input_vat.name&quot;,
+            &quot;code&quot;: &quot;1160&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.input_vat.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 2,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
+                &quot;code&quot;: &quot;1100&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;parent_id&quot;: 1,
+            &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
+            &quot;code&quot;: &quot;1200&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: null,
+            &quot;level&quot;: 1,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 1,
+                &quot;parent_id&quot;: null,
+                &quot;name&quot;: &quot;accounting.accounts.assets.name&quot;,
+                &quot;code&quot;: &quot;1000&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 0,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;parent_id&quot;: 10,
+            &quot;name&quot;: &quot;accounting.accounts.land.name&quot;,
+            &quot;code&quot;: &quot;1210&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.land.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 10,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
+                &quot;code&quot;: &quot;1200&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 12,
+            &quot;parent_id&quot;: 10,
+            &quot;name&quot;: &quot;accounting.accounts.buildings.name&quot;,
+            &quot;code&quot;: &quot;1220&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.buildings.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 10,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
+                &quot;code&quot;: &quot;1200&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 13,
+            &quot;parent_id&quot;: 10,
+            &quot;name&quot;: &quot;accounting.accounts.accumulated_depreciation_buildings.name&quot;,
+            &quot;code&quot;: &quot;1225&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.accumulated_depreciation_buildings.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 10,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
+                &quot;code&quot;: &quot;1200&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 14,
+            &quot;parent_id&quot;: 10,
+            &quot;name&quot;: &quot;accounting.accounts.equipment.name&quot;,
+            &quot;code&quot;: &quot;1230&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.equipment.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 10,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
+                &quot;code&quot;: &quot;1200&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 15,
+            &quot;parent_id&quot;: 10,
+            &quot;name&quot;: &quot;accounting.accounts.accumulated_depreciation_equipment.name&quot;,
+            &quot;code&quot;: &quot;1235&quot;,
+            &quot;type&quot;: &quot;asset&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.accumulated_depreciation_equipment.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 10,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
+                &quot;code&quot;: &quot;1200&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 16,
+            &quot;parent_id&quot;: null,
+            &quot;name&quot;: &quot;accounting.accounts.liabilities.name&quot;,
+            &quot;code&quot;: &quot;2000&quot;,
+            &quot;type&quot;: &quot;liability&quot;,
+            &quot;description&quot;: null,
+            &quot;level&quot;: 0,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: null
+        },
+        {
+            &quot;id&quot;: 17,
+            &quot;parent_id&quot;: 16,
+            &quot;name&quot;: &quot;accounting.accounts.current_liabilities.name&quot;,
+            &quot;code&quot;: &quot;2100&quot;,
+            &quot;type&quot;: &quot;liability&quot;,
+            &quot;description&quot;: null,
+            &quot;level&quot;: 1,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 16,
+                &quot;parent_id&quot;: null,
+                &quot;name&quot;: &quot;accounting.accounts.liabilities.name&quot;,
+                &quot;code&quot;: &quot;2000&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 0,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 18,
+            &quot;parent_id&quot;: 17,
+            &quot;name&quot;: &quot;accounting.accounts.accounts_payable.name&quot;,
+            &quot;code&quot;: &quot;2110&quot;,
+            &quot;type&quot;: &quot;liability&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.accounts_payable.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 17,
+                &quot;parent_id&quot;: 16,
+                &quot;name&quot;: &quot;accounting.accounts.current_liabilities.name&quot;,
+                &quot;code&quot;: &quot;2100&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 19,
+            &quot;parent_id&quot;: 17,
+            &quot;name&quot;: &quot;accounting.accounts.accrued_expenses.name&quot;,
+            &quot;code&quot;: &quot;2120&quot;,
+            &quot;type&quot;: &quot;liability&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.accrued_expenses.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 17,
+                &quot;parent_id&quot;: 16,
+                &quot;name&quot;: &quot;accounting.accounts.current_liabilities.name&quot;,
+                &quot;code&quot;: &quot;2100&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 20,
+            &quot;parent_id&quot;: 17,
+            &quot;name&quot;: &quot;accounting.accounts.output_vat.name&quot;,
+            &quot;code&quot;: &quot;2130&quot;,
+            &quot;type&quot;: &quot;liability&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.output_vat.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 17,
+                &quot;parent_id&quot;: 16,
+                &quot;name&quot;: &quot;accounting.accounts.current_liabilities.name&quot;,
+                &quot;code&quot;: &quot;2100&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 21,
+            &quot;parent_id&quot;: 16,
+            &quot;name&quot;: &quot;accounting.accounts.long_term_liabilities.name&quot;,
+            &quot;code&quot;: &quot;2200&quot;,
+            &quot;type&quot;: &quot;liability&quot;,
+            &quot;description&quot;: null,
+            &quot;level&quot;: 1,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 16,
+                &quot;parent_id&quot;: null,
+                &quot;name&quot;: &quot;accounting.accounts.liabilities.name&quot;,
+                &quot;code&quot;: &quot;2000&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 0,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 22,
+            &quot;parent_id&quot;: 21,
+            &quot;name&quot;: &quot;accounting.accounts.bank_loans.name&quot;,
+            &quot;code&quot;: &quot;2210&quot;,
+            &quot;type&quot;: &quot;liability&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.bank_loans.description&quot;,
+            &quot;level&quot;: 2,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 21,
+                &quot;parent_id&quot;: 16,
+                &quot;name&quot;: &quot;accounting.accounts.long_term_liabilities.name&quot;,
+                &quot;code&quot;: &quot;2200&quot;,
+                &quot;type&quot;: &quot;liability&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 23,
+            &quot;parent_id&quot;: null,
+            &quot;name&quot;: &quot;accounting.accounts.equity.name&quot;,
+            &quot;code&quot;: &quot;3000&quot;,
+            &quot;type&quot;: &quot;equity&quot;,
+            &quot;description&quot;: null,
+            &quot;level&quot;: 0,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: null
+        },
+        {
+            &quot;id&quot;: 24,
+            &quot;parent_id&quot;: 23,
+            &quot;name&quot;: &quot;accounting.accounts.owners_equity.name&quot;,
+            &quot;code&quot;: &quot;3100&quot;,
+            &quot;type&quot;: &quot;equity&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.owners_equity.description&quot;,
+            &quot;level&quot;: 1,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 23,
+                &quot;parent_id&quot;: null,
+                &quot;name&quot;: &quot;accounting.accounts.equity.name&quot;,
+                &quot;code&quot;: &quot;3000&quot;,
+                &quot;type&quot;: &quot;equity&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 0,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 25,
+            &quot;parent_id&quot;: 23,
+            &quot;name&quot;: &quot;accounting.accounts.retained_earnings.name&quot;,
+            &quot;code&quot;: &quot;3200&quot;,
+            &quot;type&quot;: &quot;equity&quot;,
+            &quot;description&quot;: &quot;accounting.accounts.retained_earnings.description&quot;,
+            &quot;level&quot;: 1,
+            &quot;is_active&quot;: true,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: {
+                &quot;id&quot;: 23,
+                &quot;parent_id&quot;: null,
+                &quot;name&quot;: &quot;accounting.accounts.equity.name&quot;,
+                &quot;code&quot;: &quot;3000&quot;,
+                &quot;type&quot;: &quot;equity&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 0,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/accounts?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/accounts?page=2&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: &quot;http://localhost:8000/api/v1/accounts?page=2&quot;
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 2,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/accounts?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/accounts?page=2&quot;,
+                &quot;label&quot;: &quot;2&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/accounts?page=2&quot;,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/accounts&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 25,
+        &quot;total&quot;: 44
+    }
 }</code>
  </pre>
     </span>
@@ -748,7 +1356,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-accounts" data-method="GET"
       data-path="api/v1/accounts"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -778,6 +1386,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/accounts</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-accounts"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -820,6 +1440,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="accounts-POSTapi-v1-accounts">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -831,6 +1452,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/accounts" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -841,6 +1463,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -871,7 +1494,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-accounts" data-method="POST"
       data-path="api/v1/accounts"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -902,6 +1525,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-accounts"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -930,6 +1565,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="accounts-GETapi-v1-accounts--id-">Display the specified account.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -941,6 +1577,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/accounts/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -951,6 +1588,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -964,7 +1602,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-accounts--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -976,7 +1614,45 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;parent_id&quot;: null,
+        &quot;name&quot;: &quot;accounting.accounts.assets.name&quot;,
+        &quot;code&quot;: &quot;1000&quot;,
+        &quot;type&quot;: &quot;asset&quot;,
+        &quot;description&quot;: null,
+        &quot;level&quot;: 0,
+        &quot;is_active&quot;: true,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;parent&quot;: null,
+        &quot;children&quot;: [
+            {
+                &quot;id&quot;: 2,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.current_assets.name&quot;,
+                &quot;code&quot;: &quot;1100&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            {
+                &quot;id&quot;: 10,
+                &quot;parent_id&quot;: 1,
+                &quot;name&quot;: &quot;accounting.accounts.fixed_assets.name&quot;,
+                &quot;code&quot;: &quot;1200&quot;,
+                &quot;type&quot;: &quot;asset&quot;,
+                &quot;description&quot;: null,
+                &quot;level&quot;: 1,
+                &quot;is_active&quot;: true,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        ]
+    }
 }</code>
  </pre>
     </span>
@@ -997,7 +1673,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-accounts--id-" data-method="GET"
       data-path="api/v1/accounts/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -1027,6 +1703,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/accounts/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-accounts--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -1081,6 +1769,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="accounts-PUTapi-v1-accounts--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -1092,6 +1781,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/accounts/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -1102,6 +1792,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1132,7 +1823,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-accounts--id-" data-method="PUT"
       data-path="api/v1/accounts/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -1166,6 +1857,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/accounts/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-accounts--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -1208,6 +1911,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="accounts-DELETEapi-v1-accounts--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -1219,6 +1923,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/accounts/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -1229,6 +1934,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1259,7 +1965,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-accounts--id-" data-method="DELETE"
       data-path="api/v1/accounts/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -1289,6 +1995,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/accounts/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-accounts--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -1335,6 +2053,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="categories-GETapi-v1-categories">Display a listing of the categories.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -1346,6 +2065,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/categories?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -1362,6 +2082,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1375,7 +2096,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-categories">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -1387,7 +2108,94 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;TR&quot;,
+            &quot;description&quot;: &quot;Transistor&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: null
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;name&quot;: &quot;FBT&quot;,
+            &quot;description&quot;: &quot;Flyback&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: null
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;name&quot;: &quot;IC&quot;,
+            &quot;description&quot;: &quot;Integrated Circuit&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;parent&quot;: null
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;name&quot;: &quot;TR&quot;,
+            &quot;description&quot;: &quot;Transistor&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;parent&quot;: null
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;name&quot;: &quot;FBT&quot;,
+            &quot;description&quot;: &quot;Flyback&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;parent&quot;: null
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;name&quot;: &quot;IC&quot;,
+            &quot;description&quot;: &quot;Integrated Circuit&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;parent&quot;: null
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/categories?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/categories?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/categories?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/categories&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 6,
+        &quot;total&quot;: 6
+    }
 }</code>
  </pre>
     </span>
@@ -1408,7 +2216,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-categories" data-method="GET"
       data-path="api/v1/categories"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -1438,6 +2246,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/categories</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-categories"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -1480,6 +2300,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="categories-POSTapi-v1-categories">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -1491,6 +2312,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/categories" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -1501,6 +2323,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1531,7 +2354,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-categories" data-method="POST"
       data-path="api/v1/categories"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -1562,6 +2385,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-categories"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -1590,6 +2425,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="categories-GETapi-v1-categories--id-">Display the specified category.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -1601,6 +2437,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/categories/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -1611,6 +2448,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1624,7 +2462,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-categories--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -1636,7 +2474,16 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;TR&quot;,
+        &quot;description&quot;: &quot;Transistor&quot;,
+        &quot;parent_id&quot;: null,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;parent&quot;: null,
+        &quot;children&quot;: []
+    }
 }</code>
  </pre>
     </span>
@@ -1657,7 +2504,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-categories--id-" data-method="GET"
       data-path="api/v1/categories/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -1687,6 +2534,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/categories/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-categories--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -1741,6 +2600,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="categories-PUTapi-v1-categories--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -1752,6 +2612,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/categories/consequatur" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -1762,6 +2623,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1792,7 +2654,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-categories--id-" data-method="PUT"
       data-path="api/v1/categories/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -1826,6 +2688,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/categories/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-categories--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -1868,6 +2742,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="categories-DELETEapi-v1-categories--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -1879,6 +2754,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/categories/consequatur" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -1889,6 +2765,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -1919,7 +2796,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-categories--id-" data-method="DELETE"
       data-path="api/v1/categories/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -1949,6 +2826,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/categories/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-categories--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -1995,6 +2884,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="currency-settings-GETapi-v1-currency-settings">Display a listing of the currency settings.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -2006,6 +2896,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/currency-settings?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -2022,6 +2913,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -2035,7 +2927,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-currency-settings">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -2047,7 +2939,52 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;currency_symbol&quot;: &quot;Rp&quot;,
+            &quot;decimal_separator&quot;: &quot;,&quot;,
+            &quot;thousand_separator&quot;: &quot;.&quot;,
+            &quot;decimal_places&quot;: 0,
+            &quot;position&quot;: &quot;prefix&quot;,
+            &quot;currency_code&quot;: &quot;IDR&quot;,
+            &quot;locale&quot;: &quot;id-ID&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/currency-settings?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/currency-settings?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/currency-settings?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/currency-settings&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 1,
+        &quot;total&quot;: 1
+    }
 }</code>
  </pre>
     </span>
@@ -2068,7 +3005,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-currency-settings" data-method="GET"
       data-path="api/v1/currency-settings"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -2098,6 +3035,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/currency-settings</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-currency-settings"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -2140,6 +3089,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="currency-settings-POSTapi-v1-currency-settings">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -2151,6 +3101,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/currency-settings" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -2161,6 +3112,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -2191,7 +3143,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-currency-settings" data-method="POST"
       data-path="api/v1/currency-settings"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -2222,6 +3174,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-currency-settings"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -2250,6 +3214,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="currency-settings-GETapi-v1-currency-settings--id-">Display the specified currency setting.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -2261,6 +3226,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/currency-settings/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -2271,6 +3237,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -2284,7 +3251,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-currency-settings--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -2296,7 +3263,18 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;currency_symbol&quot;: &quot;Rp&quot;,
+        &quot;decimal_separator&quot;: &quot;,&quot;,
+        &quot;thousand_separator&quot;: &quot;.&quot;,
+        &quot;decimal_places&quot;: 0,
+        &quot;position&quot;: &quot;prefix&quot;,
+        &quot;currency_code&quot;: &quot;IDR&quot;,
+        &quot;locale&quot;: &quot;id-ID&quot;,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -2317,7 +3295,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-currency-settings--id-" data-method="GET"
       data-path="api/v1/currency-settings/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -2347,6 +3325,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/currency-settings/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-currency-settings--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -2401,6 +3391,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="currency-settings-PUTapi-v1-currency-settings--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -2412,6 +3403,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/currency-settings/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -2422,6 +3414,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -2452,7 +3445,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-currency-settings--id-" data-method="PUT"
       data-path="api/v1/currency-settings/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -2486,6 +3479,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/currency-settings/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-currency-settings--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -2528,6 +3533,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="currency-settings-DELETEapi-v1-currency-settings--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -2539,6 +3545,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/currency-settings/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -2549,6 +3556,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -2579,7 +3587,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-currency-settings--id-" data-method="DELETE"
       data-path="api/v1/currency-settings/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -2609,6 +3617,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/currency-settings/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-currency-settings--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -2655,6 +3675,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="customer-interactions-GETapi-v1-customer-interactions">Display a listing of the customer interactions.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -2666,6 +3687,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/customer-interactions?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -2682,6 +3704,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -2695,7 +3718,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-customer-interactions">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -2707,7 +3730,544 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;customer_id&quot;: 1,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Dolores nobis architecto id illum. Ducimus similique optio qui ut nemo voluptas. A vitae hic tenetur et atque iusto. Doloremque illo quod accusantium dolor in inventore.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-03-25T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;Walk In Customer&quot;,
+                &quot;address&quot;: &quot;-&quot;,
+                &quot;phone_number&quot;: &quot;0&quot;,
+                &quot;email&quot;: &quot;-&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;0&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;customer_id&quot;: 2,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;call&quot;,
+            &quot;notes&quot;: &quot;Amet corporis atque accusantium facere maxime. Iure nihil sit in sit natus molestiae. Libero consequuntur quae temporibus. Ipsam dolor nesciunt neque magni dicta autem.&quot;,
+            &quot;interaction_date&quot;: &quot;2024-12-07T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;customer_id&quot;: 2,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Repellat doloribus quia qui ullam saepe. Explicabo ea atque unde eos illum eveniet. Quam ducimus aut veritatis nostrum et quos eius. Amet quia blanditiis est ex dicta.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-10-11T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;customer_id&quot;: 3,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Eaque possimus blanditiis consequuntur velit commodi dolor dignissimos cupiditate. Inventore velit enim sunt repellendus eum. At et rerum molestias quod. Eum aut nam sint ullam et.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-09-15T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;Siti Aminah&quot;,
+                &quot;address&quot;: &quot;Perumahan Griya Asri Blok B2, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;082112345678&quot;,
+                &quot;email&quot;: &quot;siti.aminah@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;customer_id&quot;: 3,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;call&quot;,
+            &quot;notes&quot;: &quot;Ullam neque eum quia tempora delectus dignissimos temporibus. Molestiae commodi quia expedita autem. Dignissimos cumque impedit facere rerum doloribus quia. Ut maiores qui labore.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-10-27T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;Siti Aminah&quot;,
+                &quot;address&quot;: &quot;Perumahan Griya Asri Blok B2, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;082112345678&quot;,
+                &quot;email&quot;: &quot;siti.aminah@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;customer_id&quot;: 4,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Ut laboriosam reprehenderit mollitia sequi laudantium non. Maiores qui neque voluptatem omnis placeat. Omnis ea unde repudiandae laborum tenetur.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-05-28T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 4,
+                &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+                &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;085312345678&quot;,
+                &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;customer_id&quot;: 4,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Quia ut nulla et sunt odio. Possimus officiis commodi consequatur autem. Minima perferendis rerum sapiente aut eaque. Non praesentium et similique laboriosam numquam quia vitae.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-06-05T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 4,
+                &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+                &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;085312345678&quot;,
+                &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;customer_id&quot;: 4,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Quos sequi sed aliquid unde quia. Et asperiores molestias beatae qui voluptas. Aspernatur consectetur atque a est. Sit itaque et quos autem magnam voluptas.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-06-04T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 4,
+                &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+                &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;085312345678&quot;,
+                &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;customer_id&quot;: 5,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Fugit ipsum illo et nulla doloremque incidunt non incidunt. Numquam ipsa est officia corporis quo. A tenetur commodi ipsa quasi. Laudantium ut consequatur et ut praesentium est illo et. Iste laudantium aut veritatis et amet sint.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-06-14T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 5,
+                &quot;name&quot;: &quot;Lilis Suryani&quot;,
+                &quot;address&quot;: &quot;Jl. Gajah Mada No. 12, Yogyakarta&quot;,
+                &quot;phone_number&quot;: &quot;087812345678&quot;,
+                &quot;email&quot;: &quot;lilis.suryani@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;7&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;customer_id&quot;: 5,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Consequatur dicta neque maiores aspernatur. Aperiam ducimus distinctio omnis quod. Nemo natus non perferendis a.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-03-17T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 5,
+                &quot;name&quot;: &quot;Lilis Suryani&quot;,
+                &quot;address&quot;: &quot;Jl. Gajah Mada No. 12, Yogyakarta&quot;,
+                &quot;phone_number&quot;: &quot;087812345678&quot;,
+                &quot;email&quot;: &quot;lilis.suryani@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;7&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;customer_id&quot;: 6,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Eaque velit omnis et nihil quia debitis. Et ut a minima consequatur omnis.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-04-27T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 6,
+                &quot;name&quot;: &quot;Agus Wijaya&quot;,
+                &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+                &quot;phone_number&quot;: &quot;089912345678&quot;,
+                &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 12,
+            &quot;customer_id&quot;: 6,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Perspiciatis ea neque et et. Qui voluptatibus magni dignissimos quas aut minus at. Consequuntur deleniti nulla ullam asperiores nam non dignissimos. Culpa sed exercitationem officiis.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-04-15T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 6,
+                &quot;name&quot;: &quot;Agus Wijaya&quot;,
+                &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+                &quot;phone_number&quot;: &quot;089912345678&quot;,
+                &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 13,
+            &quot;customer_id&quot;: 7,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Illum provident sunt placeat illo delectus qui enim. Architecto ut aut aliquam aut asperiores saepe.&quot;,
+            &quot;interaction_date&quot;: &quot;2024-12-13T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 7,
+                &quot;name&quot;: &quot;Walk In Customer&quot;,
+                &quot;address&quot;: &quot;-&quot;,
+                &quot;phone_number&quot;: &quot;0&quot;,
+                &quot;email&quot;: &quot;-&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;0&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 14,
+            &quot;customer_id&quot;: 8,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Minima qui et neque repellat et omnis. In doloribus molestiae quaerat rerum quis aliquam. Omnis tempore accusamus officiis non eveniet aliquid eligendi.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-05-01T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 8,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 15,
+            &quot;customer_id&quot;: 8,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;call&quot;,
+            &quot;notes&quot;: &quot;Officiis alias sit autem eos. Et nobis consequuntur quibusdam.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-03-02T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 8,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 16,
+            &quot;customer_id&quot;: 8,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Corporis unde dolores quae voluptate iusto facilis aut. Quia voluptas ut ipsam aliquid consequatur dolorum. Molestiae doloribus perspiciatis delectus saepe tenetur aliquid error aut.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-06-22T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 8,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 17,
+            &quot;customer_id&quot;: 9,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;call&quot;,
+            &quot;notes&quot;: &quot;Quas qui ipsa iure unde veritatis. Molestias officiis deserunt a facilis occaecati voluptatem. Sed aliquam occaecati officia sit sit omnis qui.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-02-05T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 9,
+                &quot;name&quot;: &quot;Siti Aminah&quot;,
+                &quot;address&quot;: &quot;Perumahan Griya Asri Blok B2, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;082112345678&quot;,
+                &quot;email&quot;: &quot;siti.aminah@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 18,
+            &quot;customer_id&quot;: 9,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Velit quo enim sit earum doloremque. Atque rerum sunt dolorum deleniti sit nemo. Optio qui non accusantium ea voluptatem voluptas hic blanditiis.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-07-29T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 9,
+                &quot;name&quot;: &quot;Siti Aminah&quot;,
+                &quot;address&quot;: &quot;Perumahan Griya Asri Blok B2, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;082112345678&quot;,
+                &quot;email&quot;: &quot;siti.aminah@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 19,
+            &quot;customer_id&quot;: 10,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Saepe numquam consequatur omnis rem aut debitis. Suscipit nisi commodi consectetur rerum libero error velit. Pariatur unde eum quibusdam ab ipsam consequatur. Dolorum impedit nostrum voluptatem ex minus soluta eaque.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-07-21T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 10,
+                &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+                &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;085312345678&quot;,
+                &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 20,
+            &quot;customer_id&quot;: 10,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Est et perferendis occaecati sit sint. Dolorem excepturi dolores molestiae dicta. Distinctio aut aut quo ducimus quia eos omnis. Nesciunt unde tempora ipsa voluptatem et voluptatem.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-02-05T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 10,
+                &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+                &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;085312345678&quot;,
+                &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 21,
+            &quot;customer_id&quot;: 10,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Quam dolores omnis eveniet id. Dolore corrupti dolorem fugiat aliquam ea sint praesentium. Voluptate dolor quis necessitatibus sit.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-06-07T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 10,
+                &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+                &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;085312345678&quot;,
+                &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 22,
+            &quot;customer_id&quot;: 11,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Ipsa dicta accusantium dolorem molestias. Voluptates non est ut. Ea sunt rerum incidunt minima earum deserunt numquam.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-11-15T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 11,
+                &quot;name&quot;: &quot;Lilis Suryani&quot;,
+                &quot;address&quot;: &quot;Jl. Gajah Mada No. 12, Yogyakarta&quot;,
+                &quot;phone_number&quot;: &quot;087812345678&quot;,
+                &quot;email&quot;: &quot;lilis.suryani@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;7&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 23,
+            &quot;customer_id&quot;: 11,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Et et expedita laborum iste quia iure maxime. Nesciunt aliquid laborum quod. Quia nihil eum ducimus excepturi perferendis quae earum. Est cupiditate non voluptatem vel ex velit.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-11-15T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 11,
+                &quot;name&quot;: &quot;Lilis Suryani&quot;,
+                &quot;address&quot;: &quot;Jl. Gajah Mada No. 12, Yogyakarta&quot;,
+                &quot;phone_number&quot;: &quot;087812345678&quot;,
+                &quot;email&quot;: &quot;lilis.suryani@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;7&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 24,
+            &quot;customer_id&quot;: 12,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Eos corrupti dolorem consequuntur id inventore autem provident. Est aliquid natus eum eligendi. Quia voluptatibus reprehenderit ut libero.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-07-16T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;customer&quot;: {
+                &quot;id&quot;: 12,
+                &quot;name&quot;: &quot;Agus Wijaya&quot;,
+                &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+                &quot;phone_number&quot;: &quot;089912345678&quot;,
+                &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/customer-interactions?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/customer-interactions?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/customer-interactions?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/customer-interactions&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 24,
+        &quot;total&quot;: 24
+    }
 }</code>
  </pre>
     </span>
@@ -2728,7 +4288,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-customer-interactions" data-method="GET"
       data-path="api/v1/customer-interactions"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -2758,6 +4318,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/customer-interactions</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-customer-interactions"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -2800,6 +4372,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="customer-interactions-POSTapi-v1-customer-interactions">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -2811,6 +4384,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/customer-interactions" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -2821,6 +4395,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -2851,7 +4426,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-customer-interactions" data-method="POST"
       data-path="api/v1/customer-interactions"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -2882,6 +4457,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-customer-interactions"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -2910,6 +4497,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="customer-interactions-GETapi-v1-customer-interactions--id-">Display the specified customer interaction.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -2920,17 +4508,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/v1/customer-interactions/17" \
+    --get "http://localhost:8000/api/v1/customer-interactions/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/customer-interactions/17"
+    "http://localhost:8000/api/v1/customer-interactions/1"
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -2944,7 +4534,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-customer-interactions--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -2956,7 +4546,27 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;customer_id&quot;: 1,
+        &quot;user_id&quot;: 1,
+        &quot;type&quot;: &quot;email&quot;,
+        &quot;notes&quot;: &quot;Dolores nobis architecto id illum. Ducimus similique optio qui ut nemo voluptas. A vitae hic tenetur et atque iusto. Doloremque illo quod accusantium dolor in inventore.&quot;,
+        &quot;interaction_date&quot;: &quot;2025-03-25T00:00:00.000000Z&quot;,
+        &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+        &quot;customer&quot;: {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;Walk In Customer&quot;,
+            &quot;address&quot;: &quot;-&quot;,
+            &quot;phone_number&quot;: &quot;0&quot;,
+            &quot;email&quot;: &quot;-&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;0&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        }
+    }
 }</code>
  </pre>
     </span>
@@ -2977,7 +4587,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-customer-interactions--id-" data-method="GET"
       data-path="api/v1/customer-interactions/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -3007,6 +4617,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/customer-interactions/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-customer-interactions--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -3039,10 +4661,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="GETapi-v1-customer-interactions--id-"
-               value="17"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the customer interaction. Example: <code>17</code></p>
+<p>The ID of the customer interaction. Example: <code>1</code></p>
             </div>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>customer_interaction</code></b>&nbsp;&nbsp;
@@ -3061,6 +4683,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="customer-interactions-PUTapi-v1-customer-interactions--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -3071,17 +4694,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/v1/customer-interactions/17" \
+    "http://localhost:8000/api/v1/customer-interactions/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/customer-interactions/17"
+    "http://localhost:8000/api/v1/customer-interactions/1"
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -3112,7 +4737,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-customer-interactions--id-" data-method="PUT"
       data-path="api/v1/customer-interactions/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -3147,6 +4772,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-customer-interactions--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -3178,16 +4815,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="PUTapi-v1-customer-interactions--id-"
-               value="17"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the customer interaction. Example: <code>17</code></p>
+<p>The ID of the customer interaction. Example: <code>1</code></p>
             </div>
                     </form>
 
                     <h2 id="customer-interactions-DELETEapi-v1-customer-interactions--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -3198,17 +4836,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost:8000/api/v1/customer-interactions/17" \
+    "http://localhost:8000/api/v1/customer-interactions/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/customer-interactions/17"
+    "http://localhost:8000/api/v1/customer-interactions/1"
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -3239,7 +4879,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-customer-interactions--id-" data-method="DELETE"
       data-path="api/v1/customer-interactions/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -3269,6 +4909,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/customer-interactions/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-customer-interactions--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -3301,10 +4953,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="DELETEapi-v1-customer-interactions--id-"
-               value="17"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the customer interaction. Example: <code>17</code></p>
+<p>The ID of the customer interaction. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -3315,6 +4967,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="customers-GETapi-v1-customers">Display a listing of the customers.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Retrieves a paginated list of customers. You can specify the number of customers per page.</p>
@@ -3326,6 +4979,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/customers?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -3342,6 +4996,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -3355,7 +5010,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-customers">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -3367,7 +5022,172 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;Walk In Customer&quot;,
+            &quot;address&quot;: &quot;-&quot;,
+            &quot;phone_number&quot;: &quot;0&quot;,
+            &quot;email&quot;: &quot;-&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;0&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;name&quot;: &quot;Budi Santoso&quot;,
+            &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+            &quot;phone_number&quot;: &quot;081234567890&quot;,
+            &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;name&quot;: &quot;Siti Aminah&quot;,
+            &quot;address&quot;: &quot;Perumahan Griya Asri Blok B2, Bandung&quot;,
+            &quot;phone_number&quot;: &quot;082112345678&quot;,
+            &quot;email&quot;: &quot;siti.aminah@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;30&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+            &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+            &quot;phone_number&quot;: &quot;085312345678&quot;,
+            &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;15&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;name&quot;: &quot;Lilis Suryani&quot;,
+            &quot;address&quot;: &quot;Jl. Gajah Mada No. 12, Yogyakarta&quot;,
+            &quot;phone_number&quot;: &quot;087812345678&quot;,
+            &quot;email&quot;: &quot;lilis.suryani@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;7&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;name&quot;: &quot;Agus Wijaya&quot;,
+            &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+            &quot;phone_number&quot;: &quot;089912345678&quot;,
+            &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;name&quot;: &quot;Walk In Customer&quot;,
+            &quot;address&quot;: &quot;-&quot;,
+            &quot;phone_number&quot;: &quot;0&quot;,
+            &quot;email&quot;: &quot;-&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;0&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;name&quot;: &quot;Budi Santoso&quot;,
+            &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+            &quot;phone_number&quot;: &quot;081234567890&quot;,
+            &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;name&quot;: &quot;Siti Aminah&quot;,
+            &quot;address&quot;: &quot;Perumahan Griya Asri Blok B2, Bandung&quot;,
+            &quot;phone_number&quot;: &quot;082112345678&quot;,
+            &quot;email&quot;: &quot;siti.aminah@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;30&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+            &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+            &quot;phone_number&quot;: &quot;085312345678&quot;,
+            &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;15&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;name&quot;: &quot;Lilis Suryani&quot;,
+            &quot;address&quot;: &quot;Jl. Gajah Mada No. 12, Yogyakarta&quot;,
+            &quot;phone_number&quot;: &quot;087812345678&quot;,
+            &quot;email&quot;: &quot;lilis.suryani@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;7&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 12,
+            &quot;name&quot;: &quot;Agus Wijaya&quot;,
+            &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+            &quot;phone_number&quot;: &quot;089912345678&quot;,
+            &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/customers?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/customers?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/customers?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/customers&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 12,
+        &quot;total&quot;: 12
+    }
 }</code>
  </pre>
     </span>
@@ -3388,7 +5208,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-customers" data-method="GET"
       data-path="api/v1/customers"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -3418,6 +5238,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/customers</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-customers"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -3457,9 +5289,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                 </form>
 
-                    <h2 id="customers-POSTapi-v1-customers">Store a newly created resource in storage.</h2>
+                    <h2 id="customers-POSTapi-v1-customers">Create a new customer.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -3471,8 +5304,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/customers" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"\\\"John Doe\\\"\",
+    \"address\": \"\\\"123 Main St\\\"\",
+    \"phone_number\": \"\\\"555-1234\\\"\",
+    \"email\": \"\\\"john.doe@example.com\\\"\",
+    \"payment_terms\": \"\\\"Net 30\\\"\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -3481,19 +5323,45 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
+};
+
+let body = {
+    "name": "\"John Doe\"",
+    "address": "\"123 Main St\"",
+    "phone_number": "\"555-1234\"",
+    "email": "\"john.doe@example.com\"",
+    "payment_terms": "\"Net 30\""
 };
 
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-POSTapi-v1-customers">
-</span>
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;John Doe&quot;,
+        &quot;address&quot;: &quot;123 Main St&quot;,
+        &quot;phone_number&quot;: &quot;555-1234&quot;,
+        &quot;email&quot;: &quot;john.doe@example.com&quot;,
+        &quot;payment_terms&quot;: &quot;Net 30&quot;
+    }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-POSTapi-v1-customers" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-POSTapi-v1-customers"></span>:
@@ -3511,7 +5379,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-customers" data-method="POST"
       data-path="api/v1/customers"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -3542,6 +5410,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-customers"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -3565,11 +5445,73 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-v1-customers"
+               value=""John Doe""
+               data-component="body">
+    <br>
+<p>The name of the customer. Example: <code>"John Doe"</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="address"                data-endpoint="POSTapi-v1-customers"
+               value=""123 Main St""
+               data-component="body">
+    <br>
+<p>The address of the customer. Example: <code>"123 Main St"</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>phone_number</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="phone_number"                data-endpoint="POSTapi-v1-customers"
+               value=""555-1234""
+               data-component="body">
+    <br>
+<p>The phone number of the customer. Example: <code>"555-1234"</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-v1-customers"
+               value=""john.doe@example.com""
+               data-component="body">
+    <br>
+<p>The email of the customer. Must be unique. Example: <code>"john.doe@example.com"</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_terms</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_terms"                data-endpoint="POSTapi-v1-customers"
+               value=""Net 30""
+               data-component="body">
+    <br>
+<p>The payment terms. Example: <code>"Net 30"</code></p>
+        </div>
+        </form>
 
                     <h2 id="customers-GETapi-v1-customers--id-">Display the specified customer.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Retrieves a single customer by its ID.</p>
@@ -3581,6 +5523,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/customers/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -3591,6 +5534,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -3604,7 +5548,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-customers--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -3616,7 +5560,17 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Walk In Customer&quot;,
+        &quot;address&quot;: &quot;-&quot;,
+        &quot;phone_number&quot;: &quot;0&quot;,
+        &quot;email&quot;: &quot;-&quot;,
+        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+        &quot;payment_terms&quot;: &quot;0&quot;,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -3637,7 +5591,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-customers--id-" data-method="GET"
       data-path="api/v1/customers/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -3668,6 +5622,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-customers--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -3694,11 +5660,23 @@ You can check the Dev Tools console for debugging information.</code></pre>
                         <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
+<small>integer</small>&nbsp;
  &nbsp;
  &nbsp;
-                <input type="text" style="display: none"
-                              name="id"                data-endpoint="GETapi-v1-customers--id-"
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="GETapi-v1-customers--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the customer. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>customer</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="customer"                data-endpoint="GETapi-v1-customers--id-"
                value="1"
                data-component="url">
     <br>
@@ -3706,9 +5684,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
-                    <h2 id="customers-PUTapi-v1-customers--id-">Update the specified resource in storage.</h2>
+                    <h2 id="customers-PUTapi-v1-customers--id-">Update the specified customer.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -3720,8 +5699,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/customers/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"\\\"Jane Doe\\\"\",
+    \"address\": \"456 Oak Ave\",
+    \"phone_number\": \"555-5678\",
+    \"email\": \"jane.doe@example.com\",
+    \"payment_terms\": \"Net 60\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -3730,19 +5718,42 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
+};
+
+let body = {
+    "name": "\"Jane Doe\"",
+    "address": "456 Oak Ave",
+    "phone_number": "555-5678",
+    "email": "jane.doe@example.com",
+    "payment_terms": "Net 60"
 };
 
 fetch(url, {
     method: "PUT",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
 
 <span id="example-responses-PUTapi-v1-customers--id-">
-</span>
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+ &quot;data&quot;: {
+     &quot;id&quot;: 1,
+     &quot;name&quot;: &quot;Jane Doe&quot;,
+     ...
+ }
+}</code>
+ </pre>
+    </span>
 <span id="execution-results-PUTapi-v1-customers--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-PUTapi-v1-customers--id-"></span>:
@@ -3760,7 +5771,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-customers--id-" data-method="PUT"
       data-path="api/v1/customers/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -3794,6 +5805,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/customers/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-customers--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -3831,11 +5854,85 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the customer. Example: <code>1</code></p>
             </div>
-                    </form>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>customer</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="customer"                data-endpoint="PUTapi-v1-customers--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the customer to update. Example: <code>1</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-v1-customers--id-"
+               value=""Jane Doe""
+               data-component="body">
+    <br>
+<p>The name of the customer. Example: <code>"Jane Doe"</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="address"                data-endpoint="PUTapi-v1-customers--id-"
+               value="456 Oak Ave"
+               data-component="body">
+    <br>
+<p>The address of the customer. Must not be greater than 255 characters. Example: <code>456 Oak Ave</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>phone_number</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="phone_number"                data-endpoint="PUTapi-v1-customers--id-"
+               value="555-5678"
+               data-component="body">
+    <br>
+<p>The phone number of the customer. Must not be greater than 255 characters. Example: <code>555-5678</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="PUTapi-v1-customers--id-"
+               value="jane.doe@example.com"
+               data-component="body">
+    <br>
+<p>The email of the customer. Must be unique. Must be a valid email address. Example: <code>jane.doe@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_terms</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_terms"                data-endpoint="PUTapi-v1-customers--id-"
+               value="Net 60"
+               data-component="body">
+    <br>
+<p>The payment terms. Must not be greater than 255 characters. Example: <code>Net 60</code></p>
+        </div>
+        </form>
 
-                    <h2 id="customers-DELETEapi-v1-customers--id-">Remove the specified resource from storage.</h2>
+                    <h2 id="customers-DELETEapi-v1-customers--id-">Delete the specified customer.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -3847,6 +5944,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/customers/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -3857,6 +5955,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -3869,7 +5968,13 @@ fetch(url, {
 </span>
 
 <span id="example-responses-DELETEapi-v1-customers--id-">
-</span>
+            <blockquote>
+            <p>Example response (204):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+    </span>
 <span id="execution-results-DELETEapi-v1-customers--id-" hidden>
     <blockquote>Received response<span
                 id="execution-response-status-DELETEapi-v1-customers--id-"></span>:
@@ -3887,7 +5992,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-customers--id-" data-method="DELETE"
       data-path="api/v1/customers/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -3917,6 +6022,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/customers/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-customers--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -3954,6 +6071,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>The ID of the customer. Example: <code>1</code></p>
             </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>customer</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="customer"                data-endpoint="DELETEapi-v1-customers--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the customer to delete. Example: <code>1</code></p>
+            </div>
                     </form>
 
                 <h1 id="journal-entries">Journal Entries</h1>
@@ -3963,6 +6092,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="journal-entries-GETapi-v1-journal-entries">Display a listing of the journal entries.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -3974,6 +6104,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/journal-entries?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -3990,6 +6121,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -4003,7 +6135,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-journal-entries">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -4015,7 +6147,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Server Error&quot;
 }</code>
  </pre>
     </span>
@@ -4036,7 +6168,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-journal-entries" data-method="GET"
       data-path="api/v1/journal-entries"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -4066,6 +6198,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/journal-entries</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-journal-entries"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -4108,6 +6252,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="journal-entries-POSTapi-v1-journal-entries">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -4119,6 +6264,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/journal-entries" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -4129,6 +6275,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -4159,7 +6306,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-journal-entries" data-method="POST"
       data-path="api/v1/journal-entries"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -4190,6 +6337,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-journal-entries"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -4218,6 +6377,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="journal-entries-GETapi-v1-journal-entries--id-">Display the specified journal entry.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -4229,6 +6389,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/journal-entries/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -4239,6 +6400,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -4252,7 +6414,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-journal-entries--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -4264,7 +6426,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Server Error&quot;
 }</code>
  </pre>
     </span>
@@ -4285,7 +6447,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-journal-entries--id-" data-method="GET"
       data-path="api/v1/journal-entries/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -4315,6 +6477,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/journal-entries/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-journal-entries--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -4369,6 +6543,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="journal-entries-PUTapi-v1-journal-entries--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -4380,6 +6555,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/journal-entries/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -4390,6 +6566,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -4420,7 +6597,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-journal-entries--id-" data-method="PUT"
       data-path="api/v1/journal-entries/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -4454,6 +6631,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/journal-entries/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-journal-entries--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -4496,6 +6685,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="journal-entries-DELETEapi-v1-journal-entries--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -4507,6 +6697,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/journal-entries/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -4517,6 +6708,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -4547,7 +6739,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-journal-entries--id-" data-method="DELETE"
       data-path="api/v1/journal-entries/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -4577,6 +6769,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/journal-entries/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-journal-entries--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -4623,6 +6827,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="pos-GETapi-v1-pos">Display a listing of the resource.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -4634,6 +6839,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/pos" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -4644,6 +6850,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -4657,7 +6864,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-pos">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -4669,7 +6876,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: []
 }</code>
  </pre>
     </span>
@@ -4690,7 +6897,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-pos" data-method="GET"
       data-path="api/v1/pos"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -4721,6 +6928,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-pos"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -4749,6 +6968,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="pos-POSTapi-v1-pos">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -4760,6 +6980,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/pos" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -4770,6 +6991,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -4800,7 +7022,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-pos" data-method="POST"
       data-path="api/v1/pos"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -4831,6 +7053,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-pos"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -4859,6 +7093,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="pos-GETapi-v1-pos--id-">Display the specified resource.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -4870,6 +7105,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/pos/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -4880,6 +7116,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -4893,7 +7130,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-pos--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -4905,7 +7142,21 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;invoice&quot;: &quot;PO-00001&quot;,
+        &quot;supplier_id&quot;: 2,
+        &quot;user_id&quot;: null,
+        &quot;order_date&quot;: &quot;2025-10-27T09:16:25.000000Z&quot;,
+        &quot;due_date&quot;: &quot;2025-11-10T09:16:25.000000Z&quot;,
+        &quot;payment_type&quot;: &quot;Cash&quot;,
+        &quot;discount_total&quot;: &quot;25.00&quot;,
+        &quot;discount_total_type&quot;: &quot;percentage&quot;,
+        &quot;total&quot;: 1260,
+        &quot;status&quot;: &quot;Paid&quot;,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -4926,7 +7177,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-pos--id-" data-method="GET"
       data-path="api/v1/pos/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -4956,6 +7207,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/pos/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-pos--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -5010,6 +7273,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="pos-PUTapi-v1-pos--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -5021,6 +7285,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/pos/consequatur" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -5031,6 +7296,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -5061,7 +7327,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-pos--id-" data-method="PUT"
       data-path="api/v1/pos/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -5095,6 +7361,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/pos/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-pos--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -5137,6 +7415,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="pos-DELETEapi-v1-pos--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -5148,6 +7427,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/pos/consequatur" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -5158,6 +7438,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -5188,7 +7469,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-pos--id-" data-method="DELETE"
       data-path="api/v1/pos/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -5218,6 +7499,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/pos/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-pos--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -5264,6 +7557,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="payments-GETapi-v1-payments">Display a listing of the payments.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -5275,6 +7569,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/payments?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -5291,6 +7586,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -5304,7 +7600,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-payments">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -5316,7 +7612,2350 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;paymentable_id&quot;: 1,
+            &quot;amount&quot;: &quot;1260.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-10-28T09:16:25.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Cash&quot;,
+            &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 1,
+                &quot;invoice&quot;: &quot;PO-00001&quot;,
+                &quot;supplier_id&quot;: 2,
+                &quot;user_id&quot;: null,
+                &quot;order_date&quot;: &quot;2025-10-27T09:16:25.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-11-10T09:16:25.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Cash&quot;,
+                &quot;discount_total&quot;: 25,
+                &quot;discount_total_type&quot;: &quot;percentage&quot;,
+                &quot;total&quot;: 1260,
+                &quot;status&quot;: &quot;Paid&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;sub_total&quot;: 1260,
+                &quot;grand_total&quot;: 945,
+                &quot;items&quot;: [
+                    {
+                        &quot;id&quot;: 1,
+                        &quot;po_id&quot;: 1,
+                        &quot;product_id&quot;: 2,
+                        &quot;quantity&quot;: 7,
+                        &quot;remaining_quantity&quot;: 7,
+                        &quot;price&quot;: &quot;180.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 1260,
+                        &quot;expiry_date&quot;: &quot;2026-01-08&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;paymentable_id&quot;: 3,
+            &quot;amount&quot;: &quot;2260.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-11-23T09:16:25.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Transfer&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 3,
+                &quot;invoice&quot;: &quot;PO-00003&quot;,
+                &quot;supplier_id&quot;: 3,
+                &quot;user_id&quot;: null,
+                &quot;order_date&quot;: &quot;2025-11-18T09:16:25.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-12-15T09:16:25.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Transfer&quot;,
+                &quot;discount_total&quot;: 31,
+                &quot;discount_total_type&quot;: &quot;percentage&quot;,
+                &quot;total&quot;: 5400,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;sub_total&quot;: 5400,
+                &quot;grand_total&quot;: 3726,
+                &quot;items&quot;: [
+                    {
+                        &quot;id&quot;: 3,
+                        &quot;po_id&quot;: 3,
+                        &quot;product_id&quot;: 1,
+                        &quot;quantity&quot;: 9,
+                        &quot;remaining_quantity&quot;: 9,
+                        &quot;price&quot;: &quot;600.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 5400,
+                        &quot;expiry_date&quot;: null,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;paymentable_id&quot;: 4,
+            &quot;amount&quot;: &quot;2764.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-10-28T09:16:25.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Cash&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 4,
+                &quot;invoice&quot;: &quot;PO-00004&quot;,
+                &quot;supplier_id&quot;: 5,
+                &quot;user_id&quot;: null,
+                &quot;order_date&quot;: &quot;2025-10-24T09:16:25.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-11-05T09:16:25.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Cash&quot;,
+                &quot;discount_total&quot;: 14,
+                &quot;discount_total_type&quot;: &quot;fixed&quot;,
+                &quot;total&quot;: 4200,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;sub_total&quot;: 4200,
+                &quot;grand_total&quot;: 4186,
+                &quot;items&quot;: [
+                    {
+                        &quot;id&quot;: 4,
+                        &quot;po_id&quot;: 4,
+                        &quot;product_id&quot;: 5,
+                        &quot;quantity&quot;: 3,
+                        &quot;remaining_quantity&quot;: 3,
+                        &quot;price&quot;: &quot;1400.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 4200,
+                        &quot;expiry_date&quot;: &quot;2026-02-17&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;paymentable_id&quot;: 5,
+            &quot;amount&quot;: &quot;1569.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-11-04T09:16:25.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;-&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 5,
+                &quot;invoice&quot;: &quot;PO-00005&quot;,
+                &quot;supplier_id&quot;: 5,
+                &quot;user_id&quot;: null,
+                &quot;order_date&quot;: &quot;2025-10-30T09:16:25.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-11-10T09:16:25.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;-&quot;,
+                &quot;discount_total&quot;: 31,
+                &quot;discount_total_type&quot;: &quot;fixed&quot;,
+                &quot;total&quot;: 3930,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;sub_total&quot;: 3930,
+                &quot;grand_total&quot;: 3899,
+                &quot;items&quot;: [
+                    {
+                        &quot;id&quot;: 5,
+                        &quot;po_id&quot;: 5,
+                        &quot;product_id&quot;: 3,
+                        &quot;quantity&quot;: 3,
+                        &quot;remaining_quantity&quot;: 3,
+                        &quot;price&quot;: &quot;950.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 2850,
+                        &quot;expiry_date&quot;: &quot;2026-01-21&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    },
+                    {
+                        &quot;id&quot;: 6,
+                        &quot;po_id&quot;: 5,
+                        &quot;product_id&quot;: 2,
+                        &quot;quantity&quot;: 6,
+                        &quot;remaining_quantity&quot;: 6,
+                        &quot;price&quot;: &quot;180.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 1080,
+                        &quot;expiry_date&quot;: &quot;2026-02-12&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;paymentable_id&quot;: 6,
+            &quot;amount&quot;: &quot;6040.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-11-15T09:16:25.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Transfer&quot;,
+            &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 6,
+                &quot;invoice&quot;: &quot;PO-00006&quot;,
+                &quot;supplier_id&quot;: 4,
+                &quot;user_id&quot;: null,
+                &quot;order_date&quot;: &quot;2025-11-11T09:16:25.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-11-21T09:16:25.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Transfer&quot;,
+                &quot;discount_total&quot;: 28,
+                &quot;discount_total_type&quot;: &quot;fixed&quot;,
+                &quot;total&quot;: 6040,
+                &quot;status&quot;: &quot;Paid&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;sub_total&quot;: 6040,
+                &quot;grand_total&quot;: 6012,
+                &quot;items&quot;: [
+                    {
+                        &quot;id&quot;: 7,
+                        &quot;po_id&quot;: 6,
+                        &quot;product_id&quot;: 2,
+                        &quot;quantity&quot;: 2,
+                        &quot;remaining_quantity&quot;: 2,
+                        &quot;price&quot;: &quot;180.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 360,
+                        &quot;expiry_date&quot;: &quot;2025-12-29&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    },
+                    {
+                        &quot;id&quot;: 8,
+                        &quot;po_id&quot;: 6,
+                        &quot;product_id&quot;: 1,
+                        &quot;quantity&quot;: 6,
+                        &quot;remaining_quantity&quot;: 6,
+                        &quot;price&quot;: &quot;600.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 3600,
+                        &quot;expiry_date&quot;: null,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    },
+                    {
+                        &quot;id&quot;: 9,
+                        &quot;po_id&quot;: 6,
+                        &quot;product_id&quot;: 4,
+                        &quot;quantity&quot;: 1,
+                        &quot;remaining_quantity&quot;: 1,
+                        &quot;price&quot;: &quot;90.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 90,
+                        &quot;expiry_date&quot;: &quot;2026-02-04&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    },
+                    {
+                        &quot;id&quot;: 10,
+                        &quot;po_id&quot;: 6,
+                        &quot;product_id&quot;: 3,
+                        &quot;quantity&quot;: 2,
+                        &quot;remaining_quantity&quot;: 2,
+                        &quot;price&quot;: &quot;950.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 1900,
+                        &quot;expiry_date&quot;: &quot;2025-12-09&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    },
+                    {
+                        &quot;id&quot;: 11,
+                        &quot;po_id&quot;: 6,
+                        &quot;product_id&quot;: 4,
+                        &quot;quantity&quot;: 1,
+                        &quot;remaining_quantity&quot;: 1,
+                        &quot;price&quot;: &quot;90.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 90,
+                        &quot;expiry_date&quot;: &quot;2026-01-31&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;paymentable_id&quot;: 8,
+            &quot;amount&quot;: &quot;360.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-10-25T09:16:25.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Transfer&quot;,
+            &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 8,
+                &quot;invoice&quot;: &quot;PO-00008&quot;,
+                &quot;supplier_id&quot;: 4,
+                &quot;user_id&quot;: null,
+                &quot;order_date&quot;: &quot;2025-10-24T09:16:25.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-11-16T09:16:25.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Transfer&quot;,
+                &quot;discount_total&quot;: 1,
+                &quot;discount_total_type&quot;: &quot;fixed&quot;,
+                &quot;total&quot;: 360,
+                &quot;status&quot;: &quot;Paid&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;sub_total&quot;: 360,
+                &quot;grand_total&quot;: 359,
+                &quot;items&quot;: [
+                    {
+                        &quot;id&quot;: 14,
+                        &quot;po_id&quot;: 8,
+                        &quot;product_id&quot;: 2,
+                        &quot;quantity&quot;: 2,
+                        &quot;remaining_quantity&quot;: 2,
+                        &quot;price&quot;: &quot;180.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 360,
+                        &quot;expiry_date&quot;: &quot;2025-12-25&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;paymentable_id&quot;: 9,
+            &quot;amount&quot;: &quot;4238.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-11-12T09:16:25.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;-&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 9,
+                &quot;invoice&quot;: &quot;PO-00009&quot;,
+                &quot;supplier_id&quot;: 3,
+                &quot;user_id&quot;: null,
+                &quot;order_date&quot;: &quot;2025-11-12T09:16:25.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-12-10T09:16:25.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;-&quot;,
+                &quot;discount_total&quot;: 45,
+                &quot;discount_total_type&quot;: &quot;fixed&quot;,
+                &quot;total&quot;: 5400,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;sub_total&quot;: 5400,
+                &quot;grand_total&quot;: 5355,
+                &quot;items&quot;: [
+                    {
+                        &quot;id&quot;: 15,
+                        &quot;po_id&quot;: 9,
+                        &quot;product_id&quot;: 1,
+                        &quot;quantity&quot;: 9,
+                        &quot;remaining_quantity&quot;: 9,
+                        &quot;price&quot;: &quot;600.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 5400,
+                        &quot;expiry_date&quot;: null,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+            &quot;paymentable_id&quot;: 10,
+            &quot;amount&quot;: &quot;1044.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;-&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 10,
+                &quot;invoice&quot;: &quot;PO-00010&quot;,
+                &quot;supplier_id&quot;: 3,
+                &quot;user_id&quot;: null,
+                &quot;order_date&quot;: &quot;2025-11-16T09:16:25.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-11-24T09:16:25.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;-&quot;,
+                &quot;discount_total&quot;: 3,
+                &quot;discount_total_type&quot;: &quot;percentage&quot;,
+                &quot;total&quot;: 7400,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;sub_total&quot;: 7400,
+                &quot;grand_total&quot;: 7178,
+                &quot;items&quot;: [
+                    {
+                        &quot;id&quot;: 16,
+                        &quot;po_id&quot;: 10,
+                        &quot;product_id&quot;: 1,
+                        &quot;quantity&quot;: 3,
+                        &quot;remaining_quantity&quot;: 3,
+                        &quot;price&quot;: &quot;600.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 1800,
+                        &quot;expiry_date&quot;: null,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    },
+                    {
+                        &quot;id&quot;: 17,
+                        &quot;po_id&quot;: 10,
+                        &quot;product_id&quot;: 5,
+                        &quot;quantity&quot;: 4,
+                        &quot;remaining_quantity&quot;: 4,
+                        &quot;price&quot;: &quot;1400.00&quot;,
+                        &quot;discount&quot;: null,
+                        &quot;discount_type&quot;: &quot;percentage&quot;,
+                        &quot;total&quot;: 5600,
+                        &quot;expiry_date&quot;: &quot;2026-01-23&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 2,
+            &quot;amount&quot;: &quot;326.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-03-02T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Cash&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 2,
+                &quot;invoice&quot;: &quot;INV-00002&quot;,
+                &quot;customer_id&quot;: &quot;12&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-08-28T14:30:03.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-09-16T14:30:03.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Cash&quot;,
+                &quot;order_discount&quot;: 12,
+                &quot;order_discount_type&quot;: &quot;fixed&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 646.799999999999954525264911353588104248046875,
+                &quot;total&quot;: 7114.8000000000001818989403545856475830078125,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 4,
+                        &quot;sales_id&quot;: 2,
+                        &quot;product_id&quot;: 9,
+                        &quot;quantity&quot;: 5,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;800.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 9,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;2740660386479&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 17,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 6,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 5,
+                        &quot;sales_id&quot;: 2,
+                        &quot;product_id&quot;: 4,
+                        &quot;quantity&quot;: 3,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;480.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 4,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;9107410836319&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 12,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 6,
+                        &quot;sales_id&quot;: 2,
+                        &quot;product_id&quot;: 5,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;2600.00&quot;,
+                        &quot;total&quot;: &quot;5200.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 5,
+                            &quot;code&quot;: &quot;TR15&quot;,
+                            &quot;barcode&quot;: &quot;5112846880205&quot;,
+                            &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+                            &quot;stock_quantity&quot;: 16,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 1400,
+                            &quot;selling_price&quot;: 2600,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2024-11-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 3,
+            &quot;amount&quot;: &quot;7252.08&quot;,
+            &quot;payment_date&quot;: &quot;2025-09-23T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;eWallet&quot;,
+            &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 3,
+                &quot;invoice&quot;: &quot;INV-00003&quot;,
+                &quot;customer_id&quot;: &quot;1&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-07-19T14:30:03.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-08-03T14:30:03.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;eWallet&quot;,
+                &quot;order_discount&quot;: 0,
+                &quot;order_discount_type&quot;: &quot;percentage&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 48,
+                &quot;total&quot;: 528,
+                &quot;status&quot;: &quot;Paid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 7,
+                        &quot;sales_id&quot;: 3,
+                        &quot;product_id&quot;: 4,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;160.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 4,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;9107410836319&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 12,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 8,
+                        &quot;sales_id&quot;: 3,
+                        &quot;product_id&quot;: 9,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;320.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 9,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;2740660386479&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 17,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 6,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 6,
+            &quot;amount&quot;: &quot;619.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-07-08T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;-&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 6,
+                &quot;invoice&quot;: &quot;INV-00006&quot;,
+                &quot;customer_id&quot;: &quot;10&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2024-11-28T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2024-12-16T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;eWallet&quot;,
+                &quot;order_discount&quot;: 10,
+                &quot;order_discount_type&quot;: &quot;fixed&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 79,
+                &quot;total&quot;: 869,
+                &quot;status&quot;: &quot;Unpaid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 13,
+                        &quot;sales_id&quot;: 6,
+                        &quot;product_id&quot;: 4,
+                        &quot;quantity&quot;: 5,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;800.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 4,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;9107410836319&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 12,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 12,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 7,
+            &quot;amount&quot;: &quot;5266.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-02-24T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;eWallet&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 7,
+                &quot;invoice&quot;: &quot;INV-00007&quot;,
+                &quot;customer_id&quot;: &quot;2&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-05-28T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-06-22T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Transfer&quot;,
+                &quot;order_discount&quot;: 2,
+                &quot;order_discount_type&quot;: &quot;fixed&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 82.7999999999999971578290569595992565155029296875,
+                &quot;total&quot;: 910.799999999999954525264911353588104248046875,
+                &quot;status&quot;: &quot;Unpaid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 14,
+                        &quot;sales_id&quot;: 7,
+                        &quot;product_id&quot;: 9,
+                        &quot;quantity&quot;: 3,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;480.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 9,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;2740660386479&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 17,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 6,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 15,
+                        &quot;sales_id&quot;: 7,
+                        &quot;product_id&quot;: 7,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;350.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 7,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;3779775320282&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 46,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 4,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 13,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 9,
+            &quot;amount&quot;: &quot;6084.10&quot;,
+            &quot;payment_date&quot;: &quot;2025-08-22T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;-&quot;,
+            &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 9,
+                &quot;invoice&quot;: &quot;INV-00009&quot;,
+                &quot;customer_id&quot;: &quot;6&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-10-22T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-11-10T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;-&quot;,
+                &quot;order_discount&quot;: 17,
+                &quot;order_discount_type&quot;: &quot;fixed&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 566.299999999999954525264911353588104248046875,
+                &quot;total&quot;: 6229.3000000000001818989403545856475830078125,
+                &quot;status&quot;: &quot;Paid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 20,
+                        &quot;sales_id&quot;: 9,
+                        &quot;product_id&quot;: 4,
+                        &quot;quantity&quot;: 3,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;480.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 4,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;9107410836319&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 12,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 21,
+                        &quot;sales_id&quot;: 9,
+                        &quot;product_id&quot;: 5,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;2600.00&quot;,
+                        &quot;total&quot;: &quot;5200.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 5,
+                            &quot;code&quot;: &quot;TR15&quot;,
+                            &quot;barcode&quot;: &quot;5112846880205&quot;,
+                            &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+                            &quot;stock_quantity&quot;: 16,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 1400,
+                            &quot;selling_price&quot;: 2600,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2024-11-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 14,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 10,
+            &quot;amount&quot;: &quot;2208.00&quot;,
+            &quot;payment_date&quot;: &quot;2024-11-28T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Card&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 10,
+                &quot;invoice&quot;: &quot;INV-00010&quot;,
+                &quot;customer_id&quot;: &quot;4&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-02-18T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-03-10T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;eWallet&quot;,
+                &quot;order_discount&quot;: 15,
+                &quot;order_discount_type&quot;: &quot;fixed&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 30.5,
+                &quot;total&quot;: 335.5,
+                &quot;status&quot;: &quot;Unpaid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 22,
+                        &quot;sales_id&quot;: 10,
+                        &quot;product_id&quot;: 9,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;320.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 9,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;2740660386479&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 17,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 6,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 15,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 11,
+            &quot;amount&quot;: &quot;9659.10&quot;,
+            &quot;payment_date&quot;: &quot;2025-03-05T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Cash&quot;,
+            &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 11,
+                &quot;invoice&quot;: &quot;INV-00011&quot;,
+                &quot;customer_id&quot;: &quot;7&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-08-24T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-09-15T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Card&quot;,
+                &quot;order_discount&quot;: 12,
+                &quot;order_discount_type&quot;: &quot;fixed&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 441.80000000000001136868377216160297393798828125,
+                &quot;total&quot;: 4859.8000000000001818989403545856475830078125,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 23,
+                        &quot;sales_id&quot;: 11,
+                        &quot;product_id&quot;: 2,
+                        &quot;quantity&quot;: 4,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;1400.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 2,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;4819617615387&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 50,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 2,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 2,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 24,
+                        &quot;sales_id&quot;: 11,
+                        &quot;product_id&quot;: 6,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1100.00&quot;,
+                        &quot;total&quot;: &quot;2200.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 6,
+                            &quot;code&quot;: &quot;TR11&quot;,
+                            &quot;barcode&quot;: &quot;5089614188767&quot;,
+                            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                            &quot;stock_quantity&quot;: 19,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 600,
+                            &quot;selling_price&quot;: 1100,
+                            &quot;category_id&quot;: 6,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 9,
+                            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: false,
+                            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 25,
+                        &quot;sales_id&quot;: 11,
+                        &quot;product_id&quot;: 4,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;320.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 4,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;9107410836319&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 12,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 26,
+                        &quot;sales_id&quot;: 11,
+                        &quot;product_id&quot;: 7,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;350.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 7,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;3779775320282&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 46,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 4,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 27,
+                        &quot;sales_id&quot;: 11,
+                        &quot;product_id&quot;: 4,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;160.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 4,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;9107410836319&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 12,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 16,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 12,
+            &quot;amount&quot;: &quot;1553.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-05-15T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Transfer&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 12,
+                &quot;invoice&quot;: &quot;INV-00012&quot;,
+                &quot;customer_id&quot;: &quot;9&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-09-21T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-10-02T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Cash&quot;,
+                &quot;order_discount&quot;: 17,
+                &quot;order_discount_type&quot;: &quot;percentage&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 821.700000000000045474735088646411895751953125,
+                &quot;total&quot;: 9038.70000000000072759576141834259033203125,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 28,
+                        &quot;sales_id&quot;: 12,
+                        &quot;product_id&quot;: 6,
+                        &quot;quantity&quot;: 5,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1100.00&quot;,
+                        &quot;total&quot;: &quot;5500.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 6,
+                            &quot;code&quot;: &quot;TR11&quot;,
+                            &quot;barcode&quot;: &quot;5089614188767&quot;,
+                            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                            &quot;stock_quantity&quot;: 19,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 600,
+                            &quot;selling_price&quot;: 1100,
+                            &quot;category_id&quot;: 6,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 9,
+                            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: false,
+                            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 29,
+                        &quot;sales_id&quot;: 12,
+                        &quot;product_id&quot;: 1,
+                        &quot;quantity&quot;: 4,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1100.00&quot;,
+                        &quot;total&quot;: &quot;4400.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 1,
+                            &quot;code&quot;: &quot;TR11&quot;,
+                            &quot;barcode&quot;: &quot;7986298486210&quot;,
+                            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                            &quot;stock_quantity&quot;: 44,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 600,
+                            &quot;selling_price&quot;: 1100,
+                            &quot;category_id&quot;: 2,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: false,
+                            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 17,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 13,
+            &quot;amount&quot;: &quot;292.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-02-18T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Card&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 13,
+                &quot;invoice&quot;: &quot;INV-00013&quot;,
+                &quot;customer_id&quot;: &quot;6&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-08-26T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-09-11T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Transfer&quot;,
+                &quot;order_discount&quot;: 13,
+                &quot;order_discount_type&quot;: &quot;percentage&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 178.349999999999994315658113919198513031005859375,
+                &quot;total&quot;: 1961.84999999999990905052982270717620849609375,
+                &quot;status&quot;: &quot;Paid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 30,
+                        &quot;sales_id&quot;: 13,
+                        &quot;product_id&quot;: 2,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;350.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 2,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;4819617615387&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 50,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 2,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 2,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 31,
+                        &quot;sales_id&quot;: 13,
+                        &quot;product_id&quot;: 8,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1700.00&quot;,
+                        &quot;total&quot;: &quot;1700.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 8,
+                            &quot;code&quot;: &quot;TR13&quot;,
+                            &quot;barcode&quot;: &quot;3148624359009&quot;,
+                            &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+                            &quot;stock_quantity&quot;: 53,
+                            &quot;low_stock_threshold&quot;: 20,
+                            &quot;price&quot;: 950,
+                            &quot;selling_price&quot;: 1700,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-09-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 18,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 14,
+            &quot;amount&quot;: &quot;3553.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-01-23T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;-&quot;,
+            &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 14,
+                &quot;invoice&quot;: &quot;INV-00014&quot;,
+                &quot;customer_id&quot;: &quot;8&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-08-04T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-08-29T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;-&quot;,
+                &quot;order_discount&quot;: 2,
+                &quot;order_discount_type&quot;: &quot;fixed&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 629.799999999999954525264911353588104248046875,
+                &quot;total&quot;: 6927.8000000000001818989403545856475830078125,
+                &quot;status&quot;: &quot;Unpaid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 32,
+                        &quot;sales_id&quot;: 14,
+                        &quot;product_id&quot;: 1,
+                        &quot;quantity&quot;: 5,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1100.00&quot;,
+                        &quot;total&quot;: &quot;5500.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 1,
+                            &quot;code&quot;: &quot;TR11&quot;,
+                            &quot;barcode&quot;: &quot;7986298486210&quot;,
+                            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                            &quot;stock_quantity&quot;: 44,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 600,
+                            &quot;selling_price&quot;: 1100,
+                            &quot;category_id&quot;: 2,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: false,
+                            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 33,
+                        &quot;sales_id&quot;: 14,
+                        &quot;product_id&quot;: 4,
+                        &quot;quantity&quot;: 5,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;800.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 4,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;9107410836319&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 12,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 19,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 15,
+            &quot;amount&quot;: &quot;33.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-02-09T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Cash&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 15,
+                &quot;invoice&quot;: &quot;INV-00015&quot;,
+                &quot;customer_id&quot;: &quot;10&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-08-12T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-08-23T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Cash&quot;,
+                &quot;order_discount&quot;: 2,
+                &quot;order_discount_type&quot;: &quot;fixed&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 554.799999999999954525264911353588104248046875,
+                &quot;total&quot;: 6102.8000000000001818989403545856475830078125,
+                &quot;status&quot;: &quot;Paid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 34,
+                        &quot;sales_id&quot;: 15,
+                        &quot;product_id&quot;: 7,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;350.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 7,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;3779775320282&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 46,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 4,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 35,
+                        &quot;sales_id&quot;: 15,
+                        &quot;product_id&quot;: 5,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;2600.00&quot;,
+                        &quot;total&quot;: &quot;5200.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 5,
+                            &quot;code&quot;: &quot;TR15&quot;,
+                            &quot;barcode&quot;: &quot;5112846880205&quot;,
+                            &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+                            &quot;stock_quantity&quot;: 16,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 1400,
+                            &quot;selling_price&quot;: 2600,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2024-11-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 20,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 17,
+            &quot;amount&quot;: &quot;2260.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-03-27T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Cash&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 17,
+                &quot;invoice&quot;: &quot;INV-00017&quot;,
+                &quot;customer_id&quot;: &quot;4&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-10-13T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-11-05T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Cash&quot;,
+                &quot;order_discount&quot;: 3,
+                &quot;order_discount_type&quot;: &quot;percentage&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 213.400000000000005684341886080801486968994140625,
+                &quot;total&quot;: 2347.40000000000009094947017729282379150390625,
+                &quot;status&quot;: &quot;Unpaid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 38,
+                        &quot;sales_id&quot;: 17,
+                        &quot;product_id&quot;: 1,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1100.00&quot;,
+                        &quot;total&quot;: &quot;1100.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 1,
+                            &quot;code&quot;: &quot;TR11&quot;,
+                            &quot;barcode&quot;: &quot;7986298486210&quot;,
+                            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                            &quot;stock_quantity&quot;: 44,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 600,
+                            &quot;selling_price&quot;: 1100,
+                            &quot;category_id&quot;: 2,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: false,
+                            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 39,
+                        &quot;sales_id&quot;: 17,
+                        &quot;product_id&quot;: 1,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1100.00&quot;,
+                        &quot;total&quot;: &quot;1100.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 1,
+                            &quot;code&quot;: &quot;TR11&quot;,
+                            &quot;barcode&quot;: &quot;7986298486210&quot;,
+                            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                            &quot;stock_quantity&quot;: 44,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 600,
+                            &quot;selling_price&quot;: 1100,
+                            &quot;category_id&quot;: 2,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: false,
+                            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 21,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 18,
+            &quot;amount&quot;: &quot;7387.60&quot;,
+            &quot;payment_date&quot;: &quot;2025-07-27T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Cash&quot;,
+            &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 18,
+                &quot;invoice&quot;: &quot;INV-00018&quot;,
+                &quot;customer_id&quot;: &quot;6&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-09-20T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-10-19T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Card&quot;,
+                &quot;order_discount&quot;: 2,
+                &quot;order_discount_type&quot;: &quot;fixed&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 694.799999999999954525264911353588104248046875,
+                &quot;total&quot;: 7642.8000000000001818989403545856475830078125,
+                &quot;status&quot;: &quot;Unpaid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 40,
+                        &quot;sales_id&quot;: 18,
+                        &quot;product_id&quot;: 3,
+                        &quot;quantity&quot;: 3,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1700.00&quot;,
+                        &quot;total&quot;: &quot;5100.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 3,
+                            &quot;code&quot;: &quot;TR13&quot;,
+                            &quot;barcode&quot;: &quot;8381563189398&quot;,
+                            &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+                            &quot;stock_quantity&quot;: 55,
+                            &quot;low_stock_threshold&quot;: 20,
+                            &quot;price&quot;: 950,
+                            &quot;selling_price&quot;: 1700,
+                            &quot;category_id&quot;: 3,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+                            &quot;warehouse_id&quot;: 3,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-09-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 41,
+                        &quot;sales_id&quot;: 18,
+                        &quot;product_id&quot;: 7,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;350.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 7,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;3779775320282&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 46,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 4,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 42,
+                        &quot;sales_id&quot;: 18,
+                        &quot;product_id&quot;: 2,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;700.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 2,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;4819617615387&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 50,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 2,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 2,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 43,
+                        &quot;sales_id&quot;: 18,
+                        &quot;product_id&quot;: 4,
+                        &quot;quantity&quot;: 3,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;480.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 4,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;9107410836319&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 12,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 44,
+                        &quot;sales_id&quot;: 18,
+                        &quot;product_id&quot;: 9,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;320.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 9,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;2740660386479&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 17,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 6,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 22,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 20,
+            &quot;amount&quot;: &quot;5790.40&quot;,
+            &quot;payment_date&quot;: &quot;2025-08-14T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Cash&quot;,
+            &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 20,
+                &quot;invoice&quot;: &quot;INV-00020&quot;,
+                &quot;customer_id&quot;: &quot;5&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2024-11-27T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2024-12-27T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;eWallet&quot;,
+                &quot;order_discount&quot;: 19,
+                &quot;order_discount_type&quot;: &quot;percentage&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 506.25,
+                &quot;total&quot;: 5568.75,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 50,
+                        &quot;sales_id&quot;: 20,
+                        &quot;product_id&quot;: 10,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;2600.00&quot;,
+                        &quot;total&quot;: &quot;5200.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 10,
+                            &quot;code&quot;: &quot;TR15&quot;,
+                            &quot;barcode&quot;: &quot;3867088010591&quot;,
+                            &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+                            &quot;stock_quantity&quot;: 1,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 1400,
+                            &quot;selling_price&quot;: 2600,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 6,
+                            &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2024-11-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 51,
+                        &quot;sales_id&quot;: 20,
+                        &quot;product_id&quot;: 2,
+                        &quot;quantity&quot;: 3,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;1050.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 2,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;4819617615387&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 50,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 2,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 2,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 23,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 23,
+            &quot;amount&quot;: &quot;1154.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-04-14T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Cash&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 23,
+                &quot;invoice&quot;: &quot;INV-00023&quot;,
+                &quot;customer_id&quot;: &quot;6&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-04-10T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-05-08T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;eWallet&quot;,
+                &quot;order_discount&quot;: 2,
+                &quot;order_discount_type&quot;: &quot;percentage&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 705.6000000000000227373675443232059478759765625,
+                &quot;total&quot;: 7761.600000000000363797880709171295166015625,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 55,
+                        &quot;sales_id&quot;: 23,
+                        &quot;product_id&quot;: 8,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1700.00&quot;,
+                        &quot;total&quot;: &quot;3400.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 8,
+                            &quot;code&quot;: &quot;TR13&quot;,
+                            &quot;barcode&quot;: &quot;3148624359009&quot;,
+                            &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+                            &quot;stock_quantity&quot;: 53,
+                            &quot;low_stock_threshold&quot;: 20,
+                            &quot;price&quot;: 950,
+                            &quot;selling_price&quot;: 1700,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-09-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 56,
+                        &quot;sales_id&quot;: 23,
+                        &quot;product_id&quot;: 7,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;700.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 7,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;3779775320282&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 46,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 4,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 3,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 57,
+                        &quot;sales_id&quot;: 23,
+                        &quot;product_id&quot;: 8,
+                        &quot;quantity&quot;: 1,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1700.00&quot;,
+                        &quot;total&quot;: &quot;1700.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 8,
+                            &quot;code&quot;: &quot;TR13&quot;,
+                            &quot;barcode&quot;: &quot;3148624359009&quot;,
+                            &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+                            &quot;stock_quantity&quot;: 53,
+                            &quot;low_stock_threshold&quot;: 20,
+                            &quot;price&quot;: 950,
+                            &quot;selling_price&quot;: 1700,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-09-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 58,
+                        &quot;sales_id&quot;: 23,
+                        &quot;product_id&quot;: 2,
+                        &quot;quantity&quot;: 4,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;1400.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 2,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;4819617615387&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 50,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 2,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 2,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 24,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 24,
+            &quot;amount&quot;: &quot;2347.40&quot;,
+            &quot;payment_date&quot;: &quot;2025-09-16T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;eWallet&quot;,
+            &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 24,
+                &quot;invoice&quot;: &quot;INV-00024&quot;,
+                &quot;customer_id&quot;: &quot;11&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-06-16T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-06-23T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Cash&quot;,
+                &quot;order_discount&quot;: 14,
+                &quot;order_discount_type&quot;: &quot;percentage&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 304.43999999999999772626324556767940521240234375,
+                &quot;total&quot;: 3348.84000000000014551915228366851806640625,
+                &quot;status&quot;: &quot;Partial&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 59,
+                        &quot;sales_id&quot;: 24,
+                        &quot;product_id&quot;: 2,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;350.00&quot;,
+                        &quot;total&quot;: &quot;700.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 2,
+                            &quot;code&quot;: &quot;TR12&quot;,
+                            &quot;barcode&quot;: &quot;4819617615387&quot;,
+                            &quot;name&quot;: &quot;Expired Diode&quot;,
+                            &quot;stock_quantity&quot;: 50,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 180,
+                            &quot;selling_price&quot;: 350,
+                            &quot;category_id&quot;: 2,
+                            &quot;units_id&quot;: 1,
+                            &quot;supplier_id&quot;: 2,
+                            &quot;description&quot;: &quot;Diode product already expired&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 60,
+                        &quot;sales_id&quot;: 24,
+                        &quot;product_id&quot;: 9,
+                        &quot;quantity&quot;: 4,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;160.00&quot;,
+                        &quot;total&quot;: &quot;640.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 9,
+                            &quot;code&quot;: &quot;TR14&quot;,
+                            &quot;barcode&quot;: &quot;2740660386479&quot;,
+                            &quot;name&quot;: &quot;Low Stock LED&quot;,
+                            &quot;stock_quantity&quot;: 17,
+                            &quot;low_stock_threshold&quot;: 5,
+                            &quot;price&quot;: 90,
+                            &quot;selling_price&quot;: 160,
+                            &quot;category_id&quot;: 6,
+                            &quot;units_id&quot;: 2,
+                            &quot;supplier_id&quot;: 4,
+                            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                            &quot;warehouse_id&quot;: 1,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    },
+                    {
+                        &quot;id&quot;: 61,
+                        &quot;sales_id&quot;: 24,
+                        &quot;product_id&quot;: 6,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;1100.00&quot;,
+                        &quot;total&quot;: &quot;2200.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 6,
+                            &quot;code&quot;: &quot;TR11&quot;,
+                            &quot;barcode&quot;: &quot;5089614188767&quot;,
+                            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                            &quot;stock_quantity&quot;: 19,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 600,
+                            &quot;selling_price&quot;: 1100,
+                            &quot;category_id&quot;: 6,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 9,
+                            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: false,
+                            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            &quot;id&quot;: 25,
+            &quot;paymentable_type&quot;: &quot;App\\Models\\Sales&quot;,
+            &quot;paymentable_id&quot;: 26,
+            &quot;amount&quot;: &quot;2082.00&quot;,
+            &quot;payment_date&quot;: &quot;2025-05-17T09:16:26.000000Z&quot;,
+            &quot;payment_method&quot;: &quot;Cash&quot;,
+            &quot;notes&quot;: &quot;Partial payment during seeding.&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:26.000000Z&quot;,
+            &quot;paymentable&quot;: {
+                &quot;id&quot;: 26,
+                &quot;invoice&quot;: &quot;INV-00026&quot;,
+                &quot;customer_id&quot;: &quot;5&quot;,
+                &quot;user_id&quot;: 1,
+                &quot;order_date&quot;: &quot;2025-03-05T14:30:04.000000Z&quot;,
+                &quot;due_date&quot;: &quot;2025-03-23T14:30:04.000000Z&quot;,
+                &quot;payment_type&quot;: &quot;Cash&quot;,
+                &quot;order_discount&quot;: 20,
+                &quot;order_discount_type&quot;: &quot;percentage&quot;,
+                &quot;tax_rate&quot;: 10,
+                &quot;total_tax&quot;: 416,
+                &quot;total&quot;: 4576,
+                &quot;status&quot;: &quot;Unpaid&quot;,
+                &quot;amount_received&quot;: null,
+                &quot;change_amount&quot;: 0,
+                &quot;is_pos&quot;: false,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                &quot;sales_opportunity_id&quot;: null,
+                &quot;sales_items&quot;: [
+                    {
+                        &quot;id&quot;: 63,
+                        &quot;sales_id&quot;: 26,
+                        &quot;product_id&quot;: 10,
+                        &quot;quantity&quot;: 2,
+                        &quot;discount&quot;: &quot;0.00&quot;,
+                        &quot;discount_type&quot;: &quot;fixed&quot;,
+                        &quot;customer_price&quot;: &quot;2600.00&quot;,
+                        &quot;total&quot;: &quot;5200.00&quot;,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                        &quot;product&quot;: {
+                            &quot;id&quot;: 10,
+                            &quot;code&quot;: &quot;TR15&quot;,
+                            &quot;barcode&quot;: &quot;3867088010591&quot;,
+                            &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+                            &quot;stock_quantity&quot;: 1,
+                            &quot;low_stock_threshold&quot;: 10,
+                            &quot;price&quot;: 1400,
+                            &quot;selling_price&quot;: 2600,
+                            &quot;category_id&quot;: 1,
+                            &quot;units_id&quot;: 3,
+                            &quot;supplier_id&quot;: 6,
+                            &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+                            &quot;warehouse_id&quot;: 2,
+                            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                            &quot;has_expiry&quot;: true,
+                            &quot;created_at&quot;: &quot;2024-11-20T14:30:03.000000Z&quot;,
+                            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/payments?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/payments?page=6&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: &quot;http://localhost:8000/api/v1/payments?page=2&quot;
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 6,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/payments?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/payments?page=2&quot;,
+                &quot;label&quot;: &quot;2&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/payments?page=3&quot;,
+                &quot;label&quot;: &quot;3&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/payments?page=4&quot;,
+                &quot;label&quot;: &quot;4&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/payments?page=5&quot;,
+                &quot;label&quot;: &quot;5&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/payments?page=6&quot;,
+                &quot;label&quot;: &quot;6&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/payments?page=2&quot;,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/payments&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 25,
+        &quot;total&quot;: 141
+    }
 }</code>
  </pre>
     </span>
@@ -5337,7 +9976,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-payments" data-method="GET"
       data-path="api/v1/payments"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -5367,6 +10006,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/payments</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-payments"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -5409,6 +10060,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="payments-POSTapi-v1-payments">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -5420,6 +10072,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/payments" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -5430,6 +10083,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -5460,7 +10114,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-payments" data-method="POST"
       data-path="api/v1/payments"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -5491,6 +10145,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-payments"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -5519,6 +10185,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="payments-GETapi-v1-payments--id-">Display the specified payment.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -5530,6 +10197,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/payments/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -5540,6 +10208,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -5553,7 +10222,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-payments--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -5565,7 +10234,50 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;paymentable_type&quot;: &quot;App\\Models\\Purchase&quot;,
+        &quot;paymentable_id&quot;: 1,
+        &quot;amount&quot;: &quot;1260.00&quot;,
+        &quot;payment_date&quot;: &quot;2025-10-28T09:16:25.000000Z&quot;,
+        &quot;payment_method&quot;: &quot;Cash&quot;,
+        &quot;notes&quot;: &quot;Full payment during seeding.&quot;,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;paymentable&quot;: {
+            &quot;id&quot;: 1,
+            &quot;invoice&quot;: &quot;PO-00001&quot;,
+            &quot;supplier_id&quot;: 2,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-27T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-10T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;discount_total&quot;: 25,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 1260,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 1260,
+            &quot;grand_total&quot;: 945,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 1,
+                    &quot;po_id&quot;: 1,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 7,
+                    &quot;remaining_quantity&quot;: 7,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1260,
+                    &quot;expiry_date&quot;: &quot;2026-01-08&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        }
+    }
 }</code>
  </pre>
     </span>
@@ -5586,7 +10298,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-payments--id-" data-method="GET"
       data-path="api/v1/payments/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -5616,6 +10328,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/payments/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-payments--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -5670,6 +10394,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="payments-PUTapi-v1-payments--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -5681,6 +10406,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/payments/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -5691,6 +10417,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -5721,7 +10448,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-payments--id-" data-method="PUT"
       data-path="api/v1/payments/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -5755,6 +10482,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/payments/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-payments--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -5797,6 +10536,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="payments-DELETEapi-v1-payments--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -5808,6 +10548,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/payments/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -5818,6 +10559,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -5848,7 +10590,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-payments--id-" data-method="DELETE"
       data-path="api/v1/payments/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -5878,6 +10620,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/payments/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-payments--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -5924,6 +10678,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="pipeline-stages-GETapi-v1-pipeline-stages">Display a listing of the pipeline stages.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -5935,6 +10690,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/pipeline-stages?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -5951,6 +10707,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -5964,7 +10721,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-pipeline-stages">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -5976,7 +10733,39 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/pipeline-stages?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/pipeline-stages?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: null,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/pipeline-stages?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/pipeline-stages&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: null,
+        &quot;total&quot;: 0
+    }
 }</code>
  </pre>
     </span>
@@ -5997,7 +10786,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-pipeline-stages" data-method="GET"
       data-path="api/v1/pipeline-stages"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -6027,6 +10816,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/pipeline-stages</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-pipeline-stages"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -6069,6 +10870,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="pipeline-stages-POSTapi-v1-pipeline-stages">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -6080,6 +10882,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/pipeline-stages" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -6090,6 +10893,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -6120,7 +10924,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-pipeline-stages" data-method="POST"
       data-path="api/v1/pipeline-stages"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -6151,6 +10955,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-pipeline-stages"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -6179,6 +10995,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="pipeline-stages-GETapi-v1-pipeline-stages--id-">Display the specified pipeline stage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -6190,6 +11007,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/pipeline-stages/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -6200,6 +11018,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -6213,7 +11032,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-pipeline-stages--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (404):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -6225,7 +11044,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;No query results for model [App\\Models\\PipelineStage] 17&quot;
 }</code>
  </pre>
     </span>
@@ -6246,7 +11065,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-pipeline-stages--id-" data-method="GET"
       data-path="api/v1/pipeline-stages/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -6276,6 +11095,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/pipeline-stages/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-pipeline-stages--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -6330,6 +11161,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="pipeline-stages-PUTapi-v1-pipeline-stages--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -6341,6 +11173,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/pipeline-stages/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -6351,6 +11184,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -6381,7 +11215,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-pipeline-stages--id-" data-method="PUT"
       data-path="api/v1/pipeline-stages/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -6415,6 +11249,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/pipeline-stages/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-pipeline-stages--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -6457,6 +11303,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="pipeline-stages-DELETEapi-v1-pipeline-stages--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -6468,6 +11315,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/pipeline-stages/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -6478,6 +11326,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -6508,7 +11357,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-pipeline-stages--id-" data-method="DELETE"
       data-path="api/v1/pipeline-stages/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -6538,6 +11387,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/pipeline-stages/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-pipeline-stages--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -6584,6 +11445,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="products-GETapi-v1-products">Display a listing of the products.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Retrieves a paginated list of products. You can specify the number of products per page.</p>
@@ -6595,6 +11457,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/products?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -6611,6 +11474,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -6624,7 +11488,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-products">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -6636,7 +11500,600 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;code&quot;: &quot;TR11&quot;,
+            &quot;barcode&quot;: &quot;7986298486210&quot;,
+            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+            &quot;stock_quantity&quot;: 44,
+            &quot;low_stock_threshold&quot;: 10,
+            &quot;price&quot;: 600,
+            &quot;selling_price&quot;: 1100,
+            &quot;category_id&quot;: 2,
+            &quot;units_id&quot;: 1,
+            &quot;supplier_id&quot;: 3,
+            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+            &quot;warehouse_id&quot;: 2,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;has_expiry&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;warehouse&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
+                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
+                &quot;is_main&quot;: 0,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;category&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;FBT&quot;,
+                &quot;description&quot;: &quot;Flyback&quot;,
+                &quot;parent_id&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 3,
+                &quot;code&quot;: &quot;SUP003&quot;,
+                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;Pieces&quot;,
+                &quot;symbol&quot;: &quot;PCS&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;code&quot;: &quot;TR12&quot;,
+            &quot;barcode&quot;: &quot;4819617615387&quot;,
+            &quot;name&quot;: &quot;Expired Diode&quot;,
+            &quot;stock_quantity&quot;: 50,
+            &quot;low_stock_threshold&quot;: 10,
+            &quot;price&quot;: 180,
+            &quot;selling_price&quot;: 350,
+            &quot;category_id&quot;: 2,
+            &quot;units_id&quot;: 1,
+            &quot;supplier_id&quot;: 2,
+            &quot;description&quot;: &quot;Diode product already expired&quot;,
+            &quot;warehouse_id&quot;: 2,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;has_expiry&quot;: true,
+            &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;warehouse&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
+                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
+                &quot;is_main&quot;: 0,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;category&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;FBT&quot;,
+                &quot;description&quot;: &quot;Flyback&quot;,
+                &quot;parent_id&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 2,
+                &quot;code&quot;: &quot;SUP002&quot;,
+                &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+                &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;0227654321&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;Pieces&quot;,
+                &quot;symbol&quot;: &quot;PCS&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;code&quot;: &quot;TR13&quot;,
+            &quot;barcode&quot;: &quot;8381563189398&quot;,
+            &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+            &quot;stock_quantity&quot;: 55,
+            &quot;low_stock_threshold&quot;: 20,
+            &quot;price&quot;: 950,
+            &quot;selling_price&quot;: 1700,
+            &quot;category_id&quot;: 3,
+            &quot;units_id&quot;: 3,
+            &quot;supplier_id&quot;: 4,
+            &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+            &quot;warehouse_id&quot;: 3,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;has_expiry&quot;: true,
+            &quot;created_at&quot;: &quot;2025-09-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;warehouse&quot;: {
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;Gudang Bandung&quot;,
+                &quot;address&quot;: &quot;Jl. Pasteur No. 23, Bandung&quot;,
+                &quot;description&quot;: &quot;Gudang cabang untuk area Jawa Barat.&quot;,
+                &quot;is_main&quot;: 0,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;category&quot;: {
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;IC&quot;,
+                &quot;description&quot;: &quot;Integrated Circuit&quot;,
+                &quot;parent_id&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 4,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;Meters&quot;,
+                &quot;symbol&quot;: &quot;M&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;code&quot;: &quot;TR14&quot;,
+            &quot;barcode&quot;: &quot;9107410836319&quot;,
+            &quot;name&quot;: &quot;Low Stock LED&quot;,
+            &quot;stock_quantity&quot;: 12,
+            &quot;low_stock_threshold&quot;: 5,
+            &quot;price&quot;: 90,
+            &quot;selling_price&quot;: 160,
+            &quot;category_id&quot;: 1,
+            &quot;units_id&quot;: 2,
+            &quot;supplier_id&quot;: 3,
+            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+            &quot;warehouse_id&quot;: 1,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;has_expiry&quot;: true,
+            &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;warehouse&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;Gudang Utama Jakarta&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Cakung No. 10, Jakarta Timur&quot;,
+                &quot;description&quot;: &quot;Gudang utama untuk distribusi pusat.&quot;,
+                &quot;is_main&quot;: 1,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;category&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;TR&quot;,
+                &quot;description&quot;: &quot;Transistor&quot;,
+                &quot;parent_id&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 3,
+                &quot;code&quot;: &quot;SUP003&quot;,
+                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Roll&quot;,
+                &quot;symbol&quot;: &quot;Roll&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;code&quot;: &quot;TR15&quot;,
+            &quot;barcode&quot;: &quot;5112846880205&quot;,
+            &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+            &quot;stock_quantity&quot;: 16,
+            &quot;low_stock_threshold&quot;: 10,
+            &quot;price&quot;: 1400,
+            &quot;selling_price&quot;: 2600,
+            &quot;category_id&quot;: 1,
+            &quot;units_id&quot;: 1,
+            &quot;supplier_id&quot;: 4,
+            &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+            &quot;warehouse_id&quot;: 2,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;has_expiry&quot;: true,
+            &quot;created_at&quot;: &quot;2024-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;warehouse&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
+                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
+                &quot;is_main&quot;: 0,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;category&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;TR&quot;,
+                &quot;description&quot;: &quot;Transistor&quot;,
+                &quot;parent_id&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 4,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;Pieces&quot;,
+                &quot;symbol&quot;: &quot;PCS&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;code&quot;: &quot;TR11&quot;,
+            &quot;barcode&quot;: &quot;5089614188767&quot;,
+            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+            &quot;stock_quantity&quot;: 19,
+            &quot;low_stock_threshold&quot;: 10,
+            &quot;price&quot;: 600,
+            &quot;selling_price&quot;: 1100,
+            &quot;category_id&quot;: 6,
+            &quot;units_id&quot;: 3,
+            &quot;supplier_id&quot;: 9,
+            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+            &quot;warehouse_id&quot;: 2,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;has_expiry&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;warehouse&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
+                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
+                &quot;is_main&quot;: 0,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;category&quot;: {
+                &quot;id&quot;: 6,
+                &quot;name&quot;: &quot;IC&quot;,
+                &quot;description&quot;: &quot;Integrated Circuit&quot;,
+                &quot;parent_id&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 9,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;Meters&quot;,
+                &quot;symbol&quot;: &quot;M&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;code&quot;: &quot;TR12&quot;,
+            &quot;barcode&quot;: &quot;3779775320282&quot;,
+            &quot;name&quot;: &quot;Expired Diode&quot;,
+            &quot;stock_quantity&quot;: 46,
+            &quot;low_stock_threshold&quot;: 10,
+            &quot;price&quot;: 180,
+            &quot;selling_price&quot;: 350,
+            &quot;category_id&quot;: 4,
+            &quot;units_id&quot;: 3,
+            &quot;supplier_id&quot;: 3,
+            &quot;description&quot;: &quot;Diode product already expired&quot;,
+            &quot;warehouse_id&quot;: 1,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;has_expiry&quot;: true,
+            &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;warehouse&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;Gudang Utama Jakarta&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Cakung No. 10, Jakarta Timur&quot;,
+                &quot;description&quot;: &quot;Gudang utama untuk distribusi pusat.&quot;,
+                &quot;is_main&quot;: 1,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;category&quot;: {
+                &quot;id&quot;: 4,
+                &quot;name&quot;: &quot;TR&quot;,
+                &quot;description&quot;: &quot;Transistor&quot;,
+                &quot;parent_id&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 3,
+                &quot;code&quot;: &quot;SUP003&quot;,
+                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;Meters&quot;,
+                &quot;symbol&quot;: &quot;M&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;code&quot;: &quot;TR13&quot;,
+            &quot;barcode&quot;: &quot;3148624359009&quot;,
+            &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+            &quot;stock_quantity&quot;: 53,
+            &quot;low_stock_threshold&quot;: 20,
+            &quot;price&quot;: 950,
+            &quot;selling_price&quot;: 1700,
+            &quot;category_id&quot;: 1,
+            &quot;units_id&quot;: 1,
+            &quot;supplier_id&quot;: 4,
+            &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+            &quot;warehouse_id&quot;: 2,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;has_expiry&quot;: true,
+            &quot;created_at&quot;: &quot;2025-09-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;warehouse&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
+                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
+                &quot;is_main&quot;: 0,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;category&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;TR&quot;,
+                &quot;description&quot;: &quot;Transistor&quot;,
+                &quot;parent_id&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 4,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;Pieces&quot;,
+                &quot;symbol&quot;: &quot;PCS&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;code&quot;: &quot;TR14&quot;,
+            &quot;barcode&quot;: &quot;2740660386479&quot;,
+            &quot;name&quot;: &quot;Low Stock LED&quot;,
+            &quot;stock_quantity&quot;: 17,
+            &quot;low_stock_threshold&quot;: 5,
+            &quot;price&quot;: 90,
+            &quot;selling_price&quot;: 160,
+            &quot;category_id&quot;: 6,
+            &quot;units_id&quot;: 2,
+            &quot;supplier_id&quot;: 4,
+            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+            &quot;warehouse_id&quot;: 1,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;has_expiry&quot;: true,
+            &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;warehouse&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;Gudang Utama Jakarta&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Cakung No. 10, Jakarta Timur&quot;,
+                &quot;description&quot;: &quot;Gudang utama untuk distribusi pusat.&quot;,
+                &quot;is_main&quot;: 1,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;category&quot;: {
+                &quot;id&quot;: 6,
+                &quot;name&quot;: &quot;IC&quot;,
+                &quot;description&quot;: &quot;Integrated Circuit&quot;,
+                &quot;parent_id&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 4,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Roll&quot;,
+                &quot;symbol&quot;: &quot;Roll&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;code&quot;: &quot;TR15&quot;,
+            &quot;barcode&quot;: &quot;3867088010591&quot;,
+            &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+            &quot;stock_quantity&quot;: 1,
+            &quot;low_stock_threshold&quot;: 10,
+            &quot;price&quot;: 1400,
+            &quot;selling_price&quot;: 2600,
+            &quot;category_id&quot;: 1,
+            &quot;units_id&quot;: 3,
+            &quot;supplier_id&quot;: 6,
+            &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+            &quot;warehouse_id&quot;: 2,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;has_expiry&quot;: true,
+            &quot;created_at&quot;: &quot;2024-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;warehouse&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
+                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
+                &quot;is_main&quot;: 0,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;category&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;TR&quot;,
+                &quot;description&quot;: &quot;Transistor&quot;,
+                &quot;parent_id&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 6,
+                &quot;code&quot;: &quot;SUP001&quot;,
+                &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+                &quot;phone_number&quot;: &quot;0218887766&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;Meters&quot;,
+                &quot;symbol&quot;: &quot;M&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/products?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/products?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/products?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/products&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 10,
+        &quot;total&quot;: 10
+    }
 }</code>
  </pre>
     </span>
@@ -6657,7 +12114,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-products" data-method="GET"
       data-path="api/v1/products"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -6687,6 +12144,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/products</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-products"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -6729,6 +12198,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="products-POSTapi-v1-products">Create a new product.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Creates a new product with the provided data.</p>
@@ -6740,6 +12210,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/products" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -6763,6 +12234,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -6835,7 +12307,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-products" data-method="POST"
       data-path="api/v1/products"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -6865,6 +12337,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/products</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-products"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -7015,6 +12499,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="products-GETapi-v1-products--id-">Display the specified product.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Retrieves a single product by its ID.</p>
@@ -7026,6 +12511,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/products/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -7036,6 +12522,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -7049,7 +12536,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-products--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -7061,7 +12548,62 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;code&quot;: &quot;TR11&quot;,
+        &quot;barcode&quot;: &quot;7986298486210&quot;,
+        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+        &quot;stock_quantity&quot;: 44,
+        &quot;low_stock_threshold&quot;: 10,
+        &quot;price&quot;: 600,
+        &quot;selling_price&quot;: 1100,
+        &quot;category_id&quot;: 2,
+        &quot;units_id&quot;: 1,
+        &quot;supplier_id&quot;: 3,
+        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+        &quot;warehouse_id&quot;: 2,
+        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+        &quot;has_expiry&quot;: false,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;warehouse&quot;: {
+            &quot;id&quot;: 2,
+            &quot;name&quot;: &quot;Gudang Surabaya&quot;,
+            &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
+            &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
+            &quot;is_main&quot;: 0,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        &quot;category&quot;: {
+            &quot;id&quot;: 2,
+            &quot;name&quot;: &quot;FBT&quot;,
+            &quot;description&quot;: &quot;Flyback&quot;,
+            &quot;parent_id&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        &quot;supplier&quot;: {
+            &quot;id&quot;: 3,
+            &quot;code&quot;: &quot;SUP003&quot;,
+            &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+            &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+            &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+            &quot;location&quot;: &quot;OUT&quot;,
+            &quot;payment_terms&quot;: &quot;15&quot;,
+            &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        &quot;unit&quot;: {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;Pieces&quot;,
+            &quot;symbol&quot;: &quot;PCS&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        }
+    }
 }</code>
  </pre>
     </span>
@@ -7082,7 +12624,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-products--id-" data-method="GET"
       data-path="api/v1/products/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -7112,6 +12654,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/products/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-products--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -7166,6 +12720,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="products-PUTapi-v1-products--id-">Update the specified product.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Updates a product with the provided data.</p>
@@ -7177,15 +12732,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/products/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
     \"name\": \"\\\"Laptop Pro v2\\\"\",
-    \"code\": \"amniihfqcoynlazghdtqt\",
+    \"code\": \"LP-001\",
     \"price\": 1250,
-    \"selling_price\": 80,
-    \"stock_quantity\": 6,
-    \"description\": \"Dolores dolorum amet iste laborum eius est dolor.\"
+    \"selling_price\": 1200,
+    \"category_id\": 1,
+    \"supplier_id\": 1,
+    \"units_id\": 1,
+    \"stock_quantity\": 100,
+    \"description\": \"A powerful laptop.\"
 }"
 </code></pre></div>
 
@@ -7196,17 +12755,21 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
 
 let body = {
     "name": "\"Laptop Pro v2\"",
-    "code": "amniihfqcoynlazghdtqt",
+    "code": "LP-001",
     "price": 1250,
-    "selling_price": 80,
-    "stock_quantity": 6,
-    "description": "Dolores dolorum amet iste laborum eius est dolor."
+    "selling_price": 1200,
+    "category_id": 1,
+    "supplier_id": 1,
+    "units_id": 1,
+    "stock_quantity": 100,
+    "description": "A powerful laptop."
 };
 
 fetch(url, {
@@ -7258,7 +12821,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-products--id-" data-method="PUT"
       data-path="api/v1/products/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -7292,6 +12855,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/products/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-products--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -7361,10 +12936,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="code"                data-endpoint="PUTapi-v1-products--id-"
-               value="amniihfqcoynlazghdtqt"
+               value="LP-001"
                data-component="body">
     <br>
-<p>Must not be greater than 255 characters. Example: <code>amniihfqcoynlazghdtqt</code></p>
+<p>The product code. Must be unique. Must not be greater than 255 characters. Example: <code>LP-001</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>price</code></b>&nbsp;&nbsp;
@@ -7385,10 +12960,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="selling_price"                data-endpoint="PUTapi-v1-products--id-"
-               value="80"
+               value="1200"
                data-component="body">
     <br>
-<p>Must be at least 0. Example: <code>80</code></p>
+<p>The selling price of the product. Must be at least 0. Example: <code>1200</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>category_id</code></b>&nbsp;&nbsp;
@@ -7397,10 +12972,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="category_id"                data-endpoint="PUTapi-v1-products--id-"
-               value=""
+               value="1"
                data-component="body">
     <br>
-<p>The <code>id</code> of an existing record in the categories table.</p>
+<p>The ID of the category the product belongs to. The <code>id</code> of an existing record in the categories table. Example: <code>1</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>supplier_id</code></b>&nbsp;&nbsp;
@@ -7409,10 +12984,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="supplier_id"                data-endpoint="PUTapi-v1-products--id-"
-               value=""
+               value="1"
                data-component="body">
     <br>
-<p>The <code>id</code> of an existing record in the suppliers table.</p>
+<p>The ID of the supplier. The <code>id</code> of an existing record in the suppliers table. Example: <code>1</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>units_id</code></b>&nbsp;&nbsp;
@@ -7421,10 +12996,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="units_id"                data-endpoint="PUTapi-v1-products--id-"
-               value=""
+               value="1"
                data-component="body">
     <br>
-<p>The <code>id</code> of an existing record in the units table.</p>
+<p>The ID of the unit of measure. The <code>id</code> of an existing record in the units table. Example: <code>1</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>warehouse_id</code></b>&nbsp;&nbsp;
@@ -7445,10 +13020,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="stock_quantity"                data-endpoint="PUTapi-v1-products--id-"
-               value="6"
+               value="100"
                data-component="body">
     <br>
-<p>Must be at least 0. Example: <code>6</code></p>
+<p>The initial stock quantity. Must be at least 0. Example: <code>100</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
@@ -7457,16 +13032,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="description"                data-endpoint="PUTapi-v1-products--id-"
-               value="Dolores dolorum amet iste laborum eius est dolor."
+               value="A powerful laptop."
                data-component="body">
     <br>
-<p>Example: <code>Dolores dolorum amet iste laborum eius est dolor.</code></p>
+<p>A description of the product. Example: <code>A powerful laptop.</code></p>
         </div>
         </form>
 
                     <h2 id="products-DELETEapi-v1-products--id-">Delete the specified product.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Deletes a single product by its ID.</p>
@@ -7478,6 +13054,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/products/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -7488,6 +13065,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -7533,7 +13111,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-products--id-" data-method="DELETE"
       data-path="api/v1/products/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -7563,6 +13141,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/products/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-products--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -7621,6 +13211,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="purchase-order-items-GETapi-v1-po-items">Display a listing of the purchase order items.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -7632,6 +13223,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/po-items?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -7648,6 +13240,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -7661,7 +13254,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-po-items">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -7673,7 +13266,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Server Error&quot;
 }</code>
  </pre>
     </span>
@@ -7694,7 +13287,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-po-items" data-method="GET"
       data-path="api/v1/po-items"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -7724,6 +13317,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/po-items</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-po-items"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -7766,6 +13371,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="purchase-order-items-POSTapi-v1-po-items">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -7777,6 +13383,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/po-items" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -7787,6 +13394,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -7817,7 +13425,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-po-items" data-method="POST"
       data-path="api/v1/po-items"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -7848,6 +13456,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-po-items"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -7876,6 +13496,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="purchase-order-items-GETapi-v1-po-items--id-">Display the specified purchase order item.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -7887,6 +13508,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/po-items/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -7897,6 +13519,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -7910,7 +13533,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-po-items--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -7922,7 +13545,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Server Error&quot;
 }</code>
  </pre>
     </span>
@@ -7943,7 +13566,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-po-items--id-" data-method="GET"
       data-path="api/v1/po-items/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -7973,6 +13596,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/po-items/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-po-items--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -8027,6 +13662,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="purchase-order-items-PUTapi-v1-po-items--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -8038,6 +13674,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/po-items/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -8048,6 +13685,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -8078,7 +13716,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-po-items--id-" data-method="PUT"
       data-path="api/v1/po-items/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -8112,6 +13750,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/po-items/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-po-items--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -8154,6 +13804,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="purchase-order-items-DELETEapi-v1-po-items--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -8165,6 +13816,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/po-items/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -8175,6 +13827,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -8205,7 +13858,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-po-items--id-" data-method="DELETE"
       data-path="api/v1/po-items/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -8235,6 +13888,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/po-items/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-po-items--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -8281,6 +13946,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="purchase-orders-GETapi-v1-purchases">Display a listing of the purchase orders.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Retrieves a paginated list of purchase orders.</p>
@@ -8292,6 +13958,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/purchases?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -8308,6 +13975,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -8321,7 +13989,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-purchases">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -8333,7 +14001,1176 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;invoice&quot;: &quot;PO-00001&quot;,
+            &quot;supplier_id&quot;: 2,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-27T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-10T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;discount_total&quot;: 25,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 1260,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 1260,
+            &quot;grand_total&quot;: 945,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 2,
+                &quot;code&quot;: &quot;SUP002&quot;,
+                &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+                &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;0227654321&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 1,
+                    &quot;po_id&quot;: 1,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 7,
+                    &quot;remaining_quantity&quot;: 7,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1260,
+                    &quot;expiry_date&quot;: &quot;2026-01-08&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;invoice&quot;: &quot;PO-00002&quot;,
+            &quot;supplier_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-01T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-24T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: 49,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 1260,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 1260,
+            &quot;grand_total&quot;: 642.6000000000000227373675443232059478759765625,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 1,
+                &quot;code&quot;: &quot;SUP001&quot;,
+                &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+                &quot;phone_number&quot;: &quot;0218887766&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 2,
+                    &quot;po_id&quot;: 2,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 7,
+                    &quot;remaining_quantity&quot;: 7,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1260,
+                    &quot;expiry_date&quot;: &quot;2026-01-21&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;invoice&quot;: &quot;PO-00003&quot;,
+            &quot;supplier_id&quot;: 3,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-18T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-15T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: 31,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 5400,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 5400,
+            &quot;grand_total&quot;: 3726,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 3,
+                &quot;code&quot;: &quot;SUP003&quot;,
+                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 3,
+                    &quot;po_id&quot;: 3,
+                    &quot;product_id&quot;: 1,
+                    &quot;quantity&quot;: 9,
+                    &quot;remaining_quantity&quot;: 9,
+                    &quot;price&quot;: &quot;600.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 5400,
+                    &quot;expiry_date&quot;: null,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;invoice&quot;: &quot;PO-00004&quot;,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-24T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-05T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;discount_total&quot;: 14,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 4200,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 4200,
+            &quot;grand_total&quot;: 4186,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 5,
+                &quot;code&quot;: &quot;SUP005&quot;,
+                &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+                &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+                &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;60&quot;,
+                &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 4,
+                    &quot;po_id&quot;: 4,
+                    &quot;product_id&quot;: 5,
+                    &quot;quantity&quot;: 3,
+                    &quot;remaining_quantity&quot;: 3,
+                    &quot;price&quot;: &quot;1400.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 4200,
+                    &quot;expiry_date&quot;: &quot;2026-02-17&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;invoice&quot;: &quot;PO-00005&quot;,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-30T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-10T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: 31,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 3930,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 3930,
+            &quot;grand_total&quot;: 3899,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 5,
+                &quot;code&quot;: &quot;SUP005&quot;,
+                &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+                &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+                &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;60&quot;,
+                &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 5,
+                    &quot;po_id&quot;: 5,
+                    &quot;product_id&quot;: 3,
+                    &quot;quantity&quot;: 3,
+                    &quot;remaining_quantity&quot;: 3,
+                    &quot;price&quot;: &quot;950.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 2850,
+                    &quot;expiry_date&quot;: &quot;2026-01-21&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 6,
+                    &quot;po_id&quot;: 5,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 6,
+                    &quot;remaining_quantity&quot;: 6,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1080,
+                    &quot;expiry_date&quot;: &quot;2026-02-12&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;invoice&quot;: &quot;PO-00006&quot;,
+            &quot;supplier_id&quot;: 4,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-11T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-21T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: 28,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 6040,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 6040,
+            &quot;grand_total&quot;: 6012,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 4,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 7,
+                    &quot;po_id&quot;: 6,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 2,
+                    &quot;remaining_quantity&quot;: 2,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 360,
+                    &quot;expiry_date&quot;: &quot;2025-12-29&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 8,
+                    &quot;po_id&quot;: 6,
+                    &quot;product_id&quot;: 1,
+                    &quot;quantity&quot;: 6,
+                    &quot;remaining_quantity&quot;: 6,
+                    &quot;price&quot;: &quot;600.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 3600,
+                    &quot;expiry_date&quot;: null,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 9,
+                    &quot;po_id&quot;: 6,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 1,
+                    &quot;remaining_quantity&quot;: 1,
+                    &quot;price&quot;: &quot;90.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 90,
+                    &quot;expiry_date&quot;: &quot;2026-02-04&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 10,
+                    &quot;po_id&quot;: 6,
+                    &quot;product_id&quot;: 3,
+                    &quot;quantity&quot;: 2,
+                    &quot;remaining_quantity&quot;: 2,
+                    &quot;price&quot;: &quot;950.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1900,
+                    &quot;expiry_date&quot;: &quot;2025-12-09&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 11,
+                    &quot;po_id&quot;: 6,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 1,
+                    &quot;remaining_quantity&quot;: 1,
+                    &quot;price&quot;: &quot;90.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 90,
+                    &quot;expiry_date&quot;: &quot;2026-01-31&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;invoice&quot;: &quot;PO-00007&quot;,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-27T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: 25,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 4980,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 4980,
+            &quot;grand_total&quot;: 4955,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 5,
+                &quot;code&quot;: &quot;SUP005&quot;,
+                &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+                &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+                &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;60&quot;,
+                &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 12,
+                    &quot;po_id&quot;: 7,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 1,
+                    &quot;remaining_quantity&quot;: 1,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 180,
+                    &quot;expiry_date&quot;: &quot;2026-02-11&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 13,
+                    &quot;po_id&quot;: 7,
+                    &quot;product_id&quot;: 1,
+                    &quot;quantity&quot;: 8,
+                    &quot;remaining_quantity&quot;: 8,
+                    &quot;price&quot;: &quot;600.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 4800,
+                    &quot;expiry_date&quot;: null,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;invoice&quot;: &quot;PO-00008&quot;,
+            &quot;supplier_id&quot;: 4,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-24T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-16T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: 1,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 360,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 360,
+            &quot;grand_total&quot;: 359,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 4,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 14,
+                    &quot;po_id&quot;: 8,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 2,
+                    &quot;remaining_quantity&quot;: 2,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 360,
+                    &quot;expiry_date&quot;: &quot;2025-12-25&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;invoice&quot;: &quot;PO-00009&quot;,
+            &quot;supplier_id&quot;: 3,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-12T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-10T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: 45,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 5400,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 5400,
+            &quot;grand_total&quot;: 5355,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 3,
+                &quot;code&quot;: &quot;SUP003&quot;,
+                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 15,
+                    &quot;po_id&quot;: 9,
+                    &quot;product_id&quot;: 1,
+                    &quot;quantity&quot;: 9,
+                    &quot;remaining_quantity&quot;: 9,
+                    &quot;price&quot;: &quot;600.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 5400,
+                    &quot;expiry_date&quot;: null,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;invoice&quot;: &quot;PO-00010&quot;,
+            &quot;supplier_id&quot;: 3,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-16T09:16:25.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-24T09:16:25.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: 3,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 7400,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;sub_total&quot;: 7400,
+            &quot;grand_total&quot;: 7178,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 3,
+                &quot;code&quot;: &quot;SUP003&quot;,
+                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 16,
+                    &quot;po_id&quot;: 10,
+                    &quot;product_id&quot;: 1,
+                    &quot;quantity&quot;: 3,
+                    &quot;remaining_quantity&quot;: 3,
+                    &quot;price&quot;: &quot;600.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1800,
+                    &quot;expiry_date&quot;: null,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 17,
+                    &quot;po_id&quot;: 10,
+                    &quot;product_id&quot;: 5,
+                    &quot;quantity&quot;: 4,
+                    &quot;remaining_quantity&quot;: 4,
+                    &quot;price&quot;: &quot;1400.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 5600,
+                    &quot;expiry_date&quot;: &quot;2026-01-23&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;invoice&quot;: &quot;PO-00011&quot;,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-14T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-10T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: 35,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 1400,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sub_total&quot;: 1400,
+            &quot;grand_total&quot;: 1365,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 5,
+                &quot;code&quot;: &quot;SUP005&quot;,
+                &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+                &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+                &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;60&quot;,
+                &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 18,
+                    &quot;po_id&quot;: 11,
+                    &quot;product_id&quot;: 10,
+                    &quot;quantity&quot;: 1,
+                    &quot;remaining_quantity&quot;: 1,
+                    &quot;price&quot;: &quot;1400.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1400,
+                    &quot;expiry_date&quot;: &quot;2026-01-19&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 12,
+            &quot;invoice&quot;: &quot;PO-00012&quot;,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-26T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-15T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: 29,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 3510,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sub_total&quot;: 3510,
+            &quot;grand_total&quot;: 3481,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 5,
+                &quot;code&quot;: &quot;SUP005&quot;,
+                &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+                &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+                &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;60&quot;,
+                &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 19,
+                    &quot;po_id&quot;: 12,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 9,
+                    &quot;remaining_quantity&quot;: 9,
+                    &quot;price&quot;: &quot;90.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 810,
+                    &quot;expiry_date&quot;: &quot;2026-01-18&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 20,
+                    &quot;po_id&quot;: 12,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 9,
+                    &quot;remaining_quantity&quot;: 9,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1620,
+                    &quot;expiry_date&quot;: &quot;2025-12-19&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 21,
+                    &quot;po_id&quot;: 12,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 5,
+                    &quot;remaining_quantity&quot;: 5,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 900,
+                    &quot;expiry_date&quot;: &quot;2026-01-06&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 22,
+                    &quot;po_id&quot;: 12,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 2,
+                    &quot;remaining_quantity&quot;: 2,
+                    &quot;price&quot;: &quot;90.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 180,
+                    &quot;expiry_date&quot;: &quot;2025-12-22&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 13,
+            &quot;invoice&quot;: &quot;PO-00013&quot;,
+            &quot;supplier_id&quot;: 7,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-12T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-08T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: 8,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 8660,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sub_total&quot;: 8660,
+            &quot;grand_total&quot;: 8652,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 7,
+                &quot;code&quot;: &quot;SUP002&quot;,
+                &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+                &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;0227654321&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 23,
+                    &quot;po_id&quot;: 13,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 3,
+                    &quot;remaining_quantity&quot;: 3,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 540,
+                    &quot;expiry_date&quot;: &quot;2026-02-03&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 24,
+                    &quot;po_id&quot;: 13,
+                    &quot;product_id&quot;: 5,
+                    &quot;quantity&quot;: 4,
+                    &quot;remaining_quantity&quot;: 4,
+                    &quot;price&quot;: &quot;1400.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 5600,
+                    &quot;expiry_date&quot;: &quot;2025-12-02&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 25,
+                    &quot;po_id&quot;: 13,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 4,
+                    &quot;remaining_quantity&quot;: 4,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 720,
+                    &quot;expiry_date&quot;: &quot;2026-02-06&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 26,
+                    &quot;po_id&quot;: 13,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 10,
+                    &quot;remaining_quantity&quot;: 10,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1800,
+                    &quot;expiry_date&quot;: &quot;2025-12-05&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 14,
+            &quot;invoice&quot;: &quot;PO-00014&quot;,
+            &quot;supplier_id&quot;: 6,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-07T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-26T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;discount_total&quot;: 36,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 540,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sub_total&quot;: 540,
+            &quot;grand_total&quot;: 504,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 6,
+                &quot;code&quot;: &quot;SUP001&quot;,
+                &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+                &quot;phone_number&quot;: &quot;0218887766&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 27,
+                    &quot;po_id&quot;: 14,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 6,
+                    &quot;remaining_quantity&quot;: 6,
+                    &quot;price&quot;: &quot;90.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 540,
+                    &quot;expiry_date&quot;: &quot;2026-02-11&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 15,
+            &quot;invoice&quot;: &quot;PO-00015&quot;,
+            &quot;supplier_id&quot;: 8,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-10-25T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-04T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: 41,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 6000,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sub_total&quot;: 6000,
+            &quot;grand_total&quot;: 3540,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 8,
+                &quot;code&quot;: &quot;SUP003&quot;,
+                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 28,
+                    &quot;po_id&quot;: 15,
+                    &quot;product_id&quot;: 6,
+                    &quot;quantity&quot;: 10,
+                    &quot;remaining_quantity&quot;: 10,
+                    &quot;price&quot;: &quot;600.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 6000,
+                    &quot;expiry_date&quot;: null,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 16,
+            &quot;invoice&quot;: &quot;PO-00016&quot;,
+            &quot;supplier_id&quot;: 7,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-11T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-18T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: 37,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 950,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sub_total&quot;: 950,
+            &quot;grand_total&quot;: 913,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 7,
+                &quot;code&quot;: &quot;SUP002&quot;,
+                &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+                &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;0227654321&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 29,
+                    &quot;po_id&quot;: 16,
+                    &quot;product_id&quot;: 8,
+                    &quot;quantity&quot;: 1,
+                    &quot;remaining_quantity&quot;: 1,
+                    &quot;price&quot;: &quot;950.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 950,
+                    &quot;expiry_date&quot;: &quot;2025-11-23&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 17,
+            &quot;invoice&quot;: &quot;PO-00017&quot;,
+            &quot;supplier_id&quot;: 2,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-14T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-11T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: 14,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 7000,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sub_total&quot;: 7000,
+            &quot;grand_total&quot;: 6986,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 2,
+                &quot;code&quot;: &quot;SUP002&quot;,
+                &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+                &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;0227654321&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 30,
+                    &quot;po_id&quot;: 17,
+                    &quot;product_id&quot;: 5,
+                    &quot;quantity&quot;: 5,
+                    &quot;remaining_quantity&quot;: 5,
+                    &quot;price&quot;: &quot;1400.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 7000,
+                    &quot;expiry_date&quot;: &quot;2025-12-02&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 18,
+            &quot;invoice&quot;: &quot;PO-00018&quot;,
+            &quot;supplier_id&quot;: 9,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-17T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-12-04T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;discount_total&quot;: 37,
+            &quot;discount_total_type&quot;: &quot;percentage&quot;,
+            &quot;total&quot;: 900,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sub_total&quot;: 900,
+            &quot;grand_total&quot;: 567,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 9,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 31,
+                    &quot;po_id&quot;: 18,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 5,
+                    &quot;remaining_quantity&quot;: 5,
+                    &quot;price&quot;: &quot;90.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 450,
+                    &quot;expiry_date&quot;: &quot;2025-12-27&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                },
+                {
+                    &quot;id&quot;: 32,
+                    &quot;po_id&quot;: 18,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 5,
+                    &quot;remaining_quantity&quot;: 5,
+                    &quot;price&quot;: &quot;90.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 450,
+                    &quot;expiry_date&quot;: &quot;2025-12-20&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 19,
+            &quot;invoice&quot;: &quot;PO-00019&quot;,
+            &quot;supplier_id&quot;: 9,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-16T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-26T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;discount_total&quot;: 3,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 1800,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sub_total&quot;: 1800,
+            &quot;grand_total&quot;: 1797,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 9,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 33,
+                    &quot;po_id&quot;: 19,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 10,
+                    &quot;remaining_quantity&quot;: 10,
+                    &quot;price&quot;: &quot;180.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1800,
+                    &quot;expiry_date&quot;: &quot;2025-11-23&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 20,
+            &quot;invoice&quot;: &quot;PO-00020&quot;,
+            &quot;supplier_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;order_date&quot;: &quot;2025-11-09T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-16T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;discount_total&quot;: 43,
+            &quot;discount_total_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 1900,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sub_total&quot;: 1900,
+            &quot;grand_total&quot;: 1857,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 1,
+                &quot;code&quot;: &quot;SUP001&quot;,
+                &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+                &quot;phone_number&quot;: &quot;0218887766&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: null,
+            &quot;items&quot;: [
+                {
+                    &quot;id&quot;: 34,
+                    &quot;po_id&quot;: 20,
+                    &quot;product_id&quot;: 8,
+                    &quot;quantity&quot;: 2,
+                    &quot;remaining_quantity&quot;: 2,
+                    &quot;price&quot;: &quot;950.00&quot;,
+                    &quot;discount&quot;: null,
+                    &quot;discount_type&quot;: &quot;percentage&quot;,
+                    &quot;total&quot;: 1900,
+                    &quot;expiry_date&quot;: &quot;2025-12-29&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            ]
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/purchases?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/purchases?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/purchases?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/purchases&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 20,
+        &quot;total&quot;: 20
+    }
 }</code>
  </pre>
     </span>
@@ -8354,7 +15191,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-purchases" data-method="GET"
       data-path="api/v1/purchases"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -8384,6 +15221,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/purchases</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-purchases"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -8426,6 +15275,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="purchase-orders-POSTapi-v1-purchases">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -8437,6 +15287,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/purchases" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -8447,6 +15298,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -8477,7 +15329,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-purchases" data-method="POST"
       data-path="api/v1/purchases"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -8508,6 +15360,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-purchases"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -8536,6 +15400,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="purchase-orders-GETapi-v1-purchases--id-">Display the specified purchase order.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Retrieves a single purchase order by its ID.</p>
@@ -8547,6 +15412,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/purchases/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -8557,6 +15423,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -8570,7 +15437,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-purchases--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -8582,7 +15449,53 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;invoice&quot;: &quot;PO-00001&quot;,
+        &quot;supplier_id&quot;: 2,
+        &quot;user_id&quot;: null,
+        &quot;order_date&quot;: &quot;2025-10-27T09:16:25.000000Z&quot;,
+        &quot;due_date&quot;: &quot;2025-11-10T09:16:25.000000Z&quot;,
+        &quot;payment_type&quot;: &quot;Cash&quot;,
+        &quot;discount_total&quot;: 25,
+        &quot;discount_total_type&quot;: &quot;percentage&quot;,
+        &quot;total&quot;: 1260,
+        &quot;status&quot;: &quot;Paid&quot;,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;sub_total&quot;: 1260,
+        &quot;grand_total&quot;: 945,
+        &quot;supplier&quot;: {
+            &quot;id&quot;: 2,
+            &quot;code&quot;: &quot;SUP002&quot;,
+            &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+            &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+            &quot;phone_number&quot;: &quot;0227654321&quot;,
+            &quot;location&quot;: &quot;IN&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
+            &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        &quot;user&quot;: null,
+        &quot;items&quot;: [
+            {
+                &quot;id&quot;: 1,
+                &quot;po_id&quot;: 1,
+                &quot;product_id&quot;: 2,
+                &quot;quantity&quot;: 7,
+                &quot;remaining_quantity&quot;: 7,
+                &quot;price&quot;: &quot;180.00&quot;,
+                &quot;discount&quot;: null,
+                &quot;discount_type&quot;: &quot;percentage&quot;,
+                &quot;total&quot;: 1260,
+                &quot;expiry_date&quot;: &quot;2026-01-08&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        ]
+    }
 }</code>
  </pre>
     </span>
@@ -8603,7 +15516,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-purchases--id-" data-method="GET"
       data-path="api/v1/purchases/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -8633,6 +15546,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/purchases/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-purchases--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -8687,6 +15612,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="purchase-orders-PUTapi-v1-purchases--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -8698,6 +15624,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/purchases/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -8708,6 +15635,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -8738,7 +15666,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-purchases--id-" data-method="PUT"
       data-path="api/v1/purchases/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -8772,6 +15700,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/purchases/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-purchases--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -8814,6 +15754,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="purchase-orders-DELETEapi-v1-purchases--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -8825,6 +15766,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/purchases/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -8835,6 +15777,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -8865,7 +15808,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-purchases--id-" data-method="DELETE"
       data-path="api/v1/purchases/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -8895,6 +15838,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/purchases/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-purchases--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -8941,6 +15896,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="roles-GETapi-v1-roles">Display a listing of the roles.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -8952,6 +15908,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/roles?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -8968,6 +15925,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -8981,7 +15939,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-roles">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -8993,7 +15951,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Server Error&quot;
 }</code>
  </pre>
     </span>
@@ -9014,7 +15972,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-roles" data-method="GET"
       data-path="api/v1/roles"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -9044,6 +16002,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/roles</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-roles"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -9086,6 +16056,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="roles-POSTapi-v1-roles">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -9097,6 +16068,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/roles" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -9107,6 +16079,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -9137,7 +16110,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-roles" data-method="POST"
       data-path="api/v1/roles"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -9168,6 +16141,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-roles"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -9196,6 +16181,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="roles-GETapi-v1-roles--id-">Display the specified role.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -9207,6 +16193,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/roles/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -9217,6 +16204,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -9230,7 +16218,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-roles--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -9242,7 +16230,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Server Error&quot;
 }</code>
  </pre>
     </span>
@@ -9263,7 +16251,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-roles--id-" data-method="GET"
       data-path="api/v1/roles/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -9293,6 +16281,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/roles/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-roles--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -9347,6 +16347,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="roles-PUTapi-v1-roles--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -9358,6 +16359,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/roles/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -9368,6 +16370,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -9398,7 +16401,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-roles--id-" data-method="PUT"
       data-path="api/v1/roles/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -9432,6 +16435,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/roles/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-roles--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -9474,6 +16489,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="roles-DELETEapi-v1-roles--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -9485,6 +16501,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/roles/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -9495,6 +16512,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -9525,7 +16543,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-roles--id-" data-method="DELETE"
       data-path="api/v1/roles/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -9555,6 +16573,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/roles/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-roles--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -9601,6 +16631,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="sales-items-GETapi-v1-sales-items">Display a listing of the sales items.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -9612,6 +16643,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/sales-items?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -9628,6 +16660,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -9641,7 +16674,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-items">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -9653,7 +16686,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Server Error&quot;
 }</code>
  </pre>
     </span>
@@ -9674,7 +16707,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-sales-items" data-method="GET"
       data-path="api/v1/sales-items"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -9704,6 +16737,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-items</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-sales-items"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -9746,6 +16791,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-items-POSTapi-v1-sales-items">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -9757,6 +16803,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/sales-items" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -9767,6 +16814,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -9797,7 +16845,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-sales-items" data-method="POST"
       data-path="api/v1/sales-items"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -9828,6 +16876,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-sales-items"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -9856,6 +16916,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-items-GETapi-v1-sales-items--id-">Display the specified sales item.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -9867,6 +16928,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/sales-items/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -9877,6 +16939,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -9890,7 +16953,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-items--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -9902,7 +16965,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Server Error&quot;
 }</code>
  </pre>
     </span>
@@ -9923,7 +16986,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-sales-items--id-" data-method="GET"
       data-path="api/v1/sales-items/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -9953,6 +17016,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-items/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-sales-items--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -10007,6 +17082,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-items-PUTapi-v1-sales-items--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -10018,6 +17094,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/sales-items/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -10028,6 +17105,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -10058,7 +17136,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-sales-items--id-" data-method="PUT"
       data-path="api/v1/sales-items/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -10092,6 +17170,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-items/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-sales-items--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -10134,6 +17224,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-items-DELETEapi-v1-sales-items--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -10145,6 +17236,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/sales-items/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -10155,6 +17247,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -10185,7 +17278,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-sales-items--id-" data-method="DELETE"
       data-path="api/v1/sales-items/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -10215,6 +17308,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-items/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-sales-items--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -10261,6 +17366,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="sales-opportunities-GETapi-v1-sales-opportunities">Display a listing of the sales opportunities.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -10272,6 +17378,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/sales-opportunities?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -10288,6 +17395,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -10301,7 +17409,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-opportunities">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -10313,7 +17421,39 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/sales-opportunities?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/sales-opportunities?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: null,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales-opportunities?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/sales-opportunities&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: null,
+        &quot;total&quot;: 0
+    }
 }</code>
  </pre>
     </span>
@@ -10334,7 +17474,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-sales-opportunities" data-method="GET"
       data-path="api/v1/sales-opportunities"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -10364,6 +17504,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-opportunities</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-sales-opportunities"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -10406,6 +17558,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-opportunities-POSTapi-v1-sales-opportunities">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -10417,6 +17570,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/sales-opportunities" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -10427,6 +17581,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -10457,7 +17612,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-sales-opportunities" data-method="POST"
       data-path="api/v1/sales-opportunities"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -10488,6 +17643,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-sales-opportunities"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -10516,6 +17683,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-opportunities-GETapi-v1-sales-opportunities--id-">Display the specified sales opportunity.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -10527,6 +17695,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/sales-opportunities/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -10537,6 +17706,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -10550,7 +17720,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-opportunities--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (404):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -10562,7 +17732,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;No query results for model [App\\Models\\SalesOpportunity] 17&quot;
 }</code>
  </pre>
     </span>
@@ -10583,7 +17753,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-sales-opportunities--id-" data-method="GET"
       data-path="api/v1/sales-opportunities/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -10613,6 +17783,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-opportunities/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-sales-opportunities--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -10667,6 +17849,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-opportunities-PUTapi-v1-sales-opportunities--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -10678,6 +17861,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/sales-opportunities/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -10688,6 +17872,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -10718,7 +17903,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-sales-opportunities--id-" data-method="PUT"
       data-path="api/v1/sales-opportunities/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -10752,6 +17937,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-opportunities/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-sales-opportunities--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -10794,6 +17991,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-opportunities-DELETEapi-v1-sales-opportunities--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -10805,6 +18003,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/sales-opportunities/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -10815,6 +18014,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -10845,7 +18045,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-sales-opportunities--id-" data-method="DELETE"
       data-path="api/v1/sales-opportunities/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -10875,6 +18075,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-opportunities/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-sales-opportunities--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -10921,6 +18133,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="sales-opportunity-items-GETapi-v1-sales-opportunity-items">Display a listing of the sales opportunity items.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -10932,6 +18145,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/sales-opportunity-items?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -10948,6 +18162,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -10961,7 +18176,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-opportunity-items">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -10973,7 +18188,39 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/sales-opportunity-items?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/sales-opportunity-items?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: null,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales-opportunity-items?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/sales-opportunity-items&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: null,
+        &quot;total&quot;: 0
+    }
 }</code>
  </pre>
     </span>
@@ -10994,7 +18241,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-sales-opportunity-items" data-method="GET"
       data-path="api/v1/sales-opportunity-items"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -11024,6 +18271,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-opportunity-items</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-sales-opportunity-items"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -11066,6 +18325,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-opportunity-items-POSTapi-v1-sales-opportunity-items">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -11077,6 +18337,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/sales-opportunity-items" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -11087,6 +18348,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -11117,7 +18379,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-sales-opportunity-items" data-method="POST"
       data-path="api/v1/sales-opportunity-items"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -11148,6 +18410,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-sales-opportunity-items"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -11176,6 +18450,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-opportunity-items-GETapi-v1-sales-opportunity-items--id-">Display the specified sales opportunity item.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -11187,6 +18462,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/sales-opportunity-items/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -11197,6 +18473,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -11210,7 +18487,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-opportunity-items--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (404):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -11222,7 +18499,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;No query results for model [App\\Models\\SalesOpportunityItem] 17&quot;
 }</code>
  </pre>
     </span>
@@ -11243,7 +18520,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-sales-opportunity-items--id-" data-method="GET"
       data-path="api/v1/sales-opportunity-items/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -11273,6 +18550,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-opportunity-items/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-sales-opportunity-items--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -11327,6 +18616,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-opportunity-items-PUTapi-v1-sales-opportunity-items--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -11338,6 +18628,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/sales-opportunity-items/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -11348,6 +18639,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -11378,7 +18670,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-sales-opportunity-items--id-" data-method="PUT"
       data-path="api/v1/sales-opportunity-items/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -11412,6 +18704,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-opportunity-items/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-sales-opportunity-items--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -11454,6 +18758,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-opportunity-items-DELETEapi-v1-sales-opportunity-items--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -11465,6 +18770,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/sales-opportunity-items/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -11475,6 +18781,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -11505,7 +18812,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-sales-opportunity-items--id-" data-method="DELETE"
       data-path="api/v1/sales-opportunity-items/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -11535,6 +18842,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-opportunity-items/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-sales-opportunity-items--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -11581,6 +18900,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="sales-orders-GETapi-v1-sales">Display a listing of the sales orders.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Retrieves a paginated list of sales orders.</p>
@@ -11592,6 +18912,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/sales?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -11608,6 +18929,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -11621,7 +18943,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -11633,7 +18955,3277 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;invoice&quot;: &quot;INV-00001&quot;,
+            &quot;customer_id&quot;: &quot;6&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-05-24T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-06-11T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;order_discount&quot;: 1,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 158.400000000000005684341886080801486968994140625,
+            &quot;total&quot;: 1742.40000000000009094947017729282379150390625,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 1,
+                    &quot;sales_id&quot;: 1,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 3,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;480.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 9,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;2740660386479&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 17,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 2,
+                    &quot;sales_id&quot;: 1,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 5,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;800.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 3,
+                    &quot;sales_id&quot;: 1,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;320.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 6,
+                &quot;name&quot;: &quot;Agus Wijaya&quot;,
+                &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+                &quot;phone_number&quot;: &quot;089912345678&quot;,
+                &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;invoice&quot;: &quot;INV-00002&quot;,
+            &quot;customer_id&quot;: &quot;12&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-08-28T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-09-16T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;order_discount&quot;: 12,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 646.799999999999954525264911353588104248046875,
+            &quot;total&quot;: 7114.8000000000001818989403545856475830078125,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 4,
+                    &quot;sales_id&quot;: 2,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 5,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;800.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 9,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;2740660386479&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 17,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 5,
+                    &quot;sales_id&quot;: 2,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 3,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;480.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 6,
+                    &quot;sales_id&quot;: 2,
+                    &quot;product_id&quot;: 5,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;2600.00&quot;,
+                    &quot;total&quot;: &quot;5200.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;code&quot;: &quot;TR15&quot;,
+                        &quot;barcode&quot;: &quot;5112846880205&quot;,
+                        &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+                        &quot;stock_quantity&quot;: 16,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 1400,
+                        &quot;selling_price&quot;: 2600,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2024-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 12,
+                &quot;name&quot;: &quot;Agus Wijaya&quot;,
+                &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+                &quot;phone_number&quot;: &quot;089912345678&quot;,
+                &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;invoice&quot;: &quot;INV-00003&quot;,
+            &quot;customer_id&quot;: &quot;1&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-07-19T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-08-03T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;eWallet&quot;,
+            &quot;order_discount&quot;: 0,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 48,
+            &quot;total&quot;: 528,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 7,
+                    &quot;sales_id&quot;: 3,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;160.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 8,
+                    &quot;sales_id&quot;: 3,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;320.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 9,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;2740660386479&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 17,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;Walk In Customer&quot;,
+                &quot;address&quot;: &quot;-&quot;,
+                &quot;phone_number&quot;: &quot;0&quot;,
+                &quot;email&quot;: &quot;-&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;0&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;invoice&quot;: &quot;INV-00004&quot;,
+            &quot;customer_id&quot;: &quot;3&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-08-03T14:30:03.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-08-10T14:30:03.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;eWallet&quot;,
+            &quot;order_discount&quot;: 15,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 343.3999999999999772626324556767940521240234375,
+            &quot;total&quot;: 3777.40000000000009094947017729282379150390625,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 9,
+                    &quot;sales_id&quot;: 4,
+                    &quot;product_id&quot;: 8,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1700.00&quot;,
+                    &quot;total&quot;: &quot;3400.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 8,
+                        &quot;code&quot;: &quot;TR13&quot;,
+                        &quot;barcode&quot;: &quot;3148624359009&quot;,
+                        &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+                        &quot;stock_quantity&quot;: 53,
+                        &quot;low_stock_threshold&quot;: 20,
+                        &quot;price&quot;: 950,
+                        &quot;selling_price&quot;: 1700,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-09-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 10,
+                    &quot;sales_id&quot;: 4,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 4,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;640.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 9,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;2740660386479&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 17,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;Siti Aminah&quot;,
+                &quot;address&quot;: &quot;Perumahan Griya Asri Blok B2, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;082112345678&quot;,
+                &quot;email&quot;: &quot;siti.aminah@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;invoice&quot;: &quot;INV-00005&quot;,
+            &quot;customer_id&quot;: &quot;2&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-09-07T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-09-22T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Card&quot;,
+            &quot;order_discount&quot;: 11,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 810.8999999999999772626324556767940521240234375,
+            &quot;total&quot;: 8919.899999999999636202119290828704833984375,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 11,
+                    &quot;sales_id&quot;: 5,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;320.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 12,
+                    &quot;sales_id&quot;: 5,
+                    &quot;product_id&quot;: 5,
+                    &quot;quantity&quot;: 3,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;2600.00&quot;,
+                    &quot;total&quot;: &quot;7800.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;code&quot;: &quot;TR15&quot;,
+                        &quot;barcode&quot;: &quot;5112846880205&quot;,
+                        &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+                        &quot;stock_quantity&quot;: 16,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 1400,
+                        &quot;selling_price&quot;: 2600,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2024-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;invoice&quot;: &quot;INV-00006&quot;,
+            &quot;customer_id&quot;: &quot;10&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2024-11-28T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2024-12-16T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;eWallet&quot;,
+            &quot;order_discount&quot;: 10,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 79,
+            &quot;total&quot;: 869,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 13,
+                    &quot;sales_id&quot;: 6,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 5,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;800.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 10,
+                &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+                &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;085312345678&quot;,
+                &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;invoice&quot;: &quot;INV-00007&quot;,
+            &quot;customer_id&quot;: &quot;2&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-05-28T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-06-22T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;order_discount&quot;: 2,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 82.7999999999999971578290569595992565155029296875,
+            &quot;total&quot;: 910.799999999999954525264911353588104248046875,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 14,
+                    &quot;sales_id&quot;: 7,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 3,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;480.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 9,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;2740660386479&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 17,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 15,
+                    &quot;sales_id&quot;: 7,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;350.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;3779775320282&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 46,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 4,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;invoice&quot;: &quot;INV-00008&quot;,
+            &quot;customer_id&quot;: &quot;3&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-10-06T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-10-25T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;order_discount&quot;: 14,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 387.6000000000000227373675443232059478759765625,
+            &quot;total&quot;: 4263.600000000000363797880709171295166015625,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 16,
+                    &quot;sales_id&quot;: 8,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;350.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;3779775320282&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 46,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 4,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 17,
+                    &quot;sales_id&quot;: 8,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 4,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;640.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 18,
+                    &quot;sales_id&quot;: 8,
+                    &quot;product_id&quot;: 6,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1100.00&quot;,
+                    &quot;total&quot;: &quot;2200.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 6,
+                        &quot;code&quot;: &quot;TR11&quot;,
+                        &quot;barcode&quot;: &quot;5089614188767&quot;,
+                        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                        &quot;stock_quantity&quot;: 19,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 600,
+                        &quot;selling_price&quot;: 1100,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 9,
+                        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: false,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 19,
+                    &quot;sales_id&quot;: 8,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;700.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;3779775320282&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 46,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 4,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;Siti Aminah&quot;,
+                &quot;address&quot;: &quot;Perumahan Griya Asri Blok B2, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;082112345678&quot;,
+                &quot;email&quot;: &quot;siti.aminah@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;invoice&quot;: &quot;INV-00009&quot;,
+            &quot;customer_id&quot;: &quot;6&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-10-22T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-10T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;order_discount&quot;: 17,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 566.299999999999954525264911353588104248046875,
+            &quot;total&quot;: 6229.3000000000001818989403545856475830078125,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 20,
+                    &quot;sales_id&quot;: 9,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 3,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;480.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 21,
+                    &quot;sales_id&quot;: 9,
+                    &quot;product_id&quot;: 5,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;2600.00&quot;,
+                    &quot;total&quot;: &quot;5200.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;code&quot;: &quot;TR15&quot;,
+                        &quot;barcode&quot;: &quot;5112846880205&quot;,
+                        &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+                        &quot;stock_quantity&quot;: 16,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 1400,
+                        &quot;selling_price&quot;: 2600,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2024-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 6,
+                &quot;name&quot;: &quot;Agus Wijaya&quot;,
+                &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+                &quot;phone_number&quot;: &quot;089912345678&quot;,
+                &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;invoice&quot;: &quot;INV-00010&quot;,
+            &quot;customer_id&quot;: &quot;4&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-02-18T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-03-10T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;eWallet&quot;,
+            &quot;order_discount&quot;: 15,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 30.5,
+            &quot;total&quot;: 335.5,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 22,
+                    &quot;sales_id&quot;: 10,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;320.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 9,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;2740660386479&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 17,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 4,
+                &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+                &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;085312345678&quot;,
+                &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;invoice&quot;: &quot;INV-00011&quot;,
+            &quot;customer_id&quot;: &quot;7&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-08-24T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-09-15T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Card&quot;,
+            &quot;order_discount&quot;: 12,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 441.80000000000001136868377216160297393798828125,
+            &quot;total&quot;: 4859.8000000000001818989403545856475830078125,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 23,
+                    &quot;sales_id&quot;: 11,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 4,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;1400.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 2,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;4819617615387&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 50,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 2,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 24,
+                    &quot;sales_id&quot;: 11,
+                    &quot;product_id&quot;: 6,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1100.00&quot;,
+                    &quot;total&quot;: &quot;2200.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 6,
+                        &quot;code&quot;: &quot;TR11&quot;,
+                        &quot;barcode&quot;: &quot;5089614188767&quot;,
+                        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                        &quot;stock_quantity&quot;: 19,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 600,
+                        &quot;selling_price&quot;: 1100,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 9,
+                        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: false,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 25,
+                    &quot;sales_id&quot;: 11,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;320.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 26,
+                    &quot;sales_id&quot;: 11,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;350.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;3779775320282&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 46,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 4,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 27,
+                    &quot;sales_id&quot;: 11,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;160.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 7,
+                &quot;name&quot;: &quot;Walk In Customer&quot;,
+                &quot;address&quot;: &quot;-&quot;,
+                &quot;phone_number&quot;: &quot;0&quot;,
+                &quot;email&quot;: &quot;-&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;0&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 12,
+            &quot;invoice&quot;: &quot;INV-00012&quot;,
+            &quot;customer_id&quot;: &quot;9&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-09-21T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-10-02T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;order_discount&quot;: 17,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 821.700000000000045474735088646411895751953125,
+            &quot;total&quot;: 9038.70000000000072759576141834259033203125,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 28,
+                    &quot;sales_id&quot;: 12,
+                    &quot;product_id&quot;: 6,
+                    &quot;quantity&quot;: 5,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1100.00&quot;,
+                    &quot;total&quot;: &quot;5500.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 6,
+                        &quot;code&quot;: &quot;TR11&quot;,
+                        &quot;barcode&quot;: &quot;5089614188767&quot;,
+                        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                        &quot;stock_quantity&quot;: 19,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 600,
+                        &quot;selling_price&quot;: 1100,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 9,
+                        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: false,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 29,
+                    &quot;sales_id&quot;: 12,
+                    &quot;product_id&quot;: 1,
+                    &quot;quantity&quot;: 4,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1100.00&quot;,
+                    &quot;total&quot;: &quot;4400.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 1,
+                        &quot;code&quot;: &quot;TR11&quot;,
+                        &quot;barcode&quot;: &quot;7986298486210&quot;,
+                        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                        &quot;stock_quantity&quot;: 44,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 600,
+                        &quot;selling_price&quot;: 1100,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: false,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 9,
+                &quot;name&quot;: &quot;Siti Aminah&quot;,
+                &quot;address&quot;: &quot;Perumahan Griya Asri Blok B2, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;082112345678&quot;,
+                &quot;email&quot;: &quot;siti.aminah@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 13,
+            &quot;invoice&quot;: &quot;INV-00013&quot;,
+            &quot;customer_id&quot;: &quot;6&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-08-26T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-09-11T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;order_discount&quot;: 13,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 178.349999999999994315658113919198513031005859375,
+            &quot;total&quot;: 1961.84999999999990905052982270717620849609375,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 30,
+                    &quot;sales_id&quot;: 13,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;350.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 2,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;4819617615387&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 50,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 2,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 31,
+                    &quot;sales_id&quot;: 13,
+                    &quot;product_id&quot;: 8,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1700.00&quot;,
+                    &quot;total&quot;: &quot;1700.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 8,
+                        &quot;code&quot;: &quot;TR13&quot;,
+                        &quot;barcode&quot;: &quot;3148624359009&quot;,
+                        &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+                        &quot;stock_quantity&quot;: 53,
+                        &quot;low_stock_threshold&quot;: 20,
+                        &quot;price&quot;: 950,
+                        &quot;selling_price&quot;: 1700,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-09-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 6,
+                &quot;name&quot;: &quot;Agus Wijaya&quot;,
+                &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+                &quot;phone_number&quot;: &quot;089912345678&quot;,
+                &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 14,
+            &quot;invoice&quot;: &quot;INV-00014&quot;,
+            &quot;customer_id&quot;: &quot;8&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-08-04T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-08-29T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;order_discount&quot;: 2,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 629.799999999999954525264911353588104248046875,
+            &quot;total&quot;: 6927.8000000000001818989403545856475830078125,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 32,
+                    &quot;sales_id&quot;: 14,
+                    &quot;product_id&quot;: 1,
+                    &quot;quantity&quot;: 5,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1100.00&quot;,
+                    &quot;total&quot;: &quot;5500.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 1,
+                        &quot;code&quot;: &quot;TR11&quot;,
+                        &quot;barcode&quot;: &quot;7986298486210&quot;,
+                        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                        &quot;stock_quantity&quot;: 44,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 600,
+                        &quot;selling_price&quot;: 1100,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: false,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 33,
+                    &quot;sales_id&quot;: 14,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 5,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;800.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 8,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 15,
+            &quot;invoice&quot;: &quot;INV-00015&quot;,
+            &quot;customer_id&quot;: &quot;10&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-08-12T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-08-23T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;order_discount&quot;: 2,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 554.799999999999954525264911353588104248046875,
+            &quot;total&quot;: 6102.8000000000001818989403545856475830078125,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 34,
+                    &quot;sales_id&quot;: 15,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;350.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;3779775320282&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 46,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 4,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 35,
+                    &quot;sales_id&quot;: 15,
+                    &quot;product_id&quot;: 5,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;2600.00&quot;,
+                    &quot;total&quot;: &quot;5200.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 5,
+                        &quot;code&quot;: &quot;TR15&quot;,
+                        &quot;barcode&quot;: &quot;5112846880205&quot;,
+                        &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+                        &quot;stock_quantity&quot;: 16,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 1400,
+                        &quot;selling_price&quot;: 2600,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2024-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 10,
+                &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+                &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;085312345678&quot;,
+                &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 16,
+            &quot;invoice&quot;: &quot;INV-00016&quot;,
+            &quot;customer_id&quot;: &quot;11&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2024-12-17T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2024-12-30T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;-&quot;,
+            &quot;order_discount&quot;: 17,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 218.30000000000001136868377216160297393798828125,
+            &quot;total&quot;: 2401.3000000000001818989403545856475830078125,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 36,
+                    &quot;sales_id&quot;: 16,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 4,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;1400.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;3779775320282&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 46,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 4,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 37,
+                    &quot;sales_id&quot;: 16,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 5,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;800.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 11,
+                &quot;name&quot;: &quot;Lilis Suryani&quot;,
+                &quot;address&quot;: &quot;Jl. Gajah Mada No. 12, Yogyakarta&quot;,
+                &quot;phone_number&quot;: &quot;087812345678&quot;,
+                &quot;email&quot;: &quot;lilis.suryani@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;7&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 17,
+            &quot;invoice&quot;: &quot;INV-00017&quot;,
+            &quot;customer_id&quot;: &quot;4&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-10-13T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-05T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;order_discount&quot;: 3,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 213.400000000000005684341886080801486968994140625,
+            &quot;total&quot;: 2347.40000000000009094947017729282379150390625,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 38,
+                    &quot;sales_id&quot;: 17,
+                    &quot;product_id&quot;: 1,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1100.00&quot;,
+                    &quot;total&quot;: &quot;1100.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 1,
+                        &quot;code&quot;: &quot;TR11&quot;,
+                        &quot;barcode&quot;: &quot;7986298486210&quot;,
+                        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                        &quot;stock_quantity&quot;: 44,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 600,
+                        &quot;selling_price&quot;: 1100,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: false,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 39,
+                    &quot;sales_id&quot;: 17,
+                    &quot;product_id&quot;: 1,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1100.00&quot;,
+                    &quot;total&quot;: &quot;1100.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 1,
+                        &quot;code&quot;: &quot;TR11&quot;,
+                        &quot;barcode&quot;: &quot;7986298486210&quot;,
+                        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                        &quot;stock_quantity&quot;: 44,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 600,
+                        &quot;selling_price&quot;: 1100,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: false,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 4,
+                &quot;name&quot;: &quot;Ahmad Fauzi&quot;,
+                &quot;address&quot;: &quot;Jl. Diponegoro No. 99, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;085312345678&quot;,
+                &quot;email&quot;: &quot;ahmad.fauzi@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 18,
+            &quot;invoice&quot;: &quot;INV-00018&quot;,
+            &quot;customer_id&quot;: &quot;6&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-09-20T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-10-19T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Card&quot;,
+            &quot;order_discount&quot;: 2,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 694.799999999999954525264911353588104248046875,
+            &quot;total&quot;: 7642.8000000000001818989403545856475830078125,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 40,
+                    &quot;sales_id&quot;: 18,
+                    &quot;product_id&quot;: 3,
+                    &quot;quantity&quot;: 3,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1700.00&quot;,
+                    &quot;total&quot;: &quot;5100.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 3,
+                        &quot;code&quot;: &quot;TR13&quot;,
+                        &quot;barcode&quot;: &quot;8381563189398&quot;,
+                        &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+                        &quot;stock_quantity&quot;: 55,
+                        &quot;low_stock_threshold&quot;: 20,
+                        &quot;price&quot;: 950,
+                        &quot;selling_price&quot;: 1700,
+                        &quot;category_id&quot;: 3,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+                        &quot;warehouse_id&quot;: 3,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-09-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 41,
+                    &quot;sales_id&quot;: 18,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;350.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;3779775320282&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 46,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 4,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 42,
+                    &quot;sales_id&quot;: 18,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;700.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 2,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;4819617615387&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 50,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 2,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 43,
+                    &quot;sales_id&quot;: 18,
+                    &quot;product_id&quot;: 4,
+                    &quot;quantity&quot;: 3,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;480.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 4,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;9107410836319&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 12,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 44,
+                    &quot;sales_id&quot;: 18,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;320.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 9,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;2740660386479&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 17,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 6,
+                &quot;name&quot;: &quot;Agus Wijaya&quot;,
+                &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+                &quot;phone_number&quot;: &quot;089912345678&quot;,
+                &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 19,
+            &quot;invoice&quot;: &quot;INV-00019&quot;,
+            &quot;customer_id&quot;: &quot;1&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-10-14T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-11-01T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Card&quot;,
+            &quot;order_discount&quot;: 19,
+            &quot;order_discount_type&quot;: &quot;fixed&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 290.1000000000000227373675443232059478759765625,
+            &quot;total&quot;: 3191.09999999999990905052982270717620849609375,
+            &quot;status&quot;: &quot;Unpaid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 45,
+                    &quot;sales_id&quot;: 19,
+                    &quot;product_id&quot;: 6,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1100.00&quot;,
+                    &quot;total&quot;: &quot;1100.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 6,
+                        &quot;code&quot;: &quot;TR11&quot;,
+                        &quot;barcode&quot;: &quot;5089614188767&quot;,
+                        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                        &quot;stock_quantity&quot;: 19,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 600,
+                        &quot;selling_price&quot;: 1100,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 9,
+                        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: false,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 46,
+                    &quot;sales_id&quot;: 19,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;320.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 9,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;2740660386479&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 17,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 47,
+                    &quot;sales_id&quot;: 19,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;350.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 2,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;4819617615387&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 50,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 2,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 48,
+                    &quot;sales_id&quot;: 19,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 5,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;800.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 9,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;2740660386479&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 17,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 49,
+                    &quot;sales_id&quot;: 19,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;350.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 2,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;4819617615387&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 50,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 2,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;Walk In Customer&quot;,
+                &quot;address&quot;: &quot;-&quot;,
+                &quot;phone_number&quot;: &quot;0&quot;,
+                &quot;email&quot;: &quot;-&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;0&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 20,
+            &quot;invoice&quot;: &quot;INV-00020&quot;,
+            &quot;customer_id&quot;: &quot;5&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2024-11-27T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2024-12-27T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;eWallet&quot;,
+            &quot;order_discount&quot;: 19,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 506.25,
+            &quot;total&quot;: 5568.75,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 50,
+                    &quot;sales_id&quot;: 20,
+                    &quot;product_id&quot;: 10,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;2600.00&quot;,
+                    &quot;total&quot;: &quot;5200.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 10,
+                        &quot;code&quot;: &quot;TR15&quot;,
+                        &quot;barcode&quot;: &quot;3867088010591&quot;,
+                        &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
+                        &quot;stock_quantity&quot;: 1,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 1400,
+                        &quot;selling_price&quot;: 2600,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 6,
+                        &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2024-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 51,
+                    &quot;sales_id&quot;: 20,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 3,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;1050.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 2,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;4819617615387&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 50,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 2,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 5,
+                &quot;name&quot;: &quot;Lilis Suryani&quot;,
+                &quot;address&quot;: &quot;Jl. Gajah Mada No. 12, Yogyakarta&quot;,
+                &quot;phone_number&quot;: &quot;087812345678&quot;,
+                &quot;email&quot;: &quot;lilis.suryani@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;7&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 21,
+            &quot;invoice&quot;: &quot;INV-00021&quot;,
+            &quot;customer_id&quot;: &quot;2&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2024-12-08T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-01-06T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Card&quot;,
+            &quot;order_discount&quot;: 19,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 558.8999999999999772626324556767940521240234375,
+            &quot;total&quot;: 6147.899999999999636202119290828704833984375,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 52,
+                    &quot;sales_id&quot;: 21,
+                    &quot;product_id&quot;: 1,
+                    &quot;quantity&quot;: 5,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1100.00&quot;,
+                    &quot;total&quot;: &quot;5500.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 1,
+                        &quot;code&quot;: &quot;TR11&quot;,
+                        &quot;barcode&quot;: &quot;7986298486210&quot;,
+                        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                        &quot;stock_quantity&quot;: 44,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 600,
+                        &quot;selling_price&quot;: 1100,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: false,
+                        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 53,
+                    &quot;sales_id&quot;: 21,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 4,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;1400.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 2,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;4819617615387&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 50,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 2,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 22,
+            &quot;invoice&quot;: &quot;INV-00022&quot;,
+            &quot;customer_id&quot;: &quot;8&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-02-24T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-03-03T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Transfer&quot;,
+            &quot;order_discount&quot;: 18,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 143.5,
+            &quot;total&quot;: 1578.5,
+            &quot;status&quot;: &quot;Paid&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 54,
+                    &quot;sales_id&quot;: 22,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 5,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;1750.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 2,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;4819617615387&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 50,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 2,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 8,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 23,
+            &quot;invoice&quot;: &quot;INV-00023&quot;,
+            &quot;customer_id&quot;: &quot;6&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-04-10T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-05-08T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;eWallet&quot;,
+            &quot;order_discount&quot;: 2,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 705.6000000000000227373675443232059478759765625,
+            &quot;total&quot;: 7761.600000000000363797880709171295166015625,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 55,
+                    &quot;sales_id&quot;: 23,
+                    &quot;product_id&quot;: 8,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1700.00&quot;,
+                    &quot;total&quot;: &quot;3400.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 8,
+                        &quot;code&quot;: &quot;TR13&quot;,
+                        &quot;barcode&quot;: &quot;3148624359009&quot;,
+                        &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+                        &quot;stock_quantity&quot;: 53,
+                        &quot;low_stock_threshold&quot;: 20,
+                        &quot;price&quot;: 950,
+                        &quot;selling_price&quot;: 1700,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-09-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 56,
+                    &quot;sales_id&quot;: 23,
+                    &quot;product_id&quot;: 7,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;700.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 7,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;3779775320282&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 46,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 4,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 3,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 57,
+                    &quot;sales_id&quot;: 23,
+                    &quot;product_id&quot;: 8,
+                    &quot;quantity&quot;: 1,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1700.00&quot;,
+                    &quot;total&quot;: &quot;1700.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 8,
+                        &quot;code&quot;: &quot;TR13&quot;,
+                        &quot;barcode&quot;: &quot;3148624359009&quot;,
+                        &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+                        &quot;stock_quantity&quot;: 53,
+                        &quot;low_stock_threshold&quot;: 20,
+                        &quot;price&quot;: 950,
+                        &quot;selling_price&quot;: 1700,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-09-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 58,
+                    &quot;sales_id&quot;: 23,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 4,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;1400.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 2,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;4819617615387&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 50,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 2,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 6,
+                &quot;name&quot;: &quot;Agus Wijaya&quot;,
+                &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+                &quot;phone_number&quot;: &quot;089912345678&quot;,
+                &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 24,
+            &quot;invoice&quot;: &quot;INV-00024&quot;,
+            &quot;customer_id&quot;: &quot;11&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-06-16T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-06-23T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;Cash&quot;,
+            &quot;order_discount&quot;: 14,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 304.43999999999999772626324556767940521240234375,
+            &quot;total&quot;: 3348.84000000000014551915228366851806640625,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 59,
+                    &quot;sales_id&quot;: 24,
+                    &quot;product_id&quot;: 2,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;350.00&quot;,
+                    &quot;total&quot;: &quot;700.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 2,
+                        &quot;code&quot;: &quot;TR12&quot;,
+                        &quot;barcode&quot;: &quot;4819617615387&quot;,
+                        &quot;name&quot;: &quot;Expired Diode&quot;,
+                        &quot;stock_quantity&quot;: 50,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 180,
+                        &quot;selling_price&quot;: 350,
+                        &quot;category_id&quot;: 2,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 2,
+                        &quot;description&quot;: &quot;Diode product already expired&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 60,
+                    &quot;sales_id&quot;: 24,
+                    &quot;product_id&quot;: 9,
+                    &quot;quantity&quot;: 4,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;160.00&quot;,
+                    &quot;total&quot;: &quot;640.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 9,
+                        &quot;code&quot;: &quot;TR14&quot;,
+                        &quot;barcode&quot;: &quot;2740660386479&quot;,
+                        &quot;name&quot;: &quot;Low Stock LED&quot;,
+                        &quot;stock_quantity&quot;: 17,
+                        &quot;low_stock_threshold&quot;: 5,
+                        &quot;price&quot;: 90,
+                        &quot;selling_price&quot;: 160,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 2,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                        &quot;warehouse_id&quot;: 1,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                },
+                {
+                    &quot;id&quot;: 61,
+                    &quot;sales_id&quot;: 24,
+                    &quot;product_id&quot;: 6,
+                    &quot;quantity&quot;: 2,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1100.00&quot;,
+                    &quot;total&quot;: &quot;2200.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 6,
+                        &quot;code&quot;: &quot;TR11&quot;,
+                        &quot;barcode&quot;: &quot;5089614188767&quot;,
+                        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
+                        &quot;stock_quantity&quot;: 19,
+                        &quot;low_stock_threshold&quot;: 10,
+                        &quot;price&quot;: 600,
+                        &quot;selling_price&quot;: 1100,
+                        &quot;category_id&quot;: 6,
+                        &quot;units_id&quot;: 3,
+                        &quot;supplier_id&quot;: 9,
+                        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: false,
+                        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 11,
+                &quot;name&quot;: &quot;Lilis Suryani&quot;,
+                &quot;address&quot;: &quot;Jl. Gajah Mada No. 12, Yogyakarta&quot;,
+                &quot;phone_number&quot;: &quot;087812345678&quot;,
+                &quot;email&quot;: &quot;lilis.suryani@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;7&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 25,
+            &quot;invoice&quot;: &quot;INV-00025&quot;,
+            &quot;customer_id&quot;: &quot;8&quot;,
+            &quot;user_id&quot;: 1,
+            &quot;order_date&quot;: &quot;2025-06-15T14:30:04.000000Z&quot;,
+            &quot;due_date&quot;: &quot;2025-06-25T14:30:04.000000Z&quot;,
+            &quot;payment_type&quot;: &quot;eWallet&quot;,
+            &quot;order_discount&quot;: 15,
+            &quot;order_discount_type&quot;: &quot;percentage&quot;,
+            &quot;tax_rate&quot;: 10,
+            &quot;total_tax&quot;: 433.5,
+            &quot;total&quot;: 4768.5,
+            &quot;status&quot;: &quot;Partial&quot;,
+            &quot;amount_received&quot;: null,
+            &quot;change_amount&quot;: 0,
+            &quot;is_pos&quot;: false,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+            &quot;sales_opportunity_id&quot;: null,
+            &quot;sales_items&quot;: [
+                {
+                    &quot;id&quot;: 62,
+                    &quot;sales_id&quot;: 25,
+                    &quot;product_id&quot;: 8,
+                    &quot;quantity&quot;: 3,
+                    &quot;discount&quot;: &quot;0.00&quot;,
+                    &quot;discount_type&quot;: &quot;fixed&quot;,
+                    &quot;customer_price&quot;: &quot;1700.00&quot;,
+                    &quot;total&quot;: &quot;5100.00&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:04.000000Z&quot;,
+                    &quot;product&quot;: {
+                        &quot;id&quot;: 8,
+                        &quot;code&quot;: &quot;TR13&quot;,
+                        &quot;barcode&quot;: &quot;3148624359009&quot;,
+                        &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
+                        &quot;stock_quantity&quot;: 53,
+                        &quot;low_stock_threshold&quot;: 20,
+                        &quot;price&quot;: 950,
+                        &quot;selling_price&quot;: 1700,
+                        &quot;category_id&quot;: 1,
+                        &quot;units_id&quot;: 1,
+                        &quot;supplier_id&quot;: 4,
+                        &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
+                        &quot;warehouse_id&quot;: 2,
+                        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                        &quot;has_expiry&quot;: true,
+                        &quot;created_at&quot;: &quot;2025-09-20T14:30:03.000000Z&quot;,
+                        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                    }
+                }
+            ],
+            &quot;customer&quot;: {
+                &quot;id&quot;: 8,
+                &quot;name&quot;: &quot;Budi Santoso&quot;,
+                &quot;address&quot;: &quot;Jl. Merdeka No. 45, Jakarta&quot;,
+                &quot;phone_number&quot;: &quot;081234567890&quot;,
+                &quot;email&quot;: &quot;budi.santoso@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;admin&quot;,
+                &quot;shopname&quot;: null,
+                &quot;address&quot;: null,
+                &quot;email&quot;: &quot;admin@gmail.com&quot;,
+                &quot;email_verified_at&quot;: null,
+                &quot;two_factor_secret&quot;: null,
+                &quot;two_factor_recovery_codes&quot;: null,
+                &quot;two_factor_confirmed_at&quot;: null,
+                &quot;remember_token&quot;: null,
+                &quot;avatar&quot;: &quot;&quot;,
+                &quot;timezone&quot;: null,
+                &quot;system_settings&quot;: null,
+                &quot;accounting_settings&quot;: null,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+            }
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/sales?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/sales?page=4&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: &quot;http://localhost:8000/api/v1/sales?page=2&quot;
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 4,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales?page=2&quot;,
+                &quot;label&quot;: &quot;2&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales?page=3&quot;,
+                &quot;label&quot;: &quot;3&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales?page=4&quot;,
+                &quot;label&quot;: &quot;4&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales?page=2&quot;,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/sales&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 25,
+        &quot;total&quot;: 100
+    }
 }</code>
  </pre>
     </span>
@@ -11654,7 +22246,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-sales" data-method="GET"
       data-path="api/v1/sales"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -11684,6 +22276,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-sales"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -11726,6 +22330,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-orders-POSTapi-v1-sales">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -11737,6 +22342,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/sales" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -11747,6 +22353,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -11777,7 +22384,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-sales" data-method="POST"
       data-path="api/v1/sales"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -11808,6 +22415,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-sales"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -11836,6 +22455,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-orders-GETapi-v1-sales--id-">Display the specified sales order.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Retrieves a single sales order by its ID.</p>
@@ -11847,6 +22467,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/sales/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -11857,6 +22478,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -11870,7 +22492,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -11882,7 +22504,151 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;invoice&quot;: &quot;INV-00001&quot;,
+        &quot;customer_id&quot;: &quot;6&quot;,
+        &quot;user_id&quot;: 1,
+        &quot;order_date&quot;: &quot;2025-05-24T14:30:03.000000Z&quot;,
+        &quot;due_date&quot;: &quot;2025-06-11T14:30:03.000000Z&quot;,
+        &quot;payment_type&quot;: &quot;Transfer&quot;,
+        &quot;order_discount&quot;: 1,
+        &quot;order_discount_type&quot;: &quot;percentage&quot;,
+        &quot;tax_rate&quot;: 10,
+        &quot;total_tax&quot;: 158.400000000000005684341886080801486968994140625,
+        &quot;total&quot;: 1742.40000000000009094947017729282379150390625,
+        &quot;status&quot;: &quot;Unpaid&quot;,
+        &quot;amount_received&quot;: null,
+        &quot;change_amount&quot;: 0,
+        &quot;is_pos&quot;: false,
+        &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+        &quot;sales_opportunity_id&quot;: null,
+        &quot;sales_items&quot;: [
+            {
+                &quot;id&quot;: 1,
+                &quot;sales_id&quot;: 1,
+                &quot;product_id&quot;: 9,
+                &quot;quantity&quot;: 3,
+                &quot;discount&quot;: &quot;0.00&quot;,
+                &quot;discount_type&quot;: &quot;fixed&quot;,
+                &quot;customer_price&quot;: &quot;160.00&quot;,
+                &quot;total&quot;: &quot;480.00&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;product&quot;: {
+                    &quot;id&quot;: 9,
+                    &quot;code&quot;: &quot;TR14&quot;,
+                    &quot;barcode&quot;: &quot;2740660386479&quot;,
+                    &quot;name&quot;: &quot;Low Stock LED&quot;,
+                    &quot;stock_quantity&quot;: 17,
+                    &quot;low_stock_threshold&quot;: 5,
+                    &quot;price&quot;: 90,
+                    &quot;selling_price&quot;: 160,
+                    &quot;category_id&quot;: 6,
+                    &quot;units_id&quot;: 2,
+                    &quot;supplier_id&quot;: 4,
+                    &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                    &quot;warehouse_id&quot;: 1,
+                    &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                    &quot;has_expiry&quot;: true,
+                    &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            },
+            {
+                &quot;id&quot;: 2,
+                &quot;sales_id&quot;: 1,
+                &quot;product_id&quot;: 4,
+                &quot;quantity&quot;: 5,
+                &quot;discount&quot;: &quot;0.00&quot;,
+                &quot;discount_type&quot;: &quot;fixed&quot;,
+                &quot;customer_price&quot;: &quot;160.00&quot;,
+                &quot;total&quot;: &quot;800.00&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;product&quot;: {
+                    &quot;id&quot;: 4,
+                    &quot;code&quot;: &quot;TR14&quot;,
+                    &quot;barcode&quot;: &quot;9107410836319&quot;,
+                    &quot;name&quot;: &quot;Low Stock LED&quot;,
+                    &quot;stock_quantity&quot;: 12,
+                    &quot;low_stock_threshold&quot;: 5,
+                    &quot;price&quot;: 90,
+                    &quot;selling_price&quot;: 160,
+                    &quot;category_id&quot;: 1,
+                    &quot;units_id&quot;: 2,
+                    &quot;supplier_id&quot;: 3,
+                    &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                    &quot;warehouse_id&quot;: 1,
+                    &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                    &quot;has_expiry&quot;: true,
+                    &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            },
+            {
+                &quot;id&quot;: 3,
+                &quot;sales_id&quot;: 1,
+                &quot;product_id&quot;: 4,
+                &quot;quantity&quot;: 2,
+                &quot;discount&quot;: &quot;0.00&quot;,
+                &quot;discount_type&quot;: &quot;fixed&quot;,
+                &quot;customer_price&quot;: &quot;160.00&quot;,
+                &quot;total&quot;: &quot;320.00&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;product&quot;: {
+                    &quot;id&quot;: 4,
+                    &quot;code&quot;: &quot;TR14&quot;,
+                    &quot;barcode&quot;: &quot;9107410836319&quot;,
+                    &quot;name&quot;: &quot;Low Stock LED&quot;,
+                    &quot;stock_quantity&quot;: 12,
+                    &quot;low_stock_threshold&quot;: 5,
+                    &quot;price&quot;: 90,
+                    &quot;selling_price&quot;: 160,
+                    &quot;category_id&quot;: 1,
+                    &quot;units_id&quot;: 2,
+                    &quot;supplier_id&quot;: 3,
+                    &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
+                    &quot;warehouse_id&quot;: 1,
+                    &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                    &quot;has_expiry&quot;: true,
+                    &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+                }
+            }
+        ],
+        &quot;customer&quot;: {
+            &quot;id&quot;: 6,
+            &quot;name&quot;: &quot;Agus Wijaya&quot;,
+            &quot;address&quot;: &quot;Jl. Sudirman No. 88, Medan&quot;,
+            &quot;phone_number&quot;: &quot;089912345678&quot;,
+            &quot;email&quot;: &quot;agus.wijaya@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        &quot;user&quot;: {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;admin&quot;,
+            &quot;shopname&quot;: null,
+            &quot;address&quot;: null,
+            &quot;email&quot;: &quot;admin@gmail.com&quot;,
+            &quot;email_verified_at&quot;: null,
+            &quot;two_factor_secret&quot;: null,
+            &quot;two_factor_recovery_codes&quot;: null,
+            &quot;two_factor_confirmed_at&quot;: null,
+            &quot;remember_token&quot;: null,
+            &quot;avatar&quot;: &quot;&quot;,
+            &quot;timezone&quot;: null,
+            &quot;system_settings&quot;: null,
+            &quot;accounting_settings&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;
+        }
+    }
 }</code>
  </pre>
     </span>
@@ -11903,7 +22669,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-sales--id-" data-method="GET"
       data-path="api/v1/sales/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -11933,6 +22699,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-sales--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -11987,6 +22765,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-orders-PUTapi-v1-sales--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -11998,6 +22777,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/sales/consequatur" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -12008,6 +22788,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -12038,7 +22819,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-sales--id-" data-method="PUT"
       data-path="api/v1/sales/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -12072,6 +22853,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-sales--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -12114,6 +22907,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-orders-DELETEapi-v1-sales--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -12125,6 +22919,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/sales/consequatur" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -12135,6 +22930,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -12165,7 +22961,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-sales--id-" data-method="DELETE"
       data-path="api/v1/sales/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -12195,6 +22991,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-sales--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -12241,6 +23049,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="sales-pipelines-GETapi-v1-sales-pipelines">Display a listing of the sales pipelines.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -12252,6 +23061,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/sales-pipelines?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -12268,6 +23078,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -12281,7 +23092,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-pipelines">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -12293,7 +23104,39 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/sales-pipelines?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/sales-pipelines?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: null,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales-pipelines?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/sales-pipelines&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: null,
+        &quot;total&quot;: 0
+    }
 }</code>
  </pre>
     </span>
@@ -12314,7 +23157,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-sales-pipelines" data-method="GET"
       data-path="api/v1/sales-pipelines"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -12344,6 +23187,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-pipelines</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-sales-pipelines"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -12386,6 +23241,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-pipelines-POSTapi-v1-sales-pipelines">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -12397,6 +23253,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/sales-pipelines" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -12407,6 +23264,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -12437,7 +23295,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-sales-pipelines" data-method="POST"
       data-path="api/v1/sales-pipelines"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -12468,6 +23326,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-sales-pipelines"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -12496,6 +23366,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-pipelines-GETapi-v1-sales-pipelines--id-">Display the specified sales pipeline.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -12507,6 +23378,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/sales-pipelines/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -12517,6 +23389,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -12530,7 +23403,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-pipelines--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (404):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -12542,7 +23415,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;No query results for model [App\\Models\\SalesPipeline] 17&quot;
 }</code>
  </pre>
     </span>
@@ -12563,7 +23436,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-sales-pipelines--id-" data-method="GET"
       data-path="api/v1/sales-pipelines/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -12593,6 +23466,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-pipelines/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-sales-pipelines--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -12647,6 +23532,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-pipelines-PUTapi-v1-sales-pipelines--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -12658,6 +23544,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/sales-pipelines/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -12668,6 +23555,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -12698,7 +23586,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-sales-pipelines--id-" data-method="PUT"
       data-path="api/v1/sales-pipelines/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -12732,6 +23620,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-pipelines/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-sales-pipelines--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -12774,6 +23674,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="sales-pipelines-DELETEapi-v1-sales-pipelines--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -12785,6 +23686,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/sales-pipelines/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -12795,6 +23697,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -12825,7 +23728,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-sales-pipelines--id-" data-method="DELETE"
       data-path="api/v1/sales-pipelines/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -12855,6 +23758,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/sales-pipelines/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-sales-pipelines--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -12901,6 +23816,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="stock-adjustments-GETapi-v1-stock-adjustments">Display a listing of the stock adjustments.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -12912,6 +23828,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/stock-adjustments?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -12928,6 +23845,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -12941,7 +23859,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-stock-adjustments">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -12953,7 +23871,39 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/stock-adjustments?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/stock-adjustments?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: null,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/stock-adjustments?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/stock-adjustments&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: null,
+        &quot;total&quot;: 0
+    }
 }</code>
  </pre>
     </span>
@@ -12974,7 +23924,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-stock-adjustments" data-method="GET"
       data-path="api/v1/stock-adjustments"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -13004,6 +23954,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/stock-adjustments</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-stock-adjustments"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -13046,6 +24008,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="stock-adjustments-POSTapi-v1-stock-adjustments">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -13057,6 +24020,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/stock-adjustments" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -13067,6 +24031,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -13097,7 +24062,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-stock-adjustments" data-method="POST"
       data-path="api/v1/stock-adjustments"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -13128,6 +24093,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-stock-adjustments"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -13156,6 +24133,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="stock-adjustments-GETapi-v1-stock-adjustments--id-">Display the specified stock adjustment.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -13167,6 +24145,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/stock-adjustments/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -13177,6 +24156,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -13190,7 +24170,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-stock-adjustments--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (404):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -13202,7 +24182,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;No query results for model [App\\Models\\StockAdjustment] 17&quot;
 }</code>
  </pre>
     </span>
@@ -13223,7 +24203,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-stock-adjustments--id-" data-method="GET"
       data-path="api/v1/stock-adjustments/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -13253,6 +24233,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/stock-adjustments/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-stock-adjustments--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -13307,6 +24299,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="stock-adjustments-PUTapi-v1-stock-adjustments--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -13318,6 +24311,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/stock-adjustments/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -13328,6 +24322,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -13358,7 +24353,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-stock-adjustments--id-" data-method="PUT"
       data-path="api/v1/stock-adjustments/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -13392,6 +24387,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/stock-adjustments/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-stock-adjustments--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -13434,6 +24441,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="stock-adjustments-DELETEapi-v1-stock-adjustments--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -13445,6 +24453,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/stock-adjustments/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -13455,6 +24464,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -13485,7 +24495,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-stock-adjustments--id-" data-method="DELETE"
       data-path="api/v1/stock-adjustments/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -13515,6 +24525,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/stock-adjustments/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-stock-adjustments--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -13561,6 +24583,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="supplier-interactions-GETapi-v1-supplier-interactions">Display a listing of the supplier interactions.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -13572,6 +24595,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/supplier-interactions?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -13588,6 +24612,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -13601,7 +24626,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-supplier-interactions">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -13613,7 +24638,523 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;supplier_id&quot;: 1,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Rerum molestiae et sequi repellendus. Dignissimos molestiae natus temporibus ut velit atque. Ex et dignissimos excepturi et quia necessitatibus similique perferendis. Ut magni qui qui ducimus.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-07-04T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 1,
+                &quot;code&quot;: &quot;SUP001&quot;,
+                &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+                &quot;phone_number&quot;: &quot;0218887766&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;supplier_id&quot;: 1,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Dolores voluptas sint vitae distinctio voluptate nobis delectus aspernatur. Animi harum aut velit voluptas nesciunt commodi adipisci. Quis consectetur ipsa nam mollitia accusamus. Perspiciatis asperiores molestiae voluptate quibusdam commodi totam deleniti.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-10-04T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 1,
+                &quot;code&quot;: &quot;SUP001&quot;,
+                &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+                &quot;phone_number&quot;: &quot;0218887766&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;supplier_id&quot;: 2,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;call&quot;,
+            &quot;notes&quot;: &quot;Autem sit minus aut ea. Explicabo tenetur ullam qui aut voluptatibus cum libero. Nihil id in maxime et autem rem.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-02-03T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 2,
+                &quot;code&quot;: &quot;SUP002&quot;,
+                &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+                &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;0227654321&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;supplier_id&quot;: 2,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Neque corporis sit voluptatum voluptatem cumque animi ut. Dolore autem maiores quas atque ducimus magnam. Accusantium molestiae et magnam eaque voluptas.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-07-10T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 2,
+                &quot;code&quot;: &quot;SUP002&quot;,
+                &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+                &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;0227654321&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;supplier_id&quot;: 3,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Aut quia nobis maxime expedita aut adipisci dolor nam. Doloribus suscipit expedita quae voluptates beatae. Sed culpa cumque iusto qui sit cum cupiditate. Dolorem aut voluptatibus tenetur reprehenderit possimus nemo.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-04-01T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 3,
+                &quot;code&quot;: &quot;SUP003&quot;,
+                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;supplier_id&quot;: 3,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Ducimus voluptas cupiditate tempore nisi. Magni provident delectus autem facilis. Dolores qui et quos dolores debitis inventore. Deserunt cum rerum at nam.&quot;,
+            &quot;interaction_date&quot;: &quot;2024-11-21T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 3,
+                &quot;code&quot;: &quot;SUP003&quot;,
+                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;supplier_id&quot;: 4,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Nesciunt quis voluptatum dolor eligendi expedita sapiente. Temporibus ut quo vel neque aut enim vel. Exercitationem nihil et velit qui.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-05-18T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 4,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;supplier_id&quot;: 4,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Sed accusamus numquam dolore ratione. Est expedita nesciunt libero nihil libero dolore ab. Voluptate saepe inventore aspernatur praesentium ut beatae dolor. Quaerat explicabo provident eos natus dolor nihil. Laboriosam recusandae nostrum error a dolore voluptatem rem.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-07-16T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 4,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;call&quot;,
+            &quot;notes&quot;: &quot;Eum voluptas quia ab tenetur numquam. Et soluta architecto pariatur voluptas consequatur.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-08-01T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 5,
+                &quot;code&quot;: &quot;SUP005&quot;,
+                &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+                &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+                &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;60&quot;,
+                &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Voluptatem recusandae ipsam et eligendi et similique. Quisquam fugiat quo ut et odit unde. Iure expedita ut unde recusandae reprehenderit blanditiis. Quia maxime est quas et. Officiis ut ea ad at nihil consequatur.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-09-26T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 5,
+                &quot;code&quot;: &quot;SUP005&quot;,
+                &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+                &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+                &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;60&quot;,
+                &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;supplier_id&quot;: 5,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Quos voluptas facere molestiae consequatur. Exercitationem qui excepturi quaerat dolorem aut reprehenderit. Eos qui laborum qui voluptatem fugiat pariatur.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-03-29T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 5,
+                &quot;code&quot;: &quot;SUP005&quot;,
+                &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+                &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+                &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;60&quot;,
+                &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 12,
+            &quot;supplier_id&quot;: 6,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Ullam natus illum earum. Repudiandae ut culpa vitae.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-03-23T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 6,
+                &quot;code&quot;: &quot;SUP001&quot;,
+                &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+                &quot;phone_number&quot;: &quot;0218887766&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 13,
+            &quot;supplier_id&quot;: 6,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Sint est eius praesentium asperiores itaque. Accusamus sint deleniti distinctio perferendis sed. Assumenda rerum laudantium ut. Aut et ullam non reprehenderit quis.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-09-19T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 6,
+                &quot;code&quot;: &quot;SUP001&quot;,
+                &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+                &quot;phone_number&quot;: &quot;0218887766&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 14,
+            &quot;supplier_id&quot;: 6,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Nisi et quo maxime nobis explicabo. Quisquam blanditiis vero aut architecto rerum atque. Voluptas quis dolor possimus laboriosam commodi ab. Reiciendis dolorem dignissimos adipisci.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-04-27T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 6,
+                &quot;code&quot;: &quot;SUP001&quot;,
+                &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+                &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+                &quot;phone_number&quot;: &quot;0218887766&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;30&quot;,
+                &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 15,
+            &quot;supplier_id&quot;: 7,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Eum dolore culpa atque dicta earum quia at. At nobis odio quae dolore doloribus quod ut. Dolores repellat aspernatur aliquid dolorum qui voluptatum.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-06-08T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 7,
+                &quot;code&quot;: &quot;SUP002&quot;,
+                &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+                &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;0227654321&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 16,
+            &quot;supplier_id&quot;: 7,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;call&quot;,
+            &quot;notes&quot;: &quot;Quia labore molestiae sit a odit. Saepe minus quis suscipit velit magni vitae quasi. Suscipit porro tempora sequi veniam iste.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-07-14T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 7,
+                &quot;code&quot;: &quot;SUP002&quot;,
+                &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+                &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+                &quot;phone_number&quot;: &quot;0227654321&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 17,
+            &quot;supplier_id&quot;: 8,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;meeting&quot;,
+            &quot;notes&quot;: &quot;Commodi accusantium ut in aut dolorem minima consectetur. Id dolorem molestiae minima accusantium vel. Et officia earum rerum magnam sint corporis dolores.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-06-13T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 8,
+                &quot;code&quot;: &quot;SUP003&quot;,
+                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;15&quot;,
+                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 18,
+            &quot;supplier_id&quot;: 9,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;email&quot;,
+            &quot;notes&quot;: &quot;Culpa possimus quisquam accusantium autem architecto sint voluptatem. Et quia ut fuga qui quo rem maxime doloremque. Similique non sapiente commodi doloribus fuga.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-10-06T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 9,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 19,
+            &quot;supplier_id&quot;: 9,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Nisi libero autem qui ex sunt et. Labore voluptatem doloremque ipsam eligendi consequatur molestias. Quaerat eveniet repellendus dolorem nesciunt. Molestiae sint quaerat modi neque earum et dolorem.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-05-22T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 9,
+                &quot;code&quot;: &quot;SUP004&quot;,
+                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+                &quot;phone_number&quot;: &quot;0318889988&quot;,
+                &quot;location&quot;: &quot;IN&quot;,
+                &quot;payment_terms&quot;: &quot;45&quot;,
+                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 20,
+            &quot;supplier_id&quot;: 10,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;call&quot;,
+            &quot;notes&quot;: &quot;Illum libero explicabo consequatur nulla adipisci consequatur. Est optio quibusdam dolorem sunt ipsam. Ut facilis numquam accusamus vel cupiditate rerum corporis.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-08-27T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 10,
+                &quot;code&quot;: &quot;SUP005&quot;,
+                &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+                &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+                &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;60&quot;,
+                &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 21,
+            &quot;supplier_id&quot;: 10,
+            &quot;user_id&quot;: 1,
+            &quot;type&quot;: &quot;note&quot;,
+            &quot;notes&quot;: &quot;Ipsa perferendis tempora nostrum in assumenda veniam. Quis nesciunt dolorem et. A cumque occaecati odio distinctio.&quot;,
+            &quot;interaction_date&quot;: &quot;2025-06-12T00:00:00.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+            &quot;supplier&quot;: {
+                &quot;id&quot;: 10,
+                &quot;code&quot;: &quot;SUP005&quot;,
+                &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+                &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+                &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+                &quot;location&quot;: &quot;OUT&quot;,
+                &quot;payment_terms&quot;: &quot;60&quot;,
+                &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+            }
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/supplier-interactions?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/supplier-interactions?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/supplier-interactions?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/supplier-interactions&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 21,
+        &quot;total&quot;: 21
+    }
 }</code>
  </pre>
     </span>
@@ -13634,7 +25175,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-supplier-interactions" data-method="GET"
       data-path="api/v1/supplier-interactions"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -13664,6 +25205,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/supplier-interactions</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-supplier-interactions"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -13706,6 +25259,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="supplier-interactions-POSTapi-v1-supplier-interactions">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -13717,6 +25271,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/supplier-interactions" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -13727,6 +25282,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -13757,7 +25313,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-supplier-interactions" data-method="POST"
       data-path="api/v1/supplier-interactions"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -13788,6 +25344,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-supplier-interactions"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -13816,6 +25384,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="supplier-interactions-GETapi-v1-supplier-interactions--id-">Display the specified supplier interaction.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -13826,17 +25395,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/v1/supplier-interactions/17" \
+    --get "http://localhost:8000/api/v1/supplier-interactions/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/supplier-interactions/17"
+    "http://localhost:8000/api/v1/supplier-interactions/1"
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -13850,7 +25421,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-supplier-interactions--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -13862,7 +25433,29 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;supplier_id&quot;: 1,
+        &quot;user_id&quot;: 1,
+        &quot;type&quot;: &quot;meeting&quot;,
+        &quot;notes&quot;: &quot;Rerum molestiae et sequi repellendus. Dignissimos molestiae natus temporibus ut velit atque. Ex et dignissimos excepturi et quia necessitatibus similique perferendis. Ut magni qui qui ducimus.&quot;,
+        &quot;interaction_date&quot;: &quot;2025-07-04T00:00:00.000000Z&quot;,
+        &quot;created_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T14:30:07.000000Z&quot;,
+        &quot;supplier&quot;: {
+            &quot;id&quot;: 1,
+            &quot;code&quot;: &quot;SUP001&quot;,
+            &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+            &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+            &quot;phone_number&quot;: &quot;0218887766&quot;,
+            &quot;location&quot;: &quot;IN&quot;,
+            &quot;payment_terms&quot;: &quot;30&quot;,
+            &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        }
+    }
 }</code>
  </pre>
     </span>
@@ -13883,7 +25476,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-supplier-interactions--id-" data-method="GET"
       data-path="api/v1/supplier-interactions/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -13913,6 +25506,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/supplier-interactions/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-supplier-interactions--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -13945,10 +25550,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="GETapi-v1-supplier-interactions--id-"
-               value="17"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the supplier interaction. Example: <code>17</code></p>
+<p>The ID of the supplier interaction. Example: <code>1</code></p>
             </div>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>supplier_interaction</code></b>&nbsp;&nbsp;
@@ -13967,6 +25572,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="supplier-interactions-PUTapi-v1-supplier-interactions--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -13977,17 +25583,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/v1/supplier-interactions/17" \
+    "http://localhost:8000/api/v1/supplier-interactions/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/supplier-interactions/17"
+    "http://localhost:8000/api/v1/supplier-interactions/1"
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -14018,7 +25626,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-supplier-interactions--id-" data-method="PUT"
       data-path="api/v1/supplier-interactions/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -14053,6 +25661,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-supplier-interactions--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -14084,16 +25704,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="PUTapi-v1-supplier-interactions--id-"
-               value="17"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the supplier interaction. Example: <code>17</code></p>
+<p>The ID of the supplier interaction. Example: <code>1</code></p>
             </div>
                     </form>
 
                     <h2 id="supplier-interactions-DELETEapi-v1-supplier-interactions--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -14104,17 +25725,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost:8000/api/v1/supplier-interactions/17" \
+    "http://localhost:8000/api/v1/supplier-interactions/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/supplier-interactions/17"
+    "http://localhost:8000/api/v1/supplier-interactions/1"
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -14145,7 +25768,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-supplier-interactions--id-" data-method="DELETE"
       data-path="api/v1/supplier-interactions/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -14175,6 +25798,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/supplier-interactions/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-supplier-interactions--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -14207,10 +25842,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="DELETEapi-v1-supplier-interactions--id-"
-               value="17"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the supplier interaction. Example: <code>17</code></p>
+<p>The ID of the supplier interaction. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -14221,6 +25856,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="suppliers-GETapi-v1-suppliers">Display a listing of the suppliers.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Retrieves a paginated list of suppliers.</p>
@@ -14232,6 +25868,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/suppliers?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -14248,6 +25885,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -14261,7 +25899,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-suppliers">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -14273,7 +25911,170 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;code&quot;: &quot;SUP001&quot;,
+            &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+            &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+            &quot;phone_number&quot;: &quot;0218887766&quot;,
+            &quot;location&quot;: &quot;IN&quot;,
+            &quot;payment_terms&quot;: &quot;30&quot;,
+            &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;code&quot;: &quot;SUP002&quot;,
+            &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+            &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+            &quot;phone_number&quot;: &quot;0227654321&quot;,
+            &quot;location&quot;: &quot;IN&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
+            &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;code&quot;: &quot;SUP003&quot;,
+            &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+            &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+            &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+            &quot;location&quot;: &quot;OUT&quot;,
+            &quot;payment_terms&quot;: &quot;15&quot;,
+            &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;code&quot;: &quot;SUP004&quot;,
+            &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+            &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+            &quot;phone_number&quot;: &quot;0318889988&quot;,
+            &quot;location&quot;: &quot;IN&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
+            &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;code&quot;: &quot;SUP005&quot;,
+            &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+            &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+            &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+            &quot;location&quot;: &quot;OUT&quot;,
+            &quot;payment_terms&quot;: &quot;60&quot;,
+            &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;code&quot;: &quot;SUP001&quot;,
+            &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+            &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+            &quot;phone_number&quot;: &quot;0218887766&quot;,
+            &quot;location&quot;: &quot;IN&quot;,
+            &quot;payment_terms&quot;: &quot;30&quot;,
+            &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 7,
+            &quot;code&quot;: &quot;SUP002&quot;,
+            &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
+            &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
+            &quot;phone_number&quot;: &quot;0227654321&quot;,
+            &quot;location&quot;: &quot;IN&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
+            &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 8,
+            &quot;code&quot;: &quot;SUP003&quot;,
+            &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
+            &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
+            &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
+            &quot;location&quot;: &quot;OUT&quot;,
+            &quot;payment_terms&quot;: &quot;15&quot;,
+            &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 9,
+            &quot;code&quot;: &quot;SUP004&quot;,
+            &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
+            &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
+            &quot;phone_number&quot;: &quot;0318889988&quot;,
+            &quot;location&quot;: &quot;IN&quot;,
+            &quot;payment_terms&quot;: &quot;45&quot;,
+            &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 10,
+            &quot;code&quot;: &quot;SUP005&quot;,
+            &quot;name&quot;: &quot;Shenzhen Tech Supplies&quot;,
+            &quot;address&quot;: &quot;Futian District, Shenzhen, China&quot;,
+            &quot;phone_number&quot;: &quot;+86-755-1234-5678&quot;,
+            &quot;location&quot;: &quot;OUT&quot;,
+            &quot;payment_terms&quot;: &quot;60&quot;,
+            &quot;email&quot;: &quot;shenzhen.tech@example.com&quot;,
+            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/suppliers?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/suppliers?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/suppliers?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/suppliers&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 10,
+        &quot;total&quot;: 10
+    }
 }</code>
  </pre>
     </span>
@@ -14294,7 +26095,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-suppliers" data-method="GET"
       data-path="api/v1/suppliers"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -14324,6 +26125,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/suppliers</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-suppliers"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -14366,6 +26179,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="suppliers-POSTapi-v1-suppliers">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -14377,6 +26191,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/suppliers" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -14387,6 +26202,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -14417,7 +26233,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-suppliers" data-method="POST"
       data-path="api/v1/suppliers"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -14448,6 +26264,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-suppliers"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -14476,6 +26304,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="suppliers-GETapi-v1-suppliers--id-">Display the specified supplier.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 <p>Retrieves a single supplier by its ID.</p>
@@ -14487,6 +26316,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/suppliers/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -14497,6 +26327,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -14510,7 +26341,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-suppliers--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -14522,7 +26353,19 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;code&quot;: &quot;SUP001&quot;,
+        &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
+        &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
+        &quot;phone_number&quot;: &quot;0218887766&quot;,
+        &quot;location&quot;: &quot;IN&quot;,
+        &quot;payment_terms&quot;: &quot;30&quot;,
+        &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
+        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -14543,7 +26386,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-suppliers--id-" data-method="GET"
       data-path="api/v1/suppliers/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -14573,6 +26416,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/suppliers/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-suppliers--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -14627,6 +26482,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="suppliers-PUTapi-v1-suppliers--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -14638,6 +26494,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/suppliers/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -14648,6 +26505,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -14678,7 +26536,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-suppliers--id-" data-method="PUT"
       data-path="api/v1/suppliers/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -14712,6 +26570,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/suppliers/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-suppliers--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -14754,6 +26624,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="suppliers-DELETEapi-v1-suppliers--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -14765,6 +26636,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/suppliers/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -14775,6 +26647,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -14805,7 +26678,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-suppliers--id-" data-method="DELETE"
       data-path="api/v1/suppliers/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -14835,6 +26708,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/suppliers/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-suppliers--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -14881,6 +26766,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="taxes-GETapi-v1-taxes">Display a listing of the taxes.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -14892,6 +26778,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/taxes?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -14908,6 +26795,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -14921,7 +26809,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-taxes">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -14933,7 +26821,39 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/taxes?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/taxes?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: null,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/taxes?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/taxes&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: null,
+        &quot;total&quot;: 0
+    }
 }</code>
  </pre>
     </span>
@@ -14954,7 +26874,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-taxes" data-method="GET"
       data-path="api/v1/taxes"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -14984,6 +26904,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/taxes</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-taxes"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -15026,6 +26958,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="taxes-POSTapi-v1-taxes">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -15037,6 +26970,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/taxes" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -15047,6 +26981,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -15077,7 +27012,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-taxes" data-method="POST"
       data-path="api/v1/taxes"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -15108,6 +27043,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-taxes"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -15136,6 +27083,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="taxes-GETapi-v1-taxes--id-">Display the specified tax.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -15147,6 +27095,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/taxes/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -15157,6 +27106,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -15170,7 +27120,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-taxes--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (404):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -15182,7 +27132,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;No query results for model [App\\Models\\Tax] 17&quot;
 }</code>
  </pre>
     </span>
@@ -15203,7 +27153,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-taxes--id-" data-method="GET"
       data-path="api/v1/taxes/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -15233,6 +27183,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/taxes/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-taxes--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -15287,6 +27249,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="taxes-PUTapi-v1-taxes--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -15298,6 +27261,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/taxes/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -15308,6 +27272,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -15338,7 +27303,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-taxes--id-" data-method="PUT"
       data-path="api/v1/taxes/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -15372,6 +27337,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/taxes/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-taxes--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -15414,6 +27391,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="taxes-DELETEapi-v1-taxes--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -15425,6 +27403,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/taxes/17" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -15435,6 +27414,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -15465,7 +27445,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-taxes--id-" data-method="DELETE"
       data-path="api/v1/taxes/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -15495,6 +27475,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/taxes/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-taxes--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -15541,6 +27533,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="transactions-GETapi-v1-transactions">Display a listing of the transactions.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -15552,6 +27545,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/transactions?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -15568,6 +27562,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -15581,7 +27576,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-transactions">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -15593,7 +27588,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Server Error&quot;
 }</code>
  </pre>
     </span>
@@ -15614,7 +27609,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-transactions" data-method="GET"
       data-path="api/v1/transactions"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -15644,6 +27639,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/transactions</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-transactions"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -15686,6 +27693,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="transactions-POSTapi-v1-transactions">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -15697,6 +27705,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/transactions" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -15707,6 +27716,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -15737,7 +27747,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-transactions" data-method="POST"
       data-path="api/v1/transactions"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -15768,6 +27778,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-transactions"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -15796,6 +27818,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="transactions-GETapi-v1-transactions--id-">Display the specified transaction.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -15807,6 +27830,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/transactions/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -15817,6 +27841,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -15830,7 +27855,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-transactions--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (500):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -15842,7 +27867,7 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Server Error&quot;
 }</code>
  </pre>
     </span>
@@ -15863,7 +27888,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-transactions--id-" data-method="GET"
       data-path="api/v1/transactions/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -15893,6 +27918,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/transactions/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-transactions--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -15947,6 +27984,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="transactions-PUTapi-v1-transactions--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -15958,6 +27996,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/transactions/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -15968,6 +28007,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -15998,7 +28038,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-transactions--id-" data-method="PUT"
       data-path="api/v1/transactions/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -16032,6 +28072,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/transactions/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-transactions--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -16074,6 +28126,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="transactions-DELETEapi-v1-transactions--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -16085,6 +28138,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/transactions/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -16095,6 +28149,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -16125,7 +28180,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-transactions--id-" data-method="DELETE"
       data-path="api/v1/transactions/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -16155,6 +28210,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/transactions/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-transactions--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -16201,6 +28268,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="units-GETapi-v1-units">Display a listing of the units.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -16212,6 +28280,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/units?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -16228,6 +28297,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -16241,7 +28311,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-units">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -16253,7 +28323,61 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;Pieces&quot;,
+            &quot;symbol&quot;: &quot;PCS&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;name&quot;: &quot;Roll&quot;,
+            &quot;symbol&quot;: &quot;Roll&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;name&quot;: &quot;Meters&quot;,
+            &quot;symbol&quot;: &quot;M&quot;,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/units?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/units?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/units?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/units&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 3,
+        &quot;total&quot;: 3
+    }
 }</code>
  </pre>
     </span>
@@ -16274,7 +28398,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-units" data-method="GET"
       data-path="api/v1/units"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -16304,6 +28428,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/units</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-units"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -16346,6 +28482,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="units-POSTapi-v1-units">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -16357,6 +28494,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/units" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -16367,6 +28505,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -16397,7 +28536,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-units" data-method="POST"
       data-path="api/v1/units"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -16428,6 +28567,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-units"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -16456,6 +28607,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="units-GETapi-v1-units--id-">Display the specified unit.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -16467,6 +28619,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/units/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -16477,6 +28630,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -16490,7 +28644,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-units--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -16502,7 +28656,13 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Pieces&quot;,
+        &quot;symbol&quot;: &quot;PCS&quot;,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -16523,7 +28683,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-units--id-" data-method="GET"
       data-path="api/v1/units/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -16553,6 +28713,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/units/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-units--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -16607,6 +28779,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="units-PUTapi-v1-units--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -16618,6 +28791,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/units/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -16628,6 +28802,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -16658,7 +28833,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-units--id-" data-method="PUT"
       data-path="api/v1/units/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -16692,6 +28867,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/units/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-units--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -16734,6 +28921,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="units-DELETEapi-v1-units--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -16745,6 +28933,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/units/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -16755,6 +28944,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -16785,7 +28975,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-units--id-" data-method="DELETE"
       data-path="api/v1/units/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -16815,6 +29005,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/units/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-units--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -16861,6 +29063,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="users-GETapi-v1-users">Display a listing of the users.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -16872,6 +29075,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/users?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -16888,6 +29092,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -16901,7 +29106,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-users">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -16913,7 +29118,106 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;admin&quot;,
+            &quot;shopname&quot;: null,
+            &quot;address&quot;: null,
+            &quot;email&quot;: &quot;admin@gmail.com&quot;,
+            &quot;email_verified_at&quot;: null,
+            &quot;two_factor_secret&quot;: null,
+            &quot;two_factor_recovery_codes&quot;: null,
+            &quot;two_factor_confirmed_at&quot;: null,
+            &quot;remember_token&quot;: null,
+            &quot;avatar&quot;: &quot;&quot;,
+            &quot;timezone&quot;: null,
+            &quot;system_settings&quot;: null,
+            &quot;accounting_settings&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+            &quot;roles&quot;: [
+                {
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;superuser&quot;,
+                    &quot;guard_name&quot;: &quot;web&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;pivot&quot;: {
+                        &quot;model_type&quot;: &quot;App\\Models\\User&quot;,
+                        &quot;model_id&quot;: 1,
+                        &quot;role_id&quot;: 1
+                    }
+                }
+            ],
+            &quot;permissions&quot;: []
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;name&quot;: &quot;Super User&quot;,
+            &quot;shopname&quot;: null,
+            &quot;address&quot;: null,
+            &quot;email&quot;: &quot;superuser@example.com&quot;,
+            &quot;email_verified_at&quot;: &quot;2025-11-20T13:30:04.000000Z&quot;,
+            &quot;two_factor_secret&quot;: null,
+            &quot;two_factor_recovery_codes&quot;: null,
+            &quot;two_factor_confirmed_at&quot;: null,
+            &quot;remember_token&quot;: null,
+            &quot;avatar&quot;: null,
+            &quot;timezone&quot;: null,
+            &quot;system_settings&quot;: null,
+            &quot;accounting_settings&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
+            &quot;roles&quot;: [
+                {
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;superuser&quot;,
+                    &quot;guard_name&quot;: &quot;web&quot;,
+                    &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                    &quot;pivot&quot;: {
+                        &quot;model_type&quot;: &quot;App\\Models\\User&quot;,
+                        &quot;model_id&quot;: 2,
+                        &quot;role_id&quot;: 1
+                    }
+                }
+            ],
+            &quot;permissions&quot;: []
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/users?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/users?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/users?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/users&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 2,
+        &quot;total&quot;: 2
+    }
 }</code>
  </pre>
     </span>
@@ -16934,7 +29238,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-users" data-method="GET"
       data-path="api/v1/users"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -16964,6 +29268,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/users</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-users"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -17006,6 +29322,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="users-POSTapi-v1-users">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -17017,6 +29334,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/users" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -17027,6 +29345,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -17057,7 +29376,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-users" data-method="POST"
       data-path="api/v1/users"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -17088,6 +29407,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-users"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -17116,6 +29447,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="users-GETapi-v1-users--id-">Display the specified user.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -17127,6 +29459,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/users/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -17137,6 +29470,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -17150,7 +29484,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-users--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -17162,7 +29496,39 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;admin&quot;,
+        &quot;shopname&quot;: null,
+        &quot;address&quot;: null,
+        &quot;email&quot;: &quot;admin@gmail.com&quot;,
+        &quot;email_verified_at&quot;: null,
+        &quot;two_factor_secret&quot;: null,
+        &quot;two_factor_recovery_codes&quot;: null,
+        &quot;two_factor_confirmed_at&quot;: null,
+        &quot;remember_token&quot;: null,
+        &quot;avatar&quot;: &quot;&quot;,
+        &quot;timezone&quot;: null,
+        &quot;system_settings&quot;: null,
+        &quot;accounting_settings&quot;: null,
+        &quot;created_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T14:30:02.000000Z&quot;,
+        &quot;roles&quot;: [
+            {
+                &quot;id&quot;: 1,
+                &quot;name&quot;: &quot;superuser&quot;,
+                &quot;guard_name&quot;: &quot;web&quot;,
+                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+                &quot;pivot&quot;: {
+                    &quot;model_type&quot;: &quot;App\\Models\\User&quot;,
+                    &quot;model_id&quot;: 1,
+                    &quot;role_id&quot;: 1
+                }
+            }
+        ],
+        &quot;permissions&quot;: []
+    }
 }</code>
  </pre>
     </span>
@@ -17183,7 +29549,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-users--id-" data-method="GET"
       data-path="api/v1/users/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -17213,6 +29579,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/users/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-users--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -17267,6 +29645,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="users-PUTapi-v1-users--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -17278,6 +29657,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/users/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -17288,6 +29668,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -17318,7 +29699,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-users--id-" data-method="PUT"
       data-path="api/v1/users/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -17352,6 +29733,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/users/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-users--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -17394,6 +29787,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="users-DELETEapi-v1-users--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -17405,6 +29799,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/users/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -17415,6 +29810,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -17445,7 +29841,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-users--id-" data-method="DELETE"
       data-path="api/v1/users/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -17475,6 +29871,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/users/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-users--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -17521,6 +29929,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                                 <h2 id="warehouses-GETapi-v1-warehouses">Display a listing of the warehouses.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -17532,6 +29941,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/warehouses?per_page=25" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -17548,6 +29958,7 @@ Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -17561,7 +29972,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-warehouses">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -17573,7 +29984,67 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 1,
+            &quot;name&quot;: &quot;Gudang Utama Jakarta&quot;,
+            &quot;address&quot;: &quot;Jl. Raya Cakung No. 10, Jakarta Timur&quot;,
+            &quot;description&quot;: &quot;Gudang utama untuk distribusi pusat.&quot;,
+            &quot;is_main&quot;: 1,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;name&quot;: &quot;Gudang Surabaya&quot;,
+            &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
+            &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
+            &quot;is_main&quot;: 0,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;name&quot;: &quot;Gudang Bandung&quot;,
+            &quot;address&quot;: &quot;Jl. Pasteur No. 23, Bandung&quot;,
+            &quot;description&quot;: &quot;Gudang cabang untuk area Jawa Barat.&quot;,
+            &quot;is_main&quot;: 0,
+            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;http://localhost:8000/api/v1/warehouses?page=1&quot;,
+        &quot;last&quot;: &quot;http://localhost:8000/api/v1/warehouses?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;from&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;links&quot;: [
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
+                &quot;active&quot;: false
+            },
+            {
+                &quot;url&quot;: &quot;http://localhost:8000/api/v1/warehouses?page=1&quot;,
+                &quot;label&quot;: &quot;1&quot;,
+                &quot;active&quot;: true
+            },
+            {
+                &quot;url&quot;: null,
+                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
+                &quot;active&quot;: false
+            }
+        ],
+        &quot;path&quot;: &quot;http://localhost:8000/api/v1/warehouses&quot;,
+        &quot;per_page&quot;: 25,
+        &quot;to&quot;: 3,
+        &quot;total&quot;: 3
+    }
 }</code>
  </pre>
     </span>
@@ -17594,7 +30065,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-warehouses" data-method="GET"
       data-path="api/v1/warehouses"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -17624,6 +30095,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/warehouses</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-warehouses"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -17666,6 +30149,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="warehouses-POSTapi-v1-warehouses">Store a newly created resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -17677,6 +30161,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/v1/warehouses" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -17687,6 +30172,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -17717,7 +30203,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-POSTapi-v1-warehouses" data-method="POST"
       data-path="api/v1/warehouses"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -17748,6 +30234,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-warehouses"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
  &nbsp;
@@ -17776,6 +30274,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="warehouses-GETapi-v1-warehouses--id-">Display the specified warehouse.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -17787,6 +30286,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
     --get "http://localhost:8000/api/v1/warehouses/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -17797,6 +30297,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -17810,7 +30311,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-warehouses--id-">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -17822,7 +30323,15 @@ access-control-allow-origin: *
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;Gudang Utama Jakarta&quot;,
+        &quot;address&quot;: &quot;Jl. Raya Cakung No. 10, Jakarta Timur&quot;,
+        &quot;description&quot;: &quot;Gudang utama untuk distribusi pusat.&quot;,
+        &quot;is_main&quot;: 1,
+        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -17843,7 +30352,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-GETapi-v1-warehouses--id-" data-method="GET"
       data-path="api/v1/warehouses/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -17873,6 +30382,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/warehouses/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-warehouses--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -17927,6 +30448,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="warehouses-PUTapi-v1-warehouses--id-">Update the specified resource in storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -17938,6 +30460,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/v1/warehouses/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -17948,6 +30471,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -17978,7 +30502,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-PUTapi-v1-warehouses--id-" data-method="PUT"
       data-path="api/v1/warehouses/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -18012,6 +30536,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/warehouses/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-v1-warehouses--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;
@@ -18054,6 +30590,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                     <h2 id="warehouses-DELETEapi-v1-warehouses--id-">Remove the specified resource from storage.</h2>
 
 <p>
+<small class="badge badge-darkred">requires authentication</small>
 </p>
 
 
@@ -18065,6 +30602,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
     "http://localhost:8000/api/v1/warehouses/1" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
@@ -18075,6 +30613,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
     "Content-Type": "application/json",
     "Accept": "application/json",
 };
@@ -18105,7 +30644,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </span>
 <form id="form-DELETEapi-v1-warehouses--id-" data-method="DELETE"
       data-path="api/v1/warehouses/{id}"
-      data-authed="0"
+      data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
@@ -18135,6 +30674,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <b><code>api/v1/warehouses/{id}</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-warehouses--id-"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
 &nbsp;

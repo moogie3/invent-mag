@@ -20,9 +20,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Display a listing of the resource.'
       description: ''
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -35,15 +36,18 @@ endpoints:
     responses:
       -
         custom: []
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: '{"data":[]}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -62,9 +66,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Store a newly created resource in storage.'
       description: ''
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -76,7 +81,10 @@ endpoints:
     fileParameters: []
     responses: []
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -95,9 +103,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Display the specified resource.'
       description: ''
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -134,15 +143,18 @@ endpoints:
     responses:
       -
         custom: []
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: '{"data":{"id":1,"invoice":"PO-00001","supplier_id":2,"user_id":null,"order_date":"2025-10-27T09:16:25.000000Z","due_date":"2025-11-10T09:16:25.000000Z","payment_type":"Cash","discount_total":"25.00","discount_total_type":"percentage","total":1260,"status":"Paid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -162,9 +174,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Update the specified resource in storage.'
       description: ''
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -188,7 +201,10 @@ endpoints:
     fileParameters: []
     responses: []
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -207,9 +223,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Remove the specified resource from storage.'
       description: ''
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -233,7 +250,10 @@ endpoints:
     fileParameters: []
     responses: []
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null

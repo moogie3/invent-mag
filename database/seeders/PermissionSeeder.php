@@ -81,5 +81,6 @@ class PermissionSeeder extends Seeder
 
         // Accounting Permissions
         Permission::firstOrCreate(['name' => 'view-accounting']);
+        Permission::firstOrCreate(['name' => 'view-accounts']);
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreCustomerRequest;
+use App\Http\Requests\Api\V1\UpdateCustomerRequest;
 use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
@@ -30,11 +32,29 @@ class CustomerController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Create a new customer.
+     *
+     * @bodyParam name string required The name of the customer. Example: "John Doe"
+     * @bodyParam address string required The address of the customer. Example: "123 Main St"
+     * @bodyParam phone_number string required The phone number of the customer. Example: "555-1234"
+     * @bodyParam email string The email of the customer. Must be unique. Example: "john.doe@example.com"
+     * @bodyParam payment_terms string required The payment terms. Example: "Net 30"
+     *
+     * @response 201 {
+     *  "data": {
+     *      "id": 1,
+     *      "name": "John Doe",
+     *      "address": "123 Main St",
+     *      "phone_number": "555-1234",
+     *      "email": "john.doe@example.com",
+     *      "payment_terms": "Net 30"
+     *  }
+     * }
      */
-    public function store(Request $request)
+    public function store(StoreCustomerRequest $request)
     {
-        //
+        $customer = Customer::create($request->validated());
+        return new CustomerResource($customer);
     }
 
     /**
@@ -42,7 +62,7 @@ class CustomerController extends Controller
      *
      * Retrieves a single customer by its ID.
      *
-     * @urlParam id required The ID of the customer. Example: 1
+     * @urlParam customer integer required The ID of the customer. Example: 1
      *
      */
     public function show(Customer $customer)
@@ -51,18 +71,35 @@ class CustomerController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified customer.
+     *
+     * @urlParam customer integer required The ID of the customer to update. Example: 1
+     * @bodyParam name string The name of the customer. Example: "Jane Doe"
+     *
+     * @response {
+     *  "data": {
+     *      "id": 1,
+     *      "name": "Jane Doe",
+     *      ...
+     *  }
+     * }
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        //
+        $customer->update($request->validated());
+        return new CustomerResource($customer);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the specified customer.
+     *
+     * @urlParam customer integer required The ID of the customer to delete. Example: 1
+     *
+     * @response 204 ""
      */
-    public function destroy(string $id)
+    public function destroy(Customer $customer)
     {
-        //
+        $customer->delete();
+        return response()->noContent();
     }
 }

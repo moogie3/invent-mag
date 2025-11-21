@@ -20,9 +20,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Display a listing of the products.'
       description: 'Retrieves a paginated list of products. You can specify the number of products per page.'
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -47,15 +48,18 @@ endpoints:
     responses:
       -
         custom: []
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: '{"data":[{"id":1,"code":"TR11","barcode":"7986298486210","name":"Near Low Stock Capacitor","stock_quantity":44,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":1,"supplier_id":3,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":2,"name":"FBT","description":"Flyback","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":1,"name":"Pieces","symbol":"PCS","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":2,"code":"TR12","barcode":"4819617615387","name":"Expired Diode","stock_quantity":50,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":2,"units_id":1,"supplier_id":2,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":2,"name":"FBT","description":"Flyback","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":2,"code":"SUP002","name":"CV. Sumber Rejeki","address":"Jl. Rajawali No. 12, Bandung","phone_number":"0227654321","location":"IN","payment_terms":"45","email":"sumber.rejeki@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":1,"name":"Pieces","symbol":"PCS","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":3,"code":"TR13","barcode":"8381563189398","name":"Near Expiry Crystal Oscillator","stock_quantity":55,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":3,"units_id":3,"supplier_id":4,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-09-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","warehouse":{"id":3,"name":"Gudang Bandung","address":"Jl. Pasteur No. 23, Bandung","description":"Gudang cabang untuk area Jawa Barat.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":3,"name":"IC","description":"Integrated Circuit","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":3,"name":"Meters","symbol":"M","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":4,"code":"TR14","barcode":"9107410836319","name":"Low Stock LED","stock_quantity":12,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":2,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":1,"name":"Gudang Utama Jakarta","address":"Jl. Raya Cakung No. 10, Jakarta Timur","description":"Gudang utama untuk distribusi pusat.","is_main":1,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":1,"name":"TR","description":"Transistor","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":2,"name":"Roll","symbol":"Roll","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":5,"code":"TR15","barcode":"5112846880205","name":"Expired Voltage Regulator","stock_quantity":16,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":1,"units_id":1,"supplier_id":4,"description":"Voltage regulator expired long ago","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":1,"name":"TR","description":"Transistor","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":1,"name":"Pieces","symbol":"PCS","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":6,"code":"TR11","barcode":"5089614188767","name":"Near Low Stock Capacitor","stock_quantity":19,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":6,"units_id":3,"supplier_id":9,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":6,"name":"IC","description":"Integrated Circuit","parent_id":null,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"supplier":{"id":9,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"unit":{"id":3,"name":"Meters","symbol":"M","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":7,"code":"TR12","barcode":"3779775320282","name":"Expired Diode","stock_quantity":46,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":4,"units_id":3,"supplier_id":3,"description":"Diode product already expired","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":1,"name":"Gudang Utama Jakarta","address":"Jl. Raya Cakung No. 10, Jakarta Timur","description":"Gudang utama untuk distribusi pusat.","is_main":1,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":4,"name":"TR","description":"Transistor","parent_id":null,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":3,"name":"Meters","symbol":"M","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":8,"code":"TR13","barcode":"3148624359009","name":"Near Expiry Crystal Oscillator","stock_quantity":53,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":1,"units_id":1,"supplier_id":4,"description":"Crystal oscillator expiring soon","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-09-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":1,"name":"TR","description":"Transistor","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":1,"name":"Pieces","symbol":"PCS","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":9,"code":"TR14","barcode":"2740660386479","name":"Low Stock LED","stock_quantity":17,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":6,"units_id":2,"supplier_id":4,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":1,"name":"Gudang Utama Jakarta","address":"Jl. Raya Cakung No. 10, Jakarta Timur","description":"Gudang utama untuk distribusi pusat.","is_main":1,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":6,"name":"IC","description":"Integrated Circuit","parent_id":null,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":2,"name":"Roll","symbol":"Roll","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":10,"code":"TR15","barcode":"3867088010591","name":"Expired Voltage Regulator","stock_quantity":1,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":1,"units_id":3,"supplier_id":6,"description":"Voltage regulator expired long ago","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":1,"name":"TR","description":"Transistor","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":6,"code":"SUP001","name":"PT. Elektronika Nusantara","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","phone_number":"0218887766","location":"IN","payment_terms":"30","email":"elektronika.nusantara@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"unit":{"id":3,"name":"Meters","symbol":"M","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}}],"links":{"first":"http:\/\/localhost:8000\/api\/v1\/products?page=1","last":"http:\/\/localhost:8000\/api\/v1\/products?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/products?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost:8000\/api\/v1\/products","per_page":25,"to":10,"total":10}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -74,9 +78,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Create a new product.'
       description: 'Creates a new product with the provided data.'
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -235,7 +240,10 @@ endpoints:
         headers: []
         description: ''
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -254,9 +262,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Display the specified product.'
       description: 'Retrieves a single product by its ID.'
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -293,15 +302,18 @@ endpoints:
     responses:
       -
         custom: []
-        status: 401
-        content: '{"message":"Unauthenticated."}'
+        status: 200
+        content: '{"data":{"id":1,"code":"TR11","barcode":"7986298486210","name":"Near Low Stock Capacitor","stock_quantity":44,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":1,"supplier_id":3,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":2,"name":"FBT","description":"Flyback","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":1,"name":"Pieces","symbol":"PCS","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -321,9 +333,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Update the specified product.'
       description: 'Updates a product with the provided data.'
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -369,9 +382,9 @@ endpoints:
       code:
         custom: []
         name: code
-        description: 'Must not be greater than 255 characters.'
+        description: 'The product code. Must be unique. Must not be greater than 255 characters.'
         required: false
-        example: amniihfqcoynlazghdtqt
+        example: LP-001
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -391,9 +404,9 @@ endpoints:
       selling_price:
         custom: []
         name: selling_price
-        description: 'Must be at least 0.'
+        description: 'The selling price of the product. Must be at least 0.'
         required: false
-        example: 80
+        example: 1200.0
         type: number
         enumValues: []
         exampleWasSpecified: false
@@ -402,9 +415,9 @@ endpoints:
       category_id:
         custom: []
         name: category_id
-        description: 'The <code>id</code> of an existing record in the categories table.'
+        description: 'The ID of the category the product belongs to. The <code>id</code> of an existing record in the categories table.'
         required: false
-        example: null
+        example: 1
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -413,9 +426,9 @@ endpoints:
       supplier_id:
         custom: []
         name: supplier_id
-        description: 'The <code>id</code> of an existing record in the suppliers table.'
+        description: 'The ID of the supplier. The <code>id</code> of an existing record in the suppliers table.'
         required: false
-        example: null
+        example: 1
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -424,9 +437,9 @@ endpoints:
       units_id:
         custom: []
         name: units_id
-        description: 'The <code>id</code> of an existing record in the units table.'
+        description: 'The ID of the unit of measure. The <code>id</code> of an existing record in the units table.'
         required: false
-        example: null
+        example: 1
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -446,9 +459,9 @@ endpoints:
       stock_quantity:
         custom: []
         name: stock_quantity
-        description: 'Must be at least 0.'
+        description: 'The initial stock quantity. Must be at least 0.'
         required: false
-        example: 6
+        example: 100.0
         type: number
         enumValues: []
         exampleWasSpecified: false
@@ -457,9 +470,9 @@ endpoints:
       description:
         custom: []
         name: description
-        description: ''
+        description: 'A description of the product.'
         required: false
-        example: 'Dolores dolorum amet iste laborum eius est dolor.'
+        example: 'A powerful laptop.'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -467,11 +480,14 @@ endpoints:
         deprecated: false
     cleanBodyParameters:
       name: '"Laptop Pro v2"'
-      code: amniihfqcoynlazghdtqt
+      code: LP-001
       price: 1250.0
-      selling_price: 80
-      stock_quantity: 6
-      description: 'Dolores dolorum amet iste laborum eius est dolor.'
+      selling_price: 1200.0
+      category_id: 1
+      supplier_id: 1
+      units_id: 1
+      stock_quantity: 100.0
+      description: 'A powerful laptop.'
     fileParameters: []
     responses:
       -
@@ -496,7 +512,10 @@ endpoints:
         headers: []
         description: ''
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null
@@ -515,9 +534,10 @@ endpoints:
       subgroupDescription: ''
       title: 'Delete the specified product.'
       description: 'Deletes a single product by its ID.'
-      authenticated: false
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
     urlParameters:
@@ -565,7 +585,10 @@ endpoints:
         headers: []
         description: ''
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
     controller: null
     method: null
     route: null

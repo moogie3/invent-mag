@@ -43,4 +43,55 @@ class UpdateProductRequest extends FormRequest
             'description' => 'sometimes|nullable|string',
         ];
     }
+
+    /**
+     * Get the body parameters for the request.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function bodyParameters(): array
+    {
+        return [
+            'name' => [
+                'description' => 'The name of the product.',
+                'example' => 'Laptop',
+            ],
+            'code' => [
+                'description' => 'The product code. Must be unique.',
+                'example' => 'LP-001',
+            ],
+            'price' => [
+                'description' => 'The purchase price of the product.',
+                'example' => 1000.00,
+            ],
+            'selling_price' => [
+                'description' => 'The selling price of the product.',
+                'example' => 1200.00,
+            ],
+            'category_id' => [
+                'description' => 'The ID of the category the product belongs to.',
+                'example' => 1,
+            ],
+            'supplier_id' => [
+                'description' => 'The ID of the supplier.',
+                'example' => 1,
+            ],
+            'units_id' => [
+                'description' => 'The ID of the unit of measure.',
+                'example' => 1,
+            ],
+            'warehouse_.id' => [
+                'description' => 'The ID of the warehouse where the product is stored.',
+                'example' => 1,
+            ],
+            'stock_quantity' => [
+                'description' => 'The initial stock quantity.',
+                'example' => 100,
+            ],
+            'description' => [
+                'description' => 'A description of the product.',
+                'example' => 'A powerful laptop.',
+            ],
+        ];
+    }
 }

@@ -18,6 +18,9 @@ class SalesItemController extends Controller
      * Display a listing of the sales items.
      *
      * @queryParam per_page int The number of items to return per page. Defaults to 15. Example: 25
+     *
+     * @apiResourceCollection App\Http\Resources\SalesItemResource
+     * @apiResourceModel App\Models\SalesItem
      */
     public function index(Request $request)
     {
@@ -73,6 +76,9 @@ class SalesItemController extends Controller
      * Display the specified sales item.
      *
      * @urlParam sales_item required The ID of the sales item. Example: 1
+     *
+     * @apiResource App\Http\Resources\SalesItemResource
+     * @apiResourceModel App\Models\SalesItem
      */
     public function show(SalesItem $sales_item)
     {

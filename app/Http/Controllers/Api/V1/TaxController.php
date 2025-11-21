@@ -18,6 +18,9 @@ class TaxController extends Controller
      * Display a listing of the taxes.
      *
      * @queryParam per_page int The number of taxes to return per page. Defaults to 15. Example: 25
+     *
+     * @apiResourceCollection App\Http\Resources\TaxResource
+     * @apiResourceModel App\Models\Tax
      */
     public function index(Request $request)
     {
@@ -61,6 +64,9 @@ class TaxController extends Controller
      * Display the specified tax.
      *
      * @urlParam tax required The ID of the tax. Example: 1
+     *
+     * @apiResource App\Http\Resources\TaxResource
+     * @apiResourceModel App\Models\Tax
      */
     public function show(Tax $tax)
     {

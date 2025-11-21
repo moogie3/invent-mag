@@ -158,7 +158,7 @@ endpoints:
         name: is_active
         description: ''
         required: true
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -170,7 +170,7 @@ endpoints:
       type: qxbajwbpilpmufinllwlo
       description: 'Dolores dolorum amet iste laborum eius est dolor.'
       level: 17
-      is_active: false
+      is_active: true
     fileParameters: []
     responses:
       -

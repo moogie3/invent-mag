@@ -23,6 +23,8 @@ class ProductController extends Controller
      *
      * @queryParam per_page int The number of products to return per page. Defaults to 15. Example: 25
      *
+     * @apiResourceCollection App\Http\Resources\ProductResource
+     * @apiResourceModel App\Models\Product
      */
     public function index(Request $request)
     {
@@ -47,22 +49,8 @@ class ProductController extends Controller
      * @bodyParam stock_quantity float The initial stock quantity. Example: 50
      * @bodyParam description string A description for the product.
      *
-     * @response 201 {
-     *  "data": {
-     *      "id": 1,
-     *      "name": "Laptop Pro",
-     *      "code": "LP-001",
-     *      "price": 1200.50,
-     *      "selling_price": 1499.99,
-     *      "stock_quantity": 50,
-     *      "description": "A powerful new laptop.",
-     *      "category": { ... },
-     *      "supplier": { ... },
-     *      "unit": { ... },
-     *      "warehouse": { ... }
-     *  }
-     * }
-     * @response 422 { "message": "The given data was invalid.", "errors": { ... } }
+     * @apiResource App\Http\Resources\ProductResource
+     * @apiResourceModel App\Models\Product
      */
     public function store(StoreProductRequest $request)
     {
@@ -77,6 +65,8 @@ class ProductController extends Controller
      *
      * @urlParam product required The ID of the product. Example: 1
      *
+     * @apiResource App\Http\Resources\ProductResource
+     * @apiResourceModel App\Models\Product
      */
     public function show(Product $product)
     {
@@ -92,16 +82,8 @@ class ProductController extends Controller
      * @bodyParam name string The name of the product. Example: "Laptop Pro v2"
      * @bodyParam price float The cost price of the product. Example: 1250.00
      *
-     * @response {
-     *  "data": {
-     *      "id": 1,
-     *      "name": "Laptop Pro v2",
-     *      "code": "LP-001",
-     *      "price": 1250.00,
-     *      ...
-     *  }
-     * }
-     * @response 422 { "message": "The given data was invalid.", "errors": { ... } }
+     * @apiResource App\Http\Resources\ProductResource
+     * @apiResourceModel App\Models\Product
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
@@ -116,8 +98,7 @@ class ProductController extends Controller
      *
      * @urlParam product required The ID of the product to delete. Example: 1
      *
-     * @response 204 ""
-     * @response 404 { "message": "Not Found." }
+     * @response 204 scenario="Success"
      */
     public function destroy(Product $product)
     {

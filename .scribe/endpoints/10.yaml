@@ -47,12 +47,9 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"code":"TR11","barcode":"7986298486210","name":"Near Low Stock Capacitor","stock_quantity":44,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":1,"supplier_id":3,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":2,"name":"FBT","description":"Flyback","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":1,"name":"Pieces","symbol":"PCS","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":2,"code":"TR12","barcode":"4819617615387","name":"Expired Diode","stock_quantity":50,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":2,"units_id":1,"supplier_id":2,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":2,"name":"FBT","description":"Flyback","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":2,"code":"SUP002","name":"CV. Sumber Rejeki","address":"Jl. Rajawali No. 12, Bandung","phone_number":"0227654321","location":"IN","payment_terms":"45","email":"sumber.rejeki@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":1,"name":"Pieces","symbol":"PCS","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":3,"code":"TR13","barcode":"8381563189398","name":"Near Expiry Crystal Oscillator","stock_quantity":55,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":3,"units_id":3,"supplier_id":4,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-09-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","warehouse":{"id":3,"name":"Gudang Bandung","address":"Jl. Pasteur No. 23, Bandung","description":"Gudang cabang untuk area Jawa Barat.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":3,"name":"IC","description":"Integrated Circuit","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":3,"name":"Meters","symbol":"M","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":4,"code":"TR14","barcode":"9107410836319","name":"Low Stock LED","stock_quantity":12,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":2,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":1,"name":"Gudang Utama Jakarta","address":"Jl. Raya Cakung No. 10, Jakarta Timur","description":"Gudang utama untuk distribusi pusat.","is_main":1,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":1,"name":"TR","description":"Transistor","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":2,"name":"Roll","symbol":"Roll","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":5,"code":"TR15","barcode":"5112846880205","name":"Expired Voltage Regulator","stock_quantity":16,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":1,"units_id":1,"supplier_id":4,"description":"Voltage regulator expired long ago","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":1,"name":"TR","description":"Transistor","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":1,"name":"Pieces","symbol":"PCS","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":6,"code":"TR11","barcode":"5089614188767","name":"Near Low Stock Capacitor","stock_quantity":19,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":6,"units_id":3,"supplier_id":9,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":6,"name":"IC","description":"Integrated Circuit","parent_id":null,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"supplier":{"id":9,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"unit":{"id":3,"name":"Meters","symbol":"M","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":7,"code":"TR12","barcode":"3779775320282","name":"Expired Diode","stock_quantity":46,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":4,"units_id":3,"supplier_id":3,"description":"Diode product already expired","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":1,"name":"Gudang Utama Jakarta","address":"Jl. Raya Cakung No. 10, Jakarta Timur","description":"Gudang utama untuk distribusi pusat.","is_main":1,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":4,"name":"TR","description":"Transistor","parent_id":null,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":3,"name":"Meters","symbol":"M","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":8,"code":"TR13","barcode":"3148624359009","name":"Near Expiry Crystal Oscillator","stock_quantity":53,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":1,"units_id":1,"supplier_id":4,"description":"Crystal oscillator expiring soon","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-09-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":1,"name":"TR","description":"Transistor","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":1,"name":"Pieces","symbol":"PCS","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":9,"code":"TR14","barcode":"2740660386479","name":"Low Stock LED","stock_quantity":17,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":6,"units_id":2,"supplier_id":4,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":1,"name":"Gudang Utama Jakarta","address":"Jl. Raya Cakung No. 10, Jakarta Timur","description":"Gudang utama untuk distribusi pusat.","is_main":1,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":6,"name":"IC","description":"Integrated Circuit","parent_id":null,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":2,"name":"Roll","symbol":"Roll","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":10,"code":"TR15","barcode":"3867088010591","name":"Expired Voltage Regulator","stock_quantity":1,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":1,"units_id":3,"supplier_id":6,"description":"Voltage regulator expired long ago","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":1,"name":"TR","description":"Transistor","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":6,"code":"SUP001","name":"PT. Elektronika Nusantara","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","phone_number":"0218887766","location":"IN","payment_terms":"30","email":"elektronika.nusantara@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"unit":{"id":3,"name":"Meters","symbol":"M","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}}],"links":{"first":"http:\/\/localhost:8000\/api\/v1\/products?page=1","last":"http:\/\/localhost:8000\/api\/v1\/products?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/products?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost:8000\/api\/v1\/products","per_page":25,"to":10,"total":10}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
+        content: '{"data":[{"id":80,"code":"49546606","barcode":"5086512083132","name":"sit","stock_quantity":13,"low_stock_threshold":8,"price":50805.2300000000032014213502407073974609375,"selling_price":67235.39999999999417923390865325927734375,"category_id":76,"units_id":73,"supplier_id":104,"description":"Sed fuga aspernatur natus earum.","warehouse_id":73,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"},{"id":81,"code":"53065544","barcode":"2061787130685","name":"perferendis","stock_quantity":969,"low_stock_threshold":19,"price":38165.08999999999650754034519195556640625,"selling_price":72496.9299999999930150806903839111328125,"category_id":77,"units_id":74,"supplier_id":105,"description":"A debitis autem eveniet quis labore vel.","warehouse_id":74,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}]}'
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -212,29 +209,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 201
-        content: |-
-          {
-           "data": {
-               "id": 1,
-               "name": "Laptop Pro",
-               "code": "LP-001",
-               "price": 1200.50,
-               "selling_price": 1499.99,
-               "stock_quantity": 50,
-               "description": "A powerful new laptop.",
-               "category": { ... },
-               "supplier": { ... },
-               "unit": { ... },
-               "warehouse": { ... }
-           }
-          }
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{ "message": "The given data was invalid.", "errors": { ... } }'
+        status: 200
+        content: '{"data":{"id":82,"code":"13579081","barcode":"7319228631501","name":"quisquam","stock_quantity":314,"low_stock_threshold":9,"price":50051.139999999999417923390865325927734375,"selling_price":77034.699999999997089616954326629638671875,"category_id":78,"units_id":75,"supplier_id":106,"description":"Sed vel a quo sed fugit facilis perferendis.","warehouse_id":75,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}}'
         headers: []
         description: ''
     responseFields: []
@@ -301,12 +277,9 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"code":"TR11","barcode":"7986298486210","name":"Near Low Stock Capacitor","stock_quantity":44,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":1,"supplier_id":3,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","warehouse":{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},"category":{"id":2,"name":"FBT","description":"Flyback","parent_id":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost:8000\/img\/default_placeholder.png","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},"unit":{"id":1,"name":"Pieces","symbol":"PCS","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
+        content: '{"data":{"id":83,"code":"50865123","barcode":"3139729293312","name":"veniam","stock_quantity":982,"low_stock_threshold":9,"price":44823.5999999999985448084771633148193359375,"selling_price":3544.6199999999998908606357872486114501953125,"category_id":79,"units_id":76,"supplier_id":107,"description":"Fuga aspernatur natus earum quas.","warehouse_id":76,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}}'
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -491,22 +464,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: |-
-          {
-           "data": {
-               "id": 1,
-               "name": "Laptop Pro v2",
-               "code": "LP-001",
-               "price": 1250.00,
-               ...
-           }
-          }
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{ "message": "The given data was invalid.", "errors": { ... } }'
+        content: '{"data":{"id":84,"code":"81079872","barcode":"4976636666223","name":"amet","stock_quantity":202,"low_stock_threshold":20,"price":72279.6900000000023283064365386962890625,"selling_price":119994.080000000001746229827404022216796875,"category_id":80,"units_id":77,"supplier_id":108,"description":"Laborum eius est dolor dolores minus voluptatem.","warehouse_id":77,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}}'
         headers: []
         description: ''
     responseFields: []
@@ -573,15 +531,9 @@ endpoints:
       -
         custom: []
         status: 204
-        content: '""'
+        content: ''
         headers: []
-        description: ''
-      -
-        custom: []
-        status: 404
-        content: '{ "message": "Not Found." }'
-        headers: []
-        description: ''
+        description: Success
     responseFields: []
     auth:
       - headers

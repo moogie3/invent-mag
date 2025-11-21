@@ -125,7 +125,7 @@ endpoints:
         name: payment_date
         description: 'Must be a valid date.'
         required: true
-        example: '2025-11-21T05:52:55'
+        example: '2025-11-21T06:50:03'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -157,7 +157,7 @@ endpoints:
       paymentable_id: 17
       paymentable_type: consequatur
       amount: 11613.31890586
-      payment_date: '2025-11-21T05:52:55'
+      payment_date: '2025-11-21T06:50:03'
       payment_method: consequatur
       notes: consequatur
     fileParameters: []
@@ -323,7 +323,7 @@ endpoints:
         name: payment_date
         description: 'Must be a valid date.'
         required: true
-        example: '2025-11-21T05:52:55'
+        example: '2025-11-21T06:50:03'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -355,7 +355,7 @@ endpoints:
       paymentable_id: 17
       paymentable_type: consequatur
       amount: 11613.31890586
-      payment_date: '2025-11-21T05:52:55'
+      payment_date: '2025-11-21T06:50:03'
       payment_method: consequatur
       notes: consequatur
     fileParameters: []

@@ -18,6 +18,9 @@ class StockAdjustmentController extends Controller
      * Display a listing of the stock adjustments.
      *
      * @queryParam per_page int The number of adjustments to return per page. Defaults to 15. Example: 25
+     *
+     * @apiResourceCollection App\Http\Resources\StockAdjustmentResource
+     * @apiResourceModel App\Models\StockAdjustment
      */
     public function index(Request $request)
     {
@@ -73,6 +76,9 @@ class StockAdjustmentController extends Controller
      * Display the specified stock adjustment.
      *
      * @urlParam stock_adjustment required The ID of the stock adjustment. Example: 1
+     *
+     * @apiResource App\Http\Resources\StockAdjustmentResource
+     * @apiResourceModel App\Models\StockAdjustment
      */
     public function show(StockAdjustment $stock_adjustment)
     {

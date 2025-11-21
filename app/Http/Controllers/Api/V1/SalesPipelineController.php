@@ -18,6 +18,9 @@ class SalesPipelineController extends Controller
      * Display a listing of the sales pipelines.
      *
      * @queryParam per_page int The number of pipelines to return per page. Defaults to 15. Example: 25
+     *
+     * @apiResourceCollection App\Http\Resources\SalesPipelineResource
+     * @apiResourceModel App\Models\SalesPipeline
      */
     public function index(Request $request)
     {
@@ -61,6 +64,9 @@ class SalesPipelineController extends Controller
      * Display the specified sales pipeline.
      *
      * @urlParam sales_pipeline required The ID of the sales pipeline. Example: 1
+     *
+     * @apiResource App\Http\Resources\SalesPipelineResource
+     * @apiResourceModel App\Models\SalesPipeline
      */
     public function show(SalesPipeline $sales_pipeline)
     {

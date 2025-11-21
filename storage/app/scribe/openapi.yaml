@@ -865,7 +865,7 @@ paths:
                 is_active:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
               required:
                 - name
@@ -2937,7 +2937,7 @@ paths:
                 interaction_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-11-21T05:52:55'
+                  example: '2025-11-21T06:50:02'
                   nullable: false
               required:
                 - customer_id
@@ -3082,7 +3082,7 @@ paths:
                 interaction_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-11-21T05:52:55'
+                  example: '2025-11-21T06:50:02'
                   nullable: false
               required:
                 - customer_id
@@ -6887,7 +6887,7 @@ paths:
                 date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-11-21T05:52:55'
+                  example: '2025-11-21T06:50:02'
                   nullable: false
                 description:
                   type: string
@@ -7118,7 +7118,7 @@ paths:
                 date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-11-21T05:52:55'
+                  example: '2025-11-21T06:50:02'
                   nullable: false
                 description:
                   type: string
@@ -12795,7 +12795,7 @@ paths:
                 payment_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-11-21T05:52:55'
+                  example: '2025-11-21T06:50:03'
                   nullable: false
                 payment_method:
                   type: string
@@ -13043,7 +13043,7 @@ paths:
                 payment_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-11-21T05:52:55'
+                  example: '2025-11-21T06:50:03'
                   nullable: false
                 payment_method:
                   type: string
@@ -13118,103 +13118,67 @@ paths:
               schema:
                 type: object
                 example:
-                  data: []
-                  links:
-                    first: 'http://localhost:8000/api/v1/pipeline-stages?page=1'
-                    last: 'http://localhost:8000/api/v1/pipeline-stages?page=1'
-                    prev: null
-                    next: null
-                  meta:
-                    current_page: 1
-                    from: null
-                    last_page: 1
-                    links:
-                      -
-                        url: null
-                        label: '&laquo; Previous'
-                        active: false
-                      -
-                        url: 'http://localhost:8000/api/v1/pipeline-stages?page=1'
-                        label: '1'
-                        active: true
-                      -
-                        url: null
-                        label: 'Next &raquo;'
-                        active: false
-                    path: 'http://localhost:8000/api/v1/pipeline-stages'
-                    per_page: 25
-                    to: null
-                    total: 0
+                  data:
+                    -
+                      id: 31
+                      sales_pipeline_id: 58
+                      name: dolores
+                      position: 5
+                      is_closed: 0
+                      created_at: '2025-11-21T06:50:03.000000Z'
+                      updated_at: '2025-11-21T06:50:03.000000Z'
+                    -
+                      id: 32
+                      sales_pipeline_id: 59
+                      name: quas
+                      position: 4
+                      is_closed: 0
+                      created_at: '2025-11-21T06:50:03.000000Z'
+                      updated_at: '2025-11-21T06:50:03.000000Z'
                 properties:
                   data:
                     type: array
-                    example: []
-                  links:
-                    type: object
-                    properties:
-                      first:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/pipeline-stages?page=1'
-                      last:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/pipeline-stages?page=1'
-                      prev:
-                        type: string
-                        example: null
-                      next:
-                        type: string
-                        example: null
-                  meta:
-                    type: object
-                    properties:
-                      current_page:
-                        type: integer
-                        example: 1
-                      from:
-                        type: string
-                        example: null
-                      last_page:
-                        type: integer
-                        example: 1
-                      links:
-                        type: array
-                        example:
-                          -
-                            url: null
-                            label: '&laquo; Previous'
-                            active: false
-                          -
-                            url: 'http://localhost:8000/api/v1/pipeline-stages?page=1'
-                            label: '1'
-                            active: true
-                          -
-                            url: null
-                            label: 'Next &raquo;'
-                            active: false
-                        items:
-                          type: object
-                          properties:
-                            url:
-                              type: string
-                              example: null
-                            label:
-                              type: string
-                              example: '&laquo; Previous'
-                            active:
-                              type: boolean
-                              example: false
-                      path:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/pipeline-stages'
-                      per_page:
-                        type: integer
-                        example: 25
-                      to:
-                        type: string
-                        example: null
-                      total:
-                        type: integer
-                        example: 0
+                    example:
+                      -
+                        id: 31
+                        sales_pipeline_id: 58
+                        name: dolores
+                        position: 5
+                        is_closed: 0
+                        created_at: '2025-11-21T06:50:03.000000Z'
+                        updated_at: '2025-11-21T06:50:03.000000Z'
+                      -
+                        id: 32
+                        sales_pipeline_id: 59
+                        name: quas
+                        position: 4
+                        is_closed: 0
+                        created_at: '2025-11-21T06:50:03.000000Z'
+                        updated_at: '2025-11-21T06:50:03.000000Z'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 31
+                        sales_pipeline_id:
+                          type: integer
+                          example: 58
+                        name:
+                          type: string
+                          example: dolores
+                        position:
+                          type: integer
+                          example: 5
+                        is_closed:
+                          type: integer
+                          example: 0
+                        created_at:
+                          type: string
+                          example: '2025-11-21T06:50:03.000000Z'
+                        updated_at:
+                          type: string
+                          example: '2025-11-21T06:50:03.000000Z'
       tags:
         - 'Pipeline Stages'
     post:
@@ -13257,7 +13221,7 @@ paths:
                 is_closed:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
                   nullable: false
               required:
                 - sales_pipeline_id
@@ -13271,18 +13235,46 @@ paths:
       description: ''
       parameters: []
       responses:
-        404:
+        200:
           description: ''
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  message: 'No query results for model [App\Models\PipelineStage] 17'
+                  data:
+                    id: 33
+                    sales_pipeline_id: 60
+                    name: molestias
+                    position: 3
+                    is_closed: 0
+                    created_at: '2025-11-21T06:50:03.000000Z'
+                    updated_at: '2025-11-21T06:50:03.000000Z'
                 properties:
-                  message:
-                    type: string
-                    example: 'No query results for model [App\Models\PipelineStage] 17'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 33
+                      sales_pipeline_id:
+                        type: integer
+                        example: 60
+                      name:
+                        type: string
+                        example: molestias
+                      position:
+                        type: integer
+                        example: 3
+                      is_closed:
+                        type: integer
+                        example: 0
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:03.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:03.000000Z'
       tags:
         - 'Pipeline Stages'
     put:
@@ -13325,7 +13317,7 @@ paths:
                 is_closed:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: false
               required:
                 - sales_pipeline_id
@@ -13391,1097 +13383,123 @@ paths:
                 example:
                   data:
                     -
-                      id: 1
-                      code: TR11
-                      barcode: '7986298486210'
-                      name: 'Near Low Stock Capacitor'
-                      stock_quantity: 44
-                      low_stock_threshold: 10
-                      price: 600
-                      selling_price: 1100
-                      category_id: 2
-                      units_id: 1
-                      supplier_id: 3
-                      description: 'Capacitor close to low stock'
-                      warehouse_id: 2
+                      id: 80
+                      code: '49546606'
+                      barcode: '5086512083132'
+                      name: sit
+                      stock_quantity: 13
+                      low_stock_threshold: 8
+                      price: 50805.23
+                      selling_price: 67235.4
+                      category_id: 76
+                      units_id: 73
+                      supplier_id: 104
+                      description: 'Sed fuga aspernatur natus earum.'
+                      warehouse_id: 73
                       image: 'http://localhost:8000/img/default_placeholder.png'
                       has_expiry: false
-                      created_at: '2025-11-20T09:16:25.000000Z'
-                      updated_at: '2025-11-20T09:16:25.000000Z'
-                      warehouse:
-                        id: 2
-                        name: 'Gudang Surabaya'
-                        address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                        description: 'Gudang cabang di Jawa Timur.'
-                        is_main: 0
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        id: 2
-                        name: FBT
-                        description: Flyback
-                        parent_id: null
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      supplier:
-                        id: 3
-                        code: SUP003
-                        name: 'Tokyo Electronics Ltd.'
-                        address: 'Shinjuku-ku, Tokyo, Japan'
-                        phone_number: +81-3-1234-5678
-                        location: OUT
-                        payment_terms: '15'
-                        email: tokyo.electronics@example.com
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      unit:
-                        id: 1
-                        name: Pieces
-                        symbol: PCS
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
+                      created_at: '2025-11-21T06:50:03.000000Z'
+                      updated_at: '2025-11-21T06:50:03.000000Z'
                     -
-                      id: 2
-                      code: TR12
-                      barcode: '4819617615387'
-                      name: 'Expired Diode'
-                      stock_quantity: 50
-                      low_stock_threshold: 10
-                      price: 180
-                      selling_price: 350
-                      category_id: 2
-                      units_id: 1
-                      supplier_id: 2
-                      description: 'Diode product already expired'
-                      warehouse_id: 2
-                      image: 'http://localhost:8000/img/default_placeholder.png'
-                      has_expiry: true
-                      created_at: '2025-05-20T09:16:25.000000Z'
-                      updated_at: '2025-11-20T14:30:03.000000Z'
-                      warehouse:
-                        id: 2
-                        name: 'Gudang Surabaya'
-                        address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                        description: 'Gudang cabang di Jawa Timur.'
-                        is_main: 0
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        id: 2
-                        name: FBT
-                        description: Flyback
-                        parent_id: null
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      supplier:
-                        id: 2
-                        code: SUP002
-                        name: 'CV. Sumber Rejeki'
-                        address: 'Jl. Rajawali No. 12, Bandung'
-                        phone_number: '0227654321'
-                        location: IN
-                        payment_terms: '45'
-                        email: sumber.rejeki@example.com
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      unit:
-                        id: 1
-                        name: Pieces
-                        symbol: PCS
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                    -
-                      id: 3
-                      code: TR13
-                      barcode: '8381563189398'
-                      name: 'Near Expiry Crystal Oscillator'
-                      stock_quantity: 55
-                      low_stock_threshold: 20
-                      price: 950
-                      selling_price: 1700
-                      category_id: 3
-                      units_id: 3
-                      supplier_id: 4
-                      description: 'Crystal oscillator expiring soon'
-                      warehouse_id: 3
-                      image: 'http://localhost:8000/img/default_placeholder.png'
-                      has_expiry: true
-                      created_at: '2025-09-20T09:16:25.000000Z'
-                      updated_at: '2025-11-20T09:16:25.000000Z'
-                      warehouse:
-                        id: 3
-                        name: 'Gudang Bandung'
-                        address: 'Jl. Pasteur No. 23, Bandung'
-                        description: 'Gudang cabang untuk area Jawa Barat.'
-                        is_main: 0
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        id: 3
-                        name: IC
-                        description: 'Integrated Circuit'
-                        parent_id: null
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      supplier:
-                        id: 4
-                        code: SUP004
-                        name: 'PT. Surya Mandiri'
-                        address: 'Jl. Ahmad Yani No. 22, Surabaya'
-                        phone_number: '0318889988'
-                        location: IN
-                        payment_terms: '45'
-                        email: surya.mandiri@example.com
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      unit:
-                        id: 3
-                        name: Meters
-                        symbol: M
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                    -
-                      id: 4
-                      code: TR14
-                      barcode: '9107410836319'
-                      name: 'Low Stock LED'
-                      stock_quantity: 12
-                      low_stock_threshold: 5
-                      price: 90
-                      selling_price: 160
-                      category_id: 1
-                      units_id: 2
-                      supplier_id: 3
-                      description: 'LED near expiry and low stock'
-                      warehouse_id: 1
-                      image: 'http://localhost:8000/img/default_placeholder.png'
-                      has_expiry: true
-                      created_at: '2025-10-20T09:16:25.000000Z'
-                      updated_at: '2025-11-20T14:30:03.000000Z'
-                      warehouse:
-                        id: 1
-                        name: 'Gudang Utama Jakarta'
-                        address: 'Jl. Raya Cakung No. 10, Jakarta Timur'
-                        description: 'Gudang utama untuk distribusi pusat.'
-                        is_main: 1
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        id: 1
-                        name: TR
-                        description: Transistor
-                        parent_id: null
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      supplier:
-                        id: 3
-                        code: SUP003
-                        name: 'Tokyo Electronics Ltd.'
-                        address: 'Shinjuku-ku, Tokyo, Japan'
-                        phone_number: +81-3-1234-5678
-                        location: OUT
-                        payment_terms: '15'
-                        email: tokyo.electronics@example.com
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      unit:
-                        id: 2
-                        name: Roll
-                        symbol: Roll
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                    -
-                      id: 5
-                      code: TR15
-                      barcode: '5112846880205'
-                      name: 'Expired Voltage Regulator'
-                      stock_quantity: 16
-                      low_stock_threshold: 10
-                      price: 1400
-                      selling_price: 2600
-                      category_id: 1
-                      units_id: 1
-                      supplier_id: 4
-                      description: 'Voltage regulator expired long ago'
-                      warehouse_id: 2
-                      image: 'http://localhost:8000/img/default_placeholder.png'
-                      has_expiry: true
-                      created_at: '2024-11-20T09:16:25.000000Z'
-                      updated_at: '2025-11-20T14:30:03.000000Z'
-                      warehouse:
-                        id: 2
-                        name: 'Gudang Surabaya'
-                        address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                        description: 'Gudang cabang di Jawa Timur.'
-                        is_main: 0
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        id: 1
-                        name: TR
-                        description: Transistor
-                        parent_id: null
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      supplier:
-                        id: 4
-                        code: SUP004
-                        name: 'PT. Surya Mandiri'
-                        address: 'Jl. Ahmad Yani No. 22, Surabaya'
-                        phone_number: '0318889988'
-                        location: IN
-                        payment_terms: '45'
-                        email: surya.mandiri@example.com
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      unit:
-                        id: 1
-                        name: Pieces
-                        symbol: PCS
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                    -
-                      id: 6
-                      code: TR11
-                      barcode: '5089614188767'
-                      name: 'Near Low Stock Capacitor'
-                      stock_quantity: 19
-                      low_stock_threshold: 10
-                      price: 600
-                      selling_price: 1100
-                      category_id: 6
-                      units_id: 3
-                      supplier_id: 9
-                      description: 'Capacitor close to low stock'
-                      warehouse_id: 2
+                      id: 81
+                      code: '53065544'
+                      barcode: '2061787130685'
+                      name: perferendis
+                      stock_quantity: 969
+                      low_stock_threshold: 19
+                      price: 38165.09
+                      selling_price: 72496.93
+                      category_id: 77
+                      units_id: 74
+                      supplier_id: 105
+                      description: 'A debitis autem eveniet quis labore vel.'
+                      warehouse_id: 74
                       image: 'http://localhost:8000/img/default_placeholder.png'
                       has_expiry: false
-                      created_at: '2025-11-20T14:30:03.000000Z'
-                      updated_at: '2025-11-20T14:30:03.000000Z'
-                      warehouse:
-                        id: 2
-                        name: 'Gudang Surabaya'
-                        address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                        description: 'Gudang cabang di Jawa Timur.'
-                        is_main: 0
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        id: 6
-                        name: IC
-                        description: 'Integrated Circuit'
-                        parent_id: null
-                        created_at: '2025-11-20T14:30:03.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      supplier:
-                        id: 9
-                        code: SUP004
-                        name: 'PT. Surya Mandiri'
-                        address: 'Jl. Ahmad Yani No. 22, Surabaya'
-                        phone_number: '0318889988'
-                        location: IN
-                        payment_terms: '45'
-                        email: surya.mandiri@example.com
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        created_at: '2025-11-20T14:30:03.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      unit:
-                        id: 3
-                        name: Meters
-                        symbol: M
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                    -
-                      id: 7
-                      code: TR12
-                      barcode: '3779775320282'
-                      name: 'Expired Diode'
-                      stock_quantity: 46
-                      low_stock_threshold: 10
-                      price: 180
-                      selling_price: 350
-                      category_id: 4
-                      units_id: 3
-                      supplier_id: 3
-                      description: 'Diode product already expired'
-                      warehouse_id: 1
-                      image: 'http://localhost:8000/img/default_placeholder.png'
-                      has_expiry: true
-                      created_at: '2025-05-20T14:30:03.000000Z'
-                      updated_at: '2025-11-20T14:30:03.000000Z'
-                      warehouse:
-                        id: 1
-                        name: 'Gudang Utama Jakarta'
-                        address: 'Jl. Raya Cakung No. 10, Jakarta Timur'
-                        description: 'Gudang utama untuk distribusi pusat.'
-                        is_main: 1
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        id: 4
-                        name: TR
-                        description: Transistor
-                        parent_id: null
-                        created_at: '2025-11-20T14:30:03.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      supplier:
-                        id: 3
-                        code: SUP003
-                        name: 'Tokyo Electronics Ltd.'
-                        address: 'Shinjuku-ku, Tokyo, Japan'
-                        phone_number: +81-3-1234-5678
-                        location: OUT
-                        payment_terms: '15'
-                        email: tokyo.electronics@example.com
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      unit:
-                        id: 3
-                        name: Meters
-                        symbol: M
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                    -
-                      id: 8
-                      code: TR13
-                      barcode: '3148624359009'
-                      name: 'Near Expiry Crystal Oscillator'
-                      stock_quantity: 53
-                      low_stock_threshold: 20
-                      price: 950
-                      selling_price: 1700
-                      category_id: 1
-                      units_id: 1
-                      supplier_id: 4
-                      description: 'Crystal oscillator expiring soon'
-                      warehouse_id: 2
-                      image: 'http://localhost:8000/img/default_placeholder.png'
-                      has_expiry: true
-                      created_at: '2025-09-20T14:30:03.000000Z'
-                      updated_at: '2025-11-20T14:30:03.000000Z'
-                      warehouse:
-                        id: 2
-                        name: 'Gudang Surabaya'
-                        address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                        description: 'Gudang cabang di Jawa Timur.'
-                        is_main: 0
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        id: 1
-                        name: TR
-                        description: Transistor
-                        parent_id: null
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      supplier:
-                        id: 4
-                        code: SUP004
-                        name: 'PT. Surya Mandiri'
-                        address: 'Jl. Ahmad Yani No. 22, Surabaya'
-                        phone_number: '0318889988'
-                        location: IN
-                        payment_terms: '45'
-                        email: surya.mandiri@example.com
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      unit:
-                        id: 1
-                        name: Pieces
-                        symbol: PCS
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                    -
-                      id: 9
-                      code: TR14
-                      barcode: '2740660386479'
-                      name: 'Low Stock LED'
-                      stock_quantity: 17
-                      low_stock_threshold: 5
-                      price: 90
-                      selling_price: 160
-                      category_id: 6
-                      units_id: 2
-                      supplier_id: 4
-                      description: 'LED near expiry and low stock'
-                      warehouse_id: 1
-                      image: 'http://localhost:8000/img/default_placeholder.png'
-                      has_expiry: true
-                      created_at: '2025-10-20T14:30:03.000000Z'
-                      updated_at: '2025-11-20T14:30:03.000000Z'
-                      warehouse:
-                        id: 1
-                        name: 'Gudang Utama Jakarta'
-                        address: 'Jl. Raya Cakung No. 10, Jakarta Timur'
-                        description: 'Gudang utama untuk distribusi pusat.'
-                        is_main: 1
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        id: 6
-                        name: IC
-                        description: 'Integrated Circuit'
-                        parent_id: null
-                        created_at: '2025-11-20T14:30:03.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      supplier:
-                        id: 4
-                        code: SUP004
-                        name: 'PT. Surya Mandiri'
-                        address: 'Jl. Ahmad Yani No. 22, Surabaya'
-                        phone_number: '0318889988'
-                        location: IN
-                        payment_terms: '45'
-                        email: surya.mandiri@example.com
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      unit:
-                        id: 2
-                        name: Roll
-                        symbol: Roll
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                    -
-                      id: 10
-                      code: TR15
-                      barcode: '3867088010591'
-                      name: 'Expired Voltage Regulator'
-                      stock_quantity: 1
-                      low_stock_threshold: 10
-                      price: 1400
-                      selling_price: 2600
-                      category_id: 1
-                      units_id: 3
-                      supplier_id: 6
-                      description: 'Voltage regulator expired long ago'
-                      warehouse_id: 2
-                      image: 'http://localhost:8000/img/default_placeholder.png'
-                      has_expiry: true
-                      created_at: '2024-11-20T14:30:03.000000Z'
-                      updated_at: '2025-11-20T14:30:03.000000Z'
-                      warehouse:
-                        id: 2
-                        name: 'Gudang Surabaya'
-                        address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                        description: 'Gudang cabang di Jawa Timur.'
-                        is_main: 0
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        id: 1
-                        name: TR
-                        description: Transistor
-                        parent_id: null
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                      supplier:
-                        id: 6
-                        code: SUP001
-                        name: 'PT. Elektronika Nusantara'
-                        address: 'Jl. Raya Bekasi No. 45, Jakarta Timur'
-                        phone_number: '0218887766'
-                        location: IN
-                        payment_terms: '30'
-                        email: elektronika.nusantara@example.com
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        created_at: '2025-11-20T14:30:03.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                      unit:
-                        id: 3
-                        name: Meters
-                        symbol: M
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                  links:
-                    first: 'http://localhost:8000/api/v1/products?page=1'
-                    last: 'http://localhost:8000/api/v1/products?page=1'
-                    prev: null
-                    next: null
-                  meta:
-                    current_page: 1
-                    from: 1
-                    last_page: 1
-                    links:
-                      -
-                        url: null
-                        label: '&laquo; Previous'
-                        active: false
-                      -
-                        url: 'http://localhost:8000/api/v1/products?page=1'
-                        label: '1'
-                        active: true
-                      -
-                        url: null
-                        label: 'Next &raquo;'
-                        active: false
-                    path: 'http://localhost:8000/api/v1/products'
-                    per_page: 25
-                    to: 10
-                    total: 10
+                      created_at: '2025-11-21T06:50:03.000000Z'
+                      updated_at: '2025-11-21T06:50:03.000000Z'
                 properties:
                   data:
                     type: array
                     example:
                       -
-                        id: 1
-                        code: TR11
-                        barcode: '7986298486210'
-                        name: 'Near Low Stock Capacitor'
-                        stock_quantity: 44
-                        low_stock_threshold: 10
-                        price: 600
-                        selling_price: 1100
-                        category_id: 2
-                        units_id: 1
-                        supplier_id: 3
-                        description: 'Capacitor close to low stock'
-                        warehouse_id: 2
+                        id: 80
+                        code: '49546606'
+                        barcode: '5086512083132'
+                        name: sit
+                        stock_quantity: 13
+                        low_stock_threshold: 8
+                        price: 50805.23
+                        selling_price: 67235.4
+                        category_id: 76
+                        units_id: 73
+                        supplier_id: 104
+                        description: 'Sed fuga aspernatur natus earum.'
+                        warehouse_id: 73
                         image: 'http://localhost:8000/img/default_placeholder.png'
                         has_expiry: false
-                        created_at: '2025-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                        warehouse:
-                          id: 2
-                          name: 'Gudang Surabaya'
-                          address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                          description: 'Gudang cabang di Jawa Timur.'
-                          is_main: 0
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          id: 2
-                          name: FBT
-                          description: Flyback
-                          parent_id: null
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        supplier:
-                          id: 3
-                          code: SUP003
-                          name: 'Tokyo Electronics Ltd.'
-                          address: 'Shinjuku-ku, Tokyo, Japan'
-                          phone_number: +81-3-1234-5678
-                          location: OUT
-                          payment_terms: '15'
-                          email: tokyo.electronics@example.com
-                          image: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        unit:
-                          id: 1
-                          name: Pieces
-                          symbol: PCS
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
+                        created_at: '2025-11-21T06:50:03.000000Z'
+                        updated_at: '2025-11-21T06:50:03.000000Z'
                       -
-                        id: 2
-                        code: TR12
-                        barcode: '4819617615387'
-                        name: 'Expired Diode'
-                        stock_quantity: 50
-                        low_stock_threshold: 10
-                        price: 180
-                        selling_price: 350
-                        category_id: 2
-                        units_id: 1
-                        supplier_id: 2
-                        description: 'Diode product already expired'
-                        warehouse_id: 2
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        has_expiry: true
-                        created_at: '2025-05-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                        warehouse:
-                          id: 2
-                          name: 'Gudang Surabaya'
-                          address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                          description: 'Gudang cabang di Jawa Timur.'
-                          is_main: 0
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          id: 2
-                          name: FBT
-                          description: Flyback
-                          parent_id: null
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        supplier:
-                          id: 2
-                          code: SUP002
-                          name: 'CV. Sumber Rejeki'
-                          address: 'Jl. Rajawali No. 12, Bandung'
-                          phone_number: '0227654321'
-                          location: IN
-                          payment_terms: '45'
-                          email: sumber.rejeki@example.com
-                          image: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        unit:
-                          id: 1
-                          name: Pieces
-                          symbol: PCS
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                      -
-                        id: 3
-                        code: TR13
-                        barcode: '8381563189398'
-                        name: 'Near Expiry Crystal Oscillator'
-                        stock_quantity: 55
-                        low_stock_threshold: 20
-                        price: 950
-                        selling_price: 1700
-                        category_id: 3
-                        units_id: 3
-                        supplier_id: 4
-                        description: 'Crystal oscillator expiring soon'
-                        warehouse_id: 3
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        has_expiry: true
-                        created_at: '2025-09-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T09:16:25.000000Z'
-                        warehouse:
-                          id: 3
-                          name: 'Gudang Bandung'
-                          address: 'Jl. Pasteur No. 23, Bandung'
-                          description: 'Gudang cabang untuk area Jawa Barat.'
-                          is_main: 0
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          id: 3
-                          name: IC
-                          description: 'Integrated Circuit'
-                          parent_id: null
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        supplier:
-                          id: 4
-                          code: SUP004
-                          name: 'PT. Surya Mandiri'
-                          address: 'Jl. Ahmad Yani No. 22, Surabaya'
-                          phone_number: '0318889988'
-                          location: IN
-                          payment_terms: '45'
-                          email: surya.mandiri@example.com
-                          image: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        unit:
-                          id: 3
-                          name: Meters
-                          symbol: M
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                      -
-                        id: 4
-                        code: TR14
-                        barcode: '9107410836319'
-                        name: 'Low Stock LED'
-                        stock_quantity: 12
-                        low_stock_threshold: 5
-                        price: 90
-                        selling_price: 160
-                        category_id: 1
-                        units_id: 2
-                        supplier_id: 3
-                        description: 'LED near expiry and low stock'
-                        warehouse_id: 1
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        has_expiry: true
-                        created_at: '2025-10-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                        warehouse:
-                          id: 1
-                          name: 'Gudang Utama Jakarta'
-                          address: 'Jl. Raya Cakung No. 10, Jakarta Timur'
-                          description: 'Gudang utama untuk distribusi pusat.'
-                          is_main: 1
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          id: 1
-                          name: TR
-                          description: Transistor
-                          parent_id: null
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        supplier:
-                          id: 3
-                          code: SUP003
-                          name: 'Tokyo Electronics Ltd.'
-                          address: 'Shinjuku-ku, Tokyo, Japan'
-                          phone_number: +81-3-1234-5678
-                          location: OUT
-                          payment_terms: '15'
-                          email: tokyo.electronics@example.com
-                          image: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        unit:
-                          id: 2
-                          name: Roll
-                          symbol: Roll
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                      -
-                        id: 5
-                        code: TR15
-                        barcode: '5112846880205'
-                        name: 'Expired Voltage Regulator'
-                        stock_quantity: 16
-                        low_stock_threshold: 10
-                        price: 1400
-                        selling_price: 2600
-                        category_id: 1
-                        units_id: 1
-                        supplier_id: 4
-                        description: 'Voltage regulator expired long ago'
-                        warehouse_id: 2
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        has_expiry: true
-                        created_at: '2024-11-20T09:16:25.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                        warehouse:
-                          id: 2
-                          name: 'Gudang Surabaya'
-                          address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                          description: 'Gudang cabang di Jawa Timur.'
-                          is_main: 0
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          id: 1
-                          name: TR
-                          description: Transistor
-                          parent_id: null
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        supplier:
-                          id: 4
-                          code: SUP004
-                          name: 'PT. Surya Mandiri'
-                          address: 'Jl. Ahmad Yani No. 22, Surabaya'
-                          phone_number: '0318889988'
-                          location: IN
-                          payment_terms: '45'
-                          email: surya.mandiri@example.com
-                          image: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        unit:
-                          id: 1
-                          name: Pieces
-                          symbol: PCS
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                      -
-                        id: 6
-                        code: TR11
-                        barcode: '5089614188767'
-                        name: 'Near Low Stock Capacitor'
-                        stock_quantity: 19
-                        low_stock_threshold: 10
-                        price: 600
-                        selling_price: 1100
-                        category_id: 6
-                        units_id: 3
-                        supplier_id: 9
-                        description: 'Capacitor close to low stock'
-                        warehouse_id: 2
+                        id: 81
+                        code: '53065544'
+                        barcode: '2061787130685'
+                        name: perferendis
+                        stock_quantity: 969
+                        low_stock_threshold: 19
+                        price: 38165.09
+                        selling_price: 72496.93
+                        category_id: 77
+                        units_id: 74
+                        supplier_id: 105
+                        description: 'A debitis autem eveniet quis labore vel.'
+                        warehouse_id: 74
                         image: 'http://localhost:8000/img/default_placeholder.png'
                         has_expiry: false
-                        created_at: '2025-11-20T14:30:03.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                        warehouse:
-                          id: 2
-                          name: 'Gudang Surabaya'
-                          address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                          description: 'Gudang cabang di Jawa Timur.'
-                          is_main: 0
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          id: 6
-                          name: IC
-                          description: 'Integrated Circuit'
-                          parent_id: null
-                          created_at: '2025-11-20T14:30:03.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        supplier:
-                          id: 9
-                          code: SUP004
-                          name: 'PT. Surya Mandiri'
-                          address: 'Jl. Ahmad Yani No. 22, Surabaya'
-                          phone_number: '0318889988'
-                          location: IN
-                          payment_terms: '45'
-                          email: surya.mandiri@example.com
-                          image: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at: '2025-11-20T14:30:03.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        unit:
-                          id: 3
-                          name: Meters
-                          symbol: M
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                      -
-                        id: 7
-                        code: TR12
-                        barcode: '3779775320282'
-                        name: 'Expired Diode'
-                        stock_quantity: 46
-                        low_stock_threshold: 10
-                        price: 180
-                        selling_price: 350
-                        category_id: 4
-                        units_id: 3
-                        supplier_id: 3
-                        description: 'Diode product already expired'
-                        warehouse_id: 1
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        has_expiry: true
-                        created_at: '2025-05-20T14:30:03.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                        warehouse:
-                          id: 1
-                          name: 'Gudang Utama Jakarta'
-                          address: 'Jl. Raya Cakung No. 10, Jakarta Timur'
-                          description: 'Gudang utama untuk distribusi pusat.'
-                          is_main: 1
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          id: 4
-                          name: TR
-                          description: Transistor
-                          parent_id: null
-                          created_at: '2025-11-20T14:30:03.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        supplier:
-                          id: 3
-                          code: SUP003
-                          name: 'Tokyo Electronics Ltd.'
-                          address: 'Shinjuku-ku, Tokyo, Japan'
-                          phone_number: +81-3-1234-5678
-                          location: OUT
-                          payment_terms: '15'
-                          email: tokyo.electronics@example.com
-                          image: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        unit:
-                          id: 3
-                          name: Meters
-                          symbol: M
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                      -
-                        id: 8
-                        code: TR13
-                        barcode: '3148624359009'
-                        name: 'Near Expiry Crystal Oscillator'
-                        stock_quantity: 53
-                        low_stock_threshold: 20
-                        price: 950
-                        selling_price: 1700
-                        category_id: 1
-                        units_id: 1
-                        supplier_id: 4
-                        description: 'Crystal oscillator expiring soon'
-                        warehouse_id: 2
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        has_expiry: true
-                        created_at: '2025-09-20T14:30:03.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                        warehouse:
-                          id: 2
-                          name: 'Gudang Surabaya'
-                          address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                          description: 'Gudang cabang di Jawa Timur.'
-                          is_main: 0
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          id: 1
-                          name: TR
-                          description: Transistor
-                          parent_id: null
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        supplier:
-                          id: 4
-                          code: SUP004
-                          name: 'PT. Surya Mandiri'
-                          address: 'Jl. Ahmad Yani No. 22, Surabaya'
-                          phone_number: '0318889988'
-                          location: IN
-                          payment_terms: '45'
-                          email: surya.mandiri@example.com
-                          image: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        unit:
-                          id: 1
-                          name: Pieces
-                          symbol: PCS
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                      -
-                        id: 9
-                        code: TR14
-                        barcode: '2740660386479'
-                        name: 'Low Stock LED'
-                        stock_quantity: 17
-                        low_stock_threshold: 5
-                        price: 90
-                        selling_price: 160
-                        category_id: 6
-                        units_id: 2
-                        supplier_id: 4
-                        description: 'LED near expiry and low stock'
-                        warehouse_id: 1
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        has_expiry: true
-                        created_at: '2025-10-20T14:30:03.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                        warehouse:
-                          id: 1
-                          name: 'Gudang Utama Jakarta'
-                          address: 'Jl. Raya Cakung No. 10, Jakarta Timur'
-                          description: 'Gudang utama untuk distribusi pusat.'
-                          is_main: 1
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          id: 6
-                          name: IC
-                          description: 'Integrated Circuit'
-                          parent_id: null
-                          created_at: '2025-11-20T14:30:03.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        supplier:
-                          id: 4
-                          code: SUP004
-                          name: 'PT. Surya Mandiri'
-                          address: 'Jl. Ahmad Yani No. 22, Surabaya'
-                          phone_number: '0318889988'
-                          location: IN
-                          payment_terms: '45'
-                          email: surya.mandiri@example.com
-                          image: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        unit:
-                          id: 2
-                          name: Roll
-                          symbol: Roll
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                      -
-                        id: 10
-                        code: TR15
-                        barcode: '3867088010591'
-                        name: 'Expired Voltage Regulator'
-                        stock_quantity: 1
-                        low_stock_threshold: 10
-                        price: 1400
-                        selling_price: 2600
-                        category_id: 1
-                        units_id: 3
-                        supplier_id: 6
-                        description: 'Voltage regulator expired long ago'
-                        warehouse_id: 2
-                        image: 'http://localhost:8000/img/default_placeholder.png'
-                        has_expiry: true
-                        created_at: '2024-11-20T14:30:03.000000Z'
-                        updated_at: '2025-11-20T14:30:03.000000Z'
-                        warehouse:
-                          id: 2
-                          name: 'Gudang Surabaya'
-                          address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                          description: 'Gudang cabang di Jawa Timur.'
-                          is_main: 0
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          id: 1
-                          name: TR
-                          description: Transistor
-                          parent_id: null
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
-                        supplier:
-                          id: 6
-                          code: SUP001
-                          name: 'PT. Elektronika Nusantara'
-                          address: 'Jl. Raya Bekasi No. 45, Jakarta Timur'
-                          phone_number: '0218887766'
-                          location: IN
-                          payment_terms: '30'
-                          email: elektronika.nusantara@example.com
-                          image: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at: '2025-11-20T14:30:03.000000Z'
-                          updated_at: '2025-11-20T14:30:03.000000Z'
-                        unit:
-                          id: 3
-                          name: Meters
-                          symbol: M
-                          created_at: '2025-11-20T09:16:25.000000Z'
-                          updated_at: '2025-11-20T09:16:25.000000Z'
+                        created_at: '2025-11-21T06:50:03.000000Z'
+                        updated_at: '2025-11-21T06:50:03.000000Z'
                     items:
                       type: object
                       properties:
                         id:
                           type: integer
-                          example: 1
+                          example: 80
                         code:
                           type: string
-                          example: TR11
+                          example: '49546606'
                         barcode:
                           type: string
-                          example: '7986298486210'
+                          example: '5086512083132'
                         name:
                           type: string
-                          example: 'Near Low Stock Capacitor'
+                          example: sit
                         stock_quantity:
                           type: integer
-                          example: 44
+                          example: 13
                         low_stock_threshold:
                           type: integer
-                          example: 10
+                          example: 8
                         price:
-                          type: integer
-                          example: 600
+                          type: number
+                          example: 50805.23
                         selling_price:
-                          type: integer
-                          example: 1100
+                          type: number
+                          example: 67235.4
                         category_id:
                           type: integer
-                          example: 2
+                          example: 76
                         units_id:
                           type: integer
-                          example: 1
+                          example: 73
                         supplier_id:
                           type: integer
-                          example: 3
+                          example: 104
                         description:
                           type: string
-                          example: 'Capacitor close to low stock'
+                          example: 'Sed fuga aspernatur natus earum.'
                         warehouse_id:
                           type: integer
-                          example: 2
+                          example: 73
                         image:
                           type: string
                           example: 'http://localhost:8000/img/default_placeholder.png'
@@ -14490,175 +13508,10 @@ paths:
                           example: false
                         created_at:
                           type: string
-                          example: '2025-11-20T09:16:25.000000Z'
+                          example: '2025-11-21T06:50:03.000000Z'
                         updated_at:
                           type: string
-                          example: '2025-11-20T09:16:25.000000Z'
-                        warehouse:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 2
-                            name:
-                              type: string
-                              example: 'Gudang Surabaya'
-                            address:
-                              type: string
-                              example: 'Jl. Ahmad Yani No. 50, Surabaya'
-                            description:
-                              type: string
-                              example: 'Gudang cabang di Jawa Timur.'
-                            is_main:
-                              type: integer
-                              example: 0
-                            created_at:
-                              type: string
-                              example: '2025-11-20T09:16:25.000000Z'
-                            updated_at:
-                              type: string
-                              example: '2025-11-20T14:30:03.000000Z'
-                        category:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 2
-                            name:
-                              type: string
-                              example: FBT
-                            description:
-                              type: string
-                              example: Flyback
-                            parent_id:
-                              type: string
-                              example: null
-                            created_at:
-                              type: string
-                              example: '2025-11-20T09:16:25.000000Z'
-                            updated_at:
-                              type: string
-                              example: '2025-11-20T09:16:25.000000Z'
-                        supplier:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 3
-                            code:
-                              type: string
-                              example: SUP003
-                            name:
-                              type: string
-                              example: 'Tokyo Electronics Ltd.'
-                            address:
-                              type: string
-                              example: 'Shinjuku-ku, Tokyo, Japan'
-                            phone_number:
-                              type: string
-                              example: +81-3-1234-5678
-                            location:
-                              type: string
-                              example: OUT
-                            payment_terms:
-                              type: string
-                              example: '15'
-                            email:
-                              type: string
-                              example: tokyo.electronics@example.com
-                            image:
-                              type: string
-                              example: 'http://localhost:8000/img/default_placeholder.png'
-                            created_at:
-                              type: string
-                              example: '2025-11-20T09:16:25.000000Z'
-                            updated_at:
-                              type: string
-                              example: '2025-11-20T09:16:25.000000Z'
-                        unit:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 1
-                            name:
-                              type: string
-                              example: Pieces
-                            symbol:
-                              type: string
-                              example: PCS
-                            created_at:
-                              type: string
-                              example: '2025-11-20T09:16:25.000000Z'
-                            updated_at:
-                              type: string
-                              example: '2025-11-20T09:16:25.000000Z'
-                  links:
-                    type: object
-                    properties:
-                      first:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/products?page=1'
-                      last:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/products?page=1'
-                      prev:
-                        type: string
-                        example: null
-                      next:
-                        type: string
-                        example: null
-                  meta:
-                    type: object
-                    properties:
-                      current_page:
-                        type: integer
-                        example: 1
-                      from:
-                        type: integer
-                        example: 1
-                      last_page:
-                        type: integer
-                        example: 1
-                      links:
-                        type: array
-                        example:
-                          -
-                            url: null
-                            label: '&laquo; Previous'
-                            active: false
-                          -
-                            url: 'http://localhost:8000/api/v1/products?page=1'
-                            label: '1'
-                            active: true
-                          -
-                            url: null
-                            label: 'Next &raquo;'
-                            active: false
-                        items:
-                          type: object
-                          properties:
-                            url:
-                              type: string
-                              example: null
-                            label:
-                              type: string
-                              example: '&laquo; Previous'
-                            active:
-                              type: boolean
-                              example: false
-                      path:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/products'
-                      per_page:
-                        type: integer
-                        example: 25
-                      to:
-                        type: integer
-                        example: 10
-                      total:
-                        type: integer
-                        example: 10
+                          example: '2025-11-21T06:50:03.000000Z'
       tags:
         - Products
     post:
@@ -14667,20 +13520,86 @@ paths:
       description: 'Creates a new product with the provided data.'
       parameters: []
       responses:
-        201:
+        200:
           description: ''
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: "{\n \"data\": {\n     \"id\": 1,\n     \"name\": \"Laptop Pro\",\n     \"code\": \"LP-001\",\n     \"price\": 1200.50,\n     \"selling_price\": 1499.99,\n     \"stock_quantity\": 50,\n     \"description\": \"A powerful new laptop.\",\n     \"category\": { ... },\n     \"supplier\": { ... },\n     \"unit\": { ... },\n     \"warehouse\": { ... }\n }\n}"
-        422:
-          description: ''
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: '{ "message": "The given data was invalid.", "errors": { ... } }'
+                type: object
+                example:
+                  data:
+                    id: 82
+                    code: '13579081'
+                    barcode: '7319228631501'
+                    name: quisquam
+                    stock_quantity: 314
+                    low_stock_threshold: 9
+                    price: 50051.14
+                    selling_price: 77034.7
+                    category_id: 78
+                    units_id: 75
+                    supplier_id: 106
+                    description: 'Sed vel a quo sed fugit facilis perferendis.'
+                    warehouse_id: 75
+                    image: 'http://localhost:8000/img/default_placeholder.png'
+                    has_expiry: true
+                    created_at: '2025-11-21T06:50:03.000000Z'
+                    updated_at: '2025-11-21T06:50:03.000000Z'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 82
+                      code:
+                        type: string
+                        example: '13579081'
+                      barcode:
+                        type: string
+                        example: '7319228631501'
+                      name:
+                        type: string
+                        example: quisquam
+                      stock_quantity:
+                        type: integer
+                        example: 314
+                      low_stock_threshold:
+                        type: integer
+                        example: 9
+                      price:
+                        type: number
+                        example: 50051.14
+                      selling_price:
+                        type: number
+                        example: 77034.7
+                      category_id:
+                        type: integer
+                        example: 78
+                      units_id:
+                        type: integer
+                        example: 75
+                      supplier_id:
+                        type: integer
+                        example: 106
+                      description:
+                        type: string
+                        example: 'Sed vel a quo sed fugit facilis perferendis.'
+                      warehouse_id:
+                        type: integer
+                        example: 75
+                      image:
+                        type: string
+                        example: 'http://localhost:8000/img/default_placeholder.png'
+                      has_expiry:
+                        type: boolean
+                        example: true
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:03.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:03.000000Z'
       tags:
         - Products
       requestBody:
@@ -14762,210 +13681,78 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 1
-                    code: TR11
-                    barcode: '7986298486210'
-                    name: 'Near Low Stock Capacitor'
-                    stock_quantity: 44
-                    low_stock_threshold: 10
-                    price: 600
-                    selling_price: 1100
-                    category_id: 2
-                    units_id: 1
-                    supplier_id: 3
-                    description: 'Capacitor close to low stock'
-                    warehouse_id: 2
+                    id: 83
+                    code: '50865123'
+                    barcode: '3139729293312'
+                    name: veniam
+                    stock_quantity: 982
+                    low_stock_threshold: 9
+                    price: 44823.6
+                    selling_price: 3544.62
+                    category_id: 79
+                    units_id: 76
+                    supplier_id: 107
+                    description: 'Fuga aspernatur natus earum quas.'
+                    warehouse_id: 76
                     image: 'http://localhost:8000/img/default_placeholder.png'
-                    has_expiry: false
-                    created_at: '2025-11-20T09:16:25.000000Z'
-                    updated_at: '2025-11-20T09:16:25.000000Z'
-                    warehouse:
-                      id: 2
-                      name: 'Gudang Surabaya'
-                      address: 'Jl. Ahmad Yani No. 50, Surabaya'
-                      description: 'Gudang cabang di Jawa Timur.'
-                      is_main: 0
-                      created_at: '2025-11-20T09:16:25.000000Z'
-                      updated_at: '2025-11-20T14:30:03.000000Z'
-                    category:
-                      id: 2
-                      name: FBT
-                      description: Flyback
-                      parent_id: null
-                      created_at: '2025-11-20T09:16:25.000000Z'
-                      updated_at: '2025-11-20T09:16:25.000000Z'
-                    supplier:
-                      id: 3
-                      code: SUP003
-                      name: 'Tokyo Electronics Ltd.'
-                      address: 'Shinjuku-ku, Tokyo, Japan'
-                      phone_number: +81-3-1234-5678
-                      location: OUT
-                      payment_terms: '15'
-                      email: tokyo.electronics@example.com
-                      image: 'http://localhost:8000/img/default_placeholder.png'
-                      created_at: '2025-11-20T09:16:25.000000Z'
-                      updated_at: '2025-11-20T09:16:25.000000Z'
-                    unit:
-                      id: 1
-                      name: Pieces
-                      symbol: PCS
-                      created_at: '2025-11-20T09:16:25.000000Z'
-                      updated_at: '2025-11-20T09:16:25.000000Z'
+                    has_expiry: true
+                    created_at: '2025-11-21T06:50:03.000000Z'
+                    updated_at: '2025-11-21T06:50:03.000000Z'
                 properties:
                   data:
                     type: object
                     properties:
                       id:
                         type: integer
-                        example: 1
+                        example: 83
                       code:
                         type: string
-                        example: TR11
+                        example: '50865123'
                       barcode:
                         type: string
-                        example: '7986298486210'
+                        example: '3139729293312'
                       name:
                         type: string
-                        example: 'Near Low Stock Capacitor'
+                        example: veniam
                       stock_quantity:
                         type: integer
-                        example: 44
+                        example: 982
                       low_stock_threshold:
                         type: integer
-                        example: 10
+                        example: 9
                       price:
-                        type: integer
-                        example: 600
+                        type: number
+                        example: 44823.6
                       selling_price:
-                        type: integer
-                        example: 1100
+                        type: number
+                        example: 3544.62
                       category_id:
                         type: integer
-                        example: 2
+                        example: 79
                       units_id:
                         type: integer
-                        example: 1
+                        example: 76
                       supplier_id:
                         type: integer
-                        example: 3
+                        example: 107
                       description:
                         type: string
-                        example: 'Capacitor close to low stock'
+                        example: 'Fuga aspernatur natus earum quas.'
                       warehouse_id:
                         type: integer
-                        example: 2
+                        example: 76
                       image:
                         type: string
                         example: 'http://localhost:8000/img/default_placeholder.png'
                       has_expiry:
                         type: boolean
-                        example: false
+                        example: true
                       created_at:
                         type: string
-                        example: '2025-11-20T09:16:25.000000Z'
+                        example: '2025-11-21T06:50:03.000000Z'
                       updated_at:
                         type: string
-                        example: '2025-11-20T09:16:25.000000Z'
-                      warehouse:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            example: 2
-                          name:
-                            type: string
-                            example: 'Gudang Surabaya'
-                          address:
-                            type: string
-                            example: 'Jl. Ahmad Yani No. 50, Surabaya'
-                          description:
-                            type: string
-                            example: 'Gudang cabang di Jawa Timur.'
-                          is_main:
-                            type: integer
-                            example: 0
-                          created_at:
-                            type: string
-                            example: '2025-11-20T09:16:25.000000Z'
-                          updated_at:
-                            type: string
-                            example: '2025-11-20T14:30:03.000000Z'
-                      category:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            example: 2
-                          name:
-                            type: string
-                            example: FBT
-                          description:
-                            type: string
-                            example: Flyback
-                          parent_id:
-                            type: string
-                            example: null
-                          created_at:
-                            type: string
-                            example: '2025-11-20T09:16:25.000000Z'
-                          updated_at:
-                            type: string
-                            example: '2025-11-20T09:16:25.000000Z'
-                      supplier:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            example: 3
-                          code:
-                            type: string
-                            example: SUP003
-                          name:
-                            type: string
-                            example: 'Tokyo Electronics Ltd.'
-                          address:
-                            type: string
-                            example: 'Shinjuku-ku, Tokyo, Japan'
-                          phone_number:
-                            type: string
-                            example: +81-3-1234-5678
-                          location:
-                            type: string
-                            example: OUT
-                          payment_terms:
-                            type: string
-                            example: '15'
-                          email:
-                            type: string
-                            example: tokyo.electronics@example.com
-                          image:
-                            type: string
-                            example: 'http://localhost:8000/img/default_placeholder.png'
-                          created_at:
-                            type: string
-                            example: '2025-11-20T09:16:25.000000Z'
-                          updated_at:
-                            type: string
-                            example: '2025-11-20T09:16:25.000000Z'
-                      unit:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            example: 1
-                          name:
-                            type: string
-                            example: Pieces
-                          symbol:
-                            type: string
-                            example: PCS
-                          created_at:
-                            type: string
-                            example: '2025-11-20T09:16:25.000000Z'
-                          updated_at:
-                            type: string
-                            example: '2025-11-20T09:16:25.000000Z'
+                        example: '2025-11-21T06:50:03.000000Z'
       tags:
         - Products
     put:
@@ -14977,17 +13764,83 @@ paths:
         200:
           description: ''
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: "{\n \"data\": {\n     \"id\": 1,\n     \"name\": \"Laptop Pro v2\",\n     \"code\": \"LP-001\",\n     \"price\": 1250.00,\n     ...\n }\n}"
-        422:
-          description: ''
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: '{ "message": "The given data was invalid.", "errors": { ... } }'
+                type: object
+                example:
+                  data:
+                    id: 84
+                    code: '81079872'
+                    barcode: '4976636666223'
+                    name: amet
+                    stock_quantity: 202
+                    low_stock_threshold: 20
+                    price: 72279.69
+                    selling_price: 119994.08
+                    category_id: 80
+                    units_id: 77
+                    supplier_id: 108
+                    description: 'Laborum eius est dolor dolores minus voluptatem.'
+                    warehouse_id: 77
+                    image: 'http://localhost:8000/img/default_placeholder.png'
+                    has_expiry: false
+                    created_at: '2025-11-21T06:50:03.000000Z'
+                    updated_at: '2025-11-21T06:50:03.000000Z'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 84
+                      code:
+                        type: string
+                        example: '81079872'
+                      barcode:
+                        type: string
+                        example: '4976636666223'
+                      name:
+                        type: string
+                        example: amet
+                      stock_quantity:
+                        type: integer
+                        example: 202
+                      low_stock_threshold:
+                        type: integer
+                        example: 20
+                      price:
+                        type: number
+                        example: 72279.69
+                      selling_price:
+                        type: number
+                        example: 119994.08
+                      category_id:
+                        type: integer
+                        example: 80
+                      units_id:
+                        type: integer
+                        example: 77
+                      supplier_id:
+                        type: integer
+                        example: 108
+                      description:
+                        type: string
+                        example: 'Laborum eius est dolor dolores minus voluptatem.'
+                      warehouse_id:
+                        type: integer
+                        example: 77
+                      image:
+                        type: string
+                        example: 'http://localhost:8000/img/default_placeholder.png'
+                      has_expiry:
+                        type: boolean
+                        example: false
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:03.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:03.000000Z'
       tags:
         - Products
       requestBody:
@@ -15054,24 +13907,12 @@ paths:
       parameters: []
       responses:
         204:
-          description: ''
+          description: Success
           content:
-            application/json:
+            text/plain:
               schema:
                 type: string
                 example: ''
-        404:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Not Found.'
-                properties:
-                  message:
-                    type: string
-                    example: 'Not Found.'
       tags:
         - Products
     parameters:
@@ -15110,7 +13951,7 @@ paths:
             nullable: false
       responses:
         200:
-          description: OK
+          description: ''
           content:
             application/json:
               schema:
@@ -15118,138 +13959,100 @@ paths:
                 example:
                   data:
                     -
-                      id: 1
-                      po_id: 1
-                      product_id: 1
-                      quantity: 10
-                      price: '100.00'
-                      discount: '0.00'
+                      id: 56
+                      po_id: 42
+                      product_id: 77
+                      quantity: 50
+                      remaining_quantity: 50
+                      price: '106.64'
+                      discount: '2.85'
                       discount_type: fixed
-                      total: '1000.00'
+                      total: 5332
+                      expiry_date: '2026-03-22'
+                      created_at: '2025-11-21T06:50:03.000000Z'
+                      updated_at: '2025-11-21T06:50:03.000000Z'
+                    -
+                      id: 57
+                      po_id: 43
+                      product_id: 78
+                      quantity: 63
+                      remaining_quantity: 63
+                      price: '42.04'
+                      discount: '1.59'
+                      discount_type: fixed
+                      total: 2648.52
                       expiry_date: null
-                      remaining_quantity: 10
-                      created_at: '2025-11-21T08:30:00.000000Z'
-                      updated_at: '2025-11-21T08:30:00.000000Z'
-                  links:
-                    first: '/api/v1/po-items?page=1'
-                    last: '/api/v1/po-items?page=1'
-                    prev: null
-                    next: null
-                  meta:
-                    current_page: 1
-                    from: 1
-                    last_page: 1
-                    path: /api/v1/po-items
-                    per_page: 15
-                    to: 1
-                    total: 1
+                      created_at: '2025-11-21T06:50:03.000000Z'
+                      updated_at: '2025-11-21T06:50:03.000000Z'
                 properties:
                   data:
                     type: array
                     example:
                       -
-                        id: 1
-                        po_id: 1
-                        product_id: 1
-                        quantity: 10
-                        price: '100.00'
-                        discount: '0.00'
+                        id: 56
+                        po_id: 42
+                        product_id: 77
+                        quantity: 50
+                        remaining_quantity: 50
+                        price: '106.64'
+                        discount: '2.85'
                         discount_type: fixed
-                        total: '1000.00'
+                        total: 5332
+                        expiry_date: '2026-03-22'
+                        created_at: '2025-11-21T06:50:03.000000Z'
+                        updated_at: '2025-11-21T06:50:03.000000Z'
+                      -
+                        id: 57
+                        po_id: 43
+                        product_id: 78
+                        quantity: 63
+                        remaining_quantity: 63
+                        price: '42.04'
+                        discount: '1.59'
+                        discount_type: fixed
+                        total: 2648.52
                         expiry_date: null
-                        remaining_quantity: 10
-                        created_at: '2025-11-21T08:30:00.000000Z'
-                        updated_at: '2025-11-21T08:30:00.000000Z'
+                        created_at: '2025-11-21T06:50:03.000000Z'
+                        updated_at: '2025-11-21T06:50:03.000000Z'
                     items:
                       type: object
                       properties:
                         id:
                           type: integer
-                          example: 1
+                          example: 56
                         po_id:
                           type: integer
-                          example: 1
+                          example: 42
                         product_id:
                           type: integer
-                          example: 1
+                          example: 77
                         quantity:
                           type: integer
-                          example: 10
+                          example: 50
+                        remaining_quantity:
+                          type: integer
+                          example: 50
                         price:
                           type: string
-                          example: '100.00'
+                          example: '106.64'
                         discount:
                           type: string
-                          example: '0.00'
+                          example: '2.85'
                         discount_type:
                           type: string
                           example: fixed
                         total:
-                          type: string
-                          example: '1000.00'
+                          type: integer
+                          example: 5332
                         expiry_date:
                           type: string
-                          example: null
-                        remaining_quantity:
-                          type: integer
-                          example: 10
+                          example: '2026-03-22'
                         created_at:
                           type: string
-                          example: '2025-11-21T08:30:00.000000Z'
+                          example: '2025-11-21T06:50:03.000000Z'
                         updated_at:
                           type: string
-                          example: '2025-11-21T08:30:00.000000Z'
-                  links:
-                    type: object
-                    properties:
-                      first:
-                        type: string
-                        example: '/api/v1/po-items?page=1'
-                      last:
-                        type: string
-                        example: '/api/v1/po-items?page=1'
-                      prev:
-                        type: string
-                        example: null
-                      next:
-                        type: string
-                        example: null
-                  meta:
-                    type: object
-                    properties:
-                      current_page:
-                        type: integer
-                        example: 1
-                      from:
-                        type: integer
-                        example: 1
-                      last_page:
-                        type: integer
-                        example: 1
-                      path:
-                        type: string
-                        example: /api/v1/po-items
-                      per_page:
-                        type: integer
-                        example: 15
-                      to:
-                        type: integer
-                        example: 1
-                      total:
-                        type: integer
-                        example: 1
-        500:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Server Error'
-                properties:
-                  message:
-                    type: string
-                    example: 'Server Error'
+                          example: '2025-11-21T06:50:03.000000Z'
       tags:
         - 'Purchase Order Items'
     post:
@@ -15312,7 +14115,7 @@ paths:
                 expiry_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-11-21T05:52:55'
+                  example: '2025-11-21T06:50:03'
                   nullable: true
                 remaining_quantity:
                   type: number
@@ -15333,73 +14136,65 @@ paths:
       parameters: []
       responses:
         200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  id: 1
-                  po_id: 1
-                  product_id: 1
-                  quantity: 10
-                  price: '100.00'
-                  discount: '0.00'
-                  discount_type: fixed
-                  total: '1000.00'
-                  expiry_date: null
-                  remaining_quantity: 10
-                  created_at: '2025-11-21T08:30:00.000000Z'
-                  updated_at: '2025-11-21T08:30:00.000000Z'
-                properties:
-                  id:
-                    type: integer
-                    example: 1
-                  po_id:
-                    type: integer
-                    example: 1
-                  product_id:
-                    type: integer
-                    example: 1
-                  quantity:
-                    type: integer
-                    example: 10
-                  price:
-                    type: string
-                    example: '100.00'
-                  discount:
-                    type: string
-                    example: '0.00'
-                  discount_type:
-                    type: string
-                    example: fixed
-                  total:
-                    type: string
-                    example: '1000.00'
-                  expiry_date:
-                    type: string
-                    example: null
-                  remaining_quantity:
-                    type: integer
-                    example: 10
-                  created_at:
-                    type: string
-                    example: '2025-11-21T08:30:00.000000Z'
-                  updated_at:
-                    type: string
-                    example: '2025-11-21T08:30:00.000000Z'
-        500:
           description: ''
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  message: 'Server Error'
+                  data:
+                    id: 58
+                    po_id: 44
+                    product_id: 79
+                    quantity: 50
+                    remaining_quantity: 50
+                    price: '106.64'
+                    discount: '2.85'
+                    discount_type: fixed
+                    total: 5332
+                    expiry_date: '2026-03-22'
+                    created_at: '2025-11-21T06:50:03.000000Z'
+                    updated_at: '2025-11-21T06:50:03.000000Z'
                 properties:
-                  message:
-                    type: string
-                    example: 'Server Error'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 58
+                      po_id:
+                        type: integer
+                        example: 44
+                      product_id:
+                        type: integer
+                        example: 79
+                      quantity:
+                        type: integer
+                        example: 50
+                      remaining_quantity:
+                        type: integer
+                        example: 50
+                      price:
+                        type: string
+                        example: '106.64'
+                      discount:
+                        type: string
+                        example: '2.85'
+                      discount_type:
+                        type: string
+                        example: fixed
+                      total:
+                        type: integer
+                        example: 5332
+                      expiry_date:
+                        type: string
+                        example: '2026-03-22'
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:03.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:03.000000Z'
       tags:
         - 'Purchase Order Items'
     put:
@@ -15462,7 +14257,7 @@ paths:
                 expiry_date:
                   type: string
                   description: 'Must be a valid date.'
-                  example: '2025-11-21T05:52:55'
+                  example: '2025-11-21T06:50:03'
                   nullable: true
                 remaining_quantity:
                   type: number
@@ -18376,7 +17171,7 @@ paths:
             nullable: false
       responses:
         200:
-          description: OK
+          description: ''
           content:
             application/json:
               schema:
@@ -18384,98 +17179,51 @@ paths:
                 example:
                   data:
                     -
-                      id: 1
-                      name: Admin
-                      created_at: '2025-11-21T08:30:00.000000Z'
-                      updated_at: '2025-11-21T08:30:00.000000Z'
-                  links:
-                    first: '/api/v1/roles?page=1'
-                    last: '/api/v1/roles?page=1'
-                    prev: null
-                    next: null
-                  meta:
-                    current_page: 1
-                    from: 1
-                    last_page: 1
-                    path: /api/v1/roles
-                    per_page: 15
-                    to: 1
-                    total: 1
+                      id: 17
+                      name: 'Licensing Examiner and Inspector'
+                      guard_name: web
+                      created_at: '2025-11-21T06:50:03.000000Z'
+                      updated_at: '2025-11-21T06:50:03.000000Z'
+                    -
+                      id: 18
+                      name: 'Logging Supervisor'
+                      guard_name: web
+                      created_at: '2025-11-21T06:50:03.000000Z'
+                      updated_at: '2025-11-21T06:50:03.000000Z'
                 properties:
                   data:
                     type: array
                     example:
                       -
-                        id: 1
-                        name: Admin
-                        created_at: '2025-11-21T08:30:00.000000Z'
-                        updated_at: '2025-11-21T08:30:00.000000Z'
+                        id: 17
+                        name: 'Licensing Examiner and Inspector'
+                        guard_name: web
+                        created_at: '2025-11-21T06:50:03.000000Z'
+                        updated_at: '2025-11-21T06:50:03.000000Z'
+                      -
+                        id: 18
+                        name: 'Logging Supervisor'
+                        guard_name: web
+                        created_at: '2025-11-21T06:50:03.000000Z'
+                        updated_at: '2025-11-21T06:50:03.000000Z'
                     items:
                       type: object
                       properties:
                         id:
                           type: integer
-                          example: 1
+                          example: 17
                         name:
                           type: string
-                          example: Admin
+                          example: 'Licensing Examiner and Inspector'
+                        guard_name:
+                          type: string
+                          example: web
                         created_at:
                           type: string
-                          example: '2025-11-21T08:30:00.000000Z'
+                          example: '2025-11-21T06:50:03.000000Z'
                         updated_at:
                           type: string
-                          example: '2025-11-21T08:30:00.000000Z'
-                  links:
-                    type: object
-                    properties:
-                      first:
-                        type: string
-                        example: '/api/v1/roles?page=1'
-                      last:
-                        type: string
-                        example: '/api/v1/roles?page=1'
-                      prev:
-                        type: string
-                        example: null
-                      next:
-                        type: string
-                        example: null
-                  meta:
-                    type: object
-                    properties:
-                      current_page:
-                        type: integer
-                        example: 1
-                      from:
-                        type: integer
-                        example: 1
-                      last_page:
-                        type: integer
-                        example: 1
-                      path:
-                        type: string
-                        example: /api/v1/roles
-                      per_page:
-                        type: integer
-                        example: 15
-                      to:
-                        type: integer
-                        example: 1
-                      total:
-                        type: integer
-                        example: 1
-        500:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Server Error'
-                properties:
-                  message:
-                    type: string
-                    example: 'Server Error'
+                          example: '2025-11-21T06:50:03.000000Z'
       tags:
         - Roles
     post:
@@ -18536,41 +17284,37 @@ paths:
       parameters: []
       responses:
         200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  id: 1
-                  name: Admin
-                  created_at: '2025-11-21T08:30:00.000000Z'
-                  updated_at: '2025-11-21T08:30:00.000000Z'
-                properties:
-                  id:
-                    type: integer
-                    example: 1
-                  name:
-                    type: string
-                    example: Admin
-                  created_at:
-                    type: string
-                    example: '2025-11-21T08:30:00.000000Z'
-                  updated_at:
-                    type: string
-                    example: '2025-11-21T08:30:00.000000Z'
-        500:
           description: ''
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  message: 'Server Error'
+                  data:
+                    id: 19
+                    name: 'Licensing Examiner and Inspector'
+                    guard_name: web
+                    created_at: '2025-11-21T06:50:03.000000Z'
+                    updated_at: '2025-11-21T06:50:03.000000Z'
                 properties:
-                  message:
-                    type: string
-                    example: 'Server Error'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 19
+                      name:
+                        type: string
+                        example: 'Licensing Examiner and Inspector'
+                      guard_name:
+                        type: string
+                        example: web
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:03.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:03.000000Z'
       tags:
         - Roles
     put:
@@ -18674,7 +17418,7 @@ paths:
             nullable: false
       responses:
         200:
-          description: OK
+          description: ''
           content:
             application/json:
               schema:
@@ -18682,56 +17426,65 @@ paths:
                 example:
                   data:
                     -
-                      id: 1
-                      sales_id: 1
-                      product_id: 1
+                      id: 263
+                      sales_id: 119
+                      product_id: 85
                       quantity: 5
                       discount: '0.00'
                       discount_type: fixed
-                      customer_price: '100.00'
-                      total: '500.00'
-                      created_at: '2025-11-21T08:30:00.000000Z'
-                      updated_at: '2025-11-21T08:30:00.000000Z'
-                  links:
-                    first: '/api/v1/sales-items?page=1'
-                    last: '/api/v1/sales-items?page=1'
-                    prev: null
-                    next: null
-                  meta:
-                    current_page: 1
-                    from: 1
-                    last_page: 1
-                    path: /api/v1/sales-items
-                    per_page: 15
-                    to: 1
-                    total: 1
+                      customer_price: '35869.89'
+                      total: '179349.45'
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
+                    -
+                      id: 264
+                      sales_id: 120
+                      product_id: 86
+                      quantity: 6
+                      discount: '0.00'
+                      discount_type: fixed
+                      customer_price: '76130.10'
+                      total: '456780.60'
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
                   data:
                     type: array
                     example:
                       -
-                        id: 1
-                        sales_id: 1
-                        product_id: 1
+                        id: 263
+                        sales_id: 119
+                        product_id: 85
                         quantity: 5
                         discount: '0.00'
                         discount_type: fixed
-                        customer_price: '100.00'
-                        total: '500.00'
-                        created_at: '2025-11-21T08:30:00.000000Z'
-                        updated_at: '2025-11-21T08:30:00.000000Z'
+                        customer_price: '35869.89'
+                        total: '179349.45'
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                      -
+                        id: 264
+                        sales_id: 120
+                        product_id: 86
+                        quantity: 6
+                        discount: '0.00'
+                        discount_type: fixed
+                        customer_price: '76130.10'
+                        total: '456780.60'
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
                     items:
                       type: object
                       properties:
                         id:
                           type: integer
-                          example: 1
+                          example: 263
                         sales_id:
                           type: integer
-                          example: 1
+                          example: 119
                         product_id:
                           type: integer
-                          example: 1
+                          example: 85
                         quantity:
                           type: integer
                           example: 5
@@ -18743,67 +17496,16 @@ paths:
                           example: fixed
                         customer_price:
                           type: string
-                          example: '100.00'
+                          example: '35869.89'
                         total:
                           type: string
-                          example: '500.00'
+                          example: '179349.45'
                         created_at:
                           type: string
-                          example: '2025-11-21T08:30:00.000000Z'
+                          example: '2025-11-21T06:50:04.000000Z'
                         updated_at:
                           type: string
-                          example: '2025-11-21T08:30:00.000000Z'
-                  links:
-                    type: object
-                    properties:
-                      first:
-                        type: string
-                        example: '/api/v1/sales-items?page=1'
-                      last:
-                        type: string
-                        example: '/api/v1/sales-items?page=1'
-                      prev:
-                        type: string
-                        example: null
-                      next:
-                        type: string
-                        example: null
-                  meta:
-                    type: object
-                    properties:
-                      current_page:
-                        type: integer
-                        example: 1
-                      from:
-                        type: integer
-                        example: 1
-                      last_page:
-                        type: integer
-                        example: 1
-                      path:
-                        type: string
-                        example: /api/v1/sales-items
-                      per_page:
-                        type: integer
-                        example: 15
-                      to:
-                        type: integer
-                        example: 1
-                      total:
-                        type: integer
-                        example: 1
-        500:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Server Error'
-                properties:
-                  message:
-                    type: string
-                    example: 'Server Error'
+                          example: '2025-11-21T06:50:04.000000Z'
       tags:
         - 'Sales Items'
     post:
@@ -18921,65 +17623,57 @@ paths:
       parameters: []
       responses:
         200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  id: 1
-                  sales_id: 1
-                  product_id: 1
-                  quantity: 5
-                  discount: '0.00'
-                  discount_type: fixed
-                  customer_price: '100.00'
-                  total: '500.00'
-                  created_at: '2025-11-21T08:30:00.000000Z'
-                  updated_at: '2025-11-21T08:30:00.000000Z'
-                properties:
-                  id:
-                    type: integer
-                    example: 1
-                  sales_id:
-                    type: integer
-                    example: 1
-                  product_id:
-                    type: integer
-                    example: 1
-                  quantity:
-                    type: integer
-                    example: 5
-                  discount:
-                    type: string
-                    example: '0.00'
-                  discount_type:
-                    type: string
-                    example: fixed
-                  customer_price:
-                    type: string
-                    example: '100.00'
-                  total:
-                    type: string
-                    example: '500.00'
-                  created_at:
-                    type: string
-                    example: '2025-11-21T08:30:00.000000Z'
-                  updated_at:
-                    type: string
-                    example: '2025-11-21T08:30:00.000000Z'
-        500:
           description: ''
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  message: 'Server Error'
+                  data:
+                    id: 265
+                    sales_id: 121
+                    product_id: 87
+                    quantity: 5
+                    discount: '0.00'
+                    discount_type: fixed
+                    customer_price: '113755.01'
+                    total: '568775.05'
+                    created_at: '2025-11-21T06:50:04.000000Z'
+                    updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
-                  message:
-                    type: string
-                    example: 'Server Error'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 265
+                      sales_id:
+                        type: integer
+                        example: 121
+                      product_id:
+                        type: integer
+                        example: 87
+                      quantity:
+                        type: integer
+                        example: 5
+                      discount:
+                        type: string
+                        example: '0.00'
+                      discount_type:
+                        type: string
+                        example: fixed
+                      customer_price:
+                        type: string
+                        example: '113755.01'
+                      total:
+                        type: string
+                        example: '568775.05'
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
       tags:
         - 'Sales Items'
     put:
@@ -19146,103 +17840,102 @@ paths:
               schema:
                 type: object
                 example:
-                  data: []
-                  links:
-                    first: 'http://localhost:8000/api/v1/sales-opportunities?page=1'
-                    last: 'http://localhost:8000/api/v1/sales-opportunities?page=1'
-                    prev: null
-                    next: null
-                  meta:
-                    current_page: 1
-                    from: null
-                    last_page: 1
-                    links:
-                      -
-                        url: null
-                        label: '&laquo; Previous'
-                        active: false
-                      -
-                        url: 'http://localhost:8000/api/v1/sales-opportunities?page=1'
-                        label: '1'
-                        active: true
-                      -
-                        url: null
-                        label: 'Next &raquo;'
-                        active: false
-                    path: 'http://localhost:8000/api/v1/sales-opportunities'
-                    per_page: 25
-                    to: null
-                    total: 0
+                  data:
+                    -
+                      id: 19
+                      customer_id: 54
+                      sales_pipeline_id: 61
+                      pipeline_stage_id: 34
+                      name: et
+                      description: 'Cupiditate voluptatibus voluptatibus aperiam.'
+                      amount: '9027.15'
+                      expected_close_date: '2026-08-18T00:00:00.000000Z'
+                      status: open
+                      sales_id: null
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
+                    -
+                      id: 20
+                      customer_id: 55
+                      sales_pipeline_id: 63
+                      pipeline_stage_id: 35
+                      name: a
+                      description: 'Qui ut aut dolorem non assumenda.'
+                      amount: '4760.65'
+                      expected_close_date: '2026-04-17T00:00:00.000000Z'
+                      status: open
+                      sales_id: null
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
                   data:
                     type: array
-                    example: []
-                  links:
-                    type: object
-                    properties:
-                      first:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/sales-opportunities?page=1'
-                      last:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/sales-opportunities?page=1'
-                      prev:
-                        type: string
-                        example: null
-                      next:
-                        type: string
-                        example: null
-                  meta:
-                    type: object
-                    properties:
-                      current_page:
-                        type: integer
-                        example: 1
-                      from:
-                        type: string
-                        example: null
-                      last_page:
-                        type: integer
-                        example: 1
-                      links:
-                        type: array
-                        example:
-                          -
-                            url: null
-                            label: '&laquo; Previous'
-                            active: false
-                          -
-                            url: 'http://localhost:8000/api/v1/sales-opportunities?page=1'
-                            label: '1'
-                            active: true
-                          -
-                            url: null
-                            label: 'Next &raquo;'
-                            active: false
-                        items:
-                          type: object
-                          properties:
-                            url:
-                              type: string
-                              example: null
-                            label:
-                              type: string
-                              example: '&laquo; Previous'
-                            active:
-                              type: boolean
-                              example: false
-                      path:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/sales-opportunities'
-                      per_page:
-                        type: integer
-                        example: 25
-                      to:
-                        type: string
-                        example: null
-                      total:
-                        type: integer
-                        example: 0
+                    example:
+                      -
+                        id: 19
+                        customer_id: 54
+                        sales_pipeline_id: 61
+                        pipeline_stage_id: 34
+                        name: et
+                        description: 'Cupiditate voluptatibus voluptatibus aperiam.'
+                        amount: '9027.15'
+                        expected_close_date: '2026-08-18T00:00:00.000000Z'
+                        status: open
+                        sales_id: null
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                      -
+                        id: 20
+                        customer_id: 55
+                        sales_pipeline_id: 63
+                        pipeline_stage_id: 35
+                        name: a
+                        description: 'Qui ut aut dolorem non assumenda.'
+                        amount: '4760.65'
+                        expected_close_date: '2026-04-17T00:00:00.000000Z'
+                        status: open
+                        sales_id: null
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 19
+                        customer_id:
+                          type: integer
+                          example: 54
+                        sales_pipeline_id:
+                          type: integer
+                          example: 61
+                        pipeline_stage_id:
+                          type: integer
+                          example: 34
+                        name:
+                          type: string
+                          example: et
+                        description:
+                          type: string
+                          example: 'Cupiditate voluptatibus voluptatibus aperiam.'
+                        amount:
+                          type: string
+                          example: '9027.15'
+                        expected_close_date:
+                          type: string
+                          example: '2026-08-18T00:00:00.000000Z'
+                        status:
+                          type: string
+                          example: open
+                        sales_id:
+                          type: string
+                          example: null
+                        created_at:
+                          type: string
+                          example: '2025-11-21T06:50:04.000000Z'
+                        updated_at:
+                          type: string
+                          example: '2025-11-21T06:50:04.000000Z'
       tags:
         - 'Sales Opportunities'
     post:
@@ -19377,18 +18070,66 @@ paths:
       description: ''
       parameters: []
       responses:
-        404:
+        200:
           description: ''
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  message: 'No query results for model [App\Models\SalesOpportunity] 17'
+                  data:
+                    id: 21
+                    customer_id: 56
+                    sales_pipeline_id: 65
+                    pipeline_stage_id: 36
+                    name: veniam
+                    description: 'Fuga aspernatur natus earum quas.'
+                    amount: '236.31'
+                    expected_close_date: '2026-05-01T00:00:00.000000Z'
+                    status: open
+                    sales_id: null
+                    created_at: '2025-11-21T06:50:04.000000Z'
+                    updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
-                  message:
-                    type: string
-                    example: 'No query results for model [App\Models\SalesOpportunity] 17'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 21
+                      customer_id:
+                        type: integer
+                        example: 56
+                      sales_pipeline_id:
+                        type: integer
+                        example: 65
+                      pipeline_stage_id:
+                        type: integer
+                        example: 36
+                      name:
+                        type: string
+                        example: veniam
+                      description:
+                        type: string
+                        example: 'Fuga aspernatur natus earum quas.'
+                      amount:
+                        type: string
+                        example: '236.31'
+                      expected_close_date:
+                        type: string
+                        example: '2026-05-01T00:00:00.000000Z'
+                      status:
+                        type: string
+                        example: open
+                      sales_id:
+                        type: string
+                        example: null
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
       tags:
         - 'Sales Opportunities'
     put:
@@ -19573,103 +18314,67 @@ paths:
               schema:
                 type: object
                 example:
-                  data: []
-                  links:
-                    first: 'http://localhost:8000/api/v1/sales-opportunity-items?page=1'
-                    last: 'http://localhost:8000/api/v1/sales-opportunity-items?page=1'
-                    prev: null
-                    next: null
-                  meta:
-                    current_page: 1
-                    from: null
-                    last_page: 1
-                    links:
-                      -
-                        url: null
-                        label: '&laquo; Previous'
-                        active: false
-                      -
-                        url: 'http://localhost:8000/api/v1/sales-opportunity-items?page=1'
-                        label: '1'
-                        active: true
-                      -
-                        url: null
-                        label: 'Next &raquo;'
-                        active: false
-                    path: 'http://localhost:8000/api/v1/sales-opportunity-items'
-                    per_page: 25
-                    to: null
-                    total: 0
+                  data:
+                    -
+                      id: 10
+                      sales_opportunity_id: 22
+                      product_id: 88
+                      quantity: 3
+                      price: 513.56
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
+                    -
+                      id: 11
+                      sales_opportunity_id: 23
+                      product_id: 89
+                      quantity: 2
+                      price: 541.51
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
                   data:
                     type: array
-                    example: []
-                  links:
-                    type: object
-                    properties:
-                      first:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/sales-opportunity-items?page=1'
-                      last:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/sales-opportunity-items?page=1'
-                      prev:
-                        type: string
-                        example: null
-                      next:
-                        type: string
-                        example: null
-                  meta:
-                    type: object
-                    properties:
-                      current_page:
-                        type: integer
-                        example: 1
-                      from:
-                        type: string
-                        example: null
-                      last_page:
-                        type: integer
-                        example: 1
-                      links:
-                        type: array
-                        example:
-                          -
-                            url: null
-                            label: '&laquo; Previous'
-                            active: false
-                          -
-                            url: 'http://localhost:8000/api/v1/sales-opportunity-items?page=1'
-                            label: '1'
-                            active: true
-                          -
-                            url: null
-                            label: 'Next &raquo;'
-                            active: false
-                        items:
-                          type: object
-                          properties:
-                            url:
-                              type: string
-                              example: null
-                            label:
-                              type: string
-                              example: '&laquo; Previous'
-                            active:
-                              type: boolean
-                              example: false
-                      path:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/sales-opportunity-items'
-                      per_page:
-                        type: integer
-                        example: 25
-                      to:
-                        type: string
-                        example: null
-                      total:
-                        type: integer
-                        example: 0
+                    example:
+                      -
+                        id: 10
+                        sales_opportunity_id: 22
+                        product_id: 88
+                        quantity: 3
+                        price: 513.56
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                      -
+                        id: 11
+                        sales_opportunity_id: 23
+                        product_id: 89
+                        quantity: 2
+                        price: 541.51
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 10
+                        sales_opportunity_id:
+                          type: integer
+                          example: 22
+                        product_id:
+                          type: integer
+                          example: 88
+                        quantity:
+                          type: integer
+                          example: 3
+                        price:
+                          type: number
+                          example: 513.56
+                        created_at:
+                          type: string
+                          example: '2025-11-21T06:50:04.000000Z'
+                        updated_at:
+                          type: string
+                          example: '2025-11-21T06:50:04.000000Z'
       tags:
         - 'Sales Opportunity Items'
     post:
@@ -19759,18 +18464,46 @@ paths:
       description: ''
       parameters: []
       responses:
-        404:
+        200:
           description: ''
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  message: 'No query results for model [App\Models\SalesOpportunityItem] 17'
+                  data:
+                    id: 12
+                    sales_opportunity_id: 24
+                    product_id: 90
+                    quantity: 3
+                    price: 513.56
+                    created_at: '2025-11-21T06:50:04.000000Z'
+                    updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
-                  message:
-                    type: string
-                    example: 'No query results for model [App\Models\SalesOpportunityItem] 17'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 12
+                      sales_opportunity_id:
+                        type: integer
+                        example: 24
+                      product_id:
+                        type: integer
+                        example: 90
+                      quantity:
+                        type: integer
+                        example: 3
+                      price:
+                        type: number
+                        example: 513.56
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
       tags:
         - 'Sales Opportunity Items'
     put:
@@ -27212,103 +25945,60 @@ paths:
               schema:
                 type: object
                 example:
-                  data: []
-                  links:
-                    first: 'http://localhost:8000/api/v1/sales-pipelines?page=1'
-                    last: 'http://localhost:8000/api/v1/sales-pipelines?page=1'
-                    prev: null
-                    next: null
-                  meta:
-                    current_page: 1
-                    from: null
-                    last_page: 1
-                    links:
-                      -
-                        url: null
-                        label: '&laquo; Previous'
-                        active: false
-                      -
-                        url: 'http://localhost:8000/api/v1/sales-pipelines?page=1'
-                        label: '1'
-                        active: true
-                      -
-                        url: null
-                        label: 'Next &raquo;'
-                        active: false
-                    path: 'http://localhost:8000/api/v1/sales-pipelines'
-                    per_page: 25
-                    to: null
-                    total: 0
+                  data:
+                    -
+                      id: 73
+                      name: aspernatur
+                      description: 'Earum quas dignissimos perferendis voluptatibus incidunt nostrum.'
+                      is_default: 0
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
+                    -
+                      id: 74
+                      name: possimus
+                      description: 'Id et necessitatibus architecto aut consequatur debitis.'
+                      is_default: 0
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
                   data:
                     type: array
-                    example: []
-                  links:
-                    type: object
-                    properties:
-                      first:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/sales-pipelines?page=1'
-                      last:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/sales-pipelines?page=1'
-                      prev:
-                        type: string
-                        example: null
-                      next:
-                        type: string
-                        example: null
-                  meta:
-                    type: object
-                    properties:
-                      current_page:
-                        type: integer
-                        example: 1
-                      from:
-                        type: string
-                        example: null
-                      last_page:
-                        type: integer
-                        example: 1
-                      links:
-                        type: array
-                        example:
-                          -
-                            url: null
-                            label: '&laquo; Previous'
-                            active: false
-                          -
-                            url: 'http://localhost:8000/api/v1/sales-pipelines?page=1'
-                            label: '1'
-                            active: true
-                          -
-                            url: null
-                            label: 'Next &raquo;'
-                            active: false
-                        items:
-                          type: object
-                          properties:
-                            url:
-                              type: string
-                              example: null
-                            label:
-                              type: string
-                              example: '&laquo; Previous'
-                            active:
-                              type: boolean
-                              example: false
-                      path:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/sales-pipelines'
-                      per_page:
-                        type: integer
-                        example: 25
-                      to:
-                        type: string
-                        example: null
-                      total:
-                        type: integer
-                        example: 0
+                    example:
+                      -
+                        id: 73
+                        name: aspernatur
+                        description: 'Earum quas dignissimos perferendis voluptatibus incidunt nostrum.'
+                        is_default: 0
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                      -
+                        id: 74
+                        name: possimus
+                        description: 'Id et necessitatibus architecto aut consequatur debitis.'
+                        is_default: 0
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 73
+                        name:
+                          type: string
+                          example: aspernatur
+                        description:
+                          type: string
+                          example: 'Earum quas dignissimos perferendis voluptatibus incidunt nostrum.'
+                        is_default:
+                          type: integer
+                          example: 0
+                        created_at:
+                          type: string
+                          example: '2025-11-21T06:50:04.000000Z'
+                        updated_at:
+                          type: string
+                          example: '2025-11-21T06:50:04.000000Z'
       tags:
         - 'Sales Pipelines'
     post:
@@ -27386,18 +26076,42 @@ paths:
       description: ''
       parameters: []
       responses:
-        404:
+        200:
           description: ''
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  message: 'No query results for model [App\Models\SalesPipeline] 17'
+                  data:
+                    id: 75
+                    name: natus
+                    description: 'Quas dignissimos perferendis voluptatibus incidunt nostrum quia possimus rerum.'
+                    is_default: 0
+                    created_at: '2025-11-21T06:50:04.000000Z'
+                    updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
-                  message:
-                    type: string
-                    example: 'No query results for model [App\Models\SalesPipeline] 17'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 75
+                      name:
+                        type: string
+                        example: natus
+                      description:
+                        type: string
+                        example: 'Quas dignissimos perferendis voluptatibus incidunt nostrum quia possimus rerum.'
+                      is_default:
+                        type: integer
+                        example: 0
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
       tags:
         - 'Sales Pipelines'
     put:
@@ -27525,103 +26239,88 @@ paths:
               schema:
                 type: object
                 example:
-                  data: []
-                  links:
-                    first: 'http://localhost:8000/api/v1/stock-adjustments?page=1'
-                    last: 'http://localhost:8000/api/v1/stock-adjustments?page=1'
-                    prev: null
-                    next: null
-                  meta:
-                    current_page: 1
-                    from: null
-                    last_page: 1
-                    links:
-                      -
-                        url: null
-                        label: '&laquo; Previous'
-                        active: false
-                      -
-                        url: 'http://localhost:8000/api/v1/stock-adjustments?page=1'
-                        label: '1'
-                        active: true
-                      -
-                        url: null
-                        label: 'Next &raquo;'
-                        active: false
-                    path: 'http://localhost:8000/api/v1/stock-adjustments'
-                    per_page: 25
-                    to: null
-                    total: 0
+                  data:
+                    -
+                      id: 10
+                      product_id: 91
+                      adjustment_type: increase
+                      quantity_before: 150
+                      quantity_after: 161
+                      adjustment_amount: 11
+                      reason: 'Veniam sed fuga aspernatur natus earum.'
+                      adjusted_by: 33
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
+                    -
+                      id: 11
+                      product_id: 92
+                      adjustment_type: decrease
+                      quantity_before: 188
+                      quantity_after: 181
+                      adjustment_amount: 7
+                      reason: 'Id tempore voluptate sit rem quia odit aut.'
+                      adjusted_by: 34
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
                   data:
                     type: array
-                    example: []
-                  links:
-                    type: object
-                    properties:
-                      first:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/stock-adjustments?page=1'
-                      last:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/stock-adjustments?page=1'
-                      prev:
-                        type: string
-                        example: null
-                      next:
-                        type: string
-                        example: null
-                  meta:
-                    type: object
-                    properties:
-                      current_page:
-                        type: integer
-                        example: 1
-                      from:
-                        type: string
-                        example: null
-                      last_page:
-                        type: integer
-                        example: 1
-                      links:
-                        type: array
-                        example:
-                          -
-                            url: null
-                            label: '&laquo; Previous'
-                            active: false
-                          -
-                            url: 'http://localhost:8000/api/v1/stock-adjustments?page=1'
-                            label: '1'
-                            active: true
-                          -
-                            url: null
-                            label: 'Next &raquo;'
-                            active: false
-                        items:
-                          type: object
-                          properties:
-                            url:
-                              type: string
-                              example: null
-                            label:
-                              type: string
-                              example: '&laquo; Previous'
-                            active:
-                              type: boolean
-                              example: false
-                      path:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/stock-adjustments'
-                      per_page:
-                        type: integer
-                        example: 25
-                      to:
-                        type: string
-                        example: null
-                      total:
-                        type: integer
-                        example: 0
+                    example:
+                      -
+                        id: 10
+                        product_id: 91
+                        adjustment_type: increase
+                        quantity_before: 150
+                        quantity_after: 161
+                        adjustment_amount: 11
+                        reason: 'Veniam sed fuga aspernatur natus earum.'
+                        adjusted_by: 33
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                      -
+                        id: 11
+                        product_id: 92
+                        adjustment_type: decrease
+                        quantity_before: 188
+                        quantity_after: 181
+                        adjustment_amount: 7
+                        reason: 'Id tempore voluptate sit rem quia odit aut.'
+                        adjusted_by: 34
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 10
+                        product_id:
+                          type: integer
+                          example: 91
+                        adjustment_type:
+                          type: string
+                          example: increase
+                        quantity_before:
+                          type: integer
+                          example: 150
+                        quantity_after:
+                          type: integer
+                          example: 161
+                        adjustment_amount:
+                          type: integer
+                          example: 11
+                        reason:
+                          type: string
+                          example: 'Veniam sed fuga aspernatur natus earum.'
+                        adjusted_by:
+                          type: integer
+                          example: 33
+                        created_at:
+                          type: string
+                          example: '2025-11-21T06:50:04.000000Z'
+                        updated_at:
+                          type: string
+                          example: '2025-11-21T06:50:04.000000Z'
       tags:
         - 'Stock Adjustments'
     post:
@@ -27739,18 +26438,58 @@ paths:
       description: ''
       parameters: []
       responses:
-        404:
+        200:
           description: ''
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  message: 'No query results for model [App\Models\StockAdjustment] 17'
+                  data:
+                    id: 12
+                    product_id: 93
+                    adjustment_type: increase
+                    quantity_before: 150
+                    quantity_after: 161
+                    adjustment_amount: 11
+                    reason: 'Veniam sed fuga aspernatur natus earum.'
+                    adjusted_by: 35
+                    created_at: '2025-11-21T06:50:04.000000Z'
+                    updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
-                  message:
-                    type: string
-                    example: 'No query results for model [App\Models\StockAdjustment] 17'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 12
+                      product_id:
+                        type: integer
+                        example: 93
+                      adjustment_type:
+                        type: string
+                        example: increase
+                      quantity_before:
+                        type: integer
+                        example: 150
+                      quantity_after:
+                        type: integer
+                        example: 161
+                      adjustment_amount:
+                        type: integer
+                        example: 11
+                      reason:
+                        type: string
+                        example: 'Veniam sed fuga aspernatur natus earum.'
+                      adjusted_by:
+                        type: integer
+                        example: 35
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
       tags:
         - 'Stock Adjustments'
     put:
@@ -30023,103 +28762,60 @@ paths:
               schema:
                 type: object
                 example:
-                  data: []
-                  links:
-                    first: 'http://localhost:8000/api/v1/taxes?page=1'
-                    last: 'http://localhost:8000/api/v1/taxes?page=1'
-                    prev: null
-                    next: null
-                  meta:
-                    current_page: 1
-                    from: null
-                    last_page: 1
-                    links:
-                      -
-                        url: null
-                        label: '&laquo; Previous'
-                        active: false
-                      -
-                        url: 'http://localhost:8000/api/v1/taxes?page=1'
-                        label: '1'
-                        active: true
-                      -
-                        url: null
-                        label: 'Next &raquo;'
-                        active: false
-                    path: 'http://localhost:8000/api/v1/taxes'
-                    per_page: 25
-                    to: null
-                    total: 0
+                  data:
+                    -
+                      id: 10
+                      name: dolores
+                      rate: '10.17'
+                      is_active: 1
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
+                    -
+                      id: 11
+                      name: sit
+                      rate: '5.69'
+                      is_active: 1
+                      created_at: '2025-11-21T06:50:04.000000Z'
+                      updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
                   data:
                     type: array
-                    example: []
-                  links:
-                    type: object
-                    properties:
-                      first:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/taxes?page=1'
-                      last:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/taxes?page=1'
-                      prev:
-                        type: string
-                        example: null
-                      next:
-                        type: string
-                        example: null
-                  meta:
-                    type: object
-                    properties:
-                      current_page:
-                        type: integer
-                        example: 1
-                      from:
-                        type: string
-                        example: null
-                      last_page:
-                        type: integer
-                        example: 1
-                      links:
-                        type: array
-                        example:
-                          -
-                            url: null
-                            label: '&laquo; Previous'
-                            active: false
-                          -
-                            url: 'http://localhost:8000/api/v1/taxes?page=1'
-                            label: '1'
-                            active: true
-                          -
-                            url: null
-                            label: 'Next &raquo;'
-                            active: false
-                        items:
-                          type: object
-                          properties:
-                            url:
-                              type: string
-                              example: null
-                            label:
-                              type: string
-                              example: '&laquo; Previous'
-                            active:
-                              type: boolean
-                              example: false
-                      path:
-                        type: string
-                        example: 'http://localhost:8000/api/v1/taxes'
-                      per_page:
-                        type: integer
-                        example: 25
-                      to:
-                        type: string
-                        example: null
-                      total:
-                        type: integer
-                        example: 0
+                    example:
+                      -
+                        id: 10
+                        name: dolores
+                        rate: '10.17'
+                        is_active: 1
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                      -
+                        id: 11
+                        name: sit
+                        rate: '5.69'
+                        is_active: 1
+                        created_at: '2025-11-21T06:50:04.000000Z'
+                        updated_at: '2025-11-21T06:50:04.000000Z'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 10
+                        name:
+                          type: string
+                          example: dolores
+                        rate:
+                          type: string
+                          example: '10.17'
+                        is_active:
+                          type: integer
+                          example: 1
+                        created_at:
+                          type: string
+                          example: '2025-11-21T06:50:04.000000Z'
+                        updated_at:
+                          type: string
+                          example: '2025-11-21T06:50:04.000000Z'
       tags:
         - Taxes
     post:
@@ -30198,18 +28894,42 @@ paths:
       description: ''
       parameters: []
       responses:
-        404:
+        200:
           description: ''
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  message: 'No query results for model [App\Models\Tax] 17'
+                  data:
+                    id: 12
+                    name: dolores
+                    rate: '10.17'
+                    is_active: 1
+                    created_at: '2025-11-21T06:50:04.000000Z'
+                    updated_at: '2025-11-21T06:50:04.000000Z'
                 properties:
-                  message:
-                    type: string
-                    example: 'No query results for model [App\Models\Tax] 17'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 12
+                      name:
+                        type: string
+                        example: dolores
+                      rate:
+                        type: string
+                        example: '10.17'
+                      is_active:
+                        type: integer
+                        example: 1
+                      created_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2025-11-21T06:50:04.000000Z'
       tags:
         - Taxes
     put:

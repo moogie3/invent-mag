@@ -1194,7 +1194,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"type\": \"qxbajwbpilpmufinllwlo\",
     \"description\": \"Dolores dolorum amet iste laborum eius est dolor.\",
     \"level\": 17,
-    \"is_active\": false
+    \"is_active\": true
 }"
 </code></pre></div>
 
@@ -1216,7 +1216,7 @@ let body = {
     "type": "qxbajwbpilpmufinllwlo",
     "description": "Dolores dolorum amet iste laborum eius est dolor.",
     "level": 17,
-    "is_active": false
+    "is_active": true
 };
 
 fetch(url, {
@@ -1412,7 +1412,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
         </form>
 
@@ -4671,7 +4671,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"user_id\": \"consequatur\",
     \"type\": \"mqeopfuudtdsufvyvddqa\",
     \"notes\": \"consequatur\",
-    \"interaction_date\": \"2025-11-21T05:52:55\"
+    \"interaction_date\": \"2025-11-21T06:50:02\"
 }"
 </code></pre></div>
 
@@ -4692,7 +4692,7 @@ let body = {
     "user_id": "consequatur",
     "type": "mqeopfuudtdsufvyvddqa",
     "notes": "consequatur",
-    "interaction_date": "2025-11-21T05:52:55"
+    "interaction_date": "2025-11-21T06:50:02"
 };
 
 fetch(url, {
@@ -4851,10 +4851,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="interaction_date"                data-endpoint="POSTapi-v1-customer-interactions"
-               value="2025-11-21T05:52:55"
+               value="2025-11-21T06:50:02"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+<p>Must be a valid date. Example: <code>2025-11-21T06:50:02</code></p>
         </div>
         </form>
 
@@ -5067,7 +5067,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"user_id\": \"consequatur\",
     \"type\": \"mqeopfuudtdsufvyvddqa\",
     \"notes\": \"consequatur\",
-    \"interaction_date\": \"2025-11-21T05:52:55\"
+    \"interaction_date\": \"2025-11-21T06:50:02\"
 }"
 </code></pre></div>
 
@@ -5088,7 +5088,7 @@ let body = {
     "user_id": "consequatur",
     "type": "mqeopfuudtdsufvyvddqa",
     "notes": "consequatur",
-    "interaction_date": "2025-11-21T05:52:55"
+    "interaction_date": "2025-11-21T06:50:02"
 };
 
 fetch(url, {
@@ -5264,10 +5264,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="interaction_date"                data-endpoint="PUTapi-v1-customer-interactions--id-"
-               value="2025-11-21T05:52:55"
+               value="2025-11-21T06:50:02"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+<p>Must be a valid date. Example: <code>2025-11-21T06:50:02</code></p>
         </div>
         </form>
 
@@ -8383,7 +8383,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"date\": \"2025-11-21T05:52:55\",
+    \"date\": \"2025-11-21T06:50:02\",
     \"description\": \"Dolores dolorum amet iste laborum eius est dolor.\",
     \"sourceable_id\": 17,
     \"sourceable_type\": \"consequatur\"
@@ -8403,7 +8403,7 @@ const headers = {
 };
 
 let body = {
-    "date": "2025-11-21T05:52:55",
+    "date": "2025-11-21T06:50:02",
     "description": "Dolores dolorum amet iste laborum eius est dolor.",
     "sourceable_id": 17,
     "sourceable_type": "consequatur"
@@ -8517,10 +8517,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="date"                data-endpoint="POSTapi-v1-journal-entries"
-               value="2025-11-21T05:52:55"
+               value="2025-11-21T06:50:02"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+<p>Must be a valid date. Example: <code>2025-11-21T06:50:02</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
@@ -8797,7 +8797,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"date\": \"2025-11-21T05:52:55\",
+    \"date\": \"2025-11-21T06:50:02\",
     \"description\": \"Dolores dolorum amet iste laborum eius est dolor.\",
     \"sourceable_id\": 17,
     \"sourceable_type\": \"consequatur\"
@@ -8817,7 +8817,7 @@ const headers = {
 };
 
 let body = {
-    "date": "2025-11-21T05:52:55",
+    "date": "2025-11-21T06:50:02",
     "description": "Dolores dolorum amet iste laborum eius est dolor.",
     "sourceable_id": 17,
     "sourceable_type": "consequatur"
@@ -8948,10 +8948,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="date"                data-endpoint="PUTapi-v1-journal-entries--id-"
-               value="2025-11-21T05:52:55"
+               value="2025-11-21T06:50:02"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+<p>Must be a valid date. Example: <code>2025-11-21T06:50:02</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
@@ -13058,7 +13058,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"paymentable_id\": 17,
     \"paymentable_type\": \"consequatur\",
     \"amount\": 11613.31890586000008624978363513946533203125,
-    \"payment_date\": \"2025-11-21T05:52:55\",
+    \"payment_date\": \"2025-11-21T06:50:03\",
     \"payment_method\": \"consequatur\",
     \"notes\": \"consequatur\"
 }"
@@ -13080,7 +13080,7 @@ let body = {
     "paymentable_id": 17,
     "paymentable_type": "consequatur",
     "amount": 11613.31890586000008624978363513946533203125,
-    "payment_date": "2025-11-21T05:52:55",
+    "payment_date": "2025-11-21T06:50:03",
     "payment_method": "consequatur",
     "notes": "consequatur"
 };
@@ -13229,10 +13229,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="payment_date"                data-endpoint="POSTapi-v1-payments"
-               value="2025-11-21T05:52:55"
+               value="2025-11-21T06:50:03"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+<p>Must be a valid date. Example: <code>2025-11-21T06:50:03</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>payment_method</code></b>&nbsp;&nbsp;
@@ -13491,7 +13491,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"paymentable_id\": 17,
     \"paymentable_type\": \"consequatur\",
     \"amount\": 11613.31890586000008624978363513946533203125,
-    \"payment_date\": \"2025-11-21T05:52:55\",
+    \"payment_date\": \"2025-11-21T06:50:03\",
     \"payment_method\": \"consequatur\",
     \"notes\": \"consequatur\"
 }"
@@ -13513,7 +13513,7 @@ let body = {
     "paymentable_id": 17,
     "paymentable_type": "consequatur",
     "amount": 11613.31890586000008624978363513946533203125,
-    "payment_date": "2025-11-21T05:52:55",
+    "payment_date": "2025-11-21T06:50:03",
     "payment_method": "consequatur",
     "notes": "consequatur"
 };
@@ -13679,10 +13679,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="payment_date"                data-endpoint="PUTapi-v1-payments--id-"
-               value="2025-11-21T05:52:55"
+               value="2025-11-21T06:50:03"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+<p>Must be a valid date. Example: <code>2025-11-21T06:50:03</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>payment_method</code></b>&nbsp;&nbsp;
@@ -13906,49 +13906,29 @@ fetch(url, {
             <blockquote>
             <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;data&quot;: [],
-    &quot;links&quot;: {
-        &quot;first&quot;: &quot;http://localhost:8000/api/v1/pipeline-stages?page=1&quot;,
-        &quot;last&quot;: &quot;http://localhost:8000/api/v1/pipeline-stages?page=1&quot;,
-        &quot;prev&quot;: null,
-        &quot;next&quot;: null
-    },
-    &quot;meta&quot;: {
-        &quot;current_page&quot;: 1,
-        &quot;from&quot;: null,
-        &quot;last_page&quot;: 1,
-        &quot;links&quot;: [
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
-                &quot;active&quot;: false
-            },
-            {
-                &quot;url&quot;: &quot;http://localhost:8000/api/v1/pipeline-stages?page=1&quot;,
-                &quot;label&quot;: &quot;1&quot;,
-                &quot;active&quot;: true
-            },
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
-                &quot;active&quot;: false
-            }
-        ],
-        &quot;path&quot;: &quot;http://localhost:8000/api/v1/pipeline-stages&quot;,
-        &quot;per_page&quot;: 25,
-        &quot;to&quot;: null,
-        &quot;total&quot;: 0
-    }
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 31,
+            &quot;sales_pipeline_id&quot;: 58,
+            &quot;name&quot;: &quot;dolores&quot;,
+            &quot;position&quot;: 5,
+            &quot;is_closed&quot;: 0,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 32,
+            &quot;sales_pipeline_id&quot;: 59,
+            &quot;name&quot;: &quot;quas&quot;,
+            &quot;position&quot;: 4,
+            &quot;is_closed&quot;: 0,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
+        }
+    ]
 }</code>
  </pre>
     </span>
@@ -14072,7 +14052,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"sales_pipeline_id\": \"consequatur\",
     \"name\": \"mqeopfuudtdsufvyvddqa\",
     \"position\": 17,
-    \"is_closed\": true
+    \"is_closed\": false
 }"
 </code></pre></div>
 
@@ -14092,7 +14072,7 @@ let body = {
     "sales_pipeline_id": "consequatur",
     "name": "mqeopfuudtdsufvyvddqa",
     "position": 17,
-    "is_closed": true
+    "is_closed": false
 };
 
 fetch(url, {
@@ -14252,7 +14232,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>true</code></p>
+<p>Example: <code>false</code></p>
         </div>
         </form>
 
@@ -14296,19 +14276,20 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-pipeline-stages--id-">
             <blockquote>
-            <p>Example response (404):</p>
+            <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;No query results for model [App\\Models\\PipelineStage] 17&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 33,
+        &quot;sales_pipeline_id&quot;: 60,
+        &quot;name&quot;: &quot;molestias&quot;,
+        &quot;position&quot;: 3,
+        &quot;is_closed&quot;: 0,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -14444,7 +14425,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"sales_pipeline_id\": \"consequatur\",
     \"name\": \"mqeopfuudtdsufvyvddqa\",
     \"position\": 17,
-    \"is_closed\": false
+    \"is_closed\": true
 }"
 </code></pre></div>
 
@@ -14464,7 +14445,7 @@ let body = {
     "sales_pipeline_id": "consequatur",
     "name": "mqeopfuudtdsufvyvddqa",
     "position": 17,
-    "is_closed": false
+    "is_closed": true
 };
 
 fetch(url, {
@@ -14641,7 +14622,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
         </form>
 
@@ -14841,610 +14822,49 @@ fetch(url, {
             <blockquote>
             <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: [
         {
-            &quot;id&quot;: 1,
-            &quot;code&quot;: &quot;TR11&quot;,
-            &quot;barcode&quot;: &quot;7986298486210&quot;,
-            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
-            &quot;stock_quantity&quot;: 44,
-            &quot;low_stock_threshold&quot;: 10,
-            &quot;price&quot;: 600,
-            &quot;selling_price&quot;: 1100,
-            &quot;category_id&quot;: 2,
-            &quot;units_id&quot;: 1,
-            &quot;supplier_id&quot;: 3,
-            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
-            &quot;warehouse_id&quot;: 2,
+            &quot;id&quot;: 80,
+            &quot;code&quot;: &quot;49546606&quot;,
+            &quot;barcode&quot;: &quot;5086512083132&quot;,
+            &quot;name&quot;: &quot;sit&quot;,
+            &quot;stock_quantity&quot;: 13,
+            &quot;low_stock_threshold&quot;: 8,
+            &quot;price&quot;: 50805.2300000000032014213502407073974609375,
+            &quot;selling_price&quot;: 67235.39999999999417923390865325927734375,
+            &quot;category_id&quot;: 76,
+            &quot;units_id&quot;: 73,
+            &quot;supplier_id&quot;: 104,
+            &quot;description&quot;: &quot;Sed fuga aspernatur natus earum.&quot;,
+            &quot;warehouse_id&quot;: 73,
             &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
             &quot;has_expiry&quot;: false,
-            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;warehouse&quot;: {
-                &quot;id&quot;: 2,
-                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
-                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
-                &quot;is_main&quot;: 0,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;category&quot;: {
-                &quot;id&quot;: 2,
-                &quot;name&quot;: &quot;FBT&quot;,
-                &quot;description&quot;: &quot;Flyback&quot;,
-                &quot;parent_id&quot;: null,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;supplier&quot;: {
-                &quot;id&quot;: 3,
-                &quot;code&quot;: &quot;SUP003&quot;,
-                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
-                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
-                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
-                &quot;location&quot;: &quot;OUT&quot;,
-                &quot;payment_terms&quot;: &quot;15&quot;,
-                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;unit&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Pieces&quot;,
-                &quot;symbol&quot;: &quot;PCS&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
         },
         {
-            &quot;id&quot;: 2,
-            &quot;code&quot;: &quot;TR12&quot;,
-            &quot;barcode&quot;: &quot;4819617615387&quot;,
-            &quot;name&quot;: &quot;Expired Diode&quot;,
-            &quot;stock_quantity&quot;: 50,
-            &quot;low_stock_threshold&quot;: 10,
-            &quot;price&quot;: 180,
-            &quot;selling_price&quot;: 350,
-            &quot;category_id&quot;: 2,
-            &quot;units_id&quot;: 1,
-            &quot;supplier_id&quot;: 2,
-            &quot;description&quot;: &quot;Diode product already expired&quot;,
-            &quot;warehouse_id&quot;: 2,
-            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;has_expiry&quot;: true,
-            &quot;created_at&quot;: &quot;2025-05-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-            &quot;warehouse&quot;: {
-                &quot;id&quot;: 2,
-                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
-                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
-                &quot;is_main&quot;: 0,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;category&quot;: {
-                &quot;id&quot;: 2,
-                &quot;name&quot;: &quot;FBT&quot;,
-                &quot;description&quot;: &quot;Flyback&quot;,
-                &quot;parent_id&quot;: null,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;supplier&quot;: {
-                &quot;id&quot;: 2,
-                &quot;code&quot;: &quot;SUP002&quot;,
-                &quot;name&quot;: &quot;CV. Sumber Rejeki&quot;,
-                &quot;address&quot;: &quot;Jl. Rajawali No. 12, Bandung&quot;,
-                &quot;phone_number&quot;: &quot;0227654321&quot;,
-                &quot;location&quot;: &quot;IN&quot;,
-                &quot;payment_terms&quot;: &quot;45&quot;,
-                &quot;email&quot;: &quot;sumber.rejeki@example.com&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;unit&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Pieces&quot;,
-                &quot;symbol&quot;: &quot;PCS&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
-        },
-        {
-            &quot;id&quot;: 3,
-            &quot;code&quot;: &quot;TR13&quot;,
-            &quot;barcode&quot;: &quot;8381563189398&quot;,
-            &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
-            &quot;stock_quantity&quot;: 55,
-            &quot;low_stock_threshold&quot;: 20,
-            &quot;price&quot;: 950,
-            &quot;selling_price&quot;: 1700,
-            &quot;category_id&quot;: 3,
-            &quot;units_id&quot;: 3,
-            &quot;supplier_id&quot;: 4,
-            &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
-            &quot;warehouse_id&quot;: 3,
-            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;has_expiry&quot;: true,
-            &quot;created_at&quot;: &quot;2025-09-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;warehouse&quot;: {
-                &quot;id&quot;: 3,
-                &quot;name&quot;: &quot;Gudang Bandung&quot;,
-                &quot;address&quot;: &quot;Jl. Pasteur No. 23, Bandung&quot;,
-                &quot;description&quot;: &quot;Gudang cabang untuk area Jawa Barat.&quot;,
-                &quot;is_main&quot;: 0,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;category&quot;: {
-                &quot;id&quot;: 3,
-                &quot;name&quot;: &quot;IC&quot;,
-                &quot;description&quot;: &quot;Integrated Circuit&quot;,
-                &quot;parent_id&quot;: null,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;supplier&quot;: {
-                &quot;id&quot;: 4,
-                &quot;code&quot;: &quot;SUP004&quot;,
-                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
-                &quot;phone_number&quot;: &quot;0318889988&quot;,
-                &quot;location&quot;: &quot;IN&quot;,
-                &quot;payment_terms&quot;: &quot;45&quot;,
-                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;unit&quot;: {
-                &quot;id&quot;: 3,
-                &quot;name&quot;: &quot;Meters&quot;,
-                &quot;symbol&quot;: &quot;M&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
-        },
-        {
-            &quot;id&quot;: 4,
-            &quot;code&quot;: &quot;TR14&quot;,
-            &quot;barcode&quot;: &quot;9107410836319&quot;,
-            &quot;name&quot;: &quot;Low Stock LED&quot;,
-            &quot;stock_quantity&quot;: 12,
-            &quot;low_stock_threshold&quot;: 5,
-            &quot;price&quot;: 90,
-            &quot;selling_price&quot;: 160,
-            &quot;category_id&quot;: 1,
-            &quot;units_id&quot;: 2,
-            &quot;supplier_id&quot;: 3,
-            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
-            &quot;warehouse_id&quot;: 1,
-            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;has_expiry&quot;: true,
-            &quot;created_at&quot;: &quot;2025-10-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-            &quot;warehouse&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Gudang Utama Jakarta&quot;,
-                &quot;address&quot;: &quot;Jl. Raya Cakung No. 10, Jakarta Timur&quot;,
-                &quot;description&quot;: &quot;Gudang utama untuk distribusi pusat.&quot;,
-                &quot;is_main&quot;: 1,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;category&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;TR&quot;,
-                &quot;description&quot;: &quot;Transistor&quot;,
-                &quot;parent_id&quot;: null,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;supplier&quot;: {
-                &quot;id&quot;: 3,
-                &quot;code&quot;: &quot;SUP003&quot;,
-                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
-                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
-                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
-                &quot;location&quot;: &quot;OUT&quot;,
-                &quot;payment_terms&quot;: &quot;15&quot;,
-                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;unit&quot;: {
-                &quot;id&quot;: 2,
-                &quot;name&quot;: &quot;Roll&quot;,
-                &quot;symbol&quot;: &quot;Roll&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
-        },
-        {
-            &quot;id&quot;: 5,
-            &quot;code&quot;: &quot;TR15&quot;,
-            &quot;barcode&quot;: &quot;5112846880205&quot;,
-            &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
-            &quot;stock_quantity&quot;: 16,
-            &quot;low_stock_threshold&quot;: 10,
-            &quot;price&quot;: 1400,
-            &quot;selling_price&quot;: 2600,
-            &quot;category_id&quot;: 1,
-            &quot;units_id&quot;: 1,
-            &quot;supplier_id&quot;: 4,
-            &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
-            &quot;warehouse_id&quot;: 2,
-            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;has_expiry&quot;: true,
-            &quot;created_at&quot;: &quot;2024-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-            &quot;warehouse&quot;: {
-                &quot;id&quot;: 2,
-                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
-                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
-                &quot;is_main&quot;: 0,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;category&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;TR&quot;,
-                &quot;description&quot;: &quot;Transistor&quot;,
-                &quot;parent_id&quot;: null,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;supplier&quot;: {
-                &quot;id&quot;: 4,
-                &quot;code&quot;: &quot;SUP004&quot;,
-                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
-                &quot;phone_number&quot;: &quot;0318889988&quot;,
-                &quot;location&quot;: &quot;IN&quot;,
-                &quot;payment_terms&quot;: &quot;45&quot;,
-                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;unit&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Pieces&quot;,
-                &quot;symbol&quot;: &quot;PCS&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
-        },
-        {
-            &quot;id&quot;: 6,
-            &quot;code&quot;: &quot;TR11&quot;,
-            &quot;barcode&quot;: &quot;5089614188767&quot;,
-            &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
-            &quot;stock_quantity&quot;: 19,
-            &quot;low_stock_threshold&quot;: 10,
-            &quot;price&quot;: 600,
-            &quot;selling_price&quot;: 1100,
-            &quot;category_id&quot;: 6,
-            &quot;units_id&quot;: 3,
-            &quot;supplier_id&quot;: 9,
-            &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
-            &quot;warehouse_id&quot;: 2,
+            &quot;id&quot;: 81,
+            &quot;code&quot;: &quot;53065544&quot;,
+            &quot;barcode&quot;: &quot;2061787130685&quot;,
+            &quot;name&quot;: &quot;perferendis&quot;,
+            &quot;stock_quantity&quot;: 969,
+            &quot;low_stock_threshold&quot;: 19,
+            &quot;price&quot;: 38165.08999999999650754034519195556640625,
+            &quot;selling_price&quot;: 72496.9299999999930150806903839111328125,
+            &quot;category_id&quot;: 77,
+            &quot;units_id&quot;: 74,
+            &quot;supplier_id&quot;: 105,
+            &quot;description&quot;: &quot;A debitis autem eveniet quis labore vel.&quot;,
+            &quot;warehouse_id&quot;: 74,
             &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
             &quot;has_expiry&quot;: false,
-            &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-            &quot;warehouse&quot;: {
-                &quot;id&quot;: 2,
-                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
-                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
-                &quot;is_main&quot;: 0,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;category&quot;: {
-                &quot;id&quot;: 6,
-                &quot;name&quot;: &quot;IC&quot;,
-                &quot;description&quot;: &quot;Integrated Circuit&quot;,
-                &quot;parent_id&quot;: null,
-                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;supplier&quot;: {
-                &quot;id&quot;: 9,
-                &quot;code&quot;: &quot;SUP004&quot;,
-                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
-                &quot;phone_number&quot;: &quot;0318889988&quot;,
-                &quot;location&quot;: &quot;IN&quot;,
-                &quot;payment_terms&quot;: &quot;45&quot;,
-                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;unit&quot;: {
-                &quot;id&quot;: 3,
-                &quot;name&quot;: &quot;Meters&quot;,
-                &quot;symbol&quot;: &quot;M&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
-        },
-        {
-            &quot;id&quot;: 7,
-            &quot;code&quot;: &quot;TR12&quot;,
-            &quot;barcode&quot;: &quot;3779775320282&quot;,
-            &quot;name&quot;: &quot;Expired Diode&quot;,
-            &quot;stock_quantity&quot;: 46,
-            &quot;low_stock_threshold&quot;: 10,
-            &quot;price&quot;: 180,
-            &quot;selling_price&quot;: 350,
-            &quot;category_id&quot;: 4,
-            &quot;units_id&quot;: 3,
-            &quot;supplier_id&quot;: 3,
-            &quot;description&quot;: &quot;Diode product already expired&quot;,
-            &quot;warehouse_id&quot;: 1,
-            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;has_expiry&quot;: true,
-            &quot;created_at&quot;: &quot;2025-05-20T14:30:03.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-            &quot;warehouse&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Gudang Utama Jakarta&quot;,
-                &quot;address&quot;: &quot;Jl. Raya Cakung No. 10, Jakarta Timur&quot;,
-                &quot;description&quot;: &quot;Gudang utama untuk distribusi pusat.&quot;,
-                &quot;is_main&quot;: 1,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;category&quot;: {
-                &quot;id&quot;: 4,
-                &quot;name&quot;: &quot;TR&quot;,
-                &quot;description&quot;: &quot;Transistor&quot;,
-                &quot;parent_id&quot;: null,
-                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;supplier&quot;: {
-                &quot;id&quot;: 3,
-                &quot;code&quot;: &quot;SUP003&quot;,
-                &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
-                &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
-                &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
-                &quot;location&quot;: &quot;OUT&quot;,
-                &quot;payment_terms&quot;: &quot;15&quot;,
-                &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;unit&quot;: {
-                &quot;id&quot;: 3,
-                &quot;name&quot;: &quot;Meters&quot;,
-                &quot;symbol&quot;: &quot;M&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
-        },
-        {
-            &quot;id&quot;: 8,
-            &quot;code&quot;: &quot;TR13&quot;,
-            &quot;barcode&quot;: &quot;3148624359009&quot;,
-            &quot;name&quot;: &quot;Near Expiry Crystal Oscillator&quot;,
-            &quot;stock_quantity&quot;: 53,
-            &quot;low_stock_threshold&quot;: 20,
-            &quot;price&quot;: 950,
-            &quot;selling_price&quot;: 1700,
-            &quot;category_id&quot;: 1,
-            &quot;units_id&quot;: 1,
-            &quot;supplier_id&quot;: 4,
-            &quot;description&quot;: &quot;Crystal oscillator expiring soon&quot;,
-            &quot;warehouse_id&quot;: 2,
-            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;has_expiry&quot;: true,
-            &quot;created_at&quot;: &quot;2025-09-20T14:30:03.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-            &quot;warehouse&quot;: {
-                &quot;id&quot;: 2,
-                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
-                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
-                &quot;is_main&quot;: 0,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;category&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;TR&quot;,
-                &quot;description&quot;: &quot;Transistor&quot;,
-                &quot;parent_id&quot;: null,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;supplier&quot;: {
-                &quot;id&quot;: 4,
-                &quot;code&quot;: &quot;SUP004&quot;,
-                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
-                &quot;phone_number&quot;: &quot;0318889988&quot;,
-                &quot;location&quot;: &quot;IN&quot;,
-                &quot;payment_terms&quot;: &quot;45&quot;,
-                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;unit&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Pieces&quot;,
-                &quot;symbol&quot;: &quot;PCS&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
-        },
-        {
-            &quot;id&quot;: 9,
-            &quot;code&quot;: &quot;TR14&quot;,
-            &quot;barcode&quot;: &quot;2740660386479&quot;,
-            &quot;name&quot;: &quot;Low Stock LED&quot;,
-            &quot;stock_quantity&quot;: 17,
-            &quot;low_stock_threshold&quot;: 5,
-            &quot;price&quot;: 90,
-            &quot;selling_price&quot;: 160,
-            &quot;category_id&quot;: 6,
-            &quot;units_id&quot;: 2,
-            &quot;supplier_id&quot;: 4,
-            &quot;description&quot;: &quot;LED near expiry and low stock&quot;,
-            &quot;warehouse_id&quot;: 1,
-            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;has_expiry&quot;: true,
-            &quot;created_at&quot;: &quot;2025-10-20T14:30:03.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-            &quot;warehouse&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Gudang Utama Jakarta&quot;,
-                &quot;address&quot;: &quot;Jl. Raya Cakung No. 10, Jakarta Timur&quot;,
-                &quot;description&quot;: &quot;Gudang utama untuk distribusi pusat.&quot;,
-                &quot;is_main&quot;: 1,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;category&quot;: {
-                &quot;id&quot;: 6,
-                &quot;name&quot;: &quot;IC&quot;,
-                &quot;description&quot;: &quot;Integrated Circuit&quot;,
-                &quot;parent_id&quot;: null,
-                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;supplier&quot;: {
-                &quot;id&quot;: 4,
-                &quot;code&quot;: &quot;SUP004&quot;,
-                &quot;name&quot;: &quot;PT. Surya Mandiri&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 22, Surabaya&quot;,
-                &quot;phone_number&quot;: &quot;0318889988&quot;,
-                &quot;location&quot;: &quot;IN&quot;,
-                &quot;payment_terms&quot;: &quot;45&quot;,
-                &quot;email&quot;: &quot;surya.mandiri@example.com&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;unit&quot;: {
-                &quot;id&quot;: 2,
-                &quot;name&quot;: &quot;Roll&quot;,
-                &quot;symbol&quot;: &quot;Roll&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
-        },
-        {
-            &quot;id&quot;: 10,
-            &quot;code&quot;: &quot;TR15&quot;,
-            &quot;barcode&quot;: &quot;3867088010591&quot;,
-            &quot;name&quot;: &quot;Expired Voltage Regulator&quot;,
-            &quot;stock_quantity&quot;: 1,
-            &quot;low_stock_threshold&quot;: 10,
-            &quot;price&quot;: 1400,
-            &quot;selling_price&quot;: 2600,
-            &quot;category_id&quot;: 1,
-            &quot;units_id&quot;: 3,
-            &quot;supplier_id&quot;: 6,
-            &quot;description&quot;: &quot;Voltage regulator expired long ago&quot;,
-            &quot;warehouse_id&quot;: 2,
-            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;has_expiry&quot;: true,
-            &quot;created_at&quot;: &quot;2024-11-20T14:30:03.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-            &quot;warehouse&quot;: {
-                &quot;id&quot;: 2,
-                &quot;name&quot;: &quot;Gudang Surabaya&quot;,
-                &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
-                &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
-                &quot;is_main&quot;: 0,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;category&quot;: {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;TR&quot;,
-                &quot;description&quot;: &quot;Transistor&quot;,
-                &quot;parent_id&quot;: null,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            },
-            &quot;supplier&quot;: {
-                &quot;id&quot;: 6,
-                &quot;code&quot;: &quot;SUP001&quot;,
-                &quot;name&quot;: &quot;PT. Elektronika Nusantara&quot;,
-                &quot;address&quot;: &quot;Jl. Raya Bekasi No. 45, Jakarta Timur&quot;,
-                &quot;phone_number&quot;: &quot;0218887766&quot;,
-                &quot;location&quot;: &quot;IN&quot;,
-                &quot;payment_terms&quot;: &quot;30&quot;,
-                &quot;email&quot;: &quot;elektronika.nusantara@example.com&quot;,
-                &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-            },
-            &quot;unit&quot;: {
-                &quot;id&quot;: 3,
-                &quot;name&quot;: &quot;Meters&quot;,
-                &quot;symbol&quot;: &quot;M&quot;,
-                &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-            }
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
         }
-    ],
-    &quot;links&quot;: {
-        &quot;first&quot;: &quot;http://localhost:8000/api/v1/products?page=1&quot;,
-        &quot;last&quot;: &quot;http://localhost:8000/api/v1/products?page=1&quot;,
-        &quot;prev&quot;: null,
-        &quot;next&quot;: null
-    },
-    &quot;meta&quot;: {
-        &quot;current_page&quot;: 1,
-        &quot;from&quot;: 1,
-        &quot;last_page&quot;: 1,
-        &quot;links&quot;: [
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
-                &quot;active&quot;: false
-            },
-            {
-                &quot;url&quot;: &quot;http://localhost:8000/api/v1/products?page=1&quot;,
-                &quot;label&quot;: &quot;1&quot;,
-                &quot;active&quot;: true
-            },
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
-                &quot;active&quot;: false
-            }
-        ],
-        &quot;path&quot;: &quot;http://localhost:8000/api/v1/products&quot;,
-        &quot;per_page&quot;: 25,
-        &quot;to&quot;: 10,
-        &quot;total&quot;: 10
-    }
+    ]
 }</code>
  </pre>
     </span>
@@ -15613,32 +15033,31 @@ fetch(url, {
 
 <span id="example-responses-POSTapi-v1-products">
             <blockquote>
-            <p>Example response (201):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
- &quot;data&quot;: {
-     &quot;id&quot;: 1,
-     &quot;name&quot;: &quot;Laptop Pro&quot;,
-     &quot;code&quot;: &quot;LP-001&quot;,
-     &quot;price&quot;: 1200.50,
-     &quot;selling_price&quot;: 1499.99,
-     &quot;stock_quantity&quot;: 50,
-     &quot;description&quot;: &quot;A powerful new laptop.&quot;,
-     &quot;category&quot;: { ... },
-     &quot;supplier&quot;: { ... },
-     &quot;unit&quot;: { ... },
-     &quot;warehouse&quot;: { ... }
- }
+    &quot;data&quot;: {
+        &quot;id&quot;: 82,
+        &quot;code&quot;: &quot;13579081&quot;,
+        &quot;barcode&quot;: &quot;7319228631501&quot;,
+        &quot;name&quot;: &quot;quisquam&quot;,
+        &quot;stock_quantity&quot;: 314,
+        &quot;low_stock_threshold&quot;: 9,
+        &quot;price&quot;: 50051.139999999999417923390865325927734375,
+        &quot;selling_price&quot;: 77034.699999999997089616954326629638671875,
+        &quot;category_id&quot;: 78,
+        &quot;units_id&quot;: 75,
+        &quot;supplier_id&quot;: 106,
+        &quot;description&quot;: &quot;Sed vel a quo sed fugit facilis perferendis.&quot;,
+        &quot;warehouse_id&quot;: 75,
+        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+        &quot;has_expiry&quot;: true,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
+    }
 }</code>
- </pre>
-            <blockquote>
-            <p>Example response (422):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{ &quot;message&quot;: &quot;The given data was invalid.&quot;, &quot;errors&quot;: { ... } }</code>
  </pre>
     </span>
 <span id="execution-results-POSTapi-v1-products" hidden>
@@ -15889,71 +15308,27 @@ fetch(url, {
             <blockquote>
             <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: {
-        &quot;id&quot;: 1,
-        &quot;code&quot;: &quot;TR11&quot;,
-        &quot;barcode&quot;: &quot;7986298486210&quot;,
-        &quot;name&quot;: &quot;Near Low Stock Capacitor&quot;,
-        &quot;stock_quantity&quot;: 44,
-        &quot;low_stock_threshold&quot;: 10,
-        &quot;price&quot;: 600,
-        &quot;selling_price&quot;: 1100,
-        &quot;category_id&quot;: 2,
-        &quot;units_id&quot;: 1,
-        &quot;supplier_id&quot;: 3,
-        &quot;description&quot;: &quot;Capacitor close to low stock&quot;,
-        &quot;warehouse_id&quot;: 2,
+        &quot;id&quot;: 83,
+        &quot;code&quot;: &quot;50865123&quot;,
+        &quot;barcode&quot;: &quot;3139729293312&quot;,
+        &quot;name&quot;: &quot;veniam&quot;,
+        &quot;stock_quantity&quot;: 982,
+        &quot;low_stock_threshold&quot;: 9,
+        &quot;price&quot;: 44823.5999999999985448084771633148193359375,
+        &quot;selling_price&quot;: 3544.6199999999998908606357872486114501953125,
+        &quot;category_id&quot;: 79,
+        &quot;units_id&quot;: 76,
+        &quot;supplier_id&quot;: 107,
+        &quot;description&quot;: &quot;Fuga aspernatur natus earum quas.&quot;,
+        &quot;warehouse_id&quot;: 76,
         &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-        &quot;has_expiry&quot;: false,
-        &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-        &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-        &quot;warehouse&quot;: {
-            &quot;id&quot;: 2,
-            &quot;name&quot;: &quot;Gudang Surabaya&quot;,
-            &quot;address&quot;: &quot;Jl. Ahmad Yani No. 50, Surabaya&quot;,
-            &quot;description&quot;: &quot;Gudang cabang di Jawa Timur.&quot;,
-            &quot;is_main&quot;: 0,
-            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T14:30:03.000000Z&quot;
-        },
-        &quot;category&quot;: {
-            &quot;id&quot;: 2,
-            &quot;name&quot;: &quot;FBT&quot;,
-            &quot;description&quot;: &quot;Flyback&quot;,
-            &quot;parent_id&quot;: null,
-            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-        },
-        &quot;supplier&quot;: {
-            &quot;id&quot;: 3,
-            &quot;code&quot;: &quot;SUP003&quot;,
-            &quot;name&quot;: &quot;Tokyo Electronics Ltd.&quot;,
-            &quot;address&quot;: &quot;Shinjuku-ku, Tokyo, Japan&quot;,
-            &quot;phone_number&quot;: &quot;+81-3-1234-5678&quot;,
-            &quot;location&quot;: &quot;OUT&quot;,
-            &quot;payment_terms&quot;: &quot;15&quot;,
-            &quot;email&quot;: &quot;tokyo.electronics@example.com&quot;,
-            &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
-            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-        },
-        &quot;unit&quot;: {
-            &quot;id&quot;: 1,
-            &quot;name&quot;: &quot;Pieces&quot;,
-            &quot;symbol&quot;: &quot;PCS&quot;,
-            &quot;created_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-20T09:16:25.000000Z&quot;
-        }
+        &quot;has_expiry&quot;: true,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
     }
 }</code>
  </pre>
@@ -16138,21 +15513,26 @@ fetch(url, {
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
- &quot;data&quot;: {
-     &quot;id&quot;: 1,
-     &quot;name&quot;: &quot;Laptop Pro v2&quot;,
-     &quot;code&quot;: &quot;LP-001&quot;,
-     &quot;price&quot;: 1250.00,
-     ...
- }
+    &quot;data&quot;: {
+        &quot;id&quot;: 84,
+        &quot;code&quot;: &quot;81079872&quot;,
+        &quot;barcode&quot;: &quot;4976636666223&quot;,
+        &quot;name&quot;: &quot;amet&quot;,
+        &quot;stock_quantity&quot;: 202,
+        &quot;low_stock_threshold&quot;: 20,
+        &quot;price&quot;: 72279.6900000000023283064365386962890625,
+        &quot;selling_price&quot;: 119994.080000000001746229827404022216796875,
+        &quot;category_id&quot;: 80,
+        &quot;units_id&quot;: 77,
+        &quot;supplier_id&quot;: 108,
+        &quot;description&quot;: &quot;Laborum eius est dolor dolores minus voluptatem.&quot;,
+        &quot;warehouse_id&quot;: 77,
+        &quot;image&quot;: &quot;http://localhost:8000/img/default_placeholder.png&quot;,
+        &quot;has_expiry&quot;: false,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
+    }
 }</code>
- </pre>
-            <blockquote>
-            <p>Example response (422):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{ &quot;message&quot;: &quot;The given data was invalid.&quot;, &quot;errors&quot;: { ... } }</code>
  </pre>
     </span>
 <span id="execution-results-PUTapi-v1-products--id-" hidden>
@@ -16430,19 +15810,10 @@ fetch(url, {
 
 <span id="example-responses-DELETEapi-v1-products--id-">
             <blockquote>
-            <p>Example response (204):</p>
+            <p>Example response (204, Success):</p>
         </blockquote>
                 <pre>
 <code>Empty response</code>
- </pre>
-            <blockquote>
-            <p>Example response (404):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Not Found.&quot;
-}</code>
  </pre>
     </span>
 <span id="execution-results-DELETEapi-v1-products--id-" hidden>
@@ -16605,58 +15976,41 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-po-items">
             <blockquote>
-            <p>Example response (200, OK):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: [
         {
-            &quot;id&quot;: 1,
-            &quot;po_id&quot;: 1,
-            &quot;product_id&quot;: 1,
-            &quot;quantity&quot;: 10,
-            &quot;price&quot;: &quot;100.00&quot;,
-            &quot;discount&quot;: &quot;0.00&quot;,
+            &quot;id&quot;: 56,
+            &quot;po_id&quot;: 42,
+            &quot;product_id&quot;: 77,
+            &quot;quantity&quot;: 50,
+            &quot;remaining_quantity&quot;: 50,
+            &quot;price&quot;: &quot;106.64&quot;,
+            &quot;discount&quot;: &quot;2.85&quot;,
             &quot;discount_type&quot;: &quot;fixed&quot;,
-            &quot;total&quot;: &quot;1000.00&quot;,
+            &quot;total&quot;: 5332,
+            &quot;expiry_date&quot;: &quot;2026-03-22&quot;,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 57,
+            &quot;po_id&quot;: 43,
+            &quot;product_id&quot;: 78,
+            &quot;quantity&quot;: 63,
+            &quot;remaining_quantity&quot;: 63,
+            &quot;price&quot;: &quot;42.04&quot;,
+            &quot;discount&quot;: &quot;1.59&quot;,
+            &quot;discount_type&quot;: &quot;fixed&quot;,
+            &quot;total&quot;: 2648.51999999999998181010596454143524169921875,
             &quot;expiry_date&quot;: null,
-            &quot;remaining_quantity&quot;: 10,
-            &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
         }
-    ],
-    &quot;links&quot;: {
-        &quot;first&quot;: &quot;/api/v1/po-items?page=1&quot;,
-        &quot;last&quot;: &quot;/api/v1/po-items?page=1&quot;,
-        &quot;prev&quot;: null,
-        &quot;next&quot;: null
-    },
-    &quot;meta&quot;: {
-        &quot;current_page&quot;: 1,
-        &quot;from&quot;: 1,
-        &quot;last_page&quot;: 1,
-        &quot;path&quot;: &quot;/api/v1/po-items&quot;,
-        &quot;per_page&quot;: 15,
-        &quot;to&quot;: 1,
-        &quot;total&quot;: 1
-    }
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (500):</p>
-        </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    ]
 }</code>
  </pre>
     </span>
@@ -16784,7 +16138,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"discount\": 11613.31890586000008624978363513946533203125,
     \"discount_type\": \"consequatur\",
     \"total\": 11613.31890586000008624978363513946533203125,
-    \"expiry_date\": \"2025-11-21T05:52:55\",
+    \"expiry_date\": \"2025-11-21T06:50:03\",
     \"remaining_quantity\": 11613.31890586000008624978363513946533203125
 }"
 </code></pre></div>
@@ -16809,7 +16163,7 @@ let body = {
     "discount": 11613.31890586000008624978363513946533203125,
     "discount_type": "consequatur",
     "total": 11613.31890586000008624978363513946533203125,
-    "expiry_date": "2025-11-21T05:52:55",
+    "expiry_date": "2025-11-21T06:50:03",
     "remaining_quantity": 11613.31890586000008624978363513946533203125
 };
 
@@ -17005,10 +16359,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="expiry_date"                data-endpoint="POSTapi-v1-po-items"
-               value="2025-11-21T05:52:55"
+               value="2025-11-21T06:50:03"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+<p>Must be a valid date. Example: <code>2025-11-21T06:50:03</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>remaining_quantity</code></b>&nbsp;&nbsp;
@@ -17064,39 +16418,25 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-po-items--id-">
             <blockquote>
-            <p>Example response (200, OK):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;id&quot;: 1,
-    &quot;po_id&quot;: 1,
-    &quot;product_id&quot;: 1,
-    &quot;quantity&quot;: 10,
-    &quot;price&quot;: &quot;100.00&quot;,
-    &quot;discount&quot;: &quot;0.00&quot;,
-    &quot;discount_type&quot;: &quot;fixed&quot;,
-    &quot;total&quot;: &quot;1000.00&quot;,
-    &quot;expiry_date&quot;: null,
-    &quot;remaining_quantity&quot;: 10,
-    &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
-    &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (500):</p>
-        </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 58,
+        &quot;po_id&quot;: 44,
+        &quot;product_id&quot;: 79,
+        &quot;quantity&quot;: 50,
+        &quot;remaining_quantity&quot;: 50,
+        &quot;price&quot;: &quot;106.64&quot;,
+        &quot;discount&quot;: &quot;2.85&quot;,
+        &quot;discount_type&quot;: &quot;fixed&quot;,
+        &quot;total&quot;: 5332,
+        &quot;expiry_date&quot;: &quot;2026-03-22&quot;,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -17236,7 +16576,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"discount\": 11613.31890586000008624978363513946533203125,
     \"discount_type\": \"consequatur\",
     \"total\": 11613.31890586000008624978363513946533203125,
-    \"expiry_date\": \"2025-11-21T05:52:55\",
+    \"expiry_date\": \"2025-11-21T06:50:03\",
     \"remaining_quantity\": 11613.31890586000008624978363513946533203125
 }"
 </code></pre></div>
@@ -17261,7 +16601,7 @@ let body = {
     "discount": 11613.31890586000008624978363513946533203125,
     "discount_type": "consequatur",
     "total": 11613.31890586000008624978363513946533203125,
-    "expiry_date": "2025-11-21T05:52:55",
+    "expiry_date": "2025-11-21T06:50:03",
     "remaining_quantity": 11613.31890586000008624978363513946533203125
 };
 
@@ -17474,10 +16814,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="expiry_date"                data-endpoint="PUTapi-v1-po-items--id-"
-               value="2025-11-21T05:52:55"
+               value="2025-11-21T06:50:03"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-11-21T05:52:55</code></p>
+<p>Must be a valid date. Example: <code>2025-11-21T06:50:03</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>remaining_quantity</code></b>&nbsp;&nbsp;
@@ -20009,50 +19349,27 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-roles">
             <blockquote>
-            <p>Example response (200, OK):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: [
         {
-            &quot;id&quot;: 1,
-            &quot;name&quot;: &quot;Admin&quot;,
-            &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
+            &quot;id&quot;: 17,
+            &quot;name&quot;: &quot;Licensing Examiner and Inspector&quot;,
+            &quot;guard_name&quot;: &quot;web&quot;,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 18,
+            &quot;name&quot;: &quot;Logging Supervisor&quot;,
+            &quot;guard_name&quot;: &quot;web&quot;,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
         }
-    ],
-    &quot;links&quot;: {
-        &quot;first&quot;: &quot;/api/v1/roles?page=1&quot;,
-        &quot;last&quot;: &quot;/api/v1/roles?page=1&quot;,
-        &quot;prev&quot;: null,
-        &quot;next&quot;: null
-    },
-    &quot;meta&quot;: {
-        &quot;current_page&quot;: 1,
-        &quot;from&quot;: 1,
-        &quot;last_page&quot;: 1,
-        &quot;path&quot;: &quot;/api/v1/roles&quot;,
-        &quot;per_page&quot;: 15,
-        &quot;to&quot;: 1,
-        &quot;total&quot;: 1
-    }
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (500):</p>
-        </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    ]
 }</code>
  </pre>
     </span>
@@ -20355,31 +19672,18 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-roles--id-">
             <blockquote>
-            <p>Example response (200, OK):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;id&quot;: 1,
-    &quot;name&quot;: &quot;Admin&quot;,
-    &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
-    &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (500):</p>
-        </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 19,
+        &quot;name&quot;: &quot;Licensing Examiner and Inspector&quot;,
+        &quot;guard_name&quot;: &quot;web&quot;,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:03.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -20889,56 +20193,37 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-items">
             <blockquote>
-            <p>Example response (200, OK):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: [
         {
-            &quot;id&quot;: 1,
-            &quot;sales_id&quot;: 1,
-            &quot;product_id&quot;: 1,
+            &quot;id&quot;: 263,
+            &quot;sales_id&quot;: 119,
+            &quot;product_id&quot;: 85,
             &quot;quantity&quot;: 5,
             &quot;discount&quot;: &quot;0.00&quot;,
             &quot;discount_type&quot;: &quot;fixed&quot;,
-            &quot;customer_price&quot;: &quot;100.00&quot;,
-            &quot;total&quot;: &quot;500.00&quot;,
-            &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
+            &quot;customer_price&quot;: &quot;35869.89&quot;,
+            &quot;total&quot;: &quot;179349.45&quot;,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 264,
+            &quot;sales_id&quot;: 120,
+            &quot;product_id&quot;: 86,
+            &quot;quantity&quot;: 6,
+            &quot;discount&quot;: &quot;0.00&quot;,
+            &quot;discount_type&quot;: &quot;fixed&quot;,
+            &quot;customer_price&quot;: &quot;76130.10&quot;,
+            &quot;total&quot;: &quot;456780.60&quot;,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
         }
-    ],
-    &quot;links&quot;: {
-        &quot;first&quot;: &quot;/api/v1/sales-items?page=1&quot;,
-        &quot;last&quot;: &quot;/api/v1/sales-items?page=1&quot;,
-        &quot;prev&quot;: null,
-        &quot;next&quot;: null
-    },
-    &quot;meta&quot;: {
-        &quot;current_page&quot;: 1,
-        &quot;from&quot;: 1,
-        &quot;last_page&quot;: 1,
-        &quot;path&quot;: &quot;/api/v1/sales-items&quot;,
-        &quot;per_page&quot;: 15,
-        &quot;to&quot;: 1,
-        &quot;total&quot;: 1
-    }
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (500):</p>
-        </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    ]
 }</code>
  </pre>
     </span>
@@ -21331,37 +20616,23 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-items--id-">
             <blockquote>
-            <p>Example response (200, OK):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;id&quot;: 1,
-    &quot;sales_id&quot;: 1,
-    &quot;product_id&quot;: 1,
-    &quot;quantity&quot;: 5,
-    &quot;discount&quot;: &quot;0.00&quot;,
-    &quot;discount_type&quot;: &quot;fixed&quot;,
-    &quot;customer_price&quot;: &quot;100.00&quot;,
-    &quot;total&quot;: &quot;500.00&quot;,
-    &quot;created_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;,
-    &quot;updated_at&quot;: &quot;2025-11-21T08:30:00.000000Z&quot;
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (500):</p>
-        </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Server Error&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 265,
+        &quot;sales_id&quot;: 121,
+        &quot;product_id&quot;: 87,
+        &quot;quantity&quot;: 5,
+        &quot;discount&quot;: &quot;0.00&quot;,
+        &quot;discount_type&quot;: &quot;fixed&quot;,
+        &quot;customer_price&quot;: &quot;113755.01&quot;,
+        &quot;total&quot;: &quot;568775.05&quot;,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -21963,49 +21234,39 @@ fetch(url, {
             <blockquote>
             <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;data&quot;: [],
-    &quot;links&quot;: {
-        &quot;first&quot;: &quot;http://localhost:8000/api/v1/sales-opportunities?page=1&quot;,
-        &quot;last&quot;: &quot;http://localhost:8000/api/v1/sales-opportunities?page=1&quot;,
-        &quot;prev&quot;: null,
-        &quot;next&quot;: null
-    },
-    &quot;meta&quot;: {
-        &quot;current_page&quot;: 1,
-        &quot;from&quot;: null,
-        &quot;last_page&quot;: 1,
-        &quot;links&quot;: [
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
-                &quot;active&quot;: false
-            },
-            {
-                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales-opportunities?page=1&quot;,
-                &quot;label&quot;: &quot;1&quot;,
-                &quot;active&quot;: true
-            },
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
-                &quot;active&quot;: false
-            }
-        ],
-        &quot;path&quot;: &quot;http://localhost:8000/api/v1/sales-opportunities&quot;,
-        &quot;per_page&quot;: 25,
-        &quot;to&quot;: null,
-        &quot;total&quot;: 0
-    }
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 19,
+            &quot;customer_id&quot;: 54,
+            &quot;sales_pipeline_id&quot;: 61,
+            &quot;pipeline_stage_id&quot;: 34,
+            &quot;name&quot;: &quot;et&quot;,
+            &quot;description&quot;: &quot;Cupiditate voluptatibus voluptatibus aperiam.&quot;,
+            &quot;amount&quot;: &quot;9027.15&quot;,
+            &quot;expected_close_date&quot;: &quot;2026-08-18T00:00:00.000000Z&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;sales_id&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 20,
+            &quot;customer_id&quot;: 55,
+            &quot;sales_pipeline_id&quot;: 63,
+            &quot;pipeline_stage_id&quot;: 35,
+            &quot;name&quot;: &quot;a&quot;,
+            &quot;description&quot;: &quot;Qui ut aut dolorem non assumenda.&quot;,
+            &quot;amount&quot;: &quot;4760.65&quot;,
+            &quot;expected_close_date&quot;: &quot;2026-04-17T00:00:00.000000Z&quot;,
+            &quot;status&quot;: &quot;open&quot;,
+            &quot;sales_id&quot;: null,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        }
+    ]
 }</code>
  </pre>
     </span>
@@ -22428,19 +21689,25 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-opportunities--id-">
             <blockquote>
-            <p>Example response (404):</p>
+            <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;No query results for model [App\\Models\\SalesOpportunity] 17&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 21,
+        &quot;customer_id&quot;: 56,
+        &quot;sales_pipeline_id&quot;: 65,
+        &quot;pipeline_stage_id&quot;: 36,
+        &quot;name&quot;: &quot;veniam&quot;,
+        &quot;description&quot;: &quot;Fuga aspernatur natus earum quas.&quot;,
+        &quot;amount&quot;: &quot;236.31&quot;,
+        &quot;expected_close_date&quot;: &quot;2026-05-01T00:00:00.000000Z&quot;,
+        &quot;status&quot;: &quot;open&quot;,
+        &quot;sales_id&quot;: null,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -23072,49 +22339,29 @@ fetch(url, {
             <blockquote>
             <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;data&quot;: [],
-    &quot;links&quot;: {
-        &quot;first&quot;: &quot;http://localhost:8000/api/v1/sales-opportunity-items?page=1&quot;,
-        &quot;last&quot;: &quot;http://localhost:8000/api/v1/sales-opportunity-items?page=1&quot;,
-        &quot;prev&quot;: null,
-        &quot;next&quot;: null
-    },
-    &quot;meta&quot;: {
-        &quot;current_page&quot;: 1,
-        &quot;from&quot;: null,
-        &quot;last_page&quot;: 1,
-        &quot;links&quot;: [
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
-                &quot;active&quot;: false
-            },
-            {
-                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales-opportunity-items?page=1&quot;,
-                &quot;label&quot;: &quot;1&quot;,
-                &quot;active&quot;: true
-            },
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
-                &quot;active&quot;: false
-            }
-        ],
-        &quot;path&quot;: &quot;http://localhost:8000/api/v1/sales-opportunity-items&quot;,
-        &quot;per_page&quot;: 25,
-        &quot;to&quot;: null,
-        &quot;total&quot;: 0
-    }
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 10,
+            &quot;sales_opportunity_id&quot;: 22,
+            &quot;product_id&quot;: 88,
+            &quot;quantity&quot;: 3,
+            &quot;price&quot;: 513.55999999999994543031789362430572509765625,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;sales_opportunity_id&quot;: 23,
+            &quot;product_id&quot;: 89,
+            &quot;quantity&quot;: 2,
+            &quot;price&quot;: 541.509999999999990905052982270717620849609375,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        }
+    ]
 }</code>
  </pre>
     </span>
@@ -23462,19 +22709,20 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-opportunity-items--id-">
             <blockquote>
-            <p>Example response (404):</p>
+            <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;No query results for model [App\\Models\\SalesOpportunityItem] 17&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 12,
+        &quot;sales_opportunity_id&quot;: 24,
+        &quot;product_id&quot;: 90,
+        &quot;quantity&quot;: 3,
+        &quot;price&quot;: 513.55999999999994543031789362430572509765625,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -28732,49 +27980,27 @@ fetch(url, {
             <blockquote>
             <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;data&quot;: [],
-    &quot;links&quot;: {
-        &quot;first&quot;: &quot;http://localhost:8000/api/v1/sales-pipelines?page=1&quot;,
-        &quot;last&quot;: &quot;http://localhost:8000/api/v1/sales-pipelines?page=1&quot;,
-        &quot;prev&quot;: null,
-        &quot;next&quot;: null
-    },
-    &quot;meta&quot;: {
-        &quot;current_page&quot;: 1,
-        &quot;from&quot;: null,
-        &quot;last_page&quot;: 1,
-        &quot;links&quot;: [
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
-                &quot;active&quot;: false
-            },
-            {
-                &quot;url&quot;: &quot;http://localhost:8000/api/v1/sales-pipelines?page=1&quot;,
-                &quot;label&quot;: &quot;1&quot;,
-                &quot;active&quot;: true
-            },
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
-                &quot;active&quot;: false
-            }
-        ],
-        &quot;path&quot;: &quot;http://localhost:8000/api/v1/sales-pipelines&quot;,
-        &quot;per_page&quot;: 25,
-        &quot;to&quot;: null,
-        &quot;total&quot;: 0
-    }
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 73,
+            &quot;name&quot;: &quot;aspernatur&quot;,
+            &quot;description&quot;: &quot;Earum quas dignissimos perferendis voluptatibus incidunt nostrum.&quot;,
+            &quot;is_default&quot;: 0,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 74,
+            &quot;name&quot;: &quot;possimus&quot;,
+            &quot;description&quot;: &quot;Id et necessitatibus architecto aut consequatur debitis.&quot;,
+            &quot;is_default&quot;: 0,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        }
+    ]
 }</code>
  </pre>
     </span>
@@ -29117,19 +28343,19 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-sales-pipelines--id-">
             <blockquote>
-            <p>Example response (404):</p>
+            <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;No query results for model [App\\Models\\SalesPipeline] 17&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 75,
+        &quot;name&quot;: &quot;natus&quot;,
+        &quot;description&quot;: &quot;Quas dignissimos perferendis voluptatibus incidunt nostrum quia possimus rerum.&quot;,
+        &quot;is_default&quot;: 0,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -29681,49 +28907,35 @@ fetch(url, {
             <blockquote>
             <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;data&quot;: [],
-    &quot;links&quot;: {
-        &quot;first&quot;: &quot;http://localhost:8000/api/v1/stock-adjustments?page=1&quot;,
-        &quot;last&quot;: &quot;http://localhost:8000/api/v1/stock-adjustments?page=1&quot;,
-        &quot;prev&quot;: null,
-        &quot;next&quot;: null
-    },
-    &quot;meta&quot;: {
-        &quot;current_page&quot;: 1,
-        &quot;from&quot;: null,
-        &quot;last_page&quot;: 1,
-        &quot;links&quot;: [
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
-                &quot;active&quot;: false
-            },
-            {
-                &quot;url&quot;: &quot;http://localhost:8000/api/v1/stock-adjustments?page=1&quot;,
-                &quot;label&quot;: &quot;1&quot;,
-                &quot;active&quot;: true
-            },
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
-                &quot;active&quot;: false
-            }
-        ],
-        &quot;path&quot;: &quot;http://localhost:8000/api/v1/stock-adjustments&quot;,
-        &quot;per_page&quot;: 25,
-        &quot;to&quot;: null,
-        &quot;total&quot;: 0
-    }
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 10,
+            &quot;product_id&quot;: 91,
+            &quot;adjustment_type&quot;: &quot;increase&quot;,
+            &quot;quantity_before&quot;: 150,
+            &quot;quantity_after&quot;: 161,
+            &quot;adjustment_amount&quot;: 11,
+            &quot;reason&quot;: &quot;Veniam sed fuga aspernatur natus earum.&quot;,
+            &quot;adjusted_by&quot;: 33,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;product_id&quot;: 92,
+            &quot;adjustment_type&quot;: &quot;decrease&quot;,
+            &quot;quantity_before&quot;: 188,
+            &quot;quantity_after&quot;: 181,
+            &quot;adjustment_amount&quot;: 7,
+            &quot;reason&quot;: &quot;Id tempore voluptate sit rem quia odit aut.&quot;,
+            &quot;adjusted_by&quot;: 34,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        }
+    ]
 }</code>
  </pre>
     </span>
@@ -30116,19 +29328,23 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-stock-adjustments--id-">
             <blockquote>
-            <p>Example response (404):</p>
+            <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;No query results for model [App\\Models\\StockAdjustment] 17&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 12,
+        &quot;product_id&quot;: 93,
+        &quot;adjustment_type&quot;: &quot;increase&quot;,
+        &quot;quantity_before&quot;: 150,
+        &quot;quantity_after&quot;: 161,
+        &quot;adjustment_amount&quot;: 11,
+        &quot;reason&quot;: &quot;Veniam sed fuga aspernatur natus earum.&quot;,
+        &quot;adjusted_by&quot;: 35,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>
@@ -33447,49 +32663,27 @@ fetch(url, {
             <blockquote>
             <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;data&quot;: [],
-    &quot;links&quot;: {
-        &quot;first&quot;: &quot;http://localhost:8000/api/v1/taxes?page=1&quot;,
-        &quot;last&quot;: &quot;http://localhost:8000/api/v1/taxes?page=1&quot;,
-        &quot;prev&quot;: null,
-        &quot;next&quot;: null
-    },
-    &quot;meta&quot;: {
-        &quot;current_page&quot;: 1,
-        &quot;from&quot;: null,
-        &quot;last_page&quot;: 1,
-        &quot;links&quot;: [
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;&amp;laquo; Previous&quot;,
-                &quot;active&quot;: false
-            },
-            {
-                &quot;url&quot;: &quot;http://localhost:8000/api/v1/taxes?page=1&quot;,
-                &quot;label&quot;: &quot;1&quot;,
-                &quot;active&quot;: true
-            },
-            {
-                &quot;url&quot;: null,
-                &quot;label&quot;: &quot;Next &amp;raquo;&quot;,
-                &quot;active&quot;: false
-            }
-        ],
-        &quot;path&quot;: &quot;http://localhost:8000/api/v1/taxes&quot;,
-        &quot;per_page&quot;: 25,
-        &quot;to&quot;: null,
-        &quot;total&quot;: 0
-    }
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 10,
+            &quot;name&quot;: &quot;dolores&quot;,
+            &quot;rate&quot;: &quot;10.17&quot;,
+            &quot;is_active&quot;: 1,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        },
+        {
+            &quot;id&quot;: 11,
+            &quot;name&quot;: &quot;sit&quot;,
+            &quot;rate&quot;: &quot;5.69&quot;,
+            &quot;is_active&quot;: 1,
+            &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+        }
+    ]
 }</code>
  </pre>
     </span>
@@ -33832,19 +33026,19 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-taxes--id-">
             <blockquote>
-            <p>Example response (404):</p>
+            <p>Example response (200):</p>
         </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">cache-control: no-cache, private
-content-type: application/json
-access-control-allow-origin: *
- </code></pre></details>         <pre>
+                <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;No query results for model [App\\Models\\Tax] 17&quot;
+    &quot;data&quot;: {
+        &quot;id&quot;: 12,
+        &quot;name&quot;: &quot;dolores&quot;,
+        &quot;rate&quot;: &quot;10.17&quot;,
+        &quot;is_active&quot;: 1,
+        &quot;created_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;,
+        &quot;updated_at&quot;: &quot;2025-11-21T06:50:04.000000Z&quot;
+    }
 }</code>
  </pre>
     </span>

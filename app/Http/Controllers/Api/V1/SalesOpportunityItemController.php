@@ -18,6 +18,9 @@ class SalesOpportunityItemController extends Controller
      * Display a listing of the sales opportunity items.
      *
      * @queryParam per_page int The number of items to return per page. Defaults to 15. Example: 25
+     *
+     * @apiResourceCollection App\Http\Resources\SalesOpportunityItemResource
+     * @apiResourceModel App\Models\SalesOpportunityItem
      */
     public function index(Request $request)
     {
@@ -64,6 +67,9 @@ class SalesOpportunityItemController extends Controller
      * Display the specified sales opportunity item.
      *
      * @urlParam sales_opportunity_item required The ID of the sales opportunity item. Example: 1
+     *
+     * @apiResource App\Http\Resources\SalesOpportunityItemResource
+     * @apiResourceModel App\Models\SalesOpportunityItem
      */
     public function show(SalesOpportunityItem $sales_opportunity_item)
     {

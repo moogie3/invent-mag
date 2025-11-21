@@ -46,16 +46,10 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: |-
-          {
-              "message": "Server Error"
-          }
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
+        status: 200
+        content: '{"data":[{"id":56,"po_id":42,"product_id":77,"quantity":50,"remaining_quantity":50,"price":"106.64","discount":"2.85","discount_type":"fixed","total":5332,"expiry_date":"2026-03-22","created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"},{"id":57,"po_id":43,"product_id":78,"quantity":63,"remaining_quantity":63,"price":"42.04","discount":"1.59","discount_type":"fixed","total":2648.51999999999998181010596454143524169921875,"expiry_date":null,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}]}'
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -172,7 +166,7 @@ endpoints:
         name: expiry_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-11-21T05:52:55'
+        example: '2025-11-21T06:50:03'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -197,7 +191,7 @@ endpoints:
       discount: 11613.31890586
       discount_type: consequatur
       total: 11613.31890586
-      expiry_date: '2025-11-21T05:52:55'
+      expiry_date: '2025-11-21T06:50:03'
       remaining_quantity: 11613.31890586
     fileParameters: []
     responses:
@@ -270,16 +264,10 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: |-
-          {
-              "message": "Server Error"
-          }
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
+        status: 200
+        content: '{"data":{"id":58,"po_id":44,"product_id":79,"quantity":50,"remaining_quantity":50,"price":"106.64","discount":"2.85","discount_type":"fixed","total":5332,"expiry_date":"2026-03-22","created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}}'
+        headers: []
+        description: ''
     responseFields: []
     auth:
       - headers
@@ -409,7 +397,7 @@ endpoints:
         name: expiry_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-11-21T05:52:55'
+        example: '2025-11-21T06:50:03'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -434,7 +422,7 @@ endpoints:
       discount: 11613.31890586
       discount_type: consequatur
       total: 11613.31890586
-      expiry_date: '2025-11-21T05:52:55'
+      expiry_date: '2025-11-21T06:50:03'
       remaining_quantity: 11613.31890586
     fileParameters: []
     responses:

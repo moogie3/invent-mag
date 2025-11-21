@@ -18,6 +18,9 @@ class POItemController extends Controller
      * Display a listing of the purchase order items.
      *
      * @queryParam per_page int The number of items to return per page. Defaults to 15. Example: 25
+     *
+     * @apiResourceCollection App\Http\Resources\POItemResource
+     * @apiResourceModel App\Models\POItem
      */
     public function index(Request $request)
     {
@@ -54,6 +57,9 @@ class POItemController extends Controller
      * Display the specified purchase order item.
      *
      * @urlParam po_item required The ID of the purchase order item. Example: 1
+     *
+     * @apiResource App\Http\Resources\POItemResource
+     * @apiResourceModel App\Models\POItem
      */
     public function show(POItem $po_item)
     {

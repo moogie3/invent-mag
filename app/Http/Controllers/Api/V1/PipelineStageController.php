@@ -18,6 +18,9 @@ class PipelineStageController extends Controller
      * Display a listing of the pipeline stages.
      *
      * @queryParam per_page int The number of stages to return per page. Defaults to 15. Example: 25
+     *
+     * @apiResourceCollection App\Http\Resources\PipelineStageResource
+     * @apiResourceModel App\Models\PipelineStage
      */
     public function index(Request $request)
     {
@@ -49,6 +52,9 @@ class PipelineStageController extends Controller
      * Display the specified pipeline stage.
      *
      * @urlParam pipeline_stage required The ID of the pipeline stage. Example: 1
+     *
+     * @apiResource App\Http\Resources\PipelineStageResource
+     * @apiResourceModel App\Models\PipelineStage
      */
     public function show(PipelineStage $pipeline_stage)
     {

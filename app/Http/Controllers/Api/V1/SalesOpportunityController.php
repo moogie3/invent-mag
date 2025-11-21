@@ -18,6 +18,9 @@ class SalesOpportunityController extends Controller
      * Display a listing of the sales opportunities.
      *
      * @queryParam per_page int The number of opportunities to return per page. Defaults to 15. Example: 25
+     *
+     * @apiResourceCollection App\Http\Resources\SalesOpportunityResource
+     * @apiResourceModel App\Models\SalesOpportunity
      */
     public function index(Request $request)
     {
@@ -79,6 +82,9 @@ class SalesOpportunityController extends Controller
      * Display the specified sales opportunity.
      *
      * @urlParam sales_opportunity required The ID of the sales opportunity. Example: 1
+     *
+     * @apiResource App\Http\Resources\SalesOpportunityResource
+     * @apiResourceModel App\Models\SalesOpportunity
      */
     public function show(SalesOpportunity $sales_opportunity)
     {

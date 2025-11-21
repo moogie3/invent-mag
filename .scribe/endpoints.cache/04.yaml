@@ -138,7 +138,7 @@ endpoints:
         name: interaction_date
         description: 'Must be a valid date.'
         required: true
-        example: '2025-11-21T05:52:55'
+        example: '2025-11-21T06:50:02'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -149,7 +149,7 @@ endpoints:
       user_id: consequatur
       type: mqeopfuudtdsufvyvddqa
       notes: consequatur
-      interaction_date: '2025-11-21T05:52:55'
+      interaction_date: '2025-11-21T06:50:02'
     fileParameters: []
     responses:
       -
@@ -324,7 +324,7 @@ endpoints:
         name: interaction_date
         description: 'Must be a valid date.'
         required: true
-        example: '2025-11-21T05:52:55'
+        example: '2025-11-21T06:50:02'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -335,7 +335,7 @@ endpoints:
       user_id: consequatur
       type: mqeopfuudtdsufvyvddqa
       notes: consequatur
-      interaction_date: '2025-11-21T05:52:55'
+      interaction_date: '2025-11-21T06:50:02'
     fileParameters: []
     responses:
       -

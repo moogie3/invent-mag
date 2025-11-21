@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Invent-MAG API Documentation",
-        "_postman_id": "b9cf3960-70c2-444e-a44f-ddcd66c97978",
+        "_postman_id": "1bc0230b-7d57-42c2-addc-a6ae818c3ead",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -93,7 +93,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"vmqeopfuudtdsufvyvddq\",\"code\":\"amniihfqcoynlazghdtqt\",\"type\":\"qxbajwbpilpmufinllwlo\",\"description\":\"Dolores dolorum amet iste laborum eius est dolor.\",\"level\":17,\"is_active\":false}"
+                            "raw": "{\"name\":\"vmqeopfuudtdsufvyvddq\",\"code\":\"amniihfqcoynlazghdtqt\",\"type\":\"qxbajwbpilpmufinllwlo\",\"description\":\"Dolores dolorum amet iste laborum eius est dolor.\",\"level\":17,\"is_active\":true}"
                         },
                         "description": ""
                     },
@@ -798,7 +798,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"customer_id\":\"consequatur\",\"user_id\":\"consequatur\",\"type\":\"mqeopfuudtdsufvyvddqa\",\"notes\":\"consequatur\",\"interaction_date\":\"2025-11-21T05:52:55\"}"
+                            "raw": "{\"customer_id\":\"consequatur\",\"user_id\":\"consequatur\",\"type\":\"mqeopfuudtdsufvyvddqa\",\"notes\":\"consequatur\",\"interaction_date\":\"2025-11-21T06:50:02\"}"
                         },
                         "description": ""
                     },
@@ -900,7 +900,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"customer_id\":\"consequatur\",\"user_id\":\"consequatur\",\"type\":\"mqeopfuudtdsufvyvddqa\",\"notes\":\"consequatur\",\"interaction_date\":\"2025-11-21T05:52:55\"}"
+                            "raw": "{\"customer_id\":\"consequatur\",\"user_id\":\"consequatur\",\"type\":\"mqeopfuudtdsufvyvddqa\",\"notes\":\"consequatur\",\"interaction_date\":\"2025-11-21T06:50:02\"}"
                         },
                         "description": ""
                     },
@@ -1280,7 +1280,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"date\":\"2025-11-21T05:52:55\",\"description\":\"Dolores dolorum amet iste laborum eius est dolor.\",\"sourceable_id\":17,\"sourceable_type\":\"consequatur\"}"
+                            "raw": "{\"date\":\"2025-11-21T06:50:02\",\"description\":\"Dolores dolorum amet iste laborum eius est dolor.\",\"sourceable_id\":17,\"sourceable_type\":\"consequatur\"}"
                         },
                         "description": ""
                     },
@@ -1382,7 +1382,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"date\":\"2025-11-21T05:52:55\",\"description\":\"Dolores dolorum amet iste laborum eius est dolor.\",\"sourceable_id\":17,\"sourceable_type\":\"consequatur\"}"
+                            "raw": "{\"date\":\"2025-11-21T06:50:02\",\"description\":\"Dolores dolorum amet iste laborum eius est dolor.\",\"sourceable_id\":17,\"sourceable_type\":\"consequatur\"}"
                         },
                         "description": ""
                     },
@@ -1762,7 +1762,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"paymentable_id\":17,\"paymentable_type\":\"consequatur\",\"amount\":11613.31890586000008624978363513946533203125,\"payment_date\":\"2025-11-21T05:52:55\",\"payment_method\":\"consequatur\",\"notes\":\"consequatur\"}"
+                            "raw": "{\"paymentable_id\":17,\"paymentable_type\":\"consequatur\",\"amount\":11613.31890586000008624978363513946533203125,\"payment_date\":\"2025-11-21T06:50:03\",\"payment_method\":\"consequatur\",\"notes\":\"consequatur\"}"
                         },
                         "description": ""
                     },
@@ -1864,7 +1864,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"paymentable_id\":17,\"paymentable_type\":\"consequatur\",\"amount\":11613.31890586000008624978363513946533203125,\"payment_date\":\"2025-11-21T05:52:55\",\"payment_method\":\"consequatur\",\"notes\":\"consequatur\"}"
+                            "raw": "{\"paymentable_id\":17,\"paymentable_type\":\"consequatur\",\"amount\":11613.31890586000008624978363513946533203125,\"payment_date\":\"2025-11-21T06:50:03\",\"payment_method\":\"consequatur\",\"notes\":\"consequatur\"}"
                         },
                         "description": ""
                     },
@@ -1955,22 +1955,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
+                            "header": [],
                             "code": 200,
-                            "body": "{\"data\":[],\"links\":{\"first\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/pipeline-stages?page=1\",\"last\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/pipeline-stages?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"from\":null,\"last_page\":1,\"links\":[{\"url\":null,\"label\":\"&laquo; Previous\",\"active\":false},{\"url\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/pipeline-stages?page=1\",\"label\":\"1\",\"active\":true},{\"url\":null,\"label\":\"Next &raquo;\",\"active\":false}],\"path\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/pipeline-stages\",\"per_page\":25,\"to\":null,\"total\":0}}",
+                            "body": "{\"data\":[{\"id\":31,\"sales_pipeline_id\":58,\"name\":\"dolores\",\"position\":5,\"is_closed\":0,\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"},{\"id\":32,\"sales_pipeline_id\":59,\"name\":\"quas\",\"position\":4,\"is_closed\":0,\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"}]}",
                             "name": ""
                         }
                     ]
@@ -1997,7 +1984,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"sales_pipeline_id\":\"consequatur\",\"name\":\"mqeopfuudtdsufvyvddqa\",\"position\":17,\"is_closed\":true}"
+                            "raw": "{\"sales_pipeline_id\":\"consequatur\",\"name\":\"mqeopfuudtdsufvyvddqa\",\"position\":17,\"is_closed\":false}"
                         },
                         "description": ""
                     },
@@ -2049,22 +2036,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 404,
-                            "body": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\PipelineStage] 17\"\n}",
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":33,\"sales_pipeline_id\":60,\"name\":\"molestias\",\"position\":3,\"is_closed\":0,\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -2099,7 +2073,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"sales_pipeline_id\":\"consequatur\",\"name\":\"mqeopfuudtdsufvyvddqa\",\"position\":17,\"is_closed\":false}"
+                            "raw": "{\"sales_pipeline_id\":\"consequatur\",\"name\":\"mqeopfuudtdsufvyvddqa\",\"position\":17,\"is_closed\":true}"
                         },
                         "description": ""
                     },
@@ -2190,22 +2164,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
+                            "header": [],
                             "code": 200,
-                            "body": "{\"data\":[{\"id\":1,\"code\":\"TR11\",\"barcode\":\"7986298486210\",\"name\":\"Near Low Stock Capacitor\",\"stock_quantity\":44,\"low_stock_threshold\":10,\"price\":600,\"selling_price\":1100,\"category_id\":2,\"units_id\":1,\"supplier_id\":3,\"description\":\"Capacitor close to low stock\",\"warehouse_id\":2,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":false,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\",\"warehouse\":{\"id\":2,\"name\":\"Gudang Surabaya\",\"address\":\"Jl. Ahmad Yani No. 50, Surabaya\",\"description\":\"Gudang cabang di Jawa Timur.\",\"is_main\":0,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":2,\"name\":\"FBT\",\"description\":\"Flyback\",\"parent_id\":null,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"supplier\":{\"id\":3,\"code\":\"SUP003\",\"name\":\"Tokyo Electronics Ltd.\",\"address\":\"Shinjuku-ku, Tokyo, Japan\",\"phone_number\":\"+81-3-1234-5678\",\"location\":\"OUT\",\"payment_terms\":\"15\",\"email\":\"tokyo.electronics@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"unit\":{\"id\":1,\"name\":\"Pieces\",\"symbol\":\"PCS\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}},{\"id\":2,\"code\":\"TR12\",\"barcode\":\"4819617615387\",\"name\":\"Expired Diode\",\"stock_quantity\":50,\"low_stock_threshold\":10,\"price\":180,\"selling_price\":350,\"category_id\":2,\"units_id\":1,\"supplier_id\":2,\"description\":\"Diode product already expired\",\"warehouse_id\":2,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":true,\"created_at\":\"2025-05-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\",\"warehouse\":{\"id\":2,\"name\":\"Gudang Surabaya\",\"address\":\"Jl. Ahmad Yani No. 50, Surabaya\",\"description\":\"Gudang cabang di Jawa Timur.\",\"is_main\":0,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":2,\"name\":\"FBT\",\"description\":\"Flyback\",\"parent_id\":null,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"supplier\":{\"id\":2,\"code\":\"SUP002\",\"name\":\"CV. Sumber Rejeki\",\"address\":\"Jl. Rajawali No. 12, Bandung\",\"phone_number\":\"0227654321\",\"location\":\"IN\",\"payment_terms\":\"45\",\"email\":\"sumber.rejeki@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"unit\":{\"id\":1,\"name\":\"Pieces\",\"symbol\":\"PCS\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}},{\"id\":3,\"code\":\"TR13\",\"barcode\":\"8381563189398\",\"name\":\"Near Expiry Crystal Oscillator\",\"stock_quantity\":55,\"low_stock_threshold\":20,\"price\":950,\"selling_price\":1700,\"category_id\":3,\"units_id\":3,\"supplier_id\":4,\"description\":\"Crystal oscillator expiring soon\",\"warehouse_id\":3,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":true,\"created_at\":\"2025-09-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\",\"warehouse\":{\"id\":3,\"name\":\"Gudang Bandung\",\"address\":\"Jl. Pasteur No. 23, Bandung\",\"description\":\"Gudang cabang untuk area Jawa Barat.\",\"is_main\":0,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":3,\"name\":\"IC\",\"description\":\"Integrated Circuit\",\"parent_id\":null,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"supplier\":{\"id\":4,\"code\":\"SUP004\",\"name\":\"PT. Surya Mandiri\",\"address\":\"Jl. Ahmad Yani No. 22, Surabaya\",\"phone_number\":\"0318889988\",\"location\":\"IN\",\"payment_terms\":\"45\",\"email\":\"surya.mandiri@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"unit\":{\"id\":3,\"name\":\"Meters\",\"symbol\":\"M\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}},{\"id\":4,\"code\":\"TR14\",\"barcode\":\"9107410836319\",\"name\":\"Low Stock LED\",\"stock_quantity\":12,\"low_stock_threshold\":5,\"price\":90,\"selling_price\":160,\"category_id\":1,\"units_id\":2,\"supplier_id\":3,\"description\":\"LED near expiry and low stock\",\"warehouse_id\":1,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":true,\"created_at\":\"2025-10-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\",\"warehouse\":{\"id\":1,\"name\":\"Gudang Utama Jakarta\",\"address\":\"Jl. Raya Cakung No. 10, Jakarta Timur\",\"description\":\"Gudang utama untuk distribusi pusat.\",\"is_main\":1,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":1,\"name\":\"TR\",\"description\":\"Transistor\",\"parent_id\":null,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"supplier\":{\"id\":3,\"code\":\"SUP003\",\"name\":\"Tokyo Electronics Ltd.\",\"address\":\"Shinjuku-ku, Tokyo, Japan\",\"phone_number\":\"+81-3-1234-5678\",\"location\":\"OUT\",\"payment_terms\":\"15\",\"email\":\"tokyo.electronics@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"unit\":{\"id\":2,\"name\":\"Roll\",\"symbol\":\"Roll\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}},{\"id\":5,\"code\":\"TR15\",\"barcode\":\"5112846880205\",\"name\":\"Expired Voltage Regulator\",\"stock_quantity\":16,\"low_stock_threshold\":10,\"price\":1400,\"selling_price\":2600,\"category_id\":1,\"units_id\":1,\"supplier_id\":4,\"description\":\"Voltage regulator expired long ago\",\"warehouse_id\":2,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":true,\"created_at\":\"2024-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\",\"warehouse\":{\"id\":2,\"name\":\"Gudang Surabaya\",\"address\":\"Jl. Ahmad Yani No. 50, Surabaya\",\"description\":\"Gudang cabang di Jawa Timur.\",\"is_main\":0,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":1,\"name\":\"TR\",\"description\":\"Transistor\",\"parent_id\":null,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"supplier\":{\"id\":4,\"code\":\"SUP004\",\"name\":\"PT. Surya Mandiri\",\"address\":\"Jl. Ahmad Yani No. 22, Surabaya\",\"phone_number\":\"0318889988\",\"location\":\"IN\",\"payment_terms\":\"45\",\"email\":\"surya.mandiri@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"unit\":{\"id\":1,\"name\":\"Pieces\",\"symbol\":\"PCS\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}},{\"id\":6,\"code\":\"TR11\",\"barcode\":\"5089614188767\",\"name\":\"Near Low Stock Capacitor\",\"stock_quantity\":19,\"low_stock_threshold\":10,\"price\":600,\"selling_price\":1100,\"category_id\":6,\"units_id\":3,\"supplier_id\":9,\"description\":\"Capacitor close to low stock\",\"warehouse_id\":2,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":false,\"created_at\":\"2025-11-20T14:30:03.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\",\"warehouse\":{\"id\":2,\"name\":\"Gudang Surabaya\",\"address\":\"Jl. Ahmad Yani No. 50, Surabaya\",\"description\":\"Gudang cabang di Jawa Timur.\",\"is_main\":0,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":6,\"name\":\"IC\",\"description\":\"Integrated Circuit\",\"parent_id\":null,\"created_at\":\"2025-11-20T14:30:03.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"supplier\":{\"id\":9,\"code\":\"SUP004\",\"name\":\"PT. Surya Mandiri\",\"address\":\"Jl. Ahmad Yani No. 22, Surabaya\",\"phone_number\":\"0318889988\",\"location\":\"IN\",\"payment_terms\":\"45\",\"email\":\"surya.mandiri@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T14:30:03.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"unit\":{\"id\":3,\"name\":\"Meters\",\"symbol\":\"M\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}},{\"id\":7,\"code\":\"TR12\",\"barcode\":\"3779775320282\",\"name\":\"Expired Diode\",\"stock_quantity\":46,\"low_stock_threshold\":10,\"price\":180,\"selling_price\":350,\"category_id\":4,\"units_id\":3,\"supplier_id\":3,\"description\":\"Diode product already expired\",\"warehouse_id\":1,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":true,\"created_at\":\"2025-05-20T14:30:03.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\",\"warehouse\":{\"id\":1,\"name\":\"Gudang Utama Jakarta\",\"address\":\"Jl. Raya Cakung No. 10, Jakarta Timur\",\"description\":\"Gudang utama untuk distribusi pusat.\",\"is_main\":1,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":4,\"name\":\"TR\",\"description\":\"Transistor\",\"parent_id\":null,\"created_at\":\"2025-11-20T14:30:03.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"supplier\":{\"id\":3,\"code\":\"SUP003\",\"name\":\"Tokyo Electronics Ltd.\",\"address\":\"Shinjuku-ku, Tokyo, Japan\",\"phone_number\":\"+81-3-1234-5678\",\"location\":\"OUT\",\"payment_terms\":\"15\",\"email\":\"tokyo.electronics@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"unit\":{\"id\":3,\"name\":\"Meters\",\"symbol\":\"M\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}},{\"id\":8,\"code\":\"TR13\",\"barcode\":\"3148624359009\",\"name\":\"Near Expiry Crystal Oscillator\",\"stock_quantity\":53,\"low_stock_threshold\":20,\"price\":950,\"selling_price\":1700,\"category_id\":1,\"units_id\":1,\"supplier_id\":4,\"description\":\"Crystal oscillator expiring soon\",\"warehouse_id\":2,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":true,\"created_at\":\"2025-09-20T14:30:03.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\",\"warehouse\":{\"id\":2,\"name\":\"Gudang Surabaya\",\"address\":\"Jl. Ahmad Yani No. 50, Surabaya\",\"description\":\"Gudang cabang di Jawa Timur.\",\"is_main\":0,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":1,\"name\":\"TR\",\"description\":\"Transistor\",\"parent_id\":null,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"supplier\":{\"id\":4,\"code\":\"SUP004\",\"name\":\"PT. Surya Mandiri\",\"address\":\"Jl. Ahmad Yani No. 22, Surabaya\",\"phone_number\":\"0318889988\",\"location\":\"IN\",\"payment_terms\":\"45\",\"email\":\"surya.mandiri@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"unit\":{\"id\":1,\"name\":\"Pieces\",\"symbol\":\"PCS\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}},{\"id\":9,\"code\":\"TR14\",\"barcode\":\"2740660386479\",\"name\":\"Low Stock LED\",\"stock_quantity\":17,\"low_stock_threshold\":5,\"price\":90,\"selling_price\":160,\"category_id\":6,\"units_id\":2,\"supplier_id\":4,\"description\":\"LED near expiry and low stock\",\"warehouse_id\":1,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":true,\"created_at\":\"2025-10-20T14:30:03.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\",\"warehouse\":{\"id\":1,\"name\":\"Gudang Utama Jakarta\",\"address\":\"Jl. Raya Cakung No. 10, Jakarta Timur\",\"description\":\"Gudang utama untuk distribusi pusat.\",\"is_main\":1,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":6,\"name\":\"IC\",\"description\":\"Integrated Circuit\",\"parent_id\":null,\"created_at\":\"2025-11-20T14:30:03.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"supplier\":{\"id\":4,\"code\":\"SUP004\",\"name\":\"PT. Surya Mandiri\",\"address\":\"Jl. Ahmad Yani No. 22, Surabaya\",\"phone_number\":\"0318889988\",\"location\":\"IN\",\"payment_terms\":\"45\",\"email\":\"surya.mandiri@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"unit\":{\"id\":2,\"name\":\"Roll\",\"symbol\":\"Roll\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}},{\"id\":10,\"code\":\"TR15\",\"barcode\":\"3867088010591\",\"name\":\"Expired Voltage Regulator\",\"stock_quantity\":1,\"low_stock_threshold\":10,\"price\":1400,\"selling_price\":2600,\"category_id\":1,\"units_id\":3,\"supplier_id\":6,\"description\":\"Voltage regulator expired long ago\",\"warehouse_id\":2,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":true,\"created_at\":\"2024-11-20T14:30:03.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\",\"warehouse\":{\"id\":2,\"name\":\"Gudang Surabaya\",\"address\":\"Jl. Ahmad Yani No. 50, Surabaya\",\"description\":\"Gudang cabang di Jawa Timur.\",\"is_main\":0,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":1,\"name\":\"TR\",\"description\":\"Transistor\",\"parent_id\":null,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"supplier\":{\"id\":6,\"code\":\"SUP001\",\"name\":\"PT. Elektronika Nusantara\",\"address\":\"Jl. Raya Bekasi No. 45, Jakarta Timur\",\"phone_number\":\"0218887766\",\"location\":\"IN\",\"payment_terms\":\"30\",\"email\":\"elektronika.nusantara@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T14:30:03.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"unit\":{\"id\":3,\"name\":\"Meters\",\"symbol\":\"M\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}}],\"links\":{\"first\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/products?page=1\",\"last\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/products?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"from\":1,\"last_page\":1,\"links\":[{\"url\":null,\"label\":\"&laquo; Previous\",\"active\":false},{\"url\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/products?page=1\",\"label\":\"1\",\"active\":true},{\"url\":null,\"label\":\"Next &raquo;\",\"active\":false}],\"path\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/products\",\"per_page\":25,\"to\":10,\"total\":10}}",
+                            "body": "{\"data\":[{\"id\":80,\"code\":\"49546606\",\"barcode\":\"5086512083132\",\"name\":\"sit\",\"stock_quantity\":13,\"low_stock_threshold\":8,\"price\":50805.2300000000032014213502407073974609375,\"selling_price\":67235.39999999999417923390865325927734375,\"category_id\":76,\"units_id\":73,\"supplier_id\":104,\"description\":\"Sed fuga aspernatur natus earum.\",\"warehouse_id\":73,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":false,\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"},{\"id\":81,\"code\":\"53065544\",\"barcode\":\"2061787130685\",\"name\":\"perferendis\",\"stock_quantity\":969,\"low_stock_threshold\":19,\"price\":38165.08999999999650754034519195556640625,\"selling_price\":72496.9299999999930150806903839111328125,\"category_id\":77,\"units_id\":74,\"supplier_id\":105,\"description\":\"A debitis autem eveniet quis labore vel.\",\"warehouse_id\":74,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":false,\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"}]}",
                             "name": ""
                         }
                     ]
@@ -2239,14 +2200,8 @@
                     "response": [
                         {
                             "header": [],
-                            "code": 201,
-                            "body": "{\n \"data\": {\n     \"id\": 1,\n     \"name\": \"Laptop Pro\",\n     \"code\": \"LP-001\",\n     \"price\": 1200.50,\n     \"selling_price\": 1499.99,\n     \"stock_quantity\": 50,\n     \"description\": \"A powerful new laptop.\",\n     \"category\": { ... },\n     \"supplier\": { ... },\n     \"unit\": { ... },\n     \"warehouse\": { ... }\n }\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 422,
-                            "body": "{ \"message\": \"The given data was invalid.\", \"errors\": { ... } }",
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":82,\"code\":\"13579081\",\"barcode\":\"7319228631501\",\"name\":\"quisquam\",\"stock_quantity\":314,\"low_stock_threshold\":9,\"price\":50051.139999999999417923390865325927734375,\"selling_price\":77034.699999999997089616954326629638671875,\"category_id\":78,\"units_id\":75,\"supplier_id\":106,\"description\":\"Sed vel a quo sed fugit facilis perferendis.\",\"warehouse_id\":75,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":true,\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -2290,22 +2245,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
+                            "header": [],
                             "code": 200,
-                            "body": "{\"data\":{\"id\":1,\"code\":\"TR11\",\"barcode\":\"7986298486210\",\"name\":\"Near Low Stock Capacitor\",\"stock_quantity\":44,\"low_stock_threshold\":10,\"price\":600,\"selling_price\":1100,\"category_id\":2,\"units_id\":1,\"supplier_id\":3,\"description\":\"Capacitor close to low stock\",\"warehouse_id\":2,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":false,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\",\"warehouse\":{\"id\":2,\"name\":\"Gudang Surabaya\",\"address\":\"Jl. Ahmad Yani No. 50, Surabaya\",\"description\":\"Gudang cabang di Jawa Timur.\",\"is_main\":0,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T14:30:03.000000Z\"},\"category\":{\"id\":2,\"name\":\"FBT\",\"description\":\"Flyback\",\"parent_id\":null,\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"supplier\":{\"id\":3,\"code\":\"SUP003\",\"name\":\"Tokyo Electronics Ltd.\",\"address\":\"Shinjuku-ku, Tokyo, Japan\",\"phone_number\":\"+81-3-1234-5678\",\"location\":\"OUT\",\"payment_terms\":\"15\",\"email\":\"tokyo.electronics@example.com\",\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"},\"unit\":{\"id\":1,\"name\":\"Pieces\",\"symbol\":\"PCS\",\"created_at\":\"2025-11-20T09:16:25.000000Z\",\"updated_at\":\"2025-11-20T09:16:25.000000Z\"}}}",
+                            "body": "{\"data\":{\"id\":83,\"code\":\"50865123\",\"barcode\":\"3139729293312\",\"name\":\"veniam\",\"stock_quantity\":982,\"low_stock_threshold\":9,\"price\":44823.5999999999985448084771633148193359375,\"selling_price\":3544.6199999999998908606357872486114501953125,\"category_id\":79,\"units_id\":76,\"supplier_id\":107,\"description\":\"Fuga aspernatur natus earum quas.\",\"warehouse_id\":76,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":true,\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -2354,13 +2296,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n \"data\": {\n     \"id\": 1,\n     \"name\": \"Laptop Pro v2\",\n     \"code\": \"LP-001\",\n     \"price\": 1250.00,\n     ...\n }\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 422,
-                            "body": "{ \"message\": \"The given data was invalid.\", \"errors\": { ... } }",
+                            "body": "{\"data\":{\"id\":84,\"code\":\"81079872\",\"barcode\":\"4976636666223\",\"name\":\"amet\",\"stock_quantity\":202,\"low_stock_threshold\":20,\"price\":72279.6900000000023283064365386962890625,\"selling_price\":119994.080000000001746229827404022216796875,\"category_id\":80,\"units_id\":77,\"supplier_id\":108,\"description\":\"Laborum eius est dolor dolores minus voluptatem.\",\"warehouse_id\":77,\"image\":\"http:\\\/\\\/localhost:8000\\\/img\\\/default_placeholder.png\",\"has_expiry\":false,\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -2406,14 +2342,8 @@
                         {
                             "header": [],
                             "code": 204,
-                            "body": "\"\"",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 404,
-                            "body": "{ \"message\": \"Not Found.\" }",
-                            "name": ""
+                            "body": "",
+                            "name": "Success"
                         }
                     ]
                 }
@@ -2457,26 +2387,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n    \"data\": [\n        {\n            \"id\": 1,\n            \"po_id\": 1,\n            \"product_id\": 1,\n            \"quantity\": 10,\n            \"price\": \"100.00\",\n            \"discount\": \"0.00\",\n            \"discount_type\": \"fixed\",\n            \"total\": \"1000.00\",\n            \"expiry_date\": null,\n            \"remaining_quantity\": 10,\n            \"created_at\": \"2025-11-21T08:30:00.000000Z\",\n            \"updated_at\": \"2025-11-21T08:30:00.000000Z\"\n        }\n    ],\n    \"links\": {\n        \"first\": \"\/api\/v1\/po-items?page=1\",\n        \"last\": \"\/api\/v1\/po-items?page=1\",\n        \"prev\": null,\n        \"next\": null\n    },\n    \"meta\": {\n        \"current_page\": 1,\n        \"from\": 1,\n        \"last_page\": 1,\n        \"path\": \"\/api\/v1\/po-items\",\n        \"per_page\": 15,\n        \"to\": 1,\n        \"total\": 1\n    }\n}",
-                            "name": "OK"
-                        },
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 500,
-                            "body": "{\n    \"message\": \"Server Error\"\n}",
+                            "body": "{\"data\":[{\"id\":56,\"po_id\":42,\"product_id\":77,\"quantity\":50,\"remaining_quantity\":50,\"price\":\"106.64\",\"discount\":\"2.85\",\"discount_type\":\"fixed\",\"total\":5332,\"expiry_date\":\"2026-03-22\",\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"},{\"id\":57,\"po_id\":43,\"product_id\":78,\"quantity\":63,\"remaining_quantity\":63,\"price\":\"42.04\",\"discount\":\"1.59\",\"discount_type\":\"fixed\",\"total\":2648.51999999999998181010596454143524169921875,\"expiry_date\":null,\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"}]}",
                             "name": ""
                         }
                     ]
@@ -2503,7 +2414,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"po_id\":\"consequatur\",\"product_id\":\"consequatur\",\"quantity\":11613.31890586000008624978363513946533203125,\"price\":11613.31890586000008624978363513946533203125,\"discount\":11613.31890586000008624978363513946533203125,\"discount_type\":\"consequatur\",\"total\":11613.31890586000008624978363513946533203125,\"expiry_date\":\"2025-11-21T05:52:55\",\"remaining_quantity\":11613.31890586000008624978363513946533203125}"
+                            "raw": "{\"po_id\":\"consequatur\",\"product_id\":\"consequatur\",\"quantity\":11613.31890586000008624978363513946533203125,\"price\":11613.31890586000008624978363513946533203125,\"discount\":11613.31890586000008624978363513946533203125,\"discount_type\":\"consequatur\",\"total\":11613.31890586000008624978363513946533203125,\"expiry_date\":\"2025-11-21T06:50:03\",\"remaining_quantity\":11613.31890586000008624978363513946533203125}"
                         },
                         "description": ""
                     },
@@ -2557,26 +2468,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n    \"id\": 1,\n    \"po_id\": 1,\n    \"product_id\": 1,\n    \"quantity\": 10,\n    \"price\": \"100.00\",\n    \"discount\": \"0.00\",\n    \"discount_type\": \"fixed\",\n    \"total\": \"1000.00\",\n    \"expiry_date\": null,\n    \"remaining_quantity\": 10,\n    \"created_at\": \"2025-11-21T08:30:00.000000Z\",\n    \"updated_at\": \"2025-11-21T08:30:00.000000Z\"\n}",
-                            "name": "OK"
-                        },
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 500,
-                            "body": "{\n    \"message\": \"Server Error\"\n}",
+                            "body": "{\"data\":{\"id\":58,\"po_id\":44,\"product_id\":79,\"quantity\":50,\"remaining_quantity\":50,\"price\":\"106.64\",\"discount\":\"2.85\",\"discount_type\":\"fixed\",\"total\":5332,\"expiry_date\":\"2026-03-22\",\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -2611,7 +2503,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"po_id\":\"consequatur\",\"product_id\":\"consequatur\",\"quantity\":11613.31890586000008624978363513946533203125,\"price\":11613.31890586000008624978363513946533203125,\"discount\":11613.31890586000008624978363513946533203125,\"discount_type\":\"consequatur\",\"total\":11613.31890586000008624978363513946533203125,\"expiry_date\":\"2025-11-21T05:52:55\",\"remaining_quantity\":11613.31890586000008624978363513946533203125}"
+                            "raw": "{\"po_id\":\"consequatur\",\"product_id\":\"consequatur\",\"quantity\":11613.31890586000008624978363513946533203125,\"price\":11613.31890586000008624978363513946533203125,\"discount\":11613.31890586000008624978363513946533203125,\"discount_type\":\"consequatur\",\"total\":11613.31890586000008624978363513946533203125,\"expiry_date\":\"2025-11-21T06:50:03\",\"remaining_quantity\":11613.31890586000008624978363513946533203125}"
                         },
                         "description": ""
                     },
@@ -2951,26 +2843,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n    \"data\": [\n        {\n            \"id\": 1,\n            \"name\": \"Admin\",\n            \"created_at\": \"2025-11-21T08:30:00.000000Z\",\n            \"updated_at\": \"2025-11-21T08:30:00.000000Z\"\n        }\n    ],\n    \"links\": {\n        \"first\": \"\/api\/v1\/roles?page=1\",\n        \"last\": \"\/api\/v1\/roles?page=1\",\n        \"prev\": null,\n        \"next\": null\n    },\n    \"meta\": {\n        \"current_page\": 1,\n        \"from\": 1,\n        \"last_page\": 1,\n        \"path\": \"\/api\/v1\/roles\",\n        \"per_page\": 15,\n        \"to\": 1,\n        \"total\": 1\n    }\n}",
-                            "name": "OK"
-                        },
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 500,
-                            "body": "{\n    \"message\": \"Server Error\"\n}",
+                            "body": "{\"data\":[{\"id\":17,\"name\":\"Licensing Examiner and Inspector\",\"guard_name\":\"web\",\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"},{\"id\":18,\"name\":\"Logging Supervisor\",\"guard_name\":\"web\",\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"}]}",
                             "name": ""
                         }
                     ]
@@ -3051,26 +2924,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n    \"id\": 1,\n    \"name\": \"Admin\",\n    \"created_at\": \"2025-11-21T08:30:00.000000Z\",\n    \"updated_at\": \"2025-11-21T08:30:00.000000Z\"\n}",
-                            "name": "OK"
-                        },
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 500,
-                            "body": "{\n    \"message\": \"Server Error\"\n}",
+                            "body": "{\"data\":{\"id\":19,\"name\":\"Licensing Examiner and Inspector\",\"guard_name\":\"web\",\"created_at\":\"2025-11-21T06:50:03.000000Z\",\"updated_at\":\"2025-11-21T06:50:03.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -3210,26 +3064,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n    \"data\": [\n        {\n            \"id\": 1,\n            \"sales_id\": 1,\n            \"product_id\": 1,\n            \"quantity\": 5,\n            \"discount\": \"0.00\",\n            \"discount_type\": \"fixed\",\n            \"customer_price\": \"100.00\",\n            \"total\": \"500.00\",\n            \"created_at\": \"2025-11-21T08:30:00.000000Z\",\n            \"updated_at\": \"2025-11-21T08:30:00.000000Z\"\n        }\n    ],\n    \"links\": {\n        \"first\": \"\/api\/v1\/sales-items?page=1\",\n        \"last\": \"\/api\/v1\/sales-items?page=1\",\n        \"prev\": null,\n        \"next\": null\n    },\n    \"meta\": {\n        \"current_page\": 1,\n        \"from\": 1,\n        \"last_page\": 1,\n        \"path\": \"\/api\/v1\/sales-items\",\n        \"per_page\": 15,\n        \"to\": 1,\n        \"total\": 1\n    }\n}",
-                            "name": "OK"
-                        },
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 500,
-                            "body": "{\n    \"message\": \"Server Error\"\n}",
+                            "body": "{\"data\":[{\"id\":263,\"sales_id\":119,\"product_id\":85,\"quantity\":5,\"discount\":\"0.00\",\"discount_type\":\"fixed\",\"customer_price\":\"35869.89\",\"total\":\"179349.45\",\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"},{\"id\":264,\"sales_id\":120,\"product_id\":86,\"quantity\":6,\"discount\":\"0.00\",\"discount_type\":\"fixed\",\"customer_price\":\"76130.10\",\"total\":\"456780.60\",\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}]}",
                             "name": ""
                         }
                     ]
@@ -3310,26 +3145,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n    \"id\": 1,\n    \"sales_id\": 1,\n    \"product_id\": 1,\n    \"quantity\": 5,\n    \"discount\": \"0.00\",\n    \"discount_type\": \"fixed\",\n    \"customer_price\": \"100.00\",\n    \"total\": \"500.00\",\n    \"created_at\": \"2025-11-21T08:30:00.000000Z\",\n    \"updated_at\": \"2025-11-21T08:30:00.000000Z\"\n}",
-                            "name": "OK"
-                        },
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 500,
-                            "body": "{\n    \"message\": \"Server Error\"\n}",
+                            "body": "{\"data\":{\"id\":265,\"sales_id\":121,\"product_id\":87,\"quantity\":5,\"discount\":\"0.00\",\"discount_type\":\"fixed\",\"customer_price\":\"113755.01\",\"total\":\"568775.05\",\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -3467,22 +3283,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
+                            "header": [],
                             "code": 200,
-                            "body": "{\"data\":[],\"links\":{\"first\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-opportunities?page=1\",\"last\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-opportunities?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"from\":null,\"last_page\":1,\"links\":[{\"url\":null,\"label\":\"&laquo; Previous\",\"active\":false},{\"url\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-opportunities?page=1\",\"label\":\"1\",\"active\":true},{\"url\":null,\"label\":\"Next &raquo;\",\"active\":false}],\"path\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-opportunities\",\"per_page\":25,\"to\":null,\"total\":0}}",
+                            "body": "{\"data\":[{\"id\":19,\"customer_id\":54,\"sales_pipeline_id\":61,\"pipeline_stage_id\":34,\"name\":\"et\",\"description\":\"Cupiditate voluptatibus voluptatibus aperiam.\",\"amount\":\"9027.15\",\"expected_close_date\":\"2026-08-18T00:00:00.000000Z\",\"status\":\"open\",\"sales_id\":null,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"},{\"id\":20,\"customer_id\":55,\"sales_pipeline_id\":63,\"pipeline_stage_id\":35,\"name\":\"a\",\"description\":\"Qui ut aut dolorem non assumenda.\",\"amount\":\"4760.65\",\"expected_close_date\":\"2026-04-17T00:00:00.000000Z\",\"status\":\"open\",\"sales_id\":null,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}]}",
                             "name": ""
                         }
                     ]
@@ -3561,22 +3364,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 404,
-                            "body": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\SalesOpportunity] 17\"\n}",
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":21,\"customer_id\":56,\"sales_pipeline_id\":65,\"pipeline_stage_id\":36,\"name\":\"veniam\",\"description\":\"Fuga aspernatur natus earum quas.\",\"amount\":\"236.31\",\"expected_close_date\":\"2026-05-01T00:00:00.000000Z\",\"status\":\"open\",\"sales_id\":null,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -3714,22 +3504,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
+                            "header": [],
                             "code": 200,
-                            "body": "{\"data\":[],\"links\":{\"first\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-opportunity-items?page=1\",\"last\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-opportunity-items?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"from\":null,\"last_page\":1,\"links\":[{\"url\":null,\"label\":\"&laquo; Previous\",\"active\":false},{\"url\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-opportunity-items?page=1\",\"label\":\"1\",\"active\":true},{\"url\":null,\"label\":\"Next &raquo;\",\"active\":false}],\"path\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-opportunity-items\",\"per_page\":25,\"to\":null,\"total\":0}}",
+                            "body": "{\"data\":[{\"id\":10,\"sales_opportunity_id\":22,\"product_id\":88,\"quantity\":3,\"price\":513.55999999999994543031789362430572509765625,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"},{\"id\":11,\"sales_opportunity_id\":23,\"product_id\":89,\"quantity\":2,\"price\":541.509999999999990905052982270717620849609375,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}]}",
                             "name": ""
                         }
                     ]
@@ -3808,22 +3585,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 404,
-                            "body": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\SalesOpportunityItem] 17\"\n}",
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":12,\"sales_opportunity_id\":24,\"product_id\":90,\"quantity\":3,\"price\":513.55999999999994543031789362430572509765625,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -4208,22 +3972,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
+                            "header": [],
                             "code": 200,
-                            "body": "{\"data\":[],\"links\":{\"first\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-pipelines?page=1\",\"last\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-pipelines?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"from\":null,\"last_page\":1,\"links\":[{\"url\":null,\"label\":\"&laquo; Previous\",\"active\":false},{\"url\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-pipelines?page=1\",\"label\":\"1\",\"active\":true},{\"url\":null,\"label\":\"Next &raquo;\",\"active\":false}],\"path\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/sales-pipelines\",\"per_page\":25,\"to\":null,\"total\":0}}",
+                            "body": "{\"data\":[{\"id\":73,\"name\":\"aspernatur\",\"description\":\"Earum quas dignissimos perferendis voluptatibus incidunt nostrum.\",\"is_default\":0,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"},{\"id\":74,\"name\":\"possimus\",\"description\":\"Id et necessitatibus architecto aut consequatur debitis.\",\"is_default\":0,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}]}",
                             "name": ""
                         }
                     ]
@@ -4302,22 +4053,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 404,
-                            "body": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\SalesPipeline] 17\"\n}",
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":75,\"name\":\"natus\",\"description\":\"Quas dignissimos perferendis voluptatibus incidunt nostrum quia possimus rerum.\",\"is_default\":0,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -4455,22 +4193,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
+                            "header": [],
                             "code": 200,
-                            "body": "{\"data\":[],\"links\":{\"first\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/stock-adjustments?page=1\",\"last\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/stock-adjustments?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"from\":null,\"last_page\":1,\"links\":[{\"url\":null,\"label\":\"&laquo; Previous\",\"active\":false},{\"url\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/stock-adjustments?page=1\",\"label\":\"1\",\"active\":true},{\"url\":null,\"label\":\"Next &raquo;\",\"active\":false}],\"path\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/stock-adjustments\",\"per_page\":25,\"to\":null,\"total\":0}}",
+                            "body": "{\"data\":[{\"id\":10,\"product_id\":91,\"adjustment_type\":\"increase\",\"quantity_before\":150,\"quantity_after\":161,\"adjustment_amount\":11,\"reason\":\"Veniam sed fuga aspernatur natus earum.\",\"adjusted_by\":33,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"},{\"id\":11,\"product_id\":92,\"adjustment_type\":\"decrease\",\"quantity_before\":188,\"quantity_after\":181,\"adjustment_amount\":7,\"reason\":\"Id tempore voluptate sit rem quia odit aut.\",\"adjusted_by\":34,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}]}",
                             "name": ""
                         }
                     ]
@@ -4549,22 +4274,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 404,
-                            "body": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\StockAdjustment] 17\"\n}",
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":12,\"product_id\":93,\"adjustment_type\":\"increase\",\"quantity_before\":150,\"quantity_after\":161,\"adjustment_amount\":11,\"reason\":\"Veniam sed fuga aspernatur natus earum.\",\"adjusted_by\":35,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}}",
                             "name": ""
                         }
                     ]
@@ -5196,22 +4908,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
+                            "header": [],
                             "code": 200,
-                            "body": "{\"data\":[],\"links\":{\"first\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/taxes?page=1\",\"last\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/taxes?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"from\":null,\"last_page\":1,\"links\":[{\"url\":null,\"label\":\"&laquo; Previous\",\"active\":false},{\"url\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/taxes?page=1\",\"label\":\"1\",\"active\":true},{\"url\":null,\"label\":\"Next &raquo;\",\"active\":false}],\"path\":\"http:\\\/\\\/localhost:8000\\\/api\\\/v1\\\/taxes\",\"per_page\":25,\"to\":null,\"total\":0}}",
+                            "body": "{\"data\":[{\"id\":10,\"name\":\"dolores\",\"rate\":\"10.17\",\"is_active\":1,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"},{\"id\":11,\"name\":\"sit\",\"rate\":\"5.69\",\"is_active\":1,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}]}",
                             "name": ""
                         }
                     ]
@@ -5290,22 +4989,9 @@
                     },
                     "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "access-control-allow-origin",
-                                    "value": "*"
-                                }
-                            ],
-                            "code": 404,
-                            "body": "{\n    \"message\": \"No query results for model [App\\\\Models\\\\Tax] 17\"\n}",
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":12,\"name\":\"dolores\",\"rate\":\"10.17\",\"is_active\":1,\"created_at\":\"2025-11-21T06:50:04.000000Z\",\"updated_at\":\"2025-11-21T06:50:04.000000Z\"}}",
                             "name": ""
                         }
                     ]

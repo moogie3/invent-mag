@@ -18,6 +18,9 @@ class RoleController extends Controller
      * Display a listing of the roles.
      *
      * @queryParam per_page int The number of roles to return per page. Defaults to 15. Example: 25
+     *
+     * @apiResourceCollection App\Http\Resources\RoleResource
+     * @apiResourceModel App\Models\Role
      */
     public function index(Request $request)
     {
@@ -55,6 +58,9 @@ class RoleController extends Controller
      * Display the specified role.
      *
      * @urlParam role required The ID of the role. Example: 1
+     *
+     * @apiResource App\Http\Resources\RoleResource
+     * @apiResourceModel App\Models\Role
      */
     public function show(Role $role)
     {

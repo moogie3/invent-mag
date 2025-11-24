@@ -3,92 +3,63 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PipelineStageResource;
 use App\Models\PipelineStage;
+use App\Services\SalesPipelineService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 /**
- * @group Pipeline Stages
+ * @group Sales Pipeline Stages
  *
- * APIs for managing pipeline stages
+ * APIs for managing individual pipeline stages
  */
 class PipelineStageController extends Controller
 {
-    /**
-     * Display a listing of the pipeline stages.
-     *
-     * @queryParam per_page int The number of stages to return per page. Defaults to 15. Example: 25
-     *
-     * @apiResourceCollection App\Http\Resources\PipelineStageResource
-     * @apiResourceModel App\Models\PipelineStage
-     */
-    public function index(Request $request)
+    protected $salesPipelineService;
+
+    public function __construct(SalesPipelineService $salesPipelineService)
     {
-        $perPage = $request->query('per_page', 15);
-        $stages = PipelineStage::with('pipeline')->paginate($perPage);
-        return PipelineStageResource::collection($stages);
+        $this->salesPipelineService = $salesPipelineService;
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Sales Pipeline Stages
+     * @title Update a Pipeline Stage
+     * @urlParam stage integer required The ID of the pipeline stage to update. Example: 1
+     * @bodyParam name string required The new name of the stage. Example: "Negotiation"
+     * @bodyParam position integer required The new position of the stage. Example: 1
+     * @bodyParam is_closed boolean Whether this stage represents a closed state. Example: false
      *
-     * @response 201 scenario="Success"
+     * @response {
+     *  "id": 1,
+     *  "name": "Negotiation",
+     *  ...
+     * }
      */
-    public function store(Request $request)
+    public function update(Request $request, PipelineStage $stage)
     {
-        $validated = $request->validate([
-            'sales_pipeline_id' => 'required|exists:sales_pipelines,id',
-            'name' => 'required|string|max:255',
-            'position' => 'required|integer',
-            'is_closed' => 'required|boolean',
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', Rule::unique('pipeline_stages')->ignore($stage->id)->where(function ($query) use ($stage) {
+                return $query->where('sales_pipeline_id', $stage->sales_pipeline_id);
+            })],
+            'position' => 'required|integer|min:0',
+            'is_closed' => 'boolean',
         ]);
 
-        $pipeline_stage = PipelineStage::create($validated);
-
-        return new PipelineStageResource($pipeline_stage);
+        $stage = $this->salesPipelineService->updateStage($stage, $request->all());
+        return response()->json($stage);
     }
 
     /**
-     * Display the specified pipeline stage.
+     * @group Sales Pipeline Stages
+     * @title Delete a Pipeline Stage
+     * @urlParam stage integer required The ID of the pipeline stage to delete. Example: 1
      *
-     * @urlParam pipeline_stage required The ID of the pipeline stage. Example: 1
-     *
-     * @apiResource App\Http\Resources\PipelineStageResource
-     * @apiResourceModel App\Models\PipelineStage
+     * @response 204
      */
-    public function show(PipelineStage $pipeline_stage)
+    public function destroy(PipelineStage $stage)
     {
-        return new PipelineStageResource($pipeline_stage->load('pipeline'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @response 200 scenario="Success"
-     */
-    public function update(Request $request, PipelineStage $pipeline_stage)
-    {
-        $validated = $request->validate([
-            'sales_pipeline_id' => 'required|exists:sales_pipelines,id',
-            'name' => 'required|string|max:255',
-            'position' => 'required|integer',
-            'is_closed' => 'required|boolean',
-        ]);
-
-        $pipeline_stage->update($validated);
-
-        return new PipelineStageResource($pipeline_stage);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @response 204 scenario="Success"
-     */
-    public function destroy(PipelineStage $pipeline_stage)
-    {
-        $pipeline_stage->delete();
-
+        $this->salesPipelineService->deleteStage($stage);
         return response()->noContent();
     }
 }

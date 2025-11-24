@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PurchaseResource;
 use App\Models\Purchase;
+use App\Services\PurchaseService;
 use Illuminate\Http\Request;
 
 /**
@@ -14,6 +15,13 @@ use Illuminate\Http\Request;
  */
 class PurchaseController extends Controller
 {
+    protected $purchaseService;
+
+    public function __construct(PurchaseService $purchaseService)
+    {
+        $this->purchaseService = $purchaseService;
+    }
+
     /**
      * Display a listing of the purchase orders.
      *
@@ -159,5 +167,132 @@ class PurchaseController extends Controller
         $purchase->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * @group Purchase Orders
+     * @title Get Expiring Soon Purchases
+     * @response {
+     *  "data": []
+     * }
+     */
+    public function getExpiringSoonPurchases()
+    {
+        $expiringPurchases = $this->purchaseService->getExpiringPurchases();
+        return response()->json($expiringPurchases);
+    }
+
+    /**
+     * @group Purchase Orders
+     * @title Add Payment to Purchase Order
+     * @urlParam id integer required The ID of the purchase order. Example: 1
+     * @bodyParam amount number required The payment amount. Example: 100.00
+     * @bodyParam payment_date date required The date of the payment. Example: "2023-10-27"
+     * @bodyParam payment_method string required The method of payment. Example: "Bank Transfer"
+     * @bodyParam notes string nullable Any notes about the payment.
+     *
+     * @response {
+     *  "success": true,
+     *  "message": "Payment added successfully."
+     * }
+     */
+    public function addPayment(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'payment_date' => 'required|date',
+            'payment_method' => 'required|string',
+            'notes' => 'nullable|string',
+        ]);
+
+        try {
+            $purchase = Purchase::findOrFail($id);
+            $this->purchaseService->addPayment($purchase, $request->all());
+            return response()->json(['success' => true, 'message' => 'Payment added successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Something went wrong: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * @group Purchase Orders
+     * @title Get Purchase Metrics
+     * @response {
+     *  "total_purchases": 50,
+     *  "total_paid": 25000,
+     *  "total_due": 5000
+     * }
+     */
+    public function getPurchaseMetrics()
+    {
+        $metrics = $this->purchaseService->getPurchaseMetrics();
+        return response()->json($metrics);
+    }
+
+    /**
+     * @group Purchase Orders
+     * @title Bulk Delete Purchase Orders
+     * @bodyParam ids array required An array of purchase order IDs to delete. Example: [1, 2, 3]
+     * @bodyParam ids.* integer required A purchase order ID.
+     *
+     * @response {
+     *  "success": true,
+     *  "message": "Successfully deleted purchase order(s)"
+     * }
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:po,id',
+        ]);
+
+        try {
+            $this->purchaseService->bulkDeletePurchases($request->ids);
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully deleted purchase order(s)",
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting purchase orders. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    /**
+     * @group Purchase Orders
+     * @title Bulk Mark Purchase Orders as Paid
+     * @bodyParam ids array required An array of purchase order IDs to mark as paid. Example: [1, 2, 3]
+     * @bodyParam ids.* integer required A purchase order ID.
+     *
+     * @response {
+     *  "success": true,
+     *  "message": "Successfully marked 3 purchase order(s) as paid.",
+     *  "updated_count": 3
+     * }
+     */
+    public function bulkMarkPaid(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:po,id',
+        ]);
+
+        try {
+            $updatedCount = $this->purchaseService->bulkMarkPaid($request->ids);
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully marked {$updatedCount} purchase order(s) as paid.",
+                'updated_count' => $updatedCount,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating purchase orders.',
+            ], 500);
+        }
     }
 }

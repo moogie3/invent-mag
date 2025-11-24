@@ -118,4 +118,18 @@ class TaxController extends Controller
 
         return response()->noContent();
     }
+
+    /**
+     * @group Taxes
+     * @title Get Active Tax Rate
+     *
+     * @response {
+     *  "tax_rate": 0.1
+     * }
+     */
+    public function getActiveTax()
+    {
+        $tax = \App\Models\Tax::where('is_active', 1)->first();
+        return response()->json(['tax_rate' => $tax ? $tax->rate : 0]);
+    }
 }

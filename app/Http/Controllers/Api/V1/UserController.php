@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 /**
  * @group Users
@@ -151,5 +153,32 @@ class UserController extends Controller
         $user->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * @group Users
+     * @title Get All Roles and Permissions
+     * @response {
+     *  "rolePermissions": {
+     *      "admin": ["edit articles", "delete articles"],
+     *      "writer": ["edit articles"]
+     *  },
+     *  "allPermissions": ["edit articles", "delete articles", "publish articles"]
+     * }
+     */
+    public function getRolePermissions()
+    {
+        $roles = Role::with('permissions')->get();
+        $allPermissions = Permission::all()->pluck('name');
+
+        $rolePermissions = [];
+        foreach ($roles as $role) {
+            $rolePermissions[$role->name] = $role->permissions->pluck('name')->toArray();
+        }
+
+        return response()->json([
+            'rolePermissions' => $rolePermissions,
+            'allPermissions' => $allPermissions,
+        ]);
     }
 }

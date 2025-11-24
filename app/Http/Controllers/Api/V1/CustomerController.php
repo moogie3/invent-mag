@@ -7,6 +7,8 @@ use App\Http\Requests\Api\V1\StoreCustomerRequest;
 use App\Http\Requests\Api\V1\UpdateCustomerRequest;
 use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
+use App\Services\CrmService;
+use App\Services\CustomerService;
 use Illuminate\Http\Request;
 
 /**
@@ -16,6 +18,15 @@ use Illuminate\Http\Request;
  */
 class CustomerController extends Controller
 {
+    protected $customerService;
+    protected $crmService;
+
+    public function __construct(CustomerService $customerService, CrmService $crmService)
+    {
+        $this->customerService = $customerService;
+        $this->crmService = $crmService;
+    }
+
     /**
      * Display a listing of the customers.
      *
@@ -101,5 +112,98 @@ class CustomerController extends Controller
     {
         $customer->delete();
         return response()->noContent();
+    }
+
+    /**
+     * @group Customers
+     * @title Quick Create Customer
+     * @bodyParam name string required The name of the customer. Example: "Quick Customer"
+     * @bodyParam email string required The email of the customer. Example: "quick@example.com"
+     * @bodyParam phone_number string required The phone number. Example: "555-555-5555"
+     *
+     * @response {
+     *  "success": true,
+     *  "message": "Customer created successfully",
+     *  "customer": {}
+     * }
+     */
+    public function quickCreate(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:customers,email',
+            'phone_number' => 'required|string|max:255',
+        ]);
+
+        try {
+            $customer = $this->customerService->quickCreateCustomer($request->all());
+            return response()->json([
+                'success' => true,
+                'message' => 'Customer created successfully',
+                'customer' => new CustomerResource($customer),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating customer: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * @group Customers
+     * @title Get Customer Metrics
+     *
+     * @response {
+     *  "total_customers": 100,
+     *  "new_this_month": 5
+     * }
+     */
+    public function getMetrics()
+    {
+        $metrics = $this->customerService->getMetrics();
+        return response()->json($metrics);
+    }
+
+    /**
+     * @group Customers
+     * @title Get Customer Historical Purchases
+     * @urlParam customer integer required The ID of the customer. Example: 1
+     *
+     * @response {
+     *  "success": true,
+     *  "historical_purchases": []
+     * }
+     */
+    public function getHistoricalPurchases(Customer $customer)
+    {
+        try {
+            $historicalPurchases = $this->crmService->getHistoricalPurchases($customer);
+            return response()->json([
+                'success' => true,
+                'historical_purchases' => $historicalPurchases,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to load historical purchases: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * @group Customers
+     * @title Get Customer Product History
+     * @urlParam id integer required The ID of the customer. Example: 1
+     *
+     * @response {
+     *  "data": []
+     * }
+     */
+    public function getProductHistory(Request $request, $id)
+    {
+        try {
+            $productHistory = $this->crmService->getCustomerProductHistory($id);
+            return response()->json($productHistory);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to load product history: ' . $e->getMessage()], 500);
+        }
     }
 }

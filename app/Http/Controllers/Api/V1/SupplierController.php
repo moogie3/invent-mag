@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SupplierResource;
 use App\Models\Supplier;
+use App\Services\CrmService;
+use App\Services\SupplierService;
 use Illuminate\Http\Request;
 
 /**
@@ -14,6 +16,15 @@ use Illuminate\Http\Request;
  */
 class SupplierController extends Controller
 {
+    protected $supplierService;
+    protected $crmService;
+
+    public function __construct(SupplierService $supplierService, CrmService $crmService)
+    {
+        $this->supplierService = $supplierService;
+        $this->crmService = $crmService;
+    }
+
     /**
      * Display a listing of the suppliers.
      *
@@ -147,5 +158,64 @@ class SupplierController extends Controller
         $supplier->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * @group Suppliers
+     * @title Get Supplier Metrics
+     *
+     * @response {
+     *  "total_suppliers": 50,
+     *  "new_this_month": 2
+     * }
+     */
+    public function getMetrics()
+    {
+        $metrics = $this->supplierService->getSupplierMetrics();
+        return response()->json($metrics);
+    }
+
+    /**
+     * @group Suppliers
+     * @title Get Supplier Historical Purchases
+     * @urlParam id integer required The ID of the supplier. Example: 1
+     *
+     * @response {
+     *  "historical_purchases": []
+     * }
+     */
+    public function getHistoricalPurchases(Request $request, $id)
+    {
+        try {
+            $historicalPurchases = $this->crmService->getSupplierHistoricalPurchases($id);
+
+            return response()->json([
+                'historical_purchases' => $historicalPurchases,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to load historical purchases: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * @group Suppliers
+     * @title Get Supplier Product History
+     * @urlParam id integer required The ID of the supplier. Example: 1
+     *
+     * @response {
+     *  "product_history": []
+     * }
+     */
+    public function getProductHistory(Request $request, $id)
+    {
+        try {
+            $productHistory = $this->crmService->getSupplierProductHistory($id);
+
+            return response()->json([
+                'product_history' => $productHistory,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to load product history: ' . $e->getMessage()], 500);
+        }
     }
 }

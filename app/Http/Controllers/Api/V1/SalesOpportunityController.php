@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SalesOpportunityResource;
 use App\Models\SalesOpportunity;
+use App\Services\SalesPipelineService;
 use Illuminate\Http\Request;
 
 /**
@@ -14,6 +15,13 @@ use Illuminate\Http\Request;
  */
 class SalesOpportunityController extends Controller
 {
+    protected $salesPipelineService;
+
+    public function __construct(SalesPipelineService $salesPipelineService)
+    {
+        $this->salesPipelineService = $salesPipelineService;
+    }
+
     /**
      * Display a listing of the sales opportunities.
      *
@@ -61,21 +69,26 @@ class SalesOpportunityController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validatedData = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'sales_pipeline_id' => 'required|exists:sales_pipelines,id',
             'pipeline_stage_id' => 'required|exists:pipeline_stages,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'amount' => 'nullable|numeric',
             'expected_close_date' => 'nullable|date',
-            'status' => 'required|string|max:255',
-            'sales_id' => 'nullable|exists:sales,id',
+            'status' => 'required|in:open,won,lost',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric|min:0',
         ]);
 
-        $sales_opportunity = SalesOpportunity::create($validated);
-
-        return new SalesOpportunityResource($sales_opportunity);
+        try {
+            $opportunity = $this->salesPipelineService->createOpportunity($validatedData);
+            return new SalesOpportunityResource($opportunity->load('items'));
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to create opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
+        }
     }
 
     /**
@@ -124,21 +137,26 @@ class SalesOpportunityController extends Controller
      */
     public function update(Request $request, SalesOpportunity $sales_opportunity)
     {
-        $validated = $request->validate([
+        $validatedData = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'sales_pipeline_id' => 'required|exists:sales_pipelines,id',
             'pipeline_stage_id' => 'required|exists:pipeline_stages,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'amount' => 'nullable|numeric',
             'expected_close_date' => 'nullable|date',
-            'status' => 'required|string|max:255',
-            'sales_id' => 'nullable|exists:sales,id',
+            'status' => 'required|in:open,won,lost',
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric|min:0',
         ]);
 
-        $sales_opportunity->update($validated);
-
-        return new SalesOpportunityResource($sales_opportunity);
+        try {
+            $opportunity = $this->salesPipelineService->updateOpportunity($sales_opportunity, $validatedData);
+            return new SalesOpportunityResource($opportunity->load('items'));
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to update opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
+        }
     }
 
     /**
@@ -150,8 +168,52 @@ class SalesOpportunityController extends Controller
      */
     public function destroy(SalesOpportunity $sales_opportunity)
     {
-        $sales_opportunity->delete();
+        $this->salesPipelineService->deleteOpportunity($sales_opportunity);
 
         return response()->noContent();
+    }
+
+    /**
+     * @group Sales Opportunities
+     * @title Move Opportunity to a new Stage
+     * @urlParam opportunity integer required The ID of the sales opportunity. Example: 1
+     * @bodyParam pipeline_stage_id integer required The ID of the new pipeline stage. Example: 2
+     *
+     * @response {
+     *  "id": 1,
+     *  "name": "New Client Project",
+     *  "pipeline_stage_id": 2,
+     *  ...
+     * }
+     */
+    public function moveOpportunity(Request $request, SalesOpportunity $opportunity)
+    {
+        $request->validate([
+            'pipeline_stage_id' => 'required|exists:pipeline_stages,id',
+        ]);
+
+        $opportunity = $this->salesPipelineService->moveOpportunity($opportunity, $request->pipeline_stage_id);
+        return new SalesOpportunityResource($opportunity);
+    }
+
+    /**
+     * @group Sales Opportunities
+     * @title Convert Opportunity to Sales Order
+     * @urlParam opportunity integer required The ID of the sales opportunity. Example: 1
+     *
+     * @response {
+     *  "message": "Opportunity successfully converted to Sales Order.",
+     *  "type": "success",
+     *  "sales_id": 123
+     * }
+     */
+    public function convertToSalesOrder(SalesOpportunity $opportunity)
+    {
+        try {
+            $salesOrder = $this->salesPipelineService->convertToSalesOrder($opportunity);
+            return response()->json(['message' => 'Opportunity successfully converted to Sales Order.', 'type' => 'success', 'sales_id' => $salesOrder->id], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to convert opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
+        }
     }
 }

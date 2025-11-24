@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\WarehouseResource;
 use App\Models\Warehouse;
+use App\Services\WarehouseService;
 use Illuminate\Http\Request;
 
 /**
@@ -14,6 +15,13 @@ use Illuminate\Http\Request;
  */
 class WarehouseController extends Controller
 {
+    protected $warehouseService;
+
+    public function __construct(WarehouseService $warehouseService)
+    {
+        $this->warehouseService = $warehouseService;
+    }
+
     /**
      * Display a listing of the warehouses.
      *
@@ -55,7 +63,7 @@ class WarehouseController extends Controller
             'is_main' => 'boolean',
         ]);
 
-        $warehouse = Warehouse::create($validated);
+        $warehouse = $this->warehouseService->createWarehouse($validated);
 
         return new WarehouseResource($warehouse);
     }
@@ -100,7 +108,7 @@ class WarehouseController extends Controller
             'is_main' => 'boolean',
         ]);
 
-        $warehouse->update($validated);
+        $warehouse = $this->warehouseService->updateWarehouse($warehouse, $validated);
 
         return new WarehouseResource($warehouse);
     }
@@ -114,8 +122,60 @@ class WarehouseController extends Controller
      */
     public function destroy(Warehouse $warehouse)
     {
-        $warehouse->delete();
+        $this->warehouseService->deleteWarehouse($warehouse);
 
         return response()->noContent();
+    }
+
+    /**
+     * @group Warehouses
+     * @title Set as Main Warehouse
+     * @urlParam id integer required The ID of the warehouse to set as main. Example: 1
+     *
+     * @response {
+     *  "success": true,
+     *  "message": "Main warehouse updated successfully."
+     * }
+     */
+    public function setMain(Request $request, $id)
+    {
+        $warehouse = Warehouse::find($id);
+        if (!$warehouse) {
+            return response()->json(['success' => false, 'message' => 'Warehouse not found.'], 404);
+        }
+
+        $result = $this->warehouseService->setMainWarehouse($warehouse);
+
+        if (!$result['success']) {
+            return response()->json(['success' => false, 'message' => $result['message']], 500);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Main warehouse updated successfully.']);
+    }
+
+    /**
+     * @group Warehouses
+     * @title Unset as Main Warehouse
+     * @urlParam id integer required The ID of the warehouse to unset as main. Example: 1
+     *
+     * @response {
+     *  "success": true,
+     *  "message": "Main warehouse status removed."
+     * }
+     */
+    public function unsetMain(Request $request, $id)
+    {
+        $warehouse = Warehouse::find($id);
+        if (!$warehouse) {
+            return response()->json(['success' => false, 'message' => 'Warehouse not found.'], 404);
+        }
+        
+        $result = $this->warehouseService->unsetMainWarehouse($warehouse);
+
+        if (!$result['success']) {
+            return response()->json(['success' => false, 'message' => $result['message']], 500);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Main warehouse status removed.']);
     }
 }

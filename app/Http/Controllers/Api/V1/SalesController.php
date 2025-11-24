@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SalesResource;
+use App\Models\Customer;
+use App\Models\Product;
 use App\Models\Sales;
+use App\Services\SalesService;
 use Illuminate\Http\Request;
 
 /**
@@ -14,6 +17,13 @@ use Illuminate\Http\Request;
  */
 class SalesController extends Controller
 {
+    protected $salesService;
+
+    public function __construct(SalesService $salesService)
+    {
+        $this->salesService = $salesService;
+    }
+
     /**
      * Display a listing of the sales orders.
      *
@@ -195,5 +205,148 @@ class SalesController extends Controller
         $sale->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * @group Sales Orders
+     * @title Get Expiring Soon Sales
+     * @response {
+     *  "data": []
+     * }
+     */
+    public function getExpiringSoonSales()
+    {
+        $expiringSales = $this->salesService->getExpiringSales();
+        return response()->json($expiringSales);
+    }
+
+    /**
+     * @group Sales Orders
+     * @title Add Payment to Sales Order
+     * @urlParam id integer required The ID of the sales order. Example: 1
+     * @bodyParam amount number required The payment amount. Example: 100.00
+     * @bodyParam payment_date date required The date of the payment. Example: "2023-10-27"
+     * @bodyParam payment_method string required The method of payment. Example: "Bank Transfer"
+     * @bodyParam notes string nullable Any notes about the payment.
+     *
+     * @response {
+     *  "success": true,
+     *  "message": "Payment added successfully."
+     * }
+     */
+    public function addPayment(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'payment_date' => 'required|date',
+            'payment_method' => 'required|string',
+            'notes' => 'nullable|string',
+        ]);
+
+        try {
+            $sale = Sales::findOrFail($id);
+            $this->salesService->addPayment($sale, $request->all());
+            return response()->json(['success' => true, 'message' => 'Payment added successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Something went wrong: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * @group Sales Orders
+     * @title Get Past Customer Price for a Product
+     * @urlParam customer integer required The ID of the customer. Example: 1
+     * @urlParam product integer required The ID of the product. Example: 1
+     *
+     * @response {
+     *  "past_price": 120.50
+     * }
+     */
+    public function getCustomerPrice(Customer $customer, Product $product)
+    {
+        $pastPrice = $this->salesService->getPastCustomerPriceForProduct($customer, $product);
+        return response()->json(['past_price' => $pastPrice]);
+    }
+
+    /**
+     * @group Sales Orders
+     * @title Get Sales Metrics
+     * @response {
+     *  "total_sales": 120,
+     *  "total_paid": 85000,
+     *  "total_due": 15000
+     * }
+     */
+    public function getSalesMetrics()
+    {
+        $metrics = $this->salesService->getSalesMetrics();
+        return response()->json($metrics);
+    }
+
+    /**
+     * @group Sales Orders
+     * @title Bulk Delete Sales Orders
+     * @bodyParam ids array required An array of sales order IDs to delete. Example: [1, 2, 3]
+     * @bodyParam ids.* integer required A sales order ID.
+     *
+     * @response {
+     *  "success": true,
+     *  "message": "Successfully deleted sales order(s)"
+     * }
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:sales,id',
+        ]);
+
+        try {
+            $this->salesService->bulkDeleteSales($request->ids);
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully deleted sales order(s)",
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting sales orders. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    /**
+     * @group Sales Orders
+     * @title Bulk Mark Sales Orders as Paid
+     * @bodyParam ids array required An array of sales order IDs to mark as paid. Example: [1, 2, 3]
+     * @bodyParam ids.* integer required A sales order ID.
+     *
+     * @response {
+     *  "success": true,
+     *  "message": "Successfully marked 3 sales order(s) as paid.",
+     *  "updated_count": 3
+     * }
+     */
+    public function bulkMarkPaid(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:sales,id',
+        ]);
+
+        try {
+            $updatedCount = $this->salesService->bulkMarkPaid($request->ids);
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully marked {$updatedCount} sales order(s) as paid.",
+                'updated_count' => $updatedCount,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating sales orders.',
+            ], 500);
+        }
     }
 }

@@ -29,10 +29,14 @@ class DashboardService
         $inCountUnpaid = $this->getPurchaseCountbyLocation('IN', 'Unpaid');
         $recentSales = Sales::with('customer')->orderBy('created_at', 'desc')->limit(3)->get();
         $recentPurchases = Purchase::with('supplier')->orderBy('created_at', 'desc')->limit(3)->get();
+        
+        // New aging calculations
+        $arAging = $this->getAccountsReceivableAging();
+        $apAging = $this->getAccountsPayableAging();
 
         $keyMetrics = $this->formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid, $inCountUnpaid);
         $financialItems = $this->prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue);
-        $invoiceStatusData = $this->prepareInvoiceStatusData();
+        $invoiceStatusData = $this->prepareInvoiceStatusData($arAging, $apAging); // Pass aging data here
         $customerInsights = $this->prepareCustomerInsights();
         $customerAnalytics = $this->getCustomerAnalytics($dates);
         $supplierAnalytics = $this->getSupplierAnalytics($dates);
@@ -87,8 +91,6 @@ class DashboardService
             'countRevenue' => $unpaidRevenue,
             'countSales' => $monthlySales,
             'liabilitypaymentMonthly' => $this->getLiabilityPaymentsMonthly(),
-            'inCount' => $this->getPurchaseCountByLocation('IN'),
-            'outCount' => $this->getPurchaseCountByLocation('OUT'),
             'inCountUnpaid' => $inCountUnpaid,
             'outCountUnpaid' => $outCountUnpaid,
             'totalRevenue' => $totalRevenue,
@@ -98,6 +100,8 @@ class DashboardService
             'financialItems' => $financialItems,
             'invoiceStatusData' => $invoiceStatusData,
             'customerInsights' => $customerInsights,
+            'arAging' => $arAging, // Add AR aging to the dashboard data
+            'apAging' => $apAging, // Add AP aging to the dashboard data
         ];
     }
 
@@ -332,6 +336,83 @@ class DashboardService
     {
         return Purchase::where('status', 'Unpaid')->where('due_date', '<', now())->count();
     }
+
+    private function getAccountsReceivableAging()
+    {
+        $now = Carbon::now();
+        $aging = [
+            'current' => 0,
+            '1-30' => 0,
+            '31-60' => 0,
+            '61-90' => 0,
+            '90+' => 0,
+            'total_overdue' => 0,
+        ];
+
+        $unpaidSales = Sales::whereIn('status', ['Unpaid', 'Partial'])
+            ->whereNotNull('due_date')
+            ->get();
+
+        foreach ($unpaidSales as $sale) {
+            $daysOverdue = $now->diffInDays($sale->due_date, false); // false for absolute difference
+
+            if ($daysOverdue >= 0) { // Due date is today or in the future
+                $aging['current'] += $sale->total;
+            } elseif ($daysOverdue >= -30) { // 1-30 days overdue
+                $aging['1-30'] += $sale->total;
+                $aging['total_overdue'] += $sale->total;
+            } elseif ($daysOverdue >= -60) { // 31-60 days overdue
+                $aging['31-60'] += $sale->total;
+                $aging['total_overdue'] += $sale->total;
+            } elseif ($daysOverdue >= -90) { // 61-90 days overdue
+                $aging['61-90'] += $sale->total;
+                $aging['total_overdue'] += $sale->total;
+            } else { // 90+ days overdue
+                $aging['90+'] += $sale->total;
+                $aging['total_overdue'] += $sale->total;
+            }
+        }
+        return $aging;
+    }
+
+    private function getAccountsPayableAging()
+    {
+        $now = Carbon::now();
+        $aging = [
+            'current' => 0,
+            '1-30' => 0,
+            '31-60' => 0,
+            '61-90' => 0,
+            '90+' => 0,
+            'total_overdue' => 0,
+        ];
+
+        $unpaidPurchases = Purchase::whereIn('status', ['Unpaid', 'Partial'])
+            ->whereNotNull('due_date')
+            ->get();
+
+        foreach ($unpaidPurchases as $purchase) {
+            $daysOverdue = $now->diffInDays($purchase->due_date, false);
+
+            if ($daysOverdue >= 0) { // Due date is today or in the future
+                $aging['current'] += $purchase->total;
+            } elseif ($daysOverdue >= -30) { // 1-30 days overdue
+                $aging['1-30'] += $purchase->total;
+                $aging['total_overdue'] += $purchase->total;
+            } elseif ($daysOverdue >= -60) { // 31-60 days overdue
+                $aging['31-60'] += $purchase->total;
+                $aging['total_overdue'] += $purchase->total;
+            } elseif ($daysOverdue >= -90) { // 61-90 days overdue
+                $aging['61-90'] += $purchase->total;
+                $aging['total_overdue'] += $purchase->total;
+            } else { // 90+ days overdue
+                $aging['90+'] += $purchase->total;
+                $aging['total_overdue'] += $purchase->total;
+            }
+        }
+        return $aging;
+    }
+
     private function prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue)
     {
         $operatingExpenses = $totalLiability - $unpaidLiability;
@@ -423,31 +504,35 @@ class DashboardService
         ];
     }
 
-    private function prepareInvoiceStatusData()
+    private function prepareInvoiceStatusData(array $arAging, array $apAging)
     {
-        $inCount = $this->getPurchaseCountByLocation('IN');
-        $outCount = $this->getPurchaseCountByLocation('OUT');
-        $inCountUnpaid = $this->getPurchaseCountByLocation('IN', 'Unpaid');
-        $outCountUnpaid = $this->getPurchaseCountByLocation('OUT', 'Unpaid');
-        $totalInvoices = ($outCount ?? 0) + ($inCount ?? 0);
+        // Recalculate counts based on aging data
+        $outCount = Sales::count(); // Total sales invoices
+        $inCount = Purchase::count(); // Total purchase invoices
+
+        $outCountUnpaid = $arAging['current'] + $arAging['total_overdue']; // Unpaid AR
+        $inCountUnpaid = $apAging['current'] + $apAging['total_overdue']; // Unpaid AP
+
+        $totalInvoices = $outCount + $inCount;
         $collectionRate = $this->getCollectionRate();
         $avgDueDays = $this->getAverageDueDays();
 
-        $outPercentage = ($outCount ?? 0) > 0 ? ((($outCount ?? 0) - ($outCountUnpaid ?? 0)) / ($outCount ?? 1)) * 100 : 0;
-
-        $inPercentage = ($inCount ?? 0) > 0 ? ((($inCount ?? 0) - ($inCountUnpaid ?? 0)) / ($inCount ?? 1)) * 100 : 0;
+        $outPercentage = ($outCount > 0) ? (($outCount - $outCountUnpaid) / $outCount) * 100 : 0;
+        $inPercentage = ($inCount > 0) ? (($inCount - $inCountUnpaid) / $inCount) * 100 : 0;
 
         return [
             'totalInvoices' => $totalInvoices,
             'collectionRate' => $collectionRate,
             'collectionRateDisplay' => round($collectionRate),
-            'outCount' => $outCount ?? 0,
-            'inCount' => $inCount ?? 0,
-            'outCountUnpaid' => $outCountUnpaid ?? 0,
-            'inCountUnpaid' => $inCountUnpaid ?? 0,
+            'outCount' => $outCount,
+            'inCount' => $inCount,
+            'outCountUnpaid' => $outCountUnpaid,
+            'inCountUnpaid' => $inCountUnpaid,
             'outPercentage' => $outPercentage,
             'inPercentage' => $inPercentage,
             'avgDueDays' => $avgDueDays,
+            'arAging' => $arAging, // Include AR aging details
+            'apAging' => $apAging, // Include AP aging details
         ];
     }
 

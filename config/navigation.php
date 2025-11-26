@@ -95,6 +95,30 @@ return [
             'key' => 'reports',
             'children' => [
                 [
+                    'title' => 'messages.income_statement',
+                    'route' => 'admin.reports.income-statement',
+                    'permission' => 'view-reports',
+                    'icon' => 'ti ti-file-analytics',
+                ],
+                [
+                    'title' => 'messages.balance_sheet',
+                    'route' => 'admin.reports.balance-sheet',
+                    'permission' => 'view-reports',
+                    'icon' => 'ti ti-file-text',
+                ],
+                [
+                    'title' => 'messages.aged_receivables_report',
+                    'route' => 'admin.reports.aged-receivables',
+                    'permission' => 'view-reports',
+                    'icon' => 'ti ti-receipt-2',
+                ],
+                [
+                    'title' => 'messages.aged_payables_report',
+                    'route' => 'admin.reports.aged-payables',
+                    'permission' => 'view-reports',
+                    'icon' => 'ti ti-receipt-tax',
+                ],
+                [
                     'title' => 'messages.adjustment_log',
                     'route' => 'admin.reports.adjustment-log',
                     'permission' => 'view-reports',

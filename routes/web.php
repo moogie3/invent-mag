@@ -226,6 +226,10 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
         // Reports Routes
         Route::prefix('reports')->group(function () {
+            Route::get('/income-statement', [ReportController::class, 'incomeStatement'])->name('admin.reports.income-statement');
+            Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])->name('admin.reports.balance-sheet');
+            Route::get('/aged-receivables', [ReportController::class, 'agedReceivables'])->name('admin.reports.aged-receivables');
+            Route::get('/aged-payables', [ReportController::class, 'agedPayables'])->name('admin.reports.aged-payables');
             Route::get('/adjustment-log', [ReportController::class, 'adjustmentLog'])->name('admin.reports.adjustment-log');
             Route::get('/recent-transactions', [ReportController::class, 'recentTransactions'])->name('admin.reports.recent-transactions');
             Route::post('/{id}/mark-paid', [ReportController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');

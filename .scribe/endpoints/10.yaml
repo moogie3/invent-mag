@@ -1,78 +1,19 @@
-name: Products
-description: |-
-
-  APIs for managing products
+name: 'User Settings'
+description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/products
+    uri: api/v1/settings
     metadata:
       custom: []
-      groupName: Products
-      groupDescription: |-
-
-        APIs for managing products
+      groupName: 'User Settings'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the products.'
-      description: 'Retrieves a paginated list of products. You can specify the number of products per page.'
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters:
-      per_page:
-        custom: []
-        name: per_page
-        description: 'The number of products to return per page. Defaults to 15.'
-        required: false
-        example: 25
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanQueryParameters:
-      per_page: 25
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"data":[{"id":80,"code":"49546606","barcode":"5086512083132","name":"sit","stock_quantity":13,"low_stock_threshold":8,"price":50805.2300000000032014213502407073974609375,"selling_price":67235.39999999999417923390865325927734375,"category_id":76,"units_id":73,"supplier_id":104,"description":"Sed fuga aspernatur natus earum.","warehouse_id":73,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"},{"id":81,"code":"53065544","barcode":"2061787130685","name":"perferendis","stock_quantity":969,"low_stock_threshold":19,"price":38165.08999999999650754034519195556640625,"selling_price":72496.9299999999930150806903839111328125,"category_id":77,"units_id":74,"supplier_id":105,"description":"A debitis autem eveniet quis labore vel.","warehouse_id":74,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}]}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - POST
-    uri: api/v1/products
-    metadata:
-      custom: []
-      groupName: Products
-      groupDescription: |-
-
-        APIs for managing products
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Create a new product.'
-      description: 'Creates a new product with the provided data.'
+      title: 'Get User Settings'
+      description: ''
       authenticated: true
       deprecated: false
     headers:
@@ -83,193 +24,6 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      name:
-        custom: []
-        name: name
-        description: 'The name of the product.'
-        required: true
-        example: '"Laptop Pro"'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      code:
-        custom: []
-        name: code
-        description: 'A unique code for the product.'
-        required: true
-        example: '"LP-001"'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: 'The cost price of the product.'
-        required: true
-        example: 1200.5
-        type: number
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      selling_price:
-        custom: []
-        name: selling_price
-        description: 'The selling price of the product.'
-        required: true
-        example: 1499.99
-        type: number
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      category_id:
-        custom: []
-        name: category_id
-        description: 'The ID of the category.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      supplier_id:
-        custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      units_id:
-        custom: []
-        name: units_id
-        description: 'The ID of the unit.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      warehouse_id:
-        custom: []
-        name: warehouse_id
-        description: 'The ID of the warehouse.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      stock_quantity:
-        custom: []
-        name: stock_quantity
-        description: 'The initial stock quantity.'
-        required: false
-        example: 50.0
-        type: number
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'A description for the product.'
-        required: false
-        example: 'Dolores dolorum amet iste laborum eius est dolor.'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      name: '"Laptop Pro"'
-      code: '"LP-001"'
-      price: 1200.5
-      selling_price: 1499.99
-      category_id: 1
-      supplier_id: 1
-      units_id: 1
-      warehouse_id: 1
-      stock_quantity: 50.0
-      description: 'Dolores dolorum amet iste laborum eius est dolor.'
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"data":{"id":82,"code":"13579081","barcode":"7319228631501","name":"quisquam","stock_quantity":314,"low_stock_threshold":9,"price":50051.139999999999417923390865325927734375,"selling_price":77034.699999999997089616954326629638671875,"category_id":78,"units_id":75,"supplier_id":106,"description":"Sed vel a quo sed fugit facilis perferendis.","warehouse_id":75,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/products/{id}'
-    metadata:
-      custom: []
-      groupName: Products
-      groupDescription: |-
-
-        APIs for managing products
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Display the specified product.'
-      description: 'Retrieves a single product by its ID.'
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the product.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product:
-        custom: []
-        name: product
-        description: 'The ID of the product.'
-        required: true
-        example: '1'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 1
-      product: '1'
-    queryParameters: []
-    cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -277,14 +31,14 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":83,"code":"50865123","barcode":"3139729293312","name":"veniam","stock_quantity":982,"low_stock_threshold":9,"price":44823.5999999999985448084771633148193359375,"selling_price":3544.6199999999998908606357872486114501953125,"category_id":79,"units_id":76,"supplier_id":107,"description":"Fuga aspernatur natus earum quas.","warehouse_id":76,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}}'
+        content: '{"navigation_type": "sidebar","theme_mode": "light","notification_duration": 5,"auto_logout_time": 60,"data_refresh_rate": 30,"system_language": "en","sidebar_lock": false,"show_theme_toggle": true,"enable_sound_notifications": true,"enable_browser_notifications": true,"show_success_messages": true,"remember_last_page": true,"enable_animations": true,"lazy_load_images": true,"enable_debug_mode": false,"enable_keyboard_shortcuts": true,"show_tooltips": true,"compact_mode": false,"sticky_navbar": false}'
         headers: []
         description: ''
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -292,253 +46,79 @@ endpoints:
     custom: []
     httpMethods:
       - PUT
-      - PATCH
-    uri: 'api/v1/products/{id}'
+    uri: api/v1/settings/theme-mode
     metadata:
       custom: []
-      groupName: Products
-      groupDescription: |-
-
-        APIs for managing products
+      groupName: 'User Settings'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Update the specified product.'
-      description: 'Updates a product with the provided data.'
+      title: 'Update Theme Mode'
+      description: ''
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the product.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product:
-        custom: []
-        name: product
-        description: 'The ID of the product to update.'
-        required: true
-        example: '1'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 1
-      product: '1'
+    urlParameters: []
+    cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      name:
+      theme_mode:
         custom: []
-        name: name
-        description: 'The name of the product.'
-        required: false
-        example: '"Laptop Pro v2"'
+        name: theme_mode
+        description: "The new theme mode. Must be 'light' or 'dark'."
+        required: true
+        example: '"dark"'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      code:
+    cleanBodyParameters:
+      theme_mode: '"dark"'
+    fileParameters: []
+    responses: []
+    responseFields:
+      success:
         custom: []
-        name: code
-        description: 'The product code. Must be unique. Must not be greater than 255 characters.'
+        name: success
+        description: 'Indicates whether the request was successful.'
         required: false
-        example: LP-001
-        type: string
+        example: null
+        type: boolean
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      price:
+      message:
         custom: []
-        name: price
-        description: 'The cost price of the product.'
-        required: false
-        example: 1250.0
-        type: number
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      selling_price:
-        custom: []
-        name: selling_price
-        description: 'The selling price of the product. Must be at least 0.'
-        required: false
-        example: 1200.0
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      category_id:
-        custom: []
-        name: category_id
-        description: 'The ID of the category the product belongs to. The <code>id</code> of an existing record in the categories table.'
-        required: false
-        example: 1
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier_id:
-        custom: []
-        name: supplier_id
-        description: 'The ID of the supplier. The <code>id</code> of an existing record in the suppliers table.'
-        required: false
-        example: 1
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      units_id:
-        custom: []
-        name: units_id
-        description: 'The ID of the unit of measure. The <code>id</code> of an existing record in the units table.'
-        required: false
-        example: 1
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      warehouse_id:
-        custom: []
-        name: warehouse_id
-        description: 'The <code>id</code> of an existing record in the warehouses table.'
+        name: message
+        description: 'A message describing the result of the request.'
         required: false
         example: null
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         deprecated: false
-      stock_quantity:
+      theme_mode:
         custom: []
-        name: stock_quantity
-        description: 'The initial stock quantity. Must be at least 0.'
+        name: theme_mode
+        description: 'The updated theme mode.'
         required: false
-        example: 100.0
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'A description of the product.'
-        required: false
-        example: 'A powerful laptop.'
+        example: null
         type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      name: '"Laptop Pro v2"'
-      code: LP-001
-      price: 1250.0
-      selling_price: 1200.0
-      category_id: 1
-      supplier_id: 1
-      units_id: 1
-      stock_quantity: 100.0
-      description: 'A powerful laptop.'
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"data":{"id":84,"code":"81079872","barcode":"4976636666223","name":"amet","stock_quantity":202,"low_stock_threshold":20,"price":72279.6900000000023283064365386962890625,"selling_price":119994.080000000001746229827404022216796875,"category_id":80,"units_id":77,"supplier_id":108,"description":"Laborum eius est dolor dolores minus voluptatem.","warehouse_id":77,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - DELETE
-    uri: 'api/v1/products/{id}'
-    metadata:
-      custom: []
-      groupName: Products
-      groupDescription: |-
-
-        APIs for managing products
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Delete the specified product.'
-      description: 'Deletes a single product by its ID.'
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the product.'
-        required: true
-        example: 1
-        type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      product:
-        custom: []
-        name: product
-        description: 'The ID of the product to delete.'
-        required: true
-        example: '1'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 1
-      product: '1'
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 204
-        content: ''
-        headers: []
-        description: Success
-    responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null

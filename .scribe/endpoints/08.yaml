@@ -1,22 +1,281 @@
-name: 'Purchase Order Items'
-description: |-
-
-  APIs for managing purchase order items
+name: Reports
+description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/po-items
+    uri: api/v1/reports/adjustment-log
     metadata:
       custom: []
-      groupName: 'Purchase Order Items'
-      groupDescription: |-
-
-        APIs for managing purchase order items
+      groupName: Reports
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the purchase order items.'
+      title: 'Get Stock Adjustment Log'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      page:
+        custom: []
+        name: page
+        description: 'The page number to retrieve.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      per_page:
+        custom: []
+        name: per_page
+        description: 'The number of items to return per page. Defaults to 20.'
+        required: false
+        example: 20
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      page: 1
+      per_page: 20
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":1,"product_id":1,"adjustment_type":"increase","quantity_before":10,"quantity_after":20,"adjustment_amount":10,"reason":"Stock correction","adjusted_by":1,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z","product":{"id":1,"name":"Product 1"},"adjusted_by":{"id":1,"name":"Admin"}}]}'
+        headers: []
+        description: Success
+    responseFields:
+      data:
+        custom: []
+        name: data
+        description: 'A list of stock adjustments.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].id':
+        custom: []
+        name: 'data[].id'
+        description: 'The ID of the stock adjustment.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].product_id':
+        custom: []
+        name: 'data[].product_id'
+        description: 'The ID of the product.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].adjustment_type':
+        custom: []
+        name: 'data[].adjustment_type'
+        description: 'The type of adjustment (increase, decrease, correction).'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].quantity_before':
+        custom: []
+        name: 'data[].quantity_before'
+        description: 'The stock quantity before adjustment.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].quantity_after':
+        custom: []
+        name: 'data[].quantity_after'
+        description: 'The stock quantity after adjustment.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].adjustment_amount':
+        custom: []
+        name: 'data[].adjustment_amount'
+        description: 'The amount of stock adjusted.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].reason':
+        custom: []
+        name: 'data[].reason'
+        description: 'The reason for the adjustment.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].adjusted_by':
+        custom: []
+        name: 'data[].adjusted_by'
+        description: 'The user who made the adjustment.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].created_at':
+        custom: []
+        name: 'data[].created_at'
+        description: 'The date and time the adjustment was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].updated_at':
+        custom: []
+        name: 'data[].updated_at'
+        description: 'The date and time the adjustment was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].product':
+        custom: []
+        name: 'data[].product'
+        description: 'The product related to the adjustment.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].product.id':
+        custom: []
+        name: 'data[].product.id'
+        description: 'The ID of the product.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].product.name':
+        custom: []
+        name: 'data[].product.name'
+        description: 'The name of the product.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].adjusted_by.id':
+        custom: []
+        name: 'data[].adjusted_by.id'
+        description: 'The ID of the user.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].adjusted_by.name':
+        custom: []
+        name: 'data[].adjusted_by.name'
+        description: 'The name of the user.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links:
+        custom: []
+        name: links
+        description: 'Links for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta:
+        custom: []
+        name: meta
+        description: 'Metadata for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/reports/recent-transactions
+    metadata:
+      custom: []
+      groupName: Reports
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get Recent Transactions'
       description: ''
       authenticated: true
       deprecated: false
@@ -30,7 +289,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of items to return per page. Defaults to 15.'
+        description: 'The number of transactions per page.'
         required: false
         example: 25
         type: integer
@@ -38,8 +297,104 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         deprecated: false
+      type:
+        custom: []
+        name: type
+        description: "Filter by type (e.g., 'purchase', 'sale')."
+        required: false
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: "Filter by status (e.g., 'paid', 'due')."
+        required: false
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      date_range:
+        custom: []
+        name: date_range
+        description: "Date range filter ('today', 'this_week', 'this_month', 'all')."
+        required: false
+        example: "'this_month'"
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      search:
+        custom: []
+        name: search
+        description: 'Search term.'
+        required: false
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      start_date:
+        custom: []
+        name: start_date
+        description: 'date Start date for filtering.'
+        required: false
+        example: '2023-01-01'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      end_date:
+        custom: []
+        name: end_date
+        description: 'date End date for filtering.'
+        required: false
+        example: '2023-12-31'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sort:
+        custom: []
+        name: sort
+        description: 'Field to sort by.'
+        required: false
+        example: date
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      direction:
+        custom: []
+        name: direction
+        description: 'Sort direction (asc or desc).'
+        required: false
+        example: desc
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanQueryParameters:
       per_page: 25
+      type: consequatur
+      status: consequatur
+      date_range: "'this_month'"
+      search: consequatur
+      start_date: '2023-01-01'
+      end_date: '2023-12-31'
+      sort: date
+      direction: desc
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -47,14 +402,190 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":56,"po_id":42,"product_id":77,"quantity":50,"remaining_quantity":50,"price":"106.64","discount":"2.85","discount_type":"fixed","total":5332,"expiry_date":"2026-03-22","created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"},{"id":57,"po_id":43,"product_id":78,"quantity":63,"remaining_quantity":63,"price":"42.04","discount":"1.59","discount_type":"fixed","total":2648.51999999999998181010596454143524169921875,"expiry_date":null,"created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}]}'
+        content: '{"transactions":{"data":[{"id":1,"type":"sale","ref_id":1,"date":"2025-12-01","amount":100,"description":"Sale #1","status":"paid"}]},"summary":{"total_sales":100,"total_purchases":0,"total_paid":100,"total_due":0}}'
         headers: []
-        description: ''
-    responseFields: []
+        description: Success
+    responseFields:
+      transactions:
+        custom: []
+        name: transactions
+        description: 'A paginated list of transactions.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      transactions.data:
+        custom: []
+        name: transactions.data
+        description: 'A list of transactions.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'transactions.data[].id':
+        custom: []
+        name: 'transactions.data[].id'
+        description: 'The ID of the transaction.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'transactions.data[].type':
+        custom: []
+        name: 'transactions.data[].type'
+        description: 'The type of transaction (purchase or sale).'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'transactions.data[].ref_id':
+        custom: []
+        name: 'transactions.data[].ref_id'
+        description: 'The ID of the related purchase or sale.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'transactions.data[].date':
+        custom: []
+        name: 'transactions.data[].date'
+        description: 'The date of the transaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'transactions.data[].amount':
+        custom: []
+        name: 'transactions.data[].amount'
+        description: 'The amount of the transaction.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'transactions.data[].description':
+        custom: []
+        name: 'transactions.data[].description'
+        description: 'A description of the transaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'transactions.data[].status':
+        custom: []
+        name: 'transactions.data[].status'
+        description: 'The status of the transaction (paid, unpaid, partial).'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      transactions.links:
+        custom: []
+        name: transactions.links
+        description: 'Links for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      transactions.meta:
+        custom: []
+        name: transactions.meta
+        description: 'Metadata for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      summary:
+        custom: []
+        name: summary
+        description: 'Summary of transactions.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      summary.total_sales:
+        custom: []
+        name: summary.total_sales
+        description: 'Total sales amount.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      summary.total_purchases:
+        custom: []
+        name: summary.total_purchases
+        description: 'Total purchases amount.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      summary.total_paid:
+        custom: []
+        name: summary.total_paid
+        description: 'Total paid amount.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      summary.total_due:
+        custom: []
+        name: summary.total_due
+        description: 'Total due amount.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -62,16 +593,14 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/po-items
+    uri: api/v1/reports/transactions/bulk-mark-paid
     metadata:
       custom: []
-      groupName: 'Purchase Order Items'
-      groupDescription: |-
-
-        APIs for managing purchase order items
+      groupName: Reports
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Store a newly created resource in storage.'
+      title: 'Bulk Mark Transactions as Paid'
       description: ''
       authenticated: true
       deprecated: false
@@ -84,213 +613,92 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      po_id:
+      transaction_ids:
         custom: []
-        name: po_id
-        description: 'The <code>id</code> of an existing record in the po table.'
+        name: transaction_ids
+        description: 'An array of transaction IDs to mark as paid.'
         required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product_id:
-        custom: []
-        name: product_id
-        description: 'The <code>id</code> of an existing record in the products table.'
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      quantity:
-        custom: []
-        name: quantity
-        description: ''
-        required: true
-        example: 11613.31890586
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: ''
-        required: true
-        example: 11613.31890586
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      discount:
-        custom: []
-        name: discount
-        description: ''
-        required: false
-        example: 11613.31890586
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      discount_type:
-        custom: []
-        name: discount_type
-        description: ''
-        required: false
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: ''
-        required: true
-        example: 11613.31890586
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      expiry_date:
-        custom: []
-        name: expiry_date
-        description: 'Must be a valid date.'
-        required: false
-        example: '2025-11-21T06:50:03'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      remaining_quantity:
-        custom: []
-        name: remaining_quantity
-        description: ''
-        required: false
-        example: 11613.31890586
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      po_id: consequatur
-      product_id: consequatur
-      quantity: 11613.31890586
-      price: 11613.31890586
-      discount: 11613.31890586
-      discount_type: consequatur
-      total: 11613.31890586
-      expiry_date: '2025-11-21T06:50:03'
-      remaining_quantity: 11613.31890586
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 201
-        content: ''
-        headers: []
-        description: Success
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/po-items/{id}'
-    metadata:
-      custom: []
-      groupName: 'Purchase Order Items'
-      groupDescription: |-
-
-        APIs for managing purchase order items
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Display the specified purchase order item.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the po item.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      po_item:
-        custom: []
-        name: po_item
-        description: 'The ID of the purchase order item.'
-        required: true
-        example: '1'
-        type: string
+        example:
+          - 1
+          - 2
+          - 3
+        type: 'string[]'
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-    cleanUrlParameters:
-      id: 1
-      po_item: '1'
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    cleanBodyParameters:
+      transaction_ids:
+        - 1
+        - 2
+        - 3
     fileParameters: []
     responses:
       -
         custom: []
-        status: 200
-        content: '{"data":{"id":58,"po_id":44,"product_id":79,"quantity":50,"remaining_quantity":50,"price":"106.64","discount":"2.85","discount_type":"fixed","total":5332,"expiry_date":"2026-03-22","created_at":"2025-11-21T06:50:03.000000Z","updated_at":"2025-11-21T06:50:03.000000Z"}}'
+        status: 400
+        content: '{"success": false, "message": "No transactions selected."}'
         headers: []
-        description: ''
-    responseFields: []
+        description: 'Bad Request'
+      -
+        custom: []
+        status: 500
+        content: '{"success": false, "message": "An error occurred while updating transactions."}'
+        headers: []
+        description: Error
+    responseFields:
+      success:
+        custom: []
+        name: success
+        description: 'Indicates whether the request was successful.'
+        required: false
+        example: null
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      message:
+        custom: []
+        name: message
+        description: 'A message describing the result of the request.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_count:
+        custom: []
+        name: updated_count
+        description: 'The number of transactions successfully marked as paid.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
   -
     custom: []
     httpMethods:
-      - PUT
-      - PATCH
-    uri: 'api/v1/po-items/{id}'
+      - POST
+    uri: 'api/v1/reports/transactions/{id}/mark-paid'
     metadata:
       custom: []
-      groupName: 'Purchase Order Items'
-      groupDescription: |-
-
-        APIs for managing purchase order items
+      groupName: Reports
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Update the specified resource in storage.'
+      title: 'Mark a Single Transaction as Paid'
       description: ''
       authenticated: true
       deprecated: false
@@ -302,12 +710,12 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the po item.'
+        description: 'The ID of the transaction.'
         required: true
         example: 1
         type: integer
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
@@ -315,183 +723,60 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      po_id:
+      type:
         custom: []
-        name: po_id
-        description: 'The <code>id</code> of an existing record in the po table.'
+        name: type
+        description: "The type of the transaction ('purchase' or 'sale')."
         required: true
-        example: consequatur
+        example: '"sale"'
         type: string
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
-        deprecated: false
-      product_id:
-        custom: []
-        name: product_id
-        description: 'The <code>id</code> of an existing record in the products table.'
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      quantity:
-        custom: []
-        name: quantity
-        description: ''
-        required: true
-        example: 11613.31890586
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: ''
-        required: true
-        example: 11613.31890586
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      discount:
-        custom: []
-        name: discount
-        description: ''
-        required: false
-        example: 11613.31890586
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      discount_type:
-        custom: []
-        name: discount_type
-        description: ''
-        required: false
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: ''
-        required: true
-        example: 11613.31890586
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      expiry_date:
-        custom: []
-        name: expiry_date
-        description: 'Must be a valid date.'
-        required: false
-        example: '2025-11-21T06:50:03'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      remaining_quantity:
-        custom: []
-        name: remaining_quantity
-        description: ''
-        required: false
-        example: 11613.31890586
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
         deprecated: false
     cleanBodyParameters:
-      po_id: consequatur
-      product_id: consequatur
-      quantity: 11613.31890586
-      price: 11613.31890586
-      discount: 11613.31890586
-      discount_type: consequatur
-      total: 11613.31890586
-      expiry_date: '2025-11-21T06:50:03'
-      remaining_quantity: 11613.31890586
+      type: '"sale"'
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: ''
+        content: '{"success": true, "message": "Transaction marked as paid."}'
         headers: []
         description: Success
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - DELETE
-    uri: 'api/v1/po-items/{id}'
-    metadata:
-      custom: []
-      groupName: 'Purchase Order Items'
-      groupDescription: |-
-
-        APIs for managing purchase order items
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Remove the specified resource from storage.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
+      -
         custom: []
-        name: id
-        description: 'The ID of the po item.'
-        required: true
-        example: 1
-        type: integer
+        status: 500
+        content: '{"success": false, "message": "Error updating transaction: <error message>"}'
+        headers: []
+        description: Error
+    responseFields:
+      success:
+        custom: []
+        name: success
+        description: 'Indicates whether the request was successful.'
+        required: false
+        example: null
+        type: boolean
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-    cleanUrlParameters:
-      id: 1
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
+      message:
         custom: []
-        status: 204
-        content: ''
-        headers: []
-        description: Success
-    responseFields: []
+        name: message
+        description: 'A message describing the result of the request.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null

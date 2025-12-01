@@ -1,22 +1,18 @@
-name: Warehouses
-description: |-
-
-  APIs for managing warehouses
+name: 'Supplier Interactions'
+description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/warehouses
+    uri: api/v1/supplier-interactions
     metadata:
       custom: []
-      groupName: Warehouses
-      groupDescription: |-
-
-        APIs for managing warehouses
+      groupName: 'Supplier Interactions'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the warehouses.'
+      title: 'Display a listing of the supplier interactions.'
       description: ''
       authenticated: true
       deprecated: false
@@ -30,7 +26,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of warehouses to return per page. Defaults to 15.'
+        description: 'The number of interactions to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -47,17 +43,270 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"Gudang Utama Jakarta","address":"Jl. Raya Cakung No. 10, Jakarta Timur","description":"Gudang utama untuk distribusi pusat.","is_main":1,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":2,"name":"Gudang Surabaya","address":"Jl. Ahmad Yani No. 50, Surabaya","description":"Gudang cabang di Jawa Timur.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":3,"name":"Gudang Bandung","address":"Jl. Pasteur No. 23, Bandung","description":"Gudang cabang untuk area Jawa Barat.","is_main":0,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}],"links":{"first":"http:\/\/localhost:8000\/api\/v1\/warehouses?page=1","last":"http:\/\/localhost:8000\/api\/v1\/warehouses?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/warehouses?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost:8000\/api\/v1\/warehouses","per_page":25,"to":3,"total":3}}'
+        content: '{"data":[{"id":1,"supplier_id":1,"user_id":1,"type":"meeting","notes":"Delectus in qui et dolorem molestias sit perferendis. Amet qui cumque sequi rerum possimus. Veritatis repellat suscipit fuga dolor rerum quia qui.","interaction_date":"2025-11-27T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":1,"code":"SUP001","name":"PT. Elektronika Nusantara","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","phone_number":"0218887766","location":"IN","payment_terms":"30","email":"elektronika.nusantara@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":2,"supplier_id":1,"user_id":1,"type":"meeting","notes":"Est sunt eos expedita illum magnam. Occaecati eos et incidunt dolorem. Tempora et laudantium eum dolores ea veniam ad.","interaction_date":"2025-10-02T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":1,"code":"SUP001","name":"PT. Elektronika Nusantara","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","phone_number":"0218887766","location":"IN","payment_terms":"30","email":"elektronika.nusantara@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":3,"supplier_id":1,"user_id":1,"type":"email","notes":"Enim ea dolor eveniet in molestiae fugiat quia. Quidem enim omnis numquam quis. At quo et ut facere voluptate placeat.","interaction_date":"2025-09-21T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":1,"code":"SUP001","name":"PT. Elektronika Nusantara","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","phone_number":"0218887766","location":"IN","payment_terms":"30","email":"elektronika.nusantara@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":4,"supplier_id":2,"user_id":1,"type":"call","notes":"Sed facilis non ad possimus similique. Tempora quia sint qui in quis praesentium. Odio sapiente qui incidunt sit dolores. Qui veritatis sint mollitia eos. Similique nulla dolor possimus saepe quisquam.","interaction_date":"2025-01-24T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":2,"code":"SUP002","name":"CV. Sumber Rejeki","address":"Jl. Rajawali No. 12, Bandung","phone_number":"0227654321","location":"IN","payment_terms":"45","email":"sumber.rejeki@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":5,"supplier_id":2,"user_id":1,"type":"email","notes":"Iste et atque reiciendis voluptas soluta. Et in id est totam. Tenetur illo omnis ipsum iste est est deleniti. Omnis in magni et soluta.","interaction_date":"2025-03-06T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":2,"code":"SUP002","name":"CV. Sumber Rejeki","address":"Jl. Rajawali No. 12, Bandung","phone_number":"0227654321","location":"IN","payment_terms":"45","email":"sumber.rejeki@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":6,"supplier_id":3,"user_id":1,"type":"email","notes":"Numquam corrupti dolorem exercitationem aliquid ut praesentium. Consectetur laboriosam voluptatem sunt aut. Incidunt in aliquam eaque deserunt. Dicta enim reprehenderit commodi laborum voluptatem ducimus accusamus.","interaction_date":"2025-04-22T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":7,"supplier_id":3,"user_id":1,"type":"email","notes":"Quia est sed inventore ab minima dignissimos culpa. Consectetur et aut adipisci omnis. Aliquam rerum porro repellat ipsam. Distinctio facere est voluptas itaque sint. Eum tenetur fugit esse ratione quae.","interaction_date":"2025-04-26T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":8,"supplier_id":3,"user_id":1,"type":"email","notes":"Est omnis quia ratione ut eum molestiae rerum. Et dolorem aliquam sed eos sint. Aspernatur maiores incidunt harum hic quaerat. Earum ipsam atque accusamus molestiae quia nobis.","interaction_date":"2025-09-29T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":9,"supplier_id":4,"user_id":1,"type":"note","notes":"Adipisci qui qui expedita sit dicta. Nulla modi dolore aut quos dolor repellat qui. Fugit consectetur et consequuntur quia.","interaction_date":"2025-11-06T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":10,"supplier_id":4,"user_id":1,"type":"note","notes":"Aperiam assumenda placeat cum ut. Minus blanditiis rerum vel vitae. Nihil eveniet et beatae ut suscipit pariatur dolorem. Voluptate ea dignissimos eos molestiae eveniet.","interaction_date":"2025-05-04T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":11,"supplier_id":4,"user_id":1,"type":"call","notes":"Alias id eum asperiores impedit. Doloremque id ducimus qui quibusdam doloribus quo. Incidunt fugit qui in voluptatem. Nemo recusandae occaecati magnam autem vel et.","interaction_date":"2025-08-23T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":12,"supplier_id":5,"user_id":1,"type":"call","notes":"Eum ea repellendus velit eius qui quod ducimus fugit. Voluptatem laboriosam sit earum molestiae non assumenda. Quasi aliquam accusamus ab labore sed quis et.","interaction_date":"2025-03-04T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":5,"code":"SUP005","name":"Shenzhen Tech Supplies","address":"Futian District, Shenzhen, China","phone_number":"+86-755-1234-5678","location":"OUT","payment_terms":"60","email":"shenzhen.tech@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/supplier-interactions?page=1","last":"http:\/\/localhost\/api\/v1\/supplier-interactions?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/supplier-interactions?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/supplier-interactions","per_page":25,"to":12,"total":12}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
-    responseFields: []
+    responseFields:
+      data:
+        custom: []
+        name: data
+        description: 'A list of supplier interactions.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].id':
+        custom: []
+        name: 'data[].id'
+        description: 'The ID of the interaction.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].supplier_id':
+        custom: []
+        name: 'data[].supplier_id'
+        description: 'The ID of the supplier.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].user_id':
+        custom: []
+        name: 'data[].user_id'
+        description: 'The ID of the user.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].type':
+        custom: []
+        name: 'data[].type'
+        description: 'The type of interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].notes':
+        custom: []
+        name: 'data[].notes'
+        description: 'The notes for the interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].interaction_date':
+        custom: []
+        name: 'data[].interaction_date'
+        description: 'The date of the interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].created_at':
+        custom: []
+        name: 'data[].created_at'
+        description: 'The date and time the interaction was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].updated_at':
+        custom: []
+        name: 'data[].updated_at'
+        description: 'The date and time the interaction was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].supplier':
+        custom: []
+        name: 'data[].supplier'
+        description: 'The supplier associated with the interaction.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links:
+        custom: []
+        name: links
+        description: 'Links for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.first:
+        custom: []
+        name: links.first
+        description: 'The URL of the first page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.last:
+        custom: []
+        name: links.last
+        description: 'The URL of the last page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.prev:
+        custom: []
+        name: links.prev
+        description: 'The URL of the previous page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.next:
+        custom: []
+        name: links.next
+        description: 'The URL of the next page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta:
+        custom: []
+        name: meta
+        description: 'Metadata for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.current_page:
+        custom: []
+        name: meta.current_page
+        description: 'The current page number.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.from:
+        custom: []
+        name: meta.from
+        description: 'The starting number of the results on the current page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.last_page:
+        custom: []
+        name: meta.last_page
+        description: 'The last page number.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.path:
+        custom: []
+        name: meta.path
+        description: 'The URL path.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.per_page:
+        custom: []
+        name: meta.per_page
+        description: 'The number of results per page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.to:
+        custom: []
+        name: meta.to
+        description: 'The ending number of the results on the current page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.total:
+        custom: []
+        name: meta.total
+        description: 'The total number of results.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -65,13 +314,11 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/warehouses
+    uri: api/v1/supplier-interactions
     metadata:
       custom: []
-      groupName: Warehouses
-      groupDescription: |-
-
-        APIs for managing warehouses
+      groupName: 'Supplier Interactions'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Store a newly created resource in storage.'
@@ -87,79 +334,162 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      name:
+      supplier_id:
         custom: []
-        name: name
-        description: 'The name of the warehouse.'
+        name: supplier_id
+        description: 'The ID of the supplier.'
         required: true
-        example: 'Secondary Warehouse'
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'The type of interaction (e.g., Call, Email, Meeting).'
+        required: true
+        example: Email
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      address:
+      notes:
         custom: []
-        name: address
-        description: 'The address of the warehouse.'
+        name: notes
+        description: 'Notes about the interaction.'
         required: false
-        example: '456 Storage Rd'
+        example: 'Sent follow-up email.'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      description:
+      interaction_date:
         custom: []
-        name: description
-        description: 'A description of the warehouse.'
-        required: false
-        example: 'Overflow storage.'
-        type: string
+        name: interaction_date
+        description: 'The date of the interaction.'
+        required: true
+        example: '2023-10-26'
+        type: date
         enumValues: []
         exampleWasSpecified: true
-        nullable: true
+        nullable: false
         deprecated: false
-      is_main:
+      user_id:
         custom: []
-        name: is_main
-        description: 'Is this the main warehouse.'
-        required: false
-        example: false
-        type: boolean
+        name: user_id
+        description: 'The ID of the user.'
+        required: true
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      name: 'Secondary Warehouse'
-      address: '456 Storage Rd'
-      description: 'Overflow storage.'
-      is_main: false
+      supplier_id: 1
+      type: Email
+      notes: 'Sent follow-up email.'
+      interaction_date: '2023-10-26'
+      user_id: 1
     fileParameters: []
-    responses:
-      -
+    responses: []
+    responseFields:
+      id:
         custom: []
-        status: 201
-        content: |-
-          {
-              "data": {
-                  "id": 1,
-                  "name": "Secondary Warehouse",
-                  "address": "456 Storage Rd",
-                  "description": "Overflow storage.",
-                  "is_main": false,
-                  "created_at": "2023-10-26T12:00:00.000000Z",
-                  "updated_at": "2023-10-26T12:00:00.000000Z"
-              }
-          }
-        headers: []
-        description: ''
-    responseFields: []
+        name: id
+        description: 'The ID of the interaction.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      supplier_id:
+        custom: []
+        name: supplier_id
+        description: 'The ID of the supplier.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      user_id:
+        custom: []
+        name: user_id
+        description: 'The ID of the user.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'The type of interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      notes:
+        custom: []
+        name: notes
+        description: 'The notes for the interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      interaction_date:
+        custom: []
+        name: interaction_date
+        description: 'The date of the interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the interaction was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the interaction was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -167,16 +497,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/warehouses/{id}'
+    uri: 'api/v1/supplier-interactions/{id}'
     metadata:
       custom: []
-      groupName: Warehouses
-      groupDescription: |-
-
-        APIs for managing warehouses
+      groupName: 'Supplier Interactions'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified warehouse.'
+      title: 'Display the specified supplier interaction.'
       description: ''
       authenticated: true
       deprecated: false
@@ -188,7 +516,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the warehouse.'
+        description: 'The ID of the supplier interaction.'
         required: true
         example: 1
         type: integer
@@ -196,10 +524,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      warehouse:
+      supplier_interaction:
         custom: []
-        name: warehouse
-        description: 'The ID of the warehouse.'
+        name: supplier_interaction
+        description: 'The ID of the supplier interaction.'
         required: true
         example: '1'
         type: string
@@ -209,7 +537,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 1
-      warehouse: '1'
+      supplier_interaction: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -219,17 +547,116 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"Gudang Utama Jakarta","address":"Jl. Raya Cakung No. 10, Jakarta Timur","description":"Gudang utama untuk distribusi pusat.","is_main":1,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}'
+        content: '{"data":{"id":1,"supplier_id":1,"user_id":1,"type":"meeting","notes":"Delectus in qui et dolorem molestias sit perferendis. Amet qui cumque sequi rerum possimus. Veritatis repellat suscipit fuga dolor rerum quia qui.","interaction_date":"2025-11-27T00:00:00.000000Z","created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","supplier":{"id":1,"code":"SUP001","name":"PT. Elektronika Nusantara","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","phone_number":"0218887766","location":"IN","payment_terms":"30","email":"elektronika.nusantara@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
-    responseFields: []
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the interaction.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      supplier_id:
+        custom: []
+        name: supplier_id
+        description: 'The ID of the supplier.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      user_id:
+        custom: []
+        name: user_id
+        description: 'The ID of the user.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'The type of interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      notes:
+        custom: []
+        name: notes
+        description: 'The notes for the interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      interaction_date:
+        custom: []
+        name: interaction_date
+        description: 'The date of the interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the interaction was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the interaction was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      supplier:
+        custom: []
+        name: supplier
+        description: 'The supplier associated with the interaction.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -238,13 +665,11 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/warehouses/{id}'
+    uri: 'api/v1/supplier-interactions/{id}'
     metadata:
       custom: []
-      groupName: Warehouses
-      groupDescription: |-
-
-        APIs for managing warehouses
+      groupName: 'Supplier Interactions'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Update the specified resource in storage.'
@@ -259,7 +684,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the warehouse.'
+        description: 'The ID of the supplier interaction.'
         required: true
         example: 1
         type: integer
@@ -267,10 +692,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      warehouse:
+      supplier_interaction:
         custom: []
-        name: warehouse
-        description: 'The ID of the warehouse.'
+        name: supplier_interaction
+        description: 'The ID of the supplier interaction.'
         required: true
         example: 1
         type: integer
@@ -280,83 +705,166 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 1
-      warehouse: 1
+      supplier_interaction: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      name:
+      supplier_id:
         custom: []
-        name: name
-        description: 'The name of the warehouse.'
+        name: supplier_id
+        description: 'The ID of the supplier.'
         required: true
-        example: 'Main Warehouse'
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'The type of interaction (e.g., Call, Email, Meeting).'
+        required: true
+        example: Call
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      address:
+      notes:
         custom: []
-        name: address
-        description: 'The address of the warehouse.'
+        name: notes
+        description: 'Notes about the interaction.'
         required: false
-        example: '123 Warehouse St'
+        example: 'Discussed new product line.'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      description:
+      interaction_date:
         custom: []
-        name: description
-        description: 'A description of the warehouse.'
-        required: false
-        example: 'Primary storage facility.'
-        type: string
+        name: interaction_date
+        description: 'The date of the interaction.'
+        required: true
+        example: '2023-10-27'
+        type: date
         enumValues: []
         exampleWasSpecified: true
-        nullable: true
+        nullable: false
         deprecated: false
-      is_main:
+      user_id:
         custom: []
-        name: is_main
-        description: 'Is this the main warehouse.'
-        required: false
-        example: true
-        type: boolean
+        name: user_id
+        description: 'The ID of the user.'
+        required: true
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      name: 'Main Warehouse'
-      address: '123 Warehouse St'
-      description: 'Primary storage facility.'
-      is_main: true
+      supplier_id: 1
+      type: Call
+      notes: 'Discussed new product line.'
+      interaction_date: '2023-10-27'
+      user_id: 1
     fileParameters: []
-    responses:
-      -
+    responses: []
+    responseFields:
+      id:
         custom: []
-        status: 200
-        content: |-
-          {
-              "data": {
-                  "id": 1,
-                  "name": "Main Warehouse",
-                  "address": "123 Warehouse St",
-                  "description": "Primary storage facility.",
-                  "is_main": true,
-                  "created_at": "2023-10-26T12:00:00.000000Z",
-                  "updated_at": "2023-10-27T12:00:00.000000Z"
-              }
-          }
-        headers: []
-        description: ''
-    responseFields: []
+        name: id
+        description: 'The ID of the interaction.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      supplier_id:
+        custom: []
+        name: supplier_id
+        description: 'The ID of the supplier.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      user_id:
+        custom: []
+        name: user_id
+        description: 'The ID of the user.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'The type of interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      notes:
+        custom: []
+        name: notes
+        description: 'The notes for the interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      interaction_date:
+        custom: []
+        name: interaction_date
+        description: 'The date of the interaction.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the interaction was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the interaction was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -364,13 +872,11 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/v1/warehouses/{id}'
+    uri: 'api/v1/supplier-interactions/{id}'
     metadata:
       custom: []
-      groupName: Warehouses
-      groupDescription: |-
-
-        APIs for managing warehouses
+      groupName: 'Supplier Interactions'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Remove the specified resource from storage.'
@@ -385,7 +891,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the warehouse.'
+        description: 'The ID of the supplier interaction.'
         required: true
         example: 1
         type: integer
@@ -393,10 +899,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      warehouse:
+      supplier_interaction:
         custom: []
-        name: warehouse
-        description: 'The ID of the warehouse to delete.'
+        name: supplier_interaction
+        description: 'The ID of the supplier interaction to delete.'
         required: true
         example: 1
         type: integer
@@ -406,7 +912,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 1
-      warehouse: 1
+      supplier_interaction: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -423,7 +929,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null

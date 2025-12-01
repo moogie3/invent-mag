@@ -85,7 +85,7 @@ class CustomerService
     public function getCustomerMetrics()
     {
         return [
-            'totalcustomer' => Customer::count(),
+            'total_customers' => Customer::count(),
         ];
     }
 }

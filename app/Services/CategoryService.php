@@ -19,16 +19,16 @@ class CategoryService
             return ['success' => false, 'message' => 'This category already exists.'];
         }
 
-        Categories::create($data);
+        $category = Categories::create($data);
 
-        return ['success' => true, 'message' => 'Category created successfully.'];
+        return ['success' => true, 'message' => 'Category created successfully.', 'category' => $category];
     }
 
     public function updateCategory(Categories $category, array $data)
     {
         $category->update($data);
 
-        return ['success' => true, 'message' => 'Category updated successfully.'];
+        return ['success' => true, 'message' => 'Category updated successfully.', 'category' => $category];
     }
 
     public function deleteCategory(Categories $category)

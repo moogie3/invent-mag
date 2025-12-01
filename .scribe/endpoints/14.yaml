@@ -1,22 +1,18 @@
-name: 'Sales Items'
-description: |-
-
-  APIs for managing sales items
+name: Categories
+description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/sales-items
+    uri: api/v1/categories
     metadata:
       custom: []
-      groupName: 'Sales Items'
-      groupDescription: |-
-
-        APIs for managing sales items
+      groupName: Categories
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the sales items.'
+      title: 'Display a listing of the categories.'
       description: ''
       authenticated: true
       deprecated: false
@@ -30,7 +26,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of items to return per page. Defaults to 15.'
+        description: 'The number of categories to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -47,14 +43,237 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":263,"sales_id":119,"product_id":85,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"35869.89","total":"179349.45","created_at":"2025-11-21T06:50:04.000000Z","updated_at":"2025-11-21T06:50:04.000000Z"},{"id":264,"sales_id":120,"product_id":86,"quantity":6,"discount":"0.00","discount_type":"fixed","customer_price":"76130.10","total":"456780.60","created_at":"2025-11-21T06:50:04.000000Z","updated_at":"2025-11-21T06:50:04.000000Z"}]}'
-        headers: []
-        description: ''
-    responseFields: []
+        content: '{"data":[{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},{"id":3,"name":"IC","description":"Integrated Circuit","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}],"links":{"first":"http:\/\/localhost\/api\/v1\/categories?page=1","last":"http:\/\/localhost\/api\/v1\/categories?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/categories?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/categories","per_page":25,"to":2,"total":2}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields:
+      data:
+        custom: []
+        name: data
+        description: 'A list of categories.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].id':
+        custom: []
+        name: 'data[].id'
+        description: 'The ID of the category.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].name':
+        custom: []
+        name: 'data[].name'
+        description: 'The name of the category.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].description':
+        custom: []
+        name: 'data[].description'
+        description: 'The description of the category.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].parent_id':
+        custom: []
+        name: 'data[].parent_id'
+        description: 'The ID of the parent category.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].created_at':
+        custom: []
+        name: 'data[].created_at'
+        description: 'The date and time the category was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].updated_at':
+        custom: []
+        name: 'data[].updated_at'
+        description: 'The date and time the category was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links:
+        custom: []
+        name: links
+        description: 'Links for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.first:
+        custom: []
+        name: links.first
+        description: 'The URL of the first page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.last:
+        custom: []
+        name: links.last
+        description: 'The URL of the last page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.prev:
+        custom: []
+        name: links.prev
+        description: 'The URL of the previous page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.next:
+        custom: []
+        name: links.next
+        description: 'The URL of the next page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta:
+        custom: []
+        name: meta
+        description: 'Metadata for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.current_page:
+        custom: []
+        name: meta.current_page
+        description: 'The current page number.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.from:
+        custom: []
+        name: meta.from
+        description: 'The starting number of the results on the current page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.last_page:
+        custom: []
+        name: meta.last_page
+        description: 'The last page number.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.path:
+        custom: []
+        name: meta.path
+        description: 'The URL path.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.per_page:
+        custom: []
+        name: meta.per_page
+        description: 'The number of results per page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.to:
+        custom: []
+        name: meta.to
+        description: 'The ending number of the results on the current page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.total:
+        custom: []
+        name: meta.total
+        description: 'The total number of results.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -62,13 +281,11 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/sales-items
+    uri: api/v1/categories
     metadata:
       custom: []
-      groupName: 'Sales Items'
-      groupDescription: |-
-
-        APIs for managing sales items
+      groupName: Categories
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Store a newly created resource in storage.'
@@ -84,118 +301,122 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      sales_id:
+      name:
         custom: []
-        name: sales_id
-        description: 'The ID of the sales order.'
+        name: name
+        description: 'The name of the category.'
         required: true
-        example: 1
-        type: integer
+        example: '"Electronics"'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      product_id:
+      description:
         custom: []
-        name: product_id
-        description: 'The ID of the product.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      quantity:
-        custom: []
-        name: quantity
-        description: 'The quantity of the product.'
-        required: true
-        example: 5
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      discount:
-        custom: []
-        name: discount
-        description: 'The discount applied to the item.'
+        name: description
+        description: 'The description of the category.'
         required: false
-        example: '0.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      discount_type:
-        custom: []
-        name: discount_type
-        description: 'The type of discount (e.g., percentage, fixed).'
-        required: false
-        example: fixed
+        example: '"Electronic components and devices"'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      customer_price:
+      parent_id:
         custom: []
-        name: customer_price
-        description: 'The price charged to the customer.'
+        name: parent_id
+        description: 'The ID of the parent category.'
         required: false
-        example: '100.00'
-        type: numeric
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: 'The total amount for the item.'
-        required: true
-        example: '500.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
+        nullable: true
         deprecated: false
     cleanBodyParameters:
-      sales_id: 1
-      product_id: 1
-      quantity: 5
-      discount: '0.00'
-      discount_type: fixed
-      customer_price: '100.00'
-      total: '500.00'
+      name: '"Electronics"'
+      description: '"Electronic components and devices"'
+      parent_id: 1
     fileParameters: []
     responses:
       -
         custom: []
-        status: 201
-        content: |-
-          {
-              "data": {
-                  "id": 1,
-                  "sales_id": 1,
-                  "product_id": 1,
-                  "quantity": 5,
-                  "discount": 0.00,
-                  "discount_type": "fixed",
-                  "customer_price": 100.00,
-                  "total": 500.00,
-                  "created_at": "2023-10-26T12:00:00.000000Z",
-                  "updated_at": "2023-10-26T12:00:00.000000Z"
-              }
-          }
+        status: 422
+        content: '{"success": false, "message": "Failed to create category."}'
         headers: []
-        description: ''
-    responseFields: []
+        description: 'Creation Failed'
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the category.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the category.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'The description of the category.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      parent_id:
+        custom: []
+        name: parent_id
+        description: 'The ID of the parent category.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the category was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the category was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -203,16 +424,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/sales-items/{id}'
+    uri: 'api/v1/categories/{id}'
     metadata:
       custom: []
-      groupName: 'Sales Items'
-      groupDescription: |-
-
-        APIs for managing sales items
+      groupName: Categories
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified sales item.'
+      title: 'Display the specified category.'
       description: ''
       authenticated: true
       deprecated: false
@@ -224,18 +443,18 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the sales item.'
+        description: 'The ID of the category.'
         required: true
-        example: 1
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      sales_item:
+      category:
         custom: []
-        name: sales_item
-        description: 'The ID of the sales item.'
+        name: category
+        description: 'The ID of the category.'
         required: true
         example: '1'
         type: string
@@ -244,8 +463,8 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
-      sales_item: '1'
+      id: 2
+      category: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -255,14 +474,105 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":265,"sales_id":121,"product_id":87,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"113755.01","total":"568775.05","created_at":"2025-11-21T06:50:04.000000Z","updated_at":"2025-11-21T06:50:04.000000Z"}}'
-        headers: []
-        description: ''
-    responseFields: []
+        content: '{"data":{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the category.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the category.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'The description of the category.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      parent_id:
+        custom: []
+        name: parent_id
+        description: 'The ID of the parent category.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the category was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the category was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      parent:
+        custom: []
+        name: parent
+        description: 'The parent category.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      children:
+        custom: []
+        name: children
+        description: 'A list of child categories.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -271,13 +581,11 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/sales-items/{id}'
+    uri: 'api/v1/categories/{id}'
     metadata:
       custom: []
-      groupName: 'Sales Items'
-      groupDescription: |-
-
-        APIs for managing sales items
+      groupName: Categories
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Update the specified resource in storage.'
@@ -292,143 +600,147 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the sales item.'
+        description: 'The ID of the category.'
         required: true
-        example: 1
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      sales_item:
+      category:
         custom: []
-        name: sales_item
-        description: 'The ID of the sales item.'
+        name: category
+        description: 'The ID of the category.'
         required: true
-        example: 1
-        type: integer
+        example: '1'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
-      sales_item: 1
+      id: 2
+      category: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      sales_id:
+      name:
         custom: []
-        name: sales_id
-        description: 'The ID of the sales order.'
+        name: name
+        description: 'The name of the category.'
         required: true
-        example: 1
-        type: integer
+        example: '"Electronics"'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      product_id:
+      description:
         custom: []
-        name: product_id
-        description: 'The ID of the product.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      quantity:
-        custom: []
-        name: quantity
-        description: 'The quantity of the product.'
-        required: true
-        example: 10
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      discount:
-        custom: []
-        name: discount
-        description: 'The discount applied to the item.'
+        name: description
+        description: 'The description of the category.'
         required: false
-        example: '0.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      discount_type:
-        custom: []
-        name: discount_type
-        description: 'The type of discount (e.g., percentage, fixed).'
-        required: false
-        example: fixed
+        example: '"Electronic components and devices"'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      customer_price:
+      parent_id:
         custom: []
-        name: customer_price
-        description: 'The price charged to the customer.'
+        name: parent_id
+        description: 'The ID of the parent category.'
         required: false
-        example: '100.00'
-        type: numeric
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: 'The total amount for the item.'
-        required: true
-        example: '1000.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
+        nullable: true
         deprecated: false
     cleanBodyParameters:
-      sales_id: 1
-      product_id: 1
-      quantity: 10
-      discount: '0.00'
-      discount_type: fixed
-      customer_price: '100.00'
-      total: '1000.00'
+      name: '"Electronics"'
+      description: '"Electronic components and devices"'
+      parent_id: 1
     fileParameters: []
     responses:
       -
         custom: []
-        status: 200
-        content: |-
-          {
-              "data": {
-                  "id": 1,
-                  "sales_id": 1,
-                  "product_id": 1,
-                  "quantity": 10,
-                  "discount": 0.00,
-                  "discount_type": "fixed",
-                  "customer_price": 100.00,
-                  "total": 1000.00,
-                  "created_at": "2023-10-26T12:00:00.000000Z",
-                  "updated_at": "2023-10-27T12:00:00.000000Z"
-              }
-          }
+        status: 422
+        content: '{"success": false, "message": "Failed to update category."}'
         headers: []
-        description: ''
-    responseFields: []
+        description: 'Update Failed'
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the category.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the category.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'The description of the category.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      parent_id:
+        custom: []
+        name: parent_id
+        description: 'The ID of the parent category.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the category was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the category was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -436,13 +748,11 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/v1/sales-items/{id}'
+    uri: 'api/v1/categories/{id}'
     metadata:
       custom: []
-      groupName: 'Sales Items'
-      groupDescription: |-
-
-        APIs for managing sales items
+      groupName: Categories
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Remove the specified resource from storage.'
@@ -457,28 +767,28 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the sales item.'
+        description: 'The ID of the category.'
         required: true
-        example: 1
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      sales_item:
+      category:
         custom: []
-        name: sales_item
-        description: 'The ID of the sales item to delete.'
+        name: category
+        description: 'The ID of the category.'
         required: true
-        example: 1
-        type: integer
+        example: '1'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
-      sales_item: 1
+      id: 2
+      category: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -491,11 +801,17 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 500
+        content: '{"success": false, "message": "Failed to delete category."}'
+        headers: []
+        description: 'Deletion Failed'
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null

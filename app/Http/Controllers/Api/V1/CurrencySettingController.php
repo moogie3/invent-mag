@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CurrencySettingResource;
 use App\Models\CurrencySetting;
-use Illuminate\Http\Request;
+use App\Services\CurrencyService;
 
 /**
  * @group Currency Settings
@@ -14,81 +14,70 @@ use Illuminate\Http\Request;
  */
 class CurrencySettingController extends Controller
 {
+    protected $currencyService;
+
+    public function __construct(CurrencyService $currencyService)
+    {
+        $this->currencyService = $currencyService;
+    }
     /**
      * Display a listing of the currency settings.
      *
+     * @group Currency Settings
+     * @authenticated
      * @queryParam per_page int The number of settings to return per page. Defaults to 15. Example: 25
-     */
-    public function index(Request $request)
-    {
-        $perPage = $request->query('per_page', 15);
-        $settings = CurrencySetting::paginate($perPage);
-        return CurrencySettingResource::collection($settings);
-    }
-
-    /**
-     * Store a newly created resource in storage.
      *
-     * @response 201 scenario="Success"
+     * @responseField id integer The ID of the currency setting.
+     * @responseField currency_symbol string The currency symbol.
+     * @responseField decimal_separator string The decimal separator.
+     * @responseField thousand_separator string The thousand separator.
+     * @responseField decimal_places integer The number of decimal places.
+     * @responseField position string The position of the currency symbol.
+     * @responseField currency_code string The currency code.
+     * @responseField locale string The locale.
+     * @responseField created_at string The date and time the setting was created.
+     * @responseField updated_at string The date and time the setting was last updated.
      */
-    public function store(Request $request)
+    public function index()
     {
-        $validated = $request->validate([
-            'currency_symbol' => 'required|string|max:255',
-            'decimal_separator' => 'required|string|max:1',
-            'thousand_separator' => 'required|string|max:1',
-            'decimal_places' => 'required|integer',
-            'position' => 'required|string|max:255',
-            'currency_code' => 'required|string|max:255',
-            'locale' => 'required|string|max:255',
-        ]);
-
-        $currency_setting = CurrencySetting::create($validated);
-
-        return new CurrencySettingResource($currency_setting);
-    }
-
-    /**
-     * Display the specified currency setting.
-     *
-     * @urlParam currency_setting required The ID of the currency setting. Example: 1
-     */
-    public function show(CurrencySetting $currency_setting)
-    {
-        return new CurrencySettingResource($currency_setting);
+        $setting = CurrencySetting::first();
+        return new CurrencySettingResource($setting);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @response 200 scenario="Success"
-     */
-    public function update(Request $request, CurrencySetting $currency_setting)
-    {
-        $validated = $request->validate([
-            'currency_symbol' => 'required|string|max:255',
-            'decimal_separator' => 'required|string|max:1',
-            'thousand_separator' => 'required|string|max:1',
-            'decimal_places' => 'required|integer',
-            'position' => 'required|string|max:255',
-            'currency_code' => 'required|string|max:255',
-            'locale' => 'required|string|max:255',
-        ]);
-
-        $currency_setting->update($validated);
-
-        return new CurrencySettingResource($currency_setting);
-    }
-
-    /**
-     * Remove the specified resource from storage.
+     * @group Currency Settings
+     * @authenticated
+     * @urlParam currency_setting required The ID of the currency setting. Example: 1
+     * @bodyParam currency_symbol string required The currency symbol. Example: "$"
+     * @bodyParam decimal_separator string required The decimal separator. Example: "."
+     * @bodyParam thousand_separator string required The thousand separator. Example: ","
+     * @bodyParam decimal_places integer required The number of decimal places. Example: 2
+     * @bodyParam position string required The position of the currency symbol. Example: "prefix"
+     * @bodyParam currency_code string required The currency code. Example: "USD"
+     * @bodyParam locale string required The locale. Example: "en_US"
      *
-     * @response 204 scenario="Success"
+     * @responseField id integer The ID of the currency setting.
+     * @responseField currency_symbol string The currency symbol.
+     * @responseField decimal_separator string The decimal separator.
+     * @responseField thousand_separator string The thousand separator.
+     * @responseField decimal_places integer The number of decimal places.
+     * @responseField position string The position of the currency symbol.
+     * @responseField currency_code string The currency code.
+     * @responseField locale string The locale.
+     * @responseField created_at string The date and time the setting was created.
+     * @responseField updated_at string The date and time the setting was last updated.
+     * @response 500 scenario="Update Failed" {"success": false, "message": "Failed to update currency settings."}
      */
-    public function destroy(CurrencySetting $currency_setting)
+    public function update(\App\Http\Requests\Api\V1\UpdateCurrencySettingRequest $request)
     {
-        $currency_setting->delete();
+        $result = $this->currencyService->updateCurrency($request->validated());
 
-        return response()->noContent();
+        if (!$result['success']) {
+            return response()->json(['success' => false, 'message' => $result['message']], 500);
+        }
+
+        return new CurrencySettingResource(CurrencySetting::first());
     }
 }

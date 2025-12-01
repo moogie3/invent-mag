@@ -23,39 +23,38 @@ class PipelineStageController extends Controller
     }
 
     /**
+     * Update a Pipeline Stage
+     *
      * @group Sales Pipeline Stages
-     * @title Update a Pipeline Stage
+     * @authenticated
      * @urlParam stage integer required The ID of the pipeline stage to update. Example: 1
-     * @bodyParam name string required The new name of the stage. Example: "Negotiation"
+     * @bodyParam name string required The new name of the stage. Example: Negotiation
      * @bodyParam position integer required The new position of the stage. Example: 1
      * @bodyParam is_closed boolean Whether this stage represents a closed state. Example: false
      *
-     * @response {
-     *  "id": 1,
-     *  "name": "Negotiation",
-     *  ...
-     * }
+     * @responseField id integer The ID of the pipeline stage.
+     * @responseField sales_pipeline_id integer The ID of the sales pipeline this stage belongs to.
+     * @responseField name string The name of the stage.
+     * @responseField position integer The position of the stage.
+     * @responseField is_closed boolean Whether this stage is a closed stage.
+     * @responseField created_at string The date and time the stage was created.
+     * @responseField updated_at string The date and time the stage was last updated.
+     * @response 200 scenario="Success" {"id":1,"sales_pipeline_id":1,"name":"Negotiation","position":1,"is_closed":false,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}
      */
-    public function update(Request $request, PipelineStage $stage)
+    public function update(\App\Http\Requests\Api\V1\UpdatePipelineStageRequest $request, PipelineStage $stage)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('pipeline_stages')->ignore($stage->id)->where(function ($query) use ($stage) {
-                return $query->where('sales_pipeline_id', $stage->sales_pipeline_id);
-            })],
-            'position' => 'required|integer|min:0',
-            'is_closed' => 'boolean',
-        ]);
-
-        $stage = $this->salesPipelineService->updateStage($stage, $request->all());
+        $stage = $this->salesPipelineService->updateStage($stage, $request->validated());
         return response()->json($stage);
     }
 
     /**
+     * Delete a Pipeline Stage
+     *
      * @group Sales Pipeline Stages
-     * @title Delete a Pipeline Stage
+     * @authenticated
      * @urlParam stage integer required The ID of the pipeline stage to delete. Example: 1
      *
-     * @response 204
+     * @response 204 scenario="Success"
      */
     public function destroy(PipelineStage $stage)
     {

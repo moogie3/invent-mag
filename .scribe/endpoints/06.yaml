@@ -1,22 +1,325 @@
-name: Payments
-description: |-
-
-  APIs for managing payments
+name: 'Sales Opportunities'
+description: ''
 endpoints:
   -
     custom: []
     httpMethods:
-      - GET
-    uri: api/v1/payments
+      - PUT
+    uri: 'api/v1/sales-opportunities/{opportunity_id}/move'
     metadata:
       custom: []
-      groupName: Payments
-      groupDescription: |-
-
-        APIs for managing payments
+      groupName: 'Sales Opportunities'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the payments.'
+      title: 'Move Opportunity to a new Stage'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      opportunity_id:
+        custom: []
+        name: opportunity_id
+        description: 'The ID of the opportunity.'
+        required: true
+        example: 3
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      opportunity:
+        custom: []
+        name: opportunity
+        description: 'The ID of the sales opportunity.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      opportunity_id: 3
+      opportunity: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      pipeline_stage_id:
+        custom: []
+        name: pipeline_stage_id
+        description: 'The ID of the new pipeline stage.'
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      pipeline_stage_id: 2
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: '{"message": "Failed to move opportunity: <error message>", "type": "error"}'
+        headers: []
+        description: 'Move Failed'
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the sales opportunity.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      customer_id:
+        custom: []
+        name: customer_id
+        description: 'The ID of the customer.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sales_pipeline_id:
+        custom: []
+        name: sales_pipeline_id
+        description: 'The ID of the sales pipeline.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      pipeline_stage_id:
+        custom: []
+        name: pipeline_stage_id
+        description: 'The ID of the pipeline stage.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the sales opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'The description of the sales opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'The estimated amount of the opportunity.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      expected_close_date:
+        custom: []
+        name: expected_close_date
+        description: 'The expected close date of the opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sales_id:
+        custom: []
+        name: sales_id
+        description: 'The ID of the associated sales record.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the opportunity was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the opportunity was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/sales-opportunities/{opportunity_id}/convert'
+    metadata:
+      custom: []
+      groupName: 'Sales Opportunities'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Convert Opportunity to Sales Order'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      opportunity_id:
+        custom: []
+        name: opportunity_id
+        description: 'The ID of the opportunity.'
+        required: true
+        example: 3
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      opportunity:
+        custom: []
+        name: opportunity
+        description: 'The ID of the sales opportunity.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      opportunity_id: 3
+      opportunity: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: '{"message": "Failed to convert opportunity: <error message>", "type": "error"}'
+        headers: []
+        description: 'Conversion Failed'
+    responseFields:
+      message:
+        custom: []
+        name: message
+        description: 'A message indicating the result.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'The type of response (e.g., "success", "error").'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sales_id:
+        custom: []
+        name: sales_id
+        description: 'The ID of the newly created sales order.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/sales-opportunities
+    metadata:
+      custom: []
+      groupName: 'Sales Opportunities'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Display a listing of the sales opportunities.'
       description: ''
       authenticated: true
       deprecated: false
@@ -30,7 +333,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of payments to return per page. Defaults to 15.'
+        description: 'The number of opportunities to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -47,17 +350,347 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"paymentable_type":"App\\Models\\Purchase","paymentable_id":1,"amount":"1260.00","payment_date":"2025-10-28T09:16:25.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","paymentable":{"id":1,"invoice":"PO-00001","supplier_id":2,"user_id":null,"order_date":"2025-10-27T09:16:25.000000Z","due_date":"2025-11-10T09:16:25.000000Z","payment_type":"Cash","discount_total":25,"discount_total_type":"percentage","total":1260,"status":"Paid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","sub_total":1260,"grand_total":945,"items":[{"id":1,"po_id":1,"product_id":2,"quantity":7,"remaining_quantity":7,"price":"180.00","discount":null,"discount_type":"percentage","total":1260,"expiry_date":"2026-01-08","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}]}},{"id":2,"paymentable_type":"App\\Models\\Purchase","paymentable_id":3,"amount":"2260.00","payment_date":"2025-11-23T09:16:25.000000Z","payment_method":"Transfer","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","paymentable":{"id":3,"invoice":"PO-00003","supplier_id":3,"user_id":null,"order_date":"2025-11-18T09:16:25.000000Z","due_date":"2025-12-15T09:16:25.000000Z","payment_type":"Transfer","discount_total":31,"discount_total_type":"percentage","total":5400,"status":"Partial","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","sub_total":5400,"grand_total":3726,"items":[{"id":3,"po_id":3,"product_id":1,"quantity":9,"remaining_quantity":9,"price":"600.00","discount":null,"discount_type":"percentage","total":5400,"expiry_date":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}]}},{"id":3,"paymentable_type":"App\\Models\\Purchase","paymentable_id":4,"amount":"2764.00","payment_date":"2025-10-28T09:16:25.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","paymentable":{"id":4,"invoice":"PO-00004","supplier_id":5,"user_id":null,"order_date":"2025-10-24T09:16:25.000000Z","due_date":"2025-11-05T09:16:25.000000Z","payment_type":"Cash","discount_total":14,"discount_total_type":"fixed","total":4200,"status":"Partial","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","sub_total":4200,"grand_total":4186,"items":[{"id":4,"po_id":4,"product_id":5,"quantity":3,"remaining_quantity":3,"price":"1400.00","discount":null,"discount_type":"percentage","total":4200,"expiry_date":"2026-02-17","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}]}},{"id":4,"paymentable_type":"App\\Models\\Purchase","paymentable_id":5,"amount":"1569.00","payment_date":"2025-11-04T09:16:25.000000Z","payment_method":"-","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","paymentable":{"id":5,"invoice":"PO-00005","supplier_id":5,"user_id":null,"order_date":"2025-10-30T09:16:25.000000Z","due_date":"2025-11-10T09:16:25.000000Z","payment_type":"-","discount_total":31,"discount_total_type":"fixed","total":3930,"status":"Partial","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","sub_total":3930,"grand_total":3899,"items":[{"id":5,"po_id":5,"product_id":3,"quantity":3,"remaining_quantity":3,"price":"950.00","discount":null,"discount_type":"percentage","total":2850,"expiry_date":"2026-01-21","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":6,"po_id":5,"product_id":2,"quantity":6,"remaining_quantity":6,"price":"180.00","discount":null,"discount_type":"percentage","total":1080,"expiry_date":"2026-02-12","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}]}},{"id":5,"paymentable_type":"App\\Models\\Purchase","paymentable_id":6,"amount":"6040.00","payment_date":"2025-11-15T09:16:25.000000Z","payment_method":"Transfer","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","paymentable":{"id":6,"invoice":"PO-00006","supplier_id":4,"user_id":null,"order_date":"2025-11-11T09:16:25.000000Z","due_date":"2025-11-21T09:16:25.000000Z","payment_type":"Transfer","discount_total":28,"discount_total_type":"fixed","total":6040,"status":"Paid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","sub_total":6040,"grand_total":6012,"items":[{"id":7,"po_id":6,"product_id":2,"quantity":2,"remaining_quantity":2,"price":"180.00","discount":null,"discount_type":"percentage","total":360,"expiry_date":"2025-12-29","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":8,"po_id":6,"product_id":1,"quantity":6,"remaining_quantity":6,"price":"600.00","discount":null,"discount_type":"percentage","total":3600,"expiry_date":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":9,"po_id":6,"product_id":4,"quantity":1,"remaining_quantity":1,"price":"90.00","discount":null,"discount_type":"percentage","total":90,"expiry_date":"2026-02-04","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":10,"po_id":6,"product_id":3,"quantity":2,"remaining_quantity":2,"price":"950.00","discount":null,"discount_type":"percentage","total":1900,"expiry_date":"2025-12-09","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":11,"po_id":6,"product_id":4,"quantity":1,"remaining_quantity":1,"price":"90.00","discount":null,"discount_type":"percentage","total":90,"expiry_date":"2026-01-31","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}]}},{"id":6,"paymentable_type":"App\\Models\\Purchase","paymentable_id":8,"amount":"360.00","payment_date":"2025-10-25T09:16:25.000000Z","payment_method":"Transfer","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","paymentable":{"id":8,"invoice":"PO-00008","supplier_id":4,"user_id":null,"order_date":"2025-10-24T09:16:25.000000Z","due_date":"2025-11-16T09:16:25.000000Z","payment_type":"Transfer","discount_total":1,"discount_total_type":"fixed","total":360,"status":"Paid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","sub_total":360,"grand_total":359,"items":[{"id":14,"po_id":8,"product_id":2,"quantity":2,"remaining_quantity":2,"price":"180.00","discount":null,"discount_type":"percentage","total":360,"expiry_date":"2025-12-25","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}]}},{"id":7,"paymentable_type":"App\\Models\\Purchase","paymentable_id":9,"amount":"4238.00","payment_date":"2025-11-12T09:16:25.000000Z","payment_method":"-","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","paymentable":{"id":9,"invoice":"PO-00009","supplier_id":3,"user_id":null,"order_date":"2025-11-12T09:16:25.000000Z","due_date":"2025-12-10T09:16:25.000000Z","payment_type":"-","discount_total":45,"discount_total_type":"fixed","total":5400,"status":"Partial","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","sub_total":5400,"grand_total":5355,"items":[{"id":15,"po_id":9,"product_id":1,"quantity":9,"remaining_quantity":9,"price":"600.00","discount":null,"discount_type":"percentage","total":5400,"expiry_date":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}]}},{"id":8,"paymentable_type":"App\\Models\\Purchase","paymentable_id":10,"amount":"1044.00","payment_date":"2025-11-20T09:16:25.000000Z","payment_method":"-","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","paymentable":{"id":10,"invoice":"PO-00010","supplier_id":3,"user_id":null,"order_date":"2025-11-16T09:16:25.000000Z","due_date":"2025-11-24T09:16:25.000000Z","payment_type":"-","discount_total":3,"discount_total_type":"percentage","total":7400,"status":"Partial","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","sub_total":7400,"grand_total":7178,"items":[{"id":16,"po_id":10,"product_id":1,"quantity":3,"remaining_quantity":3,"price":"600.00","discount":null,"discount_type":"percentage","total":1800,"expiry_date":null,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":17,"po_id":10,"product_id":5,"quantity":4,"remaining_quantity":4,"price":"1400.00","discount":null,"discount_type":"percentage","total":5600,"expiry_date":"2026-01-23","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}]}},{"id":9,"paymentable_type":"App\\Models\\Sales","paymentable_id":2,"amount":"326.00","payment_date":"2025-03-02T09:16:26.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":2,"invoice":"INV-00002","customer_id":"12","user_id":1,"order_date":"2025-08-28T14:30:03.000000Z","due_date":"2025-09-16T14:30:03.000000Z","payment_type":"Cash","order_discount":12,"order_discount_type":"fixed","tax_rate":10,"total_tax":646.799999999999954525264911353588104248046875,"total":7114.8000000000001818989403545856475830078125,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","sales_opportunity_id":null,"sales_items":[{"id":4,"sales_id":2,"product_id":9,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"800.00","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","product":{"id":9,"code":"TR14","barcode":"2740660386479","name":"Low Stock LED","stock_quantity":17,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":6,"units_id":2,"supplier_id":4,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":5,"sales_id":2,"product_id":4,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"480.00","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","product":{"id":4,"code":"TR14","barcode":"9107410836319","name":"Low Stock LED","stock_quantity":12,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":2,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":6,"sales_id":2,"product_id":5,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","product":{"id":5,"code":"TR15","barcode":"5112846880205","name":"Expired Voltage Regulator","stock_quantity":16,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":1,"units_id":1,"supplier_id":4,"description":"Voltage regulator expired long ago","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":10,"paymentable_type":"App\\Models\\Sales","paymentable_id":3,"amount":"7252.08","payment_date":"2025-09-23T09:16:26.000000Z","payment_method":"eWallet","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":3,"invoice":"INV-00003","customer_id":"1","user_id":1,"order_date":"2025-07-19T14:30:03.000000Z","due_date":"2025-08-03T14:30:03.000000Z","payment_type":"eWallet","order_discount":0,"order_discount_type":"percentage","tax_rate":10,"total_tax":48,"total":528,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","sales_opportunity_id":null,"sales_items":[{"id":7,"sales_id":3,"product_id":4,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"160.00","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","product":{"id":4,"code":"TR14","barcode":"9107410836319","name":"Low Stock LED","stock_quantity":12,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":2,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":8,"sales_id":3,"product_id":9,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z","product":{"id":9,"code":"TR14","barcode":"2740660386479","name":"Low Stock LED","stock_quantity":17,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":6,"units_id":2,"supplier_id":4,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":11,"paymentable_type":"App\\Models\\Sales","paymentable_id":6,"amount":"619.00","payment_date":"2025-07-08T09:16:26.000000Z","payment_method":"-","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":6,"invoice":"INV-00006","customer_id":"10","user_id":1,"order_date":"2024-11-28T14:30:04.000000Z","due_date":"2024-12-16T14:30:04.000000Z","payment_type":"eWallet","order_discount":10,"order_discount_type":"fixed","tax_rate":10,"total_tax":79,"total":869,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":13,"sales_id":6,"product_id":4,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"800.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":4,"code":"TR14","barcode":"9107410836319","name":"Low Stock LED","stock_quantity":12,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":2,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":12,"paymentable_type":"App\\Models\\Sales","paymentable_id":7,"amount":"5266.00","payment_date":"2025-02-24T09:16:26.000000Z","payment_method":"eWallet","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":7,"invoice":"INV-00007","customer_id":"2","user_id":1,"order_date":"2025-05-28T14:30:04.000000Z","due_date":"2025-06-22T14:30:04.000000Z","payment_type":"Transfer","order_discount":2,"order_discount_type":"fixed","tax_rate":10,"total_tax":82.7999999999999971578290569595992565155029296875,"total":910.799999999999954525264911353588104248046875,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":14,"sales_id":7,"product_id":9,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"480.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":9,"code":"TR14","barcode":"2740660386479","name":"Low Stock LED","stock_quantity":17,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":6,"units_id":2,"supplier_id":4,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":15,"sales_id":7,"product_id":7,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"350.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":7,"code":"TR12","barcode":"3779775320282","name":"Expired Diode","stock_quantity":46,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":4,"units_id":3,"supplier_id":3,"description":"Diode product already expired","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":13,"paymentable_type":"App\\Models\\Sales","paymentable_id":9,"amount":"6084.10","payment_date":"2025-08-22T09:16:26.000000Z","payment_method":"-","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":9,"invoice":"INV-00009","customer_id":"6","user_id":1,"order_date":"2025-10-22T14:30:04.000000Z","due_date":"2025-11-10T14:30:04.000000Z","payment_type":"-","order_discount":17,"order_discount_type":"fixed","tax_rate":10,"total_tax":566.299999999999954525264911353588104248046875,"total":6229.3000000000001818989403545856475830078125,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":20,"sales_id":9,"product_id":4,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"480.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":4,"code":"TR14","barcode":"9107410836319","name":"Low Stock LED","stock_quantity":12,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":2,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":21,"sales_id":9,"product_id":5,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":5,"code":"TR15","barcode":"5112846880205","name":"Expired Voltage Regulator","stock_quantity":16,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":1,"units_id":1,"supplier_id":4,"description":"Voltage regulator expired long ago","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":14,"paymentable_type":"App\\Models\\Sales","paymentable_id":10,"amount":"2208.00","payment_date":"2024-11-28T09:16:26.000000Z","payment_method":"Card","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":10,"invoice":"INV-00010","customer_id":"4","user_id":1,"order_date":"2025-02-18T14:30:04.000000Z","due_date":"2025-03-10T14:30:04.000000Z","payment_type":"eWallet","order_discount":15,"order_discount_type":"fixed","tax_rate":10,"total_tax":30.5,"total":335.5,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":22,"sales_id":10,"product_id":9,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":9,"code":"TR14","barcode":"2740660386479","name":"Low Stock LED","stock_quantity":17,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":6,"units_id":2,"supplier_id":4,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":15,"paymentable_type":"App\\Models\\Sales","paymentable_id":11,"amount":"9659.10","payment_date":"2025-03-05T09:16:26.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":11,"invoice":"INV-00011","customer_id":"7","user_id":1,"order_date":"2025-08-24T14:30:04.000000Z","due_date":"2025-09-15T14:30:04.000000Z","payment_type":"Card","order_discount":12,"order_discount_type":"fixed","tax_rate":10,"total_tax":441.80000000000001136868377216160297393798828125,"total":4859.8000000000001818989403545856475830078125,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":23,"sales_id":11,"product_id":2,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1400.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":2,"code":"TR12","barcode":"4819617615387","name":"Expired Diode","stock_quantity":50,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":2,"units_id":1,"supplier_id":2,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":24,"sales_id":11,"product_id":6,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"2200.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":6,"code":"TR11","barcode":"5089614188767","name":"Near Low Stock Capacitor","stock_quantity":19,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":6,"units_id":3,"supplier_id":9,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":25,"sales_id":11,"product_id":4,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":4,"code":"TR14","barcode":"9107410836319","name":"Low Stock LED","stock_quantity":12,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":2,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":26,"sales_id":11,"product_id":7,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"350.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":7,"code":"TR12","barcode":"3779775320282","name":"Expired Diode","stock_quantity":46,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":4,"units_id":3,"supplier_id":3,"description":"Diode product already expired","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":27,"sales_id":11,"product_id":4,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"160.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":4,"code":"TR14","barcode":"9107410836319","name":"Low Stock LED","stock_quantity":12,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":2,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":16,"paymentable_type":"App\\Models\\Sales","paymentable_id":12,"amount":"1553.00","payment_date":"2025-05-15T09:16:26.000000Z","payment_method":"Transfer","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":12,"invoice":"INV-00012","customer_id":"9","user_id":1,"order_date":"2025-09-21T14:30:04.000000Z","due_date":"2025-10-02T14:30:04.000000Z","payment_type":"Cash","order_discount":17,"order_discount_type":"percentage","tax_rate":10,"total_tax":821.700000000000045474735088646411895751953125,"total":9038.70000000000072759576141834259033203125,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":28,"sales_id":12,"product_id":6,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"5500.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":6,"code":"TR11","barcode":"5089614188767","name":"Near Low Stock Capacitor","stock_quantity":19,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":6,"units_id":3,"supplier_id":9,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":29,"sales_id":12,"product_id":1,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"4400.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":1,"code":"TR11","barcode":"7986298486210","name":"Near Low Stock Capacitor","stock_quantity":44,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":1,"supplier_id":3,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}}]}},{"id":17,"paymentable_type":"App\\Models\\Sales","paymentable_id":13,"amount":"292.00","payment_date":"2025-02-18T09:16:26.000000Z","payment_method":"Card","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":13,"invoice":"INV-00013","customer_id":"6","user_id":1,"order_date":"2025-08-26T14:30:04.000000Z","due_date":"2025-09-11T14:30:04.000000Z","payment_type":"Transfer","order_discount":13,"order_discount_type":"percentage","tax_rate":10,"total_tax":178.349999999999994315658113919198513031005859375,"total":1961.84999999999990905052982270717620849609375,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":30,"sales_id":13,"product_id":2,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"350.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":2,"code":"TR12","barcode":"4819617615387","name":"Expired Diode","stock_quantity":50,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":2,"units_id":1,"supplier_id":2,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":31,"sales_id":13,"product_id":8,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"1700.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":8,"code":"TR13","barcode":"3148624359009","name":"Near Expiry Crystal Oscillator","stock_quantity":53,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":1,"units_id":1,"supplier_id":4,"description":"Crystal oscillator expiring soon","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-09-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":18,"paymentable_type":"App\\Models\\Sales","paymentable_id":14,"amount":"3553.00","payment_date":"2025-01-23T09:16:26.000000Z","payment_method":"-","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":14,"invoice":"INV-00014","customer_id":"8","user_id":1,"order_date":"2025-08-04T14:30:04.000000Z","due_date":"2025-08-29T14:30:04.000000Z","payment_type":"-","order_discount":2,"order_discount_type":"fixed","tax_rate":10,"total_tax":629.799999999999954525264911353588104248046875,"total":6927.8000000000001818989403545856475830078125,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":32,"sales_id":14,"product_id":1,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"5500.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":1,"code":"TR11","barcode":"7986298486210","name":"Near Low Stock Capacitor","stock_quantity":44,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":1,"supplier_id":3,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":33,"sales_id":14,"product_id":4,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"800.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":4,"code":"TR14","barcode":"9107410836319","name":"Low Stock LED","stock_quantity":12,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":2,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":19,"paymentable_type":"App\\Models\\Sales","paymentable_id":15,"amount":"33.00","payment_date":"2025-02-09T09:16:26.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":15,"invoice":"INV-00015","customer_id":"10","user_id":1,"order_date":"2025-08-12T14:30:04.000000Z","due_date":"2025-08-23T14:30:04.000000Z","payment_type":"Cash","order_discount":2,"order_discount_type":"fixed","tax_rate":10,"total_tax":554.799999999999954525264911353588104248046875,"total":6102.8000000000001818989403545856475830078125,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":34,"sales_id":15,"product_id":7,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"350.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":7,"code":"TR12","barcode":"3779775320282","name":"Expired Diode","stock_quantity":46,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":4,"units_id":3,"supplier_id":3,"description":"Diode product already expired","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":35,"sales_id":15,"product_id":5,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":5,"code":"TR15","barcode":"5112846880205","name":"Expired Voltage Regulator","stock_quantity":16,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":1,"units_id":1,"supplier_id":4,"description":"Voltage regulator expired long ago","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-11-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":20,"paymentable_type":"App\\Models\\Sales","paymentable_id":17,"amount":"2260.00","payment_date":"2025-03-27T09:16:26.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":17,"invoice":"INV-00017","customer_id":"4","user_id":1,"order_date":"2025-10-13T14:30:04.000000Z","due_date":"2025-11-05T14:30:04.000000Z","payment_type":"Cash","order_discount":3,"order_discount_type":"percentage","tax_rate":10,"total_tax":213.400000000000005684341886080801486968994140625,"total":2347.40000000000009094947017729282379150390625,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":38,"sales_id":17,"product_id":1,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"1100.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":1,"code":"TR11","barcode":"7986298486210","name":"Near Low Stock Capacitor","stock_quantity":44,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":1,"supplier_id":3,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":39,"sales_id":17,"product_id":1,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"1100.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":1,"code":"TR11","barcode":"7986298486210","name":"Near Low Stock Capacitor","stock_quantity":44,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":1,"supplier_id":3,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}}]}},{"id":21,"paymentable_type":"App\\Models\\Sales","paymentable_id":18,"amount":"7387.60","payment_date":"2025-07-27T09:16:26.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":18,"invoice":"INV-00018","customer_id":"6","user_id":1,"order_date":"2025-09-20T14:30:04.000000Z","due_date":"2025-10-19T14:30:04.000000Z","payment_type":"Card","order_discount":2,"order_discount_type":"fixed","tax_rate":10,"total_tax":694.799999999999954525264911353588104248046875,"total":7642.8000000000001818989403545856475830078125,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":40,"sales_id":18,"product_id":3,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"5100.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":3,"code":"TR13","barcode":"8381563189398","name":"Near Expiry Crystal Oscillator","stock_quantity":55,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":3,"units_id":3,"supplier_id":4,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-09-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}},{"id":41,"sales_id":18,"product_id":7,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"350.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":7,"code":"TR12","barcode":"3779775320282","name":"Expired Diode","stock_quantity":46,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":4,"units_id":3,"supplier_id":3,"description":"Diode product already expired","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":42,"sales_id":18,"product_id":2,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"700.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":2,"code":"TR12","barcode":"4819617615387","name":"Expired Diode","stock_quantity":50,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":2,"units_id":1,"supplier_id":2,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":43,"sales_id":18,"product_id":4,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"480.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":4,"code":"TR14","barcode":"9107410836319","name":"Low Stock LED","stock_quantity":12,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":2,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":44,"sales_id":18,"product_id":9,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":9,"code":"TR14","barcode":"2740660386479","name":"Low Stock LED","stock_quantity":17,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":6,"units_id":2,"supplier_id":4,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":22,"paymentable_type":"App\\Models\\Sales","paymentable_id":20,"amount":"5790.40","payment_date":"2025-08-14T09:16:26.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":20,"invoice":"INV-00020","customer_id":"5","user_id":1,"order_date":"2024-11-27T14:30:04.000000Z","due_date":"2024-12-27T14:30:04.000000Z","payment_type":"eWallet","order_discount":19,"order_discount_type":"percentage","tax_rate":10,"total_tax":506.25,"total":5568.75,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":50,"sales_id":20,"product_id":10,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":10,"code":"TR15","barcode":"3867088010591","name":"Expired Voltage Regulator","stock_quantity":1,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":1,"units_id":3,"supplier_id":6,"description":"Voltage regulator expired long ago","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":51,"sales_id":20,"product_id":2,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1050.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":2,"code":"TR12","barcode":"4819617615387","name":"Expired Diode","stock_quantity":50,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":2,"units_id":1,"supplier_id":2,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":23,"paymentable_type":"App\\Models\\Sales","paymentable_id":23,"amount":"1154.00","payment_date":"2025-04-14T09:16:26.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":23,"invoice":"INV-00023","customer_id":"6","user_id":1,"order_date":"2025-04-10T14:30:04.000000Z","due_date":"2025-05-08T14:30:04.000000Z","payment_type":"eWallet","order_discount":2,"order_discount_type":"percentage","tax_rate":10,"total_tax":705.6000000000000227373675443232059478759765625,"total":7761.600000000000363797880709171295166015625,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":55,"sales_id":23,"product_id":8,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"3400.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":8,"code":"TR13","barcode":"3148624359009","name":"Near Expiry Crystal Oscillator","stock_quantity":53,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":1,"units_id":1,"supplier_id":4,"description":"Crystal oscillator expiring soon","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-09-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":56,"sales_id":23,"product_id":7,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"700.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":7,"code":"TR12","barcode":"3779775320282","name":"Expired Diode","stock_quantity":46,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":4,"units_id":3,"supplier_id":3,"description":"Diode product already expired","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":57,"sales_id":23,"product_id":8,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"1700.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":8,"code":"TR13","barcode":"3148624359009","name":"Near Expiry Crystal Oscillator","stock_quantity":53,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":1,"units_id":1,"supplier_id":4,"description":"Crystal oscillator expiring soon","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-09-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":58,"sales_id":23,"product_id":2,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1400.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":2,"code":"TR12","barcode":"4819617615387","name":"Expired Diode","stock_quantity":50,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":2,"units_id":1,"supplier_id":2,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":24,"paymentable_type":"App\\Models\\Sales","paymentable_id":24,"amount":"2347.40","payment_date":"2025-09-16T09:16:26.000000Z","payment_method":"eWallet","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":24,"invoice":"INV-00024","customer_id":"11","user_id":1,"order_date":"2025-06-16T14:30:04.000000Z","due_date":"2025-06-23T14:30:04.000000Z","payment_type":"Cash","order_discount":14,"order_discount_type":"percentage","tax_rate":10,"total_tax":304.43999999999999772626324556767940521240234375,"total":3348.84000000000014551915228366851806640625,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":59,"sales_id":24,"product_id":2,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"700.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":2,"code":"TR12","barcode":"4819617615387","name":"Expired Diode","stock_quantity":50,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":2,"units_id":1,"supplier_id":2,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-05-20T09:16:25.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":60,"sales_id":24,"product_id":9,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"640.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":9,"code":"TR14","barcode":"2740660386479","name":"Low Stock LED","stock_quantity":17,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":6,"units_id":2,"supplier_id":4,"description":"LED near expiry and low stock","warehouse_id":1,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}},{"id":61,"sales_id":24,"product_id":6,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"2200.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":6,"code":"TR11","barcode":"5089614188767","name":"Near Low Stock Capacitor","stock_quantity":19,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":6,"units_id":3,"supplier_id":9,"description":"Capacitor close to low stock","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}},{"id":25,"paymentable_type":"App\\Models\\Sales","paymentable_id":26,"amount":"2082.00","payment_date":"2025-05-17T09:16:26.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-11-20T09:16:26.000000Z","updated_at":"2025-11-20T09:16:26.000000Z","paymentable":{"id":26,"invoice":"INV-00026","customer_id":"5","user_id":1,"order_date":"2025-03-05T14:30:04.000000Z","due_date":"2025-03-23T14:30:04.000000Z","payment_type":"Cash","order_discount":20,"order_discount_type":"percentage","tax_rate":10,"total_tax":416,"total":4576,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":63,"sales_id":26,"product_id":10,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-11-20T14:30:04.000000Z","updated_at":"2025-11-20T14:30:04.000000Z","product":{"id":10,"code":"TR15","barcode":"3867088010591","name":"Expired Voltage Regulator","stock_quantity":1,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":1,"units_id":3,"supplier_id":6,"description":"Voltage regulator expired long ago","warehouse_id":2,"image":"http:\/\/localhost:8000\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}}]}}],"links":{"first":"http:\/\/localhost:8000\/api\/v1\/payments?page=1","last":"http:\/\/localhost:8000\/api\/v1\/payments?page=6","prev":null,"next":"http:\/\/localhost:8000\/api\/v1\/payments?page=2"},"meta":{"current_page":1,"from":1,"last_page":6,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/payments?page=1","label":"1","active":true},{"url":"http:\/\/localhost:8000\/api\/v1\/payments?page=2","label":"2","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/payments?page=3","label":"3","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/payments?page=4","label":"4","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/payments?page=5","label":"5","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/payments?page=6","label":"6","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/payments?page=2","label":"Next &raquo;","active":false}],"path":"http:\/\/localhost:8000\/api\/v1\/payments","per_page":25,"to":25,"total":141}}'
+        content: '{"data":[{"id":3,"customer_id":6,"sales_pipeline_id":1,"pipeline_stage_id":5,"name":"Opportunity 3","description":null,"amount":"6990.00","expected_close_date":null,"status":"open","sales_id":null,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"pipeline":{"id":1,"name":"Default Pipeline","description":"The default sales pipeline.","is_default":1,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z"},"stage":{"id":5,"sales_pipeline_id":1,"name":"Lost","position":5,"is_closed":1,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z"}},{"id":4,"customer_id":2,"sales_pipeline_id":1,"pipeline_stage_id":4,"name":"Opportunity 4","description":null,"amount":"3864.00","expected_close_date":null,"status":"open","sales_id":null,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"pipeline":{"id":1,"name":"Default Pipeline","description":"The default sales pipeline.","is_default":1,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z"},"stage":{"id":4,"sales_pipeline_id":1,"name":"Won","position":4,"is_closed":1,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z"}},{"id":5,"customer_id":5,"sales_pipeline_id":1,"pipeline_stage_id":4,"name":"Opportunity 5","description":null,"amount":"5899.00","expected_close_date":null,"status":"open","sales_id":null,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"pipeline":{"id":1,"name":"Default Pipeline","description":"The default sales pipeline.","is_default":1,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z"},"stage":{"id":4,"sales_pipeline_id":1,"name":"Won","position":4,"is_closed":1,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z"}}]}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
-    responseFields: []
+    responseFields:
+      data:
+        custom: []
+        name: data
+        description: 'A list of sales opportunities.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].id':
+        custom: []
+        name: 'data[].id'
+        description: 'The ID of the sales opportunity.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].customer_id':
+        custom: []
+        name: 'data[].customer_id'
+        description: 'The ID of the customer.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].sales_pipeline_id':
+        custom: []
+        name: 'data[].sales_pipeline_id'
+        description: 'The ID of the sales pipeline.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].pipeline_stage_id':
+        custom: []
+        name: 'data[].pipeline_stage_id'
+        description: 'The ID of the pipeline stage.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].name':
+        custom: []
+        name: 'data[].name'
+        description: 'The name of the sales opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].description':
+        custom: []
+        name: 'data[].description'
+        description: 'The description of the sales opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].amount':
+        custom: []
+        name: 'data[].amount'
+        description: 'The estimated amount of the opportunity.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].expected_close_date':
+        custom: []
+        name: 'data[].expected_close_date'
+        description: 'The expected close date of the opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].status':
+        custom: []
+        name: 'data[].status'
+        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].sales_id':
+        custom: []
+        name: 'data[].sales_id'
+        description: 'The ID of the associated sales record.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].created_at':
+        custom: []
+        name: 'data[].created_at'
+        description: 'The date and time the opportunity was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].updated_at':
+        custom: []
+        name: 'data[].updated_at'
+        description: 'The date and time the opportunity was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].pipeline':
+        custom: []
+        name: 'data[].pipeline'
+        description: 'The sales pipeline.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].stage':
+        custom: []
+        name: 'data[].stage'
+        description: 'The pipeline stage.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].customer':
+        custom: []
+        name: 'data[].customer'
+        description: 'The customer.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].items':
+        custom: []
+        name: 'data[].items'
+        description: 'The items in the opportunity.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links:
+        custom: []
+        name: links
+        description: 'Links for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.first:
+        custom: []
+        name: links.first
+        description: 'The URL of the first page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.last:
+        custom: []
+        name: links.last
+        description: 'The URL of the last page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.prev:
+        custom: []
+        name: links.prev
+        description: 'The URL of the previous page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.next:
+        custom: []
+        name: links.next
+        description: 'The URL of the next page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta:
+        custom: []
+        name: meta
+        description: 'Metadata for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.current_page:
+        custom: []
+        name: meta.current_page
+        description: 'The current page number.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.from:
+        custom: []
+        name: meta.from
+        description: 'The starting number of the results on the current page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.last_page:
+        custom: []
+        name: meta.last_page
+        description: 'The last page number.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.path:
+        custom: []
+        name: meta.path
+        description: 'The URL path.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.per_page:
+        custom: []
+        name: meta.per_page
+        description: 'The number of results per page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.to:
+        custom: []
+        name: meta.to
+        description: 'The ending number of the results on the current page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.total:
+        custom: []
+        name: meta.total
+        description: 'The total number of results.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -65,13 +698,11 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/payments
+    uri: api/v1/sales-opportunities
     metadata:
       custom: []
-      groupName: Payments
-      groupDescription: |-
-
-        APIs for managing payments
+      groupName: 'Sales Opportunities'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Store a newly created resource in storage.'
@@ -87,23 +718,253 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      paymentable_id:
+      customer_id:
         custom: []
-        name: paymentable_id
-        description: ''
+        name: customer_id
+        description: 'The ID of the customer.'
         required: true
-        example: 17
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sales_pipeline_id:
+        custom: []
+        name: sales_pipeline_id
+        description: 'The ID of the sales pipeline.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      pipeline_stage_id:
+        custom: []
+        name: pipeline_stage_id
+        description: 'The ID of the pipeline stage.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the sales opportunity.'
+        required: true
+        example: 'New Client Project'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the sales opportunity.'
+        required: false
+        example: 'Develop a new e-commerce platform.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      expected_close_date:
+        custom: []
+        name: expected_close_date
+        description: 'The expected close date of the opportunity.'
+        required: false
+        example: '2024-12-31'
+        type: date
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+        required: false
+        example: Open
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      items:
+        custom: []
+        name: items
+        description: 'A list of product items for the opportunity.'
+        required: true
+        example:
+          - consequatur
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'items[].product_id':
+        custom: []
+        name: 'items[].product_id'
+        description: 'The <code>id</code> of an existing record in the products table.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'items[].quantity':
+        custom: []
+        name: 'items[].quantity'
+        description: 'Must be at least 1.'
+        required: true
+        example: 45
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      paymentable_type:
+      'items[].price':
         custom: []
-        name: paymentable_type
-        description: ''
+        name: 'items[].price'
+        description: 'Must be at least 0.'
         required: true
-        example: consequatur
+        example: 56
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'The estimated amount of the opportunity.'
+        required: false
+        example: '50000.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      'items.*.product_id':
+        custom: []
+        name: 'items.*.product_id'
+        description: 'The ID of the product.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      'items.*.quantity':
+        custom: []
+        name: 'items.*.quantity'
+        description: 'The quantity of the product.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      'items.*.price':
+        custom: []
+        name: 'items.*.price'
+        description: 'The price of the product.'
+        required: true
+        example: '100.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      customer_id: 1
+      sales_pipeline_id: 1
+      pipeline_stage_id: 1
+      name: 'New Client Project'
+      description: 'Develop a new e-commerce platform.'
+      expected_close_date: '2024-12-31'
+      status: Open
+      items:
+        - consequatur
+      amount: '50000.00'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: '{"message": "Failed to create opportunity: <error message>", "type": "error"}'
+        headers: []
+        description: 'Creation Failed'
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the sales opportunity.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      customer_id:
+        custom: []
+        name: customer_id
+        description: 'The ID of the customer.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sales_pipeline_id:
+        custom: []
+        name: sales_pipeline_id
+        description: 'The ID of the sales pipeline.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      pipeline_stage_id:
+        custom: []
+        name: pipeline_stage_id
+        description: 'The ID of the pipeline stage.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the sales opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'The description of the sales opportunity.'
+        required: false
+        example: null
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -112,67 +973,84 @@ endpoints:
       amount:
         custom: []
         name: amount
-        description: ''
-        required: true
-        example: 11613.31890586
+        description: 'The estimated amount of the opportunity.'
+        required: false
+        example: null
         type: number
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      payment_date:
+      expected_close_date:
         custom: []
-        name: payment_date
-        description: 'Must be a valid date.'
-        required: true
-        example: '2025-11-21T06:50:03'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      payment_method:
-        custom: []
-        name: payment_method
-        description: ''
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: ''
+        name: expected_close_date
+        description: 'The expected close date of the opportunity.'
         required: false
-        example: consequatur
+        example: null
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         deprecated: false
-    cleanBodyParameters:
-      paymentable_id: 17
-      paymentable_type: consequatur
-      amount: 11613.31890586
-      payment_date: '2025-11-21T06:50:03'
-      payment_method: consequatur
-      notes: consequatur
-    fileParameters: []
-    responses:
-      -
+      status:
         custom: []
-        status: 201
-        content: ''
-        headers: []
-        description: Success
-    responseFields: []
+        name: status
+        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sales_id:
+        custom: []
+        name: sales_id
+        description: 'The ID of the associated sales record.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the opportunity was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the opportunity was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      items:
+        custom: []
+        name: items
+        description: 'The items in the opportunity.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -180,16 +1058,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/payments/{id}'
+    uri: 'api/v1/sales-opportunities/{id}'
     metadata:
       custom: []
-      groupName: Payments
-      groupDescription: |-
-
-        APIs for managing payments
+      groupName: 'Sales Opportunities'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified payment.'
+      title: 'Display the specified sales opportunity.'
       description: ''
       authenticated: true
       deprecated: false
@@ -201,18 +1077,18 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the payment.'
+        description: 'The ID of the sales opportunity.'
         required: true
-        example: 1
+        example: 3
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      payment:
+      sales_opportunity:
         custom: []
-        name: payment
-        description: 'The ID of the payment.'
+        name: sales_opportunity
+        description: 'The ID of the sales opportunity.'
         required: true
         example: '1'
         type: string
@@ -221,8 +1097,8 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
-      payment: '1'
+      id: 3
+      sales_opportunity: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -232,17 +1108,193 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"paymentable_type":"App\\Models\\Purchase","paymentable_id":1,"amount":"1260.00","payment_date":"2025-10-28T09:16:25.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","paymentable":{"id":1,"invoice":"PO-00001","supplier_id":2,"user_id":null,"order_date":"2025-10-27T09:16:25.000000Z","due_date":"2025-11-10T09:16:25.000000Z","payment_type":"Cash","discount_total":25,"discount_total_type":"percentage","total":1260,"status":"Paid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z","sub_total":1260,"grand_total":945,"items":[{"id":1,"po_id":1,"product_id":2,"quantity":7,"remaining_quantity":7,"price":"180.00","discount":null,"discount_type":"percentage","total":1260,"expiry_date":"2026-01-08","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}]}}}'
+        content: '{"data":{"id":3,"customer_id":6,"sales_pipeline_id":1,"pipeline_stage_id":5,"name":"Opportunity 3","description":null,"amount":"6990.00","expected_close_date":null,"status":"open","sales_id":null,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z","pipeline":{"id":1,"name":"Default Pipeline","description":"The default sales pipeline.","is_default":1,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z"},"stage":{"id":5,"sales_pipeline_id":1,"name":"Lost","position":5,"is_closed":1,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z"},"customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"items":[{"id":5,"sales_opportunity_id":3,"product_id":5,"quantity":2,"price":2600,"created_at":"2025-11-30T05:06:06.000000Z","updated_at":"2025-11-30T05:06:06.000000Z"}]}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
-    responseFields: []
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the sales opportunity.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      customer_id:
+        custom: []
+        name: customer_id
+        description: 'The ID of the customer.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sales_pipeline_id:
+        custom: []
+        name: sales_pipeline_id
+        description: 'The ID of the sales pipeline.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      pipeline_stage_id:
+        custom: []
+        name: pipeline_stage_id
+        description: 'The ID of the pipeline stage.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the sales opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'The description of the sales opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'The estimated amount of the opportunity.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      expected_close_date:
+        custom: []
+        name: expected_close_date
+        description: 'The expected close date of the opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sales_id:
+        custom: []
+        name: sales_id
+        description: 'The ID of the associated sales record.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the opportunity was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the opportunity was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      pipeline:
+        custom: []
+        name: pipeline
+        description: 'The sales pipeline.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      stage:
+        custom: []
+        name: stage
+        description: 'The pipeline stage.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      customer:
+        custom: []
+        name: customer
+        description: 'The customer.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      items:
+        custom: []
+        name: items
+        description: 'The items in the opportunity.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -251,13 +1303,11 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/payments/{id}'
+    uri: 'api/v1/sales-opportunities/{id}'
     metadata:
       custom: []
-      groupName: Payments
-      groupDescription: |-
-
-        APIs for managing payments
+      groupName: 'Sales Opportunities'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Update the specified resource in storage.'
@@ -272,36 +1322,278 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the payment.'
+        description: 'The ID of the sales opportunity.'
+        required: true
+        example: 3
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sales_opportunity:
+        custom: []
+        name: sales_opportunity
+        description: 'The ID of the sales opportunity.'
         required: true
         example: 1
         type: integer
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 3
+      sales_opportunity: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      paymentable_id:
+      customer_id:
         custom: []
-        name: paymentable_id
-        description: ''
+        name: customer_id
+        description: 'The ID of the customer.'
         required: true
-        example: 17
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sales_pipeline_id:
+        custom: []
+        name: sales_pipeline_id
+        description: 'The ID of the sales pipeline.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      pipeline_stage_id:
+        custom: []
+        name: pipeline_stage_id
+        description: 'The ID of the pipeline stage.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the sales opportunity.'
+        required: true
+        example: 'New Client Project'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the sales opportunity.'
+        required: false
+        example: 'Develop a new e-commerce platform.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      expected_close_date:
+        custom: []
+        name: expected_close_date
+        description: 'The expected close date of the opportunity.'
+        required: false
+        example: '2024-12-31'
+        type: date
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+        required: false
+        example: Open
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      items:
+        custom: []
+        name: items
+        description: 'A list of product items for the opportunity.'
+        required: true
+        example:
+          - consequatur
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'items[].product_id':
+        custom: []
+        name: 'items[].product_id'
+        description: 'The <code>id</code> of an existing record in the products table.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'items[].quantity':
+        custom: []
+        name: 'items[].quantity'
+        description: 'Must be at least 1.'
+        required: true
+        example: 45
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      paymentable_type:
+      'items[].price':
         custom: []
-        name: paymentable_type
-        description: ''
+        name: 'items[].price'
+        description: 'Must be at least 0.'
         required: true
-        example: consequatur
+        example: 56
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'The estimated amount of the opportunity.'
+        required: false
+        example: '50000.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      'items.*.product_id':
+        custom: []
+        name: 'items.*.product_id'
+        description: 'The ID of the product.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      'items.*.quantity':
+        custom: []
+        name: 'items.*.quantity'
+        description: 'The quantity of the product.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      'items.*.price':
+        custom: []
+        name: 'items.*.price'
+        description: 'The price of the product.'
+        required: true
+        example: '100.00'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      customer_id: 1
+      sales_pipeline_id: 1
+      pipeline_stage_id: 1
+      name: 'New Client Project'
+      description: 'Develop a new e-commerce platform.'
+      expected_close_date: '2024-12-31'
+      status: Open
+      items:
+        - consequatur
+      amount: '50000.00'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: '{"message": "Failed to update opportunity: <error message>", "type": "error"}'
+        headers: []
+        description: 'Update Failed'
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the sales opportunity.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      customer_id:
+        custom: []
+        name: customer_id
+        description: 'The ID of the customer.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sales_pipeline_id:
+        custom: []
+        name: sales_pipeline_id
+        description: 'The ID of the sales pipeline.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      pipeline_stage_id:
+        custom: []
+        name: pipeline_stage_id
+        description: 'The ID of the pipeline stage.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the sales opportunity.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'The description of the sales opportunity.'
+        required: false
+        example: null
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -310,67 +1602,84 @@ endpoints:
       amount:
         custom: []
         name: amount
-        description: ''
-        required: true
-        example: 11613.31890586
+        description: 'The estimated amount of the opportunity.'
+        required: false
+        example: null
         type: number
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      payment_date:
+      expected_close_date:
         custom: []
-        name: payment_date
-        description: 'Must be a valid date.'
-        required: true
-        example: '2025-11-21T06:50:03'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      payment_method:
-        custom: []
-        name: payment_method
-        description: ''
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: ''
+        name: expected_close_date
+        description: 'The expected close date of the opportunity.'
         required: false
-        example: consequatur
+        example: null
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         deprecated: false
-    cleanBodyParameters:
-      paymentable_id: 17
-      paymentable_type: consequatur
-      amount: 11613.31890586
-      payment_date: '2025-11-21T06:50:03'
-      payment_method: consequatur
-      notes: consequatur
-    fileParameters: []
-    responses:
-      -
+      status:
         custom: []
-        status: 200
-        content: ''
-        headers: []
-        description: Success
-    responseFields: []
+        name: status
+        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sales_id:
+        custom: []
+        name: sales_id
+        description: 'The ID of the associated sales record.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the opportunity was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the opportunity was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      items:
+        custom: []
+        name: items
+        description: 'The items in the opportunity.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -378,13 +1687,11 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/v1/payments/{id}'
+    uri: 'api/v1/sales-opportunities/{id}'
     metadata:
       custom: []
-      groupName: Payments
-      groupDescription: |-
-
-        APIs for managing payments
+      groupName: 'Sales Opportunities'
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Remove the specified resource from storage.'
@@ -399,16 +1706,28 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the payment.'
+        description: 'The ID of the sales opportunity.'
         required: true
-        example: 1
+        example: 3
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      sales_opportunity:
+        custom: []
+        name: sales_opportunity
+        description: 'The ID of the sales opportunity to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 3
+      sales_opportunity: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -421,11 +1740,17 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 500
+        content: '{"message": "Failed to delete opportunity: <error message>", "type": "error"}'
+        headers: []
+        description: 'Deletion Failed'
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null

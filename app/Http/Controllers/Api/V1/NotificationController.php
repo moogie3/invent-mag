@@ -21,11 +21,12 @@ class NotificationController extends Controller
     }
 
     /**
+     * Get Notification Count
+     *
      * @group Notifications
-     * @title Get Notification Count
-     * @response {
-     *  "count": 5
-     * }
+     * @authenticated
+     *
+     * @responseField count integer The total number of notifications.
      */
     public function count()
     {
@@ -34,19 +35,17 @@ class NotificationController extends Controller
     }
 
     /**
+     * Get All Notifications
+     *
      * @group Notifications
-     * @title Get All Notifications
-     * @response {
-     *  "notifications": [
-     *      {
-     *          "id": "po::1",
-     *          "title": "Purchase Order Due",
-     *          "description": "Invoice #123 is due tomorrow.",
-     *          "urgency": "high",
-     *          "route": "/admin/po/view/1"
-     *      }
-     *  ]
-     * }
+     * @authenticated
+     *
+     * @responseField notifications object[] A list of notifications.
+     * @responseField notifications[].id string The composite ID of the notification.
+     * @responseField notifications[].title string The title of the notification.
+     * @responseField notifications[].description string The description of the notification.
+     * @responseField notifications[].urgency string The urgency of the notification.
+     * @responseField notifications[].route string The route for the notification.
      */
     public function getNotifications()
     {
@@ -64,13 +63,13 @@ class NotificationController extends Controller
     }
 
     /**
+     * Mark Notification as Read
+     *
      * @group Notifications
-     * @title Mark Notification as Read
+     * @authenticated
      * @urlParam id string required The composite ID of the notification to mark as read. Example: "po::1"
      *
-     * @response {
-     *  "success": true
-     * }
+     * @responseField success boolean Indicates whether the request was successful.
      */
     public function markAsRead($id)
     {

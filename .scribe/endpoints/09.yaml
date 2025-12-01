@@ -1,22 +1,18 @@
-name: POS
-description: |-
-
-  APIs for managing Point of Sale
+name: Notifications
+description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/pos
+    uri: api/v1/notifications/count
     metadata:
       custom: []
-      groupName: POS
-      groupDescription: |-
-
-        APIs for managing Point of Sale
+      groupName: Notifications
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the resource.'
+      title: 'Get Notification Count'
       description: ''
       authenticated: true
       deprecated: false
@@ -26,20 +22,8 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters:
-      per_page:
-        custom: []
-        name: per_page
-        description: 'The number of items to return per page. Defaults to 15.'
-        required: false
-        example: 25
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanQueryParameters:
-      per_page: 25
+    queryParameters: []
+    cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -47,17 +31,138 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"invoice":"PO-00001","supplier_id":2,"user_id":null,"order_date":"2025-10-27T09:16:25.000000Z","due_date":"2025-11-10T09:16:25.000000Z","payment_type":"Cash","discount_total":"25.00","discount_total_type":"percentage","total":1260,"status":"Paid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":2,"invoice":"PO-00002","supplier_id":1,"user_id":null,"order_date":"2025-11-01T09:16:25.000000Z","due_date":"2025-11-24T09:16:25.000000Z","payment_type":"Transfer","discount_total":"49.00","discount_total_type":"percentage","total":1260,"status":"Unpaid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":3,"invoice":"PO-00003","supplier_id":3,"user_id":null,"order_date":"2025-11-18T09:16:25.000000Z","due_date":"2025-12-15T09:16:25.000000Z","payment_type":"Transfer","discount_total":"31.00","discount_total_type":"percentage","total":5400,"status":"Partial","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":4,"invoice":"PO-00004","supplier_id":5,"user_id":null,"order_date":"2025-10-24T09:16:25.000000Z","due_date":"2025-11-05T09:16:25.000000Z","payment_type":"Cash","discount_total":"14.00","discount_total_type":"fixed","total":4200,"status":"Partial","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":5,"invoice":"PO-00005","supplier_id":5,"user_id":null,"order_date":"2025-10-30T09:16:25.000000Z","due_date":"2025-11-10T09:16:25.000000Z","payment_type":"-","discount_total":"31.00","discount_total_type":"fixed","total":3930,"status":"Partial","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":6,"invoice":"PO-00006","supplier_id":4,"user_id":null,"order_date":"2025-11-11T09:16:25.000000Z","due_date":"2025-11-21T09:16:25.000000Z","payment_type":"Transfer","discount_total":"28.00","discount_total_type":"fixed","total":6040,"status":"Paid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":7,"invoice":"PO-00007","supplier_id":5,"user_id":null,"order_date":"2025-10-27T09:16:25.000000Z","due_date":"2025-11-20T09:16:25.000000Z","payment_type":"Transfer","discount_total":"25.00","discount_total_type":"fixed","total":4980,"status":"Unpaid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":8,"invoice":"PO-00008","supplier_id":4,"user_id":null,"order_date":"2025-10-24T09:16:25.000000Z","due_date":"2025-11-16T09:16:25.000000Z","payment_type":"Transfer","discount_total":"1.00","discount_total_type":"fixed","total":360,"status":"Paid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":9,"invoice":"PO-00009","supplier_id":3,"user_id":null,"order_date":"2025-11-12T09:16:25.000000Z","due_date":"2025-12-10T09:16:25.000000Z","payment_type":"-","discount_total":"45.00","discount_total_type":"fixed","total":5400,"status":"Partial","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":10,"invoice":"PO-00010","supplier_id":3,"user_id":null,"order_date":"2025-11-16T09:16:25.000000Z","due_date":"2025-11-24T09:16:25.000000Z","payment_type":"-","discount_total":"3.00","discount_total_type":"percentage","total":7400,"status":"Partial","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"},{"id":11,"invoice":"PO-00011","supplier_id":5,"user_id":null,"order_date":"2025-11-14T14:30:03.000000Z","due_date":"2025-12-10T14:30:03.000000Z","payment_type":"-","discount_total":"35.00","discount_total_type":"fixed","total":1400,"status":"Paid","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":12,"invoice":"PO-00012","supplier_id":5,"user_id":null,"order_date":"2025-10-26T14:30:03.000000Z","due_date":"2025-11-15T14:30:03.000000Z","payment_type":"Transfer","discount_total":"29.00","discount_total_type":"fixed","total":3510,"status":"Paid","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":13,"invoice":"PO-00013","supplier_id":7,"user_id":null,"order_date":"2025-11-12T14:30:03.000000Z","due_date":"2025-12-08T14:30:03.000000Z","payment_type":"Transfer","discount_total":"8.00","discount_total_type":"fixed","total":8660,"status":"Paid","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":14,"invoice":"PO-00014","supplier_id":6,"user_id":null,"order_date":"2025-11-07T14:30:03.000000Z","due_date":"2025-11-26T14:30:03.000000Z","payment_type":"Cash","discount_total":"36.00","discount_total_type":"fixed","total":540,"status":"Unpaid","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":15,"invoice":"PO-00015","supplier_id":8,"user_id":null,"order_date":"2025-10-25T14:30:03.000000Z","due_date":"2025-11-04T14:30:03.000000Z","payment_type":"Transfer","discount_total":"41.00","discount_total_type":"percentage","total":6000,"status":"Paid","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":16,"invoice":"PO-00016","supplier_id":7,"user_id":null,"order_date":"2025-11-11T14:30:03.000000Z","due_date":"2025-11-18T14:30:03.000000Z","payment_type":"Transfer","discount_total":"37.00","discount_total_type":"fixed","total":950,"status":"Unpaid","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":17,"invoice":"PO-00017","supplier_id":2,"user_id":null,"order_date":"2025-11-14T14:30:03.000000Z","due_date":"2025-12-11T14:30:03.000000Z","payment_type":"-","discount_total":"14.00","discount_total_type":"fixed","total":7000,"status":"Paid","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":18,"invoice":"PO-00018","supplier_id":9,"user_id":null,"order_date":"2025-11-17T14:30:03.000000Z","due_date":"2025-12-04T14:30:03.000000Z","payment_type":"-","discount_total":"37.00","discount_total_type":"percentage","total":900,"status":"Paid","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":19,"invoice":"PO-00019","supplier_id":9,"user_id":null,"order_date":"2025-11-16T14:30:03.000000Z","due_date":"2025-11-26T14:30:03.000000Z","payment_type":"Cash","discount_total":"3.00","discount_total_type":"fixed","total":1800,"status":"Unpaid","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"},{"id":20,"invoice":"PO-00020","supplier_id":1,"user_id":null,"order_date":"2025-11-09T14:30:03.000000Z","due_date":"2025-11-16T14:30:03.000000Z","payment_type":"Transfer","discount_total":"43.00","discount_total_type":"fixed","total":1900,"status":"Paid","created_at":"2025-11-20T14:30:03.000000Z","updated_at":"2025-11-20T14:30:03.000000Z"}],"links":{"first":"http:\/\/localhost:8000\/api\/v1\/pos?page=1","last":"http:\/\/localhost:8000\/api\/v1\/pos?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost:8000\/api\/v1\/pos?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost:8000\/api\/v1\/pos","per_page":25,"to":20,"total":20}}'
+        content: '{"count":63}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
-    responseFields: []
+    responseFields:
+      count:
+        custom: []
+        name: count
+        description: 'The total number of notifications.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/notifications
+    metadata:
+      custom: []
+      groupName: Notifications
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get All Notifications'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"notifications":[{"id":"sale::72","title":"Due Invoice: #INV-00072","description":"Due on Dec 27, 2024","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/72"},{"id":"sale::70","title":"Due Invoice: #INV-00070","description":"Due on Jan 01, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/70"},{"id":"sale::4","title":"Due Invoice: #INV-00004","description":"Due on Jan 13, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/4"},{"id":"sale::49","title":"Due Invoice: #INV-00049","description":"Due on Jan 19, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/49"},{"id":"sale::61","title":"Due Invoice: #INV-00061","description":"Due on Jan 22, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/61"},{"id":"sale::63","title":"Due Invoice: #INV-00063","description":"Due on Feb 04, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/63"},{"id":"sale::41","title":"Due Invoice: #INV-00041","description":"Due on Feb 10, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/41"},{"id":"sale::89","title":"Due Invoice: #INV-00089","description":"Due on Feb 14, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/89"},{"id":"sale::35","title":"Due Invoice: #INV-00035","description":"Due on Feb 15, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/35"},{"id":"sale::100","title":"Due Invoice: #INV-00100","description":"Due on Feb 19, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/100"},{"id":"sale::47","title":"Due Invoice: #INV-00047","description":"Due on Mar 07, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/47"},{"id":"sale::28","title":"Due Invoice: #INV-00028","description":"Due on Mar 23, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/28"},{"id":"sale::79","title":"Due Invoice: #INV-00079","description":"Due on Mar 24, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/79"},{"id":"sale::38","title":"Due Invoice: #INV-00038","description":"Due on Mar 26, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/38"},{"id":"sale::52","title":"Due Invoice: #INV-00052","description":"Due on Mar 26, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/52"},{"id":"sale::51","title":"Due Invoice: #INV-00051","description":"Due on Mar 31, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/51"},{"id":"sale::12","title":"Due Invoice: #INV-00012","description":"Due on Apr 18, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/12"},{"id":"sale::81","title":"Due Invoice: #INV-00081","description":"Due on Apr 27, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/81"},{"id":"sale::93","title":"Due Invoice: #INV-00093","description":"Due on May 12, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/93"},{"id":"sale::90","title":"Due Invoice: #INV-00090","description":"Due on Jun 01, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/90"},{"id":"sale::30","title":"Due Invoice: #INV-00030","description":"Due on Jun 02, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/30"},{"id":"sale::99","title":"Due Invoice: #INV-00099","description":"Due on Jun 13, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/99"},{"id":"sale::85","title":"Due Invoice: #INV-00085","description":"Due on Jun 18, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/85"},{"id":"sale::9","title":"Due Invoice: #INV-00009","description":"Due on Jun 23, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/9"},{"id":"sale::86","title":"Due Invoice: #INV-00086","description":"Due on Jul 03, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/86"},{"id":"sale::34","title":"Due Invoice: #INV-00034","description":"Due on Jul 07, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/34"},{"id":"sale::53","title":"Due Invoice: #INV-00053","description":"Due on Jul 11, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/53"},{"id":"sale::26","title":"Due Invoice: #INV-00026","description":"Due on Jul 13, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/26"},{"id":"sale::42","title":"Due Invoice: #INV-00042","description":"Due on Jul 14, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/42"},{"id":"sale::95","title":"Due Invoice: #INV-00095","description":"Due on Jul 17, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/95"},{"id":"sale::75","title":"Due Invoice: #INV-00075","description":"Due on Jul 20, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/75"},{"id":"sale::98","title":"Due Invoice: #INV-00098","description":"Due on Aug 01, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/98"},{"id":"sale::48","title":"Due Invoice: #INV-00048","description":"Due on Aug 13, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/48"},{"id":"sale::37","title":"Due Invoice: #INV-00037","description":"Due on Aug 18, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/37"},{"id":"sale::82","title":"Due Invoice: #INV-00082","description":"Due on Aug 19, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/82"},{"id":"sale::78","title":"Due Invoice: #INV-00078","description":"Due on Aug 20, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/78"},{"id":"sale::33","title":"Due Invoice: #INV-00033","description":"Due on Sep 01, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/33"},{"id":"sale::73","title":"Due Invoice: #INV-00073","description":"Due on Sep 01, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/73"},{"id":"sale::11","title":"Due Invoice: #INV-00011","description":"Due on Sep 02, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/11"},{"id":"sale::66","title":"Due Invoice: #INV-00066","description":"Due on Sep 04, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/66"},{"id":"sale::84","title":"Due Invoice: #INV-00084","description":"Due on Sep 17, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/84"},{"id":"sale::8","title":"Due Invoice: #INV-00008","description":"Due on Sep 19, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/8"},{"id":"sale::71","title":"Due Invoice: #INV-00071","description":"Due on Sep 21, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/71"},{"id":"sale::6","title":"Due Invoice: #INV-00006","description":"Due on Sep 29, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/6"},{"id":"sale::29","title":"Due Invoice: #INV-00029","description":"Due on Sep 30, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/29"},{"id":"sale::43","title":"Due Invoice: #INV-00043","description":"Due on Oct 01, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/43"},{"id":"sale::20","title":"Due Invoice: #INV-00020","description":"Due on Oct 10, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/20"},{"id":"sale::64","title":"Due Invoice: #INV-00064","description":"Due on Oct 12, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/64"},{"id":"sale::62","title":"Due Invoice: #INV-00062","description":"Due on Oct 13, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/62"},{"id":"sale::7","title":"Due Invoice: #INV-00007","description":"Due on Oct 14, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/7"},{"id":"sale::57","title":"Due Invoice: #INV-00057","description":"Due on Oct 22, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/57"},{"id":"sale::94","title":"Due Invoice: #INV-00094","description":"Due on Oct 22, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/94"},{"id":"sale::87","title":"Due Invoice: #INV-00087","description":"Due on Oct 24, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/87"},{"id":"sale::83","title":"Due Invoice: #INV-00083","description":"Due on Oct 27, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/83"},{"id":"sale::10","title":"Due Invoice: #INV-00010","description":"Due on Oct 31, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/10"},{"id":"sale::67","title":"Due Invoice: #INV-00067","description":"Due on Nov 02, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/67"},{"id":"sale::59","title":"Due Invoice: #INV-00059","description":"Due on Nov 03, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/59"},{"id":"sale::97","title":"Due Invoice: #INV-00097","description":"Due on Nov 15, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/97"},{"id":"sale::18","title":"Due Invoice: #INV-00018","description":"Due on Nov 20, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/18"},{"id":"po::4","title":"Due Purchase: PO #4","description":"Due on Nov 28, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/po\/edit\/4"},{"id":"po::8","title":"Due Purchase: PO #8","description":"Due on Nov 29, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/po\/edit\/8"},{"id":"sale::15","title":"Due Invoice: #INV-00015","description":"Due on Nov 29, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/sales\/edit\/15"},{"id":"po::9","title":"Due Purchase: PO #9","description":"Due on Dec 02, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/po\/edit\/9"},{"id":"poitem::24","title":"Expiring Product: Low Stock LED","description":"Expires on Dec 04, 2025","urgency":"high","route":"http:\/\/localhost\/admin\/product\/edit\/4"},{"id":"poitem::35","title":"Expiring Product: Low Stock LED","description":"Expires on Dec 08, 2025","urgency":"low","route":"http:\/\/localhost\/admin\/product\/edit\/4"}]}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields:
+      notifications:
+        custom: []
+        name: notifications
+        description: 'A list of notifications.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'notifications[].id':
+        custom: []
+        name: 'notifications[].id'
+        description: 'The composite ID of the notification.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'notifications[].title':
+        custom: []
+        name: 'notifications[].title'
+        description: 'The title of the notification.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'notifications[].description':
+        custom: []
+        name: 'notifications[].description'
+        description: 'The description of the notification.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'notifications[].urgency':
+        custom: []
+        name: 'notifications[].urgency'
+        description: 'The urgency of the notification.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'notifications[].route':
+        custom: []
+        name: 'notifications[].route'
+        description: 'The route for the notification.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -65,170 +170,14 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/pos
+    uri: 'api/v1/notifications/{id}/mark-as-read'
     metadata:
       custom: []
-      groupName: POS
-      groupDescription: |-
-
-        APIs for managing Point of Sale
+      groupName: Notifications
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Store a newly created resource in storage.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      invoice:
-        custom: []
-        name: invoice
-        description: 'The invoice number.'
-        required: true
-        example: INV-2023-001
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      supplier_id:
-        custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      order_date:
-        custom: []
-        name: order_date
-        description: 'The date of the order.'
-        required: true
-        example: '2023-10-26'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      due_date:
-        custom: []
-        name: due_date
-        description: 'The due date of the payment.'
-        required: false
-        example: '2023-11-26'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      payment_type:
-        custom: []
-        name: payment_type
-        description: 'The payment type (e.g., Cash, Credit Card).'
-        required: true
-        example: Cash
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: 'The total amount of the purchase order.'
-        required: true
-        example: '1500.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the purchase order (e.g., Pending, Paid).'
-        required: true
-        example: Pending
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      payment_date:
-        custom: []
-        name: payment_date
-        description: 'The date of payment.'
-        required: false
-        example: '2023-10-26'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      invoice: INV-2023-001
-      supplier_id: 1
-      order_date: '2023-10-26'
-      due_date: '2023-11-26'
-      payment_type: Cash
-      total: '1500.00'
-      status: Pending
-      payment_date: '2023-10-26'
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 201
-        content: |-
-          {
-              "data": {
-                  "id": 1,
-                  "invoice": "INV-2023-001",
-                  "supplier_id": 1,
-                  "order_date": "2023-10-26",
-                  "due_date": "2023-11-26",
-                  "payment_type": "Cash",
-                  "total": 1500.00,
-                  "status": "Pending",
-                  "payment_date": "2023-10-26",
-                  "created_at": "2023-10-26T12:00:00.000000Z",
-                  "updated_at": "2023-10-26T12:00:00.000000Z"
-              }
-          }
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/pos/{id}'
-    metadata:
-      custom: []
-      groupName: POS
-      groupDescription: |-
-
-        APIs for managing Point of Sale
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Display the specified resource.'
+      title: 'Mark Notification as Read'
       description: ''
       authenticated: true
       deprecated: false
@@ -240,294 +189,38 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the po.'
+        description: 'The composite ID of the notification to mark as read.'
         required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      po:
-        custom: []
-        name: po
-        description: 'The ID of the resource.'
-        required: true
-        example: consequatur
+        example: '"po::1"'
         type: string
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
-      po: consequatur
+      id: '"po::1"'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses:
-      -
+    responses: []
+    responseFields:
+      success:
         custom: []
-        status: 200
-        content: '{"data":{"id":1,"invoice":"PO-00001","supplier_id":2,"user_id":null,"order_date":"2025-10-27T09:16:25.000000Z","due_date":"2025-11-10T09:16:25.000000Z","payment_type":"Cash","discount_total":"25.00","discount_total_type":"percentage","total":1260,"status":"Paid","created_at":"2025-11-20T09:16:25.000000Z","updated_at":"2025-11-20T09:16:25.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - PUT
-      - PATCH
-    uri: 'api/v1/pos/{id}'
-    metadata:
-      custom: []
-      groupName: POS
-      groupDescription: |-
-
-        APIs for managing Point of Sale
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Update the specified resource in storage.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the po.'
-        required: true
-        example: 1
-        type: integer
+        name: success
+        description: 'Indicates whether the request was successful.'
+        required: false
+        example: null
+        type: boolean
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      po:
-        custom: []
-        name: po
-        description: 'The ID of the purchase order.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 1
-      po: 1
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      invoice:
-        custom: []
-        name: invoice
-        description: 'The invoice number.'
-        required: false
-        example: INV-2023-002
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      supplier_id:
-        custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: 2
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      order_date:
-        custom: []
-        name: order_date
-        description: 'The date of the order.'
-        required: false
-        example: '2023-10-27'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      due_date:
-        custom: []
-        name: due_date
-        description: 'The due date of the payment.'
-        required: false
-        example: '2023-11-27'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      payment_type:
-        custom: []
-        name: payment_type
-        description: 'The payment type (e.g., Cash, Credit Card).'
-        required: false
-        example: 'Credit Card'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: 'The total amount of the purchase order.'
-        required: false
-        example: '2000.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the purchase order (e.g., Pending, Paid).'
-        required: false
-        example: Paid
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      payment_date:
-        custom: []
-        name: payment_date
-        description: 'The date of payment.'
-        required: false
-        example: '2023-10-27'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      invoice: INV-2023-002
-      supplier_id: 2
-      order_date: '2023-10-27'
-      due_date: '2023-11-27'
-      payment_type: 'Credit Card'
-      total: '2000.00'
-      status: Paid
-      payment_date: '2023-10-27'
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: |-
-          {
-              "data": {
-                  "id": 1,
-                  "invoice": "INV-2023-002",
-                  "supplier_id": 2,
-                  "order_date": "2023-10-27",
-                  "due_date": "2023-11-27",
-                  "payment_type": "Credit Card",
-                  "total": 2000.00,
-                  "status": "Paid",
-                  "payment_date": "2023-10-27",
-                  "created_at": "2023-10-26T12:00:00.000000Z",
-                  "updated_at": "2023-10-27T12:00:00.000000Z"
-              }
-          }
-        headers: []
-        description: ''
-    responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - DELETE
-    uri: 'api/v1/pos/{id}'
-    metadata:
-      custom: []
-      groupName: POS
-      groupDescription: |-
-
-        APIs for managing Point of Sale
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Remove the specified resource from storage.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the po.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      po:
-        custom: []
-        name: po
-        description: 'The ID of the purchase order to delete.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 1
-      po: 1
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 204
-        content: ''
-        headers: []
-        description: Success
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null

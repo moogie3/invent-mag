@@ -184,6 +184,10 @@ class PurchaseService
             // Get accounting settings from the user
             $accountingSettings = Auth::user()->accounting_settings;
 
+            if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_payable_account_id'])) {
+                throw new \Exception('Accounting settings for inventory or accounts payable are not configured.');
+            }
+
             // Retrieve account names using the IDs from settings
             $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
             $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
@@ -280,6 +284,10 @@ class PurchaseService
             // Get accounting settings from the user
             $accountingSettings = Auth::user()->accounting_settings;
 
+            if (!$accountingSettings || !isset($accountingSettings['accounts_payable_account_id']) || !isset($accountingSettings['cash_account_id'])) {
+                throw new \Exception('Accounting settings for accounts payable or cash are not configured.');
+            }
+
             // Retrieve account names using the IDs from settings
             $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
             $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;
@@ -366,36 +374,14 @@ class PurchaseService
 
     public function getPurchaseMetrics()
     {
-        $totalinvoice = Purchase::count();
-        $inCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })->count();
-        $inCountamount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'IN');
-        })
-            ->where('status', 'Unpaid')
-            ->sum('total');
-
-        $outCount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'OUT');
-        })->count();
-        $outCountamount = Purchase::whereHas('supplier', function ($query) {
-            $query->where('location', 'OUT');
-        })
-            ->where('status', 'Unpaid')
-            ->sum('total');
-
-        $totalMonthly = Purchase::whereMonth('order_date', now()->month)->whereYear('order_date', now()->year)->sum('total');
-        $paymentMonthly = Purchase::whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->where('status', 'Paid')->sum('total');
+        $total_purchases = Purchase::count();
+        $total_paid = Purchase::where('status', 'Paid')->sum('total');
+        $total_due = Purchase::where('status', 'Unpaid')->sum('total');
 
         return [
-            'totalinvoice' => $totalinvoice,
-            'inCount' => $inCount,
-            'inCountamount' => $inCountamount,
-            'outCount' => $outCount,
-            'outCountamount' => $outCountamount,
-            'totalMonthly' => $totalMonthly,
-            'paymentMonthly' => $paymentMonthly,
+            'total_purchases' => $total_purchases,
+            'total_paid' => $total_paid,
+            'total_due' => $total_due,
         ];
     }
 

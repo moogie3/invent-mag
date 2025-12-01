@@ -249,27 +249,34 @@ class CrmService
         $customer = Customer::findOrFail($id);
 
         $salesItems = \App\Models\SalesItem::whereIn('sales_id', $customer->sales()->pluck('id'))
-            ->with(['product', 'sale'])
+            ->with(['product', 'sales'])
             ->get();
 
         $productHistory = $salesItems->groupBy('product.name')
             ->map(function ($items, $productName) {
-                $history = $items->sortByDesc('sale.order_date')->map(function ($item) {
+                $history = $items->sortByDesc('sales.order_date')->map(function ($item) {
+                    // Ensure product and sales exist before accessing properties
+                    if (!$item->product || !$item->sales) {
+                        return null; // Or handle this case appropriately
+                    }
                     return [
-                        'invoice' => $item->sale->invoice,
-                        'order_date' => $item->sale->order_date,
+                        'invoice' => $item->sales->invoice,
+                        'order_date' => $item->sales->order_date,
                         'quantity' => $item->quantity,
                         'price_at_purchase' => $item->customer_price,
                     ];
-                })->values();
+                })->filter()->values(); // Filter out nulls if any were returned
 
-                $lastPrice = $history->first()['price_at_purchase'];
+                $lastPrice = $history->isNotEmpty() ? $history->first()['price_at_purchase'] : null;
 
                 return [
                     'product_name' => $productName,
                     'last_price' => $lastPrice,
                     'history' => $history,
                 ];
+            })
+            ->filter(function ($item) { // Filter out products with no valid history
+                return $item['history']->isNotEmpty();
             })
             ->sortBy('product_name')
             ->values();

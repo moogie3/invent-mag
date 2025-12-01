@@ -26,45 +26,58 @@ class SalesPipelineController extends Controller
     /**
      * Display a listing of the sales pipelines.
      *
+     * @group Sales Pipelines
+     * @authenticated
      * @queryParam per_page int The number of pipelines to return per page. Defaults to 15. Example: 25
      *
-     * @apiResourceCollection App\Http\Resources\SalesPipelineResource
-     * @apiResourceModel App\Models\SalesPipeline
+     * @responseField data object[] A list of sales pipelines.
+     * @responseField data[].id integer The ID of the sales pipeline.
+     * @responseField data[].name string The name of the sales pipeline.
+     * @responseField data[].description string The description of the sales pipeline.
+     * @responseField data[].is_default boolean Whether this is the default pipeline.
+     * @responseField data[].created_at string The date and time the pipeline was created.
+     * @responseField data[].updated_at string The date and time the pipeline was last updated.
+     * @responseField data[].stages object[] A list of stages in the pipeline.
+     * @responseField data[].opportunities object[] A list of sales opportunities in the pipeline.
+     * @responseField links object Links for pagination.
+     * @responseField links.first string The URL of the first page.
+     * @responseField links.last string The URL of the last page.
+     * @responseField links.prev string The URL of the previous page.
+     * @responseField links.next string The URL of the next page.
+     * @responseField meta object Metadata for pagination.
+     * @responseField meta.current_page integer The current page number.
+     * @responseField meta.from integer The starting number of the results on the current page.
+     * @responseField meta.last_page integer The last page number.
+     * @responseField meta.path string The URL path.
+     * @responseField meta.per_page integer The number of results per page.
+     * @responseField meta.to integer The ending number of the results on the current page.
+     * @responseField meta.total integer The total number of results.
      */
     public function index(Request $request)
     {
-        $perPage = $request->query('per_page', 15);
-        $pipelines = SalesPipeline::with(['stages', 'opportunities'])->paginate($perPage);
-        return SalesPipelineResource::collection($pipelines);
+        $data = $this->salesPipelineService->getSalesPipelineIndexData();
+        return SalesPipelineResource::collection($data['pipelines']);
     }
 
     /**
      * Store a newly created resource in storage.
      *
+     * @group Sales Pipelines
+     * @authenticated
      * @bodyParam name string required The name of the sales pipeline. Example: Initial Sales Pipeline
      * @bodyParam description string A description of the sales pipeline. Example: Pipeline for initial customer contact.
      * @bodyParam is_default boolean Is this the default pipeline. Example: false
      *
-     * @response 201 {
-     *     "data": {
-     *         "id": 1,
-     *         "name": "Initial Sales Pipeline",
-     *         "description": "Pipeline for initial customer contact.",
-     *         "is_default": false,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-26T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the sales pipeline.
+     * @responseField name string The name of the sales pipeline.
+     * @responseField description string The description of the sales pipeline.
+     * @responseField is_default boolean Whether this is the default pipeline.
+     * @responseField created_at string The date and time the pipeline was created.
+     * @responseField updated_at string The date and time the pipeline was last updated.
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Api\V1\StoreSalesPipelineRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:sales_pipelines',
-            'description' => 'nullable|string',
-            'is_default' => 'boolean',
-        ]);
-
-        $sales_pipeline = $this->salesPipelineService->createPipeline($validated);
+        $sales_pipeline = $this->salesPipelineService->createPipeline($request->validated());
 
         return new SalesPipelineResource($sales_pipeline);
     }
@@ -72,10 +85,18 @@ class SalesPipelineController extends Controller
     /**
      * Display the specified sales pipeline.
      *
+     * @group Sales Pipelines
+     * @authenticated
      * @urlParam sales_pipeline required The ID of the sales pipeline. Example: 1
      *
-     * @apiResource App\Http\Resources\SalesPipelineResource
-     * @apiResourceModel App\Models\SalesPipeline
+     * @responseField id integer The ID of the sales pipeline.
+     * @responseField name string The name of the sales pipeline.
+     * @responseField description string The description of the sales pipeline.
+     * @responseField is_default boolean Whether this is the default pipeline.
+     * @responseField created_at string The date and time the pipeline was created.
+     * @responseField updated_at string The date and time the pipeline was last updated.
+     * @responseField stages object[] A list of stages in the pipeline.
+     * @responseField opportunities object[] A list of sales opportunities in the pipeline.
      */
     public function show(SalesPipeline $sales_pipeline)
     {
@@ -85,31 +106,23 @@ class SalesPipelineController extends Controller
     /**
      * Update the specified resource in storage.
      *
+     * @group Sales Pipelines
+     * @authenticated
      * @urlParam sales_pipeline integer required The ID of the sales pipeline. Example: 1
      * @bodyParam name string required The name of the sales pipeline. Example: New Sales Pipeline
      * @bodyParam description string A description of the sales pipeline. Example: Pipeline for new leads.
      * @bodyParam is_default boolean Is this the default pipeline. Example: true
      *
-     * @response 200 {
-     *     "data": {
-     *         "id": 1,
-     *         "name": "New Sales Pipeline",
-     *         "description": "Pipeline for new leads.",
-     *         "is_default": true,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-27T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the sales pipeline.
+     * @responseField name string The name of the sales pipeline.
+     * @responseField description string The description of the sales pipeline.
+     * @responseField is_default boolean Whether this is the default pipeline.
+     * @responseField created_at string The date and time the pipeline was created.
+     * @responseField updated_at string The date and time the pipeline was last updated.
      */
-    public function update(Request $request, SalesPipeline $sales_pipeline)
+    public function update(\App\Http\Requests\Api\V1\UpdateSalesPipelineRequest $request, SalesPipeline $sales_pipeline)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('sales_pipelines')->ignore($sales_pipeline->id)],
-            'description' => 'nullable|string',
-            'is_default' => 'boolean',
-        ]);
-
-        $sales_pipeline = $this->salesPipelineService->updatePipeline($sales_pipeline, $validated);
+        $sales_pipeline = $this->salesPipelineService->updatePipeline($sales_pipeline, $request->validated());
 
         return new SalesPipelineResource($sales_pipeline);
     }
@@ -117,9 +130,12 @@ class SalesPipelineController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @group Sales Pipelines
+     * @authenticated
      * @urlParam sales_pipeline integer required The ID of the sales pipeline to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 500 scenario="Deletion Failed" {"message": "Failed to delete sales pipeline: <error message>", "type": "error"}
      */
     public function destroy(SalesPipeline $sales_pipeline)
     {
@@ -129,53 +145,46 @@ class SalesPipelineController extends Controller
     }
 
     /**
+     * Add Stage to Pipeline
+     *
      * @group Sales Pipelines
-     * @title Add Stage to Pipeline
+     * @authenticated
      * @urlParam pipeline integer required The ID of the sales pipeline. Example: 1
      * @bodyParam name string required The name of the new stage. Example: "Qualification"
      * @bodyParam is_closed boolean Whether this stage represents a closed state. Example: false
      *
-     * @response 201 {
-     *  "id": 1,
-     *  "name": "Qualification",
-     *  "sales_pipeline_id": 1,
-     *  ...
-     * }
+     * @responseField id integer The ID of the pipeline stage.
+     * @responseField sales_pipeline_id integer The ID of the sales pipeline this stage belongs to.
+     * @responseField name string The name of the stage.
+     * @responseField position integer The position of the stage.
+     * @responseField is_closed boolean Whether this stage is a closed stage.
+     * @responseField created_at string The date and time the stage was created.
+     * @responseField updated_at string The date and time the stage was last updated.
+     * @response 201 scenario="Stage Created" {"id":1,"sales_pipeline_id":1,"name":"Qualification","position":0,"is_closed":false,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}
+     * @response 500 scenario="Creation Failed" {"message": "Failed to create stage: <error message>", "type": "error"}
      */
-    public function storeStage(Request $request, SalesPipeline $pipeline)
+    public function storeStage(\App\Http\Requests\Api\V1\StorePipelineStageRequest $request, SalesPipeline $pipeline)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('pipeline_stages')->where(function ($query) use ($pipeline) {
-                return $query->where('sales_pipeline_id', $pipeline->id);
-            })],
-            'is_closed' => 'boolean',
-        ]);
-
-        $stage = $this->salesPipelineService->createStage($pipeline, $request->all());
+        $stage = $this->salesPipelineService->createStage($pipeline, $request->validated());
         return response()->json($stage, 201);
     }
 
     /**
+     * Reorder Stages in Pipeline
+     *
      * @group Sales Pipelines
-     * @title Reorder Stages in Pipeline
+     * @authenticated
      * @urlParam pipeline integer required The ID of the sales pipeline. Example: 1
      * @bodyParam stages array required An array of stage objects with id and new position.
      * @bodyParam stages.*.id integer required The ID of the stage. Example: 1
      * @bodyParam stages.*.position integer required The new position of the stage. Example: 0
      *
-     * @response {
-     *  "message": "Stages reordered successfully"
-     * }
+     * @responseField message string A message indicating the result of the reordering.
+     * @response 500 scenario="Reorder Failed" {"message": "Failed to reorder stages: <error message>", "type": "error"}
      */
-    public function reorderStages(Request $request, SalesPipeline $pipeline)
+    public function reorderStages(\App\Http\Requests\Api\V1\ReorderPipelineStagesRequest $request, SalesPipeline $pipeline)
     {
-        $request->validate([
-            'stages' => 'required|array',
-            'stages.*.id' => 'required|exists:pipeline_stages,id',
-            'stages.*.position' => 'required|integer|min:0',
-        ]);
-
-        $this->salesPipelineService->reorderStages($pipeline, $request->stages);
+        $this->salesPipelineService->reorderStages($pipeline, $request->validated()['stages']);
 
         return response()->json(['message' => 'Stages reordered successfully']);
     }

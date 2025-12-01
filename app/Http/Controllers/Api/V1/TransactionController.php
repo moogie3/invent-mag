@@ -17,7 +17,32 @@ class TransactionController extends Controller
     /**
      * Display a listing of the transactions.
      *
+     * @group Transactions
+     * @authenticated
      * @queryParam per_page int The number of transactions to return per page. Defaults to 15. Example: 25
+     *
+     * @responseField data object[] A list of transactions.
+     * @responseField data[].id integer The ID of the transaction.
+     * @responseField data[].journal_entry_id integer The ID of the journal entry.
+     * @responseField data[].account_id integer The ID of the account.
+     * @responseField data[].type string The type of transaction (debit, credit).
+     * @responseField data[].amount number The amount of the transaction.
+     * @responseField data[].created_at string The date and time the transaction was created.
+     * @responseField data[].updated_at string The date and time the transaction was last updated.
+     * @responseField data[].account object The account associated with the transaction.
+     * @responseField links object Links for pagination.
+     * @responseField links.first string The URL of the first page.
+     * @responseField links.last string The URL of the last page.
+     * @responseField links.prev string The URL of the previous page.
+     * @responseField links.next string The URL of the next page.
+     * @responseField meta object Metadata for pagination.
+     * @responseField meta.current_page integer The current page number.
+     * @responseField meta.from integer The starting number of the results on the current page.
+     * @responseField meta.last_page integer The last page number.
+     * @responseField meta.path string The URL path.
+     * @responseField meta.per_page integer The number of results per page.
+     * @responseField meta.to integer The ending number of the results on the current page.
+     * @responseField meta.total integer The total number of results.
      */
     public function index(Request $request)
     {
@@ -27,95 +52,23 @@ class TransactionController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @bodyParam journal_entry_id integer required The ID of the journal entry. Example: 1
-     * @bodyParam account_id integer required The ID of the account. Example: 1
-     * @bodyParam type string required The type of transaction (e.g., debit, credit). Example: credit
-     * @bodyParam amount numeric required The amount of the transaction. Example: 50.00
-     *
-     * @response 201 {
-     *     "data": {
-     *         "id": 1,
-     *         "journal_entry_id": 1,
-     *         "account_id": 1,
-     *         "type": "credit",
-     *         "amount": 50.00,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-26T12:00:00.000000Z"
-     *     }
-     * }
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'journal_entry_id' => 'required|exists:journal_entries,id',
-            'account_id' => 'required|exists:accounts,id',
-            'type' => 'required|string|in:debit,credit',
-            'amount' => 'required|numeric',
-        ]);
-
-        $transaction = Transaction::create($validated);
-
-        return new TransactionResource($transaction);
-    }
-
-    /**
      * Display the specified transaction.
      *
+     * @group Transactions
+     * @authenticated
      * @urlParam transaction required The ID of the transaction. Example: 1
+     *
+     * @responseField id integer The ID of the transaction.
+     * @responseField journal_entry_id integer The ID of the journal entry.
+     * @responseField account_id integer The ID of the account.
+     * @responseField type string The type of transaction (debit, credit).
+     * @responseField amount number The amount of the transaction.
+     * @responseField created_at string The date and time the transaction was created.
+     * @responseField updated_at string The date and time the transaction was last updated.
+     * @responseField account object The account associated with the transaction.
      */
     public function show(Transaction $transaction)
     {
         return new TransactionResource($transaction->load(['account']));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @urlParam transaction integer required The ID of the transaction. Example: 1
-     * @bodyParam journal_entry_id integer required The ID of the journal entry. Example: 1
-     * @bodyParam account_id integer required The ID of the account. Example: 1
-     * @bodyParam type string required The type of transaction (e.g., debit, credit). Example: debit
-     * @bodyParam amount numeric required The amount of the transaction. Example: 100.00
-     *
-     * @response 200 {
-     *     "data": {
-     *         "id": 1,
-     *         "journal_entry_id": 1,
-     *         "account_id": 1,
-     *         "type": "debit",
-     *         "amount": 100.00,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-27T12:00:00.000000Z"
-     *     }
-     * }
-     */
-    public function update(Request $request, Transaction $transaction)
-    {
-        $validated = $request->validate([
-            'journal_entry_id' => 'required|exists:journal_entries,id',
-            'account_id' => 'required|exists:accounts,id',
-            'type' => 'required|string|in:debit,credit',
-            'amount' => 'required|numeric',
-        ]);
-
-        $transaction->update($validated);
-
-        return new TransactionResource($transaction);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @urlParam transaction integer required The ID of the transaction to delete. Example: 1
-     *
-     * @response 204 scenario="Success"
-     */
-    public function destroy(Transaction $transaction)
-    {
-        $transaction->delete();
-
-        return response()->noContent();
     }
 }

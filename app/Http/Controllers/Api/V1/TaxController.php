@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TaxResource;
 use App\Models\Tax;
+use App\Services\TaxService;
 use Illuminate\Http\Request;
 
 /**
@@ -14,118 +15,86 @@ use Illuminate\Http\Request;
  */
 class TaxController extends Controller
 {
+    protected $taxService;
+
+    public function __construct(\App\Services\TaxService $taxService)
+    {
+        $this->taxService = $taxService;
+    }
     /**
      * Display a listing of the taxes.
      *
+     * @group Taxes
+     * @authenticated
      * @queryParam per_page int The number of taxes to return per page. Defaults to 15. Example: 25
      *
-     * @apiResourceCollection App\Http\Resources\TaxResource
-     * @apiResourceModel App\Models\Tax
+     * @responseField id integer The ID of the tax.
+     * @responseField name string The name of the tax.
+     * @responseField rate number The tax rate.
+     * @responseField is_active boolean Whether the tax is active.
+     * @responseField created_at string The date and time the tax was created.
+     * @responseField updated_at string The date and time the tax was last updated.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $perPage = $request->query('per_page', 15);
-        $taxes = Tax::paginate($perPage);
-        return TaxResource::collection($taxes);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @bodyParam name string required The name of the tax. Example: Sales Tax
-     * @bodyParam rate numeric required The tax rate. Example: 0.05
-     * @bodyParam is_active boolean Is the tax active. Example: true
-     *
-     * @response 201 {
-     *     "data": {
-     *         "id": 1,
-     *         "name": "Sales Tax",
-     *         "rate": 0.05,
-     *         "is_active": true,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-26T12:00:00.000000Z"
-     *     }
-     * }
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'rate' => 'required|numeric',
-            'is_active' => 'boolean',
-        ]);
-
-        $tax = Tax::create($validated);
-
+        $tax = $this->taxService->getTaxData();
         return new TaxResource($tax);
     }
 
     /**
      * Display the specified tax.
      *
+     * @group Taxes
+     * @authenticated
      * @urlParam tax required The ID of the tax. Example: 1
      *
-     * @apiResource App\Http\Resources\TaxResource
-     * @apiResourceModel App\Models\Tax
+     * @responseField id integer The ID of the tax.
+     * @responseField name string The name of the tax.
+     * @responseField rate number The tax rate.
+     * @responseField is_active boolean Whether the tax is active.
+     * @responseField created_at string The date and time the tax was created.
+     * @responseField updated_at string The date and time the tax was last updated.
      */
     public function show(Tax $tax)
     {
-        return new TaxResource($tax);
+        return new TaxResource($this->taxService->getTaxData());
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @urlParam tax integer required The ID of the tax. Example: 1
+     * @group Taxes
+     * @authenticated
      * @bodyParam name string required The name of the tax. Example: VAT
      * @bodyParam rate numeric required The tax rate. Example: 0.10
      * @bodyParam is_active boolean Is the tax active. Example: true
      *
-     * @response 200 {
-     *     "data": {
-     *         "id": 1,
-     *         "name": "VAT",
-     *         "rate": 0.10,
-     *         "is_active": true,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-27T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the tax.
+     * @responseField name string The name of the tax.
+     * @responseField rate number The tax rate.
+     * @responseField is_active boolean Whether the tax is active.
+     * @responseField created_at string The date and time the tax was created.
+     * @responseField updated_at string The date and time the tax was last updated.
+     * @response 500 scenario="Update Failed" {"success": false, "message": "Failed to update tax."}
      */
-    public function update(Request $request, Tax $tax)
+    public function update(\App\Http\Requests\Api\V1\UpdateTaxRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'rate' => 'required|numeric',
-            'is_active' => 'boolean',
-        ]);
+        $result = $this->taxService->updateTax($request->validated());
 
-        $tax->update($validated);
+        if (!$result['success']) {
+            return response()->json(['success' => false, 'message' => $result['message']], 500);
+        }
 
-        return new TaxResource($tax);
+        return new TaxResource($this->taxService->getTaxData());
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Get Active Tax Rate
      *
-     * @urlParam tax integer required The ID of the tax to delete. Example: 1
-     *
-     * @response 204 scenario="Success"
-     */
-    public function destroy(Tax $tax)
-    {
-        $tax->delete();
-
-        return response()->noContent();
-    }
-
-    /**
      * @group Taxes
-     * @title Get Active Tax Rate
+     * @authenticated
      *
-     * @response {
-     *  "tax_rate": 0.1
-     * }
+     * @responseField tax_rate number The active tax rate.
      */
     public function getActiveTax()
     {

@@ -109,6 +109,20 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * @group Products
+     * @summary Quickly Create a Product
+     * @bodyParam code string required The product code. Example: "PROD-001"
+     * @bodyParam name string required The product name. Example: "New Product"
+     * @bodyParam stock_quantity integer required The initial stock quantity. Example: 100
+     * @bodyParam price number required The purchase price of the product. Example: 99.99
+     * @bodyParam selling_price number required The selling price of the product. Example: 149.99
+     * @bodyParam category_id integer required The ID of the product category. Example: 1
+     * @bodyParam units_id integer required The ID of the product unit. Example: 1
+     * @bodyParam supplier_id integer required The ID of the product supplier. Example: 1
+     * @response 200 {"success": true, "message": "Product created successfully", "product": {"id": 1, "name": "New Product"}}
+     * @response 500 {"success": false, "message": "Error creating product. Please try again."}
+     */
     public function quickCreate(Request $request)
     {
         $request->validate([
@@ -200,6 +214,13 @@ class ProductController extends Controller
         ]);
     }
 
+    /**
+     * @group Products
+     * @summary Bulk Delete Products
+     * @bodyParam ids array required An array of product IDs to delete. Example: [1, 2, 3]
+     * @response 200 {"success": true, "message": "Successfully deleted 2 product(s)", "deleted_count": 2, "images_deleted": 1}
+     * @response 500 {"success": false, "message": "Error deleting products. Please try again."}
+     */
     public function bulkDelete(Request $request)
     {
         $request->validate([

@@ -1,22 +1,18 @@
-name: 'Stock Adjustments'
-description: |-
-
-  APIs for managing stock adjustments
+name: Payments
+description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/stock-adjustments
+    uri: api/v1/payments
     metadata:
       custom: []
-      groupName: 'Stock Adjustments'
-      groupDescription: |-
-
-        APIs for managing stock adjustments
+      groupName: Payments
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the stock adjustments.'
+      title: 'Display a listing of the payments.'
       description: ''
       authenticated: true
       deprecated: false
@@ -30,7 +26,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of adjustments to return per page. Defaults to 15.'
+        description: 'The number of payments to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -47,155 +43,281 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":10,"product_id":91,"adjustment_type":"increase","quantity_before":150,"quantity_after":161,"adjustment_amount":11,"reason":"Veniam sed fuga aspernatur natus earum.","adjusted_by":33,"created_at":"2025-11-21T06:50:04.000000Z","updated_at":"2025-11-21T06:50:04.000000Z"},{"id":11,"product_id":92,"adjustment_type":"decrease","quantity_before":188,"quantity_after":181,"adjustment_amount":7,"reason":"Id tempore voluptate sit rem quia odit aut.","adjusted_by":34,"created_at":"2025-11-21T06:50:04.000000Z","updated_at":"2025-11-21T06:50:04.000000Z"}]}'
-        headers: []
-        description: ''
-    responseFields: []
+        content: '{"data":[{"id":2,"paymentable_type":"App\\Models\\Purchase","paymentable_id":3,"amount":"7740.00","payment_date":"2025-11-23T05:06:03.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":null},{"id":3,"paymentable_type":"App\\Models\\Purchase","paymentable_id":4,"amount":"174.00","payment_date":"2025-11-18T05:06:03.000000Z","payment_method":"Transfer","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":{"id":4,"invoice":"PO-00004","supplier_id":5,"user_id":null,"order_date":"2025-11-15T05:06:03.000000Z","due_date":"2025-11-28T05:06:03.000000Z","payment_type":"Transfer","discount_total":21,"discount_total_type":"fixed","total":3060,"status":"Partial","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","sub_total":0,"grand_total":-21,"items":[]}},{"id":4,"paymentable_type":"App\\Models\\Purchase","paymentable_id":5,"amount":"2605.00","payment_date":"2025-11-21T05:06:03.000000Z","payment_method":"-","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":null},{"id":5,"paymentable_type":"App\\Models\\Purchase","paymentable_id":7,"amount":"911.00","payment_date":"2025-11-18T05:06:03.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":null},{"id":6,"paymentable_type":"App\\Models\\Purchase","paymentable_id":8,"amount":"5035.00","payment_date":"2025-11-05T05:06:03.000000Z","payment_method":"-","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":{"id":8,"invoice":"PO-00008","supplier_id":3,"user_id":null,"order_date":"2025-11-02T05:06:03.000000Z","due_date":"2025-11-29T05:06:03.000000Z","payment_type":"-","discount_total":42,"discount_total_type":"percentage","total":7600,"status":"Partial","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","sub_total":0,"grand_total":0,"items":[]}},{"id":7,"paymentable_type":"App\\Models\\Purchase","paymentable_id":9,"amount":"211.00","payment_date":"2025-11-19T05:06:03.000000Z","payment_method":"Transfer","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":{"id":9,"invoice":"PO-00009","supplier_id":2,"user_id":null,"order_date":"2025-11-17T00:00:00.000000Z","due_date":"2025-12-02T00:00:00.000000Z","payment_type":"Transfer","discount_total":20,"discount_total_type":"percentage","total":720,"status":"Partial","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-12-01T04:01:27.000000Z","sub_total":900,"grand_total":720,"items":[{"id":35,"po_id":9,"product_id":4,"quantity":10,"remaining_quantity":10,"price":"90.00","discount":"0.00","discount_type":"percentage","total":900,"expiry_date":"2025-12-08","created_at":"2025-12-01T04:01:27.000000Z","updated_at":"2025-12-01T04:01:27.000000Z"}]}},{"id":8,"paymentable_type":"App\\Models\\Purchase","paymentable_id":10,"amount":"372.00","payment_date":"2025-11-29T05:06:03.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":{"id":10,"invoice":"PO-00010","supplier_id":5,"user_id":null,"order_date":"2025-11-28T05:06:03.000000Z","due_date":"2025-12-17T05:06:03.000000Z","payment_type":"Cash","discount_total":34,"discount_total_type":"percentage","total":1440,"status":"Partial","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","sub_total":1440,"grand_total":950.4,"items":[{"id":23,"po_id":10,"product_id":4,"quantity":1,"remaining_quantity":1,"price":"90.00","discount":null,"discount_type":"percentage","total":90,"expiry_date":"2026-02-21","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},{"id":24,"po_id":10,"product_id":4,"quantity":6,"remaining_quantity":6,"price":"90.00","discount":null,"discount_type":"percentage","total":540,"expiry_date":"2025-12-04","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},{"id":25,"po_id":10,"product_id":4,"quantity":4,"remaining_quantity":4,"price":"90.00","discount":null,"discount_type":"percentage","total":360,"expiry_date":"2026-02-01","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},{"id":26,"po_id":10,"product_id":4,"quantity":5,"remaining_quantity":5,"price":"90.00","discount":null,"discount_type":"percentage","total":450,"expiry_date":"2026-01-19","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}]}},{"id":9,"paymentable_type":"App\\Models\\Sales","paymentable_id":2,"amount":"3733.00","payment_date":"2025-01-25T05:06:03.000000Z","payment_method":"Card","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":{"id":2,"invoice":"INV-00002","customer_id":"4","user_id":1,"order_date":"2025-01-22T05:06:03.000000Z","due_date":"2025-01-30T05:06:03.000000Z","payment_type":"Card","order_discount":9,"order_discount_type":"percentage","tax_rate":10,"total_tax":773.5,"total":8508.5,"status":"Paid","amount_received":8508.5,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-12-01T04:25:13.000000Z","sales_opportunity_id":null,"sales_items":[]}},{"id":10,"paymentable_type":"App\\Models\\Sales","paymentable_id":3,"amount":"791.00","payment_date":"2025-10-05T05:06:03.000000Z","payment_method":"eWallet","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":{"id":3,"invoice":"INV-00003","customer_id":"4","user_id":1,"order_date":"2025-10-05T05:06:03.000000Z","due_date":"2025-10-19T05:06:03.000000Z","payment_type":"eWallet","order_discount":19,"order_discount_type":"percentage","tax_rate":10,"total_tax":141.75,"total":1559.25,"status":"Paid","amount_received":1559.25,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-12-01T04:25:13.000000Z","sales_opportunity_id":null,"sales_items":[]}},{"id":11,"paymentable_type":"App\\Models\\Sales","paymentable_id":5,"amount":"9180.60","payment_date":"2025-10-09T05:06:03.000000Z","payment_method":"eWallet","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":{"id":5,"invoice":"INV-00005","customer_id":"4","user_id":1,"order_date":"2025-10-07T05:06:03.000000Z","due_date":"2025-10-27T05:06:03.000000Z","payment_type":"eWallet","order_discount":14,"order_discount_type":"fixed","tax_rate":10,"total_tax":834.6,"total":9180.6,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","sales_opportunity_id":null,"sales_items":[{"id":14,"sales_id":5,"product_id":4,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"160.00","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","product":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","stock_quantity":232,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":3,"units_id":1,"supplier_id":1,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z"}}]}},{"id":12,"paymentable_type":"App\\Models\\Sales","paymentable_id":6,"amount":"1682.00","payment_date":"2025-09-13T05:06:03.000000Z","payment_method":"eWallet","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":{"id":6,"invoice":"INV-00006","customer_id":"1","user_id":1,"order_date":"2025-09-13T05:06:03.000000Z","due_date":"2025-09-29T05:06:03.000000Z","payment_type":"eWallet","order_discount":16,"order_discount_type":"fixed","tax_rate":10,"total_tax":605.4,"total":6659.4,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","sales_opportunity_id":null,"sales_items":[{"id":16,"sales_id":6,"product_id":4,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","product":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","stock_quantity":232,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":3,"units_id":1,"supplier_id":1,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z"}}]}},{"id":13,"paymentable_type":"App\\Models\\Sales","paymentable_id":10,"amount":"3782.00","payment_date":"2025-10-16T05:06:03.000000Z","payment_method":"-","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":{"id":10,"invoice":"INV-00010","customer_id":"2","user_id":1,"order_date":"2025-10-15T05:06:03.000000Z","due_date":"2025-10-31T05:06:03.000000Z","payment_type":"-","order_discount":0,"order_discount_type":"percentage","tax_rate":10,"total_tax":550,"total":6050,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","sales_opportunity_id":null,"sales_items":[]}},{"id":14,"paymentable_type":"App\\Models\\Sales","paymentable_id":11,"amount":"5917.00","payment_date":"2025-08-20T05:06:03.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":{"id":11,"invoice":"INV-00011","customer_id":"1","user_id":1,"order_date":"2025-08-18T05:06:03.000000Z","due_date":"2025-09-02T05:06:03.000000Z","payment_type":"Cash","order_discount":5,"order_discount_type":"percentage","tax_rate":10,"total_tax":822.7,"total":9049.7,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","sales_opportunity_id":null,"sales_items":[{"id":26,"sales_id":11,"product_id":4,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"160.00","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","product":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","stock_quantity":232,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":3,"units_id":1,"supplier_id":1,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z"}}]}},{"id":15,"paymentable_type":"App\\Models\\Sales","paymentable_id":13,"amount":"5605.60","payment_date":"2025-02-05T05:06:04.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":13,"invoice":"INV-00013","customer_id":"5","user_id":1,"order_date":"2025-02-05T05:06:04.000000Z","due_date":"2025-02-18T05:06:04.000000Z","payment_type":"Cash","order_discount":4,"order_discount_type":"fixed","tax_rate":10,"total_tax":509.6,"total":5605.6,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[]}},{"id":16,"paymentable_type":"App\\Models\\Sales","paymentable_id":14,"amount":"480.48","payment_date":"2025-04-02T05:06:04.000000Z","payment_method":"Card","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":14,"invoice":"INV-00014","customer_id":"6","user_id":1,"order_date":"2025-03-28T05:06:04.000000Z","due_date":"2025-04-09T05:06:04.000000Z","payment_type":"Card","order_discount":9,"order_discount_type":"percentage","tax_rate":10,"total_tax":43.68,"total":480.48,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":30,"sales_id":14,"product_id":4,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"480.00","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","product":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","stock_quantity":232,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":3,"units_id":1,"supplier_id":1,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z"}}]}},{"id":17,"paymentable_type":"App\\Models\\Sales","paymentable_id":16,"amount":"3115.20","payment_date":"2025-05-28T05:06:04.000000Z","payment_method":"-","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":16,"invoice":"INV-00016","customer_id":"6","user_id":1,"order_date":"2025-05-24T05:06:04.000000Z","due_date":"2025-06-23T05:06:04.000000Z","payment_type":"-","order_discount":8,"order_discount_type":"fixed","tax_rate":10,"total_tax":283.2,"total":3115.2,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":34,"sales_id":16,"product_id":4,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"640.00","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","product":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","stock_quantity":232,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":3,"units_id":1,"supplier_id":1,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z"}},{"id":35,"sales_id":16,"product_id":4,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"480.00","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","product":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","stock_quantity":232,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":3,"units_id":1,"supplier_id":1,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z"}},{"id":38,"sales_id":16,"product_id":4,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","product":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","stock_quantity":232,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":3,"units_id":1,"supplier_id":1,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z"}}]}},{"id":18,"paymentable_type":"App\\Models\\Sales","paymentable_id":17,"amount":"1331.00","payment_date":"2025-08-15T05:06:04.000000Z","payment_method":"-","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":17,"invoice":"INV-00017","customer_id":"3","user_id":1,"order_date":"2025-08-14T05:06:04.000000Z","due_date":"2025-09-09T05:06:04.000000Z","payment_type":"-","order_discount":0,"order_discount_type":"fixed","tax_rate":10,"total_tax":121,"total":1331,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":39,"sales_id":17,"product_id":4,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"160.00","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","product":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","stock_quantity":232,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":3,"units_id":1,"supplier_id":1,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z"}}]}},{"id":19,"paymentable_type":"App\\Models\\Sales","paymentable_id":19,"amount":"1907.40","payment_date":"2025-08-14T05:06:04.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":19,"invoice":"INV-00019","customer_id":"2","user_id":1,"order_date":"2025-08-12T05:06:04.000000Z","due_date":"2025-09-08T05:06:04.000000Z","payment_type":"Cash","order_discount":16,"order_discount_type":"fixed","tax_rate":10,"total_tax":173.4,"total":1907.4,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[]}},{"id":20,"paymentable_type":"App\\Models\\Sales","paymentable_id":20,"amount":"2523.00","payment_date":"2025-09-24T05:06:04.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":20,"invoice":"INV-00020","customer_id":"6","user_id":1,"order_date":"2025-09-24T05:06:04.000000Z","due_date":"2025-10-10T05:06:04.000000Z","payment_type":"Cash","order_discount":6,"order_discount_type":"fixed","tax_rate":10,"total_tax":549.4,"total":6043.4,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[]}},{"id":21,"paymentable_type":"App\\Models\\Sales","paymentable_id":21,"amount":"4222.90","payment_date":"2025-07-08T05:06:04.000000Z","payment_method":"Card","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":21,"invoice":"INV-00021","customer_id":"2","user_id":1,"order_date":"2025-07-07T05:06:04.000000Z","due_date":"2025-07-14T05:06:04.000000Z","payment_type":"Card","order_discount":11,"order_discount_type":"fixed","tax_rate":10,"total_tax":383.9,"total":4222.9,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[]}},{"id":22,"paymentable_type":"App\\Models\\Sales","paymentable_id":22,"amount":"1850.20","payment_date":"2025-02-03T05:06:04.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":22,"invoice":"INV-00022","customer_id":"3","user_id":1,"order_date":"2025-01-30T05:06:04.000000Z","due_date":"2025-02-19T05:06:04.000000Z","payment_type":"Cash","order_discount":18,"order_discount_type":"fixed","tax_rate":10,"total_tax":168.2,"total":1850.2,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[]}},{"id":23,"paymentable_type":"App\\Models\\Sales","paymentable_id":23,"amount":"9401.70","payment_date":"2025-11-04T05:06:04.000000Z","payment_method":"-","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":23,"invoice":"INV-00023","customer_id":"3","user_id":1,"order_date":"2025-11-04T05:06:04.000000Z","due_date":"2025-11-28T05:06:04.000000Z","payment_type":"-","order_discount":3,"order_discount_type":"fixed","tax_rate":10,"total_tax":854.7,"total":9401.7,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[]}},{"id":24,"paymentable_type":"App\\Models\\Sales","paymentable_id":24,"amount":"3484.80","payment_date":"2025-04-12T05:06:04.000000Z","payment_method":"eWallet","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":24,"invoice":"INV-00024","customer_id":"1","user_id":1,"order_date":"2025-04-11T05:06:04.000000Z","due_date":"2025-05-10T05:06:04.000000Z","payment_type":"eWallet","order_discount":4,"order_discount_type":"percentage","tax_rate":10,"total_tax":316.8,"total":3484.8,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[]}},{"id":25,"paymentable_type":"App\\Models\\Sales","paymentable_id":25,"amount":"4576.00","payment_date":"2025-11-30T05:06:04.000000Z","payment_method":"Transfer","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":25,"invoice":"INV-00025","customer_id":"2","user_id":1,"order_date":"2025-11-29T05:06:04.000000Z","due_date":"2025-12-28T05:06:04.000000Z","payment_type":"Transfer","order_discount":20,"order_discount_type":"percentage","tax_rate":10,"total_tax":416,"total":4576,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":53,"sales_id":25,"product_id":5,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","product":{"id":5,"code":"TR15","barcode":"9227372176411","name":"Expired Voltage Regulator","stock_quantity":196,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":1,"units_id":2,"supplier_id":2,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-11-30T05:06:03.000000Z","updated_at":"2025-12-01T04:24:51.000000Z"}}]}},{"id":26,"paymentable_type":"App\\Models\\Sales","paymentable_id":26,"amount":"1500.00","payment_date":"2025-07-01T05:06:04.000000Z","payment_method":"eWallet","notes":"Partial payment during seeding.","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","paymentable":{"id":26,"invoice":"INV-00026","customer_id":"4","user_id":1,"order_date":"2025-06-26T05:06:04.000000Z","due_date":"2025-07-13T05:06:04.000000Z","payment_type":"eWallet","order_discount":19,"order_discount_type":"percentage","tax_rate":10,"total_tax":329.67,"total":3626.37,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","sales_opportunity_id":null,"sales_items":[{"id":56,"sales_id":26,"product_id":4,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-11-30T05:06:04.000000Z","updated_at":"2025-11-30T05:06:04.000000Z","product":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","stock_quantity":232,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":3,"units_id":1,"supplier_id":1,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z"}}]}}],"links":{"first":"http:\/\/localhost\/api\/v1\/payments?page=1","last":"http:\/\/localhost\/api\/v1\/payments?page=3","prev":null,"next":"http:\/\/localhost\/api\/v1\/payments?page=2"},"meta":{"current_page":1,"from":1,"last_page":3,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/payments?page=1","label":"1","active":true},{"url":"http:\/\/localhost\/api\/v1\/payments?page=2","label":"2","active":false},{"url":"http:\/\/localhost\/api\/v1\/payments?page=3","label":"3","active":false},{"url":"http:\/\/localhost\/api\/v1\/payments?page=2","label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/payments","per_page":25,"to":25,"total":73}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields:
+      data:
+        custom: []
+        name: data
+        description: 'A list of payments.'
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].id':
+        custom: []
+        name: 'data[].id'
+        description: 'The ID of the payment.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].paymentable_type':
+        custom: []
+        name: 'data[].paymentable_type'
+        description: 'The type of the paymentable model.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].paymentable_id':
+        custom: []
+        name: 'data[].paymentable_id'
+        description: 'The ID of the paymentable model.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].amount':
+        custom: []
+        name: 'data[].amount'
+        description: 'The amount of the payment.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].payment_date':
+        custom: []
+        name: 'data[].payment_date'
+        description: 'The date of the payment.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].payment_method':
+        custom: []
+        name: 'data[].payment_method'
+        description: 'The payment method.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].notes':
+        custom: []
+        name: 'data[].notes'
+        description: 'The notes for the payment.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].created_at':
+        custom: []
+        name: 'data[].created_at'
+        description: 'The date and time the payment was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].updated_at':
+        custom: []
+        name: 'data[].updated_at'
+        description: 'The date and time the payment was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'data[].paymentable':
+        custom: []
+        name: 'data[].paymentable'
+        description: 'The paymentable model.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links:
+        custom: []
+        name: links
+        description: 'Links for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.first:
+        custom: []
+        name: links.first
+        description: 'The URL of the first page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.last:
+        custom: []
+        name: links.last
+        description: 'The URL of the last page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.prev:
+        custom: []
+        name: links.prev
+        description: 'The URL of the previous page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      links.next:
+        custom: []
+        name: links.next
+        description: 'The URL of the next page.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta:
+        custom: []
+        name: meta
+        description: 'Metadata for pagination.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.current_page:
+        custom: []
+        name: meta.current_page
+        description: 'The current page number.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.from:
+        custom: []
+        name: meta.from
+        description: 'The starting number of the results on the current page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.last_page:
+        custom: []
+        name: meta.last_page
+        description: 'The last page number.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.path:
+        custom: []
+        name: meta.path
+        description: 'The URL path.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.per_page:
+        custom: []
+        name: meta.per_page
+        description: 'The number of results per page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.to:
+        custom: []
+        name: meta.to
+        description: 'The ending number of the results on the current page.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      meta.total:
+        custom: []
+        name: meta.total
+        description: 'The total number of results.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - POST
-    uri: api/v1/stock-adjustments
-    metadata:
-      custom: []
-      groupName: 'Stock Adjustments'
-      groupDescription: |-
-
-        APIs for managing stock adjustments
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Store a newly created resource in storage.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      product_id:
-        custom: []
-        name: product_id
-        description: 'The ID of the product.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      adjustment_type:
-        custom: []
-        name: adjustment_type
-        description: 'The type of adjustment (e.g., increase, decrease).'
-        required: true
-        example: decrease
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      quantity_before:
-        custom: []
-        name: quantity_before
-        description: 'The quantity before adjustment.'
-        required: true
-        example: '100.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      quantity_after:
-        custom: []
-        name: quantity_after
-        description: 'The quantity after adjustment.'
-        required: true
-        example: '90.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      adjustment_amount:
-        custom: []
-        name: adjustment_amount
-        description: 'The amount of adjustment.'
-        required: true
-        example: '10.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      reason:
-        custom: []
-        name: reason
-        description: 'A reason for the adjustment.'
-        required: false
-        example: 'Damaged goods.'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      adjusted_by:
-        custom: []
-        name: adjusted_by
-        description: 'The ID of the user who made the adjustment.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      product_id: 1
-      adjustment_type: decrease
-      quantity_before: '100.00'
-      quantity_after: '90.00'
-      adjustment_amount: '10.00'
-      reason: 'Damaged goods.'
-      adjusted_by: 1
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 201
-        content: |-
-          {
-              "data": {
-                  "id": 1,
-                  "product_id": 1,
-                  "adjustment_type": "decrease",
-                  "quantity_before": 100.00,
-                  "quantity_after": 90.00,
-                  "adjustment_amount": 10.00,
-                  "reason": "Damaged goods.",
-                  "adjusted_by": 1,
-                  "created_at": "2023-10-26T12:00:00.000000Z",
-                  "updated_at": "2023-10-26T12:00:00.000000Z"
-              }
-          }
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -203,16 +325,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/stock-adjustments/{id}'
+    uri: 'api/v1/payments/{id}'
     metadata:
       custom: []
-      groupName: 'Stock Adjustments'
-      groupDescription: |-
-
-        APIs for managing stock adjustments
+      groupName: Payments
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified stock adjustment.'
+      title: 'Display the specified payment.'
       description: ''
       authenticated: true
       deprecated: false
@@ -224,18 +344,18 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the stock adjustment.'
+        description: 'The ID of the payment.'
         required: true
-        example: 17
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      stock_adjustment:
+      payment:
         custom: []
-        name: stock_adjustment
-        description: 'The ID of the stock adjustment.'
+        name: payment
+        description: 'The ID of the payment.'
         required: true
         example: '1'
         type: string
@@ -244,8 +364,8 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 17
-      stock_adjustment: '1'
+      id: 2
+      payment: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -255,14 +375,127 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":12,"product_id":93,"adjustment_type":"increase","quantity_before":150,"quantity_after":161,"adjustment_amount":11,"reason":"Veniam sed fuga aspernatur natus earum.","adjusted_by":35,"created_at":"2025-11-21T06:50:04.000000Z","updated_at":"2025-11-21T06:50:04.000000Z"}}'
-        headers: []
-        description: ''
-    responseFields: []
+        content: '{"data":{"id":2,"paymentable_type":"App\\Models\\Purchase","paymentable_id":3,"amount":"7740.00","payment_date":"2025-11-23T05:06:03.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","paymentable":null}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the payment.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      paymentable_type:
+        custom: []
+        name: paymentable_type
+        description: 'The type of the paymentable model.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      paymentable_id:
+        custom: []
+        name: paymentable_id
+        description: 'The ID of the paymentable model.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'The amount of the payment.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      payment_date:
+        custom: []
+        name: payment_date
+        description: 'The date of the payment.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      payment_method:
+        custom: []
+        name: payment_method
+        description: 'The payment method.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      notes:
+        custom: []
+        name: notes
+        description: 'The notes for the payment.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the payment was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the payment was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      paymentable:
+        custom: []
+        name: paymentable
+        description: 'The paymentable model.'
+        required: false
+        example: null
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -271,13 +504,11 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/stock-adjustments/{id}'
+    uri: 'api/v1/payments/{id}'
     metadata:
       custom: []
-      groupName: 'Stock Adjustments'
-      groupDescription: |-
-
-        APIs for managing stock adjustments
+      groupName: Payments
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Update the specified resource in storage.'
@@ -292,143 +523,210 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the stock adjustment.'
+        description: 'The ID of the payment.'
         required: true
-        example: 17
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      stock_adjustment:
+      payment:
         custom: []
-        name: stock_adjustment
-        description: 'The ID of the stock adjustment.'
+        name: payment
+        description: 'The ID of the payment.'
         required: true
-        example: 1
-        type: integer
+        example: '1'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 17
-      stock_adjustment: 1
+      id: 2
+      payment: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      product_id:
+      amount:
         custom: []
-        name: product_id
-        description: 'The ID of the product.'
+        name: amount
+        description: 'The amount of the payment.'
         required: true
-        example: 1
-        type: integer
+        example: 100.0
+        type: number
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      adjustment_type:
+      payment_date:
         custom: []
-        name: adjustment_type
-        description: 'The type of adjustment (e.g., increase, decrease).'
+        name: payment_date
+        description: 'The date of the payment.'
         required: true
-        example: increase
+        example: '2025-11-28'
+        type: date
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      payment_method:
+        custom: []
+        name: payment_method
+        description: 'The payment method.'
+        required: true
+        example: Cash
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      quantity_before:
+      notes:
         custom: []
-        name: quantity_before
-        description: 'The quantity before adjustment.'
-        required: true
-        example: '100.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      quantity_after:
-        custom: []
-        name: quantity_after
-        description: 'The quantity after adjustment.'
-        required: true
-        example: '110.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      adjustment_amount:
-        custom: []
-        name: adjustment_amount
-        description: 'The amount of adjustment.'
-        required: true
-        example: '10.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      reason:
-        custom: []
-        name: reason
-        description: 'A reason for the adjustment.'
+        name: notes
+        description: 'The notes for the payment.'
         required: false
-        example: 'Inventory count discrepancy.'
+        example: 'Paid in full'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      adjusted_by:
+      paymentable_id:
         custom: []
-        name: adjusted_by
-        description: 'The ID of the user who made the adjustment.'
-        required: false
+        name: paymentable_id
+        description: 'The ID of the paymentable model (e.g., Purchase, Sales).'
+        required: true
         example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-    cleanBodyParameters:
-      product_id: 1
-      adjustment_type: increase
-      quantity_before: '100.00'
-      quantity_after: '110.00'
-      adjustment_amount: '10.00'
-      reason: 'Inventory count discrepancy.'
-      adjusted_by: 1
-    fileParameters: []
-    responses:
-      -
+      paymentable_type:
         custom: []
-        status: 200
-        content: |-
-          {
-              "data": {
-                  "id": 1,
-                  "product_id": 1,
-                  "adjustment_type": "increase",
-                  "quantity_before": 100.00,
-                  "quantity_after": 110.00,
-                  "adjustment_amount": 10.00,
-                  "reason": "Inventory count discrepancy.",
-                  "adjusted_by": 1,
-                  "created_at": "2023-10-26T12:00:00.000000Z",
-                  "updated_at": "2023-10-27T12:00:00.000000Z"
-              }
-          }
-        headers: []
-        description: ''
-    responseFields: []
+        name: paymentable_type
+        description: 'The type of the paymentable model (e.g., "App\\Models\\Purchase", "App\\Models\\Sales").'
+        required: true
+        example: App\\Models\\Purchase
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      amount: 100.0
+      payment_date: '2025-11-28'
+      payment_method: Cash
+      notes: 'Paid in full'
+      paymentable_id: 1
+      paymentable_type: App\\Models\\Purchase
+    fileParameters: []
+    responses: []
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the payment.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      paymentable_type:
+        custom: []
+        name: paymentable_type
+        description: 'The type of the paymentable model.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      paymentable_id:
+        custom: []
+        name: paymentable_id
+        description: 'The ID of the paymentable model.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'The amount of the payment.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      payment_date:
+        custom: []
+        name: payment_date
+        description: 'The date of the payment.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      payment_method:
+        custom: []
+        name: payment_method
+        description: 'The payment method.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      notes:
+        custom: []
+        name: notes
+        description: 'The notes for the payment.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the payment was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the payment was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null
@@ -436,13 +734,11 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/v1/stock-adjustments/{id}'
+    uri: 'api/v1/payments/{id}'
     metadata:
       custom: []
-      groupName: 'Stock Adjustments'
-      groupDescription: |-
-
-        APIs for managing stock adjustments
+      groupName: Payments
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
       title: 'Remove the specified resource from storage.'
@@ -457,28 +753,28 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the stock adjustment.'
+        description: 'The ID of the payment.'
         required: true
-        example: 17
+        example: 2
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      stock_adjustment:
+      payment:
         custom: []
-        name: stock_adjustment
-        description: 'The ID of the stock adjustment to delete.'
+        name: payment
+        description: 'The ID of the payment.'
         required: true
-        example: 1
-        type: integer
+        example: '1'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 17
-      stock_adjustment: 1
+      id: 2
+      payment: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -495,7 +791,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|271kdI4wVbgdgT0MGAmpZaTe7DOfr3vwBlqDwzEW5279ce05'
+      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
     controller: null
     method: null
     route: null

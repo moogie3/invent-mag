@@ -11,11 +11,33 @@ use App\Models\Product;
 use App\Models\Tax;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 use App\Models\Customer;
 
 class SalesPipelineService
 {
+    public function getOpportunitiesByFilters(Request $request)
+    {
+        $opportunitiesQuery = SalesOpportunity::with(['customer', 'pipeline', 'stage']);
+
+        if ($request->pipeline_id) {
+            $opportunitiesQuery->where('sales_pipeline_id', $request->pipeline_id);
+        }
+
+        if ($request->stage_id) {
+            $opportunitiesQuery->where('pipeline_stage_id', $request->stage_id);
+        }
+
+        $opportunities = $opportunitiesQuery->get();
+        $totalPipelineValue = $opportunities->sum('amount');
+
+        return [
+            'opportunities' => $opportunities,
+            'total_pipeline_value' => $totalPipelineValue,
+        ];
+    }
+
     public function getSalesPipelineIndexData()
     {
         $pipelines = SalesPipeline::with('stages')->get();
@@ -42,7 +64,9 @@ class SalesPipelineService
 
     public function createStage(SalesPipeline $pipeline, array $data): PipelineStage
     {
-        $data['position'] = $pipeline->stages()->count();
+        // Get the maximum existing position for stages within this pipeline,
+        // or -1 if no stages exist, then add 1 to get the next position.
+        $data['position'] = ($pipeline->stages()->max('position') ?? -1) + 1;
         return $pipeline->stages()->create($data);
     }
 

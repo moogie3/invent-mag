@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SupplierInteractionResource;
 use App\Models\SupplierInteraction;
+use App\Services\CrmService;
 use Illuminate\Http\Request;
 
 /**
@@ -14,10 +15,42 @@ use Illuminate\Http\Request;
  */
 class SupplierInteractionController extends Controller
 {
+    protected $crmService;
+
+    public function __construct(\App\Services\CrmService $crmService)
+    {
+        $this->crmService = $crmService;
+    }
     /**
      * Display a listing of the supplier interactions.
      *
+     * @group Supplier Interactions
+     * @authenticated
      * @queryParam per_page int The number of interactions to return per page. Defaults to 15. Example: 25
+     *
+     * @responseField data object[] A list of supplier interactions.
+     * @responseField data[].id integer The ID of the interaction.
+     * @responseField data[].supplier_id integer The ID of the supplier.
+     * @responseField data[].user_id integer The ID of the user.
+     * @responseField data[].type string The type of interaction.
+     * @responseField data[].notes string The notes for the interaction.
+     * @responseField data[].interaction_date string The date of the interaction.
+     * @responseField data[].created_at string The date and time the interaction was created.
+     * @responseField data[].updated_at string The date and time the interaction was last updated.
+     * @responseField data[].supplier object The supplier associated with the interaction.
+     * @responseField links object Links for pagination.
+     * @responseField links.first string The URL of the first page.
+     * @responseField links.last string The URL of the last page.
+     * @responseField links.prev string The URL of the previous page.
+     * @responseField links.next string The URL of the next page.
+     * @responseField meta object Metadata for pagination.
+     * @responseField meta.current_page integer The current page number.
+     * @responseField meta.from integer The starting number of the results on the current page.
+     * @responseField meta.last_page integer The last page number.
+     * @responseField meta.path string The URL path.
+     * @responseField meta.per_page integer The number of results per page.
+     * @responseField meta.to integer The ending number of the results on the current page.
+     * @responseField meta.total integer The total number of results.
      */
     public function index(Request $request)
     {
@@ -29,44 +62,46 @@ class SupplierInteractionController extends Controller
     /**
      * Store a newly created resource in storage.
      *
+     * @group Supplier Interactions
+     * @authenticated
      * @bodyParam supplier_id integer required The ID of the supplier. Example: 1
      * @bodyParam user_id integer required The ID of the user. Example: 1
      * @bodyParam type string required The type of interaction (e.g., Call, Email, Meeting). Example: Email
      * @bodyParam notes string Notes about the interaction. Example: Sent follow-up email.
      * @bodyParam interaction_date date required The date of the interaction. Example: 2023-10-26
      *
-     * @response 201 {
-     *     "data": {
-     *         "id": 1,
-     *         "supplier_id": 1,
-     *         "user_id": 1,
-     *         "type": "Email",
-     *         "notes": "Sent follow-up email.",
-     *         "interaction_date": "2023-10-26",
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-26T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the interaction.
+     * @responseField supplier_id integer The ID of the supplier.
+     * @responseField user_id integer The ID of the user.
+     * @responseField type string The type of interaction.
+     * @responseField notes string The notes for the interaction.
+     * @responseField interaction_date string The date of the interaction.
+     * @responseField created_at string The date and time the interaction was created.
+     * @responseField updated_at string The date and time the interaction was last updated.
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Api\V1\StoreSupplierInteractionRequest $request)
     {
-        $validated = $request->validate([
-            'supplier_id' => 'required|exists:suppliers,id',
-            'user_id' => 'required|exists:users,id',
-            'type' => 'required|string|max:255',
-            'notes' => 'nullable|string',
-            'interaction_date' => 'required|date',
-        ]);
-
-        $supplier_interaction = SupplierInteraction::create($validated);
-
-        return new SupplierInteractionResource($supplier_interaction);
+        $validated = $request->validated();
+        $interaction = $this->crmService->storeSupplierInteraction($validated, $validated['supplier_id']);
+        return new SupplierInteractionResource($interaction);
     }
 
     /**
      * Display the specified supplier interaction.
      *
+     * @group Supplier Interactions
+     * @authenticated
      * @urlParam supplier_interaction required The ID of the supplier interaction. Example: 1
+     *
+     * @responseField id integer The ID of the interaction.
+     * @responseField supplier_id integer The ID of the supplier.
+     * @responseField user_id integer The ID of the user.
+     * @responseField type string The type of interaction.
+     * @responseField notes string The notes for the interaction.
+     * @responseField interaction_date string The date of the interaction.
+     * @responseField created_at string The date and time the interaction was created.
+     * @responseField updated_at string The date and time the interaction was last updated.
+     * @responseField supplier object The supplier associated with the interaction.
      */
     public function show(SupplierInteraction $supplier_interaction)
     {
@@ -76,6 +111,8 @@ class SupplierInteractionController extends Controller
     /**
      * Update the specified resource in storage.
      *
+     * @group Supplier Interactions
+     * @authenticated
      * @urlParam supplier_interaction integer required The ID of the supplier interaction. Example: 1
      * @bodyParam supplier_id integer required The ID of the supplier. Example: 1
      * @bodyParam user_id integer required The ID of the user. Example: 1
@@ -83,29 +120,18 @@ class SupplierInteractionController extends Controller
      * @bodyParam notes string Notes about the interaction. Example: Discussed new product line.
      * @bodyParam interaction_date date required The date of the interaction. Example: 2023-10-27
      *
-     * @response 200 {
-     *     "data": {
-     *         "id": 1,
-     *         "supplier_id": 1,
-     *         "user_id": 1,
-     *         "type": "Call",
-     *         "notes": "Discussed new product line.",
-     *         "interaction_date": "2023-10-27",
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-27T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the interaction.
+     * @responseField supplier_id integer The ID of the supplier.
+     * @responseField user_id integer The ID of the user.
+     * @responseField type string The type of interaction.
+     * @responseField notes string The notes for the interaction.
+     * @responseField interaction_date string The date of the interaction.
+     * @responseField created_at string The date and time the interaction was created.
+     * @responseField updated_at string The date and time the interaction was last updated.
      */
-    public function update(Request $request, SupplierInteraction $supplier_interaction)
+    public function update(\App\Http\Requests\Api\V1\UpdateSupplierInteractionRequest $request, SupplierInteraction $supplier_interaction)
     {
-        $validated = $request->validate([
-            'supplier_id' => 'required|exists:suppliers,id',
-            'user_id' => 'required|exists:users,id',
-            'type' => 'required|string|max:255',
-            'notes' => 'nullable|string',
-            'interaction_date' => 'required|date',
-        ]);
-
+        $validated = $request->validated();
         $supplier_interaction->update($validated);
 
         return new SupplierInteractionResource($supplier_interaction);
@@ -114,6 +140,8 @@ class SupplierInteractionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @group Supplier Interactions
+     * @authenticated
      * @urlParam supplier_interaction integer required The ID of the supplier interaction to delete. Example: 1
      *
      * @response 204 scenario="Success"

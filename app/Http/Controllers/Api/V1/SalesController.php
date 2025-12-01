@@ -29,19 +29,59 @@ class SalesController extends Controller
      *
      * Retrieves a paginated list of sales orders.
      *
+     * @group Sales Orders
+     * @authenticated
      * @queryParam per_page int The number of sales orders to return per page. Defaults to 15. Example: 25
      *
+     * @responseField data object[] A list of sales orders.
+     * @responseField data[].id integer The ID of the sales order.
+     * @responseField data[].invoice string The invoice number.
+     * @responseField data[].customer_id integer The ID of the customer.
+     * @responseField data[].user_id integer The ID of the user.
+     * @responseField data[].order_date string The order date.
+     * @responseField data[].due_date string The due date.
+     * @responseField data[].payment_type string The payment type.
+     * @responseField data[].order_discount number The total order discount.
+     * @responseField data[].order_discount_type string The type of discount.
+     * @responseField data[].total number The total amount.
+     * @responseField data[].status string The status of the sales order.
+     * @responseField data[].tax_rate number The tax rate applied.
+     * @responseField data[].total_tax number The total tax amount.
+     * @responseField data[].amount_received number The amount received.
+     * @responseField data[].change_amount number The change amount.
+     * @responseField data[].is_pos boolean Whether it's a point of sale transaction.
+     * @responseField data[].sales_opportunity_id integer The ID of the sales opportunity.
+     * @responseField data[].created_at string The date and time the sales order was created.
+     * @responseField data[].updated_at string The date and time the sales order was last updated.
+     * @responseField data[].customer object The customer associated with the sales order.
+     * @responseField data[].user object The user associated with the sales order.
+     * @responseField links object Links for pagination.
+     * @responseField links.first string The URL of the first page.
+     * @responseField links.last string The URL of the last page.
+     * @responseField links.prev string The URL of the previous page.
+     * @responseField links.next string The URL of the next page.
+     * @responseField meta object Metadata for pagination.
+     * @responseField meta.current_page integer The current page number.
+     * @responseField meta.from integer The starting number of the results on the current page.
+     * @responseField meta.last_page integer The last page number.
+     * @responseField meta.path string The URL path.
+     * @responseField meta.per_page integer The number of results per page.
+     * @responseField meta.to integer The ending number of the results on the current page.
+     * @responseField meta.total integer The total number of results.
      */
     public function index(Request $request)
     {
-        $perPage = $request->query('per_page', 15);
-        $sales = Sales::with(['customer', 'user'])->paginate($perPage);
-        return SalesResource::collection($sales);
+        $perPage = $request->input('per_page', 15);
+        $filters = $request->only(['month', 'year']);
+        $data = $this->salesService->getSalesIndexData($filters, $perPage);
+        return SalesResource::collection($data['sales']);
     }
 
     /**
      * Store a newly created resource in storage.
      *
+     * @group Sales Orders
+     * @authenticated
      * @bodyParam invoice string required The invoice number. Example: INV-SALES-001
      * @bodyParam customer_id integer required The ID of the customer. Example: 1
      * @bodyParam user_id integer required The ID of the user. Example: 1
@@ -59,53 +99,30 @@ class SalesController extends Controller
      * @bodyParam is_pos boolean Is this a point of sale transaction. Example: true
      * @bodyParam sales_opportunity_id integer The ID of the sales opportunity. Example: 1
      *
-     * @response 201 {
-     *     "data": {
-     *         "id": 1,
-     *         "invoice": "INV-SALES-001",
-     *         "customer_id": 1,
-     *         "user_id": 1,
-     *         "order_date": "2023-10-26",
-     *         "due_date": "2023-11-26",
-     *         "payment_type": "Cash",
-     *         "order_discount": 5.00,
-     *         "order_discount_type": "fixed",
-     *         "total": 1500.00,
-     *         "status": "Pending",
-     *         "tax_rate": 0.05,
-     *         "total_tax": 75.00,
-     *         "amount_received": 1575.00,
-     *         "change_amount": 0.00,
-     *         "is_pos": true,
-     *         "sales_opportunity_id": 1,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-26T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the sales order.
+     * @responseField invoice string The invoice number.
+     * @responseField customer_id integer The ID of the customer.
+     * @responseField user_id integer The ID of the user.
+     * @responseField order_date string The order date.
+     * @responseField due_date string The due date.
+     * @responseField payment_type string The payment type.
+     * @responseField order_discount number The total order discount.
+     * @responseField order_discount_type string The type of discount.
+     * @responseField total number The total amount.
+     * @responseField status string The status of the sales order.
+     * @responseField tax_rate number The tax rate applied.
+     * @responseField total_tax number The total tax amount.
+     * @responseField amount_received number The amount received.
+     * @responseField change_amount number The change amount.
+     * @responseField is_pos boolean Whether it's a point of sale transaction.
+     * @responseField sales_opportunity_id integer The ID of the sales opportunity.
+     * @responseField created_at string The date and time the sales order was created.
+     * @responseField updated_at string The date and time the sales order was last updated.
+     * @response 500 scenario="Creation Failed" {"success": false, "message": "Failed to create sales order."}
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Api\V1\StoreSaleRequest $request)
     {
-        $validated = $request->validate([
-            'invoice' => 'required|string|max:255',
-            'customer_id' => 'required|exists:customers,id',
-            'user_id' => 'required|exists:users,id',
-            'order_date' => 'required|date',
-            'due_date' => 'nullable|date',
-            'payment_type' => 'required|string|max:255',
-            'order_discount' => 'nullable|numeric',
-            'order_discount_type' => 'nullable|string|in:percentage,fixed',
-            'total' => 'required|numeric',
-            'status' => 'required|string|max:255',
-            'tax_rate' => 'nullable|numeric',
-            'total_tax' => 'nullable|numeric',
-            'amount_received' => 'nullable|numeric',
-            'change_amount' => 'nullable|numeric',
-            'is_pos' => 'boolean',
-            'sales_opportunity_id' => 'nullable|exists:sales_opportunities,id',
-        ]);
-
-        $sale = Sales::create($validated);
-
+        $sale = $this->salesService->createSale($request->validated());
         return new SalesResource($sale);
     }
 
@@ -114,8 +131,31 @@ class SalesController extends Controller
      *
      * Retrieves a single sales order by its ID.
      *
+     * @group Sales Orders
+     * @authenticated
      * @urlParam sale required The ID of the sales order. Example: 1
      *
+     * @responseField id integer The ID of the sales order.
+     * @responseField invoice string The invoice number.
+     * @responseField customer_id integer The ID of the customer.
+     * @responseField user_id integer The ID of the user.
+     * @responseField order_date string The order date.
+     * @responseField due_date string The due date.
+     * @responseField payment_type string The payment type.
+     * @responseField order_discount number The total order discount.
+     * @responseField order_discount_type string The type of discount.
+     * @responseField total number The total amount.
+     * @responseField status string The status of the sales order.
+     * @responseField tax_rate number The tax rate applied.
+     * @responseField total_tax number The total tax amount.
+     * @responseField amount_received number The amount received.
+     * @responseField change_amount number The change amount.
+     * @responseField is_pos boolean Whether it's a point of sale transaction.
+     * @responseField sales_opportunity_id integer The ID of the sales opportunity.
+     * @responseField created_at string The date and time the sales order was created.
+     * @responseField updated_at string The date and time the sales order was last updated.
+     * @responseField customer object The customer associated with the sales order.
+     * @responseField user object The user associated with the sales order.
      */
     public function show(Sales $sale)
     {
@@ -125,6 +165,8 @@ class SalesController extends Controller
     /**
      * Update the specified resource in storage.
      *
+     * @group Sales Orders
+     * @authenticated
      * @urlParam sale integer required The ID of the sales order. Example: 1
      * @bodyParam invoice string The invoice number. Example: INV-SALES-002
      * @bodyParam customer_id integer The ID of the customer. Example: 2
@@ -143,76 +185,64 @@ class SalesController extends Controller
      * @bodyParam is_pos boolean Is this a point of sale transaction. Example: false
      * @bodyParam sales_opportunity_id integer The ID of the sales opportunity. Example: 1
      *
-     * @response 200 {
-     *     "data": {
-     *         "id": 1,
-     *         "invoice": "INV-SALES-002",
-     *         "customer_id": 2,
-     *         "user_id": 1,
-     *         "order_date": "2023-10-27",
-     *         "due_date": "2023-11-27",
-     *         "payment_type": "Credit Card",
-     *         "order_discount": 10.00,
-     *         "order_discount_type": "percentage",
-     *         "total": 2000.00,
-     *         "status": "Paid",
-     *         "tax_rate": 0.05,
-     *         "total_tax": 100.00,
-     *         "amount_received": 2000.00,
-     *         "change_amount": 0.00,
-     *         "is_pos": false,
-     *         "sales_opportunity_id": 1,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-27T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the sales order.
+     * @responseField invoice string The invoice number.
+     * @responseField customer_id integer The ID of the customer.
+     * @responseField user_id integer The ID of the user.
+     * @responseField order_date string The order date.
+     * @responseField due_date string The due date.
+     * @responseField payment_type string The payment type.
+     * @responseField order_discount number The total order discount.
+     * @responseField order_discount_type string The type of discount.
+     * @responseField total number The total amount.
+     * @responseField status string The status of the sales order.
+     * @responseField tax_rate number The tax rate applied.
+     * @responseField total_tax number The total tax amount.
+     * @responseField amount_received number The amount received.
+     * @responseField change_amount number The change amount.
+     * @responseField is_pos boolean Whether it's a point of sale transaction.
+     * @responseField sales_opportunity_id integer The ID of the sales opportunity.
+     * @responseField created_at string The date and time the sales order was created.
+     * @responseField updated_at string The date and time the sales order was last updated.
+     * @response 500 scenario="Update Failed" {"success": false, "message": "Failed to update sales order."}
      */
-    public function update(Request $request, Sales $sale)
+    public function update(\App\Http\Requests\Api\V1\UpdateSaleRequest $request, Sales $sale)
     {
-        $validated = $request->validate([
-            'invoice' => 'required|string|max:255',
-            'customer_id' => 'required|exists:customers,id',
-            'user_id' => 'required|exists:users,id',
-            'order_date' => 'required|date',
-            'due_date' => 'nullable|date',
-            'payment_type' => 'required|string|max:255',
-            'order_discount' => 'nullable|numeric',
-            'order_discount_type' => 'nullable|string|in:percentage,fixed',
-            'total' => 'required|numeric',
-            'status' => 'required|string|max:255',
-            'tax_rate' => 'nullable|numeric',
-            'total_tax' => 'nullable|numeric',
-            'amount_received' => 'nullable|numeric',
-            'change_amount' => 'nullable|numeric',
-            'is_pos' => 'boolean',
-            'sales_opportunity_id' => 'nullable|exists:sales_opportunities,id',
-        ]);
-
-        $sale->update($validated);
-
+        $sale = $this->salesService->updateSale($sale, $request->validated());
         return new SalesResource($sale);
     }
 
     /**
      * Remove the specified resource from storage.
      *
+     * @group Sales Orders
+     * @authenticated
      * @urlParam sale integer required The ID of the sales order to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Failed to delete sales order."}
      */
     public function destroy(Sales $sale)
     {
-        $sale->delete();
-
+        $this->salesService->deleteSale($sale);
         return response()->noContent();
     }
 
     /**
+     * Get Expiring Soon Sales
+     *
      * @group Sales Orders
-     * @title Get Expiring Soon Sales
-     * @response {
-     *  "data": []
-     * }
+     * @authenticated
+     *
+     * @responseField id integer The ID of the sales order.
+     * @responseField invoice string The invoice number.
+     * @responseField customer object The customer details.
+     * @responseField order_date string The order date.
+     * @responseField due_date string The due date.
+     * @responseField total number The total amount.
+     * @responseField status string The status of the sales order.
+     * @responseField remaining_days integer The number of days until expiry.
+     * @response 200 scenario="Success" [{"id":1,"invoice":"INV-SALES-001","customer":{"id":1,"name":"Customer 1"},"order_date":"2025-11-20","due_date":"2025-12-20","total":1000,"status":"pending","remaining_days":19}]
      */
     public function getExpiringSoonSales()
     {
@@ -221,18 +251,19 @@ class SalesController extends Controller
     }
 
     /**
+     * Add Payment to Sales Order
+     *
      * @group Sales Orders
-     * @title Add Payment to Sales Order
+     * @authenticated
      * @urlParam id integer required The ID of the sales order. Example: 1
      * @bodyParam amount number required The payment amount. Example: 100.00
-     * @bodyParam payment_date date required The date of the payment. Example: "2023-10-27"
-     * @bodyParam payment_method string required The method of payment. Example: "Bank Transfer"
+     * @bodyParam payment_date date required The date of the payment. Example: 2023-10-27
+     * @bodyParam payment_method string required The method of payment. Example: Bank Transfer
      * @bodyParam notes string nullable Any notes about the payment.
      *
-     * @response {
-     *  "success": true,
-     *  "message": "Payment added successfully."
-     * }
+     * @responseField success boolean Indicates whether the request was successful.
+     * @responseField message string A message describing the result of the request.
+     * @response 500 scenario="Payment Failed" {"success": false, "message": "Something went wrong: <error message>"}
      */
     public function addPayment(Request $request, $id)
     {
@@ -253,14 +284,14 @@ class SalesController extends Controller
     }
 
     /**
+     * Get Past Customer Price for a Product
+     *
      * @group Sales Orders
-     * @title Get Past Customer Price for a Product
+     * @authenticated
      * @urlParam customer integer required The ID of the customer. Example: 1
      * @urlParam product integer required The ID of the product. Example: 1
      *
-     * @response {
-     *  "past_price": 120.50
-     * }
+     * @responseField past_price number The past price of the product for the customer.
      */
     public function getCustomerPrice(Customer $customer, Product $product)
     {
@@ -269,13 +300,14 @@ class SalesController extends Controller
     }
 
     /**
+     * Get Sales Metrics
+     *
      * @group Sales Orders
-     * @title Get Sales Metrics
-     * @response {
-     *  "total_sales": 120,
-     *  "total_paid": 85000,
-     *  "total_due": 15000
-     * }
+     * @authenticated
+     *
+     * @responseField total_sales number Total sales amount.
+     * @responseField total_paid number Total amount paid for sales.
+     * @responseField total_due number Total amount due for sales.
      */
     public function getSalesMetrics()
     {
@@ -284,15 +316,16 @@ class SalesController extends Controller
     }
 
     /**
+     * Bulk Delete Sales Orders
+     *
      * @group Sales Orders
-     * @title Bulk Delete Sales Orders
+     * @authenticated
      * @bodyParam ids array required An array of sales order IDs to delete. Example: [1, 2, 3]
      * @bodyParam ids.* integer required A sales order ID.
      *
-     * @response {
-     *  "success": true,
-     *  "message": "Successfully deleted sales order(s)"
-     * }
+     * @responseField success boolean Indicates whether the request was successful.
+     * @responseField message string A message describing the result of the request.
+     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Error deleting sales orders. Please try again."}
      */
     public function bulkDelete(Request $request)
     {
@@ -317,16 +350,17 @@ class SalesController extends Controller
     }
 
     /**
+     * Bulk Mark Sales Orders as Paid
+     *
      * @group Sales Orders
-     * @title Bulk Mark Sales Orders as Paid
+     * @authenticated
      * @bodyParam ids array required An array of sales order IDs to mark as paid. Example: [1, 2, 3]
      * @bodyParam ids.* integer required A sales order ID.
      *
-     * @response {
-     *  "success": true,
-     *  "message": "Successfully marked 3 sales order(s) as paid.",
-     *  "updated_count": 3
-     * }
+     * @responseField success boolean Indicates whether the request was successful.
+     * @responseField message string A message describing the result of the request.
+     * @responseField updated_count integer The number of sales orders successfully marked as paid.
+     * @response 500 scenario="Update Failed" {"success": false, "message": "An error occurred while updating sales orders."}
      */
     public function bulkMarkPaid(Request $request)
     {

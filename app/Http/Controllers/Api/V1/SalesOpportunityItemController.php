@@ -17,111 +17,60 @@ class SalesOpportunityItemController extends Controller
     /**
      * Display a listing of the sales opportunity items.
      *
+     * @group Sales Opportunity Items
+     * @authenticated
      * @queryParam per_page int The number of items to return per page. Defaults to 15. Example: 25
      *
-     * @apiResourceCollection App\Http\Resources\SalesOpportunityItemResource
-     * @apiResourceModel App\Models\SalesOpportunityItem
+     * @responseField data object[] A list of sales opportunity items.
+     * @responseField data[].id integer The ID of the sales opportunity item.
+     * @responseField data[].sales_opportunity_id integer The ID of the sales opportunity.
+     * @responseField data[].product_id integer The ID of the product.
+     * @responseField data[].quantity integer The quantity of the product.
+     * @responseField data[].price number The price of the product.
+     * @responseField data[].created_at string The date and time the item was created.
+     * @responseField data[].updated_at string The date and time the item was last updated.
+     * @responseField data[].opportunity object The sales opportunity associated with the item.
+     * @responseField data[].product object The product associated with the item.
+     * @responseField links object Links for pagination.
+     * @responseField links.first string The URL of the first page.
+     * @responseField links.last string The URL of the last page.
+     * @responseField links.prev string The URL of the previous page.
+     * @responseField links.next string The URL of the next page.
+     * @responseField meta object Metadata for pagination.
+     * @responseField meta.current_page integer The current page number.
+     * @responseField meta.from integer The starting number of the results on the current page.
+     * @responseField meta.last_page integer The last page number.
+     * @responseField meta.path string The URL path.
+     * @responseField meta.per_page integer The number of results per page.
+     * @responseField meta.to integer The ending number of the results on the current page.
+     * @responseField meta.total integer The total number of results.
      */
     public function index(Request $request)
     {
         $perPage = $request->query('per_page', 15);
-        $items = SalesOpportunityItem::with(['opportunity', 'product'])->paginate($perPage);
+        $items = SalesOpportunityItem::with(['salesOpportunity', 'product'])->paginate($perPage);
         return SalesOpportunityItemResource::collection($items);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @bodyParam sales_opportunity_id integer required The ID of the sales opportunity. Example: 1
-     * @bodyParam product_id integer required The ID of the product. Example: 1
-     * @bodyParam quantity integer required The quantity of the product. Example: 5
-     * @bodyParam price numeric required The price of the product. Example: 100.00
-     *
-     * @response 201 {
-     *     "data": {
-     *         "id": 1,
-     *         "sales_opportunity_id": 1,
-     *         "product_id": 1,
-     *         "quantity": 5,
-     *         "price": 100.00,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-26T12:00:00.000000Z"
-     *     }
-     * }
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'sales_opportunity_id' => 'required|exists:sales_opportunities,id',
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer',
-            'price' => 'required|numeric',
-        ]);
-
-        $sales_opportunity_item = SalesOpportunityItem::create($validated);
-
-        return new SalesOpportunityItemResource($sales_opportunity_item);
     }
 
     /**
      * Display the specified sales opportunity item.
      *
+     * @group Sales Opportunity Items
+     * @authenticated
      * @urlParam sales_opportunity_item required The ID of the sales opportunity item. Example: 1
      *
-     * @apiResource App\Http\Resources\SalesOpportunityItemResource
-     * @apiResourceModel App\Models\SalesOpportunityItem
+     * @responseField id integer The ID of the sales opportunity item.
+     * @responseField sales_opportunity_id integer The ID of the sales opportunity.
+     * @responseField product_id integer The ID of the product.
+     * @responseField quantity integer The quantity of the product.
+     * @responseField price number The price of the product.
+     * @responseField created_at string The date and time the item was created.
+     * @responseField updated_at string The date and time the item was last updated.
+     * @responseField opportunity object The sales opportunity associated with the item.
+     * @responseField product object The product associated with the item.
      */
     public function show(SalesOpportunityItem $sales_opportunity_item)
     {
-        return new SalesOpportunityItemResource($sales_opportunity_item->load(['opportunity', 'product']));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @urlParam sales_opportunity_item integer required The ID of the sales opportunity item. Example: 1
-     * @bodyParam sales_opportunity_id integer required The ID of the sales opportunity. Example: 1
-     * @bodyParam product_id integer required The ID of the product. Example: 1
-     * @bodyParam quantity integer required The quantity of the product. Example: 10
-     * @bodyParam price numeric required The price of the product. Example: 100.00
-     *
-     * @response 200 {
-     *     "data": {
-     *         "id": 1,
-     *         "sales_opportunity_id": 1,
-     *         "product_id": 1,
-     *         "quantity": 10,
-     *         "price": 100.00,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-27T12:00:00.000000Z"
-     *     }
-     * }
-     */
-    public function update(Request $request, SalesOpportunityItem $sales_opportunity_item)
-    {
-        $validated = $request->validate([
-            'sales_opportunity_id' => 'required|exists:sales_opportunities,id',
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer',
-            'price' => 'required|numeric',
-        ]);
-
-        $sales_opportunity_item->update($validated);
-
-        return new SalesOpportunityItemResource($sales_opportunity_item);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @urlParam sales_opportunity_item integer required The ID of the sales opportunity item to delete. Example: 1
-     *
-     * @response 204 scenario="Success"
-     */
-    public function destroy(SalesOpportunityItem $sales_opportunity_item)
-    {
-        $sales_opportunity_item->delete();
-
-        return response()->noContent();
+        return new SalesOpportunityItemResource($sales_opportunity_item->load(['salesOpportunity', 'product']));
     }
 }

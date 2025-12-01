@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Supplier;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
 
 class SupplierService
 {
@@ -23,34 +24,36 @@ class SupplierService
             return ['success' => false, 'message' => 'This supplier already exists.'];
         }
 
-        if (isset($data['image'])) {
+        if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
             $data['image'] = $this->storeImage($data['image']);
         }
 
-        Supplier::create($data);
+        $supplier = Supplier::create($data);
 
-        return ['success' => true, 'message' => 'Supplier created successfully.'];
+        return ['success' => true, 'message' => 'Supplier created successfully.', 'supplier' => $supplier];
     }
 
     public function updateSupplier(Supplier $supplier, array $data)
     {
         if (isset($data['image'])) {
             $oldImage = $supplier->getRawOriginal('image');
-            if ($oldImage) {
+            if ($oldImage && !filter_var($oldImage, FILTER_VALIDATE_URL)) {
                 Storage::disk('public')->delete('image/' . $oldImage);
             }
-            $data['image'] = $this->storeImage($data['image']);
+            if ($data['image'] instanceof UploadedFile) {
+                $data['image'] = $this->storeImage($data['image']);
+            }
         }
 
         $supplier->update($data);
 
-        return ['success' => true, 'message' => 'Supplier updated successfully.'];
+        return ['success' => true, 'message' => 'Supplier updated successfully.', 'supplier' => $supplier];
     }
 
     public function deleteSupplier(Supplier $supplier)
     {
         $image = $supplier->getRawOriginal('image');
-        if ($image) {
+        if ($image && !filter_var($image, FILTER_VALIDATE_URL)) {
             Storage::disk('public')->delete('image/' . $image);
         }
 
@@ -69,9 +72,8 @@ class SupplierService
     public function getSupplierMetrics()
     {
         return [
-            'totalsupplier' => Supplier::count(),
-            'inCount' => Supplier::where('location', 'IN')->count(),
-            'outCount' => Supplier::where('location', 'OUT')->count(),
+            'total_suppliers' => Supplier::count(),
+            'new_this_month' => Supplier::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
         ];
     }
 }

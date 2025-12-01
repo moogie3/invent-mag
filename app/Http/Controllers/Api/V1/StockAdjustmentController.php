@@ -17,129 +17,66 @@ class StockAdjustmentController extends Controller
     /**
      * Display a listing of the stock adjustments.
      *
+     * @group Stock Adjustments
+     * @authenticated
      * @queryParam per_page int The number of adjustments to return per page. Defaults to 15. Example: 25
      *
-     * @apiResourceCollection App\Http\Resources\StockAdjustmentResource
-     * @apiResourceModel App\Models\StockAdjustment
+     * @responseField data object[] A list of stock adjustments.
+     * @responseField data[].id integer The ID of the stock adjustment.
+     * @responseField data[].product_id integer The ID of the product.
+     * @responseField data[].adjustment_type string The type of adjustment (increase, decrease).
+     * @responseField data[].quantity_before number The quantity before adjustment.
+     * @responseField data[].quantity_after number The quantity after adjustment.
+     * @responseField data[].adjustment_amount number The amount of adjustment.
+     * @responseField data[].reason string The reason for the adjustment.
+     * @responseField data[].adjusted_by integer The ID of the user who made the adjustment.
+     * @responseField data[].created_at string The date and time the adjustment was created.
+     * @responseField data[].updated_at string The date and time the adjustment was last updated.
+     * @responseField data[].product object The product associated with the adjustment.
+     * @responseField data[].user object The user who made the adjustment.
+     * @responseField links object Links for pagination.
+     * @responseField links.first string The URL of the first page.
+     * @responseField links.last string The URL of the last page.
+     * @responseField links.prev string The URL of the previous page.
+     * @responseField links.next string The URL of the next page.
+     * @responseField meta object Metadata for pagination.
+     * @responseField meta.current_page integer The current page number.
+     * @responseField meta.from integer The starting number of the results on the current page.
+     * @responseField meta.last_page integer The last page number.
+     * @responseField meta.path string The URL path.
+     * @responseField meta.per_page integer The number of results per page.
+     * @responseField meta.to integer The ending number of the results on the current page.
+     * @responseField meta.total integer The total number of results.
      */
     public function index(Request $request)
     {
         $perPage = $request->query('per_page', 15);
-        $adjustments = StockAdjustment::with(['product', 'user'])->paginate($perPage);
+        $adjustments = StockAdjustment::with(['product', 'adjustedBy'])->paginate($perPage);
         return StockAdjustmentResource::collection($adjustments);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @bodyParam product_id integer required The ID of the product. Example: 1
-     * @bodyParam adjustment_type string required The type of adjustment (e.g., increase, decrease). Example: decrease
-     * @bodyParam quantity_before numeric required The quantity before adjustment. Example: 100.00
-     * @bodyParam quantity_after numeric required The quantity after adjustment. Example: 90.00
-     * @bodyParam adjustment_amount numeric required The amount of adjustment. Example: 10.00
-     * @bodyParam reason string A reason for the adjustment. Example: Damaged goods.
-     * @bodyParam adjusted_by integer The ID of the user who made the adjustment. Example: 1
-     *
-     * @response 201 {
-     *     "data": {
-     *         "id": 1,
-     *         "product_id": 1,
-     *         "adjustment_type": "decrease",
-     *         "quantity_before": 100.00,
-     *         "quantity_after": 90.00,
-     *         "adjustment_amount": 10.00,
-     *         "reason": "Damaged goods.",
-     *         "adjusted_by": 1,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-26T12:00:00.000000Z"
-     *     }
-     * }
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'adjustment_type' => 'required|string|in:increase,decrease',
-            'quantity_before' => 'required|numeric',
-            'quantity_after' => 'required|numeric',
-            'adjustment_amount' => 'required|numeric',
-            'reason' => 'nullable|string',
-            'adjusted_by' => 'required|exists:users,id',
-        ]);
-
-        $stock_adjustment = StockAdjustment::create($validated);
-
-        return new StockAdjustmentResource($stock_adjustment);
     }
 
     /**
      * Display the specified stock adjustment.
      *
+     * @group Stock Adjustments
+     * @authenticated
      * @urlParam stock_adjustment required The ID of the stock adjustment. Example: 1
      *
-     * @apiResource App\Http\Resources\StockAdjustmentResource
-     * @apiResourceModel App\Models\StockAdjustment
+     * @responseField id integer The ID of the stock adjustment.
+     * @responseField product_id integer The ID of the product.
+     * @responseField adjustment_type string The type of adjustment (increase, decrease).
+     * @responseField quantity_before number The quantity before adjustment.
+     * @responseField quantity_after number The quantity after adjustment.
+     * @responseField adjustment_amount number The amount of adjustment.
+     * @responseField reason string The reason for the adjustment.
+     * @responseField adjusted_by integer The ID of the user who made the adjustment.
+     * @responseField created_at string The date and time the adjustment was created.
+     * @responseField updated_at string The date and time the adjustment was last updated.
+     * @responseField product object The product associated with the adjustment.
+     * @responseField user object The user who made the adjustment.
      */
     public function show(StockAdjustment $stock_adjustment)
     {
-        return new StockAdjustmentResource($stock_adjustment->load(['product', 'user']));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @urlParam stock_adjustment integer required The ID of the stock adjustment. Example: 1
-     * @bodyParam product_id integer required The ID of the product. Example: 1
-     * @bodyParam adjustment_type string required The type of adjustment (e.g., increase, decrease). Example: increase
-     * @bodyParam quantity_before numeric required The quantity before adjustment. Example: 100.00
-     * @bodyParam quantity_after numeric required The quantity after adjustment. Example: 110.00
-     * @bodyParam adjustment_amount numeric required The amount of adjustment. Example: 10.00
-     * @bodyParam reason string A reason for the adjustment. Example: Inventory count discrepancy.
-     * @bodyParam adjusted_by integer The ID of the user who made the adjustment. Example: 1
-     *
-     * @response 200 {
-     *     "data": {
-     *         "id": 1,
-     *         "product_id": 1,
-     *         "adjustment_type": "increase",
-     *         "quantity_before": 100.00,
-     *         "quantity_after": 110.00,
-     *         "adjustment_amount": 10.00,
-     *         "reason": "Inventory count discrepancy.",
-     *         "adjusted_by": 1,
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-27T12:00:00.000000Z"
-     *     }
-     * }
-     */
-    public function update(Request $request, StockAdjustment $stock_adjustment)
-    {
-        $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'adjustment_type' => 'required|string|in:increase,decrease',
-            'quantity_before' => 'required|numeric',
-            'quantity_after' => 'required|numeric',
-            'adjustment_amount' => 'required|numeric',
-            'reason' => 'nullable|string',
-            'adjusted_by' => 'required|exists:users,id',
-        ]);
-
-        $stock_adjustment->update($validated);
-
-        return new StockAdjustmentResource($stock_adjustment);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @urlParam stock_adjustment integer required The ID of the stock adjustment to delete. Example: 1
-     *
-     * @response 204 scenario="Success"
-     */
-    public function destroy(StockAdjustment $stock_adjustment)
-    {
-        $stock_adjustment->delete();
-
-        return response()->noContent();
+        return new StockAdjustmentResource($stock_adjustment->load(['product', 'adjustedBy']));
     }
 }

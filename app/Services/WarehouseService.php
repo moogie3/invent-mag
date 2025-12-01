@@ -29,9 +29,9 @@ class WarehouseService
             return ['success' => false, 'message' => 'There is already a main warehouse defined. Please unset the current main warehouse first.'];
         }
 
-        Warehouse::create($data);
+        $warehouse = Warehouse::create($data);
 
-        return ['success' => true, 'message' => 'Warehouse created successfully.'];
+        return ['success' => true, 'message' => 'Warehouse created successfully.', 'warehouse' => $warehouse];
     }
 
     public function updateWarehouse(Warehouse $warehouse, array $data)
@@ -42,7 +42,7 @@ class WarehouseService
 
         $warehouse->update($data);
 
-        return ['success' => true, 'message' => 'Warehouse updated successfully.'];
+        return ['success' => true, 'message' => 'Warehouse updated successfully.', 'warehouse' => $warehouse];
     }
 
     public function deleteWarehouse(Warehouse $warehouse)

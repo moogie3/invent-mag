@@ -134,23 +134,14 @@ class SalesService
 
     public function getSalesMetrics()
     {
-        $totalinvoice = Sales::count();
-        $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
-        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
-        $pendingOrders = Sales::where('status', 'Unpaid')->count();
-        $dueInvoices = Sales::where('status', 'Unpaid')
-            ->whereDate('due_date', '>=', now())
-            ->whereDate('due_date', '<=', now()->addDays(7))
-            ->count();
-        $posTotal = Sales::where('is_pos', true)->sum('total');
+        $total_sales = Sales::sum('total');
+        $total_paid = Sales::where('status', 'Paid')->sum('total');
+        $total_due = Sales::where('status', 'Unpaid')->sum('total');
 
         return [
-            'totalinvoice' => $totalinvoice,
-            'unpaidDebt' => $unpaidDebt,
-            'totalMonthly' => $totalMonthly,
-            'pendingOrders' => $pendingOrders,
-            'dueInvoices' => $dueInvoices,
-            'posTotal' => $posTotal,
+            'total_sales' => $total_sales,
+            'total_paid' => $total_paid,
+            'total_due' => $total_due,
         ];
     }
 
@@ -199,6 +190,9 @@ class SalesService
 
             foreach ($products as $productData) {
                 $product = Product::find($productData['product_id']);
+                if (!$product) {
+                    throw new \Exception("Product with ID {$productData['product_id']} not found.");
+                }
                 $totalCostOfGoods += $product->price * $productData['quantity'];
 
                 SalesItem::create([
@@ -389,6 +383,10 @@ class SalesService
 
             // Get accounting settings from the user
             $accountingSettings = Auth::user()->accounting_settings;
+
+            if (!$accountingSettings || !isset($accountingSettings['cash_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
+                throw new \Exception('Accounting settings for cash or accounts receivable are not configured.');
+            }
 
             // Retrieve account names using the IDs from settings
             $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;

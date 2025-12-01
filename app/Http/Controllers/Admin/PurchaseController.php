@@ -162,6 +162,13 @@ class PurchaseController extends Controller
         return response()->json($metrics);
     }
 
+    /**
+     * @group Purchase Orders
+     * @summary Bulk Delete Purchase Orders
+     * @bodyParam ids array required An array of purchase order IDs to delete. Example: [1, 2, 3]
+     * @response 200 {"success": true, "message": "Successfully deleted purchase order(s)"}
+     * @response 500 {"success": false, "message": "Error deleting purchase orders. Please try again."}
+     */
     public function bulkDelete(Request $request)
     {
         $request->validate([
@@ -184,6 +191,13 @@ class PurchaseController extends Controller
         }
     }
 
+    /**
+     * @group Purchase Orders
+     * @summary Bulk Mark Purchase Orders as Paid
+     * @bodyParam ids array required An array of purchase order IDs to mark as paid. Example: [1, 2, 3]
+     * @response 200 {"success": true, "message": "Successfully marked 2 purchase order(s) as paid.", "updated_count": 2}
+     * @response 500 {"success": false, "message": "An error occurred while updating purchase orders."}
+     */
     public function bulkMarkPaid(Request $request)
     {
         $request->validate([

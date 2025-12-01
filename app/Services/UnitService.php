@@ -19,16 +19,16 @@ class UnitService
             return ['success' => false, 'message' => 'This unit already exists.'];
         }
 
-        Unit::create($data);
+        $unit = Unit::create($data);
 
-        return ['success' => true, 'message' => 'Unit created successfully.'];
+        return ['success' => true, 'message' => 'Unit created successfully.', 'unit' => $unit];
     }
 
     public function updateUnit(Unit $unit, array $data)
     {
         $unit->update($data);
 
-        return ['success' => true, 'message' => 'Unit updated successfully.'];
+        return ['success' => true, 'message' => 'Unit updated successfully.', 'unit' => $unit];
     }
 
     public function deleteUnit(Unit $unit)

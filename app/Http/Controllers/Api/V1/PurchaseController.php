@@ -27,19 +27,54 @@ class PurchaseController extends Controller
      *
      * Retrieves a paginated list of purchase orders.
      *
+     * @group Purchase Orders
+     * @authenticated
      * @queryParam per_page int The number of purchase orders to return per page. Defaults to 15. Example: 25
      *
+     * @responseField data object[] A list of purchase orders.
+     * @responseField data[].id integer The ID of the purchase order.
+     * @responseField data[].invoice string The invoice number.
+     * @responseField data[].supplier_id integer The ID of the supplier.
+     * @responseField data[].user_id integer The ID of the user.
+     * @responseField data[].order_date string The order date.
+     * @responseField data[].due_date string The due date.
+     * @responseField data[].payment_type string The payment type.
+     * @responseField data[].discount_total number The total discount.
+     * @responseField data[].discount_total_type string The type of discount.
+     * @responseField data[].total number The total amount.
+     * @responseField data[].status string The status of the purchase order.
+     * @responseField data[].created_at string The date and time the purchase order was created.
+     * @responseField data[].updated_at string The date and time the purchase order was last updated.
+     * @responseField data[].supplier object The supplier associated with the purchase order.
+     * @responseField data[].user object The user associated with the purchase order.
+     * @responseField data[].items object[] The items in the purchase order.
+     * @responseField links object Links for pagination.
+     * @responseField links.first string The URL of the first page.
+     * @responseField links.last string The URL of the last page.
+     * @responseField links.prev string The URL of the previous page.
+     * @responseField links.next string The URL of the next page.
+     * @responseField meta object Metadata for pagination.
+     * @responseField meta.current_page integer The current page number.
+     * @responseField meta.from integer The starting number of the results on the current page.
+     * @responseField meta.last_page integer The last page number.
+     * @responseField meta.path string The URL path.
+     * @responseField meta.per_page integer The number of results per page.
+     * @responseField meta.to integer The ending number of the results on the current page.
+     * @responseField meta.total integer The total number of results.
      */
     public function index(Request $request)
     {
-        $perPage = $request->query('per_page', 15);
-        $purchases = Purchase::with(['supplier', 'user', 'items'])->paginate($perPage);
-        return PurchaseResource::collection($purchases);
+        $perPage = $request->input('per_page', 15);
+        $filters = $request->only(['month', 'year']);
+        $data = $this->purchaseService->getPurchaseIndexData($filters, $perPage);
+        return PurchaseResource::collection($data['pos']);
     }
 
     /**
      * Store a newly created resource in storage.
      *
+     * @group Purchase Orders
+     * @authenticated
      * @bodyParam invoice string required The invoice number. Example: INV-2023-001
      * @bodyParam supplier_id integer required The ID of the supplier. Example: 1
      * @bodyParam user_id integer required The ID of the user. Example: 1
@@ -51,41 +86,24 @@ class PurchaseController extends Controller
      * @bodyParam total numeric required The total amount of the purchase order. Example: 1500.00
      * @bodyParam status string required The status of the purchase order (e.g., Pending, Paid). Example: Pending
      *
-     * @response 201 {
-     *     "data": {
-     *         "id": 1,
-     *         "invoice": "INV-2023-001",
-     *         "supplier_id": 1,
-     *         "user_id": 1,
-     *         "order_date": "2023-10-26",
-     *         "due_date": "2023-11-26",
-     *         "payment_type": "Cash",
-     *         "discount_total": 5.00,
-     *         "discount_total_type": "fixed",
-     *         "total": 1500.00,
-     *         "status": "Pending",
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-26T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the purchase order.
+     * @responseField invoice string The invoice number.
+     * @responseField supplier_id integer The ID of the supplier.
+     * @responseField user_id integer The ID of the user.
+     * @responseField order_date string The order date.
+     * @responseField due_date string The due date.
+     * @responseField payment_type string The payment type.
+     * @responseField discount_total number The total discount.
+     * @responseField discount_total_type string The type of discount.
+     * @responseField total number The total amount.
+     * @responseField status string The status of the purchase order.
+     * @responseField created_at string The date and time the purchase order was created.
+     * @responseField updated_at string The date and time the purchase order was last updated.
+     * @response 500 scenario="Creation Failed" {"success": false, "message": "Failed to create purchase order."}
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Api\V1\StorePurchaseRequest $request)
     {
-        $validated = $request->validate([
-            'invoice' => 'required|string|max:255',
-            'supplier_id' => 'required|exists:suppliers,id',
-            'user_id' => 'required|exists:users,id',
-            'order_date' => 'required|date',
-            'due_date' => 'nullable|date',
-            'payment_type' => 'required|string|max:255',
-            'discount_total' => 'nullable|numeric',
-            'discount_total_type' => 'nullable|string|in:percentage,fixed',
-            'total' => 'required|numeric',
-            'status' => 'required|string|max:255',
-        ]);
-
-        $purchase = Purchase::create($validated);
-
+        $purchase = $this->purchaseService->createPurchase($request->validated());
         return new PurchaseResource($purchase);
     }
 
@@ -94,8 +112,26 @@ class PurchaseController extends Controller
      *
      * Retrieves a single purchase order by its ID.
      *
-     * @urlParam purchase required The ID of the purchase order. Example: 1
+     * @group Purchase Orders
+     * @authenticated
+     * @urlParam purchase required The ID of the purchase order. Example: 4
      *
+     * @responseField id integer The ID of the purchase order.
+     * @responseField invoice string The invoice number.
+     * @responseField supplier_id integer The ID of the supplier.
+     * @responseField user_id integer The ID of the user.
+     * @responseField order_date string The order date.
+     * @responseField due_date string The due date.
+     * @responseField payment_type string The payment type.
+     * @responseField discount_total number The total discount.
+     * @responseField discount_total_type string The type of discount.
+     * @responseField total number The total amount.
+     * @responseField status string The status of the purchase order.
+     * @responseField created_at string The date and time the purchase order was created.
+     * @responseField updated_at string The date and time the purchase order was last updated.
+     * @responseField supplier object The supplier associated with the purchase order.
+     * @responseField user object The user associated with the purchase order.
+     * @responseField items object[] The items in the purchase order.
      */
     public function show(Purchase $purchase)
     {
@@ -105,6 +141,8 @@ class PurchaseController extends Controller
     /**
      * Update the specified resource in storage.
      *
+     * @group Purchase Orders
+     * @authenticated
      * @urlParam purchase integer required The ID of the purchase order. Example: 1
      * @bodyParam invoice string The invoice number. Example: INV-2023-002
      * @bodyParam supplier_id integer The ID of the supplier. Example: 2
@@ -117,64 +155,59 @@ class PurchaseController extends Controller
      * @bodyParam total numeric The total amount of the purchase order. Example: 2000.00
      * @bodyParam status string The status of the purchase order (e.g., Pending, Paid). Example: Paid
      *
-     * @response 200 {
-     *     "data": {
-     *         "id": 1,
-     *         "invoice": "INV-2023-002",
-     *         "supplier_id": 2,
-     *         "user_id": 1,
-     *         "order_date": "2023-10-27",
-     *         "due_date": "2023-11-27",
-     *         "payment_type": "Credit Card",
-     *         "discount_total": 10.00,
-     *         "discount_total_type": "percentage",
-     *         "total": 2000.00,
-     *         "status": "Paid",
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-27T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the purchase order.
+     * @responseField invoice string The invoice number.
+     * @responseField supplier_id integer The ID of the supplier.
+     * @responseField user_id integer The ID of the user.
+     * @responseField order_date string The order date.
+     * @responseField due_date string The due date.
+     * @responseField payment_type string The payment type.
+     * @responseField discount_total number The total discount.
+     * @responseField discount_total_type string The type of discount.
+     * @responseField total number The total amount.
+     * @responseField status string The status of the purchase order.
+     * @responseField created_at string The date and time the purchase order was created.
+     * @responseField updated_at string The date and time the purchase order was last updated.
+     * @response 500 scenario="Update Failed" {"success": false, "message": "Failed to update purchase order."}
      */
-    public function update(Request $request, Purchase $purchase)
+    public function update(\App\Http\Requests\Api\V1\UpdatePurchaseRequest $request, Purchase $purchase)
     {
-        $validated = $request->validate([
-            'invoice' => 'required|string|max:255',
-            'supplier_id' => 'required|exists:suppliers,id',
-            'user_id' => 'required|exists:users,id',
-            'order_date' => 'required|date',
-            'due_date' => 'nullable|date',
-            'payment_type' => 'required|string|max:255',
-            'discount_total' => 'nullable|numeric',
-            'discount_total_type' => 'nullable|string|in:percentage,fixed',
-            'total' => 'required|numeric',
-            'status' => 'required|string|max:255',
-        ]);
-
-        $purchase->update($validated);
-
+        $purchase = $this->purchaseService->updatePurchase($purchase, $request->validated());
         return new PurchaseResource($purchase);
     }
 
     /**
      * Remove the specified resource from storage.
      *
+     * @group Purchase Orders
+     * @authenticated
      * @urlParam purchase integer required The ID of the purchase order to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Failed to delete purchase order."}
      */
     public function destroy(Purchase $purchase)
     {
-        $purchase->delete();
-
+        $this->purchaseService->deletePurchase($purchase);
         return response()->noContent();
     }
 
     /**
+     * Get Expiring Soon Purchases
+     *
      * @group Purchase Orders
-     * @title Get Expiring Soon Purchases
-     * @response {
-     *  "data": []
-     * }
+     * @authenticated
+     *
+     * @responseField data array A list of expiring purchase orders.
+     * @responseField data[].id integer The ID of the purchase order.
+     * @responseField data[].invoice string The invoice number.
+     * @responseField data[].supplier object The supplier details.
+     * @responseField data[].order_date string The order date.
+     * @responseField data[].due_date string The due date.
+     * @responseField data[].total number The total amount.
+     * @responseField data[].status string The status of the purchase order.
+     * @responseField data[].remaining_days integer The number of days until expiry.
+     * @response 200 scenario="Success" [{"id":1,"invoice":"PO-001","supplier":{"id":1,"name":"Supplier 1"},"order_date":"2025-11-20","due_date":"2025-12-20","total":1000,"status":"pending","remaining_days":19}]
      */
     public function getExpiringSoonPurchases()
     {
@@ -183,18 +216,19 @@ class PurchaseController extends Controller
     }
 
     /**
+     * Add Payment to Purchase Order
+     *
      * @group Purchase Orders
-     * @title Add Payment to Purchase Order
+     * @authenticated
      * @urlParam id integer required The ID of the purchase order. Example: 1
-     * @bodyParam amount number required The payment amount. Example: 100.00
-     * @bodyParam payment_date date required The date of the payment. Example: "2023-10-27"
-     * @bodyParam payment_method string required The method of payment. Example: "Bank Transfer"
+     * @bodyParam amount number required The payment amount. Example: 100
+     * @bodyParam payment_date date required The date of the payment. Example: 2023-10-27
+     * @bodyParam payment_method string required The method of payment. Example: Bank Transfer
      * @bodyParam notes string nullable Any notes about the payment.
      *
-     * @response {
-     *  "success": true,
-     *  "message": "Payment added successfully."
-     * }
+     * @responseField success boolean Indicates whether the request was successful.
+     * @responseField message string A message describing the result of the request.
+     * @response 500 scenario="Payment Failed" {"success": false, "message": "Something went wrong: <error message>"}
      */
     public function addPayment(Request $request, $id)
     {
@@ -215,13 +249,14 @@ class PurchaseController extends Controller
     }
 
     /**
+     * Get Purchase Metrics
+     *
      * @group Purchase Orders
-     * @title Get Purchase Metrics
-     * @response {
-     *  "total_purchases": 50,
-     *  "total_paid": 25000,
-     *  "total_due": 5000
-     * }
+     * @authenticated
+     *
+     * @responseField total_purchases integer Total number of purchase orders.
+     * @responseField total_paid number Total amount paid for purchase orders.
+     * @responseField total_due number Total amount due for purchase orders.
      */
     public function getPurchaseMetrics()
     {
@@ -230,15 +265,16 @@ class PurchaseController extends Controller
     }
 
     /**
+     * Bulk Delete Purchase Orders
+     *
      * @group Purchase Orders
-     * @title Bulk Delete Purchase Orders
+     * @authenticated
      * @bodyParam ids array required An array of purchase order IDs to delete. Example: [1, 2, 3]
      * @bodyParam ids.* integer required A purchase order ID.
      *
-     * @response {
-     *  "success": true,
-     *  "message": "Successfully deleted purchase order(s)"
-     * }
+     * @responseField success boolean Indicates whether the request was successful.
+     * @responseField message string A message describing the result of the request.
+     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Error deleting purchase orders. Please try again."}
      */
     public function bulkDelete(Request $request)
     {
@@ -263,16 +299,17 @@ class PurchaseController extends Controller
     }
 
     /**
+     * Bulk Mark Purchase Orders as Paid
+     *
      * @group Purchase Orders
-     * @title Bulk Mark Purchase Orders as Paid
+     * @authenticated
      * @bodyParam ids array required An array of purchase order IDs to mark as paid. Example: [1, 2, 3]
      * @bodyParam ids.* integer required A purchase order ID.
      *
-     * @response {
-     *  "success": true,
-     *  "message": "Successfully marked 3 purchase order(s) as paid.",
-     *  "updated_count": 3
-     * }
+     * @responseField success boolean Indicates whether the request was successful.
+     * @responseField message string A message describing the result of the request.
+     * @responseField updated_count integer The number of purchase orders successfully marked as paid.
+     * @response 500 scenario="Update Failed" {"success": false, "message": "An error occurred while updating purchase orders."}
      */
     public function bulkMarkPaid(Request $request)
     {

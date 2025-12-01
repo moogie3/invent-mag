@@ -31,7 +31,7 @@ class ProductSeeder extends Seeder
             // Near low stock, no expiry
             [
                 'code' => 'TR11',
-                'barcode' => $faker->unique()->ean13(),
+                'barcode' => '1234567890123',
                 'name' => 'Near Low Stock Capacitor',
                 'stock_quantity' => 9, // low_stock_threshold is 10, so this is low stock
                 'low_stock_threshold' => 10,

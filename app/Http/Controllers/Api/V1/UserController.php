@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -16,72 +17,118 @@ use Spatie\Permission\Models\Permission;
  */
 class UserController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
     /**
      * Display a listing of the users.
      *
+     * @group Users
+     * @authenticated
      * @queryParam per_page int The number of users to return per page. Defaults to 15. Example: 25
+     *
+     * @responseField data object[] A list of users.
+     * @responseField data[].id integer The ID of the user.
+     * @responseField data[].name string The name of the user.
+     * @responseField data[].shopname string The shop name of the user.
+     * @responseField data[].address string The address of the user.
+     * @responseField data[].email string The email address of the user.
+     * @responseField data[].email_verified_at string The email verification timestamp.
+     * @responseField data[].two_factor_secret string The two-factor secret.
+     * @responseField data[].two_factor_recovery_codes string The two-factor recovery codes.
+     * @responseField data[].two_factor_confirmed_at string The two-factor confirmation timestamp.
+     * @responseField data[].remember_token string The remember token.
+     * @responseField data[].avatar string The URL or path to the user's avatar.
+     * @responseField data[].timezone string The timezone of the user.
+     * @responseField data[].system_settings object The system settings for the user.
+     * @responseField data[].accounting_settings object The accounting settings for the user.
+     * @responseField data[].created_at string The date and time the user was created.
+     * @responseField data[].updated_at string The date and time the user was last updated.
+     * @responseField data[].roles object[] A list of roles assigned to the user.
+     * @responseField data[].permissions object[] A list of permissions assigned to the user.
+     * @responseField links object Links for pagination.
+     * @responseField links.first string The URL of the first page.
+     * @responseField links.last string The URL of the last page.
+     * @responseField links.prev string The URL of the previous page.
+     * @responseField links.next string The URL of the next page.
+     * @responseField meta object Metadata for pagination.
+     * @responseField meta.current_page integer The current page number.
+     * @responseField meta.from integer The starting number of the results on the current page.
+     * @responseField meta.last_page integer The last page number.
+     * @responseField meta.path string The URL path.
+     * @responseField meta.per_page integer The number of results per page.
+     * @responseField meta.to integer The ending number of the results on the current page.
+     * @responseField meta.total integer The total number of results.
      */
     public function index(Request $request)
     {
-        $perPage = $request->query('per_page', 15);
-        $users = User::with(['roles', 'permissions'])->paginate($perPage);
-        return UserResource::collection($users);
+        $data = $this->userService->getUserIndexData();
+        return UserResource::collection($data['users']);
     }
 
     /**
      * Store a newly created resource in storage.
      *
+     * @group Users
+     * @authenticated
      * @bodyParam name string required The name of the user. Example: John Doe
      * @bodyParam shopname string The shop name of the user. Example: John's Shop
      * @bodyParam address string The address of the user. Example: 123 Main St
      * @bodyParam email string required The email address of the user. Example: john.doe@example.com
      * @bodyParam password string required The password for the user. Example: password123
+     * @bodyParam password confirmation string required The password for the user. Example: password123
      * @bodyParam avatar string The URL or path to the user's avatar. Example: http://example.com/avatar1.jpg
      * @bodyParam timezone string The timezone of the user. Example: Asia/Jakarta
-     * @bodyParam system_settings array System settings for the user. Example: '{"theme": "light"}'
-     * @bodyParam accounting_settings array Accounting settings for the user. Example: '{"currency": "IDR"}'
+     * @bodyParam system_settings array System settings for the user.
+     * @bodyParam accounting_settings array Accounting settings for the user.
      *
-     * @response 201 {
-     *     "data": {
-     *         "id": 1,
-     *         "name": "John Doe",
-     *         "shopname": "John's Shop",
-     *         "address": "123 Main St",
-     *         "email": "john.doe@example.com",
-     *         "avatar": "http://example.com/avatar1.jpg",
-     *         "timezone": "Asia/Jakarta",
-     *         "system_settings": {"theme": "light"},
-     *         "accounting_settings": {"currency": "IDR"},
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-26T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the user.
+     * @responseField name string The name of the user.
+     * @responseField shopname string The shop name of the user.
+     * @responseField address string The address of the user.
+     * @responseField email string The email address of the user.
+     * @responseField avatar string The URL or path to the user's avatar.
+     * @responseField timezone string The timezone of the user.
+     * @responseField system_settings object The system settings for the user.
+     * @responseField accounting_settings object The accounting settings for the user.
+     * @responseField created_at string The date and time the user was created.
+     * @responseField updated_at string The date and time the user was last updated.
+     * @response 422 scenario="Creation Failed" {"message": "The given data was invalid."}
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Api\V1\StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'shopname' => 'nullable|string|max:255',
-            'address' => 'nullable|string',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8',
-            'avatar' => 'nullable|string',
-            'timezone' => 'nullable|string|max:255',
-            'system_settings' => 'nullable|array',
-            'accounting_settings' => 'nullable|array',
-        ]);
-
-        $validated['password'] = bcrypt($validated['password']);
-
-        $user = User::create($validated);
-
+        $user = $this->userService->createUser($request->validated());
         return new UserResource($user);
     }
 
     /**
      * Display the specified user.
      *
+     * @group Users
+     * @authenticated
      * @urlParam user required The ID of the user. Example: 1
+     *
+     * @responseField id integer The ID of the user.
+     * @responseField name string The name of the user.
+     * @responseField shopname string The shop name of the user.
+     * @responseField address string The address of the user.
+     * @responseField email string The email address of the user.
+     * @responseField email_verified_at string The email verification timestamp.
+     * @responseField two_factor_secret string The two-factor secret.
+     * @responseField two_factor_recovery_codes string The two-factor recovery codes.
+     * @responseField two_factor_confirmed_at string The two-factor confirmation timestamp.
+     * @responseField remember_token string The remember token.
+     * @responseField avatar string The URL or path to the user's avatar.
+     * @responseField timezone string The timezone of the user.
+     * @responseField system_settings object The system settings for the user.
+     * @responseField accounting_settings object The accounting settings for the user.
+     * @responseField created_at string The date and time the user was created.
+     * @responseField updated_at string The date and time the user was last updated.
+     * @responseField roles object[] A list of roles assigned to the user.
+     * @responseField permissions object[] A list of permissions assigned to the user.
      */
     public function show(User $user)
     {
@@ -91,80 +138,63 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
+     * @group Users
+     * @authenticated
      * @urlParam user integer required The ID of the user. Example: 1
      * @bodyParam name string required The name of the user. Example: Jane Doe
      * @bodyParam shopname string The shop name of the user. Example: Jane's Shop
      * @bodyParam address string The address of the user. Example: 456 Oak Ave
      * @bodyParam email string required The email address of the user. Example: jane.doe@example.com
      * @bodyParam password string The password for the user. Example: newpassword123
+     * @bodyParam password confirmationstring The password for the user. Example: newpassword123
      * @bodyParam avatar string The URL or path to the user's avatar. Example: http://example.com/avatar2.jpg
      * @bodyParam timezone string The timezone of the user. Example: America/New_York
-     * @bodyParam system_settings array System settings for the user. Example: '{"theme": "dark"}'
-     * @bodyParam accounting_settings array Accounting settings for the user. Example: '{"currency": "USD"}'
+     * @bodyParam system_settings array System settings for the user.
+     * @bodyParam accounting_settings array Accounting settings for the user.
      *
-     * @response 200 {
-     *     "data": {
-     *         "id": 1,
-     *         "name": "Jane Doe",
-     *         "shopname": "Jane's Shop",
-     *         "address": "456 Oak Ave",
-     *         "email": "jane.doe@example.com",
-     *         "avatar": "http://example.com/avatar2.jpg",
-     *         "timezone": "America/New_York",
-     *         "system_settings": {"theme": "dark"},
-     *         "accounting_settings": {"currency": "USD"},
-     *         "created_at": "2023-10-26T12:00:00.000000Z",
-     *         "updated_at": "2023-10-27T12:00:00.000000Z"
-     *     }
-     * }
+     * @responseField id integer The ID of the user.
+     * @responseField name string The name of the user.
+     * @responseField shopname string The shop name of the user.
+     * @responseField address string The address of the user.
+     * @responseField email string The email address of the user.
+     * @responseField avatar string The URL or path to the user's avatar.
+     * @responseField timezone string The timezone of the user.
+     * @responseField system_settings object The system settings for the user.
+     * @responseField accounting_settings object The accounting settings for the user.
+     * @responseField created_at string The date and time the user was created.
+     * @responseField updated_at string The date and time the user was last updated.
+     * @response 422 scenario="Update Failed" {"message": "The given data was invalid."}
      */
-    public function update(Request $request, User $user)
+    public function update(\App\Http\Requests\Api\V1\UpdateUserRequest $request, User $user)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'shopname' => 'nullable|string|max:255',
-            'address' => 'nullable|string',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8',
-            'avatar' => 'nullable|string',
-            'timezone' => 'nullable|string|max:255',
-            'system_settings' => 'nullable|array',
-            'accounting_settings' => 'nullable|array',
-        ]);
-
-        if (isset($validated['password'])) {
-            $validated['password'] = bcrypt($validated['password']);
-        }
-
-        $user->update($validated);
-
+        $user = $this->userService->updateUser($user, $request->validated());
         return new UserResource($user);
     }
 
     /**
      * Remove the specified resource from storage.
      *
+     * @group Users
+     * @authenticated
      * @urlParam user integer required The ID of the user to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 500 scenario="Deletion Failed" {"message": "Failed to delete user: <error message>"}
      */
     public function destroy(User $user)
     {
-        $user->delete();
-
+        $this->userService->deleteUser($user);
         return response()->noContent();
     }
 
     /**
+     * Get All Roles and Permissions
+     *
      * @group Users
-     * @title Get All Roles and Permissions
-     * @response {
-     *  "rolePermissions": {
-     *      "admin": ["edit articles", "delete articles"],
-     *      "writer": ["edit articles"]
-     *  },
-     *  "allPermissions": ["edit articles", "delete articles", "publish articles"]
-     * }
+     * @authenticated
+     *
+     * @responseField rolePermissions object An object where keys are role names and values are arrays of permission names.
+     * @responseField allPermissions array A list of all available permission names.
      */
     public function getRolePermissions()
     {

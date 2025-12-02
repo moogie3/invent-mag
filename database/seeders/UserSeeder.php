@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\User; // Add this line
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role; // Add this line
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {

@@ -234,7 +234,7 @@ return [
                 // Recommended: disable debug mode in response calls to avoid error stack traces in responses
                 config: [
                     'app.debug' => false,
-                ]
+                ],
             )
         ),
         'responseFields' => [

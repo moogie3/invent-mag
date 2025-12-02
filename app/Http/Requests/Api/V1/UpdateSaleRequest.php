@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateSaleRequest extends FormRequest
 {
@@ -31,7 +32,7 @@ class UpdateSaleRequest extends FormRequest
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
             'status' => 'nullable|string',
-            'payment_type' => 'nullable|string',
+            'payment_type' => ['nullable', 'string', Rule::in(['Cash', 'Card', 'Transfer', 'eWallet', '-'])],
         ];
 
         if ($saleId) {

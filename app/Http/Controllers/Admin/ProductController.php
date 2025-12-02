@@ -121,7 +121,6 @@ class ProductController extends Controller
      * @bodyParam units_id integer required The ID of the product unit. Example: 1
      * @bodyParam supplier_id integer required The ID of the product supplier. Example: 1
      * @response 200 {"success": true, "message": "Product created successfully", "product": {"id": 1, "name": "New Product"}}
-     * @response 500 {"success": false, "message": "Error creating product. Please try again."}
      */
     public function quickCreate(Request $request)
     {
@@ -219,7 +218,6 @@ class ProductController extends Controller
      * @summary Bulk Delete Products
      * @bodyParam ids array required An array of product IDs to delete. Example: [1, 2, 3]
      * @response 200 {"success": true, "message": "Successfully deleted 2 product(s)", "deleted_count": 2, "images_deleted": 1}
-     * @response 500 {"success": false, "message": "Error deleting products. Please try again."}
      */
     public function bulkDelete(Request $request)
     {

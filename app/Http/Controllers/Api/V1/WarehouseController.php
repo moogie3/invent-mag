@@ -7,6 +7,7 @@ use App\Http\Resources\WarehouseResource;
 use App\Models\Warehouse;
 use App\Services\WarehouseService;
 use Illuminate\Http\Request;
+use App\Exceptions\WarehouseException;
 
 /**
  * @group Warehouses
@@ -75,17 +76,15 @@ class WarehouseController extends Controller
      * @responseField is_main boolean Whether this is the main warehouse.
      * @responseField created_at string The date and time the warehouse was created.
      * @responseField updated_at string The date and time the warehouse was last updated.
-     * @response 422 scenario="Creation Failed" {"success": false, "message": "Failed to create warehouse."}
      */
     public function store(\App\Http\Requests\Api\V1\StoreWarehouseRequest $request)
     {
-        $result = $this->warehouseService->createWarehouse($request->validated());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
+        try {
+            $result = $this->warehouseService->createWarehouse($request->validated());
+            return new WarehouseResource($result['warehouse']);
+        } catch (WarehouseException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode() ?: 422);
         }
-
-        return new WarehouseResource($result['warehouse']);
     }
 
     /**
@@ -126,17 +125,15 @@ class WarehouseController extends Controller
      * @responseField is_main boolean Whether this is the main warehouse.
      * @responseField created_at string The date and time the warehouse was created.
      * @responseField updated_at string The date and time the warehouse was last updated.
-     * @response 422 scenario="Update Failed" {"success": false, "message": "Failed to update warehouse."}
      */
     public function update(\App\Http\Requests\Api\V1\UpdateWarehouseRequest $request, Warehouse $warehouse)
     {
-        $result = $this->warehouseService->updateWarehouse($warehouse, $request->validated());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
+        try {
+            $result = $this->warehouseService->updateWarehouse($warehouse, $request->validated());
+            return new WarehouseResource($result['warehouse']);
+        } catch (WarehouseException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode() ?: 422);
         }
-
-        return new WarehouseResource($result['warehouse']);
     }
 
     /**
@@ -147,17 +144,15 @@ class WarehouseController extends Controller
      * @urlParam warehouse integer required The ID of the warehouse to delete. Example: 1
      *
      * @response 204 scenario="Success"
-     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Failed to delete warehouse."}
      */
     public function destroy(Warehouse $warehouse)
     {
-        $result = $this->warehouseService->deleteWarehouse($warehouse);
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 500);
+        try {
+            $this->warehouseService->deleteWarehouse($warehouse);
+            return response()->noContent();
+        } catch (WarehouseException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode() ?: 500);
         }
-
-        return response()->noContent();
     }
 
     /**
@@ -170,7 +165,6 @@ class WarehouseController extends Controller
      * @responseField success boolean Indicates whether the request was successful.
      * @responseField message string A message describing the result of the request.
      * @response 404 scenario="Warehouse Not Found" {"success": false, "message": "Warehouse not found."}
-     * @response 500 scenario="Failed to set main warehouse" {"success": false, "message": "Failed to set main warehouse: <error message>"}
      */
     public function setMain(Request $request, $id)
     {
@@ -179,13 +173,12 @@ class WarehouseController extends Controller
             return response()->json(['success' => false, 'message' => 'Warehouse not found.'], 404);
         }
 
-        $result = $this->warehouseService->setMainWarehouse($warehouse);
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 500);
+        try {
+            $this->warehouseService->setMainWarehouse($warehouse);
+            return response()->json(['success' => true, 'message' => 'Main warehouse updated successfully.']);
+        } catch (WarehouseException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode() ?: 500);
         }
-
-        return response()->json(['success' => true, 'message' => 'Main warehouse updated successfully.']);
     }
 
     /**
@@ -198,7 +191,6 @@ class WarehouseController extends Controller
      * @responseField success boolean Indicates whether the request was successful.
      * @responseField message string A message describing the result of the request.
      * @response 404 scenario="Warehouse Not Found" {"success": false, "message": "Warehouse not found."}
-     * @response 500 scenario="Failed to unset main warehouse" {"success": false, "message": "Failed to unset main warehouse: <error message>"}
      */
     public function unsetMain(Request $request, $id)
     {
@@ -207,12 +199,11 @@ class WarehouseController extends Controller
             return response()->json(['success' => false, 'message' => 'Warehouse not found.'], 404);
         }
         
-        $result = $this->warehouseService->unsetMainWarehouse($warehouse);
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 500);
+        try {
+            $this->warehouseService->unsetMainWarehouse($warehouse);
+            return response()->json(['success' => true, 'message' => 'Main warehouse status removed.']);
+        } catch (WarehouseException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode() ?: 500);
         }
-
-        return response()->json(['success' => true, 'message' => 'Main warehouse status removed.']);
     }
 }

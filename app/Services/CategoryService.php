@@ -15,10 +15,6 @@ class CategoryService
 
     public function createCategory(array $data)
     {
-        if (Categories::where('name', $data['name'])->exists()) {
-            return ['success' => false, 'message' => 'This category already exists.'];
-        }
-
         $category = Categories::create($data);
 
         return ['success' => true, 'message' => 'Category created successfully.', 'category' => $category];

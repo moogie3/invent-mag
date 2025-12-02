@@ -135,7 +135,6 @@ class SalesPipelineController extends Controller
      * @urlParam sales_pipeline integer required The ID of the sales pipeline to delete. Example: 1
      *
      * @response 204 scenario="Success"
-     * @response 500 scenario="Deletion Failed" {"message": "Failed to delete sales pipeline: <error message>", "type": "error"}
      */
     public function destroy(SalesPipeline $sales_pipeline)
     {
@@ -161,7 +160,6 @@ class SalesPipelineController extends Controller
      * @responseField created_at string The date and time the stage was created.
      * @responseField updated_at string The date and time the stage was last updated.
      * @response 201 scenario="Stage Created" {"id":1,"sales_pipeline_id":1,"name":"Qualification","position":0,"is_closed":false,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}
-     * @response 500 scenario="Creation Failed" {"message": "Failed to create stage: <error message>", "type": "error"}
      */
     public function storeStage(\App\Http\Requests\Api\V1\StorePipelineStageRequest $request, SalesPipeline $pipeline)
     {
@@ -180,7 +178,6 @@ class SalesPipelineController extends Controller
      * @bodyParam stages.*.position integer required The new position of the stage. Example: 0
      *
      * @responseField message string A message indicating the result of the reordering.
-     * @response 500 scenario="Reorder Failed" {"message": "Failed to reorder stages: <error message>", "type": "error"}
      */
     public function reorderStages(\App\Http\Requests\Api\V1\ReorderPipelineStagesRequest $request, SalesPipeline $pipeline)
     {

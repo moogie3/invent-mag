@@ -262,7 +262,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -587,7 +587,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -638,16 +638,19 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"success":true,"message":"Successfully marked 2 transaction(s) as paid.","updated_count":2}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+      -
+        custom: []
         status: 400
         content: '{"success": false, "message": "No transactions selected."}'
         headers: []
         description: 'Bad Request'
-      -
-        custom: []
-        status: 500
-        content: '{"success": false, "message": "An error occurred while updating transactions."}'
-        headers: []
-        description: Error
     responseFields:
       success:
         custom: []
@@ -685,7 +688,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -746,12 +749,6 @@ endpoints:
         content: '{"success": true, "message": "Transaction marked as paid."}'
         headers: []
         description: Success
-      -
-        custom: []
-        status: 500
-        content: '{"success": false, "message": "Error updating transaction: <error message>"}'
-        headers: []
-        description: Error
     responseFields:
       success:
         custom: []
@@ -778,7 +775,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null

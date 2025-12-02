@@ -15,10 +15,6 @@ class UnitService
 
     public function createUnit(array $data)
     {
-        if (Unit::where('name', $data['name'])->exists()) {
-            return ['success' => false, 'message' => 'This unit already exists.'];
-        }
-
         $unit = Unit::create($data);
 
         return ['success' => true, 'message' => 'Unit created successfully.', 'unit' => $unit];

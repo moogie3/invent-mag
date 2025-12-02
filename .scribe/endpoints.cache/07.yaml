@@ -44,16 +44,19 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"success":true,"message":"Main warehouse updated successfully."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+      -
+        custom: []
         status: 404
         content: '{"success": false, "message": "Warehouse not found."}'
         headers: []
         description: 'Warehouse Not Found'
-      -
-        custom: []
-        status: 500
-        content: '{"success": false, "message": "Failed to set main warehouse: <error message>"}'
-        headers: []
-        description: 'Failed to set main warehouse'
     responseFields:
       success:
         custom: []
@@ -80,7 +83,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -125,16 +128,19 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"success":true,"message":"Main warehouse status removed."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+      -
+        custom: []
         status: 404
         content: '{"success": false, "message": "Warehouse not found."}'
         headers: []
         description: 'Warehouse Not Found'
-      -
-        custom: []
-        status: 500
-        content: '{"success": false, "message": "Failed to unset main warehouse: <error message>"}'
-        headers: []
-        description: 'Failed to unset main warehouse'
     responseFields:
       success:
         custom: []
@@ -161,7 +167,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -207,7 +213,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},{"id":2,"name":"Gudang Surabaya","location":null,"is_main":0,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},{"id":3,"name":"Gudang Bandung","location":null,"is_main":0,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}],"links":{"first":"http:\/\/localhost\/api\/v1\/warehouses?page=1","last":"http:\/\/localhost\/api\/v1\/warehouses?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/warehouses?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/warehouses","per_page":25,"to":3,"total":3}}'
+        content: '{"data":[{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":2,"name":"Gudang Surabaya","location":null,"is_main":0,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":3,"name":"Gudang Bandung","location":null,"is_main":0,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}],"links":{"first":"http:\/\/localhost\/api\/v1\/warehouses?page=1","last":"http:\/\/localhost\/api\/v1\/warehouses?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/warehouses?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/warehouses","per_page":25,"to":3,"total":3}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -448,7 +454,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -529,150 +535,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 422
-        content: '{"success": false, "message": "Failed to create warehouse."}'
-        headers: []
-        description: 'Creation Failed'
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the warehouse.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the warehouse.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      address:
-        custom: []
-        name: address
-        description: 'The address of the warehouse.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'A description of the warehouse.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      is_main:
-        custom: []
-        name: is_main
-        description: 'Whether this is the main warehouse.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the warehouse was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the warehouse was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/warehouses/{id}'
-    metadata:
-      custom: []
-      groupName: Warehouses
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Display the specified warehouse.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the warehouse.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      warehouse:
-        custom: []
-        name: warehouse
-        description: 'The ID of the warehouse.'
-        required: true
-        example: '1'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 1
-      warehouse: '1'
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"data":{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}'
+        status: 201
+        content: '{"data":{"id":8,"name":"Secondary Warehouse","location":null,"is_main":false,"created_at":"2025-12-02T06:45:32.000000Z","updated_at":"2025-12-02T06:45:32.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -759,7 +623,152 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/warehouses/{id}'
+    metadata:
+      custom: []
+      groupName: Warehouses
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Display the specified warehouse.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the warehouse.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      warehouse:
+        custom: []
+        name: warehouse
+        description: 'The ID of the warehouse.'
+        required: true
+        example: '1'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+      warehouse: '1'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the warehouse.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the warehouse.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'The address of the warehouse.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the warehouse.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      is_main:
+        custom: []
+        name: is_main
+        description: 'Whether this is the main warehouse.'
+        required: false
+        example: null
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the warehouse was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the warehouse was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -865,10 +874,13 @@ endpoints:
     responses:
       -
         custom: []
-        status: 422
-        content: '{"success": false, "message": "Failed to update warehouse."}'
-        headers: []
-        description: 'Update Failed'
+        status: 200
+        content: '{"data":{"id":1,"name":"Main Warehouse","location":null,"is_main":true,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T06:45:32.000000Z"}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       id:
         custom: []
@@ -950,7 +962,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -1011,17 +1023,11 @@ endpoints:
         content: ''
         headers: []
         description: Success
-      -
-        custom: []
-        status: 500
-        content: '{"success": false, "message": "Failed to delete warehouse."}'
-        headers: []
-        description: 'Deletion Failed'
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null

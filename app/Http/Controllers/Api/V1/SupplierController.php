@@ -92,15 +92,10 @@ class SupplierController extends Controller
      * @responseField image string The URL or path to the supplier's image.
      * @responseField created_at string The date and time the supplier was created.
      * @responseField updated_at string The date and time the supplier was last updated.
-     * @response 422 scenario="Creation Failed" {"success": false, "message": "Failed to create supplier."}
      */
     public function store(\App\Http\Requests\Api\V1\StoreSupplierRequest $request)
     {
         $result = $this->supplierService->createSupplier($request->validated());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
-        }
 
         return new SupplierResource($result['supplier']);
     }
@@ -157,15 +152,10 @@ class SupplierController extends Controller
      * @responseField image string The URL or path to the supplier's image.
      * @responseField created_at string The date and time the supplier was created.
      * @responseField updated_at string The date and time the supplier was last updated.
-     * @response 422 scenario="Update Failed" {"success": false, "message": "Failed to update supplier."}
      */
     public function update(\App\Http\Requests\Api\V1\UpdateSupplierRequest $request, Supplier $supplier)
     {
         $result = $this->supplierService->updateSupplier($supplier, $request->validated());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
-        }
 
         return new SupplierResource($result['supplier']);
     }
@@ -178,15 +168,10 @@ class SupplierController extends Controller
      * @urlParam supplier integer required The ID of the supplier to delete. Example: 1
      *
      * @response 204 scenario="Success"
-     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Failed to delete supplier."}
      */
     public function destroy(Supplier $supplier)
     {
-        $result = $this->supplierService->deleteSupplier($supplier);
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 500);
-        }
+        $this->supplierService->deleteSupplier($supplier);
 
         return response()->noContent();
     }
@@ -214,19 +199,14 @@ class SupplierController extends Controller
      * @urlParam id integer required The ID of the supplier. Example: 1
      *
      * @responseField historical_purchases array A list of historical purchases for the supplier.
-     * @response 500 scenario="Error" {"message": "Failed to load historical purchases: <error message>"}
      */
     public function getHistoricalPurchases(Request $request, $id)
     {
-        try {
-            $historicalPurchases = $this->crmService->getSupplierHistoricalPurchases($id);
+        $historicalPurchases = $this->crmService->getSupplierHistoricalPurchases($id);
 
-            return response()->json([
-                'historical_purchases' => $historicalPurchases,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to load historical purchases: ' . $e->getMessage()], 500);
-        }
+        return response()->json([
+            'historical_purchases' => $historicalPurchases,
+        ]);
     }
 
     /**
@@ -237,18 +217,13 @@ class SupplierController extends Controller
      * @urlParam id integer required The ID of the supplier. Example: 1
      *
      * @responseField product_history array A list of products historically supplied by the supplier.
-     * @response 500 scenario="Error" {"message": "Failed to load product history: <error message>"}
      */
     public function getProductHistory(Request $request, $id)
     {
-        try {
-            $productHistory = $this->crmService->getSupplierProductHistory($id);
+        $productHistory = $this->crmService->getSupplierProductHistory($id);
 
-            return response()->json([
-                'product_history' => $productHistory,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to load product history: ' . $e->getMessage()], 500);
-        }
+        return response()->json([
+            'product_history' => $productHistory,
+        ]);
     }
 }

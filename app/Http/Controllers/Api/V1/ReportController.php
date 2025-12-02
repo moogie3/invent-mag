@@ -127,36 +127,25 @@ class ReportController extends Controller
      * @responseField message string A message describing the result of the request.
      * @responseField updated_count integer The number of transactions successfully marked as paid.
      * @response 400 scenario="Bad Request" {"success": false, "message": "No transactions selected."}
-     * @response 500 scenario="Error" {"success": false, "message": "An error occurred while updating transactions."}
      */
     public function bulkMarkAsPaid(Request $request)
     {
-        try {
-            $transactionIds = $request->input('transaction_ids', []);
+        $transactionIds = $request->input('transaction_ids', []);
 
-            if (empty($transactionIds)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No transactions selected.'
-                ], 400);
-            }
-
-            $updatedCount = $this->transactionService->bulkMarkAsPaid($transactionIds);
-
-            return response()->json([
-                'success' => true,
-                'message' => "Successfully marked {$updatedCount} transaction(s) as paid.",
-                'updated_count' => $updatedCount
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Bulk mark as paid error: ' . $e->getMessage());
-
+        if (empty($transactionIds)) {
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while updating transactions.'
-            ], 500);
+                'message' => 'No transactions selected.'
+            ], 400);
         }
+
+        $updatedCount = $this->transactionService->bulkMarkAsPaid($transactionIds);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully marked {$updatedCount} transaction(s) as paid.",
+            'updated_count' => $updatedCount
+        ]);
     }
 
     /**
@@ -170,20 +159,12 @@ class ReportController extends Controller
      * @responseField success boolean Indicates whether the request was successful.
      * @responseField message string A message describing the result of the request.
      * @response 200 scenario="Success" {"success": true, "message": "Transaction marked as paid."}
-     * @response 500 scenario="Error" {"success": false, "message": "Error updating transaction: <error message>"}
      */
     public function markAsPaid(Request $request, $id)
     {
-        try {
-            $type = $request->input('type');
-            $result = $this->transactionService->markTransactionAsPaid($id, $type);
+        $type = $request->input('type');
+        $result = $this->transactionService->markTransactionAsPaid($id, $type);
 
-            return response()->json($result);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating transaction: ' . $e->getMessage(),
-            ], 500);
-        }
+        return response()->json($result);
     }
 }

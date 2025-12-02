@@ -30,10 +30,7 @@ endpoints:
         name: ids
         description: 'An array of purchase order IDs to delete.'
         required: true
-        example:
-          - 1
-          - 2
-          - 3
+        example: '[1, 2, 3]'
         type: 'string[]'
         enumValues: []
         exampleWasSpecified: true
@@ -51,18 +48,18 @@ endpoints:
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      ids:
-        - 1
-        - 2
-        - 3
+      ids: '[1, 2, 3]'
     fileParameters: []
     responses:
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "Error deleting purchase orders. Please try again."}'
-        headers: []
-        description: 'Deletion Failed'
+        status: 422
+        content: '{"message":"The ids field must be an array.","errors":{"ids":["The ids field must be an array."]}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       success:
         custom: []
@@ -89,7 +86,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -122,10 +119,7 @@ endpoints:
         name: ids
         description: 'An array of purchase order IDs to mark as paid.'
         required: true
-        example:
-          - 1
-          - 2
-          - 3
+        example: '[1, 2, 3]'
         type: 'string[]'
         enumValues: []
         exampleWasSpecified: true
@@ -143,18 +137,18 @@ endpoints:
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      ids:
-        - 1
-        - 2
-        - 3
+      ids: '[1, 2, 3]'
     fileParameters: []
     responses:
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "An error occurred while updating purchase orders."}'
-        headers: []
-        description: 'Update Failed'
+        status: 422
+        content: '{"message":"The ids field must be an array.","errors":{"ids":["The ids field must be an array."]}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       success:
         custom: []
@@ -192,7 +186,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -226,7 +220,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"total_purchases":5,"total_paid":0,"total_due":8850}'
+        content: '{"total_purchases":10,"total_paid":21460,"total_due":13930}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -269,7 +263,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -409,7 +403,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -502,10 +496,13 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "Something went wrong: <error message>"}'
-        headers: []
-        description: 'Payment Failed'
+        status: 200
+        content: '{"success":true,"message":"Payment added successfully."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       success:
         custom: []
@@ -532,7 +529,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -578,7 +575,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":4,"supplier_id":5,"invoice_no":null,"purchase_date":null,"total_amount":-21,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":6,"supplier_id":1,"invoice_no":null,"purchase_date":null,"total_amount":0,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","supplier":{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":8,"supplier_id":3,"invoice_no":null,"purchase_date":null,"total_amount":0,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","supplier":{"id":3,"name":"Tokyo Electronics Ltd.","contact_person":null,"email":"tokyo.electronics@example.com","phone_number":"+81-3-1234-5678","address":"Shinjuku-ku, Tokyo, Japan","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":9,"supplier_id":2,"invoice_no":null,"purchase_date":null,"total_amount":720,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-12-01T04:01:27.000000Z","supplier":{"id":2,"name":"CV. Sumber Rejeki","contact_person":null,"email":"sumber.rejeki@example.com","phone_number":"0227654321","address":"Jl. Rajawali No. 12, Bandung","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":10,"supplier_id":5,"invoice_no":null,"purchase_date":null,"total_amount":950.4,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/purchases?page=1","last":"http:\/\/localhost\/api\/v1\/purchases?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/purchases?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/purchases","per_page":25,"to":5,"total":5}}'
+        content: '{"data":[{"id":1,"supplier_id":3,"invoice_no":null,"purchase_date":null,"total_amount":648,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":3,"name":"Tokyo Electronics Ltd.","contact_person":null,"email":"tokyo.electronics@example.com","phone_number":"+81-3-1234-5678","address":"Shinjuku-ku, Tokyo, Japan","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":2,"supplier_id":4,"invoice_no":null,"purchase_date":null,"total_amount":292.5,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":4,"name":"PT. Surya Mandiri","contact_person":null,"email":"surya.mandiri@example.com","phone_number":"0318889988","address":"Jl. Ahmad Yani No. 22, Surabaya","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":3,"supplier_id":1,"invoice_no":null,"purchase_date":null,"total_amount":7572,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":4,"supplier_id":5,"invoice_no":null,"purchase_date":null,"total_amount":4930,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":5,"supplier_id":4,"invoice_no":null,"purchase_date":null,"total_amount":2949.1,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":4,"name":"PT. Surya Mandiri","contact_person":null,"email":"surya.mandiri@example.com","phone_number":"0318889988","address":"Jl. Ahmad Yani No. 22, Surabaya","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":6,"supplier_id":5,"invoice_no":null,"purchase_date":null,"total_amount":3118,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":7,"supplier_id":5,"invoice_no":null,"purchase_date":null,"total_amount":858,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":8,"supplier_id":5,"invoice_no":null,"purchase_date":null,"total_amount":4694.2,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":9,"supplier_id":4,"invoice_no":null,"purchase_date":null,"total_amount":6907,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":4,"name":"PT. Surya Mandiri","contact_person":null,"email":"surya.mandiri@example.com","phone_number":"0318889988","address":"Jl. Ahmad Yani No. 22, Surabaya","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":10,"supplier_id":5,"invoice_no":null,"purchase_date":null,"total_amount":1231.2,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/purchases?page=1","last":"http:\/\/localhost\/api\/v1\/purchases?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/purchases?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/purchases","per_page":25,"to":10,"total":10}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -918,7 +915,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -951,7 +948,7 @@ endpoints:
         name: invoice
         description: 'The invoice number.'
         required: true
-        example: INV-2023-001
+        example: '"INV-2023-001"'
         type: string
         enumValues: []
         exampleWasSpecified: true
@@ -973,7 +970,7 @@ endpoints:
         name: order_date
         description: 'The date of the order.'
         required: true
-        example: '2023-10-26'
+        example: '"2023-10-26"'
         type: date
         enumValues: []
         exampleWasSpecified: true
@@ -1017,7 +1014,7 @@ endpoints:
         name: discount_total_type
         description: 'The type of discount (e.g., percentage, fixed).'
         required: false
-        example: fixed
+        example: '"fixed"'
         type: string
         enumValues: []
         exampleWasSpecified: true
@@ -1039,7 +1036,7 @@ endpoints:
         name: payment_type
         description: 'The payment type (e.g., Cash, Credit Card).'
         required: true
-        example: Cash
+        example: '"Cash"'
         type: string
         enumValues: []
         exampleWasSpecified: true
@@ -1061,32 +1058,35 @@ endpoints:
         name: status
         description: 'The status of the purchase order (e.g., Pending, Paid).'
         required: true
-        example: Pending
+        example: '"Pending"'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      invoice: INV-2023-001
+      invoice: '"INV-2023-001"'
       supplier_id: 1
-      order_date: '2023-10-26'
+      order_date: '"2023-10-26"'
       due_date: '2023-11-26'
       products: '[{"product_id":1,"quantity":10,"price":100,"discount":0,"discount_type":"fixed","expiry_date":"2025-12-31"}]'
       discount_total: '5.00'
-      discount_total_type: fixed
+      discount_total_type: '"fixed"'
       user_id: 1
-      payment_type: Cash
+      payment_type: '"Cash"'
       total: '1500.00'
-      status: Pending
+      status: '"Pending"'
     fileParameters: []
     responses:
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "Failed to create purchase order."}'
-        headers: []
-        description: 'Creation Failed'
+        status: 422
+        content: '{"message":"The order date field must be a valid date. (and 1 more error)","errors":{"order_date":["The order date field must be a valid date."],"discount_total_type":["The selected discount total type is invalid."]}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       id:
         custom: []
@@ -1234,7 +1234,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -1263,7 +1263,7 @@ endpoints:
         name: id
         description: 'The ID of the purchase.'
         required: true
-        example: 4
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -1281,7 +1281,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 4
+      id: 1
       purchase: '4'
     queryParameters: []
     cleanQueryParameters: []
@@ -1292,7 +1292,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":4,"supplier_id":5,"invoice_no":null,"purchase_date":null,"total_amount":-21,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z","supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}}'
+        content: '{"data":{"id":1,"supplier_id":3,"invoice_no":null,"purchase_date":null,"total_amount":648,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","supplier":{"id":3,"name":"Tokyo Electronics Ltd.","contact_person":null,"email":"tokyo.electronics@example.com","phone_number":"+81-3-1234-5678","address":"Shinjuku-ku, Tokyo, Japan","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -1478,7 +1478,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -1508,7 +1508,7 @@ endpoints:
         name: id
         description: 'The ID of the purchase.'
         required: true
-        example: 4
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -1526,7 +1526,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 4
+      id: 1
       purchase: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -1611,9 +1611,9 @@ endpoints:
       payment_type:
         custom: []
         name: payment_type
-        description: 'The payment type (e.g., Cash, Credit Card).'
+        description: 'The payment type (e.g., Cash, Card, Transfer, eWallet).'
         required: false
-        example: 'Credit Card'
+        example: Card
         type: string
         enumValues: []
         exampleWasSpecified: true
@@ -1660,7 +1660,7 @@ endpoints:
       discount_total: '10.00'
       discount_total_type: percentage
       status: Paid
-      payment_type: 'Credit Card'
+      payment_type: Card
       invoice: INV-2023-002
       user_id: 1
       total: '2000.00'
@@ -1668,10 +1668,13 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "Failed to update purchase order."}'
-        headers: []
-        description: 'Update Failed'
+        status: 200
+        content: '{"data":{"id":1,"supplier_id":2,"invoice_no":null,"purchase_date":null,"total_amount":972,"paid_amount":null,"due_amount":null,"payment_status":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T06:45:32.000000Z"}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       id:
         custom: []
@@ -1819,7 +1822,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -1848,7 +1851,7 @@ endpoints:
         name: id
         description: 'The ID of the purchase.'
         required: true
-        example: 4
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -1866,7 +1869,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 4
+      id: 1
       purchase: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -1880,17 +1883,129 @@ endpoints:
         content: ''
         headers: []
         description: Success
-      -
-        custom: []
-        status: 500
-        content: '{"success": false, "message": "Failed to delete purchase order."}'
-        headers: []
-        description: 'Deletion Failed'
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: admin/po/bulk-delete
+    metadata:
+      custom: []
+      groupName: 'Purchase Orders'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      ids:
+        custom: []
+        name: ids
+        description: 'An array of purchase order IDs to delete.'
+        required: true
+        example:
+          - 1
+          - 2
+          - 3
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      ids:
+        - 1
+        - 2
+        - 3
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success": true, "message": "Successfully deleted purchase order(s)"}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: admin/po/bulk-mark-paid
+    metadata:
+      custom: []
+      groupName: 'Purchase Orders'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      ids:
+        custom: []
+        name: ids
+        description: 'An array of purchase order IDs to mark as paid.'
+        required: true
+        example:
+          - 1
+          - 2
+          - 3
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      ids:
+        - 1
+        - 2
+        - 3
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success": true, "message": "Successfully marked 2 purchase order(s) as paid.", "updated_count": 2}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null

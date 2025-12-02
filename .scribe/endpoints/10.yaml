@@ -38,7 +38,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -80,7 +80,16 @@ endpoints:
     cleanBodyParameters:
       theme_mode: '"dark"'
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 422
+        content: '{"message":"The selected theme mode is invalid.","errors":{"theme_mode":["The selected theme mode is invalid."]}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       success:
         custom: []
@@ -118,7 +127,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null

@@ -75,15 +75,10 @@ class TaxController extends Controller
      * @responseField is_active boolean Whether the tax is active.
      * @responseField created_at string The date and time the tax was created.
      * @responseField updated_at string The date and time the tax was last updated.
-     * @response 500 scenario="Update Failed" {"success": false, "message": "Failed to update tax."}
      */
     public function update(\App\Http\Requests\Api\V1\UpdateTaxRequest $request)
     {
         $result = $this->taxService->updateTax($request->validated());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 500);
-        }
 
         return new TaxResource($this->taxService->getTaxData());
     }

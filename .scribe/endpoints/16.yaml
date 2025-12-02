@@ -43,7 +43,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":2,"customer_id":2,"user_id":1,"type":"email","notes":"Natus qui ipsam quia id. Veniam numquam molestiae sed accusamus et. Omnis possimus quaerat est dolorem.","interaction_date":"2025-03-27T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":3,"customer_id":2,"user_id":1,"type":"meeting","notes":"Praesentium odit expedita accusamus unde dignissimos eligendi. Dolore et maiores voluptates itaque repellendus. Cum sed nesciunt et voluptas autem animi. Ipsam non sed ipsa cumque qui.","interaction_date":"2025-05-08T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":4,"customer_id":2,"user_id":1,"type":"email","notes":"Et quis repudiandae debitis. Ut ut pariatur aperiam qui minus voluptatem. Sed aut ipsam ipsum et qui optio qui sequi. Excepturi qui facere quia rerum non corporis aperiam.","interaction_date":"2025-08-17T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":5,"customer_id":3,"user_id":1,"type":"call","notes":"Rem rerum blanditiis dignissimos ab aut non omnis animi. Sit harum earum sint. Sint vitae laborum qui fuga et eos. Est soluta voluptatem sit eos labore quaerat.","interaction_date":"2025-05-08T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":6,"customer_id":3,"user_id":1,"type":"note","notes":"Molestias voluptas ut ut et aut in sunt. Omnis optio placeat voluptates dignissimos sed delectus reiciendis. Quae ad quasi dolore velit amet. Ex animi voluptatum rerum dolorem quo quis aspernatur.","interaction_date":"2024-12-24T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":7,"customer_id":4,"user_id":1,"type":"call","notes":"Consequatur fuga laborum est consequatur consequatur quisquam aliquam laboriosam. Delectus dignissimos sunt corporis voluptatem non explicabo et. Maiores tenetur voluptate recusandae reiciendis. Aut consequatur temporibus sit enim dolore rerum. Atque maiores tempora animi incidunt et expedita et.","interaction_date":"2025-07-07T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":8,"customer_id":5,"user_id":1,"type":"meeting","notes":"Non animi quis rerum eaque. Aut ratione rem exercitationem atque. Iusto distinctio aperiam recusandae doloribus ducimus sunt fuga fugiat.","interaction_date":"2025-09-04T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":9,"customer_id":6,"user_id":1,"type":"email","notes":"Dolorem accusantium voluptas eaque nobis consectetur. Rerum quibusdam architecto temporibus quia. Non consequuntur exercitationem pariatur ducimus ipsum libero incidunt.","interaction_date":"2025-02-23T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":10,"customer_id":6,"user_id":1,"type":"note","notes":"Quibusdam exercitationem consequatur quia voluptatum. Incidunt tempora in tempora praesentium recusandae aperiam cumque. Qui quidem sunt ea.","interaction_date":"2025-11-18T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":11,"customer_id":6,"user_id":1,"type":"call","notes":"Harum nisi qui deleniti veritatis dolore officiis. Voluptatibus officiis sit mollitia illum. Illum consequatur est est dolorem. Sequi sed rerum saepe minus quas.","interaction_date":"2025-09-08T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/customer-interactions?page=1","last":"http:\/\/localhost\/api\/v1\/customer-interactions?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/customer-interactions?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/customer-interactions","per_page":25,"to":10,"total":10}}'
+        content: '{"data":[{"id":1,"customer_id":1,"user_id":1,"type":"call","notes":"Rerum nihil eligendi ea qui sed. Corrupti mollitia dolores voluptates et. Laboriosam nisi sequi veritatis minus eos id. Ut doloremque est ducimus similique.","interaction_date":"2025-10-28T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":2,"customer_id":1,"user_id":1,"type":"note","notes":"Est reiciendis sit sed tempora. Tenetur autem ut aut doloribus consequuntur sint. Nobis autem maiores maiores nam ut molestiae illum.","interaction_date":"2024-12-17T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":3,"customer_id":1,"user_id":1,"type":"meeting","notes":"Quasi consequatur voluptate consectetur ut aut. Voluptatem officiis dolores at ab velit unde. Rerum officiis error natus sed optio dolor. Quidem exercitationem perspiciatis illum est sint ut est.","interaction_date":"2025-10-13T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":4,"customer_id":2,"user_id":1,"type":"meeting","notes":"Dolore in voluptatibus ratione et omnis. Molestiae quam eum soluta voluptas qui. Neque possimus inventore optio soluta voluptates tempore. Eos illum veritatis voluptate.","interaction_date":"2025-06-30T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":5,"customer_id":2,"user_id":1,"type":"note","notes":"Dolorem aspernatur nihil dolorem aut. Nobis animi eveniet quia in aut quia. Eius nulla quasi tempore voluptas sequi et distinctio. Aperiam ratione corporis et occaecati quia quibusdam ex.","interaction_date":"2025-07-11T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":6,"customer_id":2,"user_id":1,"type":"call","notes":"Aut et officiis corrupti et. Deleniti voluptate iure animi debitis. Sint qui voluptas impedit et officiis aut unde non.","interaction_date":"2025-07-21T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":7,"customer_id":3,"user_id":1,"type":"email","notes":"Atque beatae cumque nisi ut et. Quos cumque accusantium molestiae quas id accusamus. Nam repellat necessitatibus labore possimus nostrum aperiam excepturi. Nisi odit quidem cumque tempore autem sint nobis vero. Recusandae tempora sint consequatur est id nihil.","interaction_date":"2025-03-29T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":8,"customer_id":3,"user_id":1,"type":"note","notes":"Vel asperiores repudiandae qui et sunt dignissimos qui corrupti. Est commodi rerum aliquam rerum aut molestias cum. Voluptatem maxime blanditiis distinctio autem. Rerum dolores asperiores harum quibusdam dolore sed neque ipsam.","interaction_date":"2025-04-21T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":9,"customer_id":4,"user_id":1,"type":"note","notes":"Ut id quia sint laborum nihil laudantium aut quo. Consequatur sit beatae odit quo ut qui voluptate. Voluptatem autem veritatis sunt eos atque non. Ipsa vitae sint molestiae labore aliquid earum eius.","interaction_date":"2025-01-31T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":10,"customer_id":4,"user_id":1,"type":"note","notes":"In in et explicabo et exercitationem. Aut maiores praesentium aut. Incidunt sunt nam dolor ut. Nihil et error omnis pariatur quaerat maiores quibusdam.","interaction_date":"2025-10-09T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":11,"customer_id":5,"user_id":1,"type":"call","notes":"Repellat at id in quibusdam natus. Non sapiente ut neque excepturi nisi natus temporibus. Commodi perspiciatis facere magnam dolores eligendi earum impedit.","interaction_date":"2025-11-05T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":12,"customer_id":5,"user_id":1,"type":"note","notes":"Quam veniam repudiandae quam. Et temporibus ea ea et minus sint. Maiores accusamus ut est nesciunt commodi consequuntur.","interaction_date":"2024-12-27T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":13,"customer_id":6,"user_id":1,"type":"call","notes":"Ut mollitia reiciendis omnis quisquam. Nobis et sint pariatur nam commodi animi nam. Dolorem est recusandae soluta assumenda sint. Excepturi rerum amet enim ut minus voluptatem.","interaction_date":"2025-11-14T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":14,"customer_id":6,"user_id":1,"type":"note","notes":"Et ducimus consequuntur qui soluta aut a. Aliquam totam similique libero distinctio voluptas nobis delectus. Accusantium aut fugiat nemo sint hic laudantium ut.","interaction_date":"2025-08-16T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":15,"customer_id":6,"user_id":1,"type":"call","notes":"Quibusdam minima quia dolorum necessitatibus. Quia natus minus vitae maxime ratione architecto laboriosam. Non error enim est impedit inventore odit facere aut.","interaction_date":"2025-10-03T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/customer-interactions?page=1","last":"http:\/\/localhost\/api\/v1\/customer-interactions?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/customer-interactions?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/customer-interactions","per_page":25,"to":15,"total":15}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -306,7 +306,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -396,7 +396,16 @@ endpoints:
       interaction_date: '"2025-11-28"'
       user_id: 1
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 422
+        content: '{"message":"The interaction date field must be a valid date.","errors":{"interaction_date":["The interaction date field must be a valid date."]}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       id:
         custom: []
@@ -489,7 +498,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -518,7 +527,7 @@ endpoints:
         name: id
         description: 'The ID of the customer interaction.'
         required: true
-        example: 2
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -536,7 +545,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 2
+      id: 1
       customer_interaction: '1'
     queryParameters: []
     cleanQueryParameters: []
@@ -547,7 +556,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":2,"customer_id":2,"user_id":1,"type":"email","notes":"Natus qui ipsam quia id. Veniam numquam molestiae sed accusamus et. Omnis possimus quaerat est dolorem.","interaction_date":"2025-03-27T00:00:00.000000Z","created_at":"2025-11-30T05:06:05.000000Z","updated_at":"2025-11-30T05:06:05.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}}'
+        content: '{"data":{"id":1,"customer_id":1,"user_id":1,"type":"call","notes":"Rerum nihil eligendi ea qui sed. Corrupti mollitia dolores voluptates et. Laboriosam nisi sequi veritatis minus eos id. Ut doloremque est ducimus similique.","interaction_date":"2025-10-28T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -656,7 +665,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -686,7 +695,7 @@ endpoints:
         name: id
         description: 'The ID of the customer interaction.'
         required: true
-        example: 2
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -704,7 +713,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 2
+      id: 1
       customer_interaction: '1'
     queryParameters: []
     cleanQueryParameters: []
@@ -771,7 +780,16 @@ endpoints:
       interaction_date: '"2025-11-28"'
       user_id: 1
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 422
+        content: '{"message":"The interaction date field must be a valid date.","errors":{"interaction_date":["The interaction date field must be a valid date."]}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       id:
         custom: []
@@ -864,7 +882,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -893,7 +911,7 @@ endpoints:
         name: id
         description: 'The ID of the customer interaction.'
         required: true
-        example: 2
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -911,7 +929,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 2
+      id: 1
       customer_interaction: '1'
     queryParameters: []
     cleanQueryParameters: []
@@ -929,7 +947,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null

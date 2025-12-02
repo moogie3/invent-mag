@@ -77,10 +77,6 @@ class CategoryController extends Controller
     {
         $result = $this->categoryService->createCategory($request->validated());
 
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
-        }
-
         return new CategoryResource($result['category']);
     }
 
@@ -127,10 +123,6 @@ class CategoryController extends Controller
     {
         $result = $this->categoryService->updateCategory($category, $request->validated());
 
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
-        }
-
         return new CategoryResource($result['category']);
     }
 
@@ -142,15 +134,10 @@ class CategoryController extends Controller
      * @urlParam category required The ID of the category. Example: 1
      *
      * @response 204 scenario="Success"
-     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Failed to delete category."}
      */
     public function destroy(Categories $category)
     {
-        $result = $this->categoryService->deleteCategory($category);
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 500);
-        }
+        $this->categoryService->deleteCategory($category);
 
         return response()->noContent();
     }

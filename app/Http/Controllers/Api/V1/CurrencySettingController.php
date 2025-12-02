@@ -68,15 +68,10 @@ class CurrencySettingController extends Controller
      * @responseField locale string The locale.
      * @responseField created_at string The date and time the setting was created.
      * @responseField updated_at string The date and time the setting was last updated.
-     * @response 500 scenario="Update Failed" {"success": false, "message": "Failed to update currency settings."}
      */
     public function update(\App\Http\Requests\Api\V1\UpdateCurrencySettingRequest $request)
     {
         $result = $this->currencyService->updateCurrency($request->validated());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 500);
-        }
 
         return new CurrencySettingResource(CurrencySetting::first());
     }

@@ -261,7 +261,6 @@ class ProductController extends Controller
      * @responseField product.has_expiry boolean Whether the product has an expiry date.
      * @responseField product.created_at string The date and time the product was created.
      * @responseField product.updated_at string The date and time the product was last updated.
-     * @response 500 scenario="Creation Failed" {"success": false, "message": "Error creating product. Please try again."}
      */
     public function quickCreate(Request $request)
     {
@@ -281,21 +280,13 @@ class ProductController extends Controller
             'has_expiry' => 'nullable|sometimes|boolean',
         ]);
 
-        try {
-            $product = $this->productService->quickCreateProduct($request->all());
+        $product = $this->productService->quickCreateProduct($request->all());
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Product created successfully',
-                'product' => new ProductResource($product),
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error creating product. Please try again.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Product created successfully',
+            'product' => new ProductResource($product),
+        ]);
     }
 
     /**
@@ -307,26 +298,18 @@ class ProductController extends Controller
      * @responseField total_products integer Total number of products.
      * @responseField total_categories integer Total number of categories.
      * @responseField low_stock_count integer Number of products with low stock.
-     * @response 500 scenario="Error" {"message": "Caught exception in getProductMetrics", "error": "<error message>"}
      */
     public function getProductMetrics()
     {
-        try {
-            $totalproduct = Product::count();
-            $totalcategory = \App\Models\Categories::count();
-            $lowStockCount = Product::lowStockCount();
+        $totalproduct = Product::count();
+        $totalcategory = \App\Models\Categories::count();
+        $lowStockCount = Product::lowStockCount();
 
-            return response()->json([
-                'total_products' => $totalproduct,
-                'total_categories' => $totalcategory,
-                'low_stock_count' => $lowStockCount,
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'message' => 'Caught exception in getProductMetrics',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'total_products' => $totalproduct,
+            'total_categories' => $totalcategory,
+            'low_stock_count' => $lowStockCount,
+        ]);
     }
 
     /**
@@ -341,7 +324,6 @@ class ProductController extends Controller
      * @responseField message string A message describing the result of the request.
      * @responseField deleted_count integer The number of products successfully deleted.
      * @responseField images_deleted integer The number of images deleted.
-     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Error deleting products. Please try again."}
      */
     public function bulkDelete(Request $request)
     {
@@ -350,21 +332,13 @@ class ProductController extends Controller
             'ids.*' => 'required|integer|exists:products,id',
         ]);
 
-        try {
-            $result = $this->productService->bulkDeleteProducts($request->ids);
-            return response()->json([
-                'success' => true,
-                'message' => "Successfully deleted {$result['deleted_count']} product(s)",
-                'deleted_count' => $result['deleted_count'],
-                'images_deleted' => $result['images_deleted'],
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting products. Please try again.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
-        }
+        $result = $this->productService->bulkDeleteProducts($request->ids);
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully deleted {$result['deleted_count']} product(s)",
+            'deleted_count' => $result['deleted_count'],
+            'images_deleted' => $result['images_deleted'],
+        ]);
     }
 
     /**
@@ -380,7 +354,6 @@ class ProductController extends Controller
      * @responseField message string A message describing the result of the request.
      * @responseField updated_count integer The number of products whose stock was updated.
      * @responseField changes array A list of changes made.
-     * @response 500 scenario="Update Failed" {"success": false, "message": "Error updating stock quantities. Please try again."}
      */
     public function bulkUpdateStock(Request $request)
     {
@@ -391,35 +364,27 @@ class ProductController extends Controller
             'reason' => 'nullable|string|max:500',
         ]);
 
-        try {
-            $result = $this->productService->bulkUpdateStock(
-                $request->updates,
-                $request->reason,
-                auth()->id()
-            );
-            $updatedProductsWithBadges = [];
-            foreach ($result['changes'] as $change) {
-                $lowStockThreshold = $change['low_stock_threshold'] ?? 10;
-                [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($change['new_stock_quantity'], $lowStockThreshold);
-                $updatedProductsWithBadges[] = array_merge($change, [
-                    'badge_class' => $badgeClass,
-                    'badge_text' => $badgeText,
-                ]);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => "Successfully updated stock for {$result['updated_count']} product(s)",
-                'updated_count' => $result['updated_count'],
-                'changes' => $updatedProductsWithBadges,
+        $result = $this->productService->bulkUpdateStock(
+            $request->updates,
+            $request->reason,
+            auth()->id()
+        );
+        $updatedProductsWithBadges = [];
+        foreach ($result['changes'] as $change) {
+            $lowStockThreshold = $change['low_stock_threshold'] ?? 10;
+            [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($change['new_stock_quantity'], $lowStockThreshold);
+            $updatedProductsWithBadges[] = array_merge($change, [
+                'badge_class' => $badgeClass,
+                'badge_text' => $badgeText,
             ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating stock quantities. Please try again.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
         }
+
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully updated stock for {$result['updated_count']} product(s)",
+            'updated_count' => $result['updated_count'],
+            'changes' => $updatedProductsWithBadges,
+        ]);
     }
 
     /**
@@ -452,7 +417,6 @@ class ProductController extends Controller
      * @responseField product.has_expiry boolean Whether the product has an expiry date.
      * @responseField product.created_at string The date and time the product was created.
      * @responseField product.updated_at string The date and time the product was last updated.
-     * @response 500 scenario="Adjustment Failed" {"success": false, "message": "Error adjusting stock: <error message>"}
      */
     public function adjustStock(Request $request)
     {
@@ -463,28 +427,20 @@ class ProductController extends Controller
             'reason' => 'nullable|string|max:500',
         ]);
 
-        try {
-            $product = Product::findOrFail($request->product_id);
-            $adjustedProduct = $this->productService->adjustProductStock(
-                $product,
-                $request->adjustment_amount,
-                $request->adjustment_type,
-                $request->reason,
-                auth()->id()
-            );
+        $product = Product::findOrFail($request->product_id);
+        $adjustedProduct = $this->productService->adjustProductStock(
+            $product,
+            $request->adjustment_amount,
+            $request->adjustment_type,
+            $request->reason,
+            auth()->id()
+        );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Stock adjusted successfully.',
-                'product' => new ProductResource($adjustedProduct),
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error adjusting stock: ' . $e->getMessage(),
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock adjusted successfully.',
+            'product' => new ProductResource($adjustedProduct),
+        ]);
     }
 
     /**
@@ -512,27 +468,18 @@ class ProductController extends Controller
      * @responseField data[].has_expiry boolean Whether the product has an expiry date.
      * @responseField data[].created_at string The date and time the product was created.
      * @responseField data[].updated_at string The date and time the product was last updated.
-     * @response 500 scenario="Search Failed" {"success": false, "message": "Error searching products."}
      */
     public function search(Request $request)
     {
-        try {
-            $query = trim($request->get('q', ''));
+        $query = trim($request->get('q', ''));
 
-            if (empty($query)) {
-                $products = Product::all();
-            } else {
-                $products = $this->productService->searchProducts($query);
-            }
-
-            return ProductResource::collection($products);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error searching products.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
+        if (empty($query)) {
+            $products = Product::all();
+        } else {
+            $products = $this->productService->searchProducts($query);
         }
+
+        return ProductResource::collection($products);
     }
 
     /**
@@ -554,20 +501,11 @@ class ProductController extends Controller
      * @responseField created_at string The date and time the PO item was created.
      * @responseField updated_at string The date and time the PO item was last updated.
      * @response 200 scenario="Success" [{"id":1,"po_id":1,"product_id":1,"quantity":10,"remaining_quantity":10,"price":100,"discount":0,"discount_type":"fixed","total":1000,"expiry_date":"2025-12-31","created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}]
-     * @response 500 scenario="Error" {"success": false, "message": "Error fetching expiring products."}
      */
     public function getExpiringSoonProducts()
     {
-        try {
-            $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
-            return response()->json($expiringSoonProducts);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching expiring products.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
-        }
+        $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
+        return response()->json($expiringSoonProducts);
     }
 
     /**
@@ -591,24 +529,15 @@ class ProductController extends Controller
      * @responseField adjusted_by.id integer The ID of the user.
      * @responseField adjusted_by.name string The name of the user.
      * @response 200 scenario="Success" [{"id":1,"product_id":1,"adjustment_type":"increase","quantity_before":10,"quantity_after":20,"adjustment_amount":10,"reason":"Stock correction","adjusted_by":1,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z","adjusted_by":{"id":1,"name":"Admin"}}]
-     * @response 500 scenario="Error" {"success": false, "message": "Error fetching adjustment log."}
      */
     public function getAdjustmentLog($id)
     {
-        try {
-            $adjustments = \App\Models\StockAdjustment::where('product_id', $id)
-                ->with('adjustedBy:id,name')
-                ->orderBy('created_at', 'desc')
-                ->get();
+        $adjustments = \App\Models\StockAdjustment::where('product_id', $id)
+            ->with('adjustedBy:id,name')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-            return response()->json($adjustments);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching adjustment log.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
-        }
+        return response()->json($adjustments);
     }
 
     /**
@@ -635,26 +564,17 @@ class ProductController extends Controller
      * @responseField created_at string The date and time the product was created.
      * @responseField updated_at string The date and time the product was last updated.
      * @response 404 scenario="Not Found" {"message": "Product not found"}
-     * @response 500 scenario="Error" {"success": false, "message": "Error searching by barcode."}
      */
     public function searchByBarcode(Request $request)
     {
-        try {
-            $request->validate(['barcode' => 'required|string']);
-            $product = $this->productService->searchByBarcode($request->barcode);
+        $request->validate(['barcode' => 'required|string']);
+        $product = $this->productService->searchByBarcode($request->barcode);
 
-            if ($product) {
-                return new ProductResource($product);
-            }
-
-            return response()->json(['message' => 'Product not found'], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error searching by barcode.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
+        if ($product) {
+            return new ProductResource($product);
         }
+
+        return response()->json(['message' => 'Product not found'], 404);
     }
 
     /**
@@ -669,13 +589,6 @@ class ProductController extends Controller
      * @responseField message string A message describing the result of the request.
      * @responseField exported_count integer The number of products successfully exported.
      * @responseField file string The URL to the exported file.
-     * @response 422 {
-     *  "message": "The ids field is required.",
-     *  "errors": {
-     *    "ids": ["The ids field is required."]
-     *  }
-     * }
-     * @response 500 scenario="Export Failed" {"success": false, "message": "Error exporting products. Please try again."}
      */
     public function bulkExport(Request $request)
     {
@@ -684,20 +597,12 @@ class ProductController extends Controller
             'ids.*' => 'required|integer|exists:products,id',
         ]);
 
-        try {
-            $result = $this->productService->bulkExportProducts($request->ids);
-            return response()->json([
-                'success' => true,
-                'message' => "Successfully exported {$result['exported_count']} product(s)",
-                'exported_count' => $result['exported_count'],
-                'file' => $result['file'],
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error exporting products. Please try again.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
-        }
+        $result = $this->productService->bulkExportProducts($request->ids);
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully exported {$result['exported_count']} product(s)",
+            'exported_count' => $result['exported_count'],
+            'file' => $result['file'],
+        ]);
     }
 }

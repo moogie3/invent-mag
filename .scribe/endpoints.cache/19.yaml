@@ -57,7 +57,7 @@ endpoints:
         name: name
         description: 'The new name of the stage.'
         required: true
-        example: '"Negotiation"'
+        example: Negotiation
         type: string
         enumValues: []
         exampleWasSpecified: true
@@ -86,7 +86,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      name: '"Negotiation"'
+      name: Negotiation
       position: 1
       is_closed: false
     fileParameters: []
@@ -178,7 +178,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -243,7 +243,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null

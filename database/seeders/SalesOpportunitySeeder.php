@@ -29,13 +29,14 @@ class SalesOpportunitySeeder extends Seeder
         }
 
         for ($i = 0; $i < 5; $i++) {
+            $status = ($i == 0) ? 'won' : 'open';
             $opportunity = SalesOpportunity::create([
                 'customer_id' => $customers->random()->id,
                 'sales_pipeline_id' => $pipeline->id,
                 'pipeline_stage_id' => $stages->random()->id,
                 'name' => 'Opportunity ' . ($i + 1),
                 'amount' => rand(1000, 10000),
-                'status' => 'open',
+                'status' => $status,
             ]);
 
             for ($j = 0; $j < rand(1, 3); $j++) {

@@ -68,15 +68,10 @@ class UnitController extends Controller
      * @responseField symbol string The symbol of the unit.
      * @responseField created_at string The date and time the unit was created.
      * @responseField updated_at string The date and time the unit was last updated.
-     * @response 422 scenario="Creation Failed" {"success": false, "message": "Failed to create unit."}
      */
     public function store(\App\Http\Requests\Api\V1\StoreUnitRequest $request)
     {
         $result = $this->unitService->createUnit($request->validated());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
-        }
 
         return new UnitResource($result['unit']);
     }
@@ -113,15 +108,10 @@ class UnitController extends Controller
      * @responseField symbol string The symbol of the unit.
      * @responseField created_at string The date and time the unit was created.
      * @responseField updated_at string The date and time the unit was last updated.
-     * @response 422 scenario="Update Failed" {"success": false, "message": "Failed to update unit."}
      */
     public function update(\App\Http\Requests\Api\V1\UpdateUnitRequest $request, Unit $unit)
     {
         $result = $this->unitService->updateUnit($unit, $request->validated());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
-        }
 
         return new UnitResource($result['unit']);
     }
@@ -134,15 +124,10 @@ class UnitController extends Controller
      * @urlParam unit integer required The ID of the unit to delete. Example: 1
      *
      * @response 204 scenario="Success"
-     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Failed to delete unit."}
      */
     public function destroy(Unit $unit)
     {
-        $result = $this->unitService->deleteUnit($unit);
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 500);
-        }
+        $this->unitService->deleteUnit($unit);
 
         return response()->noContent();
     }

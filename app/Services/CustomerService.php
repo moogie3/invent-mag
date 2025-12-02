@@ -18,10 +18,6 @@ class CustomerService
 
     public function createCustomer(array $data)
     {
-        if (Customer::where('name', $data['name'])->exists()) {
-            return ['success' => false, 'message' => 'This customer already exists.'];
-        }
-
         if (isset($data['image'])) {
             $data['image'] = $this->storeImage($data['image']);
         }
@@ -33,10 +29,6 @@ class CustomerService
 
     public function quickCreateCustomer(array $data)
     {
-        if (Customer::where('name', $data['name'])->exists()) {
-            return ['success' => false, 'message' => 'This customer already exists.'];
-        }
-
         if (isset($data['image'])) {
             $data['image'] = $this->storeImage($data['image']);
         }

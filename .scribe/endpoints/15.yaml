@@ -43,7 +43,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"currency_symbol":"$","decimal_separator":".","thousand_separator":",","decimal_places":2,"position":"prefix","currency_code":"USD","locale":"en-US","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-12-01T02:17:14.000000Z"}}'
+        content: '{"data":{"id":1,"currency_symbol":"Rp","decimal_separator":",","thousand_separator":".","decimal_places":0,"position":"prefix","currency_code":"IDR","locale":"id-ID","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -163,7 +163,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -305,10 +305,13 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "Failed to update currency settings."}'
-        headers: []
-        description: 'Update Failed'
+        status: 422
+        content: '{"message":"The decimal separator field must not be greater than 1 characters. (and 3 more errors)","errors":{"decimal_separator":["The decimal separator field must not be greater than 1 characters."],"thousand_separator":["The thousand separator field must not be greater than 1 characters."],"position":["The selected position is invalid."],"currency_code":["The currency code field must not be greater than 3 characters."]}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       id:
         custom: []
@@ -423,7 +426,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null

@@ -96,7 +96,6 @@ class UserController extends Controller
      * @responseField accounting_settings object The accounting settings for the user.
      * @responseField created_at string The date and time the user was created.
      * @responseField updated_at string The date and time the user was last updated.
-     * @response 422 scenario="Creation Failed" {"message": "The given data was invalid."}
      */
     public function store(\App\Http\Requests\Api\V1\StoreUserRequest $request)
     {
@@ -163,7 +162,6 @@ class UserController extends Controller
      * @responseField accounting_settings object The accounting settings for the user.
      * @responseField created_at string The date and time the user was created.
      * @responseField updated_at string The date and time the user was last updated.
-     * @response 422 scenario="Update Failed" {"message": "The given data was invalid."}
      */
     public function update(\App\Http\Requests\Api\V1\UpdateUserRequest $request, User $user)
     {
@@ -179,7 +177,6 @@ class UserController extends Controller
      * @urlParam user integer required The ID of the user to delete. Example: 1
      *
      * @response 204 scenario="Success"
-     * @response 500 scenario="Deletion Failed" {"message": "Failed to delete user: <error message>"}
      */
     public function destroy(User $user)
     {

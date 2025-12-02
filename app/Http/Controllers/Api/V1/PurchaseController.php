@@ -75,16 +75,16 @@ class PurchaseController extends Controller
      *
      * @group Purchase Orders
      * @authenticated
-     * @bodyParam invoice string required The invoice number. Example: INV-2023-001
+     * @bodyParam invoice string required The invoice number. Example: "INV-2023-001"
      * @bodyParam supplier_id integer required The ID of the supplier. Example: 1
      * @bodyParam user_id integer required The ID of the user. Example: 1
-     * @bodyParam order_date date required The date of the order. Example: 2023-10-26
+     * @bodyParam order_date date required The date of the order. Example: "2023-10-26"
      * @bodyParam due_date date The due date of the payment. Example: 2023-11-26
-     * @bodyParam payment_type string required The payment type (e.g., Cash, Credit Card). Example: Cash
+     * @bodyParam payment_type string required The payment type (e.g., Cash, Credit Card). Example: "Cash"
      * @bodyParam discount_total numeric The total discount applied. Example: 5.00
-     * @bodyParam discount_total_type string The type of discount (e.g., percentage, fixed). Example: fixed
+     * @bodyParam discount_total_type string The type of discount (e.g., percentage, fixed). Example: "fixed"
      * @bodyParam total numeric required The total amount of the purchase order. Example: 1500.00
-     * @bodyParam status string required The status of the purchase order (e.g., Pending, Paid). Example: Pending
+     * @bodyParam status string required The status of the purchase order (e.g., Pending, Paid). Example: "Pending"
      *
      * @responseField id integer The ID of the purchase order.
      * @responseField invoice string The invoice number.
@@ -99,7 +99,6 @@ class PurchaseController extends Controller
      * @responseField status string The status of the purchase order.
      * @responseField created_at string The date and time the purchase order was created.
      * @responseField updated_at string The date and time the purchase order was last updated.
-     * @response 500 scenario="Creation Failed" {"success": false, "message": "Failed to create purchase order."}
      */
     public function store(\App\Http\Requests\Api\V1\StorePurchaseRequest $request)
     {
@@ -149,7 +148,7 @@ class PurchaseController extends Controller
      * @bodyParam user_id integer The ID of the user. Example: 1
      * @bodyParam order_date date The date of the order. Example: 2023-10-27
      * @bodyParam due_date date The due date of the payment. Example: 2023-11-27
-     * @bodyParam payment_type string The payment type (e.g., Cash, Credit Card). Example: Credit Card
+     * @bodyParam payment_type string The payment type (e.g., Cash, Card, Transfer, eWallet). Example: Card
      * @bodyParam discount_total numeric The total discount applied. Example: 10.00
      * @bodyParam discount_total_type string The type of discount (e.g., percentage, fixed). Example: percentage
      * @bodyParam total numeric The total amount of the purchase order. Example: 2000.00
@@ -168,7 +167,6 @@ class PurchaseController extends Controller
      * @responseField status string The status of the purchase order.
      * @responseField created_at string The date and time the purchase order was created.
      * @responseField updated_at string The date and time the purchase order was last updated.
-     * @response 500 scenario="Update Failed" {"success": false, "message": "Failed to update purchase order."}
      */
     public function update(\App\Http\Requests\Api\V1\UpdatePurchaseRequest $request, Purchase $purchase)
     {
@@ -184,7 +182,6 @@ class PurchaseController extends Controller
      * @urlParam purchase integer required The ID of the purchase order to delete. Example: 1
      *
      * @response 204 scenario="Success"
-     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Failed to delete purchase order."}
      */
     public function destroy(Purchase $purchase)
     {
@@ -228,7 +225,6 @@ class PurchaseController extends Controller
      *
      * @responseField success boolean Indicates whether the request was successful.
      * @responseField message string A message describing the result of the request.
-     * @response 500 scenario="Payment Failed" {"success": false, "message": "Something went wrong: <error message>"}
      */
     public function addPayment(Request $request, $id)
     {
@@ -239,13 +235,9 @@ class PurchaseController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        try {
-            $purchase = Purchase::findOrFail($id);
-            $this->purchaseService->addPayment($purchase, $request->all());
-            return response()->json(['success' => true, 'message' => 'Payment added successfully.']);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Something went wrong: ' . $e->getMessage()], 500);
-        }
+        $purchase = Purchase::findOrFail($id);
+        $this->purchaseService->addPayment($purchase, $request->all());
+        return response()->json(['success' => true, 'message' => 'Payment added successfully.']);
     }
 
     /**
@@ -269,12 +261,11 @@ class PurchaseController extends Controller
      *
      * @group Purchase Orders
      * @authenticated
-     * @bodyParam ids array required An array of purchase order IDs to delete. Example: [1, 2, 3]
+     * @bodyParam ids array required An array of purchase order IDs to delete. Example: "[1, 2, 3]"
      * @bodyParam ids.* integer required A purchase order ID.
      *
      * @responseField success boolean Indicates whether the request was successful.
      * @responseField message string A message describing the result of the request.
-     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Error deleting purchase orders. Please try again."}
      */
     public function bulkDelete(Request $request)
     {
@@ -283,19 +274,11 @@ class PurchaseController extends Controller
             'ids.*' => 'required|integer|exists:po,id',
         ]);
 
-        try {
-            $this->purchaseService->bulkDeletePurchases($request->ids);
-            return response()->json([
-                'success' => true,
-                'message' => "Successfully deleted purchase order(s)",
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting purchase orders. Please try again.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
-        }
+        $this->purchaseService->bulkDeletePurchases($request->ids);
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully deleted purchase order(s)",
+        ]);
     }
 
     /**
@@ -303,13 +286,12 @@ class PurchaseController extends Controller
      *
      * @group Purchase Orders
      * @authenticated
-     * @bodyParam ids array required An array of purchase order IDs to mark as paid. Example: [1, 2, 3]
+     * @bodyParam ids array required An array of purchase order IDs to mark as paid. Example: "[1, 2, 3]"
      * @bodyParam ids.* integer required A purchase order ID.
      *
      * @responseField success boolean Indicates whether the request was successful.
      * @responseField message string A message describing the result of the request.
      * @responseField updated_count integer The number of purchase orders successfully marked as paid.
-     * @response 500 scenario="Update Failed" {"success": false, "message": "An error occurred while updating purchase orders."}
      */
     public function bulkMarkPaid(Request $request)
     {
@@ -318,18 +300,11 @@ class PurchaseController extends Controller
             'ids.*' => 'exists:po,id',
         ]);
 
-        try {
-            $updatedCount = $this->purchaseService->bulkMarkPaid($request->ids);
-            return response()->json([
-                'success' => true,
-                'message' => "Successfully marked {$updatedCount} purchase order(s) as paid.",
-                'updated_count' => $updatedCount,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while updating purchase orders.',
-            ], 500);
-        }
+        $updatedCount = $this->purchaseService->bulkMarkPaid($request->ids);
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully marked {$updatedCount} purchase order(s) as paid.",
+            'updated_count' => $updatedCount,
+        ]);
     }
 }

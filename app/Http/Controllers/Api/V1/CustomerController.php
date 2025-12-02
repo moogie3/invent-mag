@@ -9,6 +9,7 @@ use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use App\Services\CrmService;
 use App\Services\CustomerService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 /**
@@ -85,15 +86,10 @@ class CustomerController extends Controller
      * @responseField payment_terms string The payment terms.
      * @responseField created_at string The date and time the customer was created.
      * @responseField updated_at string The date and time the customer was last updated.
-     * @response 422 scenario="Creation Failed" {"success": false, "message": "Failed to create customer."}
      */
     public function store(StoreCustomerRequest $request)
     {
         $result = $this->customerService->createCustomer($request->validated());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
-        }
 
         return new CustomerResource($result['customer']);
     }
@@ -141,15 +137,10 @@ class CustomerController extends Controller
      * @responseField payment_terms string The payment terms.
      * @responseField created_at string The date and time the customer was created.
      * @responseField updated_at string The date and time the customer was last updated.
-     * @response 422 scenario="Update Failed" {"success": false, "message": "Failed to update customer."}
      */
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
         $result = $this->customerService->updateCustomer($customer, $request->validated());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
-        }
 
         return new CustomerResource($result['customer']);
     }
@@ -162,15 +153,10 @@ class CustomerController extends Controller
      * @urlParam customer integer required The ID of the customer to delete. Example: 1
      *
      * @response 204 scenario="Success"
-     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Failed to delete customer."}
      */
     public function destroy(Customer $customer)
     {
-        $result = $this->customerService->deleteCustomer($customer);
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 500);
-        }
+        $this->customerService->deleteCustomer($customer);
 
         return response()->noContent();
     }
@@ -195,27 +181,11 @@ class CustomerController extends Controller
      * @responseField customer.phone_number string The phone number of the customer.
      * @response 422 scenario="Creation Failed" {"success": false, "message": "Failed to create customer."}
      */
-    public function quickCreate(Request $request)
+    public function quickCreate(\App\Http\Requests\Api\V1\QuickStoreCustomerRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email',
-            'phone_number' => 'required|string|max:255',
-            'address' => 'required|string',
-            'payment_terms' => 'required|string',
-        ]);
+        $result = $this->customerService->quickCreateCustomer($request->validated());
 
-        $result = $this->customerService->quickCreateCustomer($request->all());
-
-        if (!$result['success']) {
-            return response()->json(['success' => false, 'message' => $result['message']], 422);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Customer created successfully',
-            'customer' => new CustomerResource($result['customer']),
-        ]);
+        return new CustomerResource($result['customer']);
     }
 
     /**
@@ -242,7 +212,6 @@ class CustomerController extends Controller
      *
      * @responseField success boolean Indicates whether the request was successful.
      * @responseField historical_purchases array A list of historical purchases.
-     * @response 500 scenario="Failed to load" {"message": "Failed to load historical purchases: <error message>"}
      */
     public function getHistoricalPurchases(Customer $customer)
     {
@@ -265,13 +234,14 @@ class CustomerController extends Controller
      * @urlParam id integer required The ID of the customer. Example: 1
      *
      * @responseField data array A list of product history.
-     * @response 500 scenario="Failed to load" {"message": "Failed to load product history: <error message>"}
      */
     public function getProductHistory(Request $request, $id)
     {
         try {
             $productHistory = $this->crmService->getCustomerProductHistory($id);
             return response()->json($productHistory);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Customer not found.'], 404);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to load product history: ' . $e->getMessage()], 500);
         }

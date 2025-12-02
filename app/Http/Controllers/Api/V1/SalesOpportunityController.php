@@ -97,16 +97,11 @@ class SalesOpportunityController extends Controller
      * @responseField created_at string The date and time the opportunity was created.
      * @responseField updated_at string The date and time the opportunity was last updated.
      * @responseField items object[] The items in the opportunity.
-     * @response 500 scenario="Creation Failed" {"message": "Failed to create opportunity: <error message>", "type": "error"}
      */
     public function store(\App\Http\Requests\Api\V1\StoreSalesOpportunityRequest $request)
     {
-        try {
-            $opportunity = $this->salesPipelineService->createOpportunity($request->validated());
-            return new SalesOpportunityResource($opportunity->load('items'));
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to create opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
-        }
+        $opportunity = $this->salesPipelineService->createOpportunity($request->validated());
+        return new SalesOpportunityResource($opportunity->load('items'));
     }
 
     /**
@@ -170,16 +165,11 @@ class SalesOpportunityController extends Controller
      * @responseField created_at string The date and time the opportunity was created.
      * @responseField updated_at string The date and time the opportunity was last updated.
      * @responseField items object[] The items in the opportunity.
-     * @response 500 scenario="Update Failed" {"message": "Failed to update opportunity: <error message>", "type": "error"}
      */
     public function update(\App\Http\Requests\Api\V1\UpdateSalesOpportunityRequest $request, SalesOpportunity $sales_opportunity)
     {
-        try {
-            $opportunity = $this->salesPipelineService->updateOpportunity($sales_opportunity, $request->validated());
-            return new SalesOpportunityResource($opportunity->load('items'));
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to update opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
-        }
+        $opportunity = $this->salesPipelineService->updateOpportunity($sales_opportunity, $request->validated());
+        return new SalesOpportunityResource($opportunity->load('items'));
     }
 
     /**
@@ -190,7 +180,6 @@ class SalesOpportunityController extends Controller
      * @urlParam sales_opportunity integer required The ID of the sales opportunity to delete. Example: 1
      *
      * @response 204 scenario="Success"
-     * @response 500 scenario="Deletion Failed" {"message": "Failed to delete opportunity: <error message>", "type": "error"}
      */
     public function destroy(SalesOpportunity $sales_opportunity)
     {
@@ -219,7 +208,6 @@ class SalesOpportunityController extends Controller
      * @responseField sales_id integer The ID of the associated sales record.
      * @responseField created_at string The date and time the opportunity was created.
      * @responseField updated_at string The date and time the opportunity was last updated.
-     * @response 500 scenario="Move Failed" {"message": "Failed to move opportunity: <error message>", "type": "error"}
      */
     public function moveOpportunity(\App\Http\Requests\Api\V1\MoveSalesOpportunityRequest $request, SalesOpportunity $opportunity)
     {
@@ -237,15 +225,10 @@ class SalesOpportunityController extends Controller
      * @responseField message string A message indicating the result.
      * @responseField type string The type of response (e.g., "success", "error").
      * @responseField sales_id integer The ID of the newly created sales order.
-     * @response 500 scenario="Conversion Failed" {"message": "Failed to convert opportunity: <error message>", "type": "error"}
      */
     public function convertToSalesOrder(SalesOpportunity $opportunity)
     {
-        try {
-            $salesOrder = $this->salesPipelineService->convertToSalesOrder($opportunity);
-            return response()->json(['message' => 'Opportunity successfully converted to Sales Order.', 'type' => 'success', 'sales_id' => $salesOrder->id], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to convert opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
-        }
+        $salesOrder = $this->salesPipelineService->convertToSalesOrder($opportunity);
+        return response()->json(['message' => 'Opportunity successfully converted to Sales Order.', 'type' => 'success', 'sales_id' => $salesOrder->id], 200);
     }
 }

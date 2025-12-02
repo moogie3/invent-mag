@@ -31,7 +31,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"total_suppliers":5,"new_this_month":0}'
+        content: '{"total_suppliers":5,"new_this_month":5}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -63,7 +63,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -109,18 +109,12 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"historical_purchases":[{"id":6,"invoice":"PO-00006","order_date":"2025-11-28T05:06:03.000000Z","due_date":"2025-12-21T05:06:03.000000Z","payment_method":"-","status":"Unpaid","total":8850,"discount_amount":26,"items":[]}]}'
+        content: '{"historical_purchases":[{"id":3,"invoice":"PO-00003","order_date":"2025-11-27T05:06:57.000000Z","due_date":"2025-12-10T05:06:57.000000Z","payment_method":"Cash","status":"Paid","total":7600,"discount_amount":28,"items":[{"id":4,"product_name":"Near Expiry Crystal Oscillator","quantity":8,"price":"950.00","total":7600}]}]}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
-      -
-        custom: []
-        status: 500
-        content: '{"message": "Failed to load historical purchases: <error message>"}'
-        headers: []
-        description: Error
     responseFields:
       historical_purchases:
         custom: []
@@ -136,7 +130,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -182,18 +176,12 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"product_history":[]}'
+        content: '{"product_history":[{"product_name":"Near Expiry Crystal Oscillator","last_price":"950.00","history":[{"product_id":3,"product_name":"Near Expiry Crystal Oscillator","order_date":"2025-11-27T05:06:57.000000Z","invoice":"PO-00003","quantity":8,"price_at_purchase":"950.00","line_total":7600}]}]}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
-      -
-        custom: []
-        status: 500
-        content: '{"message": "Failed to load product history: <error message>"}'
-        headers: []
-        description: Error
     responseFields:
       product_history:
         custom: []
@@ -209,7 +197,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -255,7 +243,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},{"id":2,"name":"CV. Sumber Rejeki","contact_person":null,"email":"sumber.rejeki@example.com","phone_number":"0227654321","address":"Jl. Rajawali No. 12, Bandung","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},{"id":3,"name":"Tokyo Electronics Ltd.","contact_person":null,"email":"tokyo.electronics@example.com","phone_number":"+81-3-1234-5678","address":"Shinjuku-ku, Tokyo, Japan","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},{"id":4,"name":"PT. Surya Mandiri","contact_person":null,"email":"surya.mandiri@example.com","phone_number":"0318889988","address":"Jl. Ahmad Yani No. 22, Surabaya","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}],"links":{"first":"http:\/\/localhost\/api\/v1\/suppliers?page=1","last":"http:\/\/localhost\/api\/v1\/suppliers?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/suppliers?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/suppliers","per_page":25,"to":5,"total":5}}'
+        content: '{"data":[{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":2,"name":"CV. Sumber Rejeki","contact_person":null,"email":"sumber.rejeki@example.com","phone_number":"0227654321","address":"Jl. Rajawali No. 12, Bandung","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":3,"name":"Tokyo Electronics Ltd.","contact_person":null,"email":"tokyo.electronics@example.com","phone_number":"+81-3-1234-5678","address":"Shinjuku-ku, Tokyo, Japan","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":4,"name":"PT. Surya Mandiri","contact_person":null,"email":"surya.mandiri@example.com","phone_number":"0318889988","address":"Jl. Ahmad Yani No. 22, Surabaya","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}],"links":{"first":"http:\/\/localhost\/api\/v1\/suppliers?page=1","last":"http:\/\/localhost\/api\/v1\/suppliers?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/suppliers?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/suppliers","per_page":25,"to":5,"total":5}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -540,7 +528,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -617,7 +605,7 @@ endpoints:
         name: location
         description: 'The location of the supplier.'
         required: false
-        example: London
+        example: IN
         type: string
         enumValues: []
         exampleWasSpecified: true
@@ -661,7 +649,7 @@ endpoints:
       name: 'Supplier A'
       address: '123 Main St'
       phone_number: 555-1234
-      location: London
+      location: IN
       payment_terms: 'Net 30'
       email: supplierA@example.com
       image: 'http://example.com/image1.jpg'
@@ -669,194 +657,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 422
-        content: '{"success": false, "message": "Failed to create supplier."}'
-        headers: []
-        description: 'Creation Failed'
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      code:
-        custom: []
-        name: code
-        description: 'The unique code for the supplier.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the supplier.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      address:
-        custom: []
-        name: address
-        description: 'The address of the supplier.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      phone_number:
-        custom: []
-        name: phone_number
-        description: 'The phone number of the supplier.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      location:
-        custom: []
-        name: location
-        description: 'The location of the supplier.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      payment_terms:
-        custom: []
-        name: payment_terms
-        description: 'The payment terms with the supplier.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      email:
-        custom: []
-        name: email
-        description: 'The email address of the supplier.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      image:
-        custom: []
-        name: image
-        description: "The URL or path to the supplier's image."
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the supplier was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the supplier was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/suppliers/{id}'
-    metadata:
-      custom: []
-      groupName: Suppliers
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Display the specified supplier.'
-      description: 'Retrieves a single supplier by its ID.'
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the supplier.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier:
-        custom: []
-        name: supplier
-        description: 'The ID of the supplier.'
-        required: true
-        example: '1'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 1
-      supplier: '1'
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"data":{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}'
+        status: 201
+        content: '{"data":{"id":10,"name":"Supplier A","contact_person":null,"email":"supplierA@example.com","phone_number":"555-1234","address":"123 Main St","created_at":"2025-12-02T06:45:32.000000Z","updated_at":"2025-12-02T06:45:32.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -987,15 +789,14 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
   -
     custom: []
     httpMethods:
-      - PUT
-      - PATCH
+      - GET
     uri: 'api/v1/suppliers/{id}'
     metadata:
       custom: []
@@ -1003,8 +804,8 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Update the specified resource in storage.'
-      description: ''
+      title: 'Display the specified supplier.'
+      description: 'Retrieves a single supplier by its ID.'
       authenticated: true
       deprecated: false
     headers:
@@ -1028,123 +829,30 @@ endpoints:
         name: supplier
         description: 'The ID of the supplier.'
         required: true
-        example: 1
-        type: integer
+        example: '1'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
       id: 1
-      supplier: 1
+      supplier: '1'
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      code:
-        custom: []
-        name: code
-        description: 'The unique code for the supplier.'
-        required: true
-        example: SUP-002
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the supplier.'
-        required: true
-        example: 'Supplier B'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      address:
-        custom: []
-        name: address
-        description: 'The address of the supplier.'
-        required: false
-        example: '456 Oak Ave'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      phone_number:
-        custom: []
-        name: phone_number
-        description: 'The phone number of the supplier.'
-        required: false
-        example: 555-5678
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      location:
-        custom: []
-        name: location
-        description: 'The location of the supplier.'
-        required: false
-        example: 'New York'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      payment_terms:
-        custom: []
-        name: payment_terms
-        description: 'The payment terms with the supplier.'
-        required: false
-        example: 'Net 60'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      email:
-        custom: []
-        name: email
-        description: 'The email address of the supplier.'
-        required: false
-        example: supplierb@example.com
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      image:
-        custom: []
-        name: image
-        description: "The URL or path to the supplier's image."
-        required: false
-        example: 'http://example.com/image2.jpg'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      code: SUP-002
-      name: 'Supplier B'
-      address: '456 Oak Ave'
-      phone_number: 555-5678
-      location: 'New York'
-      payment_terms: 'Net 60'
-      email: supplierb@example.com
-      image: 'http://example.com/image2.jpg'
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
-        status: 422
-        content: '{"success": false, "message": "Failed to update supplier."}'
-        headers: []
-        description: 'Update Failed'
+        status: 200
+        content: '{"data":{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       id:
         custom: []
@@ -1270,7 +978,293 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/v1/suppliers/{id}'
+    metadata:
+      custom: []
+      groupName: Suppliers
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update the specified resource in storage.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the supplier.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      supplier:
+        custom: []
+        name: supplier
+        description: 'The ID of the supplier.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+      supplier: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      code:
+        custom: []
+        name: code
+        description: 'The unique code for the supplier.'
+        required: true
+        example: SUP-002
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the supplier.'
+        required: true
+        example: 'Supplier B'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'The address of the supplier.'
+        required: false
+        example: '456 Oak Ave'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      phone_number:
+        custom: []
+        name: phone_number
+        description: 'The phone number of the supplier.'
+        required: false
+        example: 555-5678
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      location:
+        custom: []
+        name: location
+        description: 'The location of the supplier.'
+        required: false
+        example: OUT
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      payment_terms:
+        custom: []
+        name: payment_terms
+        description: 'The payment terms with the supplier.'
+        required: false
+        example: 'Net 60'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'The email address of the supplier.'
+        required: false
+        example: supplierb@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      image:
+        custom: []
+        name: image
+        description: "The URL or path to the supplier's image."
+        required: false
+        example: 'http://example.com/image2.jpg'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      code: SUP-002
+      name: 'Supplier B'
+      address: '456 Oak Ave'
+      phone_number: 555-5678
+      location: OUT
+      payment_terms: 'Net 60'
+      email: supplierb@example.com
+      image: 'http://example.com/image2.jpg'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"name":"Supplier B","contact_person":null,"email":"supplierb@example.com","phone_number":"555-5678","address":"456 Oak Ave","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T06:45:32.000000Z"}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the supplier.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      code:
+        custom: []
+        name: code
+        description: 'The unique code for the supplier.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the supplier.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'The address of the supplier.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      phone_number:
+        custom: []
+        name: phone_number
+        description: 'The phone number of the supplier.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      location:
+        custom: []
+        name: location
+        description: 'The location of the supplier.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      payment_terms:
+        custom: []
+        name: payment_terms
+        description: 'The payment terms with the supplier.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'The email address of the supplier.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      image:
+        custom: []
+        name: image
+        description: "The URL or path to the supplier's image."
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the supplier was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the supplier was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -1331,17 +1325,11 @@ endpoints:
         content: ''
         headers: []
         description: Success
-      -
-        custom: []
-        status: 500
-        content: '{"success": false, "message": "Failed to delete supplier."}'
-        headers: []
-        description: 'Deletion Failed'
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null

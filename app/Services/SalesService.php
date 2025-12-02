@@ -259,6 +259,7 @@ class SalesService
 
     public function updateSale(Sales $sale, array $data): Sales
     {
+        \Illuminate\Support\Facades\Log::info('Updating sale with data: ', $data);
         return DB::transaction(function () use ($sale, $data) {
             // Note: Proper accounting for updates is complex.
             // A simple approach is to create a reversing entry and then a new entry.

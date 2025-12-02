@@ -118,7 +118,6 @@ class SalesController extends Controller
      * @responseField sales_opportunity_id integer The ID of the sales opportunity.
      * @responseField created_at string The date and time the sales order was created.
      * @responseField updated_at string The date and time the sales order was last updated.
-     * @response 500 scenario="Creation Failed" {"success": false, "message": "Failed to create sales order."}
      */
     public function store(\App\Http\Requests\Api\V1\StoreSaleRequest $request)
     {
@@ -173,7 +172,7 @@ class SalesController extends Controller
      * @bodyParam user_id integer The ID of the user. Example: 1
      * @bodyParam order_date date The date of the order. Example: 2023-10-27
      * @bodyParam due_date date The due date of the payment. Example: 2023-11-27
-     * @bodyParam payment_type string The payment type (e.g., Cash, Credit Card). Example: Credit Card
+     * @bodyParam payment_type string The payment type (e.g., Cash, Card, Transfer, eWallet). Example: Card
      * @bodyParam order_discount numeric The total discount applied. Example: 10.00
      * @bodyParam order_discount_type string The type of discount (e.g., percentage, fixed). Example: percentage
      * @bodyParam total numeric The total amount of the sales order. Example: 2000.00
@@ -204,7 +203,6 @@ class SalesController extends Controller
      * @responseField sales_opportunity_id integer The ID of the sales opportunity.
      * @responseField created_at string The date and time the sales order was created.
      * @responseField updated_at string The date and time the sales order was last updated.
-     * @response 500 scenario="Update Failed" {"success": false, "message": "Failed to update sales order."}
      */
     public function update(\App\Http\Requests\Api\V1\UpdateSaleRequest $request, Sales $sale)
     {
@@ -220,7 +218,6 @@ class SalesController extends Controller
      * @urlParam sale integer required The ID of the sales order to delete. Example: 1
      *
      * @response 204 scenario="Success"
-     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Failed to delete sales order."}
      */
     public function destroy(Sales $sale)
     {
@@ -263,7 +260,6 @@ class SalesController extends Controller
      *
      * @responseField success boolean Indicates whether the request was successful.
      * @responseField message string A message describing the result of the request.
-     * @response 500 scenario="Payment Failed" {"success": false, "message": "Something went wrong: <error message>"}
      */
     public function addPayment(Request $request, $id)
     {
@@ -274,13 +270,9 @@ class SalesController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        try {
-            $sale = Sales::findOrFail($id);
-            $this->salesService->addPayment($sale, $request->all());
-            return response()->json(['success' => true, 'message' => 'Payment added successfully.']);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Something went wrong: ' . $e->getMessage()], 500);
-        }
+        $sale = Sales::findOrFail($id);
+        $this->salesService->addPayment($sale, $request->all());
+        return response()->json(['success' => true, 'message' => 'Payment added successfully.']);
     }
 
     /**
@@ -325,7 +317,6 @@ class SalesController extends Controller
      *
      * @responseField success boolean Indicates whether the request was successful.
      * @responseField message string A message describing the result of the request.
-     * @response 500 scenario="Deletion Failed" {"success": false, "message": "Error deleting sales orders. Please try again."}
      */
     public function bulkDelete(Request $request)
     {
@@ -334,19 +325,11 @@ class SalesController extends Controller
             'ids.*' => 'required|integer|exists:sales,id',
         ]);
 
-        try {
-            $this->salesService->bulkDeleteSales($request->ids);
-            return response()->json([
-                'success' => true,
-                'message' => "Successfully deleted sales order(s)",
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting sales orders. Please try again.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
-        }
+        $this->salesService->bulkDeleteSales($request->ids);
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully deleted sales order(s)",
+        ]);
     }
 
     /**
@@ -360,7 +343,6 @@ class SalesController extends Controller
      * @responseField success boolean Indicates whether the request was successful.
      * @responseField message string A message describing the result of the request.
      * @responseField updated_count integer The number of sales orders successfully marked as paid.
-     * @response 500 scenario="Update Failed" {"success": false, "message": "An error occurred while updating sales orders."}
      */
     public function bulkMarkPaid(Request $request)
     {
@@ -369,18 +351,11 @@ class SalesController extends Controller
             'ids.*' => 'exists:sales,id',
         ]);
 
-        try {
-            $updatedCount = $this->salesService->bulkMarkPaid($request->ids);
-            return response()->json([
-                'success' => true,
-                'message' => "Successfully marked {$updatedCount} sales order(s) as paid.",
-                'updated_count' => $updatedCount,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while updating sales orders.',
-            ], 500);
-        }
+        $updatedCount = $this->salesService->bulkMarkPaid($request->ids);
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully marked {$updatedCount} sales order(s) as paid.",
+            'updated_count' => $updatedCount,
+        ]);
     }
 }

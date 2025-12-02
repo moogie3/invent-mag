@@ -188,10 +188,13 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "Error creating product. Please try again."}'
-        headers: []
-        description: 'Creation Failed'
+        status: 200
+        content: '{"success":true,"message":"Product created successfully","product":{"id":14,"code":"\"PROD-001\"","barcode":null,"name":"\"New Product\"","description":"Dolores dolorum amet iste laborum eius est dolor.","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/storage\/image\/hmU22CxZhw_test.jpg","price":99.99,"selling_price":149.99,"stock_quantity":100,"category_id":1,"supplier_id":1,"units_id":1,"has_expiry":false,"low_stock_threshold":45,"warehouse_id":1,"created_at":"2025-12-02T06:45:31.000000Z","updated_at":"2025-12-02T06:45:31.000000Z","unit":{"id":1,"name":"Pieces","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       success:
         custom: []
@@ -416,7 +419,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -478,10 +481,13 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "Error deleting products. Please try again."}'
-        headers: []
-        description: 'Deletion Failed'
+        status: 200
+        content: '{"success":true,"message":"Successfully deleted 3 product(s)","deleted_count":3,"images_deleted":0}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       success:
         custom: []
@@ -530,7 +536,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -635,10 +641,13 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "Error updating stock quantities. Please try again."}'
-        headers: []
-        description: 'Update Failed'
+        status: 422
+        content: '{"message":"The selected updates.0.id is invalid.","errors":{"updates.0.id":["The selected updates.0.id is invalid."]}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       success:
         custom: []
@@ -687,7 +696,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -768,10 +777,13 @@ endpoints:
     responses:
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "Error adjusting stock: <error message>"}'
-        headers: []
-        description: 'Adjustment Failed'
+        status: 200
+        content: '{"success":true,"message":"Stock adjusted successfully.","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","description":"LED near expiry and low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":90,"selling_price":160,"stock_quantity":11698,"category_id":1,"supplier_id":3,"units_id":3,"has_expiry":true,"low_stock_threshold":5,"warehouse_id":2,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T06:45:31.000000Z"}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       success:
         custom: []
@@ -996,7 +1008,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -1048,12 +1060,6 @@ endpoints:
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
-      -
-        custom: []
-        status: 500
-        content: '{"success": false, "message": "Error searching products."}'
-        headers: []
-        description: 'Search Failed'
     responseFields:
       data:
         custom: []
@@ -1256,7 +1262,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -1293,12 +1299,6 @@ endpoints:
         content: '[{"id":1,"po_id":1,"product_id":1,"quantity":10,"remaining_quantity":10,"price":100,"discount":0,"discount_type":"fixed","total":1000,"expiry_date":"2025-12-31","created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}]'
         headers: []
         description: Success
-      -
-        custom: []
-        status: 500
-        content: '{"success": false, "message": "Error fetching expiring products."}'
-        headers: []
-        description: Error
     responseFields:
       id:
         custom: []
@@ -1435,7 +1435,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -1469,18 +1469,12 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"total_products":3,"total_categories":2,"low_stock_count":0}'
+        content: '{"total_products":5,"total_categories":3,"low_stock_count":0}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
           access-control-allow-origin: '*'
         description: null
-      -
-        custom: []
-        status: 500
-        content: '{"message": "Caught exception in getProductMetrics", "error": "<error message>"}'
-        headers: []
-        description: Error
     responseFields:
       total_products:
         custom: []
@@ -1518,7 +1512,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -1567,12 +1561,6 @@ endpoints:
         content: '[{"id":1,"product_id":1,"adjustment_type":"increase","quantity_before":10,"quantity_after":20,"adjustment_amount":10,"reason":"Stock correction","adjusted_by":1,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z","adjusted_by":{"id":1,"name":"Admin"}}]'
         headers: []
         description: Success
-      -
-        custom: []
-        status: 500
-        content: '{"success": false, "message": "Error fetching adjustment log."}'
-        headers: []
-        description: Error
     responseFields:
       id:
         custom: []
@@ -1709,7 +1697,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -1748,19 +1736,22 @@ endpoints:
         deprecated: false
     cleanQueryParameters:
       barcode: '7981373950433'
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      barcode:
+        custom: []
+        name: barcode
+        description: ''
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      barcode: consequatur
     fileParameters: []
     responses:
-      -
-        custom: []
-        status: 200
-        content: '{"data":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","description":"LED near expiry and low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":90,"selling_price":160,"stock_quantity":232,"category_id":3,"supplier_id":1,"units_id":1,"has_expiry":true,"low_stock_threshold":5,"warehouse_id":2,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z","unit":{"id":1,"name":"Pieces","short_name":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
       -
         custom: []
         status: 404
@@ -1769,10 +1760,13 @@ endpoints:
         description: 'Not Found'
       -
         custom: []
-        status: 500
-        content: '{"success": false, "message": "Error searching by barcode."}'
-        headers: []
-        description: Error
+        status: 404
+        content: '{"message":"Product not found"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       id:
         custom: []
@@ -1964,7 +1958,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -2010,7 +2004,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","description":"LED near expiry and low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":90,"selling_price":160,"stock_quantity":232,"category_id":3,"supplier_id":1,"units_id":1,"has_expiry":true,"low_stock_threshold":5,"warehouse_id":2,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z","category":{"id":3,"name":"IC","description":"Integrated Circuit","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"supplier":{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"unit":{"id":1,"name":"Pieces","short_name":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"warehouse":{"id":2,"name":"Gudang Surabaya","location":null,"is_main":0,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":5,"code":"TR15","barcode":"9227372176411","name":"Expired Voltage Regulator","description":"Voltage regulator expired long ago","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":1400,"selling_price":2600,"stock_quantity":196,"category_id":1,"supplier_id":2,"units_id":2,"has_expiry":true,"low_stock_threshold":10,"warehouse_id":3,"created_at":"2024-11-30T05:06:03.000000Z","updated_at":"2025-12-01T04:24:51.000000Z","category":null,"supplier":{"id":2,"name":"CV. Sumber Rejeki","contact_person":null,"email":"sumber.rejeki@example.com","phone_number":"0227654321","address":"Jl. Rajawali No. 12, Bandung","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"unit":{"id":2,"name":"Roll","short_name":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"warehouse":{"id":3,"name":"Gudang Bandung","location":null,"is_main":0,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}},{"id":6,"code":"PROD-001","barcode":null,"name":"New Product","description":"Dolores dolorum amet iste laborum eius est dolor.","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":99.99,"selling_price":149.99,"stock_quantity":100,"category_id":2,"supplier_id":1,"units_id":1,"has_expiry":false,"low_stock_threshold":45,"warehouse_id":1,"created_at":"2025-12-01T02:52:21.000000Z","updated_at":"2025-12-01T02:52:21.000000Z","category":{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"supplier":{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"unit":{"id":1,"name":"Pieces","short_name":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"warehouse":{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/products?page=1","last":"http:\/\/localhost\/api\/v1\/products?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/products?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/products","per_page":25,"to":3,"total":3,"total_products":3,"low_stock_count":0,"expiring_soon_count":2,"total_categories":2}}'
+        content: '{"data":[{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","description":"Capacitor close to low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":600,"selling_price":1100,"stock_quantity":22,"category_id":2,"supplier_id":2,"units_id":3,"has_expiry":false,"low_stock_threshold":10,"warehouse_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":2,"name":"CV. Sumber Rejeki","contact_person":null,"email":"sumber.rejeki@example.com","phone_number":"0227654321","address":"Jl. Rajawali No. 12, Bandung","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":3,"name":"Meters","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","description":"Diode product already expired","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":180,"selling_price":350,"stock_quantity":48,"category_id":1,"supplier_id":5,"units_id":1,"has_expiry":true,"low_stock_threshold":10,"warehouse_id":2,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":1,"name":"TR","description":"Transistor","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":1,"name":"Pieces","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":2,"name":"Gudang Surabaya","location":null,"is_main":0,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","description":"Crystal oscillator expiring soon","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":950,"selling_price":1700,"stock_quantity":78,"category_id":2,"supplier_id":5,"units_id":3,"has_expiry":true,"low_stock_threshold":20,"warehouse_id":3,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":3,"name":"Meters","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":3,"name":"Gudang Bandung","location":null,"is_main":0,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","description":"LED near expiry and low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":90,"selling_price":160,"stock_quantity":85,"category_id":1,"supplier_id":3,"units_id":3,"has_expiry":true,"low_stock_threshold":5,"warehouse_id":2,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":1,"name":"TR","description":"Transistor","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":3,"name":"Tokyo Electronics Ltd.","contact_person":null,"email":"tokyo.electronics@example.com","phone_number":"+81-3-1234-5678","address":"Shinjuku-ku, Tokyo, Japan","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":3,"name":"Meters","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":2,"name":"Gudang Surabaya","location":null,"is_main":0,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","description":"Voltage regulator expired long ago","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":1400,"selling_price":2600,"stock_quantity":14,"category_id":2,"supplier_id":1,"units_id":1,"has_expiry":true,"low_stock_threshold":10,"warehouse_id":3,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":1,"name":"Pieces","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":3,"name":"Gudang Bandung","location":null,"is_main":0,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/products?page=1","last":"http:\/\/localhost\/api\/v1\/products?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/products?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/products","per_page":25,"to":5,"total":5,"total_products":5,"low_stock_count":0,"expiring_soon_count":5,"total_categories":3}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -2405,7 +2399,7 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -2555,257 +2549,11 @@ endpoints:
       stock_quantity: 50.0
       description: 'Dolores dolorum amet iste laborum eius est dolor.'
     fileParameters: []
-    responses: []
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      code:
-        custom: []
-        name: code
-        description: 'The product code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      barcode:
-        custom: []
-        name: barcode
-        description: 'The product barcode.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      stock_quantity:
-        custom: []
-        name: stock_quantity
-        description: 'The current stock quantity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      low_stock_threshold:
-        custom: []
-        name: low_stock_threshold
-        description: 'The low stock threshold.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: 'The price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      selling_price:
-        custom: []
-        name: selling_price
-        description: 'The selling price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      category_id:
-        custom: []
-        name: category_id
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      units_id:
-        custom: []
-        name: units_id
-        description: 'The ID of the unit.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier_id:
-        custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      warehouse_id:
-        custom: []
-        name: warehouse_id
-        description: 'The ID of the warehouse.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      image:
-        custom: []
-        name: image
-        description: 'The URL of the product image.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      has_expiry:
-        custom: []
-        name: has_expiry
-        description: 'Whether the product has an expiry date.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the product was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the product was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/products/{id}'
-    metadata:
-      custom: []
-      groupName: Products
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Display the specified product.'
-      description: 'Retrieves a single product by its ID.'
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the product.'
-        required: true
-        example: 4
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product:
-        custom: []
-        name: product
-        description: 'The ID of the product.'
-        required: true
-        example: '4'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 4
-      product: '4'
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
     responses:
       -
         custom: []
-        status: 200
-        content: '{"data":{"id":4,"code":"TR14","barcode":"7981373950433","name":"Low Stock LED","description":"LED near expiry and low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":90,"selling_price":160,"stock_quantity":232,"category_id":3,"supplier_id":1,"units_id":1,"has_expiry":true,"low_stock_threshold":5,"warehouse_id":2,"created_at":"2025-10-30T05:06:03.000000Z","updated_at":"2025-12-01T04:41:18.000000Z","category":{"id":3,"name":"IC","description":"Integrated Circuit","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"supplier":{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"unit":{"id":1,"name":"Pieces","short_name":null,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"},"warehouse":{"id":2,"name":"Gudang Surabaya","location":null,"is_main":0,"created_at":"2025-11-30T05:06:03.000000Z","updated_at":"2025-11-30T05:06:03.000000Z"}}}'
+        status: 201
+        content: '{"data":{"id":15,"code":"LP-001","barcode":null,"name":"Laptop Pro","description":"Dolores dolorum amet iste laborum eius est dolor.","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":1200.5,"selling_price":1499.99,"stock_quantity":50,"category_id":2,"supplier_id":1,"units_id":1,"has_expiry":false,"low_stock_threshold":null,"warehouse_id":1,"created_at":"2025-12-02T06:45:32.000000Z","updated_at":"2025-12-02T06:45:32.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -3002,15 +2750,14 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
   -
     custom: []
     httpMethods:
-      - PUT
-      - PATCH
+      - GET
     uri: 'api/v1/products/{id}'
     metadata:
       custom: []
@@ -3018,8 +2765,8 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Update the specified product.'
-      description: 'Updates a product with the provided data.'
+      title: 'Display the specified product.'
+      description: 'Retrieves a single product by its ID.'
       authenticated: true
       deprecated: false
     headers:
@@ -3032,7 +2779,7 @@ endpoints:
         name: id
         description: 'The ID of the product.'
         required: true
-        example: 4
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -3041,143 +2788,32 @@ endpoints:
       product:
         custom: []
         name: product
-        description: 'The ID of the product to update.'
+        description: 'The ID of the product.'
         required: true
-        example: '7'
+        example: '4'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 4
-      product: '7'
+      id: 1
+      product: '4'
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      name:
-        custom: []
-        name: name
-        description: 'The name of the product.'
-        required: false
-        example: 'Laptop Pro v2'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      code:
-        custom: []
-        name: code
-        description: 'The product code. Must be unique.'
-        required: false
-        example: LP-001
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: 'The cost price of the product.'
-        required: false
-        example: 1250.0
-        type: number
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      selling_price:
-        custom: []
-        name: selling_price
-        description: 'The selling price of the product.'
-        required: false
-        example: 1499.99
-        type: number
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      category_id:
-        custom: []
-        name: category_id
-        description: 'The ID of the category.'
-        required: false
-        example: 2
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      supplier_id:
-        custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      units_id:
-        custom: []
-        name: units_id
-        description: 'The ID of the unit.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      warehouse_id:
-        custom: []
-        name: warehouse_id
-        description: 'The ID of the warehouse.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      stock_quantity:
-        custom: []
-        name: stock_quantity
-        description: 'The initial stock quantity.'
-        required: false
-        example: 50.0
-        type: number
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'A description for the product.'
-        required: false
-        example: 'Dolores dolorum amet iste laborum eius est dolor.'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      name: 'Laptop Pro v2'
-      code: LP-001
-      price: 1250.0
-      selling_price: 1499.99
-      category_id: 2
-      supplier_id: 1
-      units_id: 1
-      warehouse_id: 1
-      stock_quantity: 50.0
-      description: 'Dolores dolorum amet iste laborum eius est dolor.'
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","description":"Capacitor close to low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":600,"selling_price":1100,"stock_quantity":22,"category_id":2,"supplier_id":2,"units_id":3,"has_expiry":false,"low_stock_threshold":10,"warehouse_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":2,"name":"CV. Sumber Rejeki","contact_person":null,"email":"sumber.rejeki@example.com","phone_number":"0227654321","address":"Jl. Rajawali No. 12, Bandung","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":3,"name":"Meters","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
     responseFields:
       id:
         custom: []
@@ -3369,7 +3005,383 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/v1/products/{id}'
+    metadata:
+      custom: []
+      groupName: Products
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update the specified product.'
+      description: 'Updates a product with the provided data.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the product.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      product:
+        custom: []
+        name: product
+        description: 'The ID of the product to update.'
+        required: true
+        example: '7'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+      product: '7'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the product.'
+        required: false
+        example: 'Laptop Pro v2'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      code:
+        custom: []
+        name: code
+        description: 'The product code. Must be unique.'
+        required: false
+        example: LP-001
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'The cost price of the product.'
+        required: false
+        example: 1250.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      selling_price:
+        custom: []
+        name: selling_price
+        description: 'The selling price of the product.'
+        required: false
+        example: 1499.99
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'The ID of the category.'
+        required: false
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      supplier_id:
+        custom: []
+        name: supplier_id
+        description: 'The ID of the supplier.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      units_id:
+        custom: []
+        name: units_id
+        description: 'The ID of the unit.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      warehouse_id:
+        custom: []
+        name: warehouse_id
+        description: 'The ID of the warehouse.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      stock_quantity:
+        custom: []
+        name: stock_quantity
+        description: 'The initial stock quantity.'
+        required: false
+        example: 50.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description for the product.'
+        required: false
+        example: 'Dolores dolorum amet iste laborum eius est dolor.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      name: 'Laptop Pro v2'
+      code: LP-001
+      price: 1250.0
+      selling_price: 1499.99
+      category_id: 2
+      supplier_id: 1
+      units_id: 1
+      warehouse_id: 1
+      stock_quantity: 50.0
+      description: 'Dolores dolorum amet iste laborum eius est dolor.'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"code":"LP-001","barcode":"1234567890123","name":"Laptop Pro v2","description":"Dolores dolorum amet iste laborum eius est dolor.","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":1250,"selling_price":1499.99,"stock_quantity":50,"category_id":2,"supplier_id":1,"units_id":1,"has_expiry":false,"low_stock_threshold":10,"warehouse_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T06:45:32.000000Z"}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the product.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      code:
+        custom: []
+        name: code
+        description: 'The product code.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      barcode:
+        custom: []
+        name: barcode
+        description: 'The product barcode.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the product.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      stock_quantity:
+        custom: []
+        name: stock_quantity
+        description: 'The current stock quantity.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      low_stock_threshold:
+        custom: []
+        name: low_stock_threshold
+        description: 'The low stock threshold.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'The price of the product.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      selling_price:
+        custom: []
+        name: selling_price
+        description: 'The selling price of the product.'
+        required: false
+        example: null
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'The ID of the category.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      units_id:
+        custom: []
+        name: units_id
+        description: 'The ID of the unit.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      supplier_id:
+        custom: []
+        name: supplier_id
+        description: 'The ID of the supplier.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      warehouse_id:
+        custom: []
+        name: warehouse_id
+        description: 'The ID of the warehouse.'
+        required: false
+        example: null
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'The description of the product.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      image:
+        custom: []
+        name: image
+        description: 'The URL of the product image.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      has_expiry:
+        custom: []
+        name: has_expiry
+        description: 'Whether the product has an expiry date.'
+        required: false
+        example: null
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      created_at:
+        custom: []
+        name: created_at
+        description: 'The date and time the product was created.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      updated_at:
+        custom: []
+        name: updated_at
+        description: 'The date and time the product was last updated.'
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null
@@ -3398,7 +3410,7 @@ endpoints:
         name: id
         description: 'The ID of the product.'
         required: true
-        example: 4
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -3416,7 +3428,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 4
+      id: 1
       product: '7'
     queryParameters: []
     cleanQueryParameters: []
@@ -3434,7 +3446,263 @@ endpoints:
     auth:
       - headers
       - Authorization
-      - 'Bearer 1|P12UYwB4HK8dRQ6U119TwCQOsOY72daPn8sB3YZg983337eb'
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: admin/product/quick-create
+    metadata:
+      custom: []
+      groupName: Products
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: multipart/form-data
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      code:
+        custom: []
+        name: code
+        description: 'The product code.'
+        required: true
+        example: '"PROD-001"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The product name.'
+        required: true
+        example: '"New Product"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      stock_quantity:
+        custom: []
+        name: stock_quantity
+        description: 'The initial stock quantity.'
+        required: true
+        example: 100
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      low_stock_threshold:
+        custom: []
+        name: low_stock_threshold
+        description: 'Must be at least 1.'
+        required: false
+        example: 45
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'The purchase price of the product.'
+        required: true
+        example: 99.99
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      selling_price:
+        custom: []
+        name: selling_price
+        description: 'The selling price of the product.'
+        required: true
+        example: 149.99
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'The ID of the product category.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      units_id:
+        custom: []
+        name: units_id
+        description: 'The ID of the product unit.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      supplier_id:
+        custom: []
+        name: supplier_id
+        description: 'The ID of the product supplier.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      warehouse_id:
+        custom: []
+        name: warehouse_id
+        description: 'The <code>id</code> of an existing record in the warehouses table.'
+        required: false
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: ''
+        required: false
+        example: 'Dolores dolorum amet iste laborum eius est dolor.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      image:
+        custom: []
+        name: image
+        description: 'Must be an image.'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      has_expiry:
+        custom: []
+        name: has_expiry
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      code: '"PROD-001"'
+      name: '"New Product"'
+      stock_quantity: 100
+      low_stock_threshold: 45
+      price: 99.99
+      selling_price: 149.99
+      category_id: 1
+      units_id: 1
+      supplier_id: 1
+      warehouse_id: 17
+      description: 'Dolores dolorum amet iste laborum eius est dolor.'
+      has_expiry: false
+    fileParameters:
+      image: null
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success": true, "message": "Product created successfully", "product": {"id": 1, "name": "New Product"}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: admin/product/bulk-delete
+    metadata:
+      custom: []
+      groupName: Products
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      ids:
+        custom: []
+        name: ids
+        description: 'An array of product IDs to delete.'
+        required: true
+        example:
+          - 1
+          - 2
+          - 3
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      ids:
+        - 1
+        - 2
+        - 3
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success": true, "message": "Successfully deleted 2 product(s)", "deleted_count": 2, "images_deleted": 1}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
     controller: null
     method: null
     route: null

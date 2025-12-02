@@ -211,6 +211,7 @@ class PurchaseService
 
     public function updatePurchase(Purchase $purchase, array $data): Purchase
     {
+        \Illuminate\Support\Facades\Log::info('Updating purchase with data: ', $data);
         return DB::transaction(function () use ($purchase, $data) {
             /** @var \App\Models\Purchase $purchase */
             $products = json_decode($data['products'], true);

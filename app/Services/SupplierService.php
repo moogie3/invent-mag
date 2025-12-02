@@ -20,10 +20,6 @@ class SupplierService
 
     public function createSupplier(array $data)
     {
-        if (Supplier::where('name', $data['name'])->exists()) {
-            return ['success' => false, 'message' => 'This supplier already exists.'];
-        }
-
         if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
             $data['image'] = $this->storeImage($data['image']);
         }

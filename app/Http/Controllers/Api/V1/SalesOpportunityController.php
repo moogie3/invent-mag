@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreSalesOpportunityRequest;
+use App\Http\Requests\Api\V1\UpdateSalesOpportunityRequest;
+use App\Http\Requests\Api\V1\MoveSalesOpportunityRequest;
 use App\Http\Resources\SalesOpportunityResource;
 use App\Models\SalesOpportunity;
 use App\Services\SalesPipelineService;
@@ -29,36 +32,8 @@ class SalesOpportunityController extends Controller
      * @authenticated
      * @queryParam per_page int The number of opportunities to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of sales opportunities.
-     * @responseField data[].id integer The ID of the sales opportunity.
-     * @responseField data[].customer_id integer The ID of the customer.
-     * @responseField data[].sales_pipeline_id integer The ID of the sales pipeline.
-     * @responseField data[].pipeline_stage_id integer The ID of the pipeline stage.
-     * @responseField data[].name string The name of the sales opportunity.
-     * @responseField data[].description string The description of the sales opportunity.
-     * @responseField data[].amount number The estimated amount of the opportunity.
-     * @responseField data[].expected_close_date string The expected close date of the opportunity.
-     * @responseField data[].status string The status of the opportunity (e.g., Open, Won, Lost).
-     * @responseField data[].sales_id integer The ID of the associated sales record.
-     * @responseField data[].created_at string The date and time the opportunity was created.
-     * @responseField data[].updated_at string The date and time the opportunity was last updated.
-     * @responseField data[].pipeline object The sales pipeline.
-     * @responseField data[].stage object The pipeline stage.
-     * @responseField data[].customer object The customer.
-     * @responseField data[].items object[] The items in the opportunity.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"name":"New Client Project","amount":50000,...}],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -152,21 +127,12 @@ class SalesOpportunityController extends Controller
      * @bodyParam items.*.quantity integer required The quantity of the product. Example: 1
      * @bodyParam items.*.price numeric required The price of the product. Example: 100.00
      *
-     * @responseField id integer The ID of the sales opportunity.
-     * @responseField customer_id integer The ID of the customer.
-     * @responseField sales_pipeline_id integer The ID of the sales pipeline.
-     * @responseField pipeline_stage_id integer The ID of the pipeline stage.
-     * @responseField name string The name of the sales opportunity.
-     * @responseField description string The description of the sales opportunity.
-     * @responseField amount number The estimated amount of the opportunity.
-     * @responseField expected_close_date string The expected close date of the opportunity.
-     * @responseField status string The status of the opportunity (e.g., Open, Won, Lost).
-     * @responseField sales_id integer The ID of the associated sales record.
-     * @responseField created_at string The date and time the opportunity was created.
-     * @responseField updated_at string The date and time the opportunity was last updated.
-     * @responseField items object[] The items in the opportunity.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"New Client Project (Updated)",...}}
+     * @response 404 scenario="Not Found" {"message": "Sales opportunity not found."}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateSalesOpportunityRequest $request, SalesOpportunity $sales_opportunity)
+    public function update(UpdateSalesOpportunityRequest $request, SalesOpportunity $sales_opportunity)
     {
         $opportunity = $this->salesPipelineService->updateOpportunity($sales_opportunity, $request->validated());
         return new SalesOpportunityResource($opportunity->load('items'));
@@ -180,6 +146,8 @@ class SalesOpportunityController extends Controller
      * @urlParam sales_opportunity integer required The ID of the sales opportunity to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Sales opportunity not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(SalesOpportunity $sales_opportunity)
     {
@@ -196,20 +164,12 @@ class SalesOpportunityController extends Controller
      * @urlParam opportunity integer required The ID of the sales opportunity. Example: 1
      * @bodyParam pipeline_stage_id integer required The ID of the new pipeline stage. Example: 2
      *
-     * @responseField id integer The ID of the sales opportunity.
-     * @responseField customer_id integer The ID of the customer.
-     * @responseField sales_pipeline_id integer The ID of the sales pipeline.
-     * @responseField pipeline_stage_id integer The ID of the pipeline stage.
-     * @responseField name string The name of the sales opportunity.
-     * @responseField description string The description of the sales opportunity.
-     * @responseField amount number The estimated amount of the opportunity.
-     * @responseField expected_close_date string The expected close date of the opportunity.
-     * @responseField status string The status of the opportunity (e.g., Open, Won, Lost).
-     * @responseField sales_id integer The ID of the associated sales record.
-     * @responseField created_at string The date and time the opportunity was created.
-     * @responseField updated_at string The date and time the opportunity was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"New Client Project","pipeline_stage_id":2,...}}
+     * @response 404 scenario="Opportunity or Stage Not Found" {"message": "Sales opportunity or stage not found."}
+     * @response 422 scenario="Validation Error" {"message":"The pipeline_stage_id field is required.","errors":{"pipeline_stage_id":["The pipeline_stage_id field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function moveOpportunity(\App\Http\Requests\Api\V1\MoveSalesOpportunityRequest $request, SalesOpportunity $opportunity)
+    public function moveOpportunity(MoveSalesOpportunityRequest $request, SalesOpportunity $opportunity)
     {
         $opportunity = $this->salesPipelineService->moveOpportunity($opportunity, $request->validated()['pipeline_stage_id']);
         return new SalesOpportunityResource($opportunity);
@@ -222,9 +182,10 @@ class SalesOpportunityController extends Controller
      * @authenticated
      * @urlParam opportunity integer required The ID of the sales opportunity. Example: 1
      *
-     * @responseField message string A message indicating the result.
-     * @responseField type string The type of response (e.g., "success", "error").
-     * @responseField sales_id integer The ID of the newly created sales order.
+     * @response 200 scenario="Success" {"message": "Opportunity successfully converted to Sales Order.", "type": "success", "sales_id": 1}
+     * @response 404 scenario="Opportunity Not Found" {"message": "Sales opportunity not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
+     * @response 500 scenario="Error converting to Sales Order" {"message": "Failed to convert opportunity to sales order: Internal server error.", "type": "error"}
      */
     public function convertToSalesOrder(SalesOpportunity $opportunity)
     {

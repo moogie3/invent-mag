@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StorePurchaseRequest;
+use App\Http\Requests\Api\V1\UpdatePurchaseRequest;
 use App\Http\Resources\PurchaseResource;
 use App\Models\Purchase;
 use App\Services\PurchaseService;
@@ -31,36 +33,8 @@ class PurchaseController extends Controller
      * @authenticated
      * @queryParam per_page int The number of purchase orders to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of purchase orders.
-     * @responseField data[].id integer The ID of the purchase order.
-     * @responseField data[].invoice string The invoice number.
-     * @responseField data[].supplier_id integer The ID of the supplier.
-     * @responseField data[].user_id integer The ID of the user.
-     * @responseField data[].order_date string The order date.
-     * @responseField data[].due_date string The due date.
-     * @responseField data[].payment_type string The payment type.
-     * @responseField data[].discount_total number The total discount.
-     * @responseField data[].discount_total_type string The type of discount.
-     * @responseField data[].total number The total amount.
-     * @responseField data[].status string The status of the purchase order.
-     * @responseField data[].created_at string The date and time the purchase order was created.
-     * @responseField data[].updated_at string The date and time the purchase order was last updated.
-     * @responseField data[].supplier object The supplier associated with the purchase order.
-     * @responseField data[].user object The user associated with the purchase order.
-     * @responseField data[].items object[] The items in the purchase order.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"invoice":"PO-001","supplier":{"id":1,"name":"Supplier 1"},...}],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -86,21 +60,11 @@ class PurchaseController extends Controller
      * @bodyParam total numeric required The total amount of the purchase order. Example: 1500.00
      * @bodyParam status string required The status of the purchase order (e.g., Pending, Paid). Example: "Pending"
      *
-     * @responseField id integer The ID of the purchase order.
-     * @responseField invoice string The invoice number.
-     * @responseField supplier_id integer The ID of the supplier.
-     * @responseField user_id integer The ID of the user.
-     * @responseField order_date string The order date.
-     * @responseField due_date string The due date.
-     * @responseField payment_type string The payment type.
-     * @responseField discount_total number The total discount.
-     * @responseField discount_total_type string The type of discount.
-     * @responseField total number The total amount.
-     * @responseField status string The status of the purchase order.
-     * @responseField created_at string The date and time the purchase order was created.
-     * @responseField updated_at string The date and time the purchase order was last updated.
+     * @response 201 scenario="Success" {"data":{"id":1,"invoice":"INV-2023-001",...}}
+     * @response 422 scenario="Validation Error" {"message":"The invoice field is required.","errors":{"invoice":["The invoice field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function store(\App\Http\Requests\Api\V1\StorePurchaseRequest $request)
+    public function store(StorePurchaseRequest $request)
     {
         $purchase = $this->purchaseService->createPurchase($request->validated());
         return new PurchaseResource($purchase);
@@ -115,22 +79,9 @@ class PurchaseController extends Controller
      * @authenticated
      * @urlParam purchase required The ID of the purchase order. Example: 4
      *
-     * @responseField id integer The ID of the purchase order.
-     * @responseField invoice string The invoice number.
-     * @responseField supplier_id integer The ID of the supplier.
-     * @responseField user_id integer The ID of the user.
-     * @responseField order_date string The order date.
-     * @responseField due_date string The due date.
-     * @responseField payment_type string The payment type.
-     * @responseField discount_total number The total discount.
-     * @responseField discount_total_type string The type of discount.
-     * @responseField total number The total amount.
-     * @responseField status string The status of the purchase order.
-     * @responseField created_at string The date and time the purchase order was created.
-     * @responseField updated_at string The date and time the purchase order was last updated.
-     * @responseField supplier object The supplier associated with the purchase order.
-     * @responseField user object The user associated with the purchase order.
-     * @responseField items object[] The items in the purchase order.
+     * @response 200 scenario="Success" {"data":{"id":4,"invoice":"PO-004",...}}
+     * @response 404 scenario="Not Found" {"message": "Purchase order not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(Purchase $purchase)
     {
@@ -154,21 +105,12 @@ class PurchaseController extends Controller
      * @bodyParam total numeric The total amount of the purchase order. Example: 2000.00
      * @bodyParam status string The status of the purchase order (e.g., Pending, Paid). Example: Paid
      *
-     * @responseField id integer The ID of the purchase order.
-     * @responseField invoice string The invoice number.
-     * @responseField supplier_id integer The ID of the supplier.
-     * @responseField user_id integer The ID of the user.
-     * @responseField order_date string The order date.
-     * @responseField due_date string The due date.
-     * @responseField payment_type string The payment type.
-     * @responseField discount_total number The total discount.
-     * @responseField discount_total_type string The type of discount.
-     * @responseField total number The total amount.
-     * @responseField status string The status of the purchase order.
-     * @responseField created_at string The date and time the purchase order was created.
-     * @responseField updated_at string The date and time the purchase order was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"invoice":"INV-2023-002",...}}
+     * @response 404 scenario="Not Found" {"message": "Purchase order not found."}
+     * @response 422 scenario="Validation Error" {"message":"The status field is required.","errors":{"status":["The status field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdatePurchaseRequest $request, Purchase $purchase)
+    public function update(UpdatePurchaseRequest $request, Purchase $purchase)
     {
         $purchase = $this->purchaseService->updatePurchase($purchase, $request->validated());
         return new PurchaseResource($purchase);
@@ -182,6 +124,8 @@ class PurchaseController extends Controller
      * @urlParam purchase integer required The ID of the purchase order to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Purchase order not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(Purchase $purchase)
     {
@@ -195,16 +139,8 @@ class PurchaseController extends Controller
      * @group Purchase Orders
      * @authenticated
      *
-     * @responseField data array A list of expiring purchase orders.
-     * @responseField data[].id integer The ID of the purchase order.
-     * @responseField data[].invoice string The invoice number.
-     * @responseField data[].supplier object The supplier details.
-     * @responseField data[].order_date string The order date.
-     * @responseField data[].due_date string The due date.
-     * @responseField data[].total number The total amount.
-     * @responseField data[].status string The status of the purchase order.
-     * @responseField data[].remaining_days integer The number of days until expiry.
      * @response 200 scenario="Success" [{"id":1,"invoice":"PO-001","supplier":{"id":1,"name":"Supplier 1"},"order_date":"2025-11-20","due_date":"2025-12-20","total":1000,"status":"pending","remaining_days":19}]
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function getExpiringSoonPurchases()
     {
@@ -223,8 +159,10 @@ class PurchaseController extends Controller
      * @bodyParam payment_method string required The method of payment. Example: Bank Transfer
      * @bodyParam notes string nullable Any notes about the payment.
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
+     * @response 200 scenario="Success" {"success":true,"message":"Payment added successfully."}
+     * @response 404 scenario="Not Found" {"message": "Purchase order not found."}
+     * @response 422 scenario="Validation Error" {"message":"The amount must be a number.","errors":{"amount":["The amount must be a number."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function addPayment(Request $request, $id)
     {
@@ -246,9 +184,8 @@ class PurchaseController extends Controller
      * @group Purchase Orders
      * @authenticated
      *
-     * @responseField total_purchases integer Total number of purchase orders.
-     * @responseField total_paid number Total amount paid for purchase orders.
-     * @responseField total_due number Total amount due for purchase orders.
+     * @response 200 scenario="Success" {"total_purchases":10,"total_paid":5000,"total_due":2500}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function getPurchaseMetrics()
     {
@@ -264,8 +201,9 @@ class PurchaseController extends Controller
      * @bodyParam ids array required An array of purchase order IDs to delete. Example: "[1, 2, 3]"
      * @bodyParam ids.* integer required A purchase order ID.
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
+     * @response 200 scenario="Success" {"success":true,"message":"Successfully deleted purchase order(s)"}
+     * @response 422 scenario="Validation Error" {"message":"The ids field is required.","errors":{"ids":["The ids field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function bulkDelete(Request $request)
     {
@@ -289,9 +227,9 @@ class PurchaseController extends Controller
      * @bodyParam ids array required An array of purchase order IDs to mark as paid. Example: "[1, 2, 3]"
      * @bodyParam ids.* integer required A purchase order ID.
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
-     * @responseField updated_count integer The number of purchase orders successfully marked as paid.
+     * @response 200 scenario="Success" {"success":true,"message":"Successfully marked 3 purchase order(s) as paid.","updated_count":3}
+     * @response 422 scenario="Validation Error" {"message":"The ids field is required.","errors":{"ids":["The ids field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function bulkMarkPaid(Request $request)
     {

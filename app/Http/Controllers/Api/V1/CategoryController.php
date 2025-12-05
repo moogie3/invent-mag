@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreCategoryRequest;
+use App\Http\Requests\Api\V1\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Models\Categories;
 use App\Services\CategoryService;
@@ -28,26 +30,8 @@ class CategoryController extends Controller
      * @authenticated
      * @queryParam per_page int The number of categories to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of categories.
-     * @responseField data[].id integer The ID of the category.
-     * @responseField data[].name string The name of the category.
-     * @responseField data[].description string The description of the category.
-     * @responseField data[].parent_id integer The ID of the parent category.
-     * @responseField data[].created_at string The date and time the category was created.
-     * @responseField data[].updated_at string The date and time the category was last updated.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"name":"Electronics","description":"Electronic components and devices",...}],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -65,15 +49,11 @@ class CategoryController extends Controller
      * @bodyParam description string The description of the category. Example: "Electronic components and devices"
      * @bodyParam parent_id int The ID of the parent category. Example: 1
      *
-     * @responseField id integer The ID of the category.
-     * @responseField name string The name of the category.
-     * @responseField description string The description of the category.
-     * @responseField parent_id integer The ID of the parent category.
-     * @responseField created_at string The date and time the category was created.
-     * @responseField updated_at string The date and time the category was last updated.
-     * @response 422 scenario="Creation Failed" {"success": false, "message": "Failed to create category."}
+     * @response 201 scenario="Success" {"data":{"id":1,"name":"Electronics","description":"Electronic components and devices",...}}
+     * @response 422 scenario="Validation Error" {"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function store(\App\Http\Requests\Api\V1\StoreCategoryRequest $request)
+    public function store(StoreCategoryRequest $request)
     {
         $result = $this->categoryService->createCategory($request->validated());
 
@@ -87,14 +67,9 @@ class CategoryController extends Controller
      * @authenticated
      * @urlParam category required The ID of the category. Example: 1
      *
-     * @responseField id integer The ID of the category.
-     * @responseField name string The name of the category.
-     * @responseField description string The description of the category.
-     * @responseField parent_id integer The ID of the parent category.
-     * @responseField created_at string The date and time the category was created.
-     * @responseField updated_at string The date and time the category was last updated.
-     * @responseField parent object The parent category.
-     * @responseField children object[] A list of child categories.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Electronics","description":"Electronic components and devices",...}}
+     * @response 404 scenario="Not Found" {"message": "Category not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(Categories $category)
     {
@@ -111,15 +86,12 @@ class CategoryController extends Controller
      * @bodyParam description string The description of the category. Example: "Electronic components and devices"
      * @bodyParam parent_id int The ID of the parent category. Example: 1
      *
-     * @responseField id integer The ID of the category.
-     * @responseField name string The name of the category.
-     * @responseField description string The description of the category.
-     * @responseField parent_id integer The ID of the parent category.
-     * @responseField created_at string The date and time the category was created.
-     * @responseField updated_at string The date and time the category was last updated.
-     * @response 422 scenario="Update Failed" {"success": false, "message": "Failed to update category."}
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Electronics (Updated)","description":"Updated description",...}}
+     * @response 404 scenario="Not Found" {"message": "Category not found."}
+     * @response 422 scenario="Validation Error" {"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateCategoryRequest $request, Categories $category)
+    public function update(UpdateCategoryRequest $request, Categories $category)
     {
         $result = $this->categoryService->updateCategory($category, $request->validated());
 
@@ -134,6 +106,8 @@ class CategoryController extends Controller
      * @urlParam category required The ID of the category. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Category not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(Categories $category)
     {

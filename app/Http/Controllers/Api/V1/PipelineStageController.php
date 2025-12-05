@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\UpdatePipelineStageRequest;
 use App\Models\PipelineStage;
 use App\Services\SalesPipelineService;
 use Illuminate\Http\Request;
@@ -32,16 +33,12 @@ class PipelineStageController extends Controller
      * @bodyParam position integer required The new position of the stage. Example: 1
      * @bodyParam is_closed boolean Whether this stage represents a closed state. Example: false
      *
-     * @responseField id integer The ID of the pipeline stage.
-     * @responseField sales_pipeline_id integer The ID of the sales pipeline this stage belongs to.
-     * @responseField name string The name of the stage.
-     * @responseField position integer The position of the stage.
-     * @responseField is_closed boolean Whether this stage is a closed stage.
-     * @responseField created_at string The date and time the stage was created.
-     * @responseField updated_at string The date and time the stage was last updated.
      * @response 200 scenario="Success" {"id":1,"sales_pipeline_id":1,"name":"Negotiation","position":1,"is_closed":false,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}
+     * @response 404 scenario="Not Found" {"message": "Pipeline stage not found."}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdatePipelineStageRequest $request, PipelineStage $stage)
+    public function update(UpdatePipelineStageRequest $request, PipelineStage $stage)
     {
         $stage = $this->salesPipelineService->updateStage($stage, $request->validated());
         return response()->json($stage);
@@ -55,6 +52,8 @@ class PipelineStageController extends Controller
      * @urlParam stage integer required The ID of the pipeline stage to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Pipeline stage not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(PipelineStage $stage)
     {

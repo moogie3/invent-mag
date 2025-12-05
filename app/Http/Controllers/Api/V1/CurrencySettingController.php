@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\UpdateCurrencySettingRequest;
 use App\Http\Resources\CurrencySettingResource;
 use App\Models\CurrencySetting;
 use App\Services\CurrencyService;
@@ -27,16 +28,8 @@ class CurrencySettingController extends Controller
      * @authenticated
      * @queryParam per_page int The number of settings to return per page. Defaults to 15. Example: 25
      *
-     * @responseField id integer The ID of the currency setting.
-     * @responseField currency_symbol string The currency symbol.
-     * @responseField decimal_separator string The decimal separator.
-     * @responseField thousand_separator string The thousand separator.
-     * @responseField decimal_places integer The number of decimal places.
-     * @responseField position string The position of the currency symbol.
-     * @responseField currency_code string The currency code.
-     * @responseField locale string The locale.
-     * @responseField created_at string The date and time the setting was created.
-     * @responseField updated_at string The date and time the setting was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"currency_symbol":"$","decimal_separator":".",...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index()
     {
@@ -58,18 +51,12 @@ class CurrencySettingController extends Controller
      * @bodyParam currency_code string required The currency code. Example: "USD"
      * @bodyParam locale string required The locale. Example: "en_US"
      *
-     * @responseField id integer The ID of the currency setting.
-     * @responseField currency_symbol string The currency symbol.
-     * @responseField decimal_separator string The decimal separator.
-     * @responseField thousand_separator string The thousand separator.
-     * @responseField decimal_places integer The number of decimal places.
-     * @responseField position string The position of the currency symbol.
-     * @responseField currency_code string The currency code.
-     * @responseField locale string The locale.
-     * @responseField created_at string The date and time the setting was created.
-     * @responseField updated_at string The date and time the setting was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"currency_symbol":"¥","decimal_separator":",",...}}
+     * @response 404 scenario="Not Found" {"message": "Currency setting not found."}
+     * @response 422 scenario="Validation Error" {"message":"The currency_symbol field is required.","errors":{"currency_symbol":["The currency_symbol field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateCurrencySettingRequest $request)
+    public function update(UpdateCurrencySettingRequest $request)
     {
         $result = $this->currencyService->updateCurrency($request->validated());
 

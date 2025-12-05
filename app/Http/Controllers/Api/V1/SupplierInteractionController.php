@@ -28,29 +28,8 @@ class SupplierInteractionController extends Controller
      * @authenticated
      * @queryParam per_page int The number of interactions to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of supplier interactions.
-     * @responseField data[].id integer The ID of the interaction.
-     * @responseField data[].supplier_id integer The ID of the supplier.
-     * @responseField data[].user_id integer The ID of the user.
-     * @responseField data[].type string The type of interaction.
-     * @responseField data[].notes string The notes for the interaction.
-     * @responseField data[].interaction_date string The date of the interaction.
-     * @responseField data[].created_at string The date and time the interaction was created.
-     * @responseField data[].updated_at string The date and time the interaction was last updated.
-     * @responseField data[].supplier object The supplier associated with the interaction.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"supplier_id":1,"user_id":1,"type":"email",...}],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {

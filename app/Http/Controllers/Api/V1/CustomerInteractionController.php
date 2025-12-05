@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreCustomerInteractionRequest;
+use App\Http\Requests\Api\V1\UpdateCustomerInteractionRequest;
 use App\Http\Resources\CustomerInteractionResource;
 use App\Models\CustomerInteraction;
 use App\Services\CrmService;
@@ -28,29 +30,8 @@ class CustomerInteractionController extends Controller
      * @authenticated
      * @queryParam per_page int The number of interactions to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of customer interactions.
-     * @responseField data[].id integer The ID of the interaction.
-     * @responseField data[].customer_id integer The ID of the customer.
-     * @responseField data[].user_id integer The ID of the user.
-     * @responseField data[].type string The type of interaction.
-     * @responseField data[].notes string The notes for the interaction.
-     * @responseField data[].interaction_date string The date of the interaction.
-     * @responseField data[].created_at string The date and time the interaction was created.
-     * @responseField data[].updated_at string The date and time the interaction was last updated.
-     * @responseField data[].customer object The customer associated with the interaction.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"customer_id":1,"user_id":1,"type":"call",...}],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -70,16 +51,11 @@ class CustomerInteractionController extends Controller
      * @bodyParam notes string The notes for the interaction. Example: "Followed up on the recent order."
      * @bodyParam interaction_date date required The date of the interaction. Example: "2025-11-28"
      *
-     * @responseField id integer The ID of the interaction.
-     * @responseField customer_id integer The ID of the customer.
-     * @responseField user_id integer The ID of the user.
-     * @responseField type string The type of interaction.
-     * @responseField notes string The notes for the interaction.
-     * @responseField interaction_date string The date of the interaction.
-     * @responseField created_at string The date and time the interaction was created.
-     * @responseField updated_at string The date and time the interaction was last updated.
+     * @response 201 scenario="Success" {"data":{"id":1,"customer_id":1,"user_id":1,"type":"call",...}}
+     * @response 422 scenario="Validation Error" {"message":"The customer_id field is required.","errors":{"customer_id":["The customer_id field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function store(\App\Http\Requests\Api\V1\StoreCustomerInteractionRequest $request)
+    public function store(StoreCustomerInteractionRequest $request)
     {
         $validated = $request->validated();
         $interaction = $this->crmService->storeCustomerInteraction($validated, $validated['customer_id']);
@@ -93,15 +69,9 @@ class CustomerInteractionController extends Controller
      * @authenticated
      * @urlParam customer_interaction required The ID of the customer interaction. Example: 1
      *
-     * @responseField id integer The ID of the interaction.
-     * @responseField customer_id integer The ID of the customer.
-     * @responseField user_id integer The ID of the user.
-     * @responseField type string The type of interaction.
-     * @responseField notes string The notes for the interaction.
-     * @responseField interaction_date string The date of the interaction.
-     * @responseField created_at string The date and time the interaction was created.
-     * @responseField updated_at string The date and time the interaction was last updated.
-     * @responseField customer object The customer associated with the interaction.
+     * @response 200 scenario="Success" {"data":{"id":1,"customer_id":1,"user_id":1,"type":"call",...}}
+     * @response 404 scenario="Not Found" {"message": "Customer interaction not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(CustomerInteraction $customer_interaction)
     {
@@ -120,16 +90,12 @@ class CustomerInteractionController extends Controller
      * @bodyParam notes string The notes for the interaction. Example: "Followed up on the recent order."
      * @bodyParam interaction_date date required The date of the interaction. Example: "2025-11-28"
      *
-     * @responseField id integer The ID of the interaction.
-     * @responseField customer_id integer The ID of the customer.
-     * @responseField user_id integer The ID of the user.
-     * @responseField type string The type of interaction.
-     * @responseField notes string The notes for the interaction.
-     * @responseField interaction_date string The date of the interaction.
-     * @responseField created_at string The date and time the interaction was created.
-     * @responseField updated_at string The date and time the interaction was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"customer_id":1,"user_id":1,"type":"call",...}}
+     * @response 404 scenario="Not Found" {"message": "Customer interaction not found."}
+     * @response 422 scenario="Validation Error" {"message":"The customer_id field is required.","errors":{"customer_id":["The customer_id field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateCustomerInteractionRequest $request, CustomerInteraction $customer_interaction)
+    public function update(UpdateCustomerInteractionRequest $request, CustomerInteraction $customer_interaction)
     {
         $validated = $request->validated();
         $customer_interaction->update($validated);
@@ -145,6 +111,8 @@ class CustomerInteractionController extends Controller
      * @urlParam customer_interaction required The ID of the customer interaction. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Customer interaction not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(CustomerInteraction $customer_interaction)
     {

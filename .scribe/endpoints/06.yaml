@@ -67,7 +67,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"customer_id":5,"sales_pipeline_id":1,"pipeline_stage_id":2,"name":"Opportunity 1","description":null,"amount":"1927.00","expected_close_date":null,"status":"won","sales_id":null,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T06:45:31.000000Z"}}'
+        content: '{"data":{"id":1,"customer_id":5,"sales_pipeline_id":1,"pipeline_stage_id":2,"name":"Opportunity 1","description":null,"amount":"1927.00","expected_close_date":null,"status":"won","sales_id":null,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-05T07:49:51.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -267,7 +267,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"message":"Opportunity successfully converted to Sales Order.","type":"success","sales_id":109}'
+        content: '{"message":"Opportunity successfully converted to Sales Order.","type":"success","sales_id":117}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreCustomerRequest;
 use App\Http\Requests\Api\V1\UpdateCustomerRequest;
+use App\Http\Requests\Api\V1\QuickStoreCustomerRequest;
 use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use App\Services\CrmService;
@@ -37,28 +38,8 @@ class CustomerController extends Controller
      * @authenticated
      * @queryParam per_page int The number of customers to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of customers.
-     * @responseField data[].id integer The ID of the customer.
-     * @responseField data[].name string The name of the customer.
-     * @responseField data[].address string The address of the customer.
-     * @responseField data[].phone_number string The phone number of the customer.
-     * @responseField data[].email string The email of the customer.
-     * @responseField data[].payment_terms string The payment terms.
-     * @responseField data[].created_at string The date and time the customer was created.
-     * @responseField data[].updated_at string The date and time the customer was last updated.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}],"links":{"first":"http:\/\/localhost\/api\/v1\/customers?page=1","last":null,"prev":null,"next":"http:\/\/localhost\/api\/v1\/customers?page=2"},"meta":{"current_page":1,"from":1,"last_page":1,"links":[...],"path":"http:\/\/localhost\/api\/v1\/customers","per_page":15,"to":15,"total":6}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -78,14 +59,9 @@ class CustomerController extends Controller
      * @bodyParam email string The email of the customer. Must be unique. Example: john.doe@example.com
      * @bodyParam payment_terms string required The payment terms. Example: Net 30
      *
-     * @responseField id integer The ID of the customer.
-     * @responseField name string The name of the customer.
-     * @responseField address string The address of the customer.
-     * @responseField phone_number string The phone number of the customer.
-     * @responseField email string The email of the customer.
-     * @responseField payment_terms string The payment terms.
-     * @responseField created_at string The date and time the customer was created.
-     * @responseField updated_at string The date and time the customer was last updated.
+     * @response 201 scenario="Success" {"data":{"name":"John Doe","address":"123 Main St","phone_number":"555-1234","email":"john.doe@example.com","payment_terms":"Net 30","updated_at":"2025-12-02T06:45:31.000000Z","created_at":"2025-12-02T06:45:31.000000Z","id":11}}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function store(StoreCustomerRequest $request)
     {
@@ -103,14 +79,9 @@ class CustomerController extends Controller
      * @authenticated
      * @urlParam customer integer required The ID of the customer. Example: 1
      *
-     * @responseField id integer The ID of the customer.
-     * @responseField name string The name of the customer.
-     * @responseField address string The address of the customer.
-     * @responseField phone_number string The phone number of the customer.
-     * @responseField email string The email of the customer.
-     * @responseField payment_terms string The payment terms.
-     * @responseField created_at string The date and time the customer was created.
-     * @responseField updated_at string The date and time the customer was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}
+     * @response 404 scenario="Not Found" {"message": "Customer not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(Customer $customer)
     {
@@ -129,14 +100,10 @@ class CustomerController extends Controller
      * @bodyParam email string The email of the customer. Must be unique. Example: jane.doe@example.com
      * @bodyParam payment_terms string The payment terms. Example: Net 60
      *
-     * @responseField id integer The ID of the customer.
-     * @responseField name string The name of the customer.
-     * @responseField address string The address of the customer.
-     * @responseField phone_number string The phone number of the customer.
-     * @responseField email string The email of the customer.
-     * @responseField payment_terms string The payment terms.
-     * @responseField created_at string The date and time the customer was created.
-     * @responseField updated_at string The date and time the customer was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Jane Doe","address":"456 Oak Ave","phone_number":"555-5678","email":"jane.doe@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"Net 60","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T08:00:00.000000Z"}}
+     * @response 404 scenario="Not Found" {"message": "Customer not found."}
+     * @response 422 scenario="Validation Error" {"message":"The email has already been taken.","errors":{"email":["The email has already been taken."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
@@ -153,6 +120,8 @@ class CustomerController extends Controller
      * @urlParam customer integer required The ID of the customer to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Customer not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(Customer $customer)
     {
@@ -172,16 +141,11 @@ class CustomerController extends Controller
      * @bodyParam address string required The address of the customer. Example: "123 Quick St"
      * @bodyParam payment_terms string required The payment terms. Example: "Net 30"
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
-     * @responseField customer object The created customer.
-     * @responseField customer.id integer The ID of the customer.
-     * @responseField customer.name string The name of the customer.
-     * @responseField customer.email string The email of the customer.
-     * @responseField customer.phone_number string The phone number of the customer.
-     * @response 422 scenario="Creation Failed" {"success": false, "message": "Failed to create customer."}
+     * @response 201 scenario="Success" {"data":{"id":12,"name":"Quick Customer","address":"123 Quick St","phone_number":"555-555-5555","email":"quick@example.com","payment_terms":"Net 30","created_at":"2025-12-02T09:00:00.000000Z","updated_at":"2025-12-02T09:00:00.000000Z"}}
+     * @response 422 scenario="Validation Error" {"message":"The email field must be a valid email address.","errors":{"email":["The email field must be a valid email address."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function quickCreate(\App\Http\Requests\Api\V1\QuickStoreCustomerRequest $request)
+    public function quickCreate(QuickStoreCustomerRequest $request)
     {
         $result = $this->customerService->quickCreateCustomer($request->validated());
 
@@ -194,8 +158,8 @@ class CustomerController extends Controller
      * @group Customers
      * @authenticated
      *
-     * @responseField total_customers integer The total number of customers.
-     * @responseField new_this_month integer The number of new customers this month.
+     * @response 200 scenario="Success" {"total_customers":6,"new_this_month":2}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function getMetrics()
     {
@@ -210,8 +174,10 @@ class CustomerController extends Controller
      * @authenticated
      * @urlParam customer integer required The ID of the customer. Example: 1
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField historical_purchases array A list of historical purchases.
+     * @response 200 scenario="Success" {"success":true,"historical_purchases":[{"sale_id":54,"invoice":"INV-00054","order_date":"2025-11-22T05:06:58.000000Z","product_id":4,"product_name":"Low Stock LED","quantity":5,"price_at_purchase":"160.00","line_total":"800.00","customer_latest_price":"160.00"}]}
+     * @response 404 scenario="Not Found" {"message": "Customer not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
+     * @response 500 scenario="Server Error" {"message": "Failed to load historical purchases: Internal server error."}
      */
     public function getHistoricalPurchases(Customer $customer)
     {
@@ -233,7 +199,10 @@ class CustomerController extends Controller
      * @authenticated
      * @urlParam id integer required The ID of the customer. Example: 1
      *
-     * @responseField data array A list of product history.
+     * @response 200 scenario="Success" [{"product_name":"Expired Diode","last_price":"350.00","history":[{"invoice":"INV-00004","order_date":"2025-09-13T05:06:57.000000Z","quantity":2,"price_at_purchase":"350.00"}]}]
+     * @response 404 scenario="Not Found" {"message": "Customer not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
+     * @response 500 scenario="Server Error" {"message": "Failed to load product history: Internal server error."}
      */
     public function getProductHistory(Request $request, $id)
     {

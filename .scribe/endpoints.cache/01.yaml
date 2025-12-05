@@ -189,233 +189,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"success":true,"message":"Product created successfully","product":{"id":14,"code":"\"PROD-001\"","barcode":null,"name":"\"New Product\"","description":"Dolores dolorum amet iste laborum eius est dolor.","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/storage\/image\/hmU22CxZhw_test.jpg","price":99.99,"selling_price":149.99,"stock_quantity":100,"category_id":1,"supplier_id":1,"units_id":1,"has_expiry":false,"low_stock_threshold":45,"warehouse_id":1,"created_at":"2025-12-02T06:45:31.000000Z","updated_at":"2025-12-02T06:45:31.000000Z","unit":{"id":1,"name":"Pieces","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      success:
+        content: '{"success":true,"message":"Product created successfully","product":{"id":16,"code":"PROD-001",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: success
-        description: 'Indicates whether the request was successful.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      message:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: message
-        description: 'A message describing the result of the request.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product:
-        custom: []
-        name: product
-        description: 'The created product.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.id:
-        custom: []
-        name: product.id
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.code:
-        custom: []
-        name: product.code
-        description: 'The product code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.barcode:
-        custom: []
-        name: product.barcode
-        description: 'The product barcode.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.name:
-        custom: []
-        name: product.name
-        description: 'The name of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.stock_quantity:
-        custom: []
-        name: product.stock_quantity
-        description: 'The current stock quantity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.low_stock_threshold:
-        custom: []
-        name: product.low_stock_threshold
-        description: 'The low stock threshold.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.price:
-        custom: []
-        name: product.price
-        description: 'The price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.selling_price:
-        custom: []
-        name: product.selling_price
-        description: 'The selling price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.category_id:
-        custom: []
-        name: product.category_id
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.units_id:
-        custom: []
-        name: product.units_id
-        description: 'The ID of the unit.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.supplier_id:
-        custom: []
-        name: product.supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.warehouse_id:
-        custom: []
-        name: product.warehouse_id
-        description: 'The ID of the warehouse.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.description:
-        custom: []
-        name: product.description
-        description: 'The description of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.image:
-        custom: []
-        name: product.image
-        description: 'The URL of the product image.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.has_expiry:
-        custom: []
-        name: product.has_expiry
-        description: 'Whether the product has an expiry date.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.created_at:
-        custom: []
-        name: product.created_at
-        description: 'The date and time the product was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.updated_at:
-        custom: []
-        name: product.updated_at
-        description: 'The date and time the product was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -483,56 +272,21 @@ endpoints:
         custom: []
         status: 200
         content: '{"success":true,"message":"Successfully deleted 3 product(s)","deleted_count":3,"images_deleted":0}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      success:
+        headers: []
+        description: Success
+      -
         custom: []
-        name: success
-        description: 'Indicates whether the request was successful.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      message:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: message
-        description: 'A message describing the result of the request.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      deleted_count:
-        custom: []
-        name: deleted_count
-        description: 'The number of products successfully deleted.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      images_deleted:
-        custom: []
-        name: images_deleted
-        description: 'The number of images deleted.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The ids field is required.","errors":{"ids":["The ids field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -641,58 +395,23 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"success":true,"message":"Successfully updated stock for 2 product(s)","updated_count":2,"changes":[{"id":4,"old_stock":50,"new_stock":100,...}]}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
         status: 422
-        content: '{"message":"The selected updates.0.id is invalid.","errors":{"updates.0.id":["The selected updates.0.id is invalid."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      success:
-        custom: []
-        name: success
-        description: 'Indicates whether the request was successful.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      message:
-        custom: []
-        name: message
-        description: 'A message describing the result of the request.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_count:
-        custom: []
-        name: updated_count
-        description: 'The number of products whose stock was updated.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      changes:
-        custom: []
-        name: changes
-        description: 'A list of changes made.'
-        required: false
-        example: null
-        type: 'string[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The updates field is required.","errors":{"updates":["The updates field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -778,233 +497,28 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"success":true,"message":"Stock adjusted successfully.","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","description":"LED near expiry and low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":90,"selling_price":160,"stock_quantity":11698,"category_id":1,"supplier_id":3,"units_id":3,"has_expiry":true,"low_stock_threshold":5,"warehouse_id":2,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T06:45:31.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      success:
+        content: '{"success":true,"message":"Stock adjusted successfully.","product":{"id":4,...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: success
-        description: 'Indicates whether the request was successful.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      message:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: message
-        description: 'A message describing the result of the request.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product:
+        status: 404
+        content: '{"message": "Product not found."}'
+        headers: []
+        description: 'Not Found'
+      -
         custom: []
-        name: product
-        description: 'The adjusted product.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.id:
-        custom: []
-        name: product.id
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.code:
-        custom: []
-        name: product.code
-        description: 'The product code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.barcode:
-        custom: []
-        name: product.barcode
-        description: 'The product barcode.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.name:
-        custom: []
-        name: product.name
-        description: 'The name of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.stock_quantity:
-        custom: []
-        name: product.stock_quantity
-        description: 'The current stock quantity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.low_stock_threshold:
-        custom: []
-        name: product.low_stock_threshold
-        description: 'The low stock threshold.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.price:
-        custom: []
-        name: product.price
-        description: 'The price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.selling_price:
-        custom: []
-        name: product.selling_price
-        description: 'The selling price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.category_id:
-        custom: []
-        name: product.category_id
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.units_id:
-        custom: []
-        name: product.units_id
-        description: 'The ID of the unit.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.supplier_id:
-        custom: []
-        name: product.supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.warehouse_id:
-        custom: []
-        name: product.warehouse_id
-        description: 'The ID of the warehouse.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.description:
-        custom: []
-        name: product.description
-        description: 'The description of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.image:
-        custom: []
-        name: product.image
-        description: 'The URL of the product image.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.has_expiry:
-        custom: []
-        name: product.has_expiry
-        description: 'Whether the product has an expiry date.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.created_at:
-        custom: []
-        name: product.created_at
-        description: 'The date and time the product was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product.updated_at:
-        custom: []
-        name: product.updated_at
-        description: 'The date and time the product was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The adjustment_amount must be a number.","errors":{"adjustment_amount":["The adjustment_amount must be a number."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1054,211 +568,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[]}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"code":"P-001","name":"Product Name",...}]}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of products.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].code':
-        custom: []
-        name: 'data[].code'
-        description: 'The product code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].barcode':
-        custom: []
-        name: 'data[].barcode'
-        description: 'The product barcode.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].name':
-        custom: []
-        name: 'data[].name'
-        description: 'The name of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].stock_quantity':
-        custom: []
-        name: 'data[].stock_quantity'
-        description: 'The current stock quantity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].low_stock_threshold':
-        custom: []
-        name: 'data[].low_stock_threshold'
-        description: 'The low stock threshold.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].price':
-        custom: []
-        name: 'data[].price'
-        description: 'The price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].selling_price':
-        custom: []
-        name: 'data[].selling_price'
-        description: 'The selling price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].category_id':
-        custom: []
-        name: 'data[].category_id'
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].units_id':
-        custom: []
-        name: 'data[].units_id'
-        description: 'The ID of the unit.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].supplier_id':
-        custom: []
-        name: 'data[].supplier_id'
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].warehouse_id':
-        custom: []
-        name: 'data[].warehouse_id'
-        description: 'The ID of the warehouse.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].description':
-        custom: []
-        name: 'data[].description'
-        description: 'The description of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].image':
-        custom: []
-        name: 'data[].image'
-        description: 'The URL of the product image.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].has_expiry':
-        custom: []
-        name: 'data[].has_expiry'
-        description: 'Whether the product has an expiry date.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the product was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the product was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1299,139 +618,13 @@ endpoints:
         content: '[{"id":1,"po_id":1,"product_id":1,"quantity":10,"remaining_quantity":10,"price":100,"discount":0,"discount_type":"fixed","total":1000,"expiry_date":"2025-12-31","created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}]'
         headers: []
         description: Success
-    responseFields:
-      id:
+      -
         custom: []
-        name: id
-        description: 'The ID of the purchase order item.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      po_id:
-        custom: []
-        name: po_id
-        description: 'The ID of the purchase order.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product_id:
-        custom: []
-        name: product_id
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      quantity:
-        custom: []
-        name: quantity
-        description: 'The quantity of the product in the PO.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      remaining_quantity:
-        custom: []
-        name: remaining_quantity
-        description: 'The remaining quantity of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: 'The price of the product at purchase.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      discount:
-        custom: []
-        name: discount
-        description: 'The discount applied to the item.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      discount_type:
-        custom: []
-        name: discount_type
-        description: 'The type of discount applied.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: 'The total value of the PO item.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      expiry_date:
-        custom: []
-        name: expiry_date
-        description: 'The expiry date of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the PO item was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the PO item was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1469,46 +662,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"total_products":5,"total_categories":3,"low_stock_count":0}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      total_products:
+        content: '{"total_products":10,"total_categories":5,"low_stock_count":2}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: total_products
-        description: 'Total number of products.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total_categories:
-        custom: []
-        name: total_categories
-        description: 'Total number of categories.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      low_stock_count:
-        custom: []
-        name: low_stock_count
-        description: 'Number of products with low stock.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1558,142 +721,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '[{"id":1,"product_id":1,"adjustment_type":"increase","quantity_before":10,"quantity_after":20,"adjustment_amount":10,"reason":"Stock correction","adjusted_by":1,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z","adjusted_by":{"id":1,"name":"Admin"}}]'
+        content: '[{"id":1,"product_id":1,"adjustment_type":"increase","quantity_before":10,"quantity_after":20,"adjustment_amount":10,"reason":"Stock correction","adjusted_by":{"id":1,"name":"Admin"},"created_at":"2025-12-01T12:00:00.000000Z"}]'
         headers: []
         description: Success
-    responseFields:
-      id:
+      -
         custom: []
-        name: id
-        description: 'The ID of the stock adjustment.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      product_id:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: product_id
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      adjustment_type:
-        custom: []
-        name: adjustment_type
-        description: 'The type of adjustment (increase, decrease, correction).'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      quantity_before:
-        custom: []
-        name: quantity_before
-        description: 'The stock quantity before adjustment.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      quantity_after:
-        custom: []
-        name: quantity_after
-        description: 'The stock quantity after adjustment.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      adjustment_amount:
-        custom: []
-        name: adjustment_amount
-        description: 'The amount of stock adjusted.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      reason:
-        custom: []
-        name: reason
-        description: 'The reason for the adjustment.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      adjusted_by:
-        custom: []
-        name: adjusted_by
-        description: 'The user who made the adjustment.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the adjustment was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the adjustment was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      adjusted_by.id:
-        custom: []
-        name: adjusted_by.id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      adjusted_by.name:
-        custom: []
-        name: adjusted_by.name
-        description: 'The name of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Product not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1754,207 +797,23 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"data":{"id":1,"code":"P-001","name":"Product Name",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
         status: 404
         content: '{"message": "Product not found"}'
         headers: []
         description: 'Not Found'
-      -
-        custom: []
-        status: 404
-        content: '{"message":"Product not found"}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      code:
-        custom: []
-        name: code
-        description: 'The product code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      barcode:
-        custom: []
-        name: barcode
-        description: 'The product barcode.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      stock_quantity:
-        custom: []
-        name: stock_quantity
-        description: 'The current stock quantity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      low_stock_threshold:
-        custom: []
-        name: low_stock_threshold
-        description: 'The low stock threshold.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: 'The price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      selling_price:
-        custom: []
-        name: selling_price
-        description: 'The selling price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      category_id:
-        custom: []
-        name: category_id
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      units_id:
-        custom: []
-        name: units_id
-        description: 'The ID of the unit.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier_id:
-        custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      warehouse_id:
-        custom: []
-        name: warehouse_id
-        description: 'The ID of the warehouse.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      image:
-        custom: []
-        name: image
-        description: 'The URL of the product image.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      has_expiry:
-        custom: []
-        name: has_expiry
-        description: 'Whether the product has an expiry date.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the product was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the product was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -2004,398 +863,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","description":"Capacitor close to low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":600,"selling_price":1100,"stock_quantity":22,"category_id":2,"supplier_id":2,"units_id":3,"has_expiry":false,"low_stock_threshold":10,"warehouse_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":2,"name":"CV. Sumber Rejeki","contact_person":null,"email":"sumber.rejeki@example.com","phone_number":"0227654321","address":"Jl. Rajawali No. 12, Bandung","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":3,"name":"Meters","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","description":"Diode product already expired","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":180,"selling_price":350,"stock_quantity":48,"category_id":1,"supplier_id":5,"units_id":1,"has_expiry":true,"low_stock_threshold":10,"warehouse_id":2,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":1,"name":"TR","description":"Transistor","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":1,"name":"Pieces","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":2,"name":"Gudang Surabaya","location":null,"is_main":0,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","description":"Crystal oscillator expiring soon","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":950,"selling_price":1700,"stock_quantity":78,"category_id":2,"supplier_id":5,"units_id":3,"has_expiry":true,"low_stock_threshold":20,"warehouse_id":3,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":5,"name":"Shenzhen Tech Supplies","contact_person":null,"email":"shenzhen.tech@example.com","phone_number":"+86-755-1234-5678","address":"Futian District, Shenzhen, China","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":3,"name":"Meters","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":3,"name":"Gudang Bandung","location":null,"is_main":0,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","description":"LED near expiry and low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":90,"selling_price":160,"stock_quantity":85,"category_id":1,"supplier_id":3,"units_id":3,"has_expiry":true,"low_stock_threshold":5,"warehouse_id":2,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":1,"name":"TR","description":"Transistor","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":3,"name":"Tokyo Electronics Ltd.","contact_person":null,"email":"tokyo.electronics@example.com","phone_number":"+81-3-1234-5678","address":"Shinjuku-ku, Tokyo, Japan","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":3,"name":"Meters","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":2,"name":"Gudang Surabaya","location":null,"is_main":0,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","description":"Voltage regulator expired long ago","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":1400,"selling_price":2600,"stock_quantity":14,"category_id":2,"supplier_id":1,"units_id":1,"has_expiry":true,"low_stock_threshold":10,"warehouse_id":3,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":1,"name":"PT. Elektronika Nusantara","contact_person":null,"email":"elektronika.nusantara@example.com","phone_number":"0218887766","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":1,"name":"Pieces","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":3,"name":"Gudang Bandung","location":null,"is_main":0,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/products?page=1","last":"http:\/\/localhost\/api\/v1\/products?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/products?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/products","per_page":25,"to":5,"total":5,"total_products":5,"low_stock_count":0,"expiring_soon_count":5,"total_categories":3}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"code":"P-001","name":"Product Name","stock_quantity":100,...}],"links":{"first":"...","last":"...","prev":null,"next":"..."},"meta":{"current_page":1,"from":1,"total":10,...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of products.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].code':
-        custom: []
-        name: 'data[].code'
-        description: 'The product code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].barcode':
-        custom: []
-        name: 'data[].barcode'
-        description: 'The product barcode.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].name':
-        custom: []
-        name: 'data[].name'
-        description: 'The name of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].stock_quantity':
-        custom: []
-        name: 'data[].stock_quantity'
-        description: 'The current stock quantity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].low_stock_threshold':
-        custom: []
-        name: 'data[].low_stock_threshold'
-        description: 'The low stock threshold.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].price':
-        custom: []
-        name: 'data[].price'
-        description: 'The price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].selling_price':
-        custom: []
-        name: 'data[].selling_price'
-        description: 'The selling price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].category_id':
-        custom: []
-        name: 'data[].category_id'
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].units_id':
-        custom: []
-        name: 'data[].units_id'
-        description: 'The ID of the unit.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].supplier_id':
-        custom: []
-        name: 'data[].supplier_id'
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].warehouse_id':
-        custom: []
-        name: 'data[].warehouse_id'
-        description: 'The ID of the warehouse.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].description':
-        custom: []
-        name: 'data[].description'
-        description: 'The description of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].image':
-        custom: []
-        name: 'data[].image'
-        description: 'The URL of the product image.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].has_expiry':
-        custom: []
-        name: 'data[].has_expiry'
-        description: 'Whether the product has an expiry date.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the product was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the product was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Additional metadata.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total_products:
-        custom: []
-        name: meta.total_products
-        description: 'Total number of products.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.low_stock_count:
-        custom: []
-        name: meta.low_stock_count
-        description: 'Number of products with low stock.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.expiring_soon_count:
-        custom: []
-        name: meta.expiring_soon_count
-        description: 'Number of products expiring soon.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total_categories:
-        custom: []
-        name: meta.total_categories
-        description: 'Total number of categories.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -2553,200 +1030,22 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":15,"code":"LP-001","barcode":null,"name":"Laptop Pro","description":"Dolores dolorum amet iste laborum eius est dolor.","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":1200.5,"selling_price":1499.99,"stock_quantity":50,"category_id":2,"supplier_id":1,"units_id":1,"has_expiry":false,"low_stock_threshold":null,"warehouse_id":1,"created_at":"2025-12-02T06:45:32.000000Z","updated_at":"2025-12-02T06:45:32.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":15,"code":"LP-001","name":"Laptop Pro","price":1200.5,"selling_price":1499.99,"stock_quantity":50,...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      code:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: code
-        description: 'The product code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      barcode:
-        custom: []
-        name: barcode
-        description: 'The product barcode.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      stock_quantity:
-        custom: []
-        name: stock_quantity
-        description: 'The current stock quantity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      low_stock_threshold:
-        custom: []
-        name: low_stock_threshold
-        description: 'The low stock threshold.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: 'The price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      selling_price:
-        custom: []
-        name: selling_price
-        description: 'The selling price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      category_id:
-        custom: []
-        name: category_id
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      units_id:
-        custom: []
-        name: units_id
-        description: 'The ID of the unit.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier_id:
-        custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      warehouse_id:
-        custom: []
-        name: warehouse_id
-        description: 'The ID of the warehouse.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      image:
-        custom: []
-        name: image
-        description: 'The URL of the product image.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      has_expiry:
-        custom: []
-        name: has_expiry
-        description: 'Whether the product has an expiry date.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the product was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the product was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -2808,200 +1107,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","description":"Capacitor close to low stock","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":600,"selling_price":1100,"stock_quantity":22,"category_id":2,"supplier_id":2,"units_id":3,"has_expiry":false,"low_stock_threshold":10,"warehouse_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","category":{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"supplier":{"id":2,"name":"CV. Sumber Rejeki","contact_person":null,"email":"sumber.rejeki@example.com","phone_number":"0227654321","address":"Jl. Rajawali No. 12, Bandung","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"unit":{"id":3,"name":"Meters","short_name":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"warehouse":{"id":1,"name":"Gudang Utama Jakarta","location":null,"is_main":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":4,"code":"TR14","name":"Low Stock LED","price":90,"selling_price":160,...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      code:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: code
-        description: 'The product code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      barcode:
-        custom: []
-        name: barcode
-        description: 'The product barcode.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      stock_quantity:
-        custom: []
-        name: stock_quantity
-        description: 'The current stock quantity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      low_stock_threshold:
-        custom: []
-        name: low_stock_threshold
-        description: 'The low stock threshold.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: 'The price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      selling_price:
-        custom: []
-        name: selling_price
-        description: 'The selling price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      category_id:
-        custom: []
-        name: category_id
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      units_id:
-        custom: []
-        name: units_id
-        description: 'The ID of the unit.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier_id:
-        custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      warehouse_id:
-        custom: []
-        name: warehouse_id
-        description: 'The ID of the warehouse.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      image:
-        custom: []
-        name: image
-        description: 'The URL of the product image.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      has_expiry:
-        custom: []
-        name: has_expiry
-        description: 'Whether the product has an expiry date.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the product was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the product was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Product not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -3184,200 +1305,28 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"code":"LP-001","barcode":"1234567890123","name":"Laptop Pro v2","description":"Dolores dolorum amet iste laborum eius est dolor.","image":"http:\/\/localhost\/storage\/image\/http:\/\/localhost\/img\/default_placeholder.png","price":1250,"selling_price":1499.99,"stock_quantity":50,"category_id":2,"supplier_id":1,"units_id":1,"has_expiry":false,"low_stock_threshold":10,"warehouse_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T06:45:32.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":7,"code":"LP-001","name":"Laptop Pro v2",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      code:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: code
-        description: 'The product code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      barcode:
+        status: 404
+        content: '{"message": "Product not found."}'
+        headers: []
+        description: 'Not Found'
+      -
         custom: []
-        name: barcode
-        description: 'The product barcode.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      stock_quantity:
-        custom: []
-        name: stock_quantity
-        description: 'The current stock quantity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      low_stock_threshold:
-        custom: []
-        name: low_stock_threshold
-        description: 'The low stock threshold.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: 'The price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      selling_price:
-        custom: []
-        name: selling_price
-        description: 'The selling price of the product.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      category_id:
-        custom: []
-        name: category_id
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      units_id:
-        custom: []
-        name: units_id
-        description: 'The ID of the unit.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier_id:
-        custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      warehouse_id:
-        custom: []
-        name: warehouse_id
-        description: 'The ID of the warehouse.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      image:
-        custom: []
-        name: image
-        description: 'The URL of the product image.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      has_expiry:
-        custom: []
-        name: has_expiry
-        description: 'Whether the product has an expiry date.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the product was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the product was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The code has already been taken.","errors":{"code":["The code has already been taken."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -3442,6 +1391,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Product not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreWarehouseRequest;
+use App\Http\Requests\Api\V1\UpdateWarehouseRequest;
 use App\Http\Resources\WarehouseResource;
 use App\Models\Warehouse;
 use App\Services\WarehouseService;
@@ -30,27 +32,8 @@ class WarehouseController extends Controller
      * @authenticated
      * @queryParam per_page int The number of warehouses to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of warehouses.
-     * @responseField data[].id integer The ID of the warehouse.
-     * @responseField data[].name string The name of the warehouse.
-     * @responseField data[].address string The address of the warehouse.
-     * @responseField data[].description string A description of the warehouse.
-     * @responseField data[].is_main boolean Whether this is the main warehouse.
-     * @responseField data[].created_at string The date and time the warehouse was created.
-     * @responseField data[].updated_at string The date and time the warehouse was last updated.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"name":"Main Warehouse",...}],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -69,15 +52,11 @@ class WarehouseController extends Controller
      * @bodyParam description string A description of the warehouse. Example: Overflow storage.
      * @bodyParam is_main boolean Is this the main warehouse. Example: false
      *
-     * @responseField id integer The ID of the warehouse.
-     * @responseField name string The name of the warehouse.
-     * @responseField address string The address of the warehouse.
-     * @responseField description string A description of the warehouse.
-     * @responseField is_main boolean Whether this is the main warehouse.
-     * @responseField created_at string The date and time the warehouse was created.
-     * @responseField updated_at string The date and time the warehouse was last updated.
+     * @response 201 scenario="Success" {"data":{"id":1,"name":"Secondary Warehouse",...}}
+     * @response 422 scenario="Validation Error" {"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function store(\App\Http\Requests\Api\V1\StoreWarehouseRequest $request)
+    public function store(StoreWarehouseRequest $request)
     {
         try {
             $result = $this->warehouseService->createWarehouse($request->validated());
@@ -94,13 +73,9 @@ class WarehouseController extends Controller
      * @authenticated
      * @urlParam warehouse required The ID of the warehouse. Example: 1
      *
-     * @responseField id integer The ID of the warehouse.
-     * @responseField name string The name of the warehouse.
-     * @responseField address string The address of the warehouse.
-     * @responseField description string A description of the warehouse.
-     * @responseField is_main boolean Whether this is the main warehouse.
-     * @responseField created_at string The date and time the warehouse was created.
-     * @responseField updated_at string The date and time the warehouse was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Main Warehouse",...}}
+     * @response 404 scenario="Not Found" {"message": "Warehouse not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(Warehouse $warehouse)
     {
@@ -118,15 +93,13 @@ class WarehouseController extends Controller
      * @bodyParam description string A description of the warehouse. Example: Primary storage facility.
      * @bodyParam is_main boolean Is this the main warehouse. Example: true
      *
-     * @responseField id integer The ID of the warehouse.
-     * @responseField name string The name of the warehouse.
-     * @responseField address string The address of the warehouse.
-     * @responseField description string A description of the warehouse.
-     * @responseField is_main boolean Whether this is the main warehouse.
-     * @responseField created_at string The date and time the warehouse was created.
-     * @responseField updated_at string The date and time the warehouse was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Main Warehouse (Updated)",...}}
+     * @response 404 scenario="Not Found" {"message": "Warehouse not found."}
+     * @response 422 scenario="Validation Error" {"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
+     * @response 500 scenario="Error Updating Warehouse" {"success":false,"message":"Failed to update warehouse: Internal server error."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateWarehouseRequest $request, Warehouse $warehouse)
+    public function update(UpdateWarehouseRequest $request, Warehouse $warehouse)
     {
         try {
             $result = $this->warehouseService->updateWarehouse($warehouse, $request->validated());
@@ -144,6 +117,9 @@ class WarehouseController extends Controller
      * @urlParam warehouse integer required The ID of the warehouse to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Warehouse not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
+     * @response 500 scenario="Error Deleting Warehouse" {"success":false,"message":"Failed to delete warehouse: Internal server error."}
      */
     public function destroy(Warehouse $warehouse)
     {
@@ -162,9 +138,10 @@ class WarehouseController extends Controller
      * @authenticated
      * @urlParam id integer required The ID of the warehouse to set as main. Example: 1
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
+     * @response 200 scenario="Success" {"success":true,"message":"Main warehouse updated successfully."}
      * @response 404 scenario="Warehouse Not Found" {"success": false, "message": "Warehouse not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
+     * @response 500 scenario="Error Setting Main Warehouse" {"success":false,"message":"Failed to set main warehouse: Internal server error."}
      */
     public function setMain(Request $request, $id)
     {
@@ -188,9 +165,10 @@ class WarehouseController extends Controller
      * @authenticated
      * @urlParam id integer required The ID of the warehouse to unset as main. Example: 1
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
+     * @response 200 scenario="Success" {"success":true,"message":"Main warehouse status removed."}
      * @response 404 scenario="Warehouse Not Found" {"success": false, "message": "Warehouse not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
+     * @response 500 scenario="Error Unsetting Main Warehouse" {"success":false,"message":"Failed to unset main warehouse: Internal server error."}
      */
     public function unsetMain(Request $request, $id)
     {

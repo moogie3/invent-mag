@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreJournalEntryRequest;
+use App\Http\Requests\Api\V1\UpdateJournalEntryRequest;
 use App\Http\Resources\JournalEntryResource;
 use App\Models\JournalEntry;
 use Illuminate\Http\Request;
@@ -21,28 +23,8 @@ class JournalEntryController extends Controller
      * @authenticated
      * @queryParam per_page int The number of entries to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of journal entries.
-     * @responseField data[].id integer The ID of the journal entry.
-     * @responseField data[].date string The date of the journal entry.
-     * @responseField data[].description string The description of the journal entry.
-     * @responseField data[].sourceable_type string The type of the sourceable model.
-     * @responseField data[].sourceable_id integer The ID of the sourceable model.
-     * @responseField data[].created_at string The date and time the journal entry was created.
-     * @responseField data[].updated_at string The date and time the journal entry was last updated.
-     * @responseField data[].transactions object[] A list of transactions for the journal entry.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"date":"2025-11-28","description":"Initial investment",...}],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -61,15 +43,11 @@ class JournalEntryController extends Controller
      * @bodyParam sourceable_id integer The ID of the sourceable model. Example: 1
      * @bodyParam sourceable_type string The type of the sourceable model. Example: App\\Models\\User
      *
-     * @responseField id integer The ID of the journal entry.
-     * @responseField date string The date of the journal entry.
-     * @responseField description string The description of the journal entry.
-     * @responseField sourceable_type string The type of the sourceable model.
-     * @responseField sourceable_id integer The ID of the sourceable model.
-     * @responseField created_at string The date and time the journal entry was created.
-     * @responseField updated_at string The date and time the journal entry was last updated.
+     * @response 201 scenario="Success" {"data":{"id":1,"date":"2025-11-28","description":"Initial investment",...}}
+     * @response 422 scenario="Validation Error" {"message":"The date field is required.","errors":{"date":["The date field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function store(\App\Http\Requests\Api\V1\StoreJournalEntryRequest $request)
+    public function store(StoreJournalEntryRequest $request)
     {
         $validated = $request->validated();
 
@@ -85,14 +63,9 @@ class JournalEntryController extends Controller
      * @authenticated
      * @urlParam journal_entry required The ID of the journal entry. Example: 1
      *
-     * @responseField id integer The ID of the journal entry.
-     * @responseField date string The date of the journal entry.
-     * @responseField description string The description of the journal entry.
-     * @responseField sourceable_type string The type of the sourceable model.
-     * @responseField sourceable_id integer The ID of the sourceable model.
-     * @responseField created_at string The date and time the journal entry was created.
-     * @responseField updated_at string The date and time the journal entry was last updated.
-     * @responseField transactions object[] A list of transactions for the journal entry.
+     * @response 200 scenario="Success" {"data":{"id":1,"date":"2025-11-28","description":"Initial investment",...}}
+     * @response 404 scenario="Not Found" {"message": "Journal entry not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(JournalEntry $journal_entry)
     {
@@ -110,15 +83,12 @@ class JournalEntryController extends Controller
      * @bodyParam sourceable_id integer The ID of the sourceable model. Example: 1
      * @bodyParam sourceable_type string The type of the sourceable model. Example: App\\Models\\User
      *
-     * @responseField id integer The ID of the journal entry.
-     * @responseField date string The date of the journal entry.
-     * @responseField description string The description of the journal entry.
-     * @responseField sourceable_type string The type of the sourceable model.
-     * @responseField sourceable_id integer The ID of the sourceable model.
-     * @responseField created_at string The date and time the journal entry was created.
-     * @responseField updated_at string The date and time the journal entry was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"date":"2025-11-28","description":"Initial investment (Updated)",...}}
+     * @response 404 scenario="Not Found" {"message": "Journal entry not found."}
+     * @response 422 scenario="Validation Error" {"message":"The date field is required.","errors":{"date":["The date field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateJournalEntryRequest $request, JournalEntry $journal_entry)
+    public function update(UpdateJournalEntryRequest $request, JournalEntry $journal_entry)
     {
         $validated = $request->validated();
 
@@ -135,6 +105,8 @@ class JournalEntryController extends Controller
      * @urlParam journal_entry required The ID of the journal entry. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Journal entry not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(JournalEntry $journal_entry)
     {

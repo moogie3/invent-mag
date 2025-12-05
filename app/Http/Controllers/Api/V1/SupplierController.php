@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreSupplierRequest;
+use App\Http\Requests\Api\V1\UpdateSupplierRequest;
 use App\Http\Resources\SupplierResource;
 use App\Models\Supplier;
 use App\Services\CrmService;
@@ -34,31 +36,8 @@ class SupplierController extends Controller
      * @authenticated
      * @queryParam per_page int The number of suppliers to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of suppliers.
-     * @responseField data[].id integer The ID of the supplier.
-     * @responseField data[].code string The unique code for the supplier.
-     * @responseField data[].name string The name of the supplier.
-     * @responseField data[].address string The address of the supplier.
-     * @responseField data[].phone_number string The phone number of the supplier.
-     * @responseField data[].location string The location of the supplier.
-     * @responseField data[].payment_terms string The payment terms with the supplier.
-     * @responseField data[].email string The email address of the supplier.
-     * @responseField data[].image string The URL or path to the supplier's image.
-     * @responseField data[].created_at string The date and time the supplier was created.
-     * @responseField data[].updated_at string The date and time the supplier was last updated.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"code":"SUP-001","name":"Supplier A",...}],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -81,19 +60,11 @@ class SupplierController extends Controller
      * @bodyParam email string The email address of the supplier. Example: supplierA@example.com
      * @bodyParam image string The URL or path to the supplier's image. Example: http://example.com/image1.jpg
      *
-     * @responseField id integer The ID of the supplier.
-     * @responseField code string The unique code for the supplier.
-     * @responseField name string The name of the supplier.
-     * @responseField address string The address of the supplier.
-     * @responseField phone_number string The phone number of the supplier.
-     * @responseField location string The location of the supplier.
-     * @responseField payment_terms string The payment terms with the supplier.
-     * @responseField email string The email address of the supplier.
-     * @responseField image string The URL or path to the supplier's image.
-     * @responseField created_at string The date and time the supplier was created.
-     * @responseField updated_at string The date and time the supplier was last updated.
+     * @response 201 scenario="Success" {"data":{"id":1,"code":"SUP-001","name":"Supplier A",...}}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function store(\App\Http\Requests\Api\V1\StoreSupplierRequest $request)
+    public function store(StoreSupplierRequest $request)
     {
         $result = $this->supplierService->createSupplier($request->validated());
 
@@ -109,17 +80,9 @@ class SupplierController extends Controller
      * @authenticated
      * @urlParam supplier required The ID of the supplier. Example: 1
      *
-     * @responseField id integer The ID of the supplier.
-     * @responseField code string The unique code for the supplier.
-     * @responseField name string The name of the supplier.
-     * @responseField address string The address of the supplier.
-     * @responseField phone_number string The phone number of the supplier.
-     * @responseField location string The location of the supplier.
-     * @responseField payment_terms string The payment terms with the supplier.
-     * @responseField email string The email address of the supplier.
-     * @responseField image string The URL or path to the supplier's image.
-     * @responseField created_at string The date and time the supplier was created.
-     * @responseField updated_at string The date and time the supplier was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"code":"SUP-001","name":"Supplier A",...}}
+     * @response 404 scenario="Not Found" {"message": "Supplier not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(Supplier $supplier)
     {
@@ -141,19 +104,12 @@ class SupplierController extends Controller
      * @bodyParam email string The email address of the supplier. Example: supplierb@example.com
      * @bodyParam image string The URL or path to the supplier's image. Example: http://example.com/image2.jpg
      *
-     * @responseField id integer The ID of the supplier.
-     * @responseField code string The unique code for the supplier.
-     * @responseField name string The name of the supplier.
-     * @responseField address string The address of the supplier.
-     * @responseField phone_number string The phone number of the supplier.
-     * @responseField location string The location of the supplier.
-     * @responseField payment_terms string The payment terms with the supplier.
-     * @responseField email string The email address of the supplier.
-     * @responseField image string The URL or path to the supplier's image.
-     * @responseField created_at string The date and time the supplier was created.
-     * @responseField updated_at string The date and time the supplier was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"code":"SUP-002","name":"Supplier B",...}}
+     * @response 404 scenario="Not Found" {"message": "Supplier not found."}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateSupplierRequest $request, Supplier $supplier)
+    public function update(UpdateSupplierRequest $request, Supplier $supplier)
     {
         $result = $this->supplierService->updateSupplier($supplier, $request->validated());
 
@@ -168,6 +124,8 @@ class SupplierController extends Controller
      * @urlParam supplier integer required The ID of the supplier to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Supplier not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(Supplier $supplier)
     {
@@ -182,8 +140,8 @@ class SupplierController extends Controller
      * @group Suppliers
      * @authenticated
      *
-     * @responseField total_suppliers integer Total number of suppliers.
-     * @responseField new_this_month integer Number of new suppliers this month.
+     * @response 200 scenario="Success" {"total_suppliers":10,"new_this_month":2}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function getMetrics()
     {
@@ -198,7 +156,10 @@ class SupplierController extends Controller
      * @authenticated
      * @urlParam id integer required The ID of the supplier. Example: 1
      *
-     * @responseField historical_purchases array A list of historical purchases for the supplier.
+     * @response 200 scenario="Success" {"historical_purchases":[{"id":1,"invoice":"PO-001","order_date":"2023-01-01",...}]}
+     * @response 404 scenario="Not Found" {"message": "Supplier not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
+     * @response 500 scenario="Server Error" {"message": "Failed to load historical purchases: Internal server error."}
      */
     public function getHistoricalPurchases(Request $request, $id)
     {
@@ -216,7 +177,10 @@ class SupplierController extends Controller
      * @authenticated
      * @urlParam id integer required The ID of the supplier. Example: 1
      *
-     * @responseField product_history array A list of products historically supplied by the supplier.
+     * @response 200 scenario="Success" {"product_history":[{"product_name":"Product A","last_supplied_date":"2023-01-01",...}]}
+     * @response 404 scenario="Not Found" {"message": "Supplier not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
+     * @response 500 scenario="Server Error" {"message": "Failed to load product history: Internal server error."}
      */
     public function getProductHistory(Request $request, $id)
     {

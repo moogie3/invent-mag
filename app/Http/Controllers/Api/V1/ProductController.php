@@ -33,41 +33,8 @@ class ProductController extends Controller
      * @authenticated
      * @queryParam per_page int The number of products to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of products.
-     * @responseField data[].id integer The ID of the product.
-     * @responseField data[].code string The product code.
-     * @responseField data[].barcode string The product barcode.
-     * @responseField data[].name string The name of the product.
-     * @responseField data[].stock_quantity integer The current stock quantity.
-     * @responseField data[].low_stock_threshold integer The low stock threshold.
-     * @responseField data[].price number The price of the product.
-     * @responseField data[].selling_price number The selling price of the product.
-     * @responseField data[].category_id integer The ID of the category.
-     * @responseField data[].units_id integer The ID of the unit.
-     * @responseField data[].supplier_id integer The ID of the supplier.
-     * @responseField data[].warehouse_id integer The ID of the warehouse.
-     * @responseField data[].description string The description of the product.
-     * @responseField data[].image string The URL of the product image.
-     * @responseField data[].has_expiry boolean Whether the product has an expiry date.
-     * @responseField data[].created_at string The date and time the product was created.
-     * @responseField data[].updated_at string The date and time the product was last updated.
-     * @responseField meta object Additional metadata.
-     * @responseField meta.total_products integer Total number of products.
-     * @responseField meta.low_stock_count integer Number of products with low stock.
-     * @responseField meta.expiring_soon_count integer Number of products expiring soon.
-     * @responseField meta.total_categories integer Total number of categories.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
+     * @response 200 scenario="Success" {"data":[{"id":1,"code":"P-001","name":"Product Name","stock_quantity":100,...}],"links":{"first":"...","last":"...","prev":null,"next":"..."},"meta":{"current_page":1,"from":1,"total":10,...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -107,23 +74,9 @@ class ProductController extends Controller
      * @bodyParam stock_quantity float The initial stock quantity. Example: 50
      * @bodyParam description string A description for the product.
      *
-     * @responseField id integer The ID of the product.
-     * @responseField code string The product code.
-     * @responseField barcode string The product barcode.
-     * @responseField name string The name of the product.
-     * @responseField stock_quantity integer The current stock quantity.
-     * @responseField low_stock_threshold integer The low stock threshold.
-     * @responseField price number The price of the product.
-     * @responseField selling_price number The selling price of the product.
-     * @responseField category_id integer The ID of the category.
-     * @responseField units_id integer The ID of the unit.
-     * @responseField supplier_id integer The ID of the supplier.
-     * @responseField warehouse_id integer The ID of the warehouse.
-     * @responseField description string The description of the product.
-     * @responseField image string The URL of the product image.
-     * @responseField has_expiry boolean Whether the product has an expiry date.
-     * @responseField created_at string The date and time the product was created.
-     * @responseField updated_at string The date and time the product was last updated.
+     * @response 201 scenario="Success" {"data":{"id":15,"code":"LP-001","name":"Laptop Pro","price":1200.5,"selling_price":1499.99,"stock_quantity":50,...}}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function store(StoreProductRequest $request)
     {
@@ -140,23 +93,9 @@ class ProductController extends Controller
      * @authenticated
      * @urlParam product required The ID of the product. Example: 4
      *
-     * @responseField id integer The ID of the product.
-     * @responseField code string The product code.
-     * @responseField barcode string The product barcode.
-     * @responseField name string The name of the product.
-     * @responseField stock_quantity integer The current stock quantity.
-     * @responseField low_stock_threshold integer The low stock threshold.
-     * @responseField price number The price of the product.
-     * @responseField selling_price number The selling price of the product.
-     * @responseField category_id integer The ID of the category.
-     * @responseField units_id integer The ID of the unit.
-     * @responseField supplier_id integer The ID of the supplier.
-     * @responseField warehouse_id integer The ID of the warehouse.
-     * @responseField description string The description of the product.
-     * @responseField image string The URL of the product image.
-     * @responseField has_expiry boolean Whether the product has an expiry date.
-     * @responseField created_at string The date and time the product was created.
-     * @responseField updated_at string The date and time the product was last updated.
+     * @response 200 scenario="Success" {"data":{"id":4,"code":"TR14","name":"Low Stock LED","price":90,"selling_price":160,...}}
+     * @response 404 scenario="Not Found" {"message": "Product not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(Product $product)
     {
@@ -182,23 +121,10 @@ class ProductController extends Controller
      * @bodyParam stock_quantity float The initial stock quantity. Example: 50
      * @bodyParam description string A description for the product.
      *
-     * @responseField id integer The ID of the product.
-     * @responseField code string The product code.
-     * @responseField barcode string The product barcode.
-     * @responseField name string The name of the product.
-     * @responseField stock_quantity integer The current stock quantity.
-     * @responseField low_stock_threshold integer The low stock threshold.
-     * @responseField price number The price of the product.
-     * @responseField selling_price number The selling price of the product.
-     * @responseField category_id integer The ID of the category.
-     * @responseField units_id integer The ID of the unit.
-     * @responseField supplier_id integer The ID of the supplier.
-     * @responseField warehouse_id integer The ID of the warehouse.
-     * @responseField description string The description of the product.
-     * @responseField image string The URL of the product image.
-     * @responseField has_expiry boolean Whether the product has an expiry date.
-     * @responseField created_at string The date and time the product was created.
-     * @responseField updated_at string The date and time the product was last updated.
+     * @response 200 scenario="Success" {"data":{"id":7,"code":"LP-001","name":"Laptop Pro v2",...}}
+     * @response 404 scenario="Not Found" {"message": "Product not found."}
+     * @response 422 scenario="Validation Error" {"message":"The code has already been taken.","errors":{"code":["The code has already been taken."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
@@ -216,6 +142,8 @@ class ProductController extends Controller
      * @urlParam product required The ID of the product to delete. Example: 7
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Product not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(Product $product)
     {
@@ -241,26 +169,9 @@ class ProductController extends Controller
      * @bodyParam image file nullable An image of the product.
      * @bodyParam has_expiry boolean nullable Whether the product has an expiry date. Example: false
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
-     * @responseField product object The created product.
-     * @responseField product.id integer The ID of the product.
-     * @responseField product.code string The product code.
-     * @responseField product.barcode string The product barcode.
-     * @responseField product.name string The name of the product.
-     * @responseField product.stock_quantity integer The current stock quantity.
-     * @responseField product.low_stock_threshold integer The low stock threshold.
-     * @responseField product.price number The price of the product.
-     * @responseField product.selling_price number The selling price of the product.
-     * @responseField product.category_id integer The ID of the category.
-     * @responseField product.units_id integer The ID of the unit.
-     * @responseField product.supplier_id integer The ID of the supplier.
-     * @responseField product.warehouse_id integer The ID of the warehouse.
-     * @responseField product.description string The description of the product.
-     * @responseField product.image string The URL of the product image.
-     * @responseField product.has_expiry boolean Whether the product has an expiry date.
-     * @responseField product.created_at string The date and time the product was created.
-     * @responseField product.updated_at string The date and time the product was last updated.
+     * @response 200 scenario="Success" {"success":true,"message":"Product created successfully","product":{"id":16,"code":"PROD-001",...}}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function quickCreate(Request $request)
     {
@@ -295,9 +206,8 @@ class ProductController extends Controller
      * @group Products
      * @authenticated
      *
-     * @responseField total_products integer Total number of products.
-     * @responseField total_categories integer Total number of categories.
-     * @responseField low_stock_count integer Number of products with low stock.
+     * @response 200 scenario="Success" {"total_products":10,"total_categories":5,"low_stock_count":2}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function getProductMetrics()
     {
@@ -320,10 +230,9 @@ class ProductController extends Controller
      * @bodyParam ids array required An array of product IDs to delete. Example: [1, 2, 3]
      * @bodyParam ids.* integer required A product ID.
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
-     * @responseField deleted_count integer The number of products successfully deleted.
-     * @responseField images_deleted integer The number of images deleted.
+     * @response 200 scenario="Success" {"success":true,"message":"Successfully deleted 3 product(s)","deleted_count":3,"images_deleted":0}
+     * @response 422 scenario="Validation Error" {"message":"The ids field is required.","errors":{"ids":["The ids field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function bulkDelete(Request $request)
     {
@@ -350,10 +259,9 @@ class ProductController extends Controller
      * @bodyParam updates.*.stock_quantity integer required The new stock quantity. Example: 100
      * @bodyParam reason string nullable A reason for the stock adjustment. Example: Annual stock take
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
-     * @responseField updated_count integer The number of products whose stock was updated.
-     * @responseField changes array A list of changes made.
+     * @response 200 scenario="Success" {"success":true,"message":"Successfully updated stock for 2 product(s)","updated_count":2,"changes":[{"id":4,"old_stock":50,"new_stock":100,...}]}
+     * @response 422 scenario="Validation Error" {"message":"The updates field is required.","errors":{"updates":["The updates field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function bulkUpdateStock(Request $request)
     {
@@ -397,26 +305,10 @@ class ProductController extends Controller
      * @bodyParam adjustment_type string required The type of adjustment. Must be one of increase, decrease, correction. Example: increase
      * @bodyParam reason string nullable A reason for the adjustment. Example: Found extra unit during count
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
-     * @responseField product object The adjusted product.
-     * @responseField product.id integer The ID of the product.
-     * @responseField product.code string The product code.
-     * @responseField product.barcode string The product barcode.
-     * @responseField product.name string The name of the product.
-     * @responseField product.stock_quantity integer The current stock quantity.
-     * @responseField product.low_stock_threshold integer The low stock threshold.
-     * @responseField product.price number The price of the product.
-     * @responseField product.selling_price number The selling price of the product.
-     * @responseField product.category_id integer The ID of the category.
-     * @responseField product.units_id integer The ID of the unit.
-     * @responseField product.supplier_id integer The ID of the supplier.
-     * @responseField product.warehouse_id integer The ID of the warehouse.
-     * @responseField product.description string The description of the product.
-     * @responseField product.image string The URL of the product image.
-     * @responseField product.has_expiry boolean Whether the product has an expiry date.
-     * @responseField product.created_at string The date and time the product was created.
-     * @responseField product.updated_at string The date and time the product was last updated.
+     * @response 200 scenario="Success" {"success":true,"message":"Stock adjusted successfully.","product":{"id":4,...}}
+     * @response 404 scenario="Not Found" {"message": "Product not found."}
+     * @response 422 scenario="Validation Error" {"message":"The adjustment_amount must be a number.","errors":{"adjustment_amount":["The adjustment_amount must be a number."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function adjustStock(Request $request)
     {
@@ -450,24 +342,8 @@ class ProductController extends Controller
      * @authenticated
      * @queryParam q string required The search query.
      *
-     * @responseField data object[] A list of products.
-     * @responseField data[].id integer The ID of the product.
-     * @responseField data[].code string The product code.
-     * @responseField data[].barcode string The product barcode.
-     * @responseField data[].name string The name of the product.
-     * @responseField data[].stock_quantity integer The current stock quantity.
-     * @responseField data[].low_stock_threshold integer The low stock threshold.
-     * @responseField data[].price number The price of the product.
-     * @responseField data[].selling_price number The selling price of the product.
-     * @responseField data[].category_id integer The ID of the category.
-     * @responseField data[].units_id integer The ID of the unit.
-     * @responseField data[].supplier_id integer The ID of the supplier.
-     * @responseField data[].warehouse_id integer The ID of the warehouse.
-     * @responseField data[].description string The description of the product.
-     * @responseField data[].image string The URL of the product image.
-     * @responseField data[].has_expiry boolean Whether the product has an expiry date.
-     * @responseField data[].created_at string The date and time the product was created.
-     * @responseField data[].updated_at string The date and time the product was last updated.
+     * @response 200 scenario="Success" {"data":[{"id":1,"code":"P-001","name":"Product Name",...}]}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function search(Request $request)
     {
@@ -488,19 +364,8 @@ class ProductController extends Controller
      * @group Products
      * @authenticated
      *
-     * @responseField id integer The ID of the purchase order item.
-     * @responseField po_id integer The ID of the purchase order.
-     * @responseField product_id integer The ID of the product.
-     * @responseField quantity integer The quantity of the product in the PO.
-     * @responseField remaining_quantity integer The remaining quantity of the product.
-     * @responseField price number The price of the product at purchase.
-     * @responseField discount number The discount applied to the item.
-     * @responseField discount_type string The type of discount applied.
-     * @responseField total number The total value of the PO item.
-     * @responseField expiry_date string The expiry date of the product.
-     * @responseField created_at string The date and time the PO item was created.
-     * @responseField updated_at string The date and time the PO item was last updated.
      * @response 200 scenario="Success" [{"id":1,"po_id":1,"product_id":1,"quantity":10,"remaining_quantity":10,"price":100,"discount":0,"discount_type":"fixed","total":1000,"expiry_date":"2025-12-31","created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}]
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function getExpiringSoonProducts()
     {
@@ -515,20 +380,9 @@ class ProductController extends Controller
      * @authenticated
      * @urlParam id integer required The ID of the product. Example: 1
      *
-     * @responseField id integer The ID of the stock adjustment.
-     * @responseField product_id integer The ID of the product.
-     * @responseField adjustment_type string The type of adjustment (increase, decrease, correction).
-     * @responseField quantity_before integer The stock quantity before adjustment.
-     * @responseField quantity_after integer The stock quantity after adjustment.
-     * @responseField adjustment_amount integer The amount of stock adjusted.
-     * @responseField reason string The reason for the adjustment.
-     * @responseField adjusted_by integer The ID of the user who made the adjustment.
-     * @responseField created_at string The date and time the adjustment was created.
-     * @responseField updated_at string The date and time the adjustment was last updated.
-     * @responseField adjusted_by object The user who made the adjustment.
-     * @responseField adjusted_by.id integer The ID of the user.
-     * @responseField adjusted_by.name string The name of the user.
-     * @response 200 scenario="Success" [{"id":1,"product_id":1,"adjustment_type":"increase","quantity_before":10,"quantity_after":20,"adjustment_amount":10,"reason":"Stock correction","adjusted_by":1,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z","adjusted_by":{"id":1,"name":"Admin"}}]
+     * @response 200 scenario="Success" [{"id":1,"product_id":1,"adjustment_type":"increase","quantity_before":10,"quantity_after":20,"adjustment_amount":10,"reason":"Stock correction","adjusted_by":{"id":1,"name":"Admin"},"created_at":"2025-12-01T12:00:00.000000Z"}]
+     * @response 404 scenario="Not Found" {"message": "Product not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function getAdjustmentLog($id)
     {
@@ -546,24 +400,10 @@ class ProductController extends Controller
      * @group Products
      * @authenticated
      * @queryParam barcode string required The barcode to search for. Example: 7981373950433
-     * @responseField id integer The ID of the product.
-     * @responseField code string The product code.
-     * @responseField barcode string The product barcode.
-     * @responseField name string The name of the product.
-     * @responseField stock_quantity integer The current stock quantity.
-     * @responseField low_stock_threshold integer The low stock threshold.
-     * @responseField price number The price of the product.
-     * @responseField selling_price number The selling price of the product.
-     * @responseField category_id integer The ID of the category.
-     * @responseField units_id integer The ID of the unit.
-     * @responseField supplier_id integer The ID of the supplier.
-     * @responseField warehouse_id integer The ID of the warehouse.
-     * @responseField description string The description of the product.
-     * @responseField image string The URL of the product image.
-     * @responseField has_expiry boolean Whether the product has an expiry date.
-     * @responseField created_at string The date and time the product was created.
-     * @responseField updated_at string The date and time the product was last updated.
+     *
+     * @response 200 scenario="Success" {"data":{"id":1,"code":"P-001","name":"Product Name",...}}
      * @response 404 scenario="Not Found" {"message": "Product not found"}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function searchByBarcode(Request $request)
     {
@@ -585,10 +425,9 @@ class ProductController extends Controller
      * @bodyParam ids array required An array of product IDs to export. Example: [1, 2, 3]
      * @bodyParam ids.* integer required A product ID.
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
-     * @responseField exported_count integer The number of products successfully exported.
-     * @responseField file string The URL to the exported file.
+     * @response 200 scenario="Success" {"success":true,"message":"Successfully exported 3 product(s)","exported_count":3,"file":"http:\/\/localhost\/storage\/exports\/products.xlsx"}
+     * @response 422 scenario="Validation Error" {"message":"The ids field is required.","errors":{"ids":["The ids field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function bulkExport(Request $request)
     {

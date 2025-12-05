@@ -61,34 +61,21 @@ endpoints:
         custom: []
         status: 200
         content: '{"success":true,"message":"Successfully deleted sales order(s)"}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      success:
+        headers: []
+        description: Success
+      -
         custom: []
-        name: success
-        description: 'Indicates whether the request was successful.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      message:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: message
-        description: 'A message describing the result of the request.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The ids field is required.","errors":{"ids":["The ids field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -156,45 +143,21 @@ endpoints:
         custom: []
         status: 200
         content: '{"success":true,"message":"Successfully marked 3 sales order(s) as paid.","updated_count":3}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      success:
+        headers: []
+        description: Success
+      -
         custom: []
-        name: success
-        description: 'Indicates whether the request was successful.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      message:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: message
-        description: 'A message describing the result of the request.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_count:
-        custom: []
-        name: updated_count
-        description: 'The number of sales orders successfully marked as paid.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The ids field is required.","errors":{"ids":["The ids field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -232,46 +195,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"total_sales":487181.30999999994,"total_paid":147762.22999999998,"total_due":182217.31}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      total_sales:
+        content: '{"total_sales":15000,"total_paid":10000,"total_due":5000}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: total_sales
-        description: 'Total sales amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total_paid:
-        custom: []
-        name: total_paid
-        description: 'Total amount paid for sales.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total_due:
-        custom: []
-        name: total_due
-        description: 'Total amount due for sales.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -312,95 +245,13 @@ endpoints:
         content: '[{"id":1,"invoice":"INV-SALES-001","customer":{"id":1,"name":"Customer 1"},"order_date":"2025-11-20","due_date":"2025-12-20","total":1000,"status":"pending","remaining_days":19}]'
         headers: []
         description: Success
-    responseFields:
-      id:
+      -
         custom: []
-        name: id
-        description: 'The ID of the sales order.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      invoice:
-        custom: []
-        name: invoice
-        description: 'The invoice number.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer:
-        custom: []
-        name: customer
-        description: 'The customer details.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      order_date:
-        custom: []
-        name: order_date
-        description: 'The order date.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      due_date:
-        custom: []
-        name: due_date
-        description: 'The due date.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: 'The total amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the sales order.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      remaining_days:
-        custom: []
-        name: remaining_days
-        description: 'The number of days until expiry.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -499,34 +350,27 @@ endpoints:
         custom: []
         status: 200
         content: '{"success":true,"message":"Payment added successfully."}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      success:
+        headers: []
+        description: Success
+      -
         custom: []
-        name: success
-        description: 'Indicates whether the request was successful.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      message:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: message
-        description: 'A message describing the result of the request.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Sales order not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
+        status: 422
+        content: '{"message":"The amount must be a number.","errors":{"amount":["The amount must be a number."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -612,24 +456,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"past_price":"1100.00"}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      past_price:
+        content: '{"past_price":150.00}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: past_price
-        description: 'The past price of the product for the customer.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Customer or Product not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -679,398 +521,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"invoice":"INV-00001","customer_id":"3","user_id":1,"order_date":"2025-05-17T05:06:57.000000Z","due_date":"2025-06-11T05:06:57.000000Z","payment_type":"Cash","order_discount":12,"order_discount_type":"percentage","tax_rate":10,"total_tax":651.2,"total":7163.2,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":1,"sales_id":1,"product_id":5,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","stock_quantity":14,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":2,"units_id":1,"supplier_id":1,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":2,"sales_id":1,"product_id":1,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"2200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":2,"invoice":"INV-00002","customer_id":"1","user_id":1,"order_date":"2025-02-25T05:06:57.000000Z","due_date":"2025-03-22T05:06:57.000000Z","payment_type":"-","order_discount":0,"order_discount_type":"percentage","tax_rate":10,"total_tax":292,"total":3212,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":3,"sales_id":2,"product_id":5,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"2600.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","stock_quantity":14,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":2,"units_id":1,"supplier_id":1,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":4,"sales_id":2,"product_id":4,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":3,"invoice":"INV-00003","customer_id":"4","user_id":1,"order_date":"2025-12-01T05:06:57.000000Z","due_date":"2025-12-15T05:06:57.000000Z","payment_type":"Cash","order_discount":13,"order_discount_type":"percentage","tax_rate":10,"total_tax":678.6,"total":7464.6,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":5,"sales_id":3,"product_id":5,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"7800.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","stock_quantity":14,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":2,"units_id":1,"supplier_id":1,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":4,"invoice":"INV-00004","customer_id":"1","user_id":1,"order_date":"2025-09-13T05:06:57.000000Z","due_date":"2025-10-06T05:06:57.000000Z","payment_type":"Cash","order_discount":11,"order_discount_type":"fixed","tax_rate":10,"total_tax":68.9,"total":757.9,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":6,"sales_id":4,"product_id":2,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"700.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":5,"invoice":"INV-00005","customer_id":"3","user_id":1,"order_date":"2024-12-25T05:06:57.000000Z","due_date":"2025-01-08T05:06:57.000000Z","payment_type":"Card","order_discount":19,"order_discount_type":"fixed","tax_rate":10,"total_tax":636.1,"total":6997.1,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":7,"sales_id":5,"product_id":4,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"640.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":8,"sales_id":5,"product_id":4,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"640.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":9,"sales_id":5,"product_id":3,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"5100.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","stock_quantity":78,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":2,"units_id":3,"supplier_id":5,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":6,"invoice":"INV-00006","customer_id":"4","user_id":1,"order_date":"2025-06-19T05:06:57.000000Z","due_date":"2025-07-04T05:06:57.000000Z","payment_type":"Card","order_discount":13,"order_discount_type":"percentage","tax_rate":10,"total_tax":856.95,"total":9426.45,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":10,"sales_id":6,"product_id":1,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"4400.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":11,"sales_id":6,"product_id":1,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"3300.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":12,"sales_id":6,"product_id":2,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1050.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":13,"sales_id":6,"product_id":1,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"1100.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":7,"invoice":"INV-00007","customer_id":"3","user_id":1,"order_date":"2024-12-08T05:06:57.000000Z","due_date":"2024-12-21T05:06:57.000000Z","payment_type":"Cash","order_discount":16,"order_discount_type":"percentage","tax_rate":10,"total_tax":277.2,"total":3049.2,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":14,"sales_id":7,"product_id":1,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"3300.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":8,"invoice":"INV-00008","customer_id":"2","user_id":1,"order_date":"2025-01-01T05:06:57.000000Z","due_date":"2025-01-11T05:06:57.000000Z","payment_type":"Transfer","order_discount":14,"order_discount_type":"fixed","tax_rate":10,"total_tax":46.6,"total":512.6,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":15,"sales_id":8,"product_id":4,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"480.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":9,"invoice":"INV-00009","customer_id":"4","user_id":1,"order_date":"2025-10-19T05:06:57.000000Z","due_date":"2025-11-18T05:06:57.000000Z","payment_type":"Transfer","order_discount":15,"order_discount_type":"fixed","tax_rate":10,"total_tax":138.5,"total":1523.5,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":16,"sales_id":9,"product_id":2,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1400.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":10,"invoice":"INV-00010","customer_id":"3","user_id":1,"order_date":"2024-12-26T05:06:57.000000Z","due_date":"2025-01-11T05:06:57.000000Z","payment_type":"-","order_discount":9,"order_discount_type":"fixed","tax_rate":10,"total_tax":259.1,"total":2850.1,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":17,"sales_id":10,"product_id":5,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"2600.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","stock_quantity":14,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":2,"units_id":1,"supplier_id":1,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":11,"invoice":"INV-00011","customer_id":"2","user_id":1,"order_date":"2025-02-18T05:06:57.000000Z","due_date":"2025-03-04T05:06:57.000000Z","payment_type":"Card","order_discount":11,"order_discount_type":"percentage","tax_rate":10,"total_tax":726.24,"total":7988.64,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":18,"sales_id":11,"product_id":1,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"2200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":19,"sales_id":11,"product_id":1,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"4400.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":20,"sales_id":11,"product_id":2,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1400.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":21,"sales_id":11,"product_id":4,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"160.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":12,"invoice":"INV-00012","customer_id":"3","user_id":1,"order_date":"2025-09-18T05:06:58.000000Z","due_date":"2025-10-10T05:06:58.000000Z","payment_type":"-","order_discount":13,"order_discount_type":"percentage","tax_rate":10,"total_tax":55.68,"total":612.48,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":22,"sales_id":12,"product_id":4,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"640.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":13,"invoice":"INV-00013","customer_id":"2","user_id":1,"order_date":"2025-07-28T05:06:58.000000Z","due_date":"2025-08-11T05:06:58.000000Z","payment_type":"Cash","order_discount":12,"order_discount_type":"percentage","tax_rate":10,"total_tax":554.4,"total":6098.4,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":23,"sales_id":13,"product_id":1,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"5500.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":24,"sales_id":13,"product_id":4,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"800.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":14,"invoice":"INV-00014","customer_id":"3","user_id":1,"order_date":"2025-10-02T05:06:58.000000Z","due_date":"2025-10-26T05:06:58.000000Z","payment_type":"eWallet","order_discount":12,"order_discount_type":"percentage","tax_rate":10,"total_tax":30.8,"total":338.8,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":25,"sales_id":14,"product_id":2,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"350.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":15,"invoice":"INV-00015","customer_id":"2","user_id":1,"order_date":"2025-08-17T05:06:58.000000Z","due_date":"2025-09-05T05:06:58.000000Z","payment_type":"Cash","order_discount":19,"order_discount_type":"percentage","tax_rate":10,"total_tax":745.2,"total":8197.2,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":26,"sales_id":15,"product_id":1,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"3300.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":27,"sales_id":15,"product_id":2,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"700.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":28,"sales_id":15,"product_id":5,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","stock_quantity":14,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":2,"units_id":1,"supplier_id":1,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":16,"invoice":"INV-00016","customer_id":"3","user_id":1,"order_date":"2025-05-28T05:06:58.000000Z","due_date":"2025-06-15T05:06:58.000000Z","payment_type":"Transfer","order_discount":7,"order_discount_type":"percentage","tax_rate":10,"total_tax":227.85,"total":2506.35,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":29,"sales_id":16,"product_id":2,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"700.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":30,"sales_id":16,"product_id":2,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1750.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":17,"invoice":"INV-00017","customer_id":"6","user_id":1,"order_date":"2025-05-24T05:06:58.000000Z","due_date":"2025-06-17T05:06:58.000000Z","payment_type":"Card","order_discount":4,"order_discount_type":"fixed","tax_rate":10,"total_tax":839.6,"total":9235.6,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":31,"sales_id":17,"product_id":3,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"5100.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","stock_quantity":78,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":2,"units_id":3,"supplier_id":5,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":32,"sales_id":17,"product_id":1,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"3300.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":18,"invoice":"INV-00018","customer_id":"5","user_id":1,"order_date":"2025-06-04T05:06:58.000000Z","due_date":"2025-06-25T05:06:58.000000Z","payment_type":"Card","order_discount":13,"order_discount_type":"fixed","tax_rate":10,"total_tax":30.7,"total":337.7,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":33,"sales_id":18,"product_id":4,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":19,"invoice":"INV-00019","customer_id":"4","user_id":1,"order_date":"2025-09-28T05:06:58.000000Z","due_date":"2025-10-08T05:06:58.000000Z","payment_type":"-","order_discount":5,"order_discount_type":"fixed","tax_rate":10,"total_tax":819.5,"total":9014.5,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":34,"sales_id":19,"product_id":3,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"6800.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","stock_quantity":78,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":2,"units_id":3,"supplier_id":5,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":35,"sales_id":19,"product_id":2,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1400.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":20,"invoice":"INV-00020","customer_id":"1","user_id":1,"order_date":"2025-04-21T05:06:58.000000Z","due_date":"2025-05-06T05:06:58.000000Z","payment_type":"Card","order_discount":4,"order_discount_type":"fixed","tax_rate":10,"total_tax":63.6,"total":699.6,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":36,"sales_id":20,"product_id":4,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"640.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":21,"invoice":"INV-00021","customer_id":"6","user_id":1,"order_date":"2025-08-26T05:06:58.000000Z","due_date":"2025-09-06T05:06:58.000000Z","payment_type":"-","order_discount":13,"order_discount_type":"percentage","tax_rate":10,"total_tax":682.95,"total":7512.45,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":37,"sales_id":21,"product_id":3,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"6800.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","stock_quantity":78,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":2,"units_id":3,"supplier_id":5,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":38,"sales_id":21,"product_id":2,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1050.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":22,"invoice":"INV-00022","customer_id":"4","user_id":1,"order_date":"2025-10-11T05:06:58.000000Z","due_date":"2025-10-26T05:06:58.000000Z","payment_type":"Cash","order_discount":15,"order_discount_type":"fixed","tax_rate":10,"total_tax":108.5,"total":1193.5,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":39,"sales_id":22,"product_id":1,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"1100.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":23,"invoice":"INV-00023","customer_id":"5","user_id":1,"order_date":"2025-09-23T05:06:58.000000Z","due_date":"2025-10-01T05:06:58.000000Z","payment_type":"-","order_discount":17,"order_discount_type":"fixed","tax_rate":10,"total_tax":690.3,"total":7593.3,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":40,"sales_id":23,"product_id":1,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"4400.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":41,"sales_id":23,"product_id":1,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"2200.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":42,"sales_id":23,"product_id":4,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":24,"invoice":"INV-00024","customer_id":"4","user_id":1,"order_date":"2025-10-26T05:06:58.000000Z","due_date":"2025-11-05T05:06:58.000000Z","payment_type":"eWallet","order_discount":2,"order_discount_type":"percentage","tax_rate":10,"total_tax":842.8,"total":9270.8,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":43,"sales_id":24,"product_id":1,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"4400.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":44,"sales_id":24,"product_id":4,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"800.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":45,"sales_id":24,"product_id":3,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"3400.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","stock_quantity":78,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":2,"units_id":3,"supplier_id":5,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":25,"invoice":"INV-00025","customer_id":"1","user_id":1,"order_date":"2025-02-15T05:06:58.000000Z","due_date":"2025-02-26T05:06:58.000000Z","payment_type":"eWallet","order_discount":10,"order_discount_type":"fixed","tax_rate":10,"total_tax":619,"total":6809,"status":"Unpaid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":46,"sales_id":25,"product_id":1,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"5500.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":47,"sales_id":25,"product_id":2,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"700.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"product":null,"customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/sales?page=1","last":"http:\/\/localhost\/api\/v1\/sales?page=4","prev":null,"next":"http:\/\/localhost\/api\/v1\/sales?page=2"},"meta":{"current_page":1,"from":1,"last_page":4,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/sales?page=1","label":"1","active":true},{"url":"http:\/\/localhost\/api\/v1\/sales?page=2","label":"2","active":false},{"url":"http:\/\/localhost\/api\/v1\/sales?page=3","label":"3","active":false},{"url":"http:\/\/localhost\/api\/v1\/sales?page=4","label":"4","active":false},{"url":"http:\/\/localhost\/api\/v1\/sales?page=2","label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/sales","per_page":25,"to":25,"total":100}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"invoice":"INV-SALES-001","customer":{...},...}],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of sales orders.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the sales order.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].invoice':
-        custom: []
-        name: 'data[].invoice'
-        description: 'The invoice number.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].customer_id':
-        custom: []
-        name: 'data[].customer_id'
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].user_id':
-        custom: []
-        name: 'data[].user_id'
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].order_date':
-        custom: []
-        name: 'data[].order_date'
-        description: 'The order date.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].due_date':
-        custom: []
-        name: 'data[].due_date'
-        description: 'The due date.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].payment_type':
-        custom: []
-        name: 'data[].payment_type'
-        description: 'The payment type.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].order_discount':
-        custom: []
-        name: 'data[].order_discount'
-        description: 'The total order discount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].order_discount_type':
-        custom: []
-        name: 'data[].order_discount_type'
-        description: 'The type of discount.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].total':
-        custom: []
-        name: 'data[].total'
-        description: 'The total amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].status':
-        custom: []
-        name: 'data[].status'
-        description: 'The status of the sales order.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].tax_rate':
-        custom: []
-        name: 'data[].tax_rate'
-        description: 'The tax rate applied.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].total_tax':
-        custom: []
-        name: 'data[].total_tax'
-        description: 'The total tax amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].amount_received':
-        custom: []
-        name: 'data[].amount_received'
-        description: 'The amount received.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].change_amount':
-        custom: []
-        name: 'data[].change_amount'
-        description: 'The change amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].is_pos':
-        custom: []
-        name: 'data[].is_pos'
-        description: "Whether it's a point of sale transaction."
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].sales_opportunity_id':
-        custom: []
-        name: 'data[].sales_opportunity_id'
-        description: 'The ID of the sales opportunity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the sales order was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the sales order was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].customer':
-        custom: []
-        name: 'data[].customer'
-        description: 'The customer associated with the sales order.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].user':
-        custom: []
-        name: 'data[].user'
-        description: 'The user associated with the sales order.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1338,222 +798,22 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"status":"Unpaid","is_pos":false,"invoice":"INV-SALES-001","customer_id":1,"user_id":2,"order_date":"2023-10-26T06:45:32.000000Z","due_date":"2023-11-26T06:45:32.000000Z","tax_rate":0,"total_tax":0,"total":495,"order_discount":5,"order_discount_type":"fixed","payment_type":"-","updated_at":"2025-12-02T06:45:32.000000Z","created_at":"2025-12-02T06:45:32.000000Z","id":110}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"invoice":"INV-SALES-001",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the sales order.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      invoice:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: invoice
-        description: 'The invoice number.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_id:
-        custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      order_date:
-        custom: []
-        name: order_date
-        description: 'The order date.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      due_date:
-        custom: []
-        name: due_date
-        description: 'The due date.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      payment_type:
-        custom: []
-        name: payment_type
-        description: 'The payment type.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      order_discount:
-        custom: []
-        name: order_discount
-        description: 'The total order discount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      order_discount_type:
-        custom: []
-        name: order_discount_type
-        description: 'The type of discount.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: 'The total amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the sales order.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      tax_rate:
-        custom: []
-        name: tax_rate
-        description: 'The tax rate applied.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total_tax:
-        custom: []
-        name: total_tax
-        description: 'The total tax amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      amount_received:
-        custom: []
-        name: amount_received
-        description: 'The amount received.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      change_amount:
-        custom: []
-        name: change_amount
-        description: 'The change amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      is_pos:
-        custom: []
-        name: is_pos
-        description: "Whether it's a point of sale transaction."
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_opportunity_id:
-        custom: []
-        name: sales_opportunity_id
-        description: 'The ID of the sales opportunity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the sales order was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the sales order was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The invoice field is required.","errors":{"invoice":["The invoice field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1615,244 +875,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"invoice":"INV-00001","customer_id":"3","user_id":1,"order_date":"2025-05-17T05:06:57.000000Z","due_date":"2025-06-11T05:06:57.000000Z","payment_type":"Cash","order_discount":12,"order_discount_type":"percentage","tax_rate":10,"total_tax":651.2,"total":7163.2,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":1,"sales_id":1,"product_id":5,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","stock_quantity":14,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":2,"units_id":1,"supplier_id":1,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":2,"sales_id":1,"product_id":1,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"2200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}],"customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"user":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"invoice":"INV-SALES-001",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the sales order.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      invoice:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: invoice
-        description: 'The invoice number.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_id:
-        custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      order_date:
-        custom: []
-        name: order_date
-        description: 'The order date.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      due_date:
-        custom: []
-        name: due_date
-        description: 'The due date.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      payment_type:
-        custom: []
-        name: payment_type
-        description: 'The payment type.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      order_discount:
-        custom: []
-        name: order_discount
-        description: 'The total order discount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      order_discount_type:
-        custom: []
-        name: order_discount_type
-        description: 'The type of discount.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: 'The total amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the sales order.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      tax_rate:
-        custom: []
-        name: tax_rate
-        description: 'The tax rate applied.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total_tax:
-        custom: []
-        name: total_tax
-        description: 'The total tax amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      amount_received:
-        custom: []
-        name: amount_received
-        description: 'The amount received.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      change_amount:
-        custom: []
-        name: change_amount
-        description: 'The change amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      is_pos:
-        custom: []
-        name: is_pos
-        description: "Whether it's a point of sale transaction."
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_opportunity_id:
-        custom: []
-        name: sales_opportunity_id
-        description: 'The ID of the sales opportunity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the sales order was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the sales order was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer:
-        custom: []
-        name: customer
-        description: 'The customer associated with the sales order.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      user:
-        custom: []
-        name: user
-        description: 'The user associated with the sales order.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Sales order not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -2145,222 +1183,28 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"invoice":"INV-00001","customer_id":2,"user_id":1,"order_date":"2023-10-27T06:45:32.000000Z","due_date":"2023-11-27T06:45:32.000000Z","payment_type":"Card","order_discount":0,"order_discount_type":"fixed","tax_rate":0,"total_tax":0,"total":500,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T06:45:32.000000Z","sales_opportunity_id":null,"sales_items":[{"id":1,"sales_id":1,"product_id":5,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","stock_quantity":14,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":2,"units_id":1,"supplier_id":1,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":2,"sales_id":1,"product_id":1,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"2200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"invoice":"INV-SALES-002",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the sales order.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      invoice:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: invoice
-        description: 'The invoice number.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_id:
+        status: 404
+        content: '{"message": "Sales order not found."}'
+        headers: []
+        description: 'Not Found'
+      -
         custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      order_date:
-        custom: []
-        name: order_date
-        description: 'The order date.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      due_date:
-        custom: []
-        name: due_date
-        description: 'The due date.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      payment_type:
-        custom: []
-        name: payment_type
-        description: 'The payment type.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      order_discount:
-        custom: []
-        name: order_discount
-        description: 'The total order discount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      order_discount_type:
-        custom: []
-        name: order_discount_type
-        description: 'The type of discount.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: 'The total amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the sales order.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      tax_rate:
-        custom: []
-        name: tax_rate
-        description: 'The tax rate applied.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      total_tax:
-        custom: []
-        name: total_tax
-        description: 'The total tax amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      amount_received:
-        custom: []
-        name: amount_received
-        description: 'The amount received.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      change_amount:
-        custom: []
-        name: change_amount
-        description: 'The change amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      is_pos:
-        custom: []
-        name: is_pos
-        description: "Whether it's a point of sale transaction."
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_opportunity_id:
-        custom: []
-        name: sales_opportunity_id
-        description: 'The ID of the sales opportunity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the sales order was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the sales order was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The status field is required.","errors":{"status":["The status field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -2425,6 +1269,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Sales order not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

@@ -21,29 +21,8 @@ class SalesOpportunityItemController extends Controller
      * @authenticated
      * @queryParam per_page int The number of items to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of sales opportunity items.
-     * @responseField data[].id integer The ID of the sales opportunity item.
-     * @responseField data[].sales_opportunity_id integer The ID of the sales opportunity.
-     * @responseField data[].product_id integer The ID of the product.
-     * @responseField data[].quantity integer The quantity of the product.
-     * @responseField data[].price number The price of the product.
-     * @responseField data[].created_at string The date and time the item was created.
-     * @responseField data[].updated_at string The date and time the item was last updated.
-     * @responseField data[].opportunity object The sales opportunity associated with the item.
-     * @responseField data[].product object The product associated with the item.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"sales_opportunity_id":1,"product_id":1,"quantity":1,...}],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -59,15 +38,9 @@ class SalesOpportunityItemController extends Controller
      * @authenticated
      * @urlParam sales_opportunity_item required The ID of the sales opportunity item. Example: 1
      *
-     * @responseField id integer The ID of the sales opportunity item.
-     * @responseField sales_opportunity_id integer The ID of the sales opportunity.
-     * @responseField product_id integer The ID of the product.
-     * @responseField quantity integer The quantity of the product.
-     * @responseField price number The price of the product.
-     * @responseField created_at string The date and time the item was created.
-     * @responseField updated_at string The date and time the item was last updated.
-     * @responseField opportunity object The sales opportunity associated with the item.
-     * @responseField product object The product associated with the item.
+     * @response 200 scenario="Success" {"data":{"id":1,"sales_opportunity_id":1,"product_id":1,"quantity":1,...}}
+     * @response 404 scenario="Not Found" {"message": "Sales opportunity item not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(SalesOpportunityItem $sales_opportunity_item)
     {

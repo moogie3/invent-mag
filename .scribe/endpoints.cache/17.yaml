@@ -379,7 +379,7 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":307,"date":"2025-11-28T00:00:00.000000Z","description":"Initial investment","sourceable_type":"App\\\\Models\\\\User","sourceable_id":1,"created_at":"2025-12-02T06:45:31.000000Z","updated_at":"2025-12-02T06:45:31.000000Z"}}'
+        content: '{"data":{"id":326,"date":"2025-11-28T00:00:00.000000Z","description":"Initial investment","sourceable_type":"App\\\\Models\\\\User","sourceable_id":1,"created_at":"2025-12-05T07:49:53.000000Z","updated_at":"2025-12-05T07:49:53.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -729,7 +729,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"date":"2025-11-28T00:00:00.000000Z","description":"Initial investment","sourceable_type":"App\\\\Models\\\\User","sourceable_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T06:45:31.000000Z"}}'
+        content: '{"data":{"id":1,"date":"2025-11-28T00:00:00.000000Z","description":"Initial investment","sourceable_type":"App\\\\Models\\\\User","sourceable_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-05T07:49:53.000000Z"}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json

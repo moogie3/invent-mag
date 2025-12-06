@@ -86,7 +86,7 @@ class CategoryController extends Controller
      * @bodyParam description string The description of the category. Example: "Electronic components and devices"
      * @bodyParam parent_id int The ID of the parent category. Example: 1
      *
-     * @response 200 scenario="Success" {"data":{"id":1,"name":"Electronics (Updated)","description":"Updated description",...}}
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Electronics (Updated)","description":"Updated description","created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T13:00:00.000000Z"}}
      * @response 404 scenario="Not Found" {"message": "Category not found."}
      * @response 422 scenario="Validation Error" {"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}
      * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}

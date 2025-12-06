@@ -45,255 +45,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"date":"2025-11-22T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00001","sourceable_type":"App\\Models\\Purchase","sourceable_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":1,"journal_entry_id":1,"account_id":7,"type":"debit","amount":"1080.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":2,"journal_entry_id":1,"account_id":3,"type":"credit","amount":"1080.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":2,"date":"2025-11-07T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00002","sourceable_type":"App\\Models\\Purchase","sourceable_id":2,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":3,"journal_entry_id":2,"account_id":7,"type":"debit","amount":"450.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":4,"journal_entry_id":2,"account_id":3,"type":"credit","amount":"450.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":3,"date":"2025-11-27T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00003","sourceable_type":"App\\Models\\Purchase","sourceable_id":3,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":5,"journal_entry_id":3,"account_id":7,"type":"debit","amount":"7600.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":6,"journal_entry_id":3,"account_id":3,"type":"credit","amount":"7600.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":4,"date":"2025-11-15T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00004","sourceable_type":"App\\Models\\Purchase","sourceable_id":4,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":7,"journal_entry_id":4,"account_id":7,"type":"debit","amount":"4930.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":8,"journal_entry_id":4,"account_id":3,"type":"credit","amount":"4930.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":5,"date":"2025-11-24T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00005","sourceable_type":"App\\Models\\Purchase","sourceable_id":5,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":9,"journal_entry_id":5,"account_id":7,"type":"debit","amount":"3830.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":10,"journal_entry_id":5,"account_id":18,"type":"credit","amount":"3830.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":18,"parent_id":17,"name":"accounting.accounts.accounts_payable.name","code":"2110","type":"liability","description":"accounting.accounts.accounts_payable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":6,"date":"2025-11-26T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00006","sourceable_type":"App\\Models\\Purchase","sourceable_id":6,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":11,"journal_entry_id":6,"account_id":7,"type":"debit","amount":"3150.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":12,"journal_entry_id":6,"account_id":18,"type":"credit","amount":"3150.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":18,"parent_id":17,"name":"accounting.accounts.accounts_payable.name","code":"2110","type":"liability","description":"accounting.accounts.accounts_payable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":7,"date":"2025-11-21T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00007","sourceable_type":"App\\Models\\Purchase","sourceable_id":7,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":13,"journal_entry_id":7,"account_id":7,"type":"debit","amount":"900.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":14,"journal_entry_id":7,"account_id":3,"type":"credit","amount":"900.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":8,"date":"2025-11-04T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00008","sourceable_type":"App\\Models\\Purchase","sourceable_id":8,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":15,"journal_entry_id":8,"account_id":7,"type":"debit","amount":"4790.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":16,"journal_entry_id":8,"account_id":3,"type":"credit","amount":"4790.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":9,"date":"2025-11-11T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00009","sourceable_type":"App\\Models\\Purchase","sourceable_id":9,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":17,"journal_entry_id":9,"account_id":7,"type":"debit","amount":"6950.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":18,"journal_entry_id":9,"account_id":18,"type":"credit","amount":"6950.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":18,"parent_id":17,"name":"accounting.accounts.accounts_payable.name","code":"2110","type":"liability","description":"accounting.accounts.accounts_payable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":10,"date":"2025-11-27T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00010","sourceable_type":"App\\Models\\Purchase","sourceable_id":10,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":19,"journal_entry_id":10,"account_id":7,"type":"debit","amount":"1710.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":20,"journal_entry_id":10,"account_id":3,"type":"credit","amount":"1710.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":11,"date":"2025-05-17T00:00:00.000000Z","description":"Sale - Invoice INV-00001","sourceable_type":"App\\Models\\Sales","sourceable_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":21,"journal_entry_id":11,"account_id":5,"type":"debit","amount":"7163.20","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":22,"journal_entry_id":11,"account_id":27,"type":"credit","amount":"6512.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":27,"parent_id":26,"name":"accounting.accounts.sales_revenue.name","code":"4100","type":"revenue","description":"accounting.accounts.sales_revenue.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":23,"journal_entry_id":11,"account_id":20,"type":"credit","amount":"651.20","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":20,"parent_id":17,"name":"accounting.accounts.output_vat.name","code":"2130","type":"liability","description":"accounting.accounts.output_vat.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":12,"date":"2025-05-17T00:00:00.000000Z","description":"COGS for Invoice INV-00001","sourceable_type":"App\\Models\\Sales","sourceable_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":24,"journal_entry_id":12,"account_id":35,"type":"debit","amount":"4000.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":35,"parent_id":30,"name":"accounting.accounts.cost_of_goods_sold.name","code":"5200","type":"expense","description":"accounting.accounts.cost_of_goods_sold.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":25,"journal_entry_id":12,"account_id":7,"type":"credit","amount":"4000.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":13,"date":"2025-05-17T00:00:00.000000Z","description":"Payment for Invoice INV-00001","sourceable_type":"App\\Models\\Sales","sourceable_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":26,"journal_entry_id":13,"account_id":3,"type":"debit","amount":"7163.20","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":27,"journal_entry_id":13,"account_id":5,"type":"credit","amount":"7163.20","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":14,"date":"2025-02-25T00:00:00.000000Z","description":"Sale - Invoice INV-00002","sourceable_type":"App\\Models\\Sales","sourceable_id":2,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":28,"journal_entry_id":14,"account_id":5,"type":"debit","amount":"3212.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":29,"journal_entry_id":14,"account_id":27,"type":"credit","amount":"2920.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":27,"parent_id":26,"name":"accounting.accounts.sales_revenue.name","code":"4100","type":"revenue","description":"accounting.accounts.sales_revenue.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":30,"journal_entry_id":14,"account_id":20,"type":"credit","amount":"292.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":20,"parent_id":17,"name":"accounting.accounts.output_vat.name","code":"2130","type":"liability","description":"accounting.accounts.output_vat.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":15,"date":"2025-02-25T00:00:00.000000Z","description":"COGS for Invoice INV-00002","sourceable_type":"App\\Models\\Sales","sourceable_id":2,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":31,"journal_entry_id":15,"account_id":35,"type":"debit","amount":"1580.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":35,"parent_id":30,"name":"accounting.accounts.cost_of_goods_sold.name","code":"5200","type":"expense","description":"accounting.accounts.cost_of_goods_sold.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":32,"journal_entry_id":15,"account_id":7,"type":"credit","amount":"1580.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":16,"date":"2025-02-25T00:00:00.000000Z","description":"Payment for Invoice INV-00002","sourceable_type":"App\\Models\\Sales","sourceable_id":2,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":33,"journal_entry_id":16,"account_id":3,"type":"debit","amount":"1642.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":34,"journal_entry_id":16,"account_id":5,"type":"credit","amount":"1642.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":17,"date":"2025-12-01T00:00:00.000000Z","description":"Sale - Invoice INV-00003","sourceable_type":"App\\Models\\Sales","sourceable_id":3,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":35,"journal_entry_id":17,"account_id":5,"type":"debit","amount":"7464.60","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":36,"journal_entry_id":17,"account_id":27,"type":"credit","amount":"6786.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":27,"parent_id":26,"name":"accounting.accounts.sales_revenue.name","code":"4100","type":"revenue","description":"accounting.accounts.sales_revenue.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":37,"journal_entry_id":17,"account_id":20,"type":"credit","amount":"678.60","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":20,"parent_id":17,"name":"accounting.accounts.output_vat.name","code":"2130","type":"liability","description":"accounting.accounts.output_vat.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":18,"date":"2025-12-01T00:00:00.000000Z","description":"COGS for Invoice INV-00003","sourceable_type":"App\\Models\\Sales","sourceable_id":3,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":38,"journal_entry_id":18,"account_id":35,"type":"debit","amount":"4200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":35,"parent_id":30,"name":"accounting.accounts.cost_of_goods_sold.name","code":"5200","type":"expense","description":"accounting.accounts.cost_of_goods_sold.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":39,"journal_entry_id":18,"account_id":7,"type":"credit","amount":"4200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":19,"date":"2025-09-13T00:00:00.000000Z","description":"Sale - Invoice INV-00004","sourceable_type":"App\\Models\\Sales","sourceable_id":4,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":40,"journal_entry_id":19,"account_id":5,"type":"debit","amount":"757.90","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":41,"journal_entry_id":19,"account_id":27,"type":"credit","amount":"689.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":27,"parent_id":26,"name":"accounting.accounts.sales_revenue.name","code":"4100","type":"revenue","description":"accounting.accounts.sales_revenue.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":42,"journal_entry_id":19,"account_id":20,"type":"credit","amount":"68.90","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":20,"parent_id":17,"name":"accounting.accounts.output_vat.name","code":"2130","type":"liability","description":"accounting.accounts.output_vat.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":20,"date":"2025-09-13T00:00:00.000000Z","description":"COGS for Invoice INV-00004","sourceable_type":"App\\Models\\Sales","sourceable_id":4,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":43,"journal_entry_id":20,"account_id":35,"type":"debit","amount":"360.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":35,"parent_id":30,"name":"accounting.accounts.cost_of_goods_sold.name","code":"5200","type":"expense","description":"accounting.accounts.cost_of_goods_sold.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":44,"journal_entry_id":20,"account_id":7,"type":"credit","amount":"360.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":21,"date":"2025-09-13T00:00:00.000000Z","description":"Payment for Invoice INV-00004","sourceable_type":"App\\Models\\Sales","sourceable_id":4,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":45,"journal_entry_id":21,"account_id":3,"type":"debit","amount":"459.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":46,"journal_entry_id":21,"account_id":5,"type":"credit","amount":"459.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":22,"date":"2024-12-25T00:00:00.000000Z","description":"Sale - Invoice INV-00005","sourceable_type":"App\\Models\\Sales","sourceable_id":5,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":47,"journal_entry_id":22,"account_id":5,"type":"debit","amount":"6997.10","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":48,"journal_entry_id":22,"account_id":27,"type":"credit","amount":"6361.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":27,"parent_id":26,"name":"accounting.accounts.sales_revenue.name","code":"4100","type":"revenue","description":"accounting.accounts.sales_revenue.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":49,"journal_entry_id":22,"account_id":20,"type":"credit","amount":"636.10","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":20,"parent_id":17,"name":"accounting.accounts.output_vat.name","code":"2130","type":"liability","description":"accounting.accounts.output_vat.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":23,"date":"2024-12-25T00:00:00.000000Z","description":"COGS for Invoice INV-00005","sourceable_type":"App\\Models\\Sales","sourceable_id":5,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":50,"journal_entry_id":23,"account_id":35,"type":"debit","amount":"3570.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":35,"parent_id":30,"name":"accounting.accounts.cost_of_goods_sold.name","code":"5200","type":"expense","description":"accounting.accounts.cost_of_goods_sold.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":51,"journal_entry_id":23,"account_id":7,"type":"credit","amount":"3570.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":24,"date":"2024-12-25T00:00:00.000000Z","description":"Payment for Invoice INV-00005","sourceable_type":"App\\Models\\Sales","sourceable_id":5,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":52,"journal_entry_id":24,"account_id":3,"type":"debit","amount":"2673.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":53,"journal_entry_id":24,"account_id":5,"type":"credit","amount":"2673.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]},{"id":25,"date":"2025-06-19T00:00:00.000000Z","description":"Sale - Invoice INV-00006","sourceable_type":"App\\Models\\Sales","sourceable_id":6,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":54,"journal_entry_id":25,"account_id":5,"type":"debit","amount":"9426.45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":55,"journal_entry_id":25,"account_id":27,"type":"credit","amount":"8569.50","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":27,"parent_id":26,"name":"accounting.accounts.sales_revenue.name","code":"4100","type":"revenue","description":"accounting.accounts.sales_revenue.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":56,"journal_entry_id":25,"account_id":20,"type":"credit","amount":"856.95","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":20,"parent_id":17,"name":"accounting.accounts.output_vat.name","code":"2130","type":"liability","description":"accounting.accounts.output_vat.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]}],"links":{"first":"http:\/\/localhost\/api\/v1\/journal-entries?page=1","last":"http:\/\/localhost\/api\/v1\/journal-entries?page=12","prev":null,"next":"http:\/\/localhost\/api\/v1\/journal-entries?page=2"},"meta":{"current_page":1,"from":1,"last_page":12,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=1","label":"1","active":true},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=2","label":"2","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=3","label":"3","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=4","label":"4","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=5","label":"5","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=6","label":"6","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=7","label":"7","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=8","label":"8","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=9","label":"9","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=10","label":"10","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=11","label":"11","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=12","label":"12","active":false},{"url":"http:\/\/localhost\/api\/v1\/journal-entries?page=2","label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/journal-entries","per_page":25,"to":25,"total":278}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"date":"2025-11-28","description":"Initial investment",...}],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of journal entries.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the journal entry.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].date':
-        custom: []
-        name: 'data[].date'
-        description: 'The date of the journal entry.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].description':
-        custom: []
-        name: 'data[].description'
-        description: 'The description of the journal entry.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].sourceable_type':
-        custom: []
-        name: 'data[].sourceable_type'
-        description: 'The type of the sourceable model.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].sourceable_id':
-        custom: []
-        name: 'data[].sourceable_id'
-        description: 'The ID of the sourceable model.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the journal entry was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the journal entry was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].transactions':
-        custom: []
-        name: 'data[].transactions'
-        description: 'A list of transactions for the journal entry.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -379,90 +140,22 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":326,"date":"2025-11-28T00:00:00.000000Z","description":"Initial investment","sourceable_type":"App\\\\Models\\\\User","sourceable_id":1,"created_at":"2025-12-05T07:49:53.000000Z","updated_at":"2025-12-05T07:49:53.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"date":"2025-11-28","description":"Initial investment",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the journal entry.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      date:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: date
-        description: 'The date of the journal entry.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the journal entry.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sourceable_type:
-        custom: []
-        name: sourceable_type
-        description: 'The type of the sourceable model.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sourceable_id:
-        custom: []
-        name: sourceable_id
-        description: 'The ID of the sourceable model.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the journal entry was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the journal entry was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The date field is required.","errors":{"date":["The date field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -524,101 +217,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"date":"2025-11-22T00:00:00.000000Z","description":"Purchase of goods, invoice PO-00001","sourceable_type":"App\\Models\\Purchase","sourceable_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","transactions":[{"id":1,"journal_entry_id":1,"account_id":7,"type":"debit","amount":"1080.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}},{"id":2,"journal_entry_id":1,"account_id":3,"type":"credit","amount":"1080.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","account":{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"date":"2025-11-28","description":"Initial investment",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the journal entry.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      date:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: date
-        description: 'The date of the journal entry.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the journal entry.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sourceable_type:
-        custom: []
-        name: sourceable_type
-        description: 'The type of the sourceable model.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sourceable_id:
-        custom: []
-        name: sourceable_id
-        description: 'The ID of the sourceable model.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the journal entry was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the journal entry was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      transactions:
-        custom: []
-        name: transactions
-        description: 'A list of transactions for the journal entry.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Journal entry not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -729,90 +343,28 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"date":"2025-11-28T00:00:00.000000Z","description":"Initial investment","sourceable_type":"App\\\\Models\\\\User","sourceable_id":1,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-05T07:49:53.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"date":"2025-11-28","description":"Initial investment (Updated)",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the journal entry.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      date:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: date
-        description: 'The date of the journal entry.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
+        status: 404
+        content: '{"message": "Journal entry not found."}'
+        headers: []
+        description: 'Not Found'
+      -
         custom: []
-        name: description
-        description: 'The description of the journal entry.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sourceable_type:
-        custom: []
-        name: sourceable_type
-        description: 'The type of the sourceable model.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sourceable_id:
-        custom: []
-        name: sourceable_id
-        description: 'The ID of the sourceable model.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the journal entry was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the journal entry was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The date field is required.","errors":{"date":["The date field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -877,6 +429,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Journal entry not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\UpdateThemeModeRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -39,11 +40,11 @@ class SettingsController extends Controller
      * @bodyParam compact_mode boolean Whether compact mode is enabled. Example: false
      * @bodyParam sticky_navbar boolean Whether the navbar is sticky. Example: false
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
      * @response 200 {"success": true, "message": "System settings updated successfully."}
+     * @response 422 scenario="Validation Error" {"message":"The navigation_type field is required.","errors":{"navigation_type":["The navigation_type field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateSettingsRequest $request)
+    public function update(UpdateSettingsRequest $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
@@ -72,6 +73,7 @@ class SettingsController extends Controller
      * @authenticated
      *
      * @response 200 {"navigation_type": "sidebar","theme_mode": "light","notification_duration": 5,"auto_logout_time": 60,"data_refresh_rate": 30,"system_language": "en","sidebar_lock": false,"show_theme_toggle": true,"enable_sound_notifications": true,"enable_browser_notifications": true,"show_success_messages": true,"remember_last_page": true,"enable_animations": true,"lazy_load_images": true,"enable_debug_mode": false,"enable_keyboard_shortcuts": true,"show_tooltips": true,"compact_mode": false,"sticky_navbar": false}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function getSettings()
     {
@@ -114,11 +116,11 @@ class SettingsController extends Controller
      * @authenticated
      * @bodyParam theme_mode string required The new theme mode. Must be 'light' or 'dark'. Example: "dark"
      *
-     * @responseField success boolean Indicates whether the request was successful.
-     * @responseField message string A message describing the result of the request.
-     * @responseField theme_mode string The updated theme mode.
+     * @response 200 scenario="Success" {"success":true,"message":"Theme mode updated successfully.","theme_mode":"dark"}
+     * @response 422 scenario="Validation Error" {"message":"The theme_mode field is required.","errors":{"theme_mode":["The theme_mode field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function updateThemeMode(\App\Http\Requests\Api\V1\UpdateThemeModeRequest $request)
+    public function updateThemeMode(UpdateThemeModeRequest $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();

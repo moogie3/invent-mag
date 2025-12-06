@@ -45,233 +45,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"TR","description":"Transistor","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":2,"name":"FBT","description":"Flyback","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":3,"name":"IC","description":"Integrated Circuit","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}],"links":{"first":"http:\/\/localhost\/api\/v1\/categories?page=1","last":"http:\/\/localhost\/api\/v1\/categories?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/categories?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/categories","per_page":25,"to":3,"total":3}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"name":"Electronics","description":"Electronic components and devices",...}],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of categories.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].name':
-        custom: []
-        name: 'data[].name'
-        description: 'The name of the category.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].description':
-        custom: []
-        name: 'data[].description'
-        description: 'The description of the category.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].parent_id':
-        custom: []
-        name: 'data[].parent_id'
-        description: 'The ID of the parent category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the category was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the category was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -345,85 +128,22 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":12,"name":"\"Electronics\"","description":"\"Electronic components and devices\"","created_at":"2025-12-05T07:49:53.000000Z","updated_at":"2025-12-05T07:49:53.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
+        content: '{"data":{"id":1,"name":"Electronics","description":"Electronic components and devices",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
       -
         custom: []
         status: 422
-        content: '{"success": false, "message": "Failed to create category."}'
+        content: '{"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
         headers: []
-        description: 'Creation Failed'
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the category.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the category.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      parent_id:
-        custom: []
-        name: parent_id
-        description: 'The ID of the parent category.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the category was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the category was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -485,33 +205,87 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"TR","description":"Transistor","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
+        content: '{"data":{"id":1,"name":"Electronics","description":"Electronic components and devices",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Category not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/v1/categories/{id}'
+    metadata:
+      custom: []
+      groupName: Categories
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update the specified resource in storage.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
       id:
         custom: []
         name: id
         description: 'The ID of the category.'
-        required: false
-        example: null
-        type: integer
+        required: true
+        example: consequatur
+        type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      category:
+        custom: []
+        name: category
+        description: 'The ID of the category.'
+        required: true
+        example: '1'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: consequatur
+      category: '1'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
       name:
         custom: []
         name: name
         description: 'The name of the category.'
-        required: false
-        example: null
+        required: true
+        example: '"Electronics"'
         type: string
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         deprecated: false
       description:
@@ -519,67 +293,54 @@ endpoints:
         name: description
         description: 'The description of the category.'
         required: false
-        example: null
+        example: '"Electronic components and devices"'
         type: string
         enumValues: []
-        exampleWasSpecified: false
-        nullable: false
+        exampleWasSpecified: true
+        nullable: true
         deprecated: false
       parent_id:
         custom: []
         name: parent_id
         description: 'The ID of the parent category.'
         required: false
-        example: null
+        example: 1
         type: integer
         enumValues: []
-        exampleWasSpecified: false
-        nullable: false
+        exampleWasSpecified: true
+        nullable: true
         deprecated: false
-      created_at:
+    cleanBodyParameters:
+      name: '"Electronics"'
+      description: '"Electronic components and devices"'
+      parent_id: 1
+    fileParameters: []
+    responses:
+      -
         custom: []
-        name: created_at
-        description: 'The date and time the category was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
+        status: 200
+        content: '{"data":{"id":1,"name":"Electronics (Updated)","description":"Updated description","created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T13:00:00.000000Z"}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: updated_at
-        description: 'The date and time the category was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      parent:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: parent
-        description: 'The parent category.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      children:
+        status: 404
+        content: '{"message": "Category not found."}'
+        headers: []
+        description: 'Not Found'
+      -
         custom: []
-        name: children
-        description: 'A list of child categories.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -644,6 +405,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Category not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

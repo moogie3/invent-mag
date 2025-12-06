@@ -139,7 +139,7 @@ class SupplierController extends Controller
      *
      * @group Suppliers
      * @authenticated
-     *
+     *z
      * @response 200 scenario="Success" {"total_suppliers":10,"new_this_month":2}
      * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */

@@ -45,277 +45,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"paymentable_type":"App\\Models\\Purchase","paymentable_id":1,"amount":"1080.00","payment_date":"2025-11-26T05:06:57.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":1,"invoice":"PO-00001","supplier_id":3,"user_id":null,"order_date":"2025-11-22T05:06:57.000000Z","due_date":"2025-12-07T05:06:57.000000Z","payment_type":"Cash","discount_total":40,"discount_total_type":"percentage","total":1080,"status":"Paid","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sub_total":1080,"grand_total":648,"items":[{"id":1,"po_id":1,"product_id":4,"quantity":8,"remaining_quantity":8,"price":"90.00","discount":null,"discount_type":"percentage","total":720,"expiry_date":"2026-02-02","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":2,"po_id":1,"product_id":2,"quantity":2,"remaining_quantity":2,"price":"180.00","discount":null,"discount_type":"percentage","total":360,"expiry_date":"2026-02-09","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}]}},{"id":2,"paymentable_type":"App\\Models\\Purchase","paymentable_id":2,"amount":"450.00","payment_date":"2025-11-11T05:06:57.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":2,"invoice":"PO-00002","supplier_id":4,"user_id":null,"order_date":"2025-11-07T05:06:57.000000Z","due_date":"2025-11-17T05:06:57.000000Z","payment_type":"Cash","discount_total":35,"discount_total_type":"percentage","total":450,"status":"Paid","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sub_total":450,"grand_total":292.5,"items":[{"id":3,"po_id":2,"product_id":4,"quantity":5,"remaining_quantity":5,"price":"90.00","discount":null,"discount_type":"percentage","total":450,"expiry_date":"2025-12-29","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}]}},{"id":3,"paymentable_type":"App\\Models\\Purchase","paymentable_id":3,"amount":"7600.00","payment_date":"2025-11-29T05:06:57.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":3,"invoice":"PO-00003","supplier_id":1,"user_id":null,"order_date":"2025-11-27T05:06:57.000000Z","due_date":"2025-12-10T05:06:57.000000Z","payment_type":"Cash","discount_total":28,"discount_total_type":"fixed","total":7600,"status":"Paid","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sub_total":7600,"grand_total":7572,"items":[{"id":4,"po_id":3,"product_id":3,"quantity":8,"remaining_quantity":8,"price":"950.00","discount":null,"discount_type":"percentage","total":7600,"expiry_date":"2025-12-08","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}]}},{"id":4,"paymentable_type":"App\\Models\\Purchase","paymentable_id":4,"amount":"4930.00","payment_date":"2025-11-15T05:06:57.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":4,"invoice":"PO-00004","supplier_id":5,"user_id":null,"order_date":"2025-11-15T05:06:57.000000Z","due_date":"2025-12-04T05:06:57.000000Z","payment_type":"Cash","discount_total":0,"discount_total_type":"fixed","total":4930,"status":"Paid","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sub_total":4930,"grand_total":4930,"items":[{"id":5,"po_id":4,"product_id":3,"quantity":5,"remaining_quantity":5,"price":"950.00","discount":null,"discount_type":"percentage","total":4750,"expiry_date":"2026-02-13","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":6,"po_id":4,"product_id":4,"quantity":2,"remaining_quantity":2,"price":"90.00","discount":null,"discount_type":"percentage","total":180,"expiry_date":"2026-02-08","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}]}},{"id":5,"paymentable_type":"App\\Models\\Purchase","paymentable_id":7,"amount":"900.00","payment_date":"2025-11-25T05:06:57.000000Z","payment_method":"Transfer","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":7,"invoice":"PO-00007","supplier_id":5,"user_id":null,"order_date":"2025-11-21T05:06:57.000000Z","due_date":"2025-12-21T05:06:57.000000Z","payment_type":"Transfer","discount_total":42,"discount_total_type":"fixed","total":900,"status":"Paid","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sub_total":900,"grand_total":858,"items":[{"id":15,"po_id":7,"product_id":4,"quantity":10,"remaining_quantity":10,"price":"90.00","discount":null,"discount_type":"percentage","total":900,"expiry_date":"2026-02-09","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}]}},{"id":6,"paymentable_type":"App\\Models\\Purchase","paymentable_id":8,"amount":"4790.00","payment_date":"2025-11-08T05:06:57.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":8,"invoice":"PO-00008","supplier_id":5,"user_id":null,"order_date":"2025-11-04T05:06:57.000000Z","due_date":"2025-11-18T05:06:57.000000Z","payment_type":"Cash","discount_total":2,"discount_total_type":"percentage","total":4790,"status":"Paid","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sub_total":4790,"grand_total":4694.2,"items":[{"id":16,"po_id":8,"product_id":2,"quantity":3,"remaining_quantity":3,"price":"180.00","discount":null,"discount_type":"percentage","total":540,"expiry_date":"2026-02-13","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":17,"po_id":8,"product_id":4,"quantity":5,"remaining_quantity":5,"price":"90.00","discount":null,"discount_type":"percentage","total":450,"expiry_date":"2026-01-14","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":18,"po_id":8,"product_id":3,"quantity":4,"remaining_quantity":4,"price":"950.00","discount":null,"discount_type":"percentage","total":3800,"expiry_date":"2025-12-08","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}]}},{"id":7,"paymentable_type":"App\\Models\\Purchase","paymentable_id":10,"amount":"1710.00","payment_date":"2025-12-02T05:06:57.000000Z","payment_method":"-","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":10,"invoice":"PO-00010","supplier_id":5,"user_id":null,"order_date":"2025-11-27T05:06:57.000000Z","due_date":"2025-12-07T05:06:57.000000Z","payment_type":"-","discount_total":28,"discount_total_type":"percentage","total":1710,"status":"Paid","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sub_total":1710,"grand_total":1231.2,"items":[{"id":23,"po_id":10,"product_id":4,"quantity":9,"remaining_quantity":9,"price":"90.00","discount":null,"discount_type":"percentage","total":810,"expiry_date":"2025-12-10","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":24,"po_id":10,"product_id":4,"quantity":10,"remaining_quantity":10,"price":"90.00","discount":null,"discount_type":"percentage","total":900,"expiry_date":"2026-01-08","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}]}},{"id":8,"paymentable_type":"App\\Models\\Sales","paymentable_id":1,"amount":"7163.20","payment_date":"2025-05-18T05:06:57.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":1,"invoice":"INV-00001","customer_id":"3","user_id":1,"order_date":"2025-05-17T05:06:57.000000Z","due_date":"2025-06-11T05:06:57.000000Z","payment_type":"Cash","order_discount":12,"order_discount_type":"percentage","tax_rate":10,"total_tax":651.2,"total":7163.2,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":1,"sales_id":1,"product_id":5,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"5200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","stock_quantity":14,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":2,"units_id":1,"supplier_id":1,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":2,"sales_id":1,"product_id":1,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"2200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":9,"paymentable_type":"App\\Models\\Sales","paymentable_id":2,"amount":"1642.00","payment_date":"2025-02-25T05:06:57.000000Z","payment_method":"-","notes":"Partial payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":2,"invoice":"INV-00002","customer_id":"1","user_id":1,"order_date":"2025-02-25T05:06:57.000000Z","due_date":"2025-03-22T05:06:57.000000Z","payment_type":"-","order_discount":0,"order_discount_type":"percentage","tax_rate":10,"total_tax":292,"total":3212,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":3,"sales_id":2,"product_id":5,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"2600.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","stock_quantity":14,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":2,"units_id":1,"supplier_id":1,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":4,"sales_id":2,"product_id":4,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":10,"paymentable_type":"App\\Models\\Sales","paymentable_id":4,"amount":"459.00","payment_date":"2025-09-17T05:06:57.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":4,"invoice":"INV-00004","customer_id":"1","user_id":1,"order_date":"2025-09-13T05:06:57.000000Z","due_date":"2025-10-06T05:06:57.000000Z","payment_type":"Cash","order_discount":11,"order_discount_type":"fixed","tax_rate":10,"total_tax":68.9,"total":757.9,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":6,"sales_id":4,"product_id":2,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"700.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":11,"paymentable_type":"App\\Models\\Sales","paymentable_id":5,"amount":"2673.00","payment_date":"2024-12-25T05:06:57.000000Z","payment_method":"Card","notes":"Partial payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":5,"invoice":"INV-00005","customer_id":"3","user_id":1,"order_date":"2024-12-25T05:06:57.000000Z","due_date":"2025-01-08T05:06:57.000000Z","payment_type":"Card","order_discount":19,"order_discount_type":"fixed","tax_rate":10,"total_tax":636.1,"total":6997.1,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":7,"sales_id":5,"product_id":4,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"640.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":8,"sales_id":5,"product_id":4,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"640.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":9,"sales_id":5,"product_id":3,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"5100.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","stock_quantity":78,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":2,"units_id":3,"supplier_id":5,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":12,"paymentable_type":"App\\Models\\Sales","paymentable_id":6,"amount":"9426.45","payment_date":"2025-06-24T05:06:57.000000Z","payment_method":"Card","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":6,"invoice":"INV-00006","customer_id":"4","user_id":1,"order_date":"2025-06-19T05:06:57.000000Z","due_date":"2025-07-04T05:06:57.000000Z","payment_type":"Card","order_discount":13,"order_discount_type":"percentage","tax_rate":10,"total_tax":856.95,"total":9426.45,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":10,"sales_id":6,"product_id":1,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"4400.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":11,"sales_id":6,"product_id":1,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"3300.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":12,"sales_id":6,"product_id":2,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1050.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":13,"sales_id":6,"product_id":1,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"1100.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":13,"paymentable_type":"App\\Models\\Sales","paymentable_id":7,"amount":"3049.20","payment_date":"2024-12-10T05:06:57.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":7,"invoice":"INV-00007","customer_id":"3","user_id":1,"order_date":"2024-12-08T05:06:57.000000Z","due_date":"2024-12-21T05:06:57.000000Z","payment_type":"Cash","order_discount":16,"order_discount_type":"percentage","tax_rate":10,"total_tax":277.2,"total":3049.2,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":14,"sales_id":7,"product_id":1,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"3300.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":14,"paymentable_type":"App\\Models\\Sales","paymentable_id":10,"amount":"2850.10","payment_date":"2024-12-26T05:06:57.000000Z","payment_method":"-","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":10,"invoice":"INV-00010","customer_id":"3","user_id":1,"order_date":"2024-12-26T05:06:57.000000Z","due_date":"2025-01-11T05:06:57.000000Z","payment_type":"-","order_discount":9,"order_discount_type":"fixed","tax_rate":10,"total_tax":259.1,"total":2850.1,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":17,"sales_id":10,"product_id":5,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"2600.00","total":"2600.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":5,"code":"TR15","barcode":"7696770298766","name":"Expired Voltage Regulator","stock_quantity":14,"low_stock_threshold":10,"price":1400,"selling_price":2600,"category_id":2,"units_id":1,"supplier_id":1,"description":"Voltage regulator expired long ago","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2024-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":15,"paymentable_type":"App\\Models\\Sales","paymentable_id":11,"amount":"733.00","payment_date":"2025-02-18T05:06:57.000000Z","payment_method":"Card","notes":"Partial payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":11,"invoice":"INV-00011","customer_id":"2","user_id":1,"order_date":"2025-02-18T05:06:57.000000Z","due_date":"2025-03-04T05:06:57.000000Z","payment_type":"Card","order_discount":11,"order_discount_type":"percentage","tax_rate":10,"total_tax":726.24,"total":7988.64,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sales_opportunity_id":null,"sales_items":[{"id":18,"sales_id":11,"product_id":1,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"2200.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":19,"sales_id":11,"product_id":1,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"4400.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":20,"sales_id":11,"product_id":2,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1400.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":21,"sales_id":11,"product_id":4,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"160.00","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":16,"paymentable_type":"App\\Models\\Sales","paymentable_id":12,"amount":"114.00","payment_date":"2025-09-23T05:06:58.000000Z","payment_method":"-","notes":"Partial payment during seeding.","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","paymentable":{"id":12,"invoice":"INV-00012","customer_id":"3","user_id":1,"order_date":"2025-09-18T05:06:58.000000Z","due_date":"2025-10-10T05:06:58.000000Z","payment_type":"-","order_discount":13,"order_discount_type":"percentage","tax_rate":10,"total_tax":55.68,"total":612.48,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":22,"sales_id":12,"product_id":4,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"640.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":17,"paymentable_type":"App\\Models\\Sales","paymentable_id":13,"amount":"6098.40","payment_date":"2025-07-29T05:06:58.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","paymentable":{"id":13,"invoice":"INV-00013","customer_id":"2","user_id":1,"order_date":"2025-07-28T05:06:58.000000Z","due_date":"2025-08-11T05:06:58.000000Z","payment_type":"Cash","order_discount":12,"order_discount_type":"percentage","tax_rate":10,"total_tax":554.4,"total":6098.4,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":23,"sales_id":13,"product_id":1,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"5500.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":24,"sales_id":13,"product_id":4,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"800.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":18,"paymentable_type":"App\\Models\\Sales","paymentable_id":14,"amount":"338.80","payment_date":"2025-10-02T05:06:58.000000Z","payment_method":"eWallet","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","paymentable":{"id":14,"invoice":"INV-00014","customer_id":"3","user_id":1,"order_date":"2025-10-02T05:06:58.000000Z","due_date":"2025-10-26T05:06:58.000000Z","payment_type":"eWallet","order_discount":12,"order_discount_type":"percentage","tax_rate":10,"total_tax":30.8,"total":338.8,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":25,"sales_id":14,"product_id":2,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"350.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":19,"paymentable_type":"App\\Models\\Sales","paymentable_id":16,"amount":"687.00","payment_date":"2025-06-01T05:06:58.000000Z","payment_method":"Transfer","notes":"Partial payment during seeding.","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","paymentable":{"id":16,"invoice":"INV-00016","customer_id":"3","user_id":1,"order_date":"2025-05-28T05:06:58.000000Z","due_date":"2025-06-15T05:06:58.000000Z","payment_type":"Transfer","order_discount":7,"order_discount_type":"percentage","tax_rate":10,"total_tax":227.85,"total":2506.35,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":29,"sales_id":16,"product_id":2,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"700.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":30,"sales_id":16,"product_id":2,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1750.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":20,"paymentable_type":"App\\Models\\Sales","paymentable_id":17,"amount":"90.00","payment_date":"2025-05-29T05:06:58.000000Z","payment_method":"Card","notes":"Partial payment during seeding.","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","paymentable":{"id":17,"invoice":"INV-00017","customer_id":"6","user_id":1,"order_date":"2025-05-24T05:06:58.000000Z","due_date":"2025-06-17T05:06:58.000000Z","payment_type":"Card","order_discount":4,"order_discount_type":"fixed","tax_rate":10,"total_tax":839.6,"total":9235.6,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":31,"sales_id":17,"product_id":3,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"5100.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","stock_quantity":78,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":2,"units_id":3,"supplier_id":5,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":32,"sales_id":17,"product_id":1,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"3300.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":21,"paymentable_type":"App\\Models\\Sales","paymentable_id":18,"amount":"169.00","payment_date":"2025-06-04T05:06:58.000000Z","payment_method":"Card","notes":"Partial payment during seeding.","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","paymentable":{"id":18,"invoice":"INV-00018","customer_id":"5","user_id":1,"order_date":"2025-06-04T05:06:58.000000Z","due_date":"2025-06-25T05:06:58.000000Z","payment_type":"Card","order_discount":13,"order_discount_type":"fixed","tax_rate":10,"total_tax":30.7,"total":337.7,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":33,"sales_id":18,"product_id":4,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"320.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":22,"paymentable_type":"App\\Models\\Sales","paymentable_id":20,"amount":"699.60","payment_date":"2025-04-22T05:06:58.000000Z","payment_method":"Card","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","paymentable":{"id":20,"invoice":"INV-00020","customer_id":"1","user_id":1,"order_date":"2025-04-21T05:06:58.000000Z","due_date":"2025-05-06T05:06:58.000000Z","payment_type":"Card","order_discount":4,"order_discount_type":"fixed","tax_rate":10,"total_tax":63.6,"total":699.6,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":36,"sales_id":20,"product_id":4,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"640.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":23,"paymentable_type":"App\\Models\\Sales","paymentable_id":21,"amount":"5239.00","payment_date":"2025-08-30T05:06:58.000000Z","payment_method":"-","notes":"Partial payment during seeding.","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","paymentable":{"id":21,"invoice":"INV-00021","customer_id":"6","user_id":1,"order_date":"2025-08-26T05:06:58.000000Z","due_date":"2025-09-06T05:06:58.000000Z","payment_type":"-","order_discount":13,"order_discount_type":"percentage","tax_rate":10,"total_tax":682.95,"total":7512.45,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":37,"sales_id":21,"product_id":3,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"6800.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","stock_quantity":78,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":2,"units_id":3,"supplier_id":5,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":38,"sales_id":21,"product_id":2,"quantity":3,"discount":"0.00","discount_type":"fixed","customer_price":"350.00","total":"1050.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":2,"code":"TR12","barcode":"4490183055700","name":"Expired Diode","stock_quantity":48,"low_stock_threshold":10,"price":180,"selling_price":350,"category_id":1,"units_id":1,"supplier_id":5,"description":"Diode product already expired","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-06-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":24,"paymentable_type":"App\\Models\\Sales","paymentable_id":22,"amount":"814.00","payment_date":"2025-10-11T05:06:58.000000Z","payment_method":"Cash","notes":"Partial payment during seeding.","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","paymentable":{"id":22,"invoice":"INV-00022","customer_id":"4","user_id":1,"order_date":"2025-10-11T05:06:58.000000Z","due_date":"2025-10-26T05:06:58.000000Z","payment_type":"Cash","order_discount":15,"order_discount_type":"fixed","tax_rate":10,"total_tax":108.5,"total":1193.5,"status":"Partial","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":39,"sales_id":22,"product_id":1,"quantity":1,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"1100.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}},{"id":25,"paymentable_type":"App\\Models\\Sales","paymentable_id":24,"amount":"9270.80","payment_date":"2025-10-26T05:06:58.000000Z","payment_method":"eWallet","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","paymentable":{"id":24,"invoice":"INV-00024","customer_id":"4","user_id":1,"order_date":"2025-10-26T05:06:58.000000Z","due_date":"2025-11-05T05:06:58.000000Z","payment_type":"eWallet","order_discount":2,"order_discount_type":"percentage","tax_rate":10,"total_tax":842.8,"total":9270.8,"status":"Paid","amount_received":null,"change_amount":0,"is_pos":false,"created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","sales_opportunity_id":null,"sales_items":[{"id":43,"sales_id":24,"product_id":1,"quantity":4,"discount":"0.00","discount_type":"fixed","customer_price":"1100.00","total":"4400.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":1,"code":"TR11","barcode":"1234567890123","name":"Near Low Stock Capacitor","stock_quantity":22,"low_stock_threshold":10,"price":600,"selling_price":1100,"category_id":2,"units_id":3,"supplier_id":2,"description":"Capacitor close to low stock","warehouse_id":1,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":false,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":44,"sales_id":24,"product_id":4,"quantity":5,"discount":"0.00","discount_type":"fixed","customer_price":"160.00","total":"800.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":4,"code":"TR14","barcode":"7116063374903","name":"Low Stock LED","stock_quantity":85,"low_stock_threshold":5,"price":90,"selling_price":160,"category_id":1,"units_id":3,"supplier_id":3,"description":"LED near expiry and low stock","warehouse_id":2,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-11-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":45,"sales_id":24,"product_id":3,"quantity":2,"discount":"0.00","discount_type":"fixed","customer_price":"1700.00","total":"3400.00","created_at":"2025-12-02T05:06:58.000000Z","updated_at":"2025-12-02T05:06:58.000000Z","product":{"id":3,"code":"TR13","barcode":"8350246525853","name":"Near Expiry Crystal Oscillator","stock_quantity":78,"low_stock_threshold":20,"price":950,"selling_price":1700,"category_id":2,"units_id":3,"supplier_id":5,"description":"Crystal oscillator expiring soon","warehouse_id":3,"image":"http:\/\/localhost\/img\/default_placeholder.png","has_expiry":true,"created_at":"2025-10-02T05:06:57.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}}],"links":{"first":"http:\/\/localhost\/api\/v1\/payments?page=1","last":"http:\/\/localhost\/api\/v1\/payments?page=3","prev":null,"next":"http:\/\/localhost\/api\/v1\/payments?page=2"},"meta":{"current_page":1,"from":1,"last_page":3,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/payments?page=1","label":"1","active":true},{"url":"http:\/\/localhost\/api\/v1\/payments?page=2","label":"2","active":false},{"url":"http:\/\/localhost\/api\/v1\/payments?page=3","label":"3","active":false},{"url":"http:\/\/localhost\/api\/v1\/payments?page=2","label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/payments","per_page":25,"to":25,"total":75}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"amount":100,"payment_date":"2025-11-28",...}],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of payments.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the payment.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].paymentable_type':
-        custom: []
-        name: 'data[].paymentable_type'
-        description: 'The type of the paymentable model.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].paymentable_id':
-        custom: []
-        name: 'data[].paymentable_id'
-        description: 'The ID of the paymentable model.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].amount':
-        custom: []
-        name: 'data[].amount'
-        description: 'The amount of the payment.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].payment_date':
-        custom: []
-        name: 'data[].payment_date'
-        description: 'The date of the payment.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].payment_method':
-        custom: []
-        name: 'data[].payment_method'
-        description: 'The payment method.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].notes':
-        custom: []
-        name: 'data[].notes'
-        description: 'The notes for the payment.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the payment was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the payment was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].paymentable':
-        custom: []
-        name: 'data[].paymentable'
-        description: 'The paymentable model.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -377,123 +116,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"paymentable_type":"App\\Models\\Purchase","paymentable_id":1,"amount":"1080.00","payment_date":"2025-11-26T05:06:57.000000Z","payment_method":"Cash","notes":"Full payment during seeding.","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","paymentable":{"id":1,"invoice":"PO-00001","supplier_id":3,"user_id":null,"order_date":"2025-11-22T05:06:57.000000Z","due_date":"2025-12-07T05:06:57.000000Z","payment_type":"Cash","discount_total":40,"discount_total_type":"percentage","total":1080,"status":"Paid","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","sub_total":1080,"grand_total":648,"items":[{"id":1,"po_id":1,"product_id":4,"quantity":8,"remaining_quantity":8,"price":"90.00","discount":null,"discount_type":"percentage","total":720,"expiry_date":"2026-02-02","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":2,"po_id":1,"product_id":2,"quantity":2,"remaining_quantity":2,"price":"180.00","discount":null,"discount_type":"percentage","total":360,"expiry_date":"2026-02-09","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}]}}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"amount":100,"payment_date":"2025-11-28",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the payment.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      paymentable_type:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: paymentable_type
-        description: 'The type of the paymentable model.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      paymentable_id:
-        custom: []
-        name: paymentable_id
-        description: 'The ID of the paymentable model.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      amount:
-        custom: []
-        name: amount
-        description: 'The amount of the payment.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      payment_date:
-        custom: []
-        name: payment_date
-        description: 'The date of the payment.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      payment_method:
-        custom: []
-        name: payment_method
-        description: 'The payment method.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'The notes for the payment.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the payment was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the payment was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      paymentable:
-        custom: []
-        name: paymentable
-        description: 'The paymentable model.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Payment not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -628,112 +266,28 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"paymentable_type":"App\\Models\\Purchase","paymentable_id":1,"amount":100,"payment_date":"2025-11-28T00:00:00.000000Z","payment_method":"Cash","notes":"Paid in full","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-05T07:49:53.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"amount":100,"payment_date":"2025-11-28",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the payment.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      paymentable_type:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: paymentable_type
-        description: 'The type of the paymentable model.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      paymentable_id:
+        status: 404
+        content: '{"message": "Payment not found."}'
+        headers: []
+        description: 'Not Found'
+      -
         custom: []
-        name: paymentable_id
-        description: 'The ID of the paymentable model.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      amount:
-        custom: []
-        name: amount
-        description: 'The amount of the payment.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      payment_date:
-        custom: []
-        name: payment_date
-        description: 'The date of the payment.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      payment_method:
-        custom: []
-        name: payment_method
-        description: 'The payment method.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'The notes for the payment.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the payment was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the payment was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The amount field is required.","errors":{"amount":["The amount field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -798,6 +352,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Payment not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

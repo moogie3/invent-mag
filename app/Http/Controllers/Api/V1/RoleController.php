@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreRoleRequest;
+use App\Http\Requests\Api\V1\UpdateRoleRequest;
 use App\Http\Resources\RoleResource;
 use App\Models\Role;
 use Illuminate\Http\Request;
@@ -21,26 +23,8 @@ class RoleController extends Controller
      * @authenticated
      * @queryParam per_page int The number of roles to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of roles.
-     * @responseField data[].id integer The ID of the role.
-     * @responseField data[].name string The name of the role.
-     * @responseField data[].guard_name string The guard name for the role.
-     * @responseField data[].created_at string The date and time the role was created.
-     * @responseField data[].updated_at string The date and time the role was last updated.
-     * @responseField data[].permissions array A list of permissions assigned to the role.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"name":"Admin","guard_name":"web","permissions":["view-users","edit-users"]},...],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -56,13 +40,11 @@ class RoleController extends Controller
      * @authenticated
      * @bodyParam name string required The name of the role. Example: Admin
      *
-     * @responseField id integer The ID of the role.
-     * @responseField name string The name of the role.
-     * @responseField guard_name string The guard name for the role.
-     * @responseField created_at string The date and time the role was created.
-     * @responseField updated_at string The date and time the role was last updated.
+     * @response 201 scenario="Success" {"data":{"id":1,"name":"Admin","guard_name":"web",...}}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function store(\App\Http\Requests\Api\V1\StoreRoleRequest $request)
+    public function store(StoreRoleRequest $request)
     {
         $validated = $request->validated();
         $role = Role::create(['name' => $validated['name'], 'guard_name' => 'web']);
@@ -81,12 +63,9 @@ class RoleController extends Controller
      * @authenticated
      * @urlParam role required The ID of the role. Example: 1
      *
-     * @responseField id integer The ID of the role.
-     * @responseField name string The name of the role.
-     * @responseField guard_name string The guard name for the role.
-     * @responseField created_at string The date and time the role was created.
-     * @responseField updated_at string The date and time the role was last updated.
-     * @responseField permissions array A list of permissions assigned to the role.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Admin","guard_name":"web","permissions":["view-users","edit-users"]}}
+     * @response 404 scenario="Not Found" {"message": "Role not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(Role $role)
     {
@@ -101,13 +80,12 @@ class RoleController extends Controller
      * @urlParam role integer required The ID of the role. Example: 1
      * @bodyParam name string required The name of the role. Example: Editor
      *
-     * @responseField id integer The ID of the role.
-     * @responseField name string The name of the role.
-     * @responseField guard_name string The guard name for the role.
-     * @responseField created_at string The date and time the role was created.
-     * @responseField updated_at string The date and time the role was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Editor","guard_name":"web",...}}
+     * @response 404 scenario="Not Found" {"message": "Role not found."}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateRoleRequest $request, Role $role)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
         $validated = $request->validated();
         $role->update(['name' => $validated['name']]);
@@ -127,6 +105,8 @@ class RoleController extends Controller
      * @urlParam role integer required The ID of the role to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Role not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(Role $role)
     {

@@ -43,266 +43,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"customer_id":1,"user_id":1,"type":"call","notes":"Rerum nihil eligendi ea qui sed. Corrupti mollitia dolores voluptates et. Laboriosam nisi sequi veritatis minus eos id. Ut doloremque est ducimus similique.","interaction_date":"2025-10-28T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":2,"customer_id":1,"user_id":1,"type":"note","notes":"Est reiciendis sit sed tempora. Tenetur autem ut aut doloribus consequuntur sint. Nobis autem maiores maiores nam ut molestiae illum.","interaction_date":"2024-12-17T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":3,"customer_id":1,"user_id":1,"type":"meeting","notes":"Quasi consequatur voluptate consectetur ut aut. Voluptatem officiis dolores at ab velit unde. Rerum officiis error natus sed optio dolor. Quidem exercitationem perspiciatis illum est sint ut est.","interaction_date":"2025-10-13T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":4,"customer_id":2,"user_id":1,"type":"meeting","notes":"Dolore in voluptatibus ratione et omnis. Molestiae quam eum soluta voluptas qui. Neque possimus inventore optio soluta voluptates tempore. Eos illum veritatis voluptate.","interaction_date":"2025-06-30T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":5,"customer_id":2,"user_id":1,"type":"note","notes":"Dolorem aspernatur nihil dolorem aut. Nobis animi eveniet quia in aut quia. Eius nulla quasi tempore voluptas sequi et distinctio. Aperiam ratione corporis et occaecati quia quibusdam ex.","interaction_date":"2025-07-11T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":6,"customer_id":2,"user_id":1,"type":"call","notes":"Aut et officiis corrupti et. Deleniti voluptate iure animi debitis. Sint qui voluptas impedit et officiis aut unde non.","interaction_date":"2025-07-21T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":7,"customer_id":3,"user_id":1,"type":"email","notes":"Atque beatae cumque nisi ut et. Quos cumque accusantium molestiae quas id accusamus. Nam repellat necessitatibus labore possimus nostrum aperiam excepturi. Nisi odit quidem cumque tempore autem sint nobis vero. Recusandae tempora sint consequatur est id nihil.","interaction_date":"2025-03-29T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":8,"customer_id":3,"user_id":1,"type":"note","notes":"Vel asperiores repudiandae qui et sunt dignissimos qui corrupti. Est commodi rerum aliquam rerum aut molestias cum. Voluptatem maxime blanditiis distinctio autem. Rerum dolores asperiores harum quibusdam dolore sed neque ipsam.","interaction_date":"2025-04-21T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":3,"name":"Siti Aminah","address":"Perumahan Griya Asri Blok B2, Bandung","phone_number":"082112345678","email":"siti.aminah@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"30","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":9,"customer_id":4,"user_id":1,"type":"note","notes":"Ut id quia sint laborum nihil laudantium aut quo. Consequatur sit beatae odit quo ut qui voluptate. Voluptatem autem veritatis sunt eos atque non. Ipsa vitae sint molestiae labore aliquid earum eius.","interaction_date":"2025-01-31T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":10,"customer_id":4,"user_id":1,"type":"note","notes":"In in et explicabo et exercitationem. Aut maiores praesentium aut. Incidunt sunt nam dolor ut. Nihil et error omnis pariatur quaerat maiores quibusdam.","interaction_date":"2025-10-09T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":4,"name":"Ahmad Fauzi","address":"Jl. Diponegoro No. 99, Surabaya","phone_number":"085312345678","email":"ahmad.fauzi@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"15","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":11,"customer_id":5,"user_id":1,"type":"call","notes":"Repellat at id in quibusdam natus. Non sapiente ut neque excepturi nisi natus temporibus. Commodi perspiciatis facere magnam dolores eligendi earum impedit.","interaction_date":"2025-11-05T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":12,"customer_id":5,"user_id":1,"type":"note","notes":"Quam veniam repudiandae quam. Et temporibus ea ea et minus sint. Maiores accusamus ut est nesciunt commodi consequuntur.","interaction_date":"2024-12-27T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":13,"customer_id":6,"user_id":1,"type":"call","notes":"Ut mollitia reiciendis omnis quisquam. Nobis et sint pariatur nam commodi animi nam. Dolorem est recusandae soluta assumenda sint. Excepturi rerum amet enim ut minus voluptatem.","interaction_date":"2025-11-14T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":14,"customer_id":6,"user_id":1,"type":"note","notes":"Et ducimus consequuntur qui soluta aut a. Aliquam totam similique libero distinctio voluptas nobis delectus. Accusantium aut fugiat nemo sint hic laudantium ut.","interaction_date":"2025-08-16T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":15,"customer_id":6,"user_id":1,"type":"call","notes":"Quibusdam minima quia dolorum necessitatibus. Quia natus minus vitae maxime ratione architecto laboriosam. Non error enim est impedit inventore odit facere aut.","interaction_date":"2025-10-03T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":6,"name":"Agus Wijaya","address":"Jl. Sudirman No. 88, Medan","phone_number":"089912345678","email":"agus.wijaya@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/customer-interactions?page=1","last":"http:\/\/localhost\/api\/v1\/customer-interactions?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/customer-interactions?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/customer-interactions","per_page":25,"to":15,"total":15}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"customer_id":1,"user_id":1,"type":"call",...}],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of customer interactions.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the interaction.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].customer_id':
-        custom: []
-        name: 'data[].customer_id'
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].user_id':
-        custom: []
-        name: 'data[].user_id'
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].type':
-        custom: []
-        name: 'data[].type'
-        description: 'The type of interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].notes':
-        custom: []
-        name: 'data[].notes'
-        description: 'The notes for the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].interaction_date':
-        custom: []
-        name: 'data[].interaction_date'
-        description: 'The date of the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the interaction was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the interaction was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].customer':
-        custom: []
-        name: 'data[].customer'
-        description: 'The customer associated with the interaction.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -399,102 +149,23 @@ endpoints:
     responses:
       -
         custom: []
+        status: 201
+        content: '{"data":{"id":1,"customer_id":1,"user_id":1,"type":"call",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
         status: 422
-        content: '{"message":"The interaction date field must be a valid date.","errors":{"interaction_date":["The interaction date field must be a valid date."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the interaction.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_id:
-        custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'The notes for the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      interaction_date:
-        custom: []
-        name: interaction_date
-        description: 'The date of the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the interaction was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the interaction was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The customer_id field is required.","errors":{"customer_id":["The customer_id field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -556,112 +227,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"customer_id":1,"user_id":1,"type":"call","notes":"Rerum nihil eligendi ea qui sed. Corrupti mollitia dolores voluptates et. Laboriosam nisi sequi veritatis minus eos id. Ut doloremque est ducimus similique.","interaction_date":"2025-10-28T00:00:00.000000Z","created_at":"2025-12-02T05:06:59.000000Z","updated_at":"2025-12-02T05:06:59.000000Z","customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"customer_id":1,"user_id":1,"type":"call",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the interaction.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_id:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'The notes for the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      interaction_date:
-        custom: []
-        name: interaction_date
-        description: 'The date of the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the interaction was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the interaction was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer:
-        custom: []
-        name: customer
-        description: 'The customer associated with the interaction.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Customer interaction not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -783,102 +364,29 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"data":{"id":1,"customer_id":1,"user_id":1,"type":"call",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Customer interaction not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
         status: 422
-        content: '{"message":"The interaction date field must be a valid date.","errors":{"interaction_date":["The interaction date field must be a valid date."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the interaction.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_id:
-        custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'The notes for the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      interaction_date:
-        custom: []
-        name: interaction_date
-        description: 'The date of the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the interaction was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the interaction was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The customer_id field is required.","errors":{"customer_id":["The customer_id field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -943,6 +451,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Customer interaction not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

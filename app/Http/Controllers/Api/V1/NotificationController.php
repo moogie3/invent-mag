@@ -26,7 +26,8 @@ class NotificationController extends Controller
      * @group Notifications
      * @authenticated
      *
-     * @responseField count integer The total number of notifications.
+     * @response 200 scenario="Success" {"count":5}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function count()
     {
@@ -40,12 +41,8 @@ class NotificationController extends Controller
      * @group Notifications
      * @authenticated
      *
-     * @responseField notifications object[] A list of notifications.
-     * @responseField notifications[].id string The composite ID of the notification.
-     * @responseField notifications[].title string The title of the notification.
-     * @responseField notifications[].description string The description of the notification.
-     * @responseField notifications[].urgency string The urgency of the notification.
-     * @responseField notifications[].route string The route for the notification.
+     * @response 200 scenario="Success" {"notifications":[{"id":"po::1","title":"New Purchase Order","description":"A new purchase order has been created.","urgency":"high","route":"/purchase-orders/1"}]}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function getNotifications()
     {
@@ -69,7 +66,9 @@ class NotificationController extends Controller
      * @authenticated
      * @urlParam id string required The composite ID of the notification to mark as read. Example: "po::1"
      *
-     * @responseField success boolean Indicates whether the request was successful.
+     * @response 200 scenario="Success" {"success":true}
+     * @response 404 scenario="Not Found" {"message": "Notification not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function markAsRead($id)
     {

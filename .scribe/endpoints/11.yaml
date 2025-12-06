@@ -31,35 +31,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"rolePermissions":{"superuser":["view-users","create-users","edit-users","delete-users","view-roles","create-roles","edit-roles","delete-roles","view-products","create-products","edit-products","delete-products","view-sales","create-sales","edit-sales","delete-sales","view-reports","access-dashboard","view-po","create-po","edit-po","delete-po","view-warehouse","create-warehouse","edit-warehouse","delete-warehouse","view-pos","create-pos","edit-pos","delete-pos","view-customer","create-customer","edit-customer","delete-customer","view-supplier","create-supplier","edit-supplier","delete-supplier","view-sales-pipeline","manage-sales-pipelines","manage-pipeline-stages","manage-sales-opportunities","view-accounting","view-accounts"],"staff":["view-products","create-products","edit-products","view-sales","create-sales","edit-sales","access-dashboard","view-po","create-po","edit-po","view-warehouse","create-warehouse","edit-warehouse","view-pos","create-pos","edit-pos"],"pos":["view-products","view-sales","delete-sales","view-reports","access-dashboard","view-warehouse","view-pos","create-pos"],"accountant":[]},"allPermissions":["view-users","create-users","edit-users","delete-users","view-roles","create-roles","edit-roles","delete-roles","view-products","create-products","edit-products","delete-products","view-sales","create-sales","edit-sales","delete-sales","view-reports","access-dashboard","view-po","create-po","edit-po","delete-po","view-warehouse","create-warehouse","edit-warehouse","delete-warehouse","view-pos","create-pos","edit-pos","delete-pos","view-customer","create-customer","edit-customer","delete-customer","view-supplier","create-supplier","edit-supplier","delete-supplier","view-sales-pipeline","manage-sales-pipelines","manage-pipeline-stages","manage-sales-opportunities","view-accounting","view-accounts"]}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      rolePermissions:
+        content: '{"rolePermissions":{"admin":["view-users","create-users"],"editor":["edit-posts"]},"allPermissions":["view-users","create-users","edit-posts"]}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: rolePermissions
-        description: 'An object where keys are role names and values are arrays of permission names.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      allPermissions:
-        custom: []
-        name: allPermissions
-        description: 'A list of all available permission names.'
-        required: false
-        example: null
-        type: 'string[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -109,365 +90,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},{"id":2,"name":"Super User","shopname":null,"address":null,"email":"superuser@example.com","email_verified_at":"2025-12-02T05:10:10.000000Z","two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":null,"timezone":null,"system_settings":{"navigation_type":"both","theme_mode":"light","notification_duration":"5","auto_logout_time":"60","data_refresh_rate":"30","system_language":"en","sidebar_lock":true,"show_theme_toggle":true,"enable_sound_notifications":true,"enable_browser_notifications":true,"show_success_messages":true,"remember_last_page":true,"enable_animations":true,"lazy_load_images":true,"enable_debug_mode":false,"enable_keyboard_shortcuts":true,"show_tooltips":true,"compact_mode":false,"sticky_navbar":true},"accounting_settings":{"cash_account_id":3,"accounts_receivable_account_id":5,"inventory_account_id":7,"accounts_payable_account_id":18,"sales_revenue_account_id":27,"cost_of_goods_sold_account_id":35},"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T06:54:09.000000Z"}]}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"name":"Admin User","email":"admin@example.com",...}],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of users.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].name':
-        custom: []
-        name: 'data[].name'
-        description: 'The name of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].shopname':
-        custom: []
-        name: 'data[].shopname'
-        description: 'The shop name of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].address':
-        custom: []
-        name: 'data[].address'
-        description: 'The address of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].email':
-        custom: []
-        name: 'data[].email'
-        description: 'The email address of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].email_verified_at':
-        custom: []
-        name: 'data[].email_verified_at'
-        description: 'The email verification timestamp.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].two_factor_secret':
-        custom: []
-        name: 'data[].two_factor_secret'
-        description: 'The two-factor secret.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].two_factor_recovery_codes':
-        custom: []
-        name: 'data[].two_factor_recovery_codes'
-        description: 'The two-factor recovery codes.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].two_factor_confirmed_at':
-        custom: []
-        name: 'data[].two_factor_confirmed_at'
-        description: 'The two-factor confirmation timestamp.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].remember_token':
-        custom: []
-        name: 'data[].remember_token'
-        description: 'The remember token.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].avatar':
-        custom: []
-        name: 'data[].avatar'
-        description: "The URL or path to the user's avatar."
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].timezone':
-        custom: []
-        name: 'data[].timezone'
-        description: 'The timezone of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].system_settings':
-        custom: []
-        name: 'data[].system_settings'
-        description: 'The system settings for the user.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].accounting_settings':
-        custom: []
-        name: 'data[].accounting_settings'
-        description: 'The accounting settings for the user.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the user was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the user was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].roles':
-        custom: []
-        name: 'data[].roles'
-        description: 'A list of roles assigned to the user.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].permissions':
-        custom: []
-        name: 'data[].permissions'
-        description: 'A list of permissions assigned to the user.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -648,135 +280,23 @@ endpoints:
     responses:
       -
         custom: []
+        status: 201
+        content: '{"data":{"id":1,"name":"John Doe","email":"john.doe@example.com",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
         status: 422
-        content: '{"message":"The password field confirmation does not match.","errors":{"password":["The password field confirmation does not match."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      shopname:
-        custom: []
-        name: shopname
-        description: 'The shop name of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      address:
-        custom: []
-        name: address
-        description: 'The address of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      email:
-        custom: []
-        name: email
-        description: 'The email address of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      avatar:
-        custom: []
-        name: avatar
-        description: "The URL or path to the user's avatar."
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      timezone:
-        custom: []
-        name: timezone
-        description: 'The timezone of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      system_settings:
-        custom: []
-        name: system_settings
-        description: 'The system settings for the user.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      accounting_settings:
-        custom: []
-        name: accounting_settings
-        description: 'The accounting settings for the user.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the user was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the user was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -838,211 +358,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"admin","shopname":null,"address":null,"email":"admin@gmail.com","email_verified_at":null,"two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":"","timezone":null,"system_settings":null,"accounting_settings":null,"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","roles":[],"permissions":[]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"name":"Admin User","email":"admin@example.com",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: name
-        description: 'The name of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      shopname:
-        custom: []
-        name: shopname
-        description: 'The shop name of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      address:
-        custom: []
-        name: address
-        description: 'The address of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      email:
-        custom: []
-        name: email
-        description: 'The email address of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      email_verified_at:
-        custom: []
-        name: email_verified_at
-        description: 'The email verification timestamp.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      two_factor_secret:
-        custom: []
-        name: two_factor_secret
-        description: 'The two-factor secret.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      two_factor_recovery_codes:
-        custom: []
-        name: two_factor_recovery_codes
-        description: 'The two-factor recovery codes.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      two_factor_confirmed_at:
-        custom: []
-        name: two_factor_confirmed_at
-        description: 'The two-factor confirmation timestamp.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      remember_token:
-        custom: []
-        name: remember_token
-        description: 'The remember token.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      avatar:
-        custom: []
-        name: avatar
-        description: "The URL or path to the user's avatar."
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      timezone:
-        custom: []
-        name: timezone
-        description: 'The timezone of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      system_settings:
-        custom: []
-        name: system_settings
-        description: 'The system settings for the user.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      accounting_settings:
-        custom: []
-        name: accounting_settings
-        description: 'The accounting settings for the user.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the user was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the user was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      roles:
-        custom: []
-        name: roles
-        description: 'A list of roles assigned to the user.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      permissions:
-        custom: []
-        name: permissions
-        description: 'A list of permissions assigned to the user.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "User not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1248,135 +579,29 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"data":{"id":1,"name":"Jane Doe","email":"jane.doe@example.com",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "User not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
         status: 422
-        content: '{"message":"The password field confirmation does not match.","errors":{"password":["The password field confirmation does not match."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      shopname:
-        custom: []
-        name: shopname
-        description: 'The shop name of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      address:
-        custom: []
-        name: address
-        description: 'The address of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      email:
-        custom: []
-        name: email
-        description: 'The email address of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      avatar:
-        custom: []
-        name: avatar
-        description: "The URL or path to the user's avatar."
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      timezone:
-        custom: []
-        name: timezone
-        description: 'The timezone of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      system_settings:
-        custom: []
-        name: system_settings
-        description: 'The system settings for the user.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      accounting_settings:
-        custom: []
-        name: accounting_settings
-        description: 'The accounting settings for the user.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the user was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the user was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1441,6 +666,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "User not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

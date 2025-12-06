@@ -67,145 +67,28 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"customer_id":5,"sales_pipeline_id":1,"pipeline_stage_id":2,"name":"Opportunity 1","description":null,"amount":"1927.00","expected_close_date":null,"status":"won","sales_id":null,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-05T07:49:51.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"name":"New Client Project","pipeline_stage_id":2,...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the sales opportunity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_id:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_pipeline_id:
+        status: 404
+        content: '{"message": "Sales opportunity or stage not found."}'
+        headers: []
+        description: 'Opportunity or Stage Not Found'
+      -
         custom: []
-        name: sales_pipeline_id
-        description: 'The ID of the sales pipeline.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      pipeline_stage_id:
-        custom: []
-        name: pipeline_stage_id
-        description: 'The ID of the pipeline stage.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the sales opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the sales opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      amount:
-        custom: []
-        name: amount
-        description: 'The estimated amount of the opportunity.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      expected_close_date:
-        custom: []
-        name: expected_close_date
-        description: 'The expected close date of the opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_id:
-        custom: []
-        name: sales_id
-        description: 'The ID of the associated sales record.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the opportunity was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the opportunity was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The pipeline_stage_id field is required.","errors":{"pipeline_stage_id":["The pipeline_stage_id field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -267,46 +150,28 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"message":"Opportunity successfully converted to Sales Order.","type":"success","sales_id":117}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      message:
+        content: '{"message": "Opportunity successfully converted to Sales Order.", "type": "success", "sales_id": 1}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: message
-        description: 'A message indicating the result.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: type
-        description: 'The type of response (e.g., "success", "error").'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_id:
+        status: 404
+        content: '{"message": "Sales opportunity not found."}'
+        headers: []
+        description: 'Opportunity Not Found'
+      -
         custom: []
-        name: sales_id
-        description: 'The ID of the newly created sales order.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 500
+        content: '{"message": "Failed to convert opportunity to sales order: Internal server error.", "type": "error"}'
+        headers: []
+        description: 'Error converting to Sales Order'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -356,343 +221,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"customer_id":5,"sales_pipeline_id":1,"pipeline_stage_id":3,"name":"Opportunity 1","description":null,"amount":"1927.00","expected_close_date":null,"status":"won","sales_id":null,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"pipeline":{"id":1,"name":"Default Pipeline","description":"The default sales pipeline.","is_default":1,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"},"stage":{"id":3,"sales_pipeline_id":1,"name":"Negotiation","position":3,"is_closed":0,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":2,"customer_id":2,"sales_pipeline_id":1,"pipeline_stage_id":2,"name":"Opportunity 2","description":null,"amount":"6086.00","expected_close_date":null,"status":"open","sales_id":null,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"pipeline":{"id":1,"name":"Default Pipeline","description":"The default sales pipeline.","is_default":1,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"},"stage":{"id":2,"sales_pipeline_id":1,"name":"Proposal","position":2,"is_closed":0,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":3,"customer_id":5,"sales_pipeline_id":1,"pipeline_stage_id":3,"name":"Opportunity 3","description":null,"amount":"2511.00","expected_close_date":null,"status":"open","sales_id":null,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"pipeline":{"id":1,"name":"Default Pipeline","description":"The default sales pipeline.","is_default":1,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"},"stage":{"id":3,"sales_pipeline_id":1,"name":"Negotiation","position":3,"is_closed":0,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":4,"customer_id":1,"sales_pipeline_id":1,"pipeline_stage_id":1,"name":"Opportunity 4","description":null,"amount":"4032.00","expected_close_date":null,"status":"open","sales_id":null,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","customer":{"id":1,"name":"Walk In Customer","address":"-","phone_number":"0","email":"-","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"0","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"pipeline":{"id":1,"name":"Default Pipeline","description":"The default sales pipeline.","is_default":1,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"},"stage":{"id":1,"sales_pipeline_id":1,"name":"Qualification","position":1,"is_closed":0,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}},{"id":5,"customer_id":2,"sales_pipeline_id":1,"pipeline_stage_id":3,"name":"Opportunity 5","description":null,"amount":"3451.00","expected_close_date":null,"status":"open","sales_id":null,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","customer":{"id":2,"name":"Budi Santoso","address":"Jl. Merdeka No. 45, Jakarta","phone_number":"081234567890","email":"budi.santoso@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"45","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"pipeline":{"id":1,"name":"Default Pipeline","description":"The default sales pipeline.","is_default":1,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"},"stage":{"id":3,"sales_pipeline_id":1,"name":"Negotiation","position":3,"is_closed":0,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}}]}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"name":"New Client Project","amount":50000,...}],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of sales opportunities.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the sales opportunity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].customer_id':
-        custom: []
-        name: 'data[].customer_id'
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].sales_pipeline_id':
-        custom: []
-        name: 'data[].sales_pipeline_id'
-        description: 'The ID of the sales pipeline.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].pipeline_stage_id':
-        custom: []
-        name: 'data[].pipeline_stage_id'
-        description: 'The ID of the pipeline stage.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].name':
-        custom: []
-        name: 'data[].name'
-        description: 'The name of the sales opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].description':
-        custom: []
-        name: 'data[].description'
-        description: 'The description of the sales opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].amount':
-        custom: []
-        name: 'data[].amount'
-        description: 'The estimated amount of the opportunity.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].expected_close_date':
-        custom: []
-        name: 'data[].expected_close_date'
-        description: 'The expected close date of the opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].status':
-        custom: []
-        name: 'data[].status'
-        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].sales_id':
-        custom: []
-        name: 'data[].sales_id'
-        description: 'The ID of the associated sales record.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the opportunity was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the opportunity was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].pipeline':
-        custom: []
-        name: 'data[].pipeline'
-        description: 'The sales pipeline.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].stage':
-        custom: []
-        name: 'data[].stage'
-        description: 'The pipeline stage.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].customer':
-        custom: []
-        name: 'data[].customer'
-        description: 'The customer.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].items':
-        custom: []
-        name: 'data[].items'
-        description: 'The items in the opportunity.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -905,157 +443,23 @@ endpoints:
     responses:
       -
         custom: []
+        status: 201
+        content: '{"data":{"id":1,"name":"New Client Project","amount":50000,...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
         status: 422
-        content: '{"message":"The selected status is invalid. (and 3 more errors)","errors":{"status":["The selected status is invalid."],"items.0.product_id":["The items.0.product_id field is required."],"items.0.quantity":["The items.0.quantity field is required."],"items.0.price":["The items.0.price field is required."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the sales opportunity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_id:
-        custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_pipeline_id:
-        custom: []
-        name: sales_pipeline_id
-        description: 'The ID of the sales pipeline.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      pipeline_stage_id:
-        custom: []
-        name: pipeline_stage_id
-        description: 'The ID of the pipeline stage.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the sales opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the sales opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      amount:
-        custom: []
-        name: amount
-        description: 'The estimated amount of the opportunity.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      expected_close_date:
-        custom: []
-        name: expected_close_date
-        description: 'The expected close date of the opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_id:
-        custom: []
-        name: sales_id
-        description: 'The ID of the associated sales record.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the opportunity was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the opportunity was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      items:
-        custom: []
-        name: items
-        description: 'The items in the opportunity.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1117,189 +521,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"customer_id":5,"sales_pipeline_id":1,"pipeline_stage_id":3,"name":"Opportunity 1","description":null,"amount":"1927.00","expected_close_date":null,"status":"won","sales_id":null,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","pipeline":{"id":1,"name":"Default Pipeline","description":"The default sales pipeline.","is_default":1,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"},"stage":{"id":3,"sales_pipeline_id":1,"name":"Negotiation","position":3,"is_closed":0,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"},"customer":{"id":5,"name":"Lilis Suryani","address":"Jl. Gajah Mada No. 12, Yogyakarta","phone_number":"087812345678","email":"lilis.suryani@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","payment_terms":"7","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"},"items":[{"id":1,"sales_opportunity_id":1,"product_id":1,"quantity":4,"price":1100,"created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z"}]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"name":"New Client Project","amount":50000,...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the sales opportunity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_id:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_pipeline_id:
-        custom: []
-        name: sales_pipeline_id
-        description: 'The ID of the sales pipeline.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      pipeline_stage_id:
-        custom: []
-        name: pipeline_stage_id
-        description: 'The ID of the pipeline stage.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the sales opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the sales opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      amount:
-        custom: []
-        name: amount
-        description: 'The estimated amount of the opportunity.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      expected_close_date:
-        custom: []
-        name: expected_close_date
-        description: 'The expected close date of the opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_id:
-        custom: []
-        name: sales_id
-        description: 'The ID of the associated sales record.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the opportunity was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the opportunity was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      pipeline:
-        custom: []
-        name: pipeline
-        description: 'The sales pipeline.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      stage:
-        custom: []
-        name: stage
-        description: 'The pipeline stage.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer:
-        custom: []
-        name: customer
-        description: 'The customer.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      items:
-        custom: []
-        name: items
-        description: 'The items in the opportunity.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Sales opportunity not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1537,157 +774,29 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"data":{"id":1,"name":"New Client Project (Updated)",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Sales opportunity not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
         status: 422
-        content: '{"message":"The selected status is invalid. (and 3 more errors)","errors":{"status":["The selected status is invalid."],"items.0.product_id":["The items.0.product_id field is required."],"items.0.quantity":["The items.0.quantity field is required."],"items.0.price":["The items.0.price field is required."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the sales opportunity.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_id:
-        custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_pipeline_id:
-        custom: []
-        name: sales_pipeline_id
-        description: 'The ID of the sales pipeline.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      pipeline_stage_id:
-        custom: []
-        name: pipeline_stage_id
-        description: 'The ID of the pipeline stage.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the sales opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the sales opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      amount:
-        custom: []
-        name: amount
-        description: 'The estimated amount of the opportunity.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      expected_close_date:
-        custom: []
-        name: expected_close_date
-        description: 'The expected close date of the opportunity.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      sales_id:
-        custom: []
-        name: sales_id
-        description: 'The ID of the associated sales record.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the opportunity was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the opportunity was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      items:
-        custom: []
-        name: items
-        description: 'The items in the opportunity.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1752,6 +861,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Sales opportunity not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

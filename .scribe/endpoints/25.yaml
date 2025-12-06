@@ -43,266 +43,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"supplier_id":1,"user_id":1,"type":"note","notes":"Neque et aut in vitae. Dolor officia error illo deleniti soluta aspernatur soluta. Voluptate dolorem molestiae rerum nihil quos. Facere est voluptas debitis natus omnis harum.","interaction_date":"2025-07-26T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":1,"code":"SUP001","name":"PT. Elektronika Nusantara","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","phone_number":"0218887766","location":"IN","payment_terms":"30","email":"elektronika.nusantara@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":2,"supplier_id":1,"user_id":1,"type":"call","notes":"Natus est fuga veritatis ut aut. Sed in sunt a magnam fugit ratione. Et voluptatem sunt excepturi. Velit laborum ab et non autem sint libero.","interaction_date":"2025-01-14T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":1,"code":"SUP001","name":"PT. Elektronika Nusantara","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","phone_number":"0218887766","location":"IN","payment_terms":"30","email":"elektronika.nusantara@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":3,"supplier_id":1,"user_id":1,"type":"meeting","notes":"Qui et optio iusto aut. Perspiciatis sunt corrupti voluptas odit vero.","interaction_date":"2025-09-09T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":1,"code":"SUP001","name":"PT. Elektronika Nusantara","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","phone_number":"0218887766","location":"IN","payment_terms":"30","email":"elektronika.nusantara@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":4,"supplier_id":2,"user_id":1,"type":"note","notes":"Quisquam reprehenderit voluptate neque facere amet delectus a. Exercitationem minima nihil aut quo inventore ut id. Voluptatem perspiciatis provident pariatur exercitationem necessitatibus nesciunt fuga. Dolores veniam commodi amet asperiores repellat.","interaction_date":"2025-01-14T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":2,"code":"SUP002","name":"CV. Sumber Rejeki","address":"Jl. Rajawali No. 12, Bandung","phone_number":"0227654321","location":"IN","payment_terms":"45","email":"sumber.rejeki@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":5,"supplier_id":2,"user_id":1,"type":"note","notes":"Corrupti nemo sit in repellendus. Velit consequatur facere fugit. Aperiam ea minima veniam natus. Et rerum est nihil in.","interaction_date":"2025-05-08T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":2,"code":"SUP002","name":"CV. Sumber Rejeki","address":"Jl. Rajawali No. 12, Bandung","phone_number":"0227654321","location":"IN","payment_terms":"45","email":"sumber.rejeki@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":6,"supplier_id":3,"user_id":1,"type":"note","notes":"Et dolore ut recusandae totam consequatur expedita quaerat. Magni iusto quo cum accusantium ut illum. Fugiat molestiae beatae facilis maiores asperiores aut consectetur porro. Quia et quod sint sed voluptas non suscipit.","interaction_date":"2025-09-23T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":7,"supplier_id":3,"user_id":1,"type":"note","notes":"Quidem sequi recusandae omnis repellat facilis. Atque est dolorem dolorem quam. Aut itaque qui cupiditate aliquam aut ad incidunt. Et temporibus alias labore soluta voluptatem nulla qui. Et adipisci et et officiis id perferendis.","interaction_date":"2025-09-27T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":3,"code":"SUP003","name":"Tokyo Electronics Ltd.","address":"Shinjuku-ku, Tokyo, Japan","phone_number":"+81-3-1234-5678","location":"OUT","payment_terms":"15","email":"tokyo.electronics@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":8,"supplier_id":4,"user_id":1,"type":"email","notes":"Voluptatem qui animi velit eos. Sit deserunt temporibus error ut repudiandae. Corrupti aliquid laudantium dolor sint.","interaction_date":"2025-06-21T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":9,"supplier_id":4,"user_id":1,"type":"email","notes":"Aut doloremque in veniam in eligendi. Et aut aliquid nesciunt voluptatem explicabo natus. Sunt fuga dolorum impedit placeat.","interaction_date":"2025-07-02T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":10,"supplier_id":4,"user_id":1,"type":"call","notes":"Ullam nihil dolor in exercitationem id sunt omnis. Quisquam voluptas laudantium et veritatis accusamus non. Voluptas vel deserunt quia. Est ut dolore et consectetur aliquid.","interaction_date":"2024-12-31T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":4,"code":"SUP004","name":"PT. Surya Mandiri","address":"Jl. Ahmad Yani No. 22, Surabaya","phone_number":"0318889988","location":"IN","payment_terms":"45","email":"surya.mandiri@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":11,"supplier_id":5,"user_id":1,"type":"call","notes":"Magnam earum consequatur est. Totam rem id fuga eum. Laudantium qui culpa corrupti recusandae molestiae dicta. Non excepturi quo alias. Consequatur doloremque consequuntur necessitatibus ex.","interaction_date":"2024-12-11T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":5,"code":"SUP005","name":"Shenzhen Tech Supplies","address":"Futian District, Shenzhen, China","phone_number":"+86-755-1234-5678","location":"OUT","payment_terms":"60","email":"shenzhen.tech@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":12,"supplier_id":5,"user_id":1,"type":"note","notes":"Iste sint voluptate earum a. Tempore est non repudiandae esse blanditiis ipsam numquam. Itaque minima sit cum eveniet ipsam est iure.","interaction_date":"2025-10-17T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":5,"code":"SUP005","name":"Shenzhen Tech Supplies","address":"Futian District, Shenzhen, China","phone_number":"+86-755-1234-5678","location":"OUT","payment_terms":"60","email":"shenzhen.tech@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}},{"id":13,"supplier_id":5,"user_id":1,"type":"email","notes":"Temporibus consequuntur et itaque rerum dolor odit dignissimos. Asperiores aut voluptatem autem sed harum vero labore. Enim corporis est et laborum. Corrupti nesciunt sed autem harum id accusamus perspiciatis.","interaction_date":"2025-07-27T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":5,"code":"SUP005","name":"Shenzhen Tech Supplies","address":"Futian District, Shenzhen, China","phone_number":"+86-755-1234-5678","location":"OUT","payment_terms":"60","email":"shenzhen.tech@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}],"links":{"first":"http:\/\/localhost\/api\/v1\/supplier-interactions?page=1","last":"http:\/\/localhost\/api\/v1\/supplier-interactions?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/supplier-interactions?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/supplier-interactions","per_page":25,"to":13,"total":13}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"supplier_id":1,"user_id":1,"type":"email",...}],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of supplier interactions.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the interaction.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].supplier_id':
-        custom: []
-        name: 'data[].supplier_id'
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].user_id':
-        custom: []
-        name: 'data[].user_id'
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].type':
-        custom: []
-        name: 'data[].type'
-        description: 'The type of interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].notes':
-        custom: []
-        name: 'data[].notes'
-        description: 'The notes for the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].interaction_date':
-        custom: []
-        name: 'data[].interaction_date'
-        description: 'The date of the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the interaction was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the interaction was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].supplier':
-        custom: []
-        name: 'data[].supplier'
-        description: 'The supplier associated with the interaction.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -400,101 +150,22 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"data":{"supplier_id":1,"user_id":2,"type":"Email","notes":"Sent follow-up email.","interaction_date":"2023-10-26T00:00:00.000000Z","updated_at":"2025-12-05T07:49:53.000000Z","created_at":"2025-12-05T07:49:53.000000Z","id":22,"user":{"id":2,"name":"Super User","shopname":null,"address":null,"email":"superuser@example.com","email_verified_at":"2025-12-02T05:10:10.000000Z","two_factor_secret":null,"two_factor_recovery_codes":null,"two_factor_confirmed_at":null,"remember_token":null,"avatar":null,"timezone":null,"system_settings":{"navigation_type":"both","theme_mode":"light","notification_duration":"5","auto_logout_time":"60","data_refresh_rate":"30","system_language":"en","sidebar_lock":true,"show_theme_toggle":true,"enable_sound_notifications":true,"enable_browser_notifications":true,"show_success_messages":true,"remember_last_page":true,"enable_animations":true,"lazy_load_images":true,"enable_debug_mode":false,"enable_keyboard_shortcuts":true,"show_tooltips":true,"compact_mode":false,"sticky_navbar":true},"accounting_settings":{"cash_account_id":3,"accounts_receivable_account_id":5,"inventory_account_id":7,"accounts_payable_account_id":18,"sales_revenue_account_id":27,"cost_of_goods_sold_account_id":35},"created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T06:54:09.000000Z"}}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"supplier_id":1,"user_id":1,"type":"email",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the interaction.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier_id:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'The notes for the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      interaction_date:
-        custom: []
-        name: interaction_date
-        description: 'The date of the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the interaction was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the interaction was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The supplier_id field is required.","errors":{"supplier_id":["The supplier_id field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -556,112 +227,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"supplier_id":1,"user_id":1,"type":"note","notes":"Neque et aut in vitae. Dolor officia error illo deleniti soluta aspernatur soluta. Voluptate dolorem molestiae rerum nihil quos. Facere est voluptas debitis natus omnis harum.","interaction_date":"2025-07-26T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-02T05:07:00.000000Z","supplier":{"id":1,"code":"SUP001","name":"PT. Elektronika Nusantara","address":"Jl. Raya Bekasi No. 45, Jakarta Timur","phone_number":"0218887766","location":"IN","payment_terms":"30","email":"elektronika.nusantara@example.com","image":"http:\/\/localhost\/img\/default_placeholder.png","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"supplier_id":1,"user_id":1,"type":"email",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the interaction.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier_id:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'The notes for the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      interaction_date:
-        custom: []
-        name: interaction_date
-        description: 'The date of the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the interaction was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the interaction was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier:
-        custom: []
-        name: supplier
-        description: 'The supplier associated with the interaction.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Supplier interaction not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -784,101 +365,28 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"supplier_id":1,"user_id":1,"type":"Call","notes":"Discussed new product line.","interaction_date":"2023-10-27T00:00:00.000000Z","created_at":"2025-12-02T05:07:00.000000Z","updated_at":"2025-12-05T07:49:53.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"supplier_id":1,"user_id":1,"type":"call",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the interaction.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      supplier_id:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      user_id:
+        status: 404
+        content: '{"message": "Supplier interaction not found."}'
+        headers: []
+        description: 'Not Found'
+      -
         custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'The notes for the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      interaction_date:
-        custom: []
-        name: interaction_date
-        description: 'The date of the interaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the interaction was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the interaction was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The supplier_id field is required.","errors":{"supplier_id":["The supplier_id field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -943,6 +451,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Supplier interaction not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

@@ -34,6 +34,12 @@ endpoints:
         content: '{"navigation_type": "sidebar","theme_mode": "light","notification_duration": 5,"auto_logout_time": 60,"data_refresh_rate": 30,"system_language": "en","sidebar_lock": false,"show_theme_toggle": true,"enable_sound_notifications": true,"enable_browser_notifications": true,"show_success_messages": true,"remember_last_page": true,"enable_animations": true,"lazy_load_images": true,"enable_debug_mode": false,"enable_keyboard_shortcuts": true,"show_tooltips": true,"compact_mode": false,"sticky_navbar": false}'
         headers: []
         description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
     responseFields: []
     auth:
       - headers
@@ -83,47 +89,23 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"success":true,"message":"Theme mode updated successfully.","theme_mode":"dark"}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
         status: 422
-        content: '{"message":"The selected theme mode is invalid.","errors":{"theme_mode":["The selected theme mode is invalid."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      success:
-        custom: []
-        name: success
-        description: 'Indicates whether the request was successful.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      message:
-        custom: []
-        name: message
-        description: 'A message describing the result of the request.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      theme_mode:
-        custom: []
-        name: theme_mode
-        description: 'The updated theme mode.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The theme_mode field is required.","errors":{"theme_mode":["The theme_mode field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization

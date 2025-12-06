@@ -43,277 +43,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"parent_id":null,"name":"accounting.accounts.assets.name","code":"1000","type":"asset","description":null,"level":0,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":2,"parent_id":1,"name":"accounting.accounts.current_assets.name","code":"1100","type":"asset","description":null,"level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":3,"parent_id":2,"name":"accounting.accounts.cash.name","code":"1110","type":"asset","description":"accounting.accounts.cash.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":4,"parent_id":2,"name":"accounting.accounts.bank.name","code":"1120","type":"asset","description":"accounting.accounts.bank.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":5,"parent_id":2,"name":"accounting.accounts.accounts_receivable.name","code":"1130","type":"asset","description":"accounting.accounts.accounts_receivable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":6,"parent_id":2,"name":"accounting.accounts.allowance_for_doubtful_accounts.name","code":"1135","type":"asset","description":"accounting.accounts.allowance_for_doubtful_accounts.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":7,"parent_id":2,"name":"accounting.accounts.inventory.name","code":"1140","type":"asset","description":"accounting.accounts.inventory.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":8,"parent_id":2,"name":"accounting.accounts.prepaid_expenses.name","code":"1150","type":"asset","description":"accounting.accounts.prepaid_expenses.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":9,"parent_id":2,"name":"accounting.accounts.input_vat.name","code":"1160","type":"asset","description":"accounting.accounts.input_vat.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":10,"parent_id":1,"name":"accounting.accounts.fixed_assets.name","code":"1200","type":"asset","description":null,"level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":11,"parent_id":10,"name":"accounting.accounts.land.name","code":"1210","type":"asset","description":"accounting.accounts.land.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":12,"parent_id":10,"name":"accounting.accounts.buildings.name","code":"1220","type":"asset","description":"accounting.accounts.buildings.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":13,"parent_id":10,"name":"accounting.accounts.accumulated_depreciation_buildings.name","code":"1225","type":"asset","description":"accounting.accounts.accumulated_depreciation_buildings.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":14,"parent_id":10,"name":"accounting.accounts.equipment.name","code":"1230","type":"asset","description":"accounting.accounts.equipment.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":15,"parent_id":10,"name":"accounting.accounts.accumulated_depreciation_equipment.name","code":"1235","type":"asset","description":"accounting.accounts.accumulated_depreciation_equipment.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":16,"parent_id":null,"name":"accounting.accounts.liabilities.name","code":"2000","type":"liability","description":null,"level":0,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":17,"parent_id":16,"name":"accounting.accounts.current_liabilities.name","code":"2100","type":"liability","description":null,"level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":18,"parent_id":17,"name":"accounting.accounts.accounts_payable.name","code":"2110","type":"liability","description":"accounting.accounts.accounts_payable.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":19,"parent_id":17,"name":"accounting.accounts.accrued_expenses.name","code":"2120","type":"liability","description":"accounting.accounts.accrued_expenses.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":20,"parent_id":17,"name":"accounting.accounts.output_vat.name","code":"2130","type":"liability","description":"accounting.accounts.output_vat.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":21,"parent_id":16,"name":"accounting.accounts.long_term_liabilities.name","code":"2200","type":"liability","description":null,"level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":22,"parent_id":21,"name":"accounting.accounts.bank_loans.name","code":"2210","type":"liability","description":"accounting.accounts.bank_loans.description","level":2,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":23,"parent_id":null,"name":"accounting.accounts.equity.name","code":"3000","type":"equity","description":null,"level":0,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":24,"parent_id":23,"name":"accounting.accounts.owners_equity.name","code":"3100","type":"equity","description":"accounting.accounts.owners_equity.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"},{"id":25,"parent_id":23,"name":"accounting.accounts.retained_earnings.name","code":"3200","type":"equity","description":"accounting.accounts.retained_earnings.description","level":1,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}],"links":{"first":"http:\/\/localhost\/api\/v1\/accounts?page=1","last":"http:\/\/localhost\/api\/v1\/accounts?page=2","prev":null,"next":"http:\/\/localhost\/api\/v1\/accounts?page=2"},"meta":{"current_page":1,"from":1,"last_page":2,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/accounts?page=1","label":"1","active":true},{"url":"http:\/\/localhost\/api\/v1\/accounts?page=2","label":"2","active":false},{"url":"http:\/\/localhost\/api\/v1\/accounts?page=2","label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/accounts","per_page":25,"to":25,"total":44}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"name":"Cash Account","code":"1110",...}],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of accounts.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the account.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].parent_id':
-        custom: []
-        name: 'data[].parent_id'
-        description: 'The ID of the parent account.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].name':
-        custom: []
-        name: 'data[].name'
-        description: 'The name of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].code':
-        custom: []
-        name: 'data[].code'
-        description: 'The account code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].type':
-        custom: []
-        name: 'data[].type'
-        description: 'The type of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].description':
-        custom: []
-        name: 'data[].description'
-        description: 'The description of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].level':
-        custom: []
-        name: 'data[].level'
-        description: 'The level of the account in the hierarchy.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].is_active':
-        custom: []
-        name: 'data[].is_active'
-        description: 'Whether the account is active.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the account was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the account was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -434,124 +173,23 @@ endpoints:
     responses:
       -
         custom: []
+        status: 201
+        content: '{"data":{"id":1,"name":"Cash Account","code":"1110",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
         status: 422
-        content: '{"message":"The code has already been taken.","errors":{"code":["The code has already been taken."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the account.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      parent_id:
-        custom: []
-        name: parent_id
-        description: 'The ID of the parent account.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      code:
-        custom: []
-        name: code
-        description: 'The account code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      level:
-        custom: []
-        name: level
-        description: 'The level of the account in the hierarchy.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      is_active:
-        custom: []
-        name: is_active
-        description: 'Whether the account is active.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the account was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the account was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -613,145 +251,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"parent_id":null,"name":"accounting.accounts.assets.name","code":"1000","type":"asset","description":null,"level":0,"is_active":true,"created_at":"2025-12-02T05:06:56.000000Z","updated_at":"2025-12-02T05:06:56.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"name":"Cash Account","code":"1110",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the account.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      parent_id:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: parent_id
-        description: 'The ID of the parent account.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      code:
-        custom: []
-        name: code
-        description: 'The account code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      level:
-        custom: []
-        name: level
-        description: 'The level of the account in the hierarchy.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      is_active:
-        custom: []
-        name: is_active
-        description: 'Whether the account is active.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the account was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the account was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      parent:
-        custom: []
-        name: parent
-        description: 'The parent account.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      children:
-        custom: []
-        name: children
-        description: 'A list of child accounts.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Account not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -897,124 +412,29 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"data":{"id":1,"name":"Cash Account (Updated)","code":"1110",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Account not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
         status: 422
-        content: '{"message":"The code has already been taken.","errors":{"code":["The code has already been taken."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the account.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      parent_id:
-        custom: []
-        name: parent_id
-        description: 'The ID of the parent account.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      code:
-        custom: []
-        name: code
-        description: 'The account code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the account.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      level:
-        custom: []
-        name: level
-        description: 'The level of the account in the hierarchy.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      is_active:
-        custom: []
-        name: is_active
-        description: 'Whether the account is active.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the account was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the account was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -1079,6 +499,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Account not found."}'
+        headers: []
+        description: 'Not Found'
       -
         custom: []
         status: 422

@@ -45,233 +45,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"superuser","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","permissions":[{"id":1,"name":"view-users","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":1}},{"id":2,"name":"create-users","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":2}},{"id":3,"name":"edit-users","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":3}},{"id":4,"name":"delete-users","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":4}},{"id":5,"name":"view-roles","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":5}},{"id":6,"name":"create-roles","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":6}},{"id":7,"name":"edit-roles","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":7}},{"id":8,"name":"delete-roles","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":8}},{"id":9,"name":"view-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":9}},{"id":10,"name":"create-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":10}},{"id":11,"name":"edit-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":11}},{"id":12,"name":"delete-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":12}},{"id":13,"name":"view-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":13}},{"id":14,"name":"create-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":14}},{"id":15,"name":"edit-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":15}},{"id":16,"name":"delete-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":16}},{"id":17,"name":"view-reports","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":17}},{"id":18,"name":"access-dashboard","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":18}},{"id":19,"name":"view-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":19}},{"id":20,"name":"create-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":20}},{"id":21,"name":"edit-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":21}},{"id":22,"name":"delete-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":22}},{"id":23,"name":"view-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":23}},{"id":24,"name":"create-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":24}},{"id":25,"name":"edit-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":25}},{"id":26,"name":"delete-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":26}},{"id":27,"name":"view-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":27}},{"id":28,"name":"create-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":28}},{"id":29,"name":"edit-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":29}},{"id":30,"name":"delete-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":30}},{"id":31,"name":"view-customer","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":31}},{"id":32,"name":"create-customer","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":32}},{"id":33,"name":"edit-customer","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":33}},{"id":34,"name":"delete-customer","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":34}},{"id":35,"name":"view-supplier","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":35}},{"id":36,"name":"create-supplier","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":36}},{"id":37,"name":"edit-supplier","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":37}},{"id":38,"name":"delete-supplier","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":38}},{"id":39,"name":"view-sales-pipeline","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":39}},{"id":40,"name":"manage-sales-pipelines","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":40}},{"id":41,"name":"manage-pipeline-stages","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":41}},{"id":42,"name":"manage-sales-opportunities","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":42}},{"id":43,"name":"view-accounting","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":43}},{"id":44,"name":"view-accounts","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":44}}]},{"id":2,"name":"staff","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","permissions":[{"id":9,"name":"view-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":9}},{"id":10,"name":"create-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":10}},{"id":11,"name":"edit-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":11}},{"id":13,"name":"view-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":13}},{"id":14,"name":"create-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":14}},{"id":15,"name":"edit-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":15}},{"id":18,"name":"access-dashboard","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":18}},{"id":19,"name":"view-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":19}},{"id":20,"name":"create-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":20}},{"id":21,"name":"edit-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":21}},{"id":23,"name":"view-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":23}},{"id":24,"name":"create-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":24}},{"id":25,"name":"edit-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":25}},{"id":27,"name":"view-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":27}},{"id":28,"name":"create-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":28}},{"id":29,"name":"edit-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":2,"permission_id":29}}]},{"id":3,"name":"pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","permissions":[{"id":9,"name":"view-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":3,"permission_id":9}},{"id":13,"name":"view-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":3,"permission_id":13}},{"id":16,"name":"delete-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":3,"permission_id":16}},{"id":17,"name":"view-reports","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":3,"permission_id":17}},{"id":18,"name":"access-dashboard","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":3,"permission_id":18}},{"id":23,"name":"view-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":3,"permission_id":23}},{"id":27,"name":"view-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":3,"permission_id":27}},{"id":28,"name":"create-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":3,"permission_id":28}}]},{"id":4,"name":"accountant","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","permissions":[]}],"links":{"first":"http:\/\/localhost\/api\/v1\/roles?page=1","last":"http:\/\/localhost\/api\/v1\/roles?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost\/api\/v1\/roles?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http:\/\/localhost\/api\/v1\/roles","per_page":25,"to":4,"total":4}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      data:
+        content: '{"data":[{"id":1,"name":"Admin","guard_name":"web","permissions":["view-users","edit-users"]},...],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: data
-        description: 'A list of roles.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the role.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].name':
-        custom: []
-        name: 'data[].name'
-        description: 'The name of the role.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].guard_name':
-        custom: []
-        name: 'data[].guard_name'
-        description: 'The guard name for the role.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the role was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the role was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].permissions':
-        custom: []
-        name: 'data[].permissions'
-        description: 'A list of permissions assigned to the role.'
-        required: false
-        example: null
-        type: 'string[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.first:
-        custom: []
-        name: links.first
-        description: 'The URL of the first page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.last:
-        custom: []
-        name: links.last
-        description: 'The URL of the last page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.prev:
-        custom: []
-        name: links.prev
-        description: 'The URL of the previous page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links.next:
-        custom: []
-        name: links.next
-        description: 'The URL of the next page.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.current_page:
-        custom: []
-        name: meta.current_page
-        description: 'The current page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.from:
-        custom: []
-        name: meta.from
-        description: 'The starting number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.last_page:
-        custom: []
-        name: meta.last_page
-        description: 'The last page number.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.path:
-        custom: []
-        name: meta.path
-        description: 'The URL path.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.per_page:
-        custom: []
-        name: meta.per_page
-        description: 'The number of results per page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.to:
-        custom: []
-        name: meta.to
-        description: 'The ending number of the results on the current page.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta.total:
-        custom: []
-        name: meta.total
-        description: 'The total number of results.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -334,69 +117,23 @@ endpoints:
     responses:
       -
         custom: []
+        status: 201
+        content: '{"data":{"id":1,"name":"Admin","guard_name":"web",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
         status: 422
-        content: '{"message":"The selected permissions.0 is invalid.","errors":{"permissions.0":["The selected permissions.0 is invalid."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the role.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the role.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      guard_name:
-        custom: []
-        name: guard_name
-        description: 'The guard name for the role.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the role was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the role was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -458,79 +195,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"superuser","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","permissions":[{"id":1,"name":"view-users","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":1}},{"id":2,"name":"create-users","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":2}},{"id":3,"name":"edit-users","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":3}},{"id":4,"name":"delete-users","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":4}},{"id":5,"name":"view-roles","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":5}},{"id":6,"name":"create-roles","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":6}},{"id":7,"name":"edit-roles","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":7}},{"id":8,"name":"delete-roles","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":8}},{"id":9,"name":"view-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":9}},{"id":10,"name":"create-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":10}},{"id":11,"name":"edit-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":11}},{"id":12,"name":"delete-products","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":12}},{"id":13,"name":"view-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":13}},{"id":14,"name":"create-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":14}},{"id":15,"name":"edit-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":15}},{"id":16,"name":"delete-sales","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":16}},{"id":17,"name":"view-reports","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":17}},{"id":18,"name":"access-dashboard","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":18}},{"id":19,"name":"view-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":19}},{"id":20,"name":"create-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":20}},{"id":21,"name":"edit-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":21}},{"id":22,"name":"delete-po","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":22}},{"id":23,"name":"view-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":23}},{"id":24,"name":"create-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":24}},{"id":25,"name":"edit-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":25}},{"id":26,"name":"delete-warehouse","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":26}},{"id":27,"name":"view-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":27}},{"id":28,"name":"create-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":28}},{"id":29,"name":"edit-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":29}},{"id":30,"name":"delete-pos","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":30}},{"id":31,"name":"view-customer","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":31}},{"id":32,"name":"create-customer","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":32}},{"id":33,"name":"edit-customer","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":33}},{"id":34,"name":"delete-customer","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":34}},{"id":35,"name":"view-supplier","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":35}},{"id":36,"name":"create-supplier","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":36}},{"id":37,"name":"edit-supplier","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":37}},{"id":38,"name":"delete-supplier","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":38}},{"id":39,"name":"view-sales-pipeline","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":39}},{"id":40,"name":"manage-sales-pipelines","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":40}},{"id":41,"name":"manage-pipeline-stages","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":41}},{"id":42,"name":"manage-sales-opportunities","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":42}},{"id":43,"name":"view-accounting","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":43}},{"id":44,"name":"view-accounts","guard_name":"web","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z","pivot":{"role_id":1,"permission_id":44}}]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"name":"Admin","guard_name":"web","permissions":["view-users","edit-users"]}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the role.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: name
-        description: 'The name of the role.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      guard_name:
-        custom: []
-        name: guard_name
-        description: 'The guard name for the role.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the role was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the role was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      permissions:
-        custom: []
-        name: permissions
-        description: 'A list of permissions assigned to the role.'
-        required: false
-        example: null
-        type: 'string[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Role not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -618,69 +298,29 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"data":{"id":1,"name":"Editor","guard_name":"web",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Role not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
         status: 422
-        content: '{"message":"The selected permissions.0 is invalid.","errors":{"permissions.0":["The selected permissions.0 is invalid."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the role.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the role.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      guard_name:
-        custom: []
-        name: guard_name
-        description: 'The guard name for the role.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the role was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the role was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -745,6 +385,18 @@ endpoints:
         content: ''
         headers: []
         description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Role not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

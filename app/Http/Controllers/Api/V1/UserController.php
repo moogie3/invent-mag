@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreUserRequest;
+use App\Http\Requests\Api\V1\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\UserService;
@@ -30,38 +32,8 @@ class UserController extends Controller
      * @authenticated
      * @queryParam per_page int The number of users to return per page. Defaults to 15. Example: 25
      *
-     * @responseField data object[] A list of users.
-     * @responseField data[].id integer The ID of the user.
-     * @responseField data[].name string The name of the user.
-     * @responseField data[].shopname string The shop name of the user.
-     * @responseField data[].address string The address of the user.
-     * @responseField data[].email string The email address of the user.
-     * @responseField data[].email_verified_at string The email verification timestamp.
-     * @responseField data[].two_factor_secret string The two-factor secret.
-     * @responseField data[].two_factor_recovery_codes string The two-factor recovery codes.
-     * @responseField data[].two_factor_confirmed_at string The two-factor confirmation timestamp.
-     * @responseField data[].remember_token string The remember token.
-     * @responseField data[].avatar string The URL or path to the user's avatar.
-     * @responseField data[].timezone string The timezone of the user.
-     * @responseField data[].system_settings object The system settings for the user.
-     * @responseField data[].accounting_settings object The accounting settings for the user.
-     * @responseField data[].created_at string The date and time the user was created.
-     * @responseField data[].updated_at string The date and time the user was last updated.
-     * @responseField data[].roles object[] A list of roles assigned to the user.
-     * @responseField data[].permissions object[] A list of permissions assigned to the user.
-     * @responseField links object Links for pagination.
-     * @responseField links.first string The URL of the first page.
-     * @responseField links.last string The URL of the last page.
-     * @responseField links.prev string The URL of the previous page.
-     * @responseField links.next string The URL of the next page.
-     * @responseField meta object Metadata for pagination.
-     * @responseField meta.current_page integer The current page number.
-     * @responseField meta.from integer The starting number of the results on the current page.
-     * @responseField meta.last_page integer The last page number.
-     * @responseField meta.path string The URL path.
-     * @responseField meta.per_page integer The number of results per page.
-     * @responseField meta.to integer The ending number of the results on the current page.
-     * @responseField meta.total integer The total number of results.
+     * @response 200 scenario="Success" {"data":[{"id":1,"name":"Admin User","email":"admin@example.com",...}],"links":{...},"meta":{...}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function index(Request $request)
     {
@@ -85,19 +57,11 @@ class UserController extends Controller
      * @bodyParam system_settings array System settings for the user.
      * @bodyParam accounting_settings array Accounting settings for the user.
      *
-     * @responseField id integer The ID of the user.
-     * @responseField name string The name of the user.
-     * @responseField shopname string The shop name of the user.
-     * @responseField address string The address of the user.
-     * @responseField email string The email address of the user.
-     * @responseField avatar string The URL or path to the user's avatar.
-     * @responseField timezone string The timezone of the user.
-     * @responseField system_settings object The system settings for the user.
-     * @responseField accounting_settings object The accounting settings for the user.
-     * @responseField created_at string The date and time the user was created.
-     * @responseField updated_at string The date and time the user was last updated.
+     * @response 201 scenario="Success" {"data":{"id":1,"name":"John Doe","email":"john.doe@example.com",...}}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function store(\App\Http\Requests\Api\V1\StoreUserRequest $request)
+    public function store(StoreUserRequest $request)
     {
         $user = $this->userService->createUser($request->validated());
         return new UserResource($user);
@@ -110,24 +74,9 @@ class UserController extends Controller
      * @authenticated
      * @urlParam user required The ID of the user. Example: 1
      *
-     * @responseField id integer The ID of the user.
-     * @responseField name string The name of the user.
-     * @responseField shopname string The shop name of the user.
-     * @responseField address string The address of the user.
-     * @responseField email string The email address of the user.
-     * @responseField email_verified_at string The email verification timestamp.
-     * @responseField two_factor_secret string The two-factor secret.
-     * @responseField two_factor_recovery_codes string The two-factor recovery codes.
-     * @responseField two_factor_confirmed_at string The two-factor confirmation timestamp.
-     * @responseField remember_token string The remember token.
-     * @responseField avatar string The URL or path to the user's avatar.
-     * @responseField timezone string The timezone of the user.
-     * @responseField system_settings object The system settings for the user.
-     * @responseField accounting_settings object The accounting settings for the user.
-     * @responseField created_at string The date and time the user was created.
-     * @responseField updated_at string The date and time the user was last updated.
-     * @responseField roles object[] A list of roles assigned to the user.
-     * @responseField permissions object[] A list of permissions assigned to the user.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Admin User","email":"admin@example.com",...}}
+     * @response 404 scenario="Not Found" {"message": "User not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(User $user)
     {
@@ -151,19 +100,12 @@ class UserController extends Controller
      * @bodyParam system_settings array System settings for the user.
      * @bodyParam accounting_settings array Accounting settings for the user.
      *
-     * @responseField id integer The ID of the user.
-     * @responseField name string The name of the user.
-     * @responseField shopname string The shop name of the user.
-     * @responseField address string The address of the user.
-     * @responseField email string The email address of the user.
-     * @responseField avatar string The URL or path to the user's avatar.
-     * @responseField timezone string The timezone of the user.
-     * @responseField system_settings object The system settings for the user.
-     * @responseField accounting_settings object The accounting settings for the user.
-     * @responseField created_at string The date and time the user was created.
-     * @responseField updated_at string The date and time the user was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"name":"Jane Doe","email":"jane.doe@example.com",...}}
+     * @response 404 scenario="Not Found" {"message": "User not found."}
+     * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
         $user = $this->userService->updateUser($user, $request->validated());
         return new UserResource($user);
@@ -177,6 +119,8 @@ class UserController extends Controller
      * @urlParam user integer required The ID of the user to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "User not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(User $user)
     {
@@ -190,8 +134,8 @@ class UserController extends Controller
      * @group Users
      * @authenticated
      *
-     * @responseField rolePermissions object An object where keys are role names and values are arrays of permission names.
-     * @responseField allPermissions array A list of all available permission names.
+     * @response 200 scenario="Success" {"rolePermissions":{"admin":["view-users","create-users"],"editor":["edit-posts"]},"allPermissions":["view-users","create-users","edit-posts"]}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function getRolePermissions()
     {

@@ -55,208 +55,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"product_id":1,"adjustment_type":"increase","quantity_before":10,"quantity_after":20,"adjustment_amount":10,"reason":"Stock correction","adjusted_by":1,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z","product":{"id":1,"name":"Product 1"},"adjusted_by":{"id":1,"name":"Admin"}}]}'
+        content: '{"data":[{"id":1,"product_id":1,"adjustment_type":"increase",...}],"links":{...},"meta":{...}}'
         headers: []
         description: Success
-    responseFields:
-      data:
+      -
         custom: []
-        name: data
-        description: 'A list of stock adjustments.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].id':
-        custom: []
-        name: 'data[].id'
-        description: 'The ID of the stock adjustment.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].product_id':
-        custom: []
-        name: 'data[].product_id'
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].adjustment_type':
-        custom: []
-        name: 'data[].adjustment_type'
-        description: 'The type of adjustment (increase, decrease, correction).'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].quantity_before':
-        custom: []
-        name: 'data[].quantity_before'
-        description: 'The stock quantity before adjustment.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].quantity_after':
-        custom: []
-        name: 'data[].quantity_after'
-        description: 'The stock quantity after adjustment.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].adjustment_amount':
-        custom: []
-        name: 'data[].adjustment_amount'
-        description: 'The amount of stock adjusted.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].reason':
-        custom: []
-        name: 'data[].reason'
-        description: 'The reason for the adjustment.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].adjusted_by':
-        custom: []
-        name: 'data[].adjusted_by'
-        description: 'The user who made the adjustment.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].created_at':
-        custom: []
-        name: 'data[].created_at'
-        description: 'The date and time the adjustment was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].updated_at':
-        custom: []
-        name: 'data[].updated_at'
-        description: 'The date and time the adjustment was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].product':
-        custom: []
-        name: 'data[].product'
-        description: 'The product related to the adjustment.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].product.id':
-        custom: []
-        name: 'data[].product.id'
-        description: 'The ID of the product.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].product.name':
-        custom: []
-        name: 'data[].product.name'
-        description: 'The name of the product.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].adjusted_by.id':
-        custom: []
-        name: 'data[].adjusted_by.id'
-        description: 'The ID of the user.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'data[].adjusted_by.name':
-        custom: []
-        name: 'data[].adjusted_by.name'
-        description: 'The name of the user.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      links:
-        custom: []
-        name: links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      meta:
-        custom: []
-        name: meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -405,183 +213,13 @@ endpoints:
         content: '{"transactions":{"data":[{"id":1,"type":"sale","ref_id":1,"date":"2025-12-01","amount":100,"description":"Sale #1","status":"paid"}]},"summary":{"total_sales":100,"total_purchases":0,"total_paid":100,"total_due":0}}'
         headers: []
         description: Success
-    responseFields:
-      transactions:
+      -
         custom: []
-        name: transactions
-        description: 'A paginated list of transactions.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      transactions.data:
-        custom: []
-        name: transactions.data
-        description: 'A list of transactions.'
-        required: false
-        example: null
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'transactions.data[].id':
-        custom: []
-        name: 'transactions.data[].id'
-        description: 'The ID of the transaction.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'transactions.data[].type':
-        custom: []
-        name: 'transactions.data[].type'
-        description: 'The type of transaction (purchase or sale).'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'transactions.data[].ref_id':
-        custom: []
-        name: 'transactions.data[].ref_id'
-        description: 'The ID of the related purchase or sale.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'transactions.data[].date':
-        custom: []
-        name: 'transactions.data[].date'
-        description: 'The date of the transaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'transactions.data[].amount':
-        custom: []
-        name: 'transactions.data[].amount'
-        description: 'The amount of the transaction.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'transactions.data[].description':
-        custom: []
-        name: 'transactions.data[].description'
-        description: 'A description of the transaction.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'transactions.data[].status':
-        custom: []
-        name: 'transactions.data[].status'
-        description: 'The status of the transaction (paid, unpaid, partial).'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      transactions.links:
-        custom: []
-        name: transactions.links
-        description: 'Links for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      transactions.meta:
-        custom: []
-        name: transactions.meta
-        description: 'Metadata for pagination.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      summary:
-        custom: []
-        name: summary
-        description: 'Summary of transactions.'
-        required: false
-        example: null
-        type: object
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      summary.total_sales:
-        custom: []
-        name: summary.total_sales
-        description: 'Total sales amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      summary.total_purchases:
-        custom: []
-        name: summary.total_purchases
-        description: 'Total purchases amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      summary.total_paid:
-        custom: []
-        name: summary.total_paid
-        description: 'Total paid amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      summary.total_due:
-        custom: []
-        name: summary.total_due
-        description: 'Total due amount.'
-        required: false
-        example: null
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -637,52 +275,22 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"success":true,"message":"Successfully marked 2 transaction(s) as paid.","updated_count":2}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
+        content: '{"success":true,"message":"Successfully marked 3 transaction(s) as paid.","updated_count":3}'
+        headers: []
+        description: Success
       -
         custom: []
-        status: 400
-        content: '{"success": false, "message": "No transactions selected."}'
+        status: 401
+        content: '{"message": "Unauthenticated."}'
         headers: []
-        description: 'Bad Request'
-    responseFields:
-      success:
+        description: Unauthenticated
+      -
         custom: []
-        name: success
-        description: 'Indicates whether the request was successful.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      message:
-        custom: []
-        name: message
-        description: 'A message describing the result of the request.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_count:
-        custom: []
-        name: updated_count
-        description: 'The number of transactions successfully marked as paid.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 422
+        content: '{"message":"The transaction_ids field is required.","errors":{"transaction_ids":["The transaction_ids field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -747,29 +355,25 @@ endpoints:
         content: '{"success": true, "message": "Transaction marked as paid."}'
         headers: []
         description: Success
-    responseFields:
-      success:
+      -
         custom: []
-        name: success
-        description: 'Indicates whether the request was successful.'
-        required: false
-        example: null
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      message:
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
         custom: []
-        name: message
-        description: 'A message describing the result of the request.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 404
+        content: '{"message": "Transaction not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
+        status: 422
+        content: '{"message":"The type field is required.","errors":{"type":["The type field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization

@@ -43,123 +43,16 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"currency_symbol":"Rp","decimal_separator":",","thousand_separator":".","decimal_places":0,"position":"prefix","currency_code":"IDR","locale":"id-ID","created_at":"2025-12-02T05:06:57.000000Z","updated_at":"2025-12-02T05:06:57.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
+        content: '{"data":{"id":1,"currency_symbol":"$","decimal_separator":".",...}}'
+        headers: []
+        description: Success
+      -
         custom: []
-        name: id
-        description: 'The ID of the currency setting.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      currency_symbol:
-        custom: []
-        name: currency_symbol
-        description: 'The currency symbol.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      decimal_separator:
-        custom: []
-        name: decimal_separator
-        description: 'The decimal separator.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      thousand_separator:
-        custom: []
-        name: thousand_separator
-        description: 'The thousand separator.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      decimal_places:
-        custom: []
-        name: decimal_places
-        description: 'The number of decimal places.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      position:
-        custom: []
-        name: position
-        description: 'The position of the currency symbol.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      currency_code:
-        custom: []
-        name: currency_code
-        description: 'The currency code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      locale:
-        custom: []
-        name: locale
-        description: 'The locale.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the setting was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the setting was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
     auth:
       - headers
       - Authorization
@@ -193,8 +86,8 @@ endpoints:
         name: id
         description: 'The ID of the currency setting.'
         required: true
-        example: 1
-        type: integer
+        example: consequatur
+        type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
@@ -211,7 +104,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: consequatur
       currency_setting: '1'
     queryParameters: []
     cleanQueryParameters: []
@@ -305,124 +198,29 @@ endpoints:
     responses:
       -
         custom: []
+        status: 200
+        content: '{"data":{"id":1,"currency_symbol":"¥","decimal_separator":",",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Currency setting not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
         status: 422
-        content: '{"message":"The decimal separator field must not be greater than 1 characters. (and 3 more errors)","errors":{"decimal_separator":["The decimal separator field must not be greater than 1 characters."],"thousand_separator":["The thousand separator field must not be greater than 1 characters."],"position":["The selected position is invalid."],"currency_code":["The currency code field must not be greater than 3 characters."]}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-    responseFields:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the currency setting.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      currency_symbol:
-        custom: []
-        name: currency_symbol
-        description: 'The currency symbol.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      decimal_separator:
-        custom: []
-        name: decimal_separator
-        description: 'The decimal separator.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      thousand_separator:
-        custom: []
-        name: thousand_separator
-        description: 'The thousand separator.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      decimal_places:
-        custom: []
-        name: decimal_places
-        description: 'The number of decimal places.'
-        required: false
-        example: null
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      position:
-        custom: []
-        name: position
-        description: 'The position of the currency symbol.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      currency_code:
-        custom: []
-        name: currency_code
-        description: 'The currency code.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      locale:
-        custom: []
-        name: locale
-        description: 'The locale.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      created_at:
-        custom: []
-        name: created_at
-        description: 'The date and time the setting was created.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      updated_at:
-        custom: []
-        name: updated_at
-        description: 'The date and time the setting was last updated.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
+        content: '{"message":"The currency_symbol field is required.","errors":{"currency_symbol":["The currency_symbol field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
     auth:
       - headers
       - Authorization

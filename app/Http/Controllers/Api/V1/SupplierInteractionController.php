@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreSupplierInteractionRequest;
+use App\Http\Requests\Api\V1\UpdateSupplierInteractionRequest;
 use App\Http\Resources\SupplierInteractionResource;
 use App\Models\SupplierInteraction;
 use App\Services\CrmService;
@@ -17,7 +19,7 @@ class SupplierInteractionController extends Controller
 {
     protected $crmService;
 
-    public function __construct(\App\Services\CrmService $crmService)
+    public function __construct(CrmService $crmService)
     {
         $this->crmService = $crmService;
     }
@@ -49,16 +51,11 @@ class SupplierInteractionController extends Controller
      * @bodyParam notes string Notes about the interaction. Example: Sent follow-up email.
      * @bodyParam interaction_date date required The date of the interaction. Example: 2023-10-26
      *
-     * @responseField id integer The ID of the interaction.
-     * @responseField supplier_id integer The ID of the supplier.
-     * @responseField user_id integer The ID of the user.
-     * @responseField type string The type of interaction.
-     * @responseField notes string The notes for the interaction.
-     * @responseField interaction_date string The date of the interaction.
-     * @responseField created_at string The date and time the interaction was created.
-     * @responseField updated_at string The date and time the interaction was last updated.
+     * @response 201 scenario="Success" {"data":{"id":1,"supplier_id":1,"user_id":1,"type":"email",...}}
+     * @response 422 scenario="Validation Error" {"message":"The supplier_id field is required.","errors":{"supplier_id":["The supplier_id field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function store(\App\Http\Requests\Api\V1\StoreSupplierInteractionRequest $request)
+    public function store(StoreSupplierInteractionRequest $request)
     {
         $validated = $request->validated();
         $interaction = $this->crmService->storeSupplierInteraction($validated, $validated['supplier_id']);
@@ -72,15 +69,9 @@ class SupplierInteractionController extends Controller
      * @authenticated
      * @urlParam supplier_interaction required The ID of the supplier interaction. Example: 1
      *
-     * @responseField id integer The ID of the interaction.
-     * @responseField supplier_id integer The ID of the supplier.
-     * @responseField user_id integer The ID of the user.
-     * @responseField type string The type of interaction.
-     * @responseField notes string The notes for the interaction.
-     * @responseField interaction_date string The date of the interaction.
-     * @responseField created_at string The date and time the interaction was created.
-     * @responseField updated_at string The date and time the interaction was last updated.
-     * @responseField supplier object The supplier associated with the interaction.
+     * @response 200 scenario="Success" {"data":{"id":1,"supplier_id":1,"user_id":1,"type":"email",...}}
+     * @response 404 scenario="Not Found" {"message": "Supplier interaction not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function show(SupplierInteraction $supplier_interaction)
     {
@@ -99,16 +90,12 @@ class SupplierInteractionController extends Controller
      * @bodyParam notes string Notes about the interaction. Example: Discussed new product line.
      * @bodyParam interaction_date date required The date of the interaction. Example: 2023-10-27
      *
-     * @responseField id integer The ID of the interaction.
-     * @responseField supplier_id integer The ID of the supplier.
-     * @responseField user_id integer The ID of the user.
-     * @responseField type string The type of interaction.
-     * @responseField notes string The notes for the interaction.
-     * @responseField interaction_date string The date of the interaction.
-     * @responseField created_at string The date and time the interaction was created.
-     * @responseField updated_at string The date and time the interaction was last updated.
+     * @response 200 scenario="Success" {"data":{"id":1,"supplier_id":1,"user_id":1,"type":"call",...}}
+     * @response 404 scenario="Not Found" {"message": "Supplier interaction not found."}
+     * @response 422 scenario="Validation Error" {"message":"The supplier_id field is required.","errors":{"supplier_id":["The supplier_id field is required."]}}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(\App\Http\Requests\Api\V1\UpdateSupplierInteractionRequest $request, SupplierInteraction $supplier_interaction)
+    public function update(UpdateSupplierInteractionRequest $request, SupplierInteraction $supplier_interaction)
     {
         $validated = $request->validated();
         $supplier_interaction->update($validated);
@@ -124,6 +111,8 @@ class SupplierInteractionController extends Controller
      * @urlParam supplier_interaction integer required The ID of the supplier interaction to delete. Example: 1
      *
      * @response 204 scenario="Success"
+     * @response 404 scenario="Not Found" {"message": "Supplier interaction not found."}
+     * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
     public function destroy(SupplierInteraction $supplier_interaction)
     {

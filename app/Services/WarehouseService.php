@@ -21,39 +21,38 @@ class WarehouseService
 
     public function createWarehouse(array $data)
     {
-        if (Warehouse::where('name', $data['name'])->exists()) {
-            throw new \App\Exceptions\WarehouseException('This warehouse already exists.', 422);
+        if (Warehouse::whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->exists()) {
+            return ['success' => false, 'message' => 'This warehouse already exists.'];
         }
 
         if (isset($data['is_main']) && $data['is_main'] && Warehouse::hasMainWarehouse()) {
-            throw new \App\Exceptions\WarehouseException('There is already a main warehouse defined. Please unset the current main warehouse first.', 422);
+            return ['success' => false, 'message' => 'There is already a main warehouse defined. Please unset the current main warehouse first.'];
         }
-
         $warehouse = Warehouse::create($data);
 
-        return ['warehouse' => $warehouse];
+        return ['success' => true, 'warehouse' => $warehouse];
     }
 
     public function updateWarehouse(Warehouse $warehouse, array $data)
     {
         if (isset($data['is_main']) && $data['is_main'] && Warehouse::hasMainWarehouse($warehouse->id)) {
-            throw new \App\Exceptions\WarehouseException('There is already a main warehouse defined. Please unset the current main warehouse first.', 422);
+            return ['success' => false, 'message' => 'There is already a main warehouse defined. Please unset the current main warehouse first.'];
         }
 
         $warehouse->update($data);
 
-        return ['warehouse' => $warehouse];
+        return ['success' => true, 'warehouse' => $warehouse];
     }
 
     public function deleteWarehouse(Warehouse $warehouse)
     {
         if ($warehouse->is_main) {
-            throw new \App\Exceptions\WarehouseException('Cannot delete the main warehouse. Please set another warehouse as main first.', 422);
+            return ['success' => false, 'message' => 'Cannot delete the main warehouse. Please set another warehouse as main first.'];
         }
 
         $warehouse->delete();
 
-        return ['message' => 'Warehouse deleted successfully.'];
+        return ['success' => true, 'message' => 'Warehouse deleted successfully.'];
     }
 
     public function setMainWarehouse(Warehouse $warehouse)
@@ -63,7 +62,7 @@ class WarehouseService
             $warehouse->is_main = true;
             $warehouse->save();
             $warehouse->refresh(); // Refresh the model
-            return ['message' => 'Main warehouse updated successfully.'];
+            return ['success' => true, 'message' => 'Main warehouse updated successfully.'];
         });
     }
 
@@ -74,10 +73,10 @@ class WarehouseService
                 $warehouse->is_main = false;
                 $warehouse->save();
                 $warehouse->refresh(); // Refresh the model
-                return ['message' => 'Main warehouse status removed.'];
+                return ['success' => true, 'message' => 'Main warehouse status removed.'];
             }
 
-            throw new \App\Exceptions\WarehouseException('This is not the main warehouse.', 422);
+            return ['success' => false, 'message' => 'This is not the main warehouse.'];
         });
     }
 }

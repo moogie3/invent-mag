@@ -245,7 +245,7 @@ class DashboardService
         }
 
         if ($categoryId) {
-            $query->whereHas('items.product', function ($q) use ($categoryId) {
+            $query->whereHas('salesItems.product', function ($q) use ($categoryId) {
                 $q->where('category_id', $categoryId);
             });
         }

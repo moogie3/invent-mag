@@ -270,13 +270,14 @@ class ProductControllerTest extends BaseFeatureTestCase
     #[Test]
     public function a_user_can_search_products_by_barcode()
     {
-        $product = Product::factory()->create(['barcode' => '1234567890123']);
+        $barcode = $this->faker->unique()->ean13();
+        $product = Product::factory()->create(['barcode' => $barcode]);
 
         $response = $this->actingAs($this->user)
-            ->getJson(route('admin.product.search-by-barcode', ['barcode' => '1234567890123']));
+            ->getJson(route('admin.product.search-by-barcode', ['barcode' => $barcode]));
 
         $response->assertStatus(200)
-            ->assertJsonFragment(['barcode' => '1234567890123']);
+            ->assertJsonFragment(['barcode' => $barcode]);
     }
 
     #[Test]

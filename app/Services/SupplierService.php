@@ -67,9 +67,13 @@ class SupplierService
 
     public function getSupplierMetrics()
     {
+        $inCount = Supplier::where('location', 'IN')->count();
+        $outCount = Supplier::where('location', 'OUT')->count();
+        $totalsupplier = Supplier::count();
         return [
-            'total_suppliers' => Supplier::count(),
-            'new_this_month' => Supplier::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
+            'totalsupplier' => $totalsupplier,
+            'inCount' => $inCount,
+            'outCount' => $outCount,
         ];
     }
 }

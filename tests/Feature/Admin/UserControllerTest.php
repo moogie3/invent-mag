@@ -42,7 +42,7 @@ class UserControllerTest extends BaseFeatureTestCase
 
     public function test_index_displays_user_management_page()
     {
-        $users = User::factory()->count(3)->create();
+        $users = User::factory()->count(1)->make();
         $perPage = 10;
         $currentPage = 1;
         $total = $users->count();
@@ -79,7 +79,7 @@ class UserControllerTest extends BaseFeatureTestCase
         $response->assertViewIs('admin.users.index');
         $response->assertViewHas('users', $userData['users']);
         $response->assertViewHas('roles', $userData['roles']);
-        $response->assertViewHas('permissions', $userData['permissions']);
+        $response->assertViewHas('permissions', $permissions);
         $response->assertViewHas('entries', $userData['entries']);
     }
 

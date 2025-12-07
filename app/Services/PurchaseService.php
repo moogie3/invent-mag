@@ -13,6 +13,8 @@ use App\Models\Supplier;
 use App\Models\User;
 use Carbon\Carbon;
 use App\Models\Account;
+use App\Models\PurchaseReturn;
+use App\Models\PurchaseReturnItem;
 
 class PurchaseService
 {
@@ -375,14 +377,47 @@ class PurchaseService
 
     public function getPurchaseMetrics()
     {
-        $total_purchases = Purchase::count();
-        $total_paid = Purchase::where('status', 'Paid')->sum('total');
-        $total_due = Purchase::where('status', 'Unpaid')->sum('total');
+        $totalinvoice = Purchase::count();
+        $inCount = 0;
+        $inCountamount = 0;
+        $outCount = 0;
+        $outCountamount = 0;
+        $totalMonthly = 0;
+        $paymentMonthly = 0;
+
+        $allPurchases = Purchase::with('supplier')->get();
+        foreach ($allPurchases as $p) {
+            if ($p->supplier->location === 'IN') {
+                $inCount++;
+                if ($p->status === 'Unpaid') {
+                    $inCountamount += $p->total;
+                }
+            }
+
+            if ($p->supplier->location === 'OUT') {
+                $outCount++;
+                if ($p->status === 'Unpaid') {
+                    $outCountamount += $p->total;
+                }
+            }
+
+            if ($p->order_date->isCurrentMonth()) {
+                $totalMonthly += $p->total;
+            }
+
+            if ($p->status === 'Paid' && $p->order_date->isCurrentMonth()) {
+                $paymentMonthly += $p->total;
+            }
+        }
 
         return [
-            'total_purchases' => $total_purchases,
-            'total_paid' => $total_paid,
-            'total_due' => $total_due,
+            'totalinvoice' => $totalinvoice,
+            'inCount' => $inCount,
+            'inCountamount' => $inCountamount,
+            'outCount' => $outCount,
+            'outCountamount' => $outCountamount,
+            'totalMonthly' => $totalMonthly,
+            'paymentMonthly' => $paymentMonthly,
         ];
     }
 
@@ -409,6 +444,79 @@ class PurchaseService
                 'due_date' => Carbon::parse($purchase->due_date)->format('d M Y'),
                 'total' => CurrencyHelper::format($purchase->total),
             ];
+        });
+    }
+
+    public function createPurchaseReturn(array $data): PurchaseReturn
+    {
+        return DB::transaction(function () use ($data) {
+            $purchase = Purchase::findOrFail($data['purchase_id']);
+            $items = json_decode($data['items'], true);
+            if (!$items || !is_array($items)) {
+                throw new \Exception('Invalid items data');
+            }
+
+            $totalReturnAmount = 0;
+            foreach ($items as $itemData) {
+                $totalReturnAmount += $itemData['price'] * $itemData['quantity'];
+            }
+
+            $purchaseReturn = PurchaseReturn::create([
+                'purchase_id' => $purchase->id,
+                'user_id' => Auth::id(),
+                'return_date' => $data['return_date'],
+                'reason' => $data['reason'],
+                'total_amount' => $totalReturnAmount,
+                'status' => $data['status'],
+            ]);
+
+            foreach ($items as $itemData) {
+                PurchaseReturnItem::create([
+                    'purchase_return_id' => $purchaseReturn->id,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $itemData['quantity'],
+                    'price' => $itemData['price'],
+                    'total' => $itemData['price'] * $itemData['quantity'],
+                ]);
+
+                $product = Product::find($itemData['product_id']);
+                if ($product) {
+                    $product->decrement('stock_quantity', $itemData['quantity']);
+                }
+            }
+
+            // Update original purchase status
+            $totalPurchasedQuantity = $purchase->items->sum('quantity');
+            $totalReturnedQuantity = $purchase->purchaseReturns->flatMap->items->sum('quantity');
+
+            if ($totalReturnedQuantity >= $totalPurchasedQuantity) {
+                $purchase->update(['status' => 'Returned']);
+            } else {
+                $purchase->update(['status' => 'Partial Return']);
+            }
+
+            // Create Journal Entry for the return
+            $accountingSettings = Auth::user()->accounting_settings;
+            if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_payable_account_id'])) {
+                throw new \Exception('Accounting settings for inventory or accounts payable are not configured.');
+            }
+
+            $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+            $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
+
+            $transactions = [
+                ['account_name' => $accountsPayableAccountName, 'type' => 'debit', 'amount' => $totalReturnAmount],
+                ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],
+            ];
+
+            $this->accountingService->createJournalEntry(
+                "Purchase Return for PO #{$purchase->invoice}",
+                Carbon::parse($data['return_date']),
+                $transactions,
+                $purchaseReturn
+            );
+
+            return $purchaseReturn;
         });
     }
 }

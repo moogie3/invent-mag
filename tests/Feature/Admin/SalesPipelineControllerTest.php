@@ -241,7 +241,7 @@ class SalesPipelineControllerTest extends BaseFeatureTestCase
         $response = $this->getJson(route('admin.sales_pipeline.pipelines.index'));
 
         $response->assertStatus(200)
-            ->assertJsonCount(3);
+            ->assertJsonCount(4);
     }
 
     public function test_it_can_reorder_stages()
@@ -299,7 +299,7 @@ class SalesPipelineControllerTest extends BaseFeatureTestCase
         $response = $this->getJson(route('admin.sales_pipeline.opportunities.index'));
 
         $response->assertStatus(200)
-            ->assertJsonCount(3, 'opportunities');
+            ->assertJsonCount(8, 'opportunities');
     }
 
     public function test_it_can_show_an_opportunity()

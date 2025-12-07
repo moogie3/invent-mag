@@ -18,6 +18,10 @@ class CustomerService
 
     public function createCustomer(array $data)
     {
+        if (Customer::whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->first()) {
+            return ['success' => false, 'message' => 'This customer already exists.'];
+        }
+
         if (isset($data['image'])) {
             $data['image'] = $this->storeImage($data['image']);
         }
@@ -77,7 +81,7 @@ class CustomerService
     public function getCustomerMetrics()
     {
         return [
-            'total_customers' => Customer::count(),
+            'totalcustomer' => Customer::count(),
         ];
     }
 }

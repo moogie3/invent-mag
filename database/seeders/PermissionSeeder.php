@@ -37,6 +37,12 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'edit-sales']);
         Permission::firstOrCreate(['name' => 'delete-sales']);
 
+        // Sales Return Management Permissions
+        Permission::firstOrCreate(['name' => 'view-sales-returns']);
+        Permission::firstOrCreate(['name' => 'create-sales-returns']);
+        Permission::firstOrCreate(['name' => 'edit-sales-returns']);
+        Permission::firstOrCreate(['name' => 'delete-sales-returns']);
+
         // Report Viewing Permissions
         Permission::firstOrCreate(['name' => 'view-reports']);
 
@@ -48,6 +54,12 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'create-po']);
         Permission::firstOrCreate(['name' => 'edit-po']);
         Permission::firstOrCreate(['name' => 'delete-po']);
+
+        // Purchase Return Management Permissions
+        Permission::firstOrCreate(['name' => 'view-purchase-returns']);
+        Permission::firstOrCreate(['name' => 'create-purchase-returns']);
+        Permission::firstOrCreate(['name' => 'edit-purchase-returns']);
+        Permission::firstOrCreate(['name' => 'delete-purchase-returns']);
 
         // Warehouse Management Permissions
         Permission::firstOrCreate(['name' => 'view-warehouse']);

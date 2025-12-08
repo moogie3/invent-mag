@@ -16,6 +16,8 @@ use App\Helpers\CurrencyHelper;
 use App\Models\Customer;
 use Carbon\Carbon;
 use App\Models\Account;
+use App\Models\SalesReturn;
+use App\Models\SalesReturnItem;
 
 class SalesService
 {
@@ -134,14 +136,23 @@ class SalesService
 
     public function getSalesMetrics()
     {
-        $total_sales = Sales::sum('total');
-        $total_paid = Sales::where('status', 'Paid')->sum('total');
-        $total_due = Sales::where('status', 'Unpaid')->sum('total');
+        $totalinvoice = Sales::count();
+        $unpaidDebt = Sales::where('status', 'Unpaid')->sum('total');
+        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
+        $pendingOrders = Sales::where('status', 'Unpaid')->count();
+        $dueInvoices = Sales::where('status', 'Unpaid')
+            ->whereDate('due_date', '>=', now())
+            ->whereDate('due_date', '<=', now()->addDays(7))
+            ->count();
+        $posTotal = Sales::where('is_pos', true)->sum('total');
 
         return [
-            'total_sales' => $total_sales,
-            'total_paid' => $total_paid,
-            'total_due' => $total_due,
+            'totalinvoice' => $totalinvoice,
+            'unpaidDebt' => $unpaidDebt,
+            'totalMonthly' => $totalMonthly,
+            'pendingOrders' => $pendingOrders,
+            'dueInvoices' => $dueInvoices,
+            'posTotal' => $posTotal,
         ];
     }
 

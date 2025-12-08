@@ -59,6 +59,7 @@ class Sales extends Model
         'Paid',
         'Partial',
         'Unpaid',
+        'Returned',
     ];
 
     public static $paymentTypes = [
@@ -82,6 +83,11 @@ class Sales extends Model
     public function salesItems(): HasMany
     {
         return $this->hasMany(SalesItem::class, 'sales_id');
+    }
+
+    public function salesReturns(): HasMany
+    {
+        return $this->hasMany(SalesReturn::class);
     }
 
     public function product(): BelongsTo

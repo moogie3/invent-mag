@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -178,6 +178,10 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::post('/{id}/payment', [PurchaseController::class, 'addPayment'])->name('admin.po.add-payment');
         });
 
+        // Purchase Return Routes
+        Route::get('purchase-returns/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.purchase-returns.items');
+        Route::resource('purchase-returns', PurchaseReturnController::class)->names('admin.purchase-returns');
+
         // Sales Routes
         Route::prefix('sales')->group(function () {
             Route::get('/', [SalesController::class, 'index'])->name('admin.sales');
@@ -197,6 +201,10 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/expiring-soon', [SalesController::class, 'getExpiringSoonSales'])->name('admin.sales.expiring-soon');
             Route::post('/{id}/payment', [SalesController::class, 'addPayment'])->name('admin.sales.add-payment');
         });
+
+        // Sales Return Routes
+        Route::get('sales-returns/sale/{sale}', [SalesReturnController::class, 'getSalesItems'])->name('admin.sales-returns.items');
+        Route::resource('sales-returns', SalesReturnController::class)->names('admin.sales-returns');
 
         // Warehouse Routes
         Route::prefix('warehouses')->group(function () {

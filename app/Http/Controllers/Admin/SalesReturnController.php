@@ -1,0 +1,75 @@
+<?php
+
+use App\Http\Controllers\Controller;
+use App\Models\Sales;
+use App\Models\SalesReturn;
+use App\Services\SalesReturnService;
+use App\Services\SalesService;
+use Illuminate\Http\Request;
+
+class SalesReturnController extends Controller
+{
+    protected $salesReturnService;
+    protected $salesService;
+
+    public function __construct(SalesReturnService $salesReturnService, SalesService $salesService)
+    {
+        $this->salesReturnService = $salesReturnService;
+        $this->salesService = $salesService;
+    }
+
+    public function index(Request $request)
+    {
+        $entries = $request->input('entries', 10);
+        $filters = $request->only(['month', 'year']);
+        $data = $this->salesReturnService->getSalesReturnIndexData($filters, $entries);
+        return view('admin.sales-returns.index', $data);
+    }
+
+    public function create()
+    {
+        $sales = Sales::all();
+        return view('admin.sales-returns.create', compact('sales'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'sales_id' => 'required|exists:sales,id',
+            'return_date' => 'required|date',
+            'items' => 'required|json',
+            'total_amount' => 'required|numeric',
+            'status' => 'required|string',
+        ]);
+
+        $this->salesService->createSalesReturn($request->all());
+
+        return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return created successfully.');
+    }
+
+    public function show(SalesReturn $salesReturn)
+    {
+        return view('admin.sales-returns.show', compact('salesReturn'));
+    }
+
+    public function edit(SalesReturn $salesReturn)
+    {
+        $sales = Sales::all();
+        return view('admin.sales-returns.edit', compact('salesReturn', 'sales'));
+    }
+
+    public function update(Request $request, SalesReturn $salesReturn)
+    {
+        //
+    }
+
+    public function destroy(SalesReturn $salesReturn)
+    {
+        //
+    }
+
+    public function getSalesItems(Sales $sale)
+    {
+        return response()->json($sale->salesItems()->with('product')->get());
+    }
+}

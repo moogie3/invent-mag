@@ -45,9 +45,19 @@
     @vite('resources/js/admin/sales-order.js')
 @endif
 
+{{-- SCRIPT FOR ADMIN SALES RETURN CREATE & EDIT --}}
+@if (request()->is('admin/sales-returns/create', 'admin/sales-returns/*/edit'))
+    @vite('resources/js/admin/sales-return.js')
+@endif
+
 {{-- SCRIPT FOR ADMIN PO CREATE & EDIT --}}
 @if (request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*'))
     @vite('resources/js/admin/purchase-order.js')
+@endif
+
+{{-- SCRIPT FOR ADMIN PURCHASE RETURN CREATE & EDIT --}}
+@if (request()->is('admin/purchase-returns/create', 'admin/purchase-returns/*/edit'))
+    @vite('resources/js/admin/purchase-return.js')
 @endif
 
 {{-- SCRIPT FOR PRODUCT --}}

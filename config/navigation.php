@@ -21,10 +21,22 @@ return [
             'permission' => 'view-sales',
         ],
         [
+            'title' => 'messages.sales_returns',
+            'route' => 'admin.sales-returns.index',
+            'icon' => 'ti ti-arrow-back',
+            'permission' => 'view-sales-returns',
+        ],
+        [
             'title' => 'messages.purchase_order',
             'route' => 'admin.po',
             'icon' => 'ti ti-shopping-cart',
             'permission' => 'view-po',
+        ],
+        [
+            'title' => 'messages.purchase_returns',
+            'route' => 'admin.purchase-returns.index',
+            'icon' => 'ti ti-truck-return',
+            'permission' => 'view-purchase-returns',
         ],
         [
             'title' => 'messages.sales_pipeline',

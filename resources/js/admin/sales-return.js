@@ -1,94 +1,125 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const salesSelect = document.getElementById('sales-select');
-    const productReturnList = document.getElementById('product-return-list');
-    const totalAmountInput = document.getElementById('total-amount');
-    const itemsJsonInput = document.getElementById('items-json');
+import { initBulkSelection, getSelectedSalesReturnIds, clearSalesReturnSelection } from './partials/sales-returns/bulkActions/selection.js';
 
-    function formatCurrency(amount) {
-        return new Intl.NumberFormat(window.currencySettings.locale, {
-            style: 'currency',
-            currency: window.currencySettings.currency_code,
-            minimumFractionDigits: window.currencySettings.decimal_places,
-        }).format(amount);
-    }
-
-    if (salesSelect) {
-        salesSelect.addEventListener('change', function() {
-            const saleId = this.value;
-            if (saleId) {
-                fetch(`/admin/sales-returns/sale/${saleId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        productReturnList.innerHTML = '';
-                        const table = document.createElement('table');
-                        table.classList.add('table', 'table-vcenter');
-                        table.innerHTML = `
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Sold Qty</th>
-                                    <th>Return Qty</th>
-                                    <th>Price</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        `;
-                        const tbody = table.querySelector('tbody');
-                        data.forEach(item => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${item.product.name}</td>
-                                <td>${item.quantity}</td>
-                                <td>
-                                    <input type="number" name="items[${item.id}][quantity]" class="form-control" value="0" min="0" max="${item.quantity}" data-price="${item.customer_price}">
-                                </td>
-                                <td>${formatCurrency(item.customer_price)}</td>
-                                <td class="item-total">${formatCurrency(0)}</td>
-                            `;
-                            tbody.appendChild(row);
-                        });
-                        productReturnList.appendChild(table);
-                        updateTotalAmount();
-                    });
-            } else {
-                productReturnList.innerHTML = '<p>Select a sales order to see its items.</p>';
-            }
-        });
-    }
-
-    if (productReturnList) {
-        productReturnList.addEventListener('input', function(event) {
-            if (event.target.tagName === 'INPUT') {
-                updateTotalAmount();
-            }
-        });
-    }
-
-    function updateTotalAmount() {
-        let total = 0;
-        const items = [];
-        productReturnList.querySelectorAll('tbody tr').forEach(row => {
-            const quantityInput = row.querySelector('input[type="number"]');
-            const price = parseFloat(quantityInput.dataset.price);
-            const quantity = parseInt(quantityInput.value);
-            const itemTotal = price * quantity;
-            row.querySelector('.item-total').textContent = formatCurrency(itemTotal);
-            total += itemTotal;
-
-            if (quantity > 0) {
-                const match = quantityInput.name.match(/items\[(\d+)\]\[quantity\]/);
-                if (match && match[1]) {
-                    items.push({
-                        product_id: match[1],
-                        quantity: quantity,
-                        price: price,
-                    });
-                }
-            }
-        });
-        totalAmountInput.value = formatCurrency(total);
-        itemsJsonInput.value = JSON.stringify(items);
-    }
+document.addEventListener('DOMContentLoaded', function () {
+    initBulkSelection();
 });
+
+window.bulkDeleteSalesReturns = function () {
+    const selectedIds = getSelectedSalesReturnIds();
+    if (selectedIds.length === 0) {
+        alert('Please select at least one sales return to delete.');
+        return;
+    }
+
+    // Set the count in the modal
+    document.getElementById('bulkDeleteCount').textContent = selectedIds.length;
+
+    // Show the modal
+    var bulkDeleteModal = new bootstrap.Modal(document.getElementById('bulkDeleteSalesReturnModal'));
+    bulkDeleteModal.show();
+
+    // Handle confirm button click
+    document.getElementById('confirmBulkDeleteBtn').onclick = function () {
+        fetch('/admin/sales-returns/bulk-delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ ids: selectedIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .finally(() => {
+            bulkDeleteModal.hide();
+        });
+    };
+}
+
+window.bulkMarkCompletedSalesReturns = function () {
+    const selectedIds = getSelectedSalesReturnIds();
+    if (selectedIds.length === 0) {
+        alert('Please select at least one sales return to mark as completed.');
+        return;
+    }
+
+    // Set the count in the modal
+    document.getElementById('bulkCompletedCount').textContent = selectedIds.length;
+
+    // Show the modal
+    var bulkMarkCompletedModal = new bootstrap.Modal(document.getElementById('bulkMarkCompletedSalesReturnModal'));
+    bulkMarkCompletedModal.show();
+
+    // Handle confirm button click
+    document.getElementById('confirmBulkCompletedBtn').onclick = function () {
+        fetch('/admin/sales-returns/bulk-complete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ ids: selectedIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .finally(() => {
+            bulkMarkCompletedModal.hide();
+        });
+    };
+}
+
+window.bulkMarkCanceledSalesReturns = function () {
+    const selectedIds = getSelectedSalesReturnIds();
+    if (selectedIds.length === 0) {
+        alert('Please select at least one sales return to mark as canceled.');
+        return;
+    }
+
+    // Set the count in the modal
+    document.getElementById('bulkCanceledCount').textContent = selectedIds.length;
+
+    // Show the modal
+    var bulkMarkCanceledModal = new bootstrap.Modal(document.getElementById('bulkMarkCanceledSalesReturnModal'));
+    bulkMarkCanceledModal.show();
+
+    // Handle confirm button click
+    document.getElementById('confirmBulkCanceledBtn').onclick = function () {
+        fetch('/admin/sales-returns/bulk-cancel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ ids: selectedIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .finally(() => {
+            bulkMarkCanceledModal.hide();
+        });
+    };
+}
+
+window.clearSalesReturnSelection = clearSalesReturnSelection;
+

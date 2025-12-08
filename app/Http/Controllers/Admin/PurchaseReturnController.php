@@ -62,16 +62,48 @@ class PurchaseReturnController extends Controller
 
     public function update(Request $request, PurchaseReturn $purchaseReturn)
     {
-        //
+        $request->validate([
+            'purchase_id' => 'required|exists:po,id',
+            'return_date' => 'required|date',
+            'items' => 'required|json',
+            'total_amount' => 'required|numeric',
+            'status' => 'required|string',
+        ]);
+
+        $this->purchaseReturnService->updatePurchaseReturn($purchaseReturn, $request->all());
+
+        return redirect()->route('admin.purchase-returns.index')->with('success', 'Purchase return updated successfully.');
     }
 
     public function destroy(PurchaseReturn $purchaseReturn)
     {
-        //
+        $purchaseReturn->delete();
+        return redirect()->route('admin.purchase-returns.index')->with('success', 'Purchase return deleted successfully.');
     }
 
     public function getPurchaseItems(Purchase $purchase)
     {
         return response()->json($purchase->items()->with('product')->get());
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+        PurchaseReturn::whereIn('id', $ids)->delete();
+        return response()->json(['success' => true, 'message' => 'Selected purchase returns have been deleted.']);
+    }
+
+    public function bulkComplete(Request $request)
+    {
+        $ids = $request->input('ids');
+        PurchaseReturn::whereIn('id', $ids)->update(['status' => 'Completed']);
+        return response()->json(['success' => true, 'message' => 'Selected purchase returns have been marked as completed.']);
+    }
+
+    public function bulkCancel(Request $request)
+    {
+        $ids = $request->input('ids');
+        PurchaseReturn::whereIn('id', $ids)->update(['status' => 'Canceled']);
+        return response()->json(['success' => true, 'message' => 'Selected purchase returns have been marked as canceled.']);
     }
 }

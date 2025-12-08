@@ -26,22 +26,41 @@
             <div class="card-header">
                 <h3 class="card-title">{{ __('messages.model_sales_return') }}</h3>
             </div>
-            <div class="card-body">
+            @include('admin.layouts.partials.sales-returns.index.bulk-actions')
+            <div id="invoiceTableContainer" class="position-relative">
                 <div class="table-responsive">
-                    <table class="table card-table table-vcenter text-nowrap datatable">
-                        <thead>
+                    <table class="table card-table table-vcenter">
+                        <thead style="font-size: large">
                             <tr>
-                                <th class="w-1">#</th>
-                                <th>{{ __('messages.table_invoice') }}</th>
-                                <th>{{ __('messages.return_date') }}</th>
-                                <th>{{ __('messages.table_total') }}</th>
-                                <th>{{ __('messages.status') }}</th>
-                                <th>{{ __('messages.table_action') }}</th>
+                                <th class="sticky-top" style="z-index: 1020;">
+                                    <input type="checkbox" id="selectAll" class="form-check-input">
+                                </th>
+                                <th class="sticky-top" style="z-index: 1020;">
+                                    <button class="table-sort fs-4 py-3" data-sort="sort-no">{{ __('messages.no') }}</button>
+                                </th>
+                                <th class="sticky-top" style="z-index: 1020;">
+                                    <button class="table-sort fs-4 py-3">{{ __('messages.table_invoice') }}</button>
+                                </th>
+                                <th class="sticky-top" style="z-index: 1020;">
+                                    <button class="table-sort fs-4 py-3">{{ __('messages.return_date') }}</button>
+                                </th>
+                                <th class="sticky-top" style="z-index: 1020;">
+                                    <button class="table-sort fs-4 py-3">{{ __('messages.table_total') }}</button>
+                                </th>
+                                <th class="sticky-top" style="z-index: 1020;">
+                                    <button class="table-sort fs-4 py-3">{{ __('messages.status') }}</button>
+                                </th>
+                                <th style="width:100px;text-align:center" class="fs-4 py-3 no-print sticky-top" style="z-index: 1020;">
+                                    {{ __('messages.table_action') }}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($returns as $return)
                                 <tr>
+                                    <td>
+                                        <input type="checkbox" name="selected_invoices[]" value="{{ $return->id }}" class="form-check-input row-checkbox">
+                                    </td>
                                     <td><span class="text-muted">{{ $loop->iteration }}</span></td>
                                     <td>
                                         <a href="{{ route('admin.sales-returns.show', $return) }}">
@@ -68,7 +87,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">
+                                    <td colspan="7" class="text-center">
                                         {{ __('messages.no_sales_returns_found') }}
                                     </td>
                                 </tr>

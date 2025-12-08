@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 use App\Models\Sales;
 use App\Models\SalesReturn;
@@ -65,11 +67,33 @@ class SalesReturnController extends Controller
 
     public function destroy(SalesReturn $salesReturn)
     {
-        //
+        $salesReturn->delete();
+        return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return deleted successfully.');
     }
 
     public function getSalesItems(Sales $sale)
     {
         return response()->json($sale->salesItems()->with('product')->get());
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+        SalesReturn::whereIn('id', $ids)->delete();
+        return response()->json(['success' => true, 'message' => 'Selected sales returns have been deleted.']);
+    }
+
+    public function bulkComplete(Request $request)
+    {
+        $ids = $request->input('ids');
+        SalesReturn::whereIn('id', $ids)->update(['status' => 'Completed']);
+        return response()->json(['success' => true, 'message' => 'Selected sales returns have been marked as completed.']);
+    }
+
+    public function bulkCancel(Request $request)
+    {
+        $ids = $request->input('ids');
+        SalesReturn::whereIn('id', $ids)->update(['status' => 'Canceled']);
+        return response()->json(['success' => true, 'message' => 'Selected sales returns have been marked as canceled.']);
     }
 }

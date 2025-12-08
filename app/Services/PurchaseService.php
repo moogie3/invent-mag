@@ -492,7 +492,7 @@ class PurchaseService
             if ($totalReturnedQuantity >= $totalPurchasedQuantity) {
                 $purchase->update(['status' => 'Returned']);
             } else {
-                $purchase->update(['status' => 'Partial Return']);
+                $purchase->update(['status' => 'Partial']);
             }
 
             // Create Journal Entry for the return

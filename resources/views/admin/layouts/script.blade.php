@@ -46,7 +46,7 @@
 @endif
 
 {{-- SCRIPT FOR ADMIN SALES RETURN CREATE & EDIT --}}
-@if (request()->is('admin/sales-returns/create', 'admin/sales-returns/*/edit'))
+@if (request()->is('admin/sales-returns', 'admin/sales-returns/create', 'admin/sales-returns/*/edit'))
     @vite('resources/js/admin/sales-return.js')
 @endif
 
@@ -56,7 +56,7 @@
 @endif
 
 {{-- SCRIPT FOR ADMIN PURCHASE RETURN CREATE & EDIT --}}
-@if (request()->is('admin/purchase-returns/create', 'admin/purchase-returns/*/edit'))
+@if (request()->is('admin/purchase-returns', 'admin/purchase-returns/create', 'admin/purchase-returns/*/edit'))
     @vite('resources/js/admin/purchase-return.js')
 @endif
 

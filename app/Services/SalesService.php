@@ -270,12 +270,12 @@ class SalesService
 
     public function updateSale(Sales $sale, array $data): Sales
     {
-        \Illuminate\Support\Facades\Log::info('Updating sale with data: ', $data);
+        Log::info('Updating sale with data: ', $data);
         return DB::transaction(function () use ($sale, $data) {
             // Note: Proper accounting for updates is complex.
             // A simple approach is to create a reversing entry and then a new entry.
             // For now, this is left as a future improvement.
-            
+
             $products = json_decode($data['products'], true);
             if (!$products || !is_array($products)) {
                 throw new \Exception('Invalid product data');
@@ -561,6 +561,79 @@ class SalesService
                 'due_date' => Carbon::parse($sale->due_date)->format('d M Y'),
                 'total' => CurrencyHelper::format($sale->total),
             ];
+        });
+    }
+
+    public function createSalesReturn(array $data): SalesReturn
+    {
+        return DB::transaction(function () use ($data) {
+            $sale = Sales::findOrFail($data['sales_id']);
+            $items = json_decode($data['items'], true);
+            if (!$items || !is_array($items)) {
+                throw new \Exception('Invalid items data');
+            }
+
+            $totalReturnAmount = 0;
+            foreach ($items as $itemData) {
+                $totalReturnAmount += $itemData['price'] * $itemData['quantity'];
+            }
+
+            $salesReturn = SalesReturn::create([
+                'sales_id' => $sale->id,
+                'user_id' => Auth::id(),
+                'return_date' => $data['return_date'],
+                'reason' => $data['reason'],
+                'total_amount' => $totalReturnAmount,
+                'status' => $data['status'],
+            ]);
+
+            foreach ($items as $itemData) {
+                SalesReturnItem::create([
+                    'sales_return_id' => $salesReturn->id,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $itemData['quantity'],
+                    'price' => $itemData['price'],
+                    'total' => $itemData['price'] * $itemData['quantity'],
+                ]);
+
+                $product = Product::find($itemData['product_id']);
+                if ($product) {
+                    $product->increment('stock_quantity', $itemData['quantity']);
+                }
+            }
+
+            // Update original sales status
+            $totalSoldQuantity = $sale->salesItems->sum('quantity');
+            $totalReturnedQuantity = $sale->salesReturns->flatMap->items->sum('quantity');
+
+            if ($totalReturnedQuantity >= $totalSoldQuantity) {
+                $sale->update(['status' => 'Returned']);
+            } else {
+                $sale->update(['status' => 'Partial']);
+            }
+
+            // Create Journal Entry for the return
+            $accountingSettings = Auth::user()->accounting_settings;
+            if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
+                throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
+            }
+
+            $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+            $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+
+            $transactions = [
+                ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],
+                ['account_name' => $inventoryAccountName, 'type' => 'debit', 'amount' => $totalReturnAmount],
+            ];
+
+            $this->accountingService->createJournalEntry(
+                "Sales Return for SO #{$sale->invoice}",
+                Carbon::parse($data['return_date']),
+                $transactions,
+                $salesReturn
+            );
+
+            return $salesReturn;
         });
     }
 }

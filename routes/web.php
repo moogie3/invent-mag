@@ -181,6 +181,10 @@ Route::middleware('web')->prefix('admin')->group(function () {
         // Purchase Return Routes
         Route::get('purchase-returns/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.purchase-returns.items');
         Route::resource('purchase-returns', PurchaseReturnController::class)->names('admin.purchase-returns');
+        Route::post('purchase-returns/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.purchase-returns.bulk-delete');
+        Route::post('purchase-returns/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.purchase-returns.bulk-complete');
+        Route::post('purchase-returns/bulk-cancel', [PurchaseReturnController::class, 'bulkCancel'])->name('admin.purchase-returns.bulk-cancel');
+
 
         // Sales Routes
         Route::prefix('sales')->group(function () {
@@ -205,6 +209,10 @@ Route::middleware('web')->prefix('admin')->group(function () {
         // Sales Return Routes
         Route::get('sales-returns/sale/{sale}', [SalesReturnController::class, 'getSalesItems'])->name('admin.sales-returns.items');
         Route::resource('sales-returns', SalesReturnController::class)->names('admin.sales-returns');
+        Route::post('sales-returns/bulk-delete', [SalesReturnController::class, 'bulkDelete'])->name('admin.sales-returns.bulk-delete');
+        Route::post('sales-returns/bulk-complete', [SalesReturnController::class, 'bulkComplete'])->name('admin.sales-returns.bulk-complete');
+        Route::post('sales-returns/bulk-cancel', [SalesReturnController::class, 'bulkCancel'])->name('admin.sales-returns.bulk-cancel');
+
 
         // Warehouse Routes
         Route::prefix('warehouses')->group(function () {

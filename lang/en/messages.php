@@ -1237,5 +1237,20 @@ return [
     'sr_modal_bulk_mark_canceled_what_happens_title' => 'What will happen?',
     'sr_modal_bulk_mark_canceled_item1' => 'The status of the selected sales returns will be set to "Canceled".',
     'no_items_selected' => 'No items selected',
-    'back' => 'Back'
+    'back' => 'Back',
+
+    'pr_failed_to_load_details' => 'Failed to load purchase return details.',
+    'pr_select_one_to_delete' => 'Please select at least one purchase return to delete.',
+    'pr_select_one_to_mark_completed' => 'Please select at least one purchase return to mark as completed.',
+    'pr_select_one_to_mark_canceled' => 'Please select at least one purchase return to mark as canceled.',
+    'pr_return_hash' => 'Return #',
+    'pr_return_information_title' => 'Return Information',
+    'pr_return_date' => 'Return Date',
+    'pr_original_po' => 'Original PO',
+    'pr_returned_items_title' => 'Returned Items',
+    'pr_total_return_amount' => 'Total Return Amount',
+    'pr_full_view_button' => 'Full View',
+    'pr_status_completed' => 'Completed',
+    'pr_status_pending' => 'Pending',
+    'pr_status_canceled' => 'Canceled',
 ];

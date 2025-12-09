@@ -113,11 +113,12 @@
                                     </td>
                                     <td>
                                         <div class="btn-list flex-nowrap justify-content-end">
-                                            <a href="{{ route('admin.purchase-returns.show', $return) }}"
-                                                class="btn btn-icon btn-ghost-secondary"
+                                            <button type="button" class="btn btn-icon btn-ghost-secondary view-purchase-return-btn"
+                                                data-bs-toggle="modal" data-bs-target="#purchaseReturnDetailModal"
+                                                data-pr-id="{{ $return->id }}"
                                                 title="{{ __('messages.view') }}">
                                                 <i class="ti ti-eye"></i>
-                                            </a>
+                                            </button>
                                             <a href="{{ route('admin.purchase-returns.edit', $return) }}"
                                                 class="btn btn-icon btn-ghost-primary"
                                                 title="{{ __('messages.edit') }}">

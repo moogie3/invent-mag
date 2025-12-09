@@ -12,12 +12,61 @@ document.addEventListener('DOMContentLoaded', function () {
     } else if (pathname.includes("/admin/purchase-returns")) {
         initBulkSelection();
     }
+
+    const purchaseReturnDetailModal = document.getElementById('purchaseReturnDetailModal');
+    if (purchaseReturnDetailModal) {
+        purchaseReturnDetailModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const prId = button.getAttribute('data-pr-id');
+            const modalContent = purchaseReturnDetailModal.querySelector('#purchaseReturnDetailModalContent');
+
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <h5 class="modal-title">${window.translations.loading}...</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${window.translations.close}"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center align-items-center" style="min-height: 100px;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">${window.translations.loading}...</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            fetch(`/admin/purchase-returns/${prId}/modal-view`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    modalContent.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading purchase return details:', error);
+                    modalContent.innerHTML = `
+                        <div class="modal-header">
+                            <h5 class="modal-title text-danger">${window.translations.error}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${window.translations.close}"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-danger">${window.translations.failed_to_load_details}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${window.translations.close}</button>
+                        </div>
+                    `;
+                });
+        });
+    }
 });
 
 window.bulkDeletePurchaseReturns = function () {
     const selectedIds = getSelectedPurchaseReturnIds();
     if (selectedIds.length === 0) {
-        alert('Please select at least one purchase return to delete.');
+        alert(window.translations.select_one_to_delete);
         return;
     }
 
@@ -56,7 +105,7 @@ window.bulkDeletePurchaseReturns = function () {
 window.bulkMarkCompletedPurchaseReturns = function () {
     const selectedIds = getSelectedPurchaseReturnIds();
     if (selectedIds.length === 0) {
-        alert('Please select at least one purchase return to mark as completed.');
+        alert(window.translations.select_one_to_mark_completed);
         return;
     }
 
@@ -95,7 +144,7 @@ window.bulkMarkCompletedPurchaseReturns = function () {
 window.bulkMarkCanceledPurchaseReturns = function () {
     const selectedIds = getSelectedPurchaseReturnIds();
     if (selectedIds.length === 0) {
-        alert('Please select at least one purchase return to mark as canceled.');
+        alert(window.translations.select_one_to_mark_canceled);
         return;
     }
 

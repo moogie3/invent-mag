@@ -105,4 +105,9 @@ class PurchaseReturnController extends Controller
         PurchaseReturn::whereIn('id', $ids)->update(['status' => 'Canceled']);
         return response()->json(['success' => true, 'message' => 'Selected purchase returns have been marked as canceled.']);
     }
+
+    public function modalView(PurchaseReturn $purchaseReturn)
+    {
+        return view('admin.layouts.partials.purchase-returns.modal-view', compact('purchaseReturn'));
+    }
 }

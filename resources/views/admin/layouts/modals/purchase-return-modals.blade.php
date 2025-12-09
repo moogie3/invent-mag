@@ -149,3 +149,23 @@
         </div>
     </div>
 </div>
+
+<!-- Purchase Return Detail Modal -->
+<div class="modal modal-blur fade" id="purchaseReturnDetailModal" tabindex="-1" aria-labelledby="purchaseReturnDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" id="purchaseReturnDetailModalContent">
+            <!-- Content will be loaded dynamically here -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="purchaseReturnDetailModalLabel">{{ __('messages.loading') }}...</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 100px;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">{{ __('messages.loading') }}...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

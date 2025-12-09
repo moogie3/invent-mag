@@ -180,6 +180,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
         // Purchase Return Routes
         Route::get('purchase-returns/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.purchase-returns.items');
+        Route::get('purchase-returns/{purchaseReturn}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.purchase-returns.modal-view');
         Route::resource('purchase-returns', PurchaseReturnController::class)->names('admin.purchase-returns');
         Route::post('purchase-returns/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.purchase-returns.bulk-delete');
         Route::post('purchase-returns/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.purchase-returns.bulk-complete');

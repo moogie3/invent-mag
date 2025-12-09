@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('discount_total', 10, 2)->default(0);
             $table->enum('discount_total_type', ['percentage', 'fixed'])->default('fixed');
             $table->float('total');
-            $table->enum('status', ['Unpaid', 'Paid', 'Partial']);
+            $table->enum('status', ['Unpaid', 'Paid', 'Partial', 'Returned']);
             $table->timestamps();
         });
 

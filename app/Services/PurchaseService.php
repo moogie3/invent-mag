@@ -315,8 +315,8 @@ class PurchaseService
     public function updatePurchaseStatus(Purchase $purchase)
     {
         $purchase->load('payments'); // Always get the latest payments
-        $totalPaid = $purchase->total_paid;
-        $grandTotal = $purchase->grand_total;
+        $totalPaid = $purchase->payments->sum('amount');
+        $grandTotal = $purchase->total;
 
         if ($totalPaid >= $grandTotal) {
             $purchase->status = 'Paid';
@@ -456,9 +456,19 @@ class PurchaseService
                 throw new \Exception('Invalid items data');
             }
 
+            // Filter for items that are actually being returned
+            $returnedItems = array_filter($items, function($item) {
+                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
+            });
+
+            if (empty($returnedItems)) {
+                throw new \Exception('No items selected for return.');
+            }
+
+            // Recalculate total amount on the backend to ensure data integrity
             $totalReturnAmount = 0;
-            foreach ($items as $itemData) {
-                $totalReturnAmount += $itemData['price'] * $itemData['quantity'];
+            foreach ($returnedItems as $itemData) {
+                $totalReturnAmount += ($itemData['return_price'] ?? $itemData['price']) * $itemData['returned_quantity'];
             }
 
             $purchaseReturn = PurchaseReturn::create([
@@ -470,28 +480,33 @@ class PurchaseService
                 'status' => $data['status'],
             ]);
 
-            foreach ($items as $itemData) {
+            foreach ($returnedItems as $itemData) {
+                $returnPrice = $itemData['return_price'] ?? $itemData['price'];
+                $returnedQuantity = $itemData['returned_quantity'];
+
                 PurchaseReturnItem::create([
                     'purchase_return_id' => $purchaseReturn->id,
                     'product_id' => $itemData['product_id'],
-                    'quantity' => $itemData['quantity'],
-                    'price' => $itemData['price'],
-                    'total' => $itemData['price'] * $itemData['quantity'],
+                    'quantity' => $returnedQuantity,
+                    'price' => $returnPrice,
+                    'total' => $returnPrice * $returnedQuantity,
                 ]);
 
+                // Decrement stock for the returned product
                 $product = Product::find($itemData['product_id']);
                 if ($product) {
-                    $product->decrement('stock_quantity', $itemData['quantity']);
+                    $product->decrement('stock_quantity', $returnedQuantity);
                 }
             }
 
             // Update original purchase status
             $totalPurchasedQuantity = $purchase->items->sum('quantity');
-            $totalReturnedQuantity = $purchase->purchaseReturns->flatMap->items->sum('quantity');
+            $totalReturnedQuantity = $purchase->purchaseReturns()->with('items')->get()->flatMap->items->sum('quantity');
+
 
             if ($totalReturnedQuantity >= $totalPurchasedQuantity) {
                 $purchase->update(['status' => 'Returned']);
-            } else {
+            } elseif ($totalReturnedQuantity > 0) {
                 $purchase->update(['status' => 'Partial']);
             }
 

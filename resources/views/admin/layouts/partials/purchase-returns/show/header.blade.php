@@ -5,14 +5,18 @@
                 <div class="page-pretitle">{{ __('messages.overview') }}</div>
                 <h2 class="page-title">
                     <i class="ti ti-receipt-refund me-2"></i>
-                    {{ __('messages.new_purchase_return') }}
+                    {{ __('messages.purchase_return_details') }}
                 </h2>
             </div>
             <div class="col-auto ms-auto">
-                <a href="{{ route('admin.purchase-returns.index') }}" class="btn btn-secondary d-none d-sm-inline-block">
-                    <i class="ti ti-arrow-left fs-4"></i>
+                <a href="{{ route('admin.purchase-returns.index') }}" class="btn btn-outline-secondary">
+                    <i class="ti ti-arrow-left me-2"></i>
                     {{ __('messages.back') }}
                 </a>
+                <button onclick="window.print()" class="btn btn-primary">
+                    <i class="ti ti-printer me-2"></i>
+                    {{ __('messages.print') }}
+                </button>
             </div>
         </div>
     </div>

@@ -1236,4 +1236,6 @@ return [
     'sr_modal_bulk_mark_completed_item1' => 'The status of the selected sales returns will be set to "Completed".',
     'sr_modal_bulk_mark_canceled_what_happens_title' => 'What will happen?',
     'sr_modal_bulk_mark_canceled_item1' => 'The status of the selected sales returns will be set to "Canceled".',
+    'no_items_selected' => 'No items selected',
+    'back' => 'Back'
 ];

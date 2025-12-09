@@ -80,7 +80,6 @@ class PurchaseReturnController extends Controller
         $purchaseReturn->delete();
         return redirect()->route('admin.purchase-returns.index')->with('success', 'Purchase return deleted successfully.');
     }
-
     public function getPurchaseItems(Purchase $purchase)
     {
         return response()->json($purchase->items()->with('product')->get());

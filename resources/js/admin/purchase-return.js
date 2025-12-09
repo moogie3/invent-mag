@@ -1,7 +1,17 @@
+import { PurchaseReturnCreate } from "./partials/purchase-returns/create/PurchaseReturnCreate.js";
+import { PurchaseReturnEdit } from "./partials/purchase-returns/edit/PurchaseReturnEdit.js";
 import { initBulkSelection, getSelectedPurchaseReturnIds, clearPurchaseReturnSelection } from './partials/purchase-returns/bulkActions/selection.js';
 
 document.addEventListener('DOMContentLoaded', function () {
-    initBulkSelection();
+    const pathname = window.location.pathname;
+
+    if (pathname.includes("/admin/purchase-returns/create")) {
+        new PurchaseReturnCreate();
+    } else if (pathname.includes("/admin/purchase-returns") && pathname.includes("/edit")) {
+        new PurchaseReturnEdit();
+    } else if (pathname.includes("/admin/purchase-returns")) {
+        initBulkSelection();
+    }
 });
 
 window.bulkDeletePurchaseReturns = function () {
@@ -21,25 +31,25 @@ window.bulkDeletePurchaseReturns = function () {
     // Handle confirm button click
     document.getElementById('confirmBulkDeleteBtn').onclick = function () {
         fetch('/admin/purchase-returns/bulk-delete', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ ids: selectedIds })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                window.location.reload();
-            } else {
-                alert(data.message);
-            }
-        })
-        .finally(() => {
-            bulkDeleteModal.hide();
-        });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ ids: selectedIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .finally(() => {
+                bulkDeleteModal.hide();
+            });
     };
 }
 
@@ -60,25 +70,25 @@ window.bulkMarkCompletedPurchaseReturns = function () {
     // Handle confirm button click
     document.getElementById('confirmBulkCompletedBtn').onclick = function () {
         fetch('/admin/purchase-returns/bulk-complete', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ ids: selectedIds })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                window.location.reload();
-            } else {
-                alert(data.message);
-            }
-        })
-        .finally(() => {
-            bulkMarkCompletedModal.hide();
-        });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ ids: selectedIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .finally(() => {
+                bulkMarkCompletedModal.hide();
+            });
     };
 }
 
@@ -99,25 +109,25 @@ window.bulkMarkCanceledPurchaseReturns = function () {
     // Handle confirm button click
     document.getElementById('confirmBulkCanceledBtn').onclick = function () {
         fetch('/admin/purchase-returns/bulk-cancel', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ ids: selectedIds })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                window.location.reload();
-            } else {
-                alert(data.message);
-            }
-        })
-        .finally(() => {
-            bulkMarkCanceledModal.hide();
-        });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ ids: selectedIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .finally(() => {
+                bulkMarkCanceledModal.hide();
+            });
     };
 }
 

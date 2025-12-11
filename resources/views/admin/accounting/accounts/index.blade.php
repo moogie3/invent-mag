@@ -44,7 +44,7 @@
                         </thead>
                         <tbody>
                             @foreach ($accounts as $account)
-                                @include('admin.accounting.accounts.partials.account_row', [
+                                @include('admin.layouts.partials.accounts.account_row', [
                                     'account' => $account,
                                     'level' => 0,
                                 ])

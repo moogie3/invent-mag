@@ -21,7 +21,7 @@ class AccountingController extends Controller
         $settings = $user->accounting_settings ?? [];
         $activeCoaTemplate = $settings['active_coa_template'] ?? null;
 
-        return view('admin.settings.accounting', compact('accounts', 'settings', 'activeCoaTemplate'));
+        return view('admin.accounting.accounting-setting', compact('accounts', 'settings', 'activeCoaTemplate'));
     }
 
     public function updateAccounting(Request $request)

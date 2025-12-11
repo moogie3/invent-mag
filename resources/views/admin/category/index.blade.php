@@ -139,5 +139,5 @@
             </div>
         </div>
     </div>
-    @include('admin.layouts.modals.catmodals')
+    @include('admin.layouts.modals.category.catmodals')
 @endsection

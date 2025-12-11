@@ -38,13 +38,19 @@
                                                 <div class="row g-3">
                                                     <div class="col-md-4">
                                                         <div class="form-label">{{ __('messages.select_template') }}</div>
-                                                        <select name="template" id="coaTemplateSelect" class="form-select" required>
-                                                            <option value="universal.json" @if($activeCoaTemplate == 'universal.json') selected @endif>{{ __('messages.universal_coa') }}</option>
-                                                            <option value="indonesian.json" @if($activeCoaTemplate == 'indonesian.json') selected @endif>{{ __('messages.indonesian_coa') }}</option>
+                                                        <select name="template" id="coaTemplateSelect" class="form-select"
+                                                            required>
+                                                            <option value="universal.json"
+                                                                @if ($activeCoaTemplate == 'universal.json') selected @endif>
+                                                                {{ __('messages.universal_coa') }}</option>
+                                                            <option value="indonesian.json"
+                                                                @if ($activeCoaTemplate == 'indonesian.json') selected @endif>
+                                                                {{ __('messages.indonesian_coa') }}</option>
                                                         </select>
                                                     </div>
                                                     <div class="col-md-4 d-flex align-items-end">
-                                                        <button type="button" id="applyCoaTemplateBtn" class="btn btn-warning">{{ __('messages.apply_template') }}</button>
+                                                        <button type="button" id="applyCoaTemplateBtn"
+                                                            class="btn btn-warning">{{ __('messages.apply_template') }}</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -65,55 +71,74 @@
                                             <div class="settings-section-content">
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <label class="form-label">{{ __('messages.sales_revenue_account') }}</label>
-                                                        <select name="sales_revenue_account_id" class="form-select" required>
-                                                            <option value="">{{ __('messages.select_account') }}</option>
+                                                        <label
+                                                            class="form-label">{{ __('messages.sales_revenue_account') }}</label>
+                                                        <select name="sales_revenue_account_id" class="form-select"
+                                                            required>
+                                                            <option value="">{{ __('messages.select_account') }}
+                                                            </option>
                                                             @foreach ($accounts['revenue'] ?? [] as $account)
-                                                                <option value="{{ $account->id }}" @if(($settings['sales_revenue_account_id'] ?? null) == $account->id) selected @endif>
+                                                                <option value="{{ $account->id }}"
+                                                                    @if (($settings['sales_revenue_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">{{ __('messages.accounts_receivable_account') }}</label>
-                                                        <select name="accounts_receivable_account_id" class="form-select" required>
-                                                            <option value="">{{ __('messages.select_account') }}</option>
+                                                        <label
+                                                            class="form-label">{{ __('messages.accounts_receivable_account') }}</label>
+                                                        <select name="accounts_receivable_account_id" class="form-select"
+                                                            required>
+                                                            <option value="">{{ __('messages.select_account') }}
+                                                            </option>
                                                             @foreach ($accounts['asset'] ?? [] as $account)
-                                                                <option value="{{ $account->id }}" @if(($settings['accounts_receivable_account_id'] ?? null) == $account->id) selected @endif>
+                                                                <option value="{{ $account->id }}"
+                                                                    @if (($settings['accounts_receivable_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">{{ __('messages.cost_of_goods_sold_account') }}</label>
-                                                        <select name="cost_of_goods_sold_account_id" class="form-select" required>
-                                                            <option value="">{{ __('messages.select_account') }}</option>
+                                                        <label
+                                                            class="form-label">{{ __('messages.cost_of_goods_sold_account') }}</label>
+                                                        <select name="cost_of_goods_sold_account_id" class="form-select"
+                                                            required>
+                                                            <option value="">{{ __('messages.select_account') }}
+                                                            </option>
                                                             @foreach ($accounts['expense'] ?? [] as $account)
-                                                                <option value="{{ $account->id }}" @if(($settings['cost_of_goods_sold_account_id'] ?? null) == $account->id) selected @endif>
+                                                                <option value="{{ $account->id }}"
+                                                                    @if (($settings['cost_of_goods_sold_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">{{ __('messages.inventory_account') }}</label>
+                                                        <label
+                                                            class="form-label">{{ __('messages.inventory_account') }}</label>
                                                         <select name="inventory_account_id" class="form-select" required>
-                                                            <option value="">{{ __('messages.select_account') }}</option>
+                                                            <option value="">{{ __('messages.select_account') }}
+                                                            </option>
                                                             @foreach ($accounts['asset'] ?? [] as $account)
-                                                                <option value="{{ $account->id }}" @if(($settings['inventory_account_id'] ?? null) == $account->id) selected @endif>
+                                                                <option value="{{ $account->id }}"
+                                                                    @if (($settings['inventory_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">{{ __('messages.accounts_payable_account') }}</label>
-                                                        <select name="accounts_payable_account_id" class="form-select" required>
-                                                            <option value="">{{ __('messages.select_account') }}</option>
+                                                        <label
+                                                            class="form-label">{{ __('messages.accounts_payable_account') }}</label>
+                                                        <select name="accounts_payable_account_id" class="form-select"
+                                                            required>
+                                                            <option value="">{{ __('messages.select_account') }}
+                                                            </option>
                                                             @foreach ($accounts['liability'] ?? [] as $account)
-                                                                <option value="{{ $account->id }}" @if(($settings['accounts_payable_account_id'] ?? null) == $account->id) selected @endif>
+                                                                <option value="{{ $account->id }}"
+                                                                    @if (($settings['accounts_payable_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
@@ -122,21 +147,24 @@
                                                     <div class="col-md-6">
                                                         <label class="form-label">{{ __('messages.cash_account') }}</label>
                                                         <select name="cash_account_id" class="form-select" required>
-                                                            <option value="">{{ __('messages.select_account') }}</option>
+                                                            <option value="">{{ __('messages.select_account') }}
+                                                            </option>
                                                             @foreach ($accounts['asset'] ?? [] as $account)
-                                                                <option value="{{ $account->id }}" @if(($settings['cash_account_id'] ?? null) == $account->id) selected @endif>
+                                                                <option value="{{ $account->id }}"
+                                                                    @if (($settings['cash_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                    
+
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="card-footer bg-transparent mt-auto">
                                             <div class="btn-list justify-content-end">
-                                                <button type="submit" class="btn btn-primary">{{ __('messages.save_settings') }}</button>
+                                                <button type="submit"
+                                                    class="btn btn-primary">{{ __('messages.save_settings') }}</button>
                                             </div>
                                         </div>
                                     </form>
@@ -169,7 +197,8 @@
                             </a>
                         </div>
                         <div class="col">
-                            <a href="#" class="btn btn-warning w-100" id="coaTemplateConfirmationModalConfirmBtn">
+                            <a href="#" class="btn btn-warning w-100"
+                                id="coaTemplateConfirmationModalConfirmBtn">
                                 {{ __('messages.confirm') }}
                             </a>
                         </div>

@@ -5,11 +5,11 @@ import { initBulkSelection, getSelectedPurchaseReturnIds, clearPurchaseReturnSel
 document.addEventListener('DOMContentLoaded', function () {
     const pathname = window.location.pathname;
 
-    if (pathname.includes("/admin/purchase-returns/create")) {
+    if (pathname.includes("/admin/por/create")) {
         new PurchaseReturnCreate();
-    } else if (pathname.includes("/admin/purchase-returns") && pathname.includes("/edit")) {
+    } else if (pathname.includes("/admin/por") && pathname.includes("/edit")) {
         new PurchaseReturnEdit();
-    } else if (pathname.includes("/admin/purchase-returns")) {
+    } else if (pathname.includes("/admin/por")) {
         initBulkSelection();
     }
 
@@ -20,21 +20,24 @@ document.addEventListener('DOMContentLoaded', function () {
             const prId = button.getAttribute('data-pr-id');
             const modalContent = purchaseReturnDetailModal.querySelector('#purchaseReturnDetailModalContent');
 
+            const loadingText = window.translations?.loading || 'Loading';
+            const closeText = window.translations?.close || 'Close';
+
             modalContent.innerHTML = `
                 <div class="modal-header">
-                    <h5 class="modal-title">${window.translations.loading}...</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${window.translations.close}"></button>
+                    <h5 class="modal-title">${loadingText}...</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${closeText}"></button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-center align-items-center" style="min-height: 100px;">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">${window.translations.loading}...</span>
+                            <span class="visually-hidden">${loadingText}...</span>
                         </div>
                     </div>
                 </div>
             `;
 
-            fetch(`/admin/purchase-returns/${prId}/modal-view`)
+            fetch(`/admin/por/${prId}/modal-view`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -46,16 +49,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .catch(error => {
                     console.error('Error loading purchase return details:', error);
+                    
+                    const errorText = window.translations?.error || 'Error';
+                    const closeText = window.translations?.close || 'Close';
+                    const failedToLoadDetailsText = window.translations?.failed_to_load_details || 'Failed to load details.';
+
                     modalContent.innerHTML = `
                         <div class="modal-header">
-                            <h5 class="modal-title text-danger">${window.translations.error}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${window.translations.close}"></button>
+                            <h5 class="modal-title text-danger">${errorText}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${closeText}"></button>
                         </div>
                         <div class="modal-body">
-                            <p class="text-danger">${window.translations.failed_to_load_details}</p>
+                            <p class="text-danger">${failedToLoadDetailsText}</p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${window.translations.close}</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${closeText}</button>
                         </div>
                     `;
                 });
@@ -66,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
 window.bulkDeletePurchaseReturns = function () {
     const selectedIds = getSelectedPurchaseReturnIds();
     if (selectedIds.length === 0) {
-        alert(window.translations.select_one_to_delete);
+        alert(window.translations?.select_one_to_delete || 'Please select at least one purchase return to delete.');
         return;
     }
 
@@ -79,7 +87,7 @@ window.bulkDeletePurchaseReturns = function () {
 
     // Handle confirm button click
     document.getElementById('confirmBulkDeleteBtn').onclick = function () {
-        fetch('/admin/purchase-returns/bulk-delete', {
+        fetch('/admin/por/bulk-delete', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -105,7 +113,7 @@ window.bulkDeletePurchaseReturns = function () {
 window.bulkMarkCompletedPurchaseReturns = function () {
     const selectedIds = getSelectedPurchaseReturnIds();
     if (selectedIds.length === 0) {
-        alert(window.translations.select_one_to_mark_completed);
+        alert(window.translations?.select_one_to_mark_completed || 'Please select at least one purchase return to mark as completed.');
         return;
     }
 
@@ -118,7 +126,7 @@ window.bulkMarkCompletedPurchaseReturns = function () {
 
     // Handle confirm button click
     document.getElementById('confirmBulkCompletedBtn').onclick = function () {
-        fetch('/admin/purchase-returns/bulk-complete', {
+        fetch('/admin/por/bulk-complete', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -144,7 +152,7 @@ window.bulkMarkCompletedPurchaseReturns = function () {
 window.bulkMarkCanceledPurchaseReturns = function () {
     const selectedIds = getSelectedPurchaseReturnIds();
     if (selectedIds.length === 0) {
-        alert(window.translations.select_one_to_mark_canceled);
+        alert(window.translations?.select_one_to_mark_canceled || 'Please select at least one purchase return to mark as canceled.');
         return;
     }
 
@@ -157,7 +165,7 @@ window.bulkMarkCanceledPurchaseReturns = function () {
 
     // Handle confirm button click
     document.getElementById('confirmBulkCanceledBtn').onclick = function () {
-        fetch('/admin/purchase-returns/bulk-cancel', {
+        fetch('/admin/por/bulk-cancel', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

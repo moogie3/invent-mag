@@ -46,7 +46,7 @@ export class PurchaseReturnEdit {
 
         if (purchaseId) {
             try {
-                const response = await fetch(`/admin/purchase-returns/purchase/${purchaseId}`);
+                const response = await fetch(`/admin/por/purchase/${purchaseId}`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

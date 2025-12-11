@@ -69,7 +69,7 @@ class SalesController extends Controller
     {
         try {
             $sales = $this->salesService->getSalesForModal($id);
-            return view('admin.layouts.modals.salesmodals-view', compact('sales'));
+            return view('admin.layouts.modals.sales.salesmodals-view', compact('sales'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Sales record not found for modal view: {$id}");
             return response('<div class="alert alert-danger">Sales record not found.</div>', 404);

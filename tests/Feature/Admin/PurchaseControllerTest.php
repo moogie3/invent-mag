@@ -43,9 +43,10 @@ class PurchaseControllerTest extends BaseFeatureTestCase
             'accounts_payable_account_id' => $accountsPayable->id,
             'inventory_account_id' => $inventory->id,
         ];
-        $this->user->save();
-
-        $this->actingAs($this->user);
+                $this->user->save();
+                $this->actingAs($this->user);
+                $this->user->refresh(); // Ensure the authenticated user model is refreshed
+        
 
         Warehouse::factory()->create(['is_main' => true]);
         $this->supplier = Supplier::factory()->create();
@@ -266,6 +267,7 @@ class PurchaseControllerTest extends BaseFeatureTestCase
                 'supplier_id' => $this->supplier->id,
                 'status' => 'Unpaid',
                 'discount_total' => 0,
+                'total' => 0, // Explicitly set total to 0
             ]);
 
         foreach($purchases as $purchase) {
@@ -343,7 +345,7 @@ class PurchaseControllerTest extends BaseFeatureTestCase
         $response = $this->get(route('admin.po.modal-view', $purchase->id));
 
         $response->assertStatus(200);
-        $response->assertViewIs('admin.layouts.modals.pomodals-view');
+        $response->assertViewIs('admin.layouts.modals.po.pomodals-view');
         $response->assertViewHas('pos', $purchase);
     }
 

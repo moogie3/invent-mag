@@ -9,7 +9,7 @@
                 </h2>
             </div>
             <div class="col-auto ms-auto">
-                <a href="{{ route('admin.purchase-returns.index') }}" class="btn btn-secondary d-none d-sm-inline-block">
+                <a href="{{ route('admin.por.index') }}" class="btn btn-secondary d-none d-sm-inline-block">
                     <i class="ti ti-arrow-left fs-4"></i>
                     {{ __('messages.back') }}
                 </a>

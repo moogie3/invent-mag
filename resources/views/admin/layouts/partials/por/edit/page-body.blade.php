@@ -8,7 +8,7 @@
                 </h3>
             </div>
             <div class="card-body">
-                <form id="purchase-return-edit-form" action="{{ route('admin.purchase-returns.update', $purchaseReturn) }}" method="POST">
+                <form id="purchase-return-edit-form" action="{{ route('admin.por.update', $purchaseReturn) }}" method="POST">
                     @csrf
                     @method('PUT')
 
@@ -104,7 +104,7 @@
 
                     {{-- Action Buttons --}}
                     <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="{{ route('admin.purchase-returns.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('admin.por.index') }}" class="btn btn-outline-secondary">
                             <i class="ti ti-x me-2"></i>
                             {{ __('messages.cancel') }}
                         </a>

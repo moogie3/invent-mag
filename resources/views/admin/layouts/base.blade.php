@@ -86,7 +86,7 @@
     @include('admin.layouts.footer')
     @include('admin.layouts.script')
     @include('admin.layouts.partials.session-notifications')
-    @include('admin.layouts.modals.keyboard-shortcuts-modal')
+    @include('admin.layouts.modals.general.keyboard-shortcuts-modal')
 
     @vite('resources/js/admin/layouts/page-loader.js')
     @vite('resources/js/admin/layouts/theme-toggle.js')

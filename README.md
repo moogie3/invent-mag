@@ -2,7 +2,7 @@
 
 ![Screenshot of Invent-MAG](screenshot.png)
 
-**Version:** 1.0  
+**Version:** 1.2
 **Author:** moogie3  
 **License:** MIT  
 

@@ -47,7 +47,7 @@
                 </h3>
             </div>
 
-            @include('admin.layouts.partials.purchase-returns.index.bulk-actions')
+            @include('admin.layouts.partials.por.index.bulk-actions')
 
             <div id="invoiceTableContainer" class="position-relative">
                 <div class="table-responsive">
@@ -99,7 +99,7 @@
                                         <span class="text-muted">{{ $loop->iteration }}</span>
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.purchase-returns.show', $return) }}">
+                                        <a href="{{ route('admin.por.show', $return) }}">
                                             {{ $return->purchase->invoice }}
                                         </a>
                                     </td>
@@ -119,7 +119,7 @@
                                                 title="{{ __('messages.view') }}">
                                                 <i class="ti ti-eye"></i>
                                             </button>
-                                            <a href="{{ route('admin.purchase-returns.edit', $return) }}"
+                                            <a href="{{ route('admin.por.edit', $return) }}"
                                                 class="btn btn-icon btn-ghost-primary"
                                                 title="{{ __('messages.edit') }}">
                                                 <i class="ti ti-edit"></i>
@@ -127,7 +127,7 @@
                                             <button type="button" class="btn btn-icon btn-ghost-danger"
                                                 data-bs-toggle="modal" data-bs-target="#deleteModal"
                                                 title="{{ __('messages.delete') }}"
-                                                onclick="setDeleteFormAction('{{ route('admin.purchase-returns.destroy', $return->id) }}')">
+                                                onclick="setDeleteFormAction('{{ route('admin.por.destroy', $return->id) }}')">
                                                 <i class="ti ti-trash"></i>
                                             </button>
                                         </div>

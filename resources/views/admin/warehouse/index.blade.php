@@ -7,5 +7,5 @@
         @include('admin.layouts.partials.warehouse.index.header')
         @include('admin.layouts.partials.warehouse.index.page-body')
     </div>
-    @include('admin.layouts.modals.waremodals')
+    @include('admin.layouts.modals.warehouse.waremodals')
 @endsection

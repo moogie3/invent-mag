@@ -344,7 +344,7 @@ class SalesPipelineControllerTest extends BaseFeatureTestCase
         $response = $this->get(route('admin.sales_pipeline.opportunities.convert.show', $opportunity));
 
         $response->assertStatus(200)
-            ->assertViewIs('admin.layouts.modals.sales-pipeline-modals')
+            ->assertViewIs('admin.layouts.modals.sales.sales-pipeline-modals')
             ->assertViewHas('opportunity', $opportunity);
     }
 

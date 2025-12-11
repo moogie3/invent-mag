@@ -7,5 +7,5 @@
         @include('admin.layouts.partials.po.create.header')
         @include('admin.layouts.partials.po.create.page-body')
     </div>
-    @include('admin.layouts.modals.pomodals')
+    @include('admin.layouts.modals.po.pomodals')
 @endsection

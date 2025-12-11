@@ -34,7 +34,7 @@ return [
         ],
         [
             'title' => 'messages.purchase_returns',
-            'route' => 'admin.purchase-returns.index',
+            'route' => 'admin.por.index',
             'icon' => 'ti ti-receipt-refund',
             'permission' => 'view-purchase-returns',
         ],

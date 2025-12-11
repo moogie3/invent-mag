@@ -208,6 +208,6 @@
             </div>
         </div>
     </div>
-    @include('admin.layouts.modals.custmodals')
-    @include('admin.layouts.modals.crm-modal')
+    @include('admin.layouts.modals.customer.custmodals')
+    @include('admin.layouts.modals.customer.crm-modal')
 @endsection

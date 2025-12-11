@@ -7,5 +7,5 @@
         @include('admin.layouts.partials.sales.edit.header')
         @include('admin.layouts.partials.sales.edit.page-body')
     </div>
-    @include('admin.layouts.modals.salesmodals')
+    @include('admin.layouts.modals.sales.salesmodals')
 @endsection

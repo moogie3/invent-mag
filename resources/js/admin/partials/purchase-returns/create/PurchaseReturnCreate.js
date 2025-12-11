@@ -32,7 +32,7 @@ export class PurchaseReturnCreate {
         this.itemsInput.value = '';
 
         if (purchaseId) {
-            fetch(`/admin/purchase-returns/purchase/${purchaseId}`)
+            fetch(`/admin/por/purchase/${purchaseId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

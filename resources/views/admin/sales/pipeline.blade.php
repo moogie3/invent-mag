@@ -460,5 +460,5 @@
 
         
     </div>
-@include('admin.layouts.modals.sales-pipeline-modals')
+@include('admin.layouts.modals.sales.sales-pipeline-modals')
 @endsection

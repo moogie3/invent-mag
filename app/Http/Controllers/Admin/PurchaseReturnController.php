@@ -7,6 +7,7 @@ use App\Models\Purchase;
 use App\Models\PurchaseReturn;
 use App\Services\PurchaseReturnService;
 use App\Services\PurchaseService;
+use App\Helpers\PurchaseReturnHelper;
 use Illuminate\Http\Request;
 
 class PurchaseReturnController extends Controller
@@ -25,13 +26,13 @@ class PurchaseReturnController extends Controller
         $entries = $request->input('entries', 10);
         $filters = $request->only(['month', 'year']);
         $data = $this->purchaseReturnService->getPurchaseReturnIndexData($filters, $entries);
-        return view('admin.purchase-returns.index', $data);
+        return view('admin.por.index', $data);
     }
 
     public function create()
     {
         $purchases = Purchase::all();
-        return view('admin.purchase-returns.create', compact('purchases'));
+        return view('admin.por.create', compact('purchases'));
     }
 
     public function store(Request $request)
@@ -46,18 +47,18 @@ class PurchaseReturnController extends Controller
 
         $this->purchaseService->createPurchaseReturn($request->all());
 
-        return redirect()->route('admin.purchase-returns.index')->with('success', 'Purchase return created successfully.');
+        return redirect()->route('admin.por.index')->with('success', 'Purchase return created successfully.');
     }
 
     public function show(PurchaseReturn $purchaseReturn)
     {
-        return view('admin.purchase-returns.show', compact('purchaseReturn'));
+        return view('admin.por.show', compact('purchaseReturn'));
     }
 
     public function edit(PurchaseReturn $purchaseReturn)
     {
         $purchases = Purchase::all();
-        return view('admin.purchase-returns.edit', compact('purchaseReturn', 'purchases'));
+        return view('admin.por.edit', compact('purchaseReturn', 'purchases'));
     }
 
     public function update(Request $request, PurchaseReturn $purchaseReturn)
@@ -72,13 +73,13 @@ class PurchaseReturnController extends Controller
 
         $this->purchaseReturnService->updatePurchaseReturn($purchaseReturn, $request->all());
 
-        return redirect()->route('admin.purchase-returns.index')->with('success', 'Purchase return updated successfully.');
+        return redirect()->route('admin.por.index')->with('success', 'Purchase return updated successfully.');
     }
 
     public function destroy(PurchaseReturn $purchaseReturn)
     {
         $purchaseReturn->delete();
-        return redirect()->route('admin.purchase-returns.index')->with('success', 'Purchase return deleted successfully.');
+        return redirect()->route('admin.por.index')->with('success', 'Purchase return deleted successfully.');
     }
     public function getPurchaseItems(Purchase $purchase)
     {
@@ -108,6 +109,9 @@ class PurchaseReturnController extends Controller
 
     public function modalView(PurchaseReturn $purchaseReturn)
     {
-        return view('admin.layouts.partials.purchase-returns.modal-view', compact('purchaseReturn'));
+        $statusClass = PurchaseReturnHelper::getStatusClass($purchaseReturn->status);
+        $statusText = PurchaseReturnHelper::getStatusText($purchaseReturn->status);
+
+        return view('admin.layouts.modals.po.pormodals-view', compact('purchaseReturn', 'statusClass', 'statusText'));
     }
 }

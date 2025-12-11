@@ -142,5 +142,5 @@
             </div>
         </div>
     </div>
-    @include('admin.layouts.modals.currmodals')
+    @include('admin.layouts.modals.currency.currmodals')
 @endsection

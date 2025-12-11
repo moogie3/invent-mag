@@ -56,7 +56,7 @@
 @endif
 
 {{-- SCRIPT FOR ADMIN PURCHASE RETURN CREATE & EDIT --}}
-@if (request()->is('admin/purchase-returns', 'admin/purchase-returns/create', 'admin/purchase-returns/*/edit'))
+@if (request()->is('admin/por', 'admin/por/create', 'admin/por/*/edit'))
     @vite('resources/js/admin/purchase-return.js')
 @endif
 
@@ -114,7 +114,7 @@
 @endif
 
 {{-- SCRIPT FOR ACCOUNTING settings --}}
-@if (request()->is('admin/settings/accounting'))
+@if (request()->is('admin/accounting/accounting-setting'))
     @vite('resources/js/admin/accounting.js')
 @endif
 

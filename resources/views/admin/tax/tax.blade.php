@@ -123,5 +123,5 @@
         </div>
     </div>
 
-    @include('admin.layouts.modals.taxmodals')
+    @include('admin.layouts.modals.tax.taxmodals')
 @endsection

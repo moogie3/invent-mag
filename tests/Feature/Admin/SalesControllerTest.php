@@ -365,7 +365,7 @@ class SalesControllerTest extends BaseFeatureTestCase
         $response = $this->get(route('admin.sales.modal-view', $sale->id));
 
         $response->assertStatus(200);
-        $response->assertViewIs('admin.layouts.modals.salesmodals-view');
+        $response->assertViewIs('admin.layouts.modals.sales.salesmodals-view');
         $response->assertViewHas('sales', $sale);
     }
 

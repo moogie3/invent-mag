@@ -13,7 +13,7 @@
                     <i class="ti ti-printer fs-4"></i>
                     {{ __('messages.export_pdf') }}
                 </button>
-                <a href="{{ route('admin.purchase-returns.create') }}" class="btn btn-primary d-none d-sm-inline-block">
+                <a href="{{ route('admin.por.create') }}" class="btn btn-primary d-none d-sm-inline-block">
                     <i class="ti ti-plus fs-4"></i>
                     {{ __('messages.new_purchase_return') }}
                 </a>

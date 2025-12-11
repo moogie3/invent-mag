@@ -247,6 +247,6 @@
         </div>
     </div>
 
-    @include('admin.layouts.modals.suppmodals')
-    @include('admin.layouts.modals.srm-modal')
+    @include('admin.layouts.modals.supplier.suppmodals')
+    @include('admin.layouts.modals.supplier.srm-modal')
 @endsection

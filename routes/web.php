@@ -179,12 +179,12 @@ Route::middleware('web')->prefix('admin')->group(function () {
         });
 
         // Purchase Return Routes
-        Route::get('purchase-returns/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.purchase-returns.items');
-        Route::get('purchase-returns/{purchaseReturn}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.purchase-returns.modal-view');
-        Route::resource('purchase-returns', PurchaseReturnController::class)->names('admin.purchase-returns');
-        Route::post('purchase-returns/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.purchase-returns.bulk-delete');
-        Route::post('purchase-returns/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.purchase-returns.bulk-complete');
-        Route::post('purchase-returns/bulk-cancel', [PurchaseReturnController::class, 'bulkCancel'])->name('admin.purchase-returns.bulk-cancel');
+        Route::get('por/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.por.items');
+        Route::get('por/{purchaseReturn}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.por.modal-view');
+        Route::resource('por', PurchaseReturnController::class)->names('admin.por');
+        Route::post('por/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.por.bulk-delete');
+        Route::post('por/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.por.bulk-complete');
+        Route::post('por/bulk-cancel', [PurchaseReturnController::class, 'bulkCancel'])->name('admin.por.bulk-cancel');
 
 
         // Sales Routes

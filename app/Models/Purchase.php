@@ -87,28 +87,27 @@ class Purchase extends Model
             return $this->payments->sum('amount');
         }
     
-        public function getBalanceAttribute()
-        {
-            return $this->grand_total - $this->total_paid;
-        }
-    
-        public function getGrandTotalAttribute()
-        {
-            // If the items relationship is loaded, calculate precisely.
-            if ($this->relationLoaded('items')) {
-                $subTotal = $this->items->sum('total');
-                $orderDiscount = \App\Helpers\PurchaseHelper::calculateDiscount(
-                    $subTotal,
-                    $this->discount_total,
-                    $this->discount_total_type
-                );
-                return $subTotal - $orderDiscount;
+            public function getBalanceAttribute()
+            {
+                return round($this->grand_total - $this->total_paid, 2);
             }
             
-            // Otherwise, fall back to the stored total, which is sufficient for most cases.
-            return $this->attributes['total'];
-        }
-    
+                public function getGrandTotalAttribute()
+                {
+                    // If the items relationship is loaded, calculate precisely.
+                    if ($this->relationLoaded('items')) {
+                        $subTotal = $this->items->sum('total');
+                        $orderDiscount = \App\Helpers\PurchaseHelper::calculateDiscount(
+                            $subTotal,
+                            $this->discount_total,
+                            $this->discount_total_type
+                        );
+                        return round($subTotal - $orderDiscount, 2);
+                    }
+                    
+                    // Otherwise, fall back to the stored total, which is sufficient for most cases.
+                    return round($this->attributes['total'], 2);
+                }    
         public function getTotalAmountAttribute()
         {
             return $this->grand_total;

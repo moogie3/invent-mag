@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="page-wrapper">
-        @include('admin.layouts.partials.purchase-returns.show.header')
-        @include('admin.layouts.partials.purchase-returns.show.page-body')
+        @include('admin.layouts.partials.por.show.header')
+        @include('admin.layouts.partials.por.show.page-body')
     </div>
 @endsection

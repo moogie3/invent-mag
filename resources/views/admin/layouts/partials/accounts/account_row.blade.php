@@ -30,6 +30,6 @@
 </tr>
 @if ($account->children->isNotEmpty())
     @foreach ($account->children as $child)
-        @include('admin.accounting.accounts.partials.account_row', ['account' => $child, 'level' => $level + 1])
+        @include('admin.layouts.partials.accounts.account_row', ['account' => $child, 'level' => $level + 1])
     @endforeach
 @endif

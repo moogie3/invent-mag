@@ -67,7 +67,7 @@ class PurchaseController extends Controller
     {
         try {
             $pos = $this->purchaseService->getPurchaseForModal($id);
-            return view('admin.layouts.modals.pomodals-view', compact('pos'));
+            return view('admin.layouts.modals.po.pomodals-view', compact('pos'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Purchase record not found for modal view: {$id}");
             return response('<div class="alert alert-danger">Purchase record not found.</div>', 404);

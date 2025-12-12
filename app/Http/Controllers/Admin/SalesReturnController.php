@@ -7,6 +7,7 @@ use App\Models\Sales;
 use App\Models\SalesReturn;
 use App\Services\SalesReturnService;
 use App\Services\SalesService;
+use App\Helpers\SalesReturnHelper;
 use Illuminate\Http\Request;
 
 class SalesReturnController extends Controller
@@ -62,7 +63,17 @@ class SalesReturnController extends Controller
 
     public function update(Request $request, SalesReturn $salesReturn)
     {
-        //
+        $request->validate([
+            'sales_id' => 'required|exists:sales,id',
+            'return_date' => 'required|date',
+            'items' => 'required|json',
+            'total_amount' => 'required|numeric',
+            'status' => 'required|string',
+        ]);
+
+        $this->salesReturnService->updateSalesReturn($salesReturn, $request->all());
+
+        return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return updated successfully.');
     }
 
     public function destroy(SalesReturn $salesReturn)
@@ -95,5 +106,13 @@ class SalesReturnController extends Controller
         $ids = $request->input('ids');
         SalesReturn::whereIn('id', $ids)->update(['status' => 'Canceled']);
         return response()->json(['success' => true, 'message' => 'Selected sales returns have been marked as canceled.']);
+    }
+
+    public function modalView(SalesReturn $salesReturn)
+    {
+        $statusClass = SalesReturnHelper::getStatusClass($salesReturn->status);
+        $statusText = SalesReturnHelper::getStatusText($salesReturn->status);
+
+        return view('admin.layouts.modals.sales.srmodals-view', compact('salesReturn', 'statusClass', 'statusText'));
     }
 }

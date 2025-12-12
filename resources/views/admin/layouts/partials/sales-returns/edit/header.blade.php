@@ -5,7 +5,7 @@
                 <div class="page-pretitle">{{ __('messages.overview') }}</div>
                 <h2 class="page-title">
                     <i class="ti ti-receipt-refund me-2"></i>
-                    {{ __('messages.new_sales_return') }}
+                    {{ __('messages.edit_sales_return') }}
                 </h2>
             </div>
             <div class="col-auto ms-auto">

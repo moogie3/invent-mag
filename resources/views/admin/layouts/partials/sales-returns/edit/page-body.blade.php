@@ -8,23 +8,21 @@
                 </h3>
             </div>
             <div class="card-body">
-                <form id="sales-return-form" action="{{ route('admin.sales-returns.store') }}" method="POST">
+                <form id="sales-return-edit-form" action="{{ route('admin.sales-returns.update', $salesReturn) }}" method="POST">
                     @csrf
+                    @method('PUT')
 
                     {{-- Sales Invoice Selection --}}
                     <div class="row">
                         <div class="col-lg-6 mb-3">
                             <label class="form-label required">{{ __('messages.sales_invoice') }}</label>
-                            <select name="sales_id" id="sales-select"
-                                class="form-select @error('sales_id') is-invalid @enderror">
-                                <option value="">{{ __('messages.select_sales') }}</option>
-                                @foreach ($sales as $sale)
-                                    <option value="{{ $sale->id }}"
-                                        {{ old('sales_id') == $sale->id ? 'selected' : '' }}>
-                                        {{ $sale->invoice }}
-                                        ({{ App\Helpers\CurrencyHelper::format($sale->total) }})
-                                    </option>
-                                @endforeach
+                            <input type="hidden" name="sales_id" value="{{ $salesReturn->sales_id }}">
+                            <select id="sales-select"
+                                class="form-select @error('sales_id') is-invalid @enderror" disabled>
+                                <option value="{{ $salesReturn->sale->id }}" selected>
+                                    {{ $salesReturn->sale->invoice }}
+                                    ({{ App\Helpers\CurrencyHelper::format($salesReturn->sale->total) }})
+                                </option>
                             </select>
                             @error('sales_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -35,7 +33,7 @@
                             <label class="form-label required">{{ __('messages.return_date') }}</label>
                             <input type="date" name="return_date"
                                 class="form-control @error('return_date') is-invalid @enderror"
-                                value="{{ old('return_date', date('Y-m-d')) }}">
+                                value="{{ old('return_date', $salesReturn->return_date->format('Y-m-d')) }}">
                             @error('return_date')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -46,7 +44,7 @@
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.reason_for_return') }}</label>
                         <textarea name="reason" class="form-control @error('reason') is-invalid @enderror" rows="3"
-                            placeholder="{{ __('messages.reason') }}">{{ old('reason') }}</textarea>
+                            placeholder="{{ __('messages.reason') }}">{{ old('reason', $salesReturn->reason) }}</textarea>
                         @error('reason')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -61,21 +59,15 @@
                             </h3>
                         </div>
                         <div class="card-body">
-                            <div id="product-return-list" class="text-muted">
-                                <div class="empty">
-                                    <div class="empty-icon">
-                                        <i class="ti ti-shopping-cart fs-1"></i>
-                                    </div>
-                                    <p class="empty-title">{{ __('messages.no_items_selected') }}</p>
-                                    <p class="empty-subtitle text-muted">
-                                        {{ __('messages.select_a_sales_order_to_see_its_items') }}
-                                    </p>
-                                </div>
+                            <div id="product-return-list">
+                                {{-- This will be populated by JavaScript --}}
                             </div>
                         </div>
                     </div>
 
                     <input type="hidden" name="items" id="items-json">
+                    <input type="hidden" id="sales-return-items" value="{{ json_encode($salesReturn->items) }}">
+
 
                     {{-- Total and Status --}}
                     <div class="row mt-4">
@@ -87,7 +79,7 @@
                                 </span>
                                 <input type="text" name="total_amount" id="total-amount"
                                     class="form-control @error('total_amount') is-invalid @enderror"
-                                    value="{{ old('total_amount', 0) }}" readonly>
+                                    value="{{ old('total_amount', $salesReturn->total_amount) }}" readonly>
                                 @error('total_amount')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -99,7 +91,7 @@
                             <select name="status" class="form-select @error('status') is-invalid @enderror">
                                 @foreach (\App\Models\SalesReturn::$statuses as $status)
                                     <option value="{{ $status }}"
-                                        {{ old('status', 'Pending') == $status ? 'selected' : '' }}>
+                                        {{ old('status', $salesReturn->status) == $status ? 'selected' : '' }}>
                                         {{ $status }}
                                     </option>
                                 @endforeach
@@ -118,7 +110,7 @@
                         </a>
                         <button type="submit" class="btn btn-primary">
                             <i class="ti ti-check me-2"></i>
-                            {{ __('messages.create_sales_return') }}
+                            {{ __('messages.update_sales_return') }}
                         </button>
                     </div>
                 </form>

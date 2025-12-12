@@ -31,7 +31,8 @@ class PurchaseReturnController extends Controller
 
     public function create()
     {
-        $purchases = Purchase::all();
+        // Get purchases that do NOT have any associated purchase returns
+        $purchases = Purchase::whereDoesntHave('purchaseReturns')->get();
         return view('admin.por.create', compact('purchases'));
     }
 
@@ -52,13 +53,17 @@ class PurchaseReturnController extends Controller
 
     public function show(PurchaseReturn $por)
     {
-        return view('admin.por.show', compact('por'));
+        $statusClass = PurchaseReturnHelper::getStatusClass($por->status);
+        $statusText = PurchaseReturnHelper::getStatusText($por->status);
+
+        return view('admin.por.show', compact('por', 'statusClass', 'statusText'));
     }
 
     public function edit(PurchaseReturn $por)
     {
         $purchases = Purchase::all();
-        return view('admin.por.edit', compact('por', 'purchases'));
+        $isCompletedOrCanceled = in_array($por->status, ['Completed', 'Canceled']);
+        return view('admin.por.edit', compact('por', 'purchases', 'isCompletedOrCanceled'));
     }
 
     public function update(Request $request, PurchaseReturn $por)

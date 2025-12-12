@@ -31,7 +31,8 @@ class SalesReturnController extends Controller
 
     public function create()
     {
-        $sales = Sales::all();
+        // Get sales that do NOT have any associated sales returns
+        $sales = Sales::whereDoesntHave('salesReturns')->get();
         return view('admin.sales-returns.create', compact('sales'));
     }
 
@@ -52,7 +53,12 @@ class SalesReturnController extends Controller
 
     public function show(SalesReturn $salesReturn)
     {
-        return view('admin.sales-returns.show', compact('salesReturn'));
+        $salesReturn->load(['sales.customer', 'salesItems.product']); // Eager load relationships
+
+        $statusClass = SalesReturnHelper::getStatusClass($salesReturn->status);
+        $statusText = SalesReturnHelper::getStatusText($salesReturn->status);
+
+        return view('admin.sales-returns.show', compact('salesReturn', 'statusClass', 'statusText'));
     }
 
     public function edit(SalesReturn $salesReturn)

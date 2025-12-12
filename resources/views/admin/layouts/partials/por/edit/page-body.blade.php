@@ -8,7 +8,9 @@
                 </h3>
             </div>
             <div class="card-body">
-                <form id="purchase-return-edit-form" action="{{ route('admin.por.update', $por) }}" method="POST">
+                <form id="purchase-return-edit-form" action="{{ route('admin.por.update', $por) }}" method="POST"
+                    data-is-completed-or-canceled="{{ $isCompletedOrCanceled ? 'true' : 'false' }}"
+                    data-status="{{ $por->status }}">
                     @csrf
                     @method('PUT')
 
@@ -47,7 +49,7 @@
                             placeholder="{{ __('messages.reason') }}">{{ old('reason', $por->reason) }}</textarea>
                         @error('reason')
                             <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                            @enderror
                     </div>
 
                     {{-- Products to Return Section --}}

@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h5 class="modal-title"><i class="ti ti-receipt-refund me-2"></i>{{ __('messages.purchase_return_details') }}</h5>
+    <h5 class="modal-title"><i class="ti ti-receipt-refund me-2"></i>{{ __('messages.sales_return_details') }}</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 <div class="modal-body p-4">
@@ -10,10 +10,9 @@
                     <div class="status-indicator {{ $statusClass }}"
                         style="width: 6px; height: 36px; border-radius: 3px; margin-right: 15px;"></div>
                     <div>
-                        <h2 class="mb-0">{{ __('messages.pr_return_hash') }}{{ $por->id }}</h2>
+                        <h2 class="mb-0">{{ __('messages.sr_return_hash') }}{{ $salesReturn->id }}</h2>
                         <div class="text-muted fs-5">
-                            {{ $por->purchase->supplier->code ?? __('messages.not_available') }} -
-                            {{ $por->purchase->supplier->name ?? __('messages.not_available') }}
+                            {{ $salesReturn->sales->customer->name ?? __('messages.not_available') }}
                         </div>
                     </div>
                 </div>
@@ -31,16 +30,16 @@
             <div class="card bg-light border-0 h-100">
                 <div class="card-body p-3">
                     <h4 class="card-title mb-3"><i
-                            class="ti ti-building-store me-2 text-primary"></i>{{ __('messages.supplier_title') }}</h4>
-                    <h5 class="mb-2">{{ $por->purchase->supplier->name ?? __('messages.not_available') }}</h5>
+                            class="ti ti-user me-2 text-primary"></i>{{ __('messages.customer') }}</h4>
+                    <h5 class="mb-2">{{ $salesReturn->sales->customer->name ?? __('messages.not_available') }}</h5>
                     <div class="text-muted mb-1"><i class="ti ti-map-pin me-1"></i>
-                        {{ $por->purchase->supplier->address ?? __('messages.not_available') }}
+                        {{ $salesReturn->sales->customer->address ?? __('messages.not_available') }}
                     </div>
                     <div class="text-muted mb-1"><i class="ti ti-phone me-1"></i>
-                        {{ $por->purchase->supplier->phone_number ?? __('messages.not_available') }}
+                        {{ $salesReturn->sales->customer->phone_number ?? __('messages.not_available') }}
                     </div>
                     <div class="text-muted mb-1"><i class="ti ti-mail me-1"></i>
-                        {{ $por->purchase->supplier->email ?? __('messages.not_available') }}
+                        {{ $salesReturn->sales->customer->email ?? __('messages.not_available') }}
                     </div>
                 </div>
             </div>
@@ -49,26 +48,26 @@
             <div class="card bg-light border-0 h-100">
                 <div class="card-body p-3">
                     <h4 class="card-title mb-3"><i
-                            class="ti ti-info-circle me-2 text-primary"></i>{{ __('messages.pr_return_information_title') }}
+                            class="ti ti-info-circle me-2 text-primary"></i>{{ __('messages.sr_return_information_title') }}
                     </h4>
                     <div class="d-flex justify-content-between mb-2">
-                        <div><strong>{{ __('messages.pr_return_date') }}</strong></div>
-                        <div>{{ $por->return_date ? $por->return_date->format('d F Y') : __('messages.not_available') }}</div>
+                        <div><strong>{{ __('messages.sr_return_date') }}</strong></div>
+                        <div>{{ $salesReturn->return_date ? $salesReturn->return_date->format('d F Y') : __('messages.not_available') }}</div>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <div><strong>{{ __('messages.pr_original_po') }}</strong></div>
+                        <div><strong>{{ __('messages.sr_original_sale') }}</strong></div>
                         <div>
-                            @if ($por->purchase)
-                                <a href="{{ route('admin.po.view', $por->purchase_id) }}">#{{ $por->purchase->invoice }}</a>
+                            @if ($salesReturn->sales)
+                                <a href="{{ route('admin.sales.view', $salesReturn->sales_id) }}">#{{ $salesReturn->sales->invoice }}</a>
                             @else
                                 {{ __('messages.not_available') }}
                             @endif
                         </div>
                     </div>
-                    @if ($por->reason)
+                    @if ($salesReturn->reason)
                         <div class="d-flex justify-content-between mb-2">
                             <div><strong>{{ __('messages.reason_for_return') }}</strong></div>
-                            <div>{{ $por->reason }}</div>
+                            <div>{{ $salesReturn->reason }}</div>
                         </div>
                     @endif
                 </div>
@@ -79,7 +78,7 @@
     <div class="card border mb-4">
         <div class="card-header bg-light py-2">
             <h4 class="card-title mb-0"><i
-                    class="ti ti-list me-2 text-primary"></i>{{ __('messages.pr_returned_items_title') }}</h4>
+                    class="ti ti-list me-2 text-primary"></i>{{ __('messages.sr_returned_items_title') }}</h4>
         </div>
         <div class="table-responsive">
             <table class="table card-table table-vcenter table-hover">
@@ -93,7 +92,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($por->items as $index => $item)
+                    @foreach ($salesReturn->items as $index => $item)
                         <tr>
                             <td class="text-center">{{ $index + 1 }}</td>
                             <td>
@@ -118,13 +117,28 @@
         <div class="card-footer bg-light">
             <div class="d-flex justify-content-end">
                 <div class="text-end">
-                    <div class="fs-5"><strong>{{ __('messages.pr_total_return_amount') }}</strong></div>
+                    <div class="fs-5"><strong>{{ __('messages.sr_total_return_amount') }}</strong></div>
                     <div class="fs-3 fw-bold text-primary">
-                        {{ \App\Helpers\CurrencyHelper::formatWithPosition($por->total_amount) }}
+                        {{ \App\Helpers\CurrencyHelper::formatWithPosition($salesReturn->total_amount) }}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+</div>
+<div class="modal-footer">
+    <div class="text-muted me-auto">
+        <small><i class="ti ti-info-circle me-1"></i>
+            {{ __('messages.sr_modal_details_info_message') }}</small>
+    </div>
+    <a href="#" class="btn btn-info" id="srModalFullView">
+        <i class="ti ti-zoom-scan me-1"></i> {{ __('messages.sr_full_view_button') }}
+    </a>
+    <button type="button" class="btn btn-secondary" id="srModalPrint">
+        <i class="ti ti-printer me-1"></i> {{ __('messages.sr_modal_details_print_button') }}
+    </button>
+    <a href="#" class="btn btn-primary" id="srModalEdit">
+        <i class="ti ti-edit me-1"></i> {{ __('messages.edit') }}
+    </a>
 </div>

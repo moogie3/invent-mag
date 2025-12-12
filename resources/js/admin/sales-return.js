@@ -67,6 +67,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
                 });
+
+            // Set href for Full View and Edit buttons
+            const srModalFullView = salesReturnDetailModal.querySelector('#srModalFullView');
+            const srModalEdit = salesReturnDetailModal.querySelector('#srModalEdit');
+            
+            if (srModalFullView) {
+                srModalFullView.href = `/admin/sales-returns/${srId}`; // Corrected to match resource route
+            }
+            if (srModalEdit) {
+                srModalEdit.href = `/admin/sales-returns/${srId}/edit`; // Assuming 'edit' route
+            }
         });
     }
 });

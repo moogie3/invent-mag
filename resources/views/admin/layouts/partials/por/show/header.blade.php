@@ -13,6 +13,10 @@
                     <i class="ti ti-arrow-left me-2"></i>
                     {{ __('messages.back') }}
                 </a>
+                <a href="{{ route('admin.por.edit', $por->id) }}" class="btn btn-info">
+                    <i class="ti ti-edit me-2"></i>
+                    {{ __('messages.edit') }}
+                </a>
                 <button onclick="window.print()" class="btn btn-primary">
                     <i class="ti ti-printer me-2"></i>
                     {{ __('messages.print') }}

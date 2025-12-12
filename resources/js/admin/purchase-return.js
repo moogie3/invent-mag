@@ -9,6 +9,43 @@ document.addEventListener('DOMContentLoaded', function () {
         new PurchaseReturnCreate();
     } else if (pathname.includes("/admin/por") && pathname.includes("/edit")) {
         new PurchaseReturnEdit();
+
+        // Logic for prStatusWarningModal
+        const editForm = document.getElementById('purchase-return-edit-form');
+        if (editForm) {
+            const isCompletedOrCanceled = editForm.dataset.isCompletedOrCanceled === 'true';
+            const status = editForm.dataset.status;
+
+            if (isCompletedOrCanceled) {
+                var prStatusWarningModal = new bootstrap.Modal(document.getElementById('prStatusWarningModal'));
+                var message = "";
+
+                if (status === 'Completed') {
+                    message = window.translations?.pr_modal_completed_warning_message || 'This purchase return is completed and cannot be edited.';
+                } else if (status === 'Canceled') {
+                    message = window.translations?.pr_modal_canceled_warning_message || 'This purchase return is canceled and cannot be edited.';
+                }
+
+                document.getElementById('prStatusWarningMessage').innerHTML = message;
+                prStatusWarningModal.show();
+
+                // Make form fields readonly
+                const formElements = document.querySelectorAll('#purchase-return-edit-form input, #purchase-return-edit-form select, #purchase-return-edit-form textarea');
+                formElements.forEach(element => {
+                    element.setAttribute('readonly', true);
+                    if (element.tagName === 'SELECT') {
+                        element.setAttribute('disabled', true);
+                    }
+                });
+
+                // Hide submit buttons
+                const submitButtons = document.querySelectorAll('#purchase-return-edit-form button[type="submit"]');
+                submitButtons.forEach(button => {
+                    button.style.display = 'none';
+                });
+            }
+        }
+
     } else if (pathname.includes("/admin/por")) {
         initBulkSelection();
     }
@@ -67,6 +104,26 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
                 });
+
+            // Set href for Full View and Edit buttons
+            const prModalFullView = purchaseReturnDetailModal.querySelector('#prModalFullView');
+            const prModalEdit = purchaseReturnDetailModal.querySelector('#prModalEdit');
+            
+            if (prModalFullView) {
+                prModalFullView.href = `/admin/por/${prId}`; // Corrected to match resource route
+            }
+            if (prModalEdit) {
+                prModalEdit.href = `/admin/por/${prId}/edit`; // Assuming 'edit' route
+            }
+        });
+
+        // Add event listener for print button inside the modal
+        purchaseReturnDetailModal.addEventListener('click', function(event) {
+            if (event.target.id === 'prModalPrint') {
+                const prId = purchaseReturnDetailModal.querySelector('#prModalFullView').href.split('/').pop();
+                // Assuming the print route is similar to the view route, but for printing
+                window.open(`/admin/por/${prId}/print`, '_blank');
+            }
         });
     }
 });

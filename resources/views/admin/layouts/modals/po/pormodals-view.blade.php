@@ -10,10 +10,10 @@
                     <div class="status-indicator {{ $statusClass }}"
                         style="width: 6px; height: 36px; border-radius: 3px; margin-right: 15px;"></div>
                     <div>
-                        <h2 class="mb-0">{{ __('messages.pr_return_hash') }}{{ $purchaseReturn->id }}</h2>
+                        <h2 class="mb-0">{{ __('messages.pr_return_hash') }}{{ $por->id }}</h2>
                         <div class="text-muted fs-5">
-                            {{ $purchaseReturn->purchase->supplier->code }} -
-                            {{ $purchaseReturn->purchase->supplier->name ?? __('messages.not_available') }}
+                            {{ $por->purchase->supplier->code ?? __('messages.not_available') }} -
+                            {{ $por->purchase->supplier->name ?? __('messages.not_available') }}
                         </div>
                     </div>
                 </div>
@@ -32,15 +32,15 @@
                 <div class="card-body p-3">
                     <h4 class="card-title mb-3"><i
                             class="ti ti-building-store me-2 text-primary"></i>{{ __('messages.supplier_title') }}</h4>
-                    <h5 class="mb-2">{{ $purchaseReturn->purchase->supplier->name }}</h5>
+                    <h5 class="mb-2">{{ $por->purchase->supplier->name ?? __('messages.not_available') }}</h5>
                     <div class="text-muted mb-1"><i class="ti ti-map-pin me-1"></i>
-                        {{ $purchaseReturn->purchase->supplier->address }}
+                        {{ $por->purchase->supplier->address ?? __('messages.not_available') }}
                     </div>
                     <div class="text-muted mb-1"><i class="ti ti-phone me-1"></i>
-                        {{ $purchaseReturn->purchase->supplier->phone_number }}
+                        {{ $por->purchase->supplier->phone_number ?? __('messages.not_available') }}
                     </div>
                     <div class="text-muted mb-1"><i class="ti ti-mail me-1"></i>
-                        {{ $purchaseReturn->purchase->supplier->email }}
+                        {{ $por->purchase->supplier->email ?? __('messages.not_available') }}
                     </div>
                 </div>
             </div>
@@ -53,18 +53,22 @@
                     </h4>
                     <div class="d-flex justify-content-between mb-2">
                         <div><strong>{{ __('messages.pr_return_date') }}</strong></div>
-                        <div>{{ $purchaseReturn->return_date->format('d F Y') }}</div>
+                        <div>{{ $por->return_date ? $por->return_date->format('d F Y') : __('messages.not_available') }}</div>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <div><strong>{{ __('messages.pr_original_po') }}</strong></div>
-                        <div><a
-                                href="{{ route('admin.po.view', $purchaseReturn->purchase_id) }}">#{{ $purchaseReturn->purchase->invoice }}</a>
+                        <div>
+                            @if ($por->purchase)
+                                <a href="{{ route('admin.po.view', $por->purchase_id) }}">#{{ $por->purchase->invoice }}</a>
+                            @else
+                                {{ __('messages.not_available') }}
+                            @endif
                         </div>
                     </div>
-                    @if ($purchaseReturn->reason)
+                    @if ($por->reason)
                         <div class="d-flex justify-content-between mb-2">
                             <div><strong>{{ __('messages.reason_for_return') }}</strong></div>
-                            <div>{{ $purchaseReturn->reason }}</div>
+                            <div>{{ $por->reason }}</div>
                         </div>
                     @endif
                 </div>
@@ -89,7 +93,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($purchaseReturn->items as $index => $item)
+                    @foreach ($por->items as $index => $item)
                         <tr>
                             <td class="text-center">{{ $index + 1 }}</td>
                             <td>
@@ -116,7 +120,7 @@
                 <div class="text-end">
                     <div class="fs-5"><strong>{{ __('messages.pr_total_return_amount') }}</strong></div>
                     <div class="fs-3 fw-bold text-primary">
-                        {{ \App\Helpers\CurrencyHelper::formatWithPosition($purchaseReturn->total_amount) }}
+                        {{ \App\Helpers\CurrencyHelper::formatWithPosition($por->total_amount) }}
                     </div>
                 </div>
             </div>
@@ -125,7 +129,7 @@
 
 </div>
 <div class="modal-footer">
-    <a href="{{ route('admin.por.show', $purchaseReturn->id) }}" class="btn btn-primary">
+    <a href="{{ route('admin.por.show', $por->id) }}" class="btn btn-primary">
         <i class="ti ti-eye me-1"></i>
         {{ __('messages.pr_full_view_button') }}
     </a>

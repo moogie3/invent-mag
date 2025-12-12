@@ -50,18 +50,18 @@ class PurchaseReturnController extends Controller
         return redirect()->route('admin.por.index')->with('success', 'Purchase return created successfully.');
     }
 
-    public function show(PurchaseReturn $purchaseReturn)
+    public function show(PurchaseReturn $por)
     {
-        return view('admin.por.show', compact('purchaseReturn'));
+        return view('admin.por.show', compact('por'));
     }
 
-    public function edit(PurchaseReturn $purchaseReturn)
+    public function edit(PurchaseReturn $por)
     {
         $purchases = Purchase::all();
-        return view('admin.por.edit', compact('purchaseReturn', 'purchases'));
+        return view('admin.por.edit', compact('por', 'purchases'));
     }
 
-    public function update(Request $request, PurchaseReturn $purchaseReturn)
+    public function update(Request $request, PurchaseReturn $por)
     {
         $request->validate([
             'purchase_id' => 'required|exists:po,id',
@@ -71,14 +71,14 @@ class PurchaseReturnController extends Controller
             'status' => 'required|string',
         ]);
 
-        $this->purchaseReturnService->updatePurchaseReturn($purchaseReturn, $request->all());
+        $this->purchaseReturnService->updatePurchaseReturn($por, $request->all());
 
         return redirect()->route('admin.por.index')->with('success', 'Purchase return updated successfully.');
     }
 
-    public function destroy(PurchaseReturn $purchaseReturn)
+    public function destroy(PurchaseReturn $por)
     {
-        $purchaseReturn->delete();
+        $por->delete();
         return redirect()->route('admin.por.index')->with('success', 'Purchase return deleted successfully.');
     }
     public function getPurchaseItems(Purchase $purchase)
@@ -107,11 +107,13 @@ class PurchaseReturnController extends Controller
         return response()->json(['success' => true, 'message' => 'Selected purchase returns have been marked as canceled.']);
     }
 
-    public function modalView(PurchaseReturn $purchaseReturn)
+    public function modalView(PurchaseReturn $por)
     {
-        $statusClass = PurchaseReturnHelper::getStatusClass($purchaseReturn->status);
-        $statusText = PurchaseReturnHelper::getStatusText($purchaseReturn->status);
+        $por->load(['purchase.supplier', 'items.product']); // Eager load relationships
 
-        return view('admin.layouts.modals.po.pormodals-view', compact('purchaseReturn', 'statusClass', 'statusText'));
+        $statusClass = PurchaseReturnHelper::getStatusClass($por->status);
+        $statusText = PurchaseReturnHelper::getStatusText($por->status);
+
+        return view('admin.layouts.modals.po.pormodals-view', compact('por', 'statusClass', 'statusText'));
     }
 }

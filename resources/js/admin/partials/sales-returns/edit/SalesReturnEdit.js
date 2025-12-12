@@ -11,7 +11,7 @@ export class SalesReturnEdit {
         this.itemsInput = document.getElementById('items-json');
         this.existingItemsInput = document.getElementById('sales-return-items');
 
-        this.returnedItems = {}; // This will hold the current state of returned items
+        this.returnedItems = {}; // This will hold the current state of returned items, keyed by Sales item ID
         this.allSalesItems = []; // This will hold all items from the original sales
 
         this.init();
@@ -35,15 +35,6 @@ export class SalesReturnEdit {
         const existingItemsJson = this.existingItemsInput.value;
         const existingItems = existingItemsJson ? JSON.parse(existingItemsJson) : [];
 
-        // Store existing returned items in the state
-        existingItems.forEach(item => {
-            this.returnedItems[item.product_id] = { // Use product_id as a key
-                product_id: item.product_id,
-                returned_quantity: item.quantity,
-                price: item.price,
-            };
-        });
-
         if (salesId) {
             try {
                 const response = await fetch(`/admin/sales-returns/sale/${salesId}`);
@@ -51,6 +42,23 @@ export class SalesReturnEdit {
                     throw new Error('Network response was not ok');
                 }
                 this.allSalesItems = await response.json();
+
+                // Match existing return items to Sales items (best effort due to schema limitation)
+                const tempExisting = [...existingItems];
+                this.allSalesItems.forEach(salesItem => {
+                    const matchIndex = tempExisting.findIndex(exItem => exItem.product_id === salesItem.product_id);
+                    if (matchIndex > -1) {
+                        const matchedItem = tempExisting[matchIndex];
+                        this.returnedItems[salesItem.id] = { // Key by sales_item_id
+                            product_id: salesItem.product_id,
+                            returned_quantity: matchedItem.quantity,
+                            price: matchedItem.price,
+                        };
+                        // Remove the matched item so it's not used again for another sales line
+                        tempExisting.splice(matchIndex, 1);
+                    }
+                });
+
                 this.populateItemsTable();
             } catch (error) {
                 console.error('Error fetching sales items:', error);
@@ -61,7 +69,7 @@ export class SalesReturnEdit {
 
     populateItemsTable() {
         if (!this.allSalesItems || this.allSalesItems.length === 0) {
-            this.productReturnList.innerHTML = '<div class="text-muted p-4 text-center">No items found in this sales.</div>';
+            this.productReturnList.innerHTML = '<div class="text-muted p-4 text-center">No items found in this sale.</div>';
             return;
         }
 
@@ -82,7 +90,7 @@ export class SalesReturnEdit {
 
         this.allSalesItems.forEach(item => {
             const unitPrice = parseFloat(item.price || 0);
-            const returnedItem = this.returnedItems[item.product.id];
+            const returnedItem = this.returnedItems[item.id]; // Use Sales item ID as key
             const returnedQuantity = returnedItem ? returnedItem.returned_quantity : 0;
             const itemTotal = unitPrice * returnedQuantity;
 
@@ -93,6 +101,7 @@ export class SalesReturnEdit {
                     <td>
                         <input type="number"
                             class="form-control quantity-input"
+                            data-item-id="${item.id}"
                             data-product-id="${item.product.id}"
                             data-price="${unitPrice}"
                             min="0"
@@ -121,6 +130,7 @@ export class SalesReturnEdit {
         const input = event.target;
         if (!input.classList.contains('quantity-input')) return;
 
+        const itemId = input.dataset.itemId;
         const productId = input.dataset.productId;
         const price = parseFloat(input.dataset.price);
         let quantity = parseInt(input.value, 10) || 0;
@@ -134,32 +144,32 @@ export class SalesReturnEdit {
             input.value = 0;
         }
 
-        const itemTotal = price * quantity;
+        const itemTotalInCents = Math.round(price * 100) * quantity;
         const row = input.closest('tr');
         if (row) {
-            row.querySelector('.item-total').textContent = itemTotal.toFixed(2);
+            row.querySelector('.item-total').textContent = (itemTotalInCents / 100).toFixed(2);
         }
 
         if (quantity > 0) {
-            this.returnedItems[productId] = {
+            this.returnedItems[itemId] = {
                 product_id: productId,
                 returned_quantity: quantity,
                 price: price,
             };
         } else {
-            delete this.returnedItems[productId];
+            delete this.returnedItems[itemId];
         }
 
         this.updateTotalAmount();
     }
 
     updateTotalAmount() {
-        let totalAmount = 0;
-        for (const productId in this.returnedItems) {
-            const item = this.returnedItems[productId];
-            totalAmount += item.price * item.returned_quantity;
+        let totalAmountInCents = 0;
+        for (const itemId in this.returnedItems) {
+            const item = this.returnedItems[itemId];
+            totalAmountInCents += Math.round(item.price * 100) * item.returned_quantity;
         }
-        this.totalAmountInput.value = totalAmount.toFixed(2);
+        this.totalAmountInput.value = (totalAmountInCents / 100).toFixed(2);
     }
 
     handleSubmit(event) {

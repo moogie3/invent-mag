@@ -1,3 +1,5 @@
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+
 export class SalesReturnEdit {
     constructor() {
         this.form = document.getElementById('sales-return-edit-form');
@@ -51,7 +53,7 @@ export class SalesReturnEdit {
                         const matchedItem = tempExisting[matchIndex];
                         this.returnedItems[salesItem.id] = { // Key by sales_item_id
                             product_id: salesItem.product_id,
-                            returned_quantity: matchedItem.quantity,
+                            quantity: matchedItem.quantity,
                             price: matchedItem.price,
                         };
                         // Remove the matched item so it's not used again for another sales line
@@ -91,7 +93,7 @@ export class SalesReturnEdit {
         this.allSalesItems.forEach(item => {
             const unitPrice = parseFloat(item.price || 0);
             const returnedItem = this.returnedItems[item.id]; // Use Sales item ID as key
-            const returnedQuantity = returnedItem ? returnedItem.returned_quantity : 0;
+            const returnedQuantity = returnedItem ? returnedItem.quantity : 0;
             const itemTotal = unitPrice * returnedQuantity;
 
             tableHTML += `
@@ -109,8 +111,8 @@ export class SalesReturnEdit {
                             value="${returnedQuantity}"
                             style="width: 100px;">
                     </td>
-                    <td>${unitPrice.toFixed(2)}</td>
-                    <td class="item-total text-end">${itemTotal.toFixed(2)}</td>
+                    <td>${formatCurrency(unitPrice)}</td>
+                    <td class="item-total text-end">${formatCurrency(itemTotal)}</td>
                 </tr>
             `;
         });
@@ -144,16 +146,16 @@ export class SalesReturnEdit {
             input.value = 0;
         }
 
-        const itemTotalInCents = Math.round(price * 100) * quantity;
+        const itemTotal = price * quantity;
         const row = input.closest('tr');
         if (row) {
-            row.querySelector('.item-total').textContent = (itemTotalInCents / 100).toFixed(2);
+            row.querySelector('.item-total').textContent = formatCurrency(itemTotal);
         }
 
         if (quantity > 0) {
             this.returnedItems[itemId] = {
                 product_id: productId,
-                returned_quantity: quantity,
+                quantity: quantity,
                 price: price,
             };
         } else {
@@ -164,12 +166,12 @@ export class SalesReturnEdit {
     }
 
     updateTotalAmount() {
-        let totalAmountInCents = 0;
+        let totalAmount = 0;
         for (const itemId in this.returnedItems) {
             const item = this.returnedItems[itemId];
-            totalAmountInCents += Math.round(item.price * 100) * item.returned_quantity;
+            totalAmount += item.price * item.quantity;
         }
-        this.totalAmountInput.value = (totalAmountInCents / 100).toFixed(2);
+        this.totalAmountInput.value = formatCurrency(totalAmount);
     }
 
     handleSubmit(event) {
@@ -179,6 +181,13 @@ export class SalesReturnEdit {
             alert('No items selected for return.');
             return;
         }
-        this.itemsInput.value = JSON.stringify(itemsArray);
+
+        const plainTotalAmount = Object.values(this.returnedItems).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        this.totalAmountInput.value = plainTotalAmount.toFixed(2);
+
+        this.itemsInput.value = JSON.stringify(itemsArray.map(item => ({
+            ...item,
+            quantity: parseInt(item.quantity, 10)
+        })));
     }
 }

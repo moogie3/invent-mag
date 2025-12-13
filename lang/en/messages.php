@@ -1075,6 +1075,7 @@ return [
     'shortcut_focus_search' => 'Focus global search input',
     'shortcut_close_modal' => 'Close active modal/popup',
     'view_sales_invoice' => 'View Sales Invoice',
+    'sales_invoice' => 'Sales Invoice',
     'resend_verification_email' => 'Resend Verification Email',
     'email_verified_success_title' => 'Email Verified!',
     'email_verified_success_message' => 'Your email address has been successfully verified. You can now access all features of your account.',
@@ -1238,7 +1239,6 @@ return [
     'sr_modal_bulk_mark_canceled_item1' => 'The status of the selected sales returns will be set to "Canceled".',
     'no_items_selected' => 'No items selected',
     'back' => 'Back',
-
     'pr_failed_to_load_details' => 'Failed to load purchase return details.',
     'pr_select_one_to_delete' => 'Please select at least one purchase return to delete.',
     'pr_select_one_to_mark_completed' => 'Please select at least one purchase return to mark as completed.',
@@ -1264,6 +1264,8 @@ return [
     'original_purchase_invoice' => 'Original Purchase Invoice',
     'unit_price' => 'Unit Price',
     'print' => 'Print',
+    'sr_modal_delete_title' => 'Delete Sales Return',
+    'sr_modal_delete_warning' => 'Do you really want to remove this sales return? This action cannot be undone.',
     'sr_return_hash' => 'Return #',
     'sr_return_information_title' => 'Return Information',
     'sr_return_date' => 'Return Date',
@@ -1273,4 +1275,12 @@ return [
     'sr_full_view_button' => 'Full View',
     'sr_modal_details_info_message' => 'View complete sales return details',
     'sr_modal_details_print_button' => 'Print',
+
+    'completed' => 'Completed',
+    'pending' => 'Pending',
+    'canceled' => 'Canceled',
+    'return_summary' => 'Return Summary',
+    'return_status' => 'Return Status',
+    'overview_of_purchase_returns' => 'Overview of your purchase returns',
+    'overview_of_sales_returns' => 'Overview of your sales returns',
 ];

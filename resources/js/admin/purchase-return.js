@@ -5,6 +5,31 @@ import { initBulkSelection, getSelectedPurchaseReturnIds, clearPurchaseReturnSel
 document.addEventListener('DOMContentLoaded', function () {
     const pathname = window.location.pathname;
 
+    if (sessionStorage.getItem("purchaseReturnBulkDeleteSuccess")) {
+        InventMagApp.showToast(
+            "Success",
+            sessionStorage.getItem("purchaseReturnBulkDeleteSuccess"),
+            "success"
+        );
+        sessionStorage.removeItem("purchaseReturnBulkDeleteSuccess");
+    }
+    if (sessionStorage.getItem("purchaseReturnBulkCompleteSuccess")) {
+        InventMagApp.showToast(
+            "Success",
+            sessionStorage.getItem("purchaseReturnBulkCompleteSuccess"),
+            "success"
+        );
+        sessionStorage.removeItem("purchaseReturnBulkCompleteSuccess");
+    }
+    if (sessionStorage.getItem("purchaseReturnBulkCancelSuccess")) {
+        InventMagApp.showToast(
+            "Success",
+            sessionStorage.getItem("purchaseReturnBulkCancelSuccess"),
+            "success"
+        );
+        sessionStorage.removeItem("purchaseReturnBulkCancelSuccess");
+    }
+
     if (pathname.includes("/admin/por/create")) {
         new PurchaseReturnCreate();
     } else if (pathname.includes("/admin/por") && pathname.includes("/edit")) {
@@ -131,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
 window.bulkDeletePurchaseReturns = function () {
     const selectedIds = getSelectedPurchaseReturnIds();
     if (selectedIds.length === 0) {
-        alert(window.translations?.select_one_to_delete || 'Please select at least one purchase return to delete.');
+        InventMagApp.showToast('Warning', window.translations?.select_one_to_delete || 'Please select at least one purchase return to delete.', 'warning');
         return;
     }
 
@@ -155,11 +180,14 @@ window.bulkDeletePurchaseReturns = function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
+                    sessionStorage.setItem('purchaseReturnBulkDeleteSuccess', data.message || 'Purchase returns deleted successfully.');
                     window.location.reload();
                 } else {
-                    alert(data.message);
+                    InventMagApp.showToast('Error', data.message || 'Failed to delete purchase returns.', 'error');
                 }
+            })
+            .catch(error => {
+                InventMagApp.showToast('Error', 'An error occurred while deleting purchase returns.', 'error');
             })
             .finally(() => {
                 bulkDeleteModal.hide();
@@ -170,7 +198,7 @@ window.bulkDeletePurchaseReturns = function () {
 window.bulkMarkCompletedPurchaseReturns = function () {
     const selectedIds = getSelectedPurchaseReturnIds();
     if (selectedIds.length === 0) {
-        alert(window.translations?.select_one_to_mark_completed || 'Please select at least one purchase return to mark as completed.');
+        InventMagApp.showToast('Warning', window.translations?.select_one_to_mark_completed || 'Please select at least one purchase return to mark as completed.', 'warning');
         return;
     }
 
@@ -194,11 +222,14 @@ window.bulkMarkCompletedPurchaseReturns = function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
+                    sessionStorage.setItem('purchaseReturnBulkCompleteSuccess', data.message || 'Purchase returns marked as completed.');
                     window.location.reload();
                 } else {
-                    alert(data.message);
+                    InventMagApp.showToast('Error', data.message || 'Failed to mark purchase returns as completed.', 'error');
                 }
+            })
+            .catch(error => {
+                InventMagApp.showToast('Error', 'An error occurred.', 'error');
             })
             .finally(() => {
                 bulkMarkCompletedModal.hide();
@@ -209,7 +240,7 @@ window.bulkMarkCompletedPurchaseReturns = function () {
 window.bulkMarkCanceledPurchaseReturns = function () {
     const selectedIds = getSelectedPurchaseReturnIds();
     if (selectedIds.length === 0) {
-        alert(window.translations?.select_one_to_mark_canceled || 'Please select at least one purchase return to mark as canceled.');
+        InventMagApp.showToast('Warning', window.translations?.select_one_to_mark_canceled || 'Please select at least one purchase return to mark as canceled.', 'warning');
         return;
     }
 
@@ -233,11 +264,14 @@ window.bulkMarkCanceledPurchaseReturns = function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
+                    sessionStorage.setItem('purchaseReturnBulkCancelSuccess', data.message || 'Purchase returns marked as canceled.');
                     window.location.reload();
                 } else {
-                    alert(data.message);
+                    InventMagApp.showToast('Error', data.message || 'Failed to mark purchase returns as canceled.', 'error');
                 }
+            })
+            .catch(error => {
+                InventMagApp.showToast('Error', 'An error occurred.', 'error');
             })
             .finally(() => {
                 bulkMarkCanceledModal.hide();

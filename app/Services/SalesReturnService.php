@@ -36,10 +36,18 @@ class SalesReturnService
 
         $returns = $query->paginate($entries);
 
+        $statusCounts = SalesReturn::select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
         return [
             'returns' => $returns,
             'total_returns' => $returns->total(),
             'total_amount' => SalesReturn::sum('total_amount'),
+            'completed_count' => $statusCounts->get('Completed', 0),
+            'pending_count' => $statusCounts->get('Pending', 0),
+            'canceled_count' => $statusCounts->get('Canceled', 0),
+            'entries' => $entries,
         ];
     }
 
@@ -62,12 +70,12 @@ class SalesReturnService
             $salesReturn->items()->delete();
 
             $returnedItems = array_filter($items, function($item) {
-                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
+                return isset($item['quantity']) && $item['quantity'] > 0;
             });
 
             $totalReturnAmount = 0;
             foreach ($returnedItems as $itemData) {
-                $totalReturnAmount += ($itemData['price'] ?? 0) * $itemData['returned_quantity'];
+                $totalReturnAmount += ($itemData['price'] ?? 0) * $itemData['quantity'];
             }
 
             $salesReturn->update([
@@ -79,7 +87,7 @@ class SalesReturnService
             ]);
 
             foreach ($returnedItems as $itemData) {
-                $returnedQuantity = $itemData['returned_quantity'];
+                $returnedQuantity = $itemData['quantity'];
                 $price = $itemData['price'] ?? 0;
 
                 SalesReturnItem::create([

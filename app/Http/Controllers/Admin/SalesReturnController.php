@@ -64,7 +64,8 @@ class SalesReturnController extends Controller
     public function edit(SalesReturn $salesReturn)
     {
         $sales = Sales::all();
-        return view('admin.sales-returns.edit', compact('salesReturn', 'sales'));
+        $isCompletedOrCanceled = in_array($salesReturn->status, ['Completed', 'Canceled']);
+        return view('admin.sales-returns.edit', compact('salesReturn', 'sales', 'isCompletedOrCanceled'));
     }
 
     public function update(Request $request, SalesReturn $salesReturn)

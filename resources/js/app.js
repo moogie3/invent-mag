@@ -6,19 +6,8 @@ window.Alpine = Alpine;
 
 Alpine.start();
 
-import "./admin/profile";
-import "./admin/category";
-import "./admin/unit";
-import "./admin/customer";
-import "./admin/purchase-order";
-import "./admin/pos";
-import "./admin/recentts";
-import "./admin/sales-order";
-import "./admin/supplier";
-import "./admin/user";
-import "./admin/warehouse";
-import "./admin/helpers/notification";
-// Don't import theme-toggle here since it's loaded separately
+// Admin-specific scripts are now conditionally loaded in script.blade.php
+// to prevent double-loading and improve performance.
 
 // Function to apply theme based on mode (light, dark, auto)
 window.applyTheme = function (themeMode) {

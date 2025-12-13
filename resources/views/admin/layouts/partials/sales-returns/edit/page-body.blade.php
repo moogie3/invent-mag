@@ -8,7 +8,9 @@
                 </h3>
             </div>
             <div class="card-body">
-                <form id="sales-return-edit-form" action="{{ route('admin.sales-returns.update', $salesReturn) }}" method="POST">
+                <form id="sales-return-edit-form" action="{{ route('admin.sales-returns.update', $salesReturn) }}" method="POST"
+                    data-is-completed-or-canceled="{{ $isCompletedOrCanceled ? 'true' : 'false' }}"
+                    data-status="{{ $salesReturn->status }}">
                     @csrf
                     @method('PUT')
 

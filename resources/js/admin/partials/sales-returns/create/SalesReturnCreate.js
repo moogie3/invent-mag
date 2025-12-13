@@ -1,3 +1,5 @@
+import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+
 export class SalesReturnCreate {
     constructor() {
         this.salesSelect = document.getElementById('sales-select');
@@ -95,8 +97,8 @@ export class SalesReturnCreate {
                             value="0"
                             style="width: 100px;">
                     </td>
-                    <td>${unitPrice.toFixed(2)}</td>
-                    <td class="item-total text-end">0.00</td>
+                    <td>${formatCurrency(unitPrice)}</td>
+                    <td class="item-total text-end">${formatCurrency(0)}</td>
                 </tr>
             `;
         });
@@ -131,13 +133,13 @@ export class SalesReturnCreate {
         const itemTotal = price * quantity;
         const row = input.closest('tr');
         if(row) {
-            row.querySelector('.item-total').textContent = itemTotal.toFixed(2);
+            row.querySelector('.item-total').textContent = formatCurrency(itemTotal);
         }
 
         if (quantity > 0) {
             this.returnedItems[itemId] = {
                 product_id: productId,
-                returned_quantity: quantity,
+                quantity: quantity,
                 price: price
             };
         } else {
@@ -151,9 +153,9 @@ export class SalesReturnCreate {
         let totalAmount = 0;
         for (const itemId in this.returnedItems) {
             const item = this.returnedItems[itemId];
-            totalAmount += item.price * item.returned_quantity;
+            totalAmount += item.price * item.quantity;
         }
-        this.totalAmountInput.value = totalAmount.toFixed(2);
+        this.totalAmountInput.value = formatCurrency(totalAmount);
     }
 
     handleSubmit(event) {
@@ -163,6 +165,13 @@ export class SalesReturnCreate {
             alert('No items selected for return.');
             return;
         }
-        this.itemsInput.value = JSON.stringify(itemsArray);
+        
+        const plainTotalAmount = Object.values(this.returnedItems).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        this.totalAmountInput.value = plainTotalAmount.toFixed(2);
+        
+        this.itemsInput.value = JSON.stringify(itemsArray.map(item => ({
+            ...item,
+            quantity: parseInt(item.quantity, 10) // Ensure quantity is an integer
+        })));
     }
 }

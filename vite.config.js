@@ -24,6 +24,8 @@ export default defineConfig({
                 "resources/js/admin/product.js",
                 "resources/js/admin/profile.js",
                 "resources/js/admin/purchase-order.js",
+                "resources/js/admin/purchase-return.js",
+                "resources/js/admin/sales-return.js",
                 "resources/js/admin/recentts.js",
                 "resources/js/admin/sales-order.js",
                 "resources/js/admin/sorting.js",

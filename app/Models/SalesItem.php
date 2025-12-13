@@ -20,12 +20,17 @@ class SalesItem extends Model
     ];
 
     protected $with = ['product'];
+    protected $appends = ['price'];
 
     public function product() {
         return $this->belongsTo(Product::class);
     }
     public function sales(){
         return $this->belongsTo(Sales::class , 'sales_id');
+    }
+
+    public function getPriceAttribute() {
+        return $this->customer_price;
     }
 
     // Explicitly define the factory for the model

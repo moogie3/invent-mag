@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>INVENT-MAG API Documentation</title>
+    <title>Invent-MAG API Documentation</title>
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
 
@@ -45,12 +45,12 @@
     </span>
 </a>
 <div class="tocify-wrapper">
-    
+
             <div class="lang-selector">
                                             <button type="button" class="lang-button" data-language-name="bash">bash</button>
                                             <button type="button" class="lang-button" data-language-name="javascript">javascript</button>
                     </div>
-    
+
     <div class="search">
         <input type="text" class="search" id="input-search" placeholder="Search">
     </div>
@@ -814,7 +814,7 @@ You can switch the language used with the tabs at the top right (or from the nav
 
         <h1 id="accounts">Accounts</h1>
 
-    
+
 
                                 <h2 id="accounts-GETapi-v1-accounts">Display a listing of the accounts.</h2>
 
@@ -2628,7 +2628,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="categories">Categories</h1>
 
-    
+
 
                                 <h2 id="categories-GETapi-v1-categories">Display a listing of the categories.</h2>
 
@@ -3902,7 +3902,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="currency-settings">Currency Settings</h1>
 
-    
+
 
                                 <h2 id="currency-settings-GETapi-v1-currency-settings">Display a listing of the currency settings.</h2>
 
@@ -5387,7 +5387,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="customer-interactions">Customer Interactions</h1>
 
-    
+
 
                                 <h2 id="customer-interactions-GETapi-v1-customer-interactions">Display a listing of the customer interactions.</h2>
 
@@ -7017,7 +7017,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="customers">Customers</h1>
 
-    
+
 
                                 <h2 id="customers-GETapi-v1-customers">Display a listing of the customers.</h2>
 
@@ -9975,7 +9975,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="journal-entries">Journal Entries</h1>
 
-    
+
 
                                 <h2 id="journal-entries-GETapi-v1-journal-entries">Display a listing of the journal entries.</h2>
 
@@ -12915,7 +12915,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="notifications">Notifications</h1>
 
-    
+
 
                                 <h2 id="notifications-GETapi-v1-notifications-count">Get Notification Count</h2>
 
@@ -13848,7 +13848,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="pos">POS</h1>
 
-    
+
 
                                 <h2 id="pos-GETapi-v1-pos">Display a listing of the resource.</h2>
 
@@ -15630,7 +15630,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="payments">Payments</h1>
 
-    
+
 
                                 <h2 id="payments-GETapi-v1-payments">Display a listing of the payments.</h2>
 
@@ -19502,7 +19502,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="products">Products</h1>
 
-    
+
 
                                 <h2 id="products-GETapi-v1-products">Display a listing of the products.</h2>
 
@@ -24201,7 +24201,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="purchase-order-items">Purchase Order Items</h1>
 
-    
+
 
                                 <h2 id="purchase-order-items-GETapi-v1-po-items">Display a listing of the purchase order items.</h2>
 
@@ -25766,7 +25766,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="purchase-orders">Purchase Orders</h1>
 
-    
+
 
                                 <h2 id="purchase-orders-GETapi-v1-purchases">Display a listing of the purchase orders.</h2>
 
@@ -29138,7 +29138,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="reports">Reports</h1>
 
-    
+
 
                                 <h2 id="reports-GETapi-v1-reports-adjustment-log">Get Stock Adjustment Log</h2>
 
@@ -30310,7 +30310,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="roles">Roles</h1>
 
-    
+
 
                                 <h2 id="roles-GETapi-v1-roles">Display a listing of the roles.</h2>
 
@@ -31427,7 +31427,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="sales-items">Sales Items</h1>
 
-    
+
 
                                 <h2 id="sales-items-GETapi-v1-sales-items">Display a listing of the sales items.</h2>
 
@@ -32888,7 +32888,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="sales-opportunities">Sales Opportunities</h1>
 
-    
+
 
                                 <h2 id="sales-opportunities-GETapi-v1-sales-opportunities">Display a listing of the sales opportunities.</h2>
 
@@ -35171,7 +35171,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="sales-opportunity-items">Sales Opportunity Items</h1>
 
-    
+
 
                                 <h2 id="sales-opportunity-items-GETapi-v1-sales-opportunity-items">Display a listing of the sales opportunity items.</h2>
 
@@ -36484,7 +36484,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="sales-orders">Sales Orders</h1>
 
-    
+
 
                                 <h2 id="sales-orders-GETapi-v1-sales">Display a listing of the sales orders.</h2>
 
@@ -42874,7 +42874,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="sales-pipeline-stages">Sales Pipeline Stages</h1>
 
-    
+
 
                                 <h2 id="sales-pipeline-stages-PUTapi-v1-pipeline-stages--id-">Update a Pipeline Stage</h2>
 
@@ -43306,7 +43306,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="sales-pipelines">Sales Pipelines</h1>
 
-    
+
 
                                 <h2 id="sales-pipelines-GETapi-v1-sales-pipelines">Display a listing of the sales pipelines.</h2>
 
@@ -45079,7 +45079,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="stock-adjustments">Stock Adjustments</h1>
 
-    
+
 
                                 <h2 id="stock-adjustments-GETapi-v1-stock-adjustments">Display a listing of the stock adjustments.</h2>
 
@@ -46572,7 +46572,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="supplier-interactions">Supplier Interactions</h1>
 
-    
+
 
                                 <h2 id="supplier-interactions-GETapi-v1-supplier-interactions">Display a listing of the supplier interactions.</h2>
 
@@ -48274,7 +48274,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="suppliers">Suppliers</h1>
 
-    
+
 
                                 <h2 id="suppliers-GETapi-v1-suppliers">Display a listing of the suppliers.</h2>
 
@@ -50450,7 +50450,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="taxes">Taxes</h1>
 
-    
+
 
                                 <h2 id="taxes-GETapi-v1-taxes">Display a listing of the taxes.</h2>
 
@@ -51842,7 +51842,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="transactions">Transactions</h1>
 
-    
+
 
                                 <h2 id="transactions-GETapi-v1-transactions">Display a listing of the transactions.</h2>
 
@@ -53745,7 +53745,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="units">Units</h1>
 
-    
+
 
                                 <h2 id="units-GETapi-v1-units">Display a listing of the units.</h2>
 
@@ -54934,7 +54934,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="user-settings">User Settings</h1>
 
-    
+
 
                                 <h2 id="user-settings-GETapi-v1-settings">Get User Settings</h2>
 
@@ -55424,7 +55424,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="users">Users</h1>
 
-    
+
 
                                 <h2 id="users-GETapi-v1-users">Display a listing of the users.</h2>
 
@@ -57341,7 +57341,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
                     <h1 id="warehouses">Warehouses</h1>
 
-    
+
 
                                 <h2 id="warehouses-GETapi-v1-warehouses">Display a listing of the warehouses.</h2>
 
@@ -58988,9 +58988,9 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <br>
 <p>A message describing the result of the request.</p>
         </div>
-                
 
-        
+
+
     </div>
     <div class="dark-box">
                     <div class="lang-selector">

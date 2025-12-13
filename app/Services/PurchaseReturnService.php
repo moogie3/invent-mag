@@ -36,10 +36,18 @@ class PurchaseReturnService
 
         $returns = $query->paginate($entries);
 
+        $statusCounts = PurchaseReturn::select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
         return [
             'returns' => $returns,
             'total_returns' => $returns->total(),
             'total_amount' => PurchaseReturn::sum('total_amount'),
+            'completed_count' => $statusCounts->get('Completed', 0),
+            'pending_count' => $statusCounts->get('Pending', 0),
+            'canceled_count' => $statusCounts->get('Canceled', 0),
+            'entries' => $entries,
         ];
     }
 

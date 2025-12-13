@@ -1,3 +1,5 @@
+import { formatCurrency } from "../../../../utils/currencyFormatter.js";
+
 export class PurchaseReturnCreate {
     constructor() {
         this.purchaseSelect = document.getElementById('purchase-select');
@@ -95,8 +97,8 @@ export class PurchaseReturnCreate {
                             value="0"
                             style="width: 100px;">
                     </td>
-                    <td>${unitPrice.toFixed(2)}</td>
-                    <td class="item-total text-end">0.00</td>
+                    <td>${formatCurrency(unitPrice)}</td>
+                    <td class="item-total text-end">${formatCurrency(0)}</td>
                 </tr>
             `;
         });
@@ -131,7 +133,7 @@ export class PurchaseReturnCreate {
         const itemTotal = price * quantity;
         const row = input.closest('tr');
         if(row) {
-            row.querySelector('.item-total').textContent = itemTotal.toFixed(2);
+            row.querySelector('.item-total').textContent = formatCurrency(itemTotal);
         }
 
         if (quantity > 0) {
@@ -153,7 +155,7 @@ export class PurchaseReturnCreate {
             const item = this.returnedItems[itemId];
             totalAmount += item.price * item.returned_quantity;
         }
-        this.totalAmountInput.value = totalAmount.toFixed(2);
+        this.totalAmountInput.value = formatCurrency(totalAmount);
     }
 
     handleSubmit(event) {
@@ -163,6 +165,13 @@ export class PurchaseReturnCreate {
             alert('No items selected for return.');
             return;
         }
-        this.itemsInput.value = JSON.stringify(itemsArray);
+
+        const plainTotalAmount = Object.values(this.returnedItems).reduce((sum, item) => sum + (item.price * item.returned_quantity), 0);
+        this.totalAmountInput.value = plainTotalAmount.toFixed(2);
+
+        this.itemsInput.value = JSON.stringify(itemsArray.map(item => ({
+            ...item,
+            returned_quantity: parseInt(item.returned_quantity, 10)
+        })));
     }
 }

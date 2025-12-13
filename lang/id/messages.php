@@ -1238,7 +1238,7 @@ return [
     'edit_sales_return' => "Edit Return Penjualan",
     'purchase_returns' => "Retur Pembelian",
     'sales_returns' => "Retur Penjualan",
-
+    'sales_invoice' => "Faktur Penjualan",
     'pr_failed_to_load_details' => 'Gagal memuat detail retur pembelian.',
     'pr_select_one_to_delete' => 'Pilih setidaknya satu retur pembelian untuk dihapus.',
     'pr_select_one_to_mark_completed' => 'Pilih setidaknya satu retur pembelian untuk ditandai sebagai selesai.',
@@ -1264,6 +1264,8 @@ return [
     'original_purchase_invoice' => 'Faktur Pembelian Asli',
     'unit_price' => 'Harga Satuan',
     'print' => 'Cetak',
+    'sr_modal_delete_title' => 'Hapus Retur Penjualan',
+    'sr_modal_delete_warning' => 'Anda yakin ingin menghapus retur penjualan ini? Tindakan ini tidak dapat dibatalkan.',
     'sr_return_hash' => 'Retur #',
     'sr_return_information_title' => 'Informasi Retur',
     'sr_return_date' => 'Tanggal Retur',
@@ -1273,4 +1275,12 @@ return [
     'sr_full_view_button' => 'Tampilan Penuh',
     'sr_modal_details_info_message' => 'Lihat detail retur penjualan lengkap',
     'sr_modal_details_print_button' => 'Cetak',
+
+    'completed' => 'Selesai',
+    'pending' => 'Tertunda',
+    'canceled' => 'Dibatalkan',
+    'return_summary' => 'Ringkasan Pengembalian',
+    'return_status' => 'Status Pengembalian',
+    'overview_of_purchase_returns' => 'Gambaran umum pengembalian pembelian',
+    'overview_of_sales_returns' => 'Gambaran umum pengembalian penjualan',
 ];

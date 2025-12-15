@@ -1283,4 +1283,7 @@ return [
     'return_status' => 'Return Status',
     'overview_of_purchase_returns' => 'Overview of your purchase returns',
     'overview_of_sales_returns' => 'Overview of your sales returns',
+    'sr_status_completed' => 'completed',
+    'sr_status_pending' => 'pending',
+    'sr_status_canceled' => 'canceled',
 ];

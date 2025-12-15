@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\POItem;
 use App\Models\PurchaseReturnItem;
+use App\Models\Account;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\BaseFeatureTestCase;
 use Carbon\Carbon;
@@ -17,6 +18,10 @@ class PurchaseReturnControllerTest extends BaseFeatureTestCase
 {
     use RefreshDatabase;
 
+    protected $seed = true;
+    protected $seeder = \Database\Seeders\AccountSeeder::class;
+    protected $permissionSeeder = \Database\Seeders\PermissionSeeder::class;
+
     protected User $user;
     protected Purchase $purchase;
     protected Product $product;
@@ -24,9 +29,23 @@ class PurchaseReturnControllerTest extends BaseFeatureTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->user = User::factory()->create();
         $this->user->assignRole('superuser');
         $this->actingAs($this->user);
+        
+        $inventoryAccount = Account::where('code', '1140')->first();
+        $accountsPayableAccount = Account::where('code', '2110')->first();
+        $cashAccount = Account::where('code', '1110')->first();
+
+        // Set accounting settings for the user
+        $this->user->accounting_settings = [
+            'inventory_account_id' => $inventoryAccount->id,
+            'accounts_payable_account_id' => $accountsPayableAccount->id,
+            'cash_account_id' => $cashAccount->id,
+        ];
+        $this->user->save();
+        $this->user->refresh(); // Refresh the user model to ensure latest settings are loaded
 
         $this->product = Product::factory()->create();
         $this->purchase = Purchase::factory()->create();
@@ -83,7 +102,7 @@ class PurchaseReturnControllerTest extends BaseFeatureTestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.por.show');
-        $response->assertViewHas('purchaseReturn', $purchaseReturn);
+        $response->assertViewHas('por', $purchaseReturn);
     }
 
     public function test_it_can_display_the_edit_page()
@@ -94,7 +113,7 @@ class PurchaseReturnControllerTest extends BaseFeatureTestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.por.edit');
-        $response->assertViewHas('purchaseReturn', $purchaseReturn);
+        $response->assertViewHas('por', $purchaseReturn);
     }
 
     public function test_it_can_update_a_purchase_return()
@@ -191,6 +210,6 @@ class PurchaseReturnControllerTest extends BaseFeatureTestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.layouts.modals.po.pormodals-view');
-        $response->assertViewHas('purchaseReturn', $purchaseReturn);
+        $response->assertViewHas('por', $purchaseReturn);
     }
 }

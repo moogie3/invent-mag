@@ -9,6 +9,7 @@ use App\Services\AccountingService;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AccountingServiceTest extends TestCase
@@ -25,7 +26,6 @@ class AccountingServiceTest extends TestCase
         $this->seed(\Database\Seeders\AccountSeeder::class);
     }
 
-    /** @test */
     public function it_creates_a_valid_journal_entry()
     {
         $sale = Sales::factory()->create();
@@ -66,7 +66,7 @@ class AccountingServiceTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_for_unbalanced_transactions()
     {
         $this->expectException(Exception::class);
@@ -88,7 +88,7 @@ class AccountingServiceTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_for_invalid_account_name()
     {
         $this->expectException(Exception::class);

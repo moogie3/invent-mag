@@ -53,6 +53,75 @@ class SalesReturnService
 
 
 
+    public function createSalesReturn(array $data): SalesReturn
+    {
+        return DB::transaction(function () use ($data) {
+            $items = json_decode($data['items'], true);
+
+            if (empty($items)) {
+                throw new \Exception('No items selected for return.');
+            }
+
+            $totalAmount = array_reduce($items, function ($carry, $item) {
+                return $carry + ($item['return_price'] * $item['returned_quantity']);
+            }, 0);
+
+            $salesReturn = SalesReturn::create([
+                'sales_id' => $data['sales_id'],
+                'return_date' => $data['return_date'],
+                'reason' => $data['reason'],
+                'status' => $data['status'],
+                'total_amount' => $totalAmount,
+                'user_id' => Auth::id(),
+            ]);
+
+            foreach ($items as $itemData) {
+                if ($itemData['returned_quantity'] > 0) {
+                    SalesReturnItem::create([
+                        'sales_return_id' => $salesReturn->id,
+                        'product_id' => $itemData['product_id'],
+                        'quantity' => $itemData['returned_quantity'],
+                        'price' => $itemData['return_price'],
+                        'total' => $itemData['return_price'] * $itemData['returned_quantity'],
+                    ]);
+
+                    $product = Product::find($itemData['product_id']);
+                    $product->increment('stock_quantity', $itemData['returned_quantity']);
+                }
+            }
+            
+            $sale = Sales::find($data['sales_id']);
+            $totalOriginalQuantitySold = $sale->salesItems()->sum('quantity');
+            $totalQuantityReturnedSoFar = $sale->salesReturns->flatMap(function ($sr) {
+                return $sr->items;
+            })->sum('quantity');
+
+            if ($totalQuantityReturnedSoFar >= $totalOriginalQuantitySold) {
+                $sale->status = 'Returned';
+            } elseif ($totalQuantityReturnedSoFar > 0) {
+                $sale->status = 'Partial';
+            } else {
+                $sale->status = 'Completed'; // Or original status, if no returns at all
+            }
+            $sale->save();
+
+            // Create journal entry for sales return
+            $this->accountingService->createJournalEntry(
+                'Sales return recorded',
+                Carbon::parse($salesReturn->return_date),
+                [
+                    ['account_name' => 'Sales Returns', 'type' => 'debit', 'amount' => $totalAmount],
+                    ['account_name' => 'Accounts Receivable', 'type' => 'credit', 'amount' => $totalAmount],
+                ],
+                $salesReturn
+            );
+
+            return $salesReturn;
+        });
+    }
+
+
+
     public function updateSalesReturn(SalesReturn $salesReturn, array $data): SalesReturn
     {
         return DB::transaction(function () use ($salesReturn, $data) {
@@ -70,12 +139,12 @@ class SalesReturnService
             $salesReturn->items()->delete();
 
             $returnedItems = array_filter($items, function($item) {
-                return isset($item['quantity']) && $item['quantity'] > 0;
+                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
             });
 
             $totalReturnAmount = 0;
             foreach ($returnedItems as $itemData) {
-                $totalReturnAmount += ($itemData['price'] ?? 0) * $itemData['quantity'];
+                $totalReturnAmount += ($itemData['price'] ?? 0) * $itemData['returned_quantity'];
             }
 
             $salesReturn->update([
@@ -87,7 +156,7 @@ class SalesReturnService
             ]);
 
             foreach ($returnedItems as $itemData) {
-                $returnedQuantity = $itemData['quantity'];
+                $returnedQuantity = $itemData['returned_quantity'];
                 $price = $itemData['price'] ?? 0;
 
                 SalesReturnItem::create([
@@ -105,15 +174,17 @@ class SalesReturnService
             }
 
             $sale = $salesReturn->sale;
-            $totalSoldQuantity = $sale->salesItems()->sum('quantity');
-            $totalReturnedQuantity = $sale->salesReturns()->with('items')->get()->flatMap(function($sr) {
+            $totalOriginalQuantitySold = $sale->salesItems()->sum('quantity');
+            $totalQuantityReturnedSoFar = $sale->salesReturns->flatMap(function ($sr) {
                 return $sr->items;
             })->sum('quantity');
 
-            if ($totalReturnedQuantity >= $totalSoldQuantity) {
+            if ($totalQuantityReturnedSoFar >= $totalOriginalQuantitySold) {
                 $sale->update(['status' => 'Returned']);
-            } elseif ($totalReturnedQuantity > 0) {
+            } elseif ($totalQuantityReturnedSoFar > 0) {
                 $sale->update(['status' => 'Partial']);
+            } else {
+                $sale->update(['status' => 'Completed']);
             }
 
             return $salesReturn->fresh();

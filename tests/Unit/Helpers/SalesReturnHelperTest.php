@@ -3,13 +3,12 @@
 namespace Tests\Unit\Helpers;
 
 use App\Helpers\SalesReturnHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class SalesReturnHelperTest extends TestCase
 {
-    /**
-     * @dataProvider statusClassProvider
-     */
+    #[DataProvider('statusClassProvider')]
     public function test_get_status_class($status, $expectedClass)
     {
         $this->assertEquals($expectedClass, SalesReturnHelper::getStatusClass($status));
@@ -26,9 +25,7 @@ class SalesReturnHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider statusTextProvider
-     */
+    #[DataProvider('statusTextProvider')]
     public function test_get_status_text($status, $expectedText)
     {
         // Mock the __ function if it doesn't exist, as it's used in the helper

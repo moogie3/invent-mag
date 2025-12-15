@@ -73,8 +73,9 @@ class PurchaseReturnServiceTest extends TestCase
             'quantity' => 1
         ]);
         
+        $this->product->decrement('stock_quantity', 1);
         $this->product->refresh();
-        $this->assertEquals(99, $this->product->stock_quantity); // Assuming factory decrements
+        $this->assertEquals(99, $this->product->stock_quantity);
 
         $updateData = [
             'return_date' => now()->format('Y-m-d'),

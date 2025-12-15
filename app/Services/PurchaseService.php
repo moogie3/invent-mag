@@ -475,7 +475,7 @@ class PurchaseService
                 'purchase_id' => $purchase->id,
                 'user_id' => Auth::id(),
                 'return_date' => $data['return_date'],
-                'reason' => $data['reason'],
+                'reason' => $data['reason'] ?? null,
                 'total_amount' => $totalReturnAmount,
                 'status' => $data['status'],
             ]);

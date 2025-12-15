@@ -4,6 +4,8 @@ namespace Tests\Unit\Helpers;
 
 use App\Helpers\CurrencyHelper;
 use App\Models\CurrencySetting;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\BaseUnitTestCase;
 use Carbon\Carbon;
 
@@ -24,11 +26,9 @@ class CurrencyHelperTest extends BaseUnitTestCase
         parent::tearDown();
     }
 
-    /**
-     * @test
-     * @group helpers
-     * @group currency-helper
-     */
+    #[Test]
+    #[Group('helpers')]
+    #[Group('currency-helper')]
     public function it_formats_amount_with_default_settings_when_db_is_empty()
     {
         $formatted = CurrencyHelper::format(12345.67);
@@ -48,11 +48,9 @@ class CurrencyHelperTest extends BaseUnitTestCase
         $this->assertEquals($expectedWithPosition, $formatted);
     }
 
-    /**
-     * @test
-     * @group helpers
-     * @group currency-helper
-     */
+    #[Test]
+    #[Group('helpers')]
+    #[Group('currency-helper')]
     public function it_formats_amount_with_database_settings()
     {
         CurrencySetting::factory()->create([
@@ -70,11 +68,9 @@ class CurrencyHelperTest extends BaseUnitTestCase
         $this->assertEquals('$ 12,345.67', $formatted);
     }
 
-    /**
-     * @test
-     * @group helpers
-     * @group currency-helper
-     */
+    #[Test]
+    #[Group('helpers')]
+    #[Group('currency-helper')]
     public function it_formats_amount_with_suffix_position()
     {
         CurrencySetting::factory()->create([
@@ -92,11 +88,9 @@ class CurrencyHelperTest extends BaseUnitTestCase
         $this->assertEquals('500.00 USD', $formatted);
     }
 
-    /**
-     * @test
-     * @group helpers
-     * @group currency-helper
-     */
+    #[Test]
+    #[Group('helpers')]
+    #[Group('currency-helper')]
     public function it_gets_correct_currency_symbol()
     {
         CurrencySetting::factory()->create(['currency_symbol' => '€']);
@@ -107,11 +101,9 @@ class CurrencyHelperTest extends BaseUnitTestCase
         $this->assertEquals('€', CurrencyHelper::getCurrencySymbol());
     }
 
-    /**
-     * @test
-     * @group helpers
-     * @group currency-helper
-     */
+    #[Test]
+    #[Group('helpers')]
+    #[Group('currency-helper')]
     public function it_gets_correct_currency_position()
     {
         CurrencySetting::factory()->create(['position' => 'suffix']);
@@ -122,11 +114,9 @@ class CurrencyHelperTest extends BaseUnitTestCase
         $this->assertEquals('suffix', CurrencyHelper::getCurrencyPosition());
     }
 
-    /**
-     * @test
-     * @group helpers
-     * @group currency-helper
-     */
+    #[Test]
+    #[Group('helpers')]
+    #[Group('currency-helper')]
     public function it_uses_cached_settings_on_subsequent_calls()
     {
         // First call, should query the database and cache the settings
@@ -148,11 +138,9 @@ class CurrencyHelperTest extends BaseUnitTestCase
         $this->assertEquals('$', CurrencyHelper::getCurrencySymbol());
     }
 
-    /**
-     * @test
-     * @group helpers
-     * @group currency-helper
-     */
+    #[Test]
+    #[Group('helpers')]
+    #[Group('currency-helper')]
     public function it_can_use_test_settings()
     {
         $testSettings = (object) [
@@ -169,11 +157,9 @@ class CurrencyHelperTest extends BaseUnitTestCase
         $this->assertEquals('TEST 10.000,0000', CurrencyHelper::format(10000));
     }
 
-    /**
-     * @test
-     * @group helpers
-     * @group currency-helper
-     */
+    #[Test]
+    #[Group('helpers')]
+    #[Group('currency-helper')]
     public function it_formats_date_correctly()
     {
         $date = '2023-10-27 10:00:00';
@@ -183,11 +169,9 @@ class CurrencyHelperTest extends BaseUnitTestCase
         $this->assertEquals('01 Jan 2024', CurrencyHelper::formatDate($carbonDate));
     }
 
-    /**
-     * @test
-     * @group helpers
-     * @group currency-helper
-     */
+    #[Test]
+    #[Group('helpers')]
+    #[Group('currency-helper')]
     public function it_handles_zero_and_null_amounts()
     {
         CurrencySetting::factory()->create([
@@ -205,11 +189,9 @@ class CurrencyHelperTest extends BaseUnitTestCase
         $this->assertEquals('$ 0.00', CurrencyHelper::format(null));
     }
 
-    /**
-     * @test
-     * @group helpers
-     * @group currency-helper
-     */
+    #[Test]
+    #[Group('helpers')]
+    #[Group('currency-helper')]
     public function it_formats_negative_amounts_correctly()
     {
         CurrencySetting::factory()->create([

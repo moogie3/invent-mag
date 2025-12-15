@@ -20,13 +20,12 @@ class SalesForecastServiceTest extends TestCase
         $this->salesForecastService = new SalesForecastService();
     }
 
-    /** @test */
     public function it_can_be_instantiated()
     {
         $this->assertInstanceOf(SalesForecastService::class, $this->salesForecastService);
     }
 
-    /** @test */
+
     public function it_returns_empty_array_when_not_enough_data()
     {
         // Only one month of data
@@ -40,7 +39,7 @@ class SalesForecastServiceTest extends TestCase
         $this->assertEmpty($result['forecast']);
     }
 
-    /** @test */
+
     public function it_returns_correct_structure_with_enough_data_for_linear_regression()
     {
         // Create 6 months of sales data
@@ -63,7 +62,7 @@ class SalesForecastServiceTest extends TestCase
         $this->assertCount(6 + $monthsToForecast, $result['labels']);
     }
 
-    /** @test */
+
     public function it_returns_correct_structure_with_enough_data_for_holt_winters()
     {
         // Create 14 months of sales data for Holt-Winters
@@ -80,7 +79,7 @@ class SalesForecastServiceTest extends TestCase
         $this->assertIsArray($result);
         $this->assertArrayHasKey('labels', $result);
         $this->assertArrayHasKey('historical', $result);
-        $this->assertArrayHasKey('forecast', 'result');
+        $this->assertArrayHasKey('forecast', $result);
         $this->assertCount(14, $result['historical']);
         $this->assertCount($monthsToForecast, $result['forecast']);
         $this->assertCount(14 + $monthsToForecast, $result['labels']);

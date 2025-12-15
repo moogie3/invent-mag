@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class AccountControllerTest extends TestCase
@@ -18,6 +19,8 @@ class AccountControllerTest extends TestCase
     {
         parent::setUp();
         $this->user = User::factory()->create();
+        $permission = Permission::create(['name' => 'view-accounts']);
+        $this->user->givePermissionTo($permission);
     }
 
     public function test_can_get_all_accounts()
@@ -61,6 +64,8 @@ class AccountControllerTest extends TestCase
 
         $updateData = [
             'name' => 'Updated Account Name',
+            'type' => 'asset',
+            'code' => '1234'
         ];
 
         $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/accounts/' . $account->id, $updateData);

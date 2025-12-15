@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\JournalEntry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -22,14 +23,14 @@ class AccountingControllerTest extends TestCase
         $this->seed(\Database\Seeders\AccountSeeder::class);
         $permission = Permission::create(['name' => 'view-accounting']);
         $role = Role::create(['name' => 'accountant'])->givePermissionTo($permission);
-        
+
         $this->user = User::factory()->create();
         $this->user->assignRole($role);
 
         $this->actingAs($this->user);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_display_the_chart_of_accounts()
     {
         $response = $this->get(route('admin.accounting.chart'));
@@ -37,7 +38,7 @@ class AccountingControllerTest extends TestCase
         $response->assertRedirect(route('admin.accounting.accounts.index'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_display_the_general_journal()
     {
         JournalEntry::factory()->count(5)->create();
@@ -49,7 +50,7 @@ class AccountingControllerTest extends TestCase
         $response->assertViewHas('entries');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_display_the_general_ledger()
     {
         $response = $this->get(route('admin.accounting.ledger'));
@@ -59,7 +60,7 @@ class AccountingControllerTest extends TestCase
         $response->assertViewHas('accounts');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_the_general_ledger()
     {
         $account = Account::where('name', 'accounting.accounts.cash.name')->first();
@@ -77,7 +78,7 @@ class AccountingControllerTest extends TestCase
         $response->assertViewHas('transactions');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_display_the_trial_balance()
     {
         // Create some transactions to ensure balances exist
@@ -127,7 +128,7 @@ class AccountingControllerTest extends TestCase
         $this->assertGreaterThan(0, $totalDebits); // Ensure some transactions were processed
     }
 
-    /** @test */
+    #[Test]
     public function it_can_display_the_accounts_index_page()
     {
         $response = $this->get(route('admin.accounting.accounts.index'));
@@ -137,7 +138,7 @@ class AccountingControllerTest extends TestCase
         $response->assertViewHas('accounts');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_display_the_accounts_create_page()
     {
         $response = $this->get(route('admin.accounting.accounts.create'));
@@ -147,7 +148,7 @@ class AccountingControllerTest extends TestCase
         $response->assertViewHas('accounts');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_store_a_new_account()
     {
         $parentAccount = Account::where('code', '1000')->first(); // Assets
@@ -172,7 +173,7 @@ class AccountingControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_account_store_request()
     {
         $response = $this->post(route('admin.accounting.accounts.store'), [
@@ -184,7 +185,7 @@ class AccountingControllerTest extends TestCase
         $response->assertSessionHasErrors(['name', 'code', 'type']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_display_the_accounts_edit_page()
     {
         $account = Account::factory()->create();
@@ -197,7 +198,7 @@ class AccountingControllerTest extends TestCase
         $response->assertViewHas('accounts');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_update_an_account()
     {
         $account = Account::factory()->create(['name' => 'Old Name', 'code' => 'OLD1', 'type' => 'asset']);
@@ -223,7 +224,7 @@ class AccountingControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_account_update_request()
     {
         $account = Account::factory()->create();
@@ -237,7 +238,7 @@ class AccountingControllerTest extends TestCase
         $response->assertSessionHasErrors(['name', 'code', 'type']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_delete_an_account()
     {
         $account = Account::factory()->create();
@@ -249,7 +250,7 @@ class AccountingControllerTest extends TestCase
         $this->assertDatabaseMissing('accounts', ['id' => $account->id]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_delete_account_with_transactions()
     {
         $account = Account::where('name', 'accounting.accounts.cash.name')->first();
@@ -262,7 +263,7 @@ class AccountingControllerTest extends TestCase
         $this->assertDatabaseHas('accounts', ['id' => $account->id]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_delete_account_with_children()
     {
         $parent = Account::where('code', '1000')->first(); // Assets

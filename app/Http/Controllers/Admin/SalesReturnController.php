@@ -53,7 +53,7 @@ class SalesReturnController extends Controller
 
     public function show(SalesReturn $salesReturn)
     {
-        $salesReturn->load(['sales.customer', 'salesItems.product']); // Eager load relationships
+        $salesReturn->load(['sale.customer', 'items.product']); // Eager load relationships
 
         $statusClass = SalesReturnHelper::getStatusClass($salesReturn->status);
         $statusText = SalesReturnHelper::getStatusText($salesReturn->status);

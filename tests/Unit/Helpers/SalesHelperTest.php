@@ -4,87 +4,88 @@ namespace Tests\Unit\Helpers;
 
 use App\Helpers\SalesHelper;
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\BaseUnitTestCase;
 
 class SalesHelperTest extends BaseUnitTestCase
 {
     // Test cases for calculateTotal (reused from PurchaseHelperTest)
-    /** @test */
+    #[Test]
     public function it_calculates_total_with_no_discount()
     {
         $this->assertEquals(100.0, SalesHelper::calculateTotal(10.0, 10, 0, 'fixed'));
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_total_with_fixed_discount()
     {
         $this->assertEquals(80.0, SalesHelper::calculateTotal(10.0, 10, 2, 'fixed')); // (10-2)*10
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_total_with_percentage_discount()
     {
         $this->assertEquals(90.0, SalesHelper::calculateTotal(10.0, 10, 10, 'percentage')); // (10 - 1)*10
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_total_with_zero_quantity()
     {
         $this->assertEquals(0.0, SalesHelper::calculateTotal(10.0, 0, 2, 'fixed'));
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_total_with_zero_price()
     {
         $this->assertEquals(0.0, SalesHelper::calculateTotal(0.0, 10, 0, 'fixed'));
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_total_with_discount_exceeding_price()
     {
         $this->assertEquals(-50.0, SalesHelper::calculateTotal(5.0, 10, 10, 'fixed'));
     }
 
     // Test cases for calculateDiscountPerUnit (reused from PurchaseHelperTest)
-    /** @test */
+    #[Test]
     public function it_calculates_fixed_discount_per_unit()
     {
         $this->assertEquals(2.0, SalesHelper::calculateDiscountPerUnit(10.0, 2, 'fixed'));
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_percentage_discount_per_unit()
     {
         $this->assertEquals(1.0, SalesHelper::calculateDiscountPerUnit(10.0, 10, 'percentage'));
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_zero_discount_per_unit_for_zero_price()
     {
         $this->assertEquals(0.0, SalesHelper::calculateDiscountPerUnit(0.0, 10, 'percentage'));
     }
 
     // Test cases for calculateDiscount (reused from PurchaseHelperTest)
-    /** @test */
+    #[Test]
     public function it_calculates_fixed_order_discount()
     {
         $this->assertEquals(50.0, SalesHelper::calculateDiscount(200.0, 50, 'fixed'));
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_percentage_order_discount()
     {
         $this->assertEquals(20.0, SalesHelper::calculateDiscount(200.0, 10, 'percentage'));
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_zero_order_discount_for_zero_subtotal()
     {
         $this->assertEquals(0.0, SalesHelper::calculateDiscount(0.0, 10, 'percentage'));
     }
 
     // Test cases for calculateTaxAmount
-    /** @test */
+    #[Test]
     public function it_calculates_tax_amount_correctly()
     {
         $this->assertEquals(10.0, SalesHelper::calculateTaxAmount(100.0, 10));
@@ -93,14 +94,14 @@ class SalesHelperTest extends BaseUnitTestCase
         $this->assertEquals(5.5, SalesHelper::calculateTaxAmount(50.0, 11));
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_tax_amount_with_negative_amount()
     {
         $this->assertEquals(-10.0, SalesHelper::calculateTaxAmount(-100.0, 10));
     }
 
     // Test cases for calculateInvoiceSummary
-    /** @test */
+    #[Test]
     public function it_calculates_invoice_summary_for_empty_items()
     {
         $summary = SalesHelper::calculateInvoiceSummary([], 0, 'fixed', 10);
@@ -114,7 +115,7 @@ class SalesHelperTest extends BaseUnitTestCase
         ], $summary);
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_invoice_summary_with_single_item_no_order_discount_no_tax()
     {
         $items = [
@@ -131,7 +132,7 @@ class SalesHelperTest extends BaseUnitTestCase
         ], $summary);
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_invoice_summary_with_multiple_items_and_order_discount_and_tax()
     {
         $items = [
@@ -153,7 +154,7 @@ class SalesHelperTest extends BaseUnitTestCase
         ], $summary);
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_invoice_summary_with_price_fallback()
     {
         $items = [
@@ -171,44 +172,44 @@ class SalesHelperTest extends BaseUnitTestCase
     }
 
     // Test cases for getStatusClass (reused from PurchaseHelperTest)
-    /** @test */
+    #[Test]
     public function it_returns_paid_status_class()
     {
         $this->assertEquals('badge bg-green-lt', SalesHelper::getStatusClass('Paid', Carbon::now()->addDays(5)));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_overdue_status_class()
     {
         $this->assertEquals('badge bg-red-lt', SalesHelper::getStatusClass('Pending', Carbon::now()->subDays(1)));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_due_soon_3_days_status_class()
     {
         $this->assertEquals('badge bg-orange-lt', SalesHelper::getStatusClass('Pending', Carbon::now()->addDays(3)));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_due_soon_7_days_status_class()
     {
         $this->assertEquals('badge bg-yellow-lt', SalesHelper::getStatusClass('Pending', Carbon::now()->addDays(7)));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_default_status_class()
     {
         $this->assertEquals('badge bg-blue-lt', SalesHelper::getStatusClass('Pending', Carbon::now()->addDays(8)));
     }
 
     // Test cases for getStatusText
-    /** @test */
+    #[Test]
     public function it_returns_paid_status_text()
     {
         $this->assertEquals('<span class="h4"><i class="ti ti-check me-1 fs-4"></i> Paid</span>', SalesHelper::getStatusText('Paid', Carbon::now()->addDays(5)));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_due_today_status_text()
     {
         Carbon::setTestNow(Carbon::create(2025, 1, 1, 12, 0, 0));
@@ -216,7 +217,7 @@ class SalesHelperTest extends BaseUnitTestCase
         Carbon::setTestNow(); // Reset Carbon
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_due_in_days_status_text()
     {
         Carbon::setTestNow(Carbon::create(2025, 1, 1));
@@ -224,7 +225,7 @@ class SalesHelperTest extends BaseUnitTestCase
         Carbon::setTestNow();
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_due_in_1_week_status_text()
     {
         Carbon::setTestNow(Carbon::create(2025, 1, 1));
@@ -232,7 +233,7 @@ class SalesHelperTest extends BaseUnitTestCase
         Carbon::setTestNow();
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_overdue_status_text()
     {
         Carbon::setTestNow(Carbon::create(2025, 1, 5));
@@ -240,7 +241,7 @@ class SalesHelperTest extends BaseUnitTestCase
         Carbon::setTestNow();
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_pending_status_text()
     {
         Carbon::setTestNow(Carbon::create(2025, 1, 1));

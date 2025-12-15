@@ -3,12 +3,13 @@
 namespace Tests\Unit\DTOs;
 
 use App\DTOs\TransactionDTO;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\BaseUnitTestCase;
 use Carbon\Carbon;
 
 class TransactionDTOTest extends BaseUnitTestCase
 {
-    /** @test */
+    #[Test]
     public function it_constructs_with_all_provided_data()
     {
         $data = [
@@ -42,7 +43,7 @@ class TransactionDTOTest extends BaseUnitTestCase
         $this->assertEquals('/sales/1/edit', $dto->edit_url);
     }
 
-    /** @test */
+    #[Test]
     public function it_constructs_with_partial_data()
     {
         $data = [
@@ -59,7 +60,7 @@ class TransactionDTOTest extends BaseUnitTestCase
         $this->assertNull($dto->invoice); // Other properties should be null by default
     }
 
-    /** @test */
+    #[Test]
     public function it_constructs_with_extra_data()
     {
         $data = [
@@ -76,7 +77,7 @@ class TransactionDTOTest extends BaseUnitTestCase
         $this->assertTrue(property_exists($dto, 'extra_field'));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_the_id_as_key()
     {
         $data = ['id' => 10];
@@ -84,7 +85,7 @@ class TransactionDTOTest extends BaseUnitTestCase
         $this->assertEquals(10, $dto->getKey());
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_array_correctly()
     {
         $date = Carbon::now();
@@ -123,7 +124,7 @@ class TransactionDTOTest extends BaseUnitTestCase
         $this->assertEquals($data['edit_url'], $array['edit_url']);
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_string_correctly()
     {
         $data = ['id' => 100];
@@ -131,7 +132,7 @@ class TransactionDTOTest extends BaseUnitTestCase
         $this->assertEquals('100', (string) $dto);
     }
 
-    /** @test */
+    #[Test]
     public function it_converts_to_string_with_null_id()
     {
         $data = ['type' => 'test'];

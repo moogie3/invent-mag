@@ -28,8 +28,21 @@ class SalesReturnControllerTest extends BaseFeatureTestCase
         $this->user->assignRole('superuser');
         $this->actingAs($this->user);
 
+        $inventoryAccount = \App\Models\Account::where('code', '1140')->first();
+        $accountsReceivableAccount = \App\Models\Account::where('code', '1130')->first();
+        $cashAccount = \App\Models\Account::where('code', '1110')->first();
+
+        $this->user->accounting_settings = [
+            'inventory_account_id' => $inventoryAccount->id,
+            'accounts_receivable_account_id' => $accountsReceivableAccount->id,
+            'cash_account_id' => $cashAccount->id,
+        ];
+        $this->user->save();
+        $this->user->refresh(); // Refresh the user model to ensure latest settings are loaded
+
         $this->product = Product::factory()->create(['stock_quantity' => 10]);
-        $this->sale = Sales::factory()->create();
+        $customer = \App\Models\Customer::factory()->create(); // Create a customer
+        $this->sale = Sales::factory()->create(['customer_id' => $customer->id]); // Associate customer with sale
         SalesItem::factory()->create([
             'sales_id' => $this->sale->id,
             'product_id' => $this->product->id,
@@ -47,6 +60,7 @@ class SalesReturnControllerTest extends BaseFeatureTestCase
             'return_date' => '2025-12-12',
             'total_amount' => 100,
             'status' => 'Completed',
+            'reason' => 'Test reason',
         ]);
         SalesReturn::create([
             'sales_id' => $this->sale->id,
@@ -54,6 +68,7 @@ class SalesReturnControllerTest extends BaseFeatureTestCase
             'return_date' => '2025-12-12',
             'total_amount' => 200,
             'status' => 'Completed',
+            'reason' => 'Test reason',
         ]);
         SalesReturn::create([
             'sales_id' => $this->sale->id,
@@ -61,6 +76,7 @@ class SalesReturnControllerTest extends BaseFeatureTestCase
             'return_date' => '2025-12-12',
             'total_amount' => 300,
             'status' => 'Completed',
+            'reason' => 'Test reason',
         ]);
 
         $response = $this->get(route('admin.sales-returns.index'));
@@ -89,6 +105,7 @@ class SalesReturnControllerTest extends BaseFeatureTestCase
             ]),
             'total_amount' => 100,
             'status' => 'Completed',
+            'reason' => 'Damaged goods', // Added reason for the return
         ];
 
         $response = $this->post(route('admin.sales-returns.store'), $returnData);
@@ -106,6 +123,14 @@ class SalesReturnControllerTest extends BaseFeatureTestCase
             'return_date' => '2025-12-12',
             'total_amount' => 100,
             'status' => 'Completed',
+            'reason' => 'Test reason',
+        ]);
+        SalesReturnItem::create([ // Create a SalesReturnItem
+            'sales_return_id' => $salesReturn->id,
+            'product_id' => $this->product->id,
+            'quantity' => 1,
+            'price' => 100,
+            'total' => 100,
         ]);
 
         $response = $this->get(route('admin.sales-returns.show', $salesReturn->id));
@@ -157,6 +182,7 @@ class SalesReturnControllerTest extends BaseFeatureTestCase
             ]),
             'total_amount' => 300,
             'status' => 'Pending',
+            'reason' => 'Customer changed mind', // Added reason for the return update
         ];
 
         $response = $this->put(route('admin.sales-returns.update', $salesReturn->id), $updateData);

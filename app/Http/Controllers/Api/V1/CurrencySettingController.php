@@ -20,6 +20,8 @@ class CurrencySettingController extends Controller
     public function __construct(CurrencyService $currencyService)
     {
         $this->currencyService = $currencyService;
+        $this->middleware('permission:view-currency-settings')->only(['index']);
+        $this->middleware('permission:edit-currency-settings')->only(['update']);
     }
     /**
      * Display a listing of the currency settings.

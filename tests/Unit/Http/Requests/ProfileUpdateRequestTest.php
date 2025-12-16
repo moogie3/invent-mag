@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 use Tests\TestCase;
 use Illuminate\Validation\Rule;
+use PHPUnit\Framework\Attributes\Test;
 
 class ProfileUpdateRequestTest extends TestCase
 {
@@ -21,6 +22,7 @@ class ProfileUpdateRequestTest extends TestCase
         $this->request = new ProfileUpdateRequest();
     }
 
+    #[Test]
     public function test_authorize_returns_true_for_authenticated_user()
     {
         $user = User::factory()->create();
@@ -34,6 +36,7 @@ class ProfileUpdateRequestTest extends TestCase
         $this->assertTrue($this->request->authorize());
     }
 
+    #[Test]
     public function test_authorize_returns_false_for_unauthenticated_user()
     {
         // Ensure no user is authenticated
@@ -46,6 +49,7 @@ class ProfileUpdateRequestTest extends TestCase
         $this->assertFalse($this->request->authorize());
     }
 
+    #[Test]
     public function test_rules_are_correct()
     {
         $user = User::factory()->create();
@@ -70,6 +74,7 @@ class ProfileUpdateRequestTest extends TestCase
         $this->assertEquals($expectedRules, $this->request->rules());
     }
 
+    #[Test]
     public function test_name_is_required()
     {
         $user = User::factory()->create();
@@ -84,6 +89,7 @@ class ProfileUpdateRequestTest extends TestCase
         $this->assertArrayHasKey('name', $validator->errors()->toArray());
     }
 
+    #[Test]
     public function test_email_must_be_unique_except_for_the_current_user()
     {
         $user1 = User::factory()->create();

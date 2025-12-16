@@ -12,9 +12,7 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // For now, we'll allow any authenticated user to update a product.
-        // You can add more specific authorization logic here later.
-        return true;
+        return $this->user()->can('edit-products');
     }
 
     /**

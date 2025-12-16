@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use Tests\Feature\BaseFeatureTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class RegistrationTest extends BaseFeatureTestCase
 {
@@ -14,6 +15,7 @@ class RegistrationTest extends BaseFeatureTestCase
         config(['auth.defaults.guard' => 'web']);
     }
 
+    #[Test]
     public function test_registration_screen_can_be_rendered(): void
     {
         $response = $this->get('/admin/register');
@@ -21,6 +23,7 @@ class RegistrationTest extends BaseFeatureTestCase
         $response->assertStatus(200);
     }
 
+    #[Test]
     public function test_new_users_can_register(): void
     {
         Event::fake();

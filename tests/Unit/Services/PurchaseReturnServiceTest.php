@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class PurchaseReturnServiceTest extends TestCase
 {
@@ -38,6 +39,7 @@ class PurchaseReturnServiceTest extends TestCase
         $this->purchaseReturnService = new PurchaseReturnService($this->accountingServiceMock);
     }
 
+    #[Test]
     public function test_it_can_get_purchase_return_index_data()
     {
         PurchaseReturn::factory()->count(5)->create();
@@ -50,6 +52,7 @@ class PurchaseReturnServiceTest extends TestCase
         $this->assertEquals(5, $data['total_returns']);
     }
 
+    #[Test]
     public function test_it_can_filter_index_data_by_month_and_year()
     {
         PurchaseReturn::factory()->create(['return_date' => '2023-01-15']);
@@ -61,6 +64,7 @@ class PurchaseReturnServiceTest extends TestCase
         $this->assertEquals(1, $data['total_returns']);
     }
 
+    #[Test]
     public function test_it_can_update_a_purchase_return()
     {
         $purchaseReturn = PurchaseReturn::factory()->create([
@@ -99,6 +103,7 @@ class PurchaseReturnServiceTest extends TestCase
         $this->assertEquals(97, $this->product->stock_quantity);
     }
     
+    #[Test]
     public function test_update_throws_exception_for_invalid_items_data()
     {
         $this->expectException(\Exception::class);

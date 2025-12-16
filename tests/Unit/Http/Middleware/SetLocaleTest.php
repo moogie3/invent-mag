@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class SetLocaleTest extends TestCase
 {
@@ -22,6 +23,7 @@ class SetLocaleTest extends TestCase
         $this->middleware = new SetLocale();
     }
 
+    #[Test]
     public function test_sets_locale_from_user_settings_if_authenticated_and_setting_exists()
     {
         // 1. Arrange
@@ -42,6 +44,7 @@ class SetLocaleTest extends TestCase
         $this->assertEquals('id', App::getLocale());
     }
 
+    #[Test]
     public function test_uses_fallback_locale_if_user_has_no_setting()
     {
         // 1. Arrange
@@ -65,6 +68,7 @@ class SetLocaleTest extends TestCase
         $this->assertEquals('fr', App::getLocale());
     }
 
+    #[Test]
     public function test_does_not_change_locale_for_unauthenticated_user()
     {
         // 1. Arrange

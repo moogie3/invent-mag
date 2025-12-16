@@ -5,6 +5,7 @@ namespace Tests\Unit\Services;
 use App\Models\Sales;
 use App\Services\SalesForecastService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Carbon\Carbon;
 
@@ -20,12 +21,13 @@ class SalesForecastServiceTest extends TestCase
         $this->salesForecastService = new SalesForecastService();
     }
 
+    #[Test]
     public function it_can_be_instantiated()
     {
         $this->assertInstanceOf(SalesForecastService::class, $this->salesForecastService);
     }
 
-
+    #[Test]
     public function it_returns_empty_array_when_not_enough_data()
     {
         // Only one month of data
@@ -39,7 +41,7 @@ class SalesForecastServiceTest extends TestCase
         $this->assertEmpty($result['forecast']);
     }
 
-
+    #[Test]
     public function it_returns_correct_structure_with_enough_data_for_linear_regression()
     {
         // Create 6 months of sales data
@@ -62,7 +64,7 @@ class SalesForecastServiceTest extends TestCase
         $this->assertCount(6 + $monthsToForecast, $result['labels']);
     }
 
-
+    #[Test]
     public function it_returns_correct_structure_with_enough_data_for_holt_winters()
     {
         // Create 14 months of sales data for Holt-Winters

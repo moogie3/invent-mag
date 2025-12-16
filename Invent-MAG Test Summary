@@ -22,3 +22,49 @@
    18. PurchaseControllerTest: Comprehensive Coverage (All public methods now covered, including getExpiringSoonPurchases, modalView, getPurchaseMetrics, explicit validation error tests for store, update, addPayment, and service-level error isolation).
    19. SalesPipelineControllerTest: Comprehensive Coverage (All public methods now covered, including explicit validation error tests for store/update, reordering stages, and conversion to sales orders with error scenarios).
    20. SalesControllerTest: Comprehensive Coverage (All public methods now covered, including CRUD, bulk actions, API endpoints, modal views, payment addition, and validation for store/update).
+   21. AccountingCoaTemplateTest: Excellent coverage (success scenarios for both universal and Indonesian templates, file-not-found error handling, and database state verification).
+   22. AccountingControllerTest: Comprehensive Coverage (All public methods covered, including reports [Journal, Ledger, Trial Balance], full CRUD for accounts, validation, and critical deletion constraints).
+   23. PurchaseReturnControllerTest: Comprehensive Coverage (Full CRUD, bulk actions [delete, complete, cancel], and AJAX/API endpoints for fetching items and modal views).
+   24. SalesReturnControllerTest: Comprehensive Coverage (Full CRUD, bulk actions [delete, complete, cancel], and AJAX/API endpoints for fetching items and modal views).
+
+✦ Here's the summary of all test files in tests/Unit/, categorized by component type:
+
+  Helper Tests:
+
+   1. CurrencyHelperTest: Excellent coverage (various currency formatting scenarios, database-driven settings, caching behavior, and date formatting).
+   2. ProductHelperTest: Excellent coverage (comprehensive expiry date calculations for various timeframes, and accurate stock level classifications with custom thresholds).
+   3. PurchaseHelperTest: Excellent coverage (comprehensive calculation of purchase totals, per-unit and order discounts, detailed invoice summary, and dynamic status classification with text and CSS for various payment states and due dates).
+   4. PurchaseReturnHelperTest: Good coverage (status class and text generation for completed, pending, and canceled statuses, including case-insensitivity and default handling for unknown statuses).
+   5. SalesHelperTest: Excellent coverage (comprehensive calculation of sales totals, per-unit, order, and tax calculations, detailed invoice summary, and dynamic status classification with text and CSS for various payment states and due dates).
+   6. SalesReturnHelperTest: Good coverage (status class and text generation for completed, pending, and canceled statuses using data providers, including case-insensitivity and default handling for unknown statuses).
+
+  Service Tests:
+
+   1. AccountingServiceTest: Excellent coverage (successful journal entry creation, and robust error handling for unbalanced transactions and invalid account names).
+   2. CategoryServiceTest: Excellent coverage (category data retrieval, successful CRUD operations, and error handling for duplicate category creation).
+   3. CrmServiceTest: Excellent coverage (comprehensive data retrieval and calculation for customer and supplier CRM dashboards, detailed historical purchase/sales data, and successful interaction storage).
+   4. CurrencyServiceTest: Good coverage (retrieval of data for the currency settings page and successful updating of currency settings).
+   5. CustomerServiceTest: Excellent coverage (full CRUD operations, including duplicate prevention, image upload/update/delete handling, and metrics retrieval).
+   6. DashboardServiceTest: Excellent coverage (comprehensive testing of dashboard data aggregation with numerous metrics, robust date range calculations, and correct data formatting for dynamic charts).
+   7. NotificationServiceTest: Excellent coverage (accurate gathering and counting of diverse notification types like due purchases, due sales, low stock, and expiring items, with effective exclusion of non-relevant items).
+   8. PosServiceTest: Excellent coverage (data retrieval for the POS interface, comprehensive sale creation including item and payment processing, stock reduction, and accurate receipt data calculation).
+   9. ProductServiceTest: Excellent coverage (full CRUD, including image handling, comprehensive stock adjustment and logging, bulk operations for deletion and stock updates, and various search and expiry management scenarios).
+   10. ProfileServiceTest: Excellent coverage (general profile updates, password changes with current password validation, and full avatar management including upload, replacement, and deletion).
+   11. PurchaseReturnServiceTest: Good coverage (data retrieval with filtering, and robust update logic including stock quantity adjustments and invalid data exception handling).
+   12. PurchaseServiceTest: Excellent coverage (full purchase lifecycle, robust stock adjustment logic, and outstanding integration testing with the accounting service for both purchase creation and payments).
+   13. SalesForecastServiceTest: Good coverage (validates graceful failure with insufficient data, and confirms correct output structure and array lengths for both linear regression and Holt-Winters forecasting models).
+   14. SalesPipelineServiceTest: Excellent coverage (full management of pipelines, stages, and opportunities, with robust testing of the opportunity-to-sales-order conversion process, including all failure conditions and critical stock rollback logic).
+   15. SalesReturnServiceTest: Excellent coverage (full lifecycle of sales returns, including data retrieval with filtering, robust stock adjustment logic, updates to original sale status, and accounting integration).
+   16. SalesServiceTest: Excellent coverage (full sales lifecycle, robust stock adjustment logic, and outstanding, detailed integration testing with the accounting service for both sale creation and payments).
+   17. SupplierServiceTest: Excellent coverage (full CRUD operations, including image upload, replacement, and deletion handling, and retrieval of location-based metrics).
+   18. TaxServiceTest: Good coverage (retrieval of tax data and robust "update or create" logic for managing tax settings).
+   19. TransactionServiceTest: Excellent coverage (thorough testing of combined sales/purchase transaction filtering by date, status, and type, summary data aggregation, and status update logic for both single and bulk operations).
+   20. UnitServiceTest: Excellent coverage (unit data retrieval, successful CRUD operations, and error handling for duplicate unit creation).
+   21. UserServiceTest: Excellent coverage (full user CRUD, data retrieval for index/edit pages, and robust testing of role and permission assignment and synchronization).
+   22. WarehouseServiceTest: Excellent coverage (full CRUD, with exhaustive testing of the business rules and constraints for managing the single "main" warehouse designation).
+
+  DTO & HTTP Tests:
+
+   1. TransactionDTOTest: Excellent coverage (thorough testing of DTO construction with full, partial, and extra data, and validation of all output/conversion methods).
+   2. SetLocaleTest: Good coverage (validates that the locale is correctly set for users with a language preference, falls back to the default for users without a preference, and does nothing for unauthenticated requests).
+   3. ProfileUpdateRequestTest: Excellent coverage (full validation of authorization logic for authenticated/unauthenticated users and thorough testing of validation rules, especially the unique email constraint).

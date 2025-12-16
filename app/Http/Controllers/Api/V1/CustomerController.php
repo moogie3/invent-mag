@@ -27,6 +27,10 @@ class CustomerController extends Controller
     {
         $this->customerService = $customerService;
         $this->crmService = $crmService;
+        $this->middleware('permission:view-customers')->only(['index', 'show', 'getMetrics', 'getHistoricalPurchases', 'getProductHistory']);
+        $this->middleware('permission:create-customers')->only(['store', 'quickCreate']);
+        $this->middleware('permission:edit-customers')->only(['update']);
+        $this->middleware('permission:delete-customers')->only(['destroy']);
     }
 
     /**

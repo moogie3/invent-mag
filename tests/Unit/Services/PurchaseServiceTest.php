@@ -12,6 +12,7 @@ use App\Services\PurchaseService;
 use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Support\Facades\Auth;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Mockery\MockInterface;
 
 class PurchaseServiceTest extends BaseUnitTestCase
@@ -49,6 +50,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->actingAs($this->user);
     }
 
+    #[Test]
     public function test_get_purchase_index_data()
     {
         Supplier::factory()->count(2)->create(['location' => 'IN']);
@@ -67,6 +69,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertArrayHasKey('paymentMonthly', $data);
     }
 
+    #[Test]
     public function test_get_purchase_create_data()
     {
         $data = $this->purchaseService->getPurchaseCreateData();
@@ -76,6 +79,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertArrayHasKey('products', $data);
     }
 
+    #[Test]
     public function test_get_purchase_edit_data()
     {
         $purchase = Purchase::factory()->create();
@@ -88,6 +92,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertArrayHasKey('isPaid', $data);
     }
 
+    #[Test]
     public function test_get_purchase_view_data()
     {
         $purchase = Purchase::factory()->hasItems(2)->create();
@@ -103,6 +108,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertArrayHasKey('totalProductDiscount', $data);
     }
 
+    #[Test]
     public function test_get_purchase_for_modal()
     {
         $purchase = Purchase::factory()->hasItems(2)->create();
@@ -111,6 +117,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertEquals($purchase->id, $result->id);
     }
 
+    #[Test]
     public function test_create_purchase()
     {
         $supplier = Supplier::factory()->create();
@@ -140,6 +147,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertEquals(8, Product::find($product2->id)->stock_quantity);
     }
 
+    #[Test]
     public function test_it_creates_a_journal_entry_on_purchase_creation()
     {
         $supplier = Supplier::factory()->create();
@@ -179,6 +187,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->purchaseService->createPurchase($purchaseData);
     }
 
+    #[Test]
     public function test_it_creates_a_journal_entry_on_payment()
     {
         $purchase = Purchase::factory()->create(['invoice' => 'PO-123']);
@@ -210,6 +219,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->purchaseService->addPayment($purchase, $paymentData);
     }
 
+    #[Test]
     public function test_update_purchase()
     {
         $purchase = Purchase::factory()->hasItems(1)->create();
@@ -221,6 +231,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $newProduct = Product::factory()->create(['stock_quantity' => 20]);
 
         $updateData = [
+            'invoice' => 'UNIT-INV-UPDATED',
             'supplier_id' => $supplier->id,
             'order_date' => now()->toDateString(),
             'due_date' => now()->addDays(60)->toDateString(),
@@ -242,6 +253,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertEquals(25, Product::find($newProduct->id)->stock_quantity);
     }
 
+    #[Test]
     public function test_add_payment()
     {
         $purchase = Purchase::factory()->create(['total' => 1000]);
@@ -257,6 +269,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertEquals('Partial', $purchase->fresh()->status);
     }
 
+    #[Test]
     public function test_update_purchase_status()
     {
         $purchase = Purchase::factory()->create(['total' => 1000]);
@@ -277,6 +290,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertEquals('Unpaid', $purchase->fresh()->status);
     }
 
+    #[Test]
     public function test_delete_purchase()
     {
         $purchase = Purchase::factory()->hasItems(1)->create();
@@ -291,6 +305,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertEquals($initialStock - $item->quantity, Product::find($item->product_id)->stock_quantity);
     }
 
+    #[Test]
     public function test_bulk_delete_purchases()
     {
         $purchases = Purchase::factory()->count(3)->hasItems(1)->create();
@@ -303,6 +318,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         }
     }
 
+    #[Test]
     public function test_bulk_mark_paid()
     {
         $supplier = Supplier::factory()->create();
@@ -337,6 +353,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         }
     }
 
+    #[Test]
     public function test_get_purchase_metrics()
     {
         Supplier::factory()->create(['location' => 'IN']);
@@ -354,6 +371,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertArrayHasKey('paymentMonthly', $metrics);
     }
 
+    #[Test]
     public function test_get_expiring_purchase_count()
     {
         Purchase::factory()->create(['due_date' => now()->addDays(10), 'status' => 'Unpaid']);
@@ -365,6 +383,7 @@ class PurchaseServiceTest extends BaseUnitTestCase
         $this->assertEquals(1, $count);
     }
 
+    #[Test]
     public function test_get_expiring_purchases()
     {
         Purchase::factory()->create(['due_date' => now()->addDays(10), 'status' => 'Unpaid']);

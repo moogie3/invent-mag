@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PurchaseFactory extends Factory
 {
+    protected $table = 'po';
     /**
      * Define the model's default state.
      *

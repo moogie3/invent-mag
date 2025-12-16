@@ -22,6 +22,10 @@ class CategoryController extends Controller
     public function __construct(CategoryService $categoryService)
     {
         $this->categoryService = $categoryService;
+        $this->middleware('permission:view-categories')->only(['index', 'show']);
+        $this->middleware('permission:create-categories')->only(['store']);
+        $this->middleware('permission:edit-categories')->only(['update']);
+        $this->middleware('permission:delete-categories')->only(['destroy']);
     }
     /**
      * Display a listing of the categories.

@@ -22,6 +22,10 @@ class PurchaseController extends Controller
     public function __construct(PurchaseService $purchaseService)
     {
         $this->purchaseService = $purchaseService;
+        $this->middleware('permission:view-purchases')->only(['index', 'show', 'getExpiringSoonPurchases', 'getPurchaseMetrics']);
+        $this->middleware('permission:create-purchases')->only(['store']);
+        $this->middleware('permission:edit-purchases')->only(['update', 'addPayment', 'bulkMarkPaid']);
+        $this->middleware('permission:delete-purchases')->only(['destroy', 'bulkDelete']);
     }
 
     /**

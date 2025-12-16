@@ -232,6 +232,7 @@ class PurchaseService
             $purchase->items()->delete();
 
             $purchase->update([
+                'invoice' => $data['invoice'],
                 'supplier_id' => $data['supplier_id'],
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],

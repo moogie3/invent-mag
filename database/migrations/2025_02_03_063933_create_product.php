@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('category_id');
             $table->integer('units_id');
             $table->integer('supplier_id');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->integer('warehouse_id');
             $table->string('image')->nullable();
             $table->boolean('has_expiry')->default(false);

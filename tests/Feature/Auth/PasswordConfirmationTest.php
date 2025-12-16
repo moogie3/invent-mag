@@ -4,10 +4,12 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Tests\Feature\BaseFeatureTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class PasswordConfirmationTest extends BaseFeatureTestCase
 {
 
+    #[Test]
     public function test_confirm_password_screen_can_be_rendered(): void
     {
         $user = User::factory()->create();
@@ -17,6 +19,7 @@ class PasswordConfirmationTest extends BaseFeatureTestCase
         $response->assertStatus(200);
     }
 
+    #[Test]
     public function test_password_can_be_confirmed(): void
     {
         $user = User::factory()->create();
@@ -29,6 +32,7 @@ class PasswordConfirmationTest extends BaseFeatureTestCase
         $response->assertSessionHasNoErrors();
     }
 
+    #[Test]
     public function test_password_is_not_confirmed_with_invalid_password(): void
     {
         $user = User::factory()->create();

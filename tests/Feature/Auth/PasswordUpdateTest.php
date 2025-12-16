@@ -5,10 +5,12 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tests\Feature\BaseFeatureTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class PasswordUpdateTest extends BaseFeatureTestCase
 {
 
+    #[Test]
     public function test_password_can_be_updated(): void
     {
         $user = User::factory()->create();
@@ -29,6 +31,7 @@ class PasswordUpdateTest extends BaseFeatureTestCase
         $this->assertTrue(Hash::check('new-password', $user->refresh()->password));
     }
 
+    #[Test]
     public function test_correct_password_must_be_provided_to_update_password(): void
     {
         $user = User::factory()->create();

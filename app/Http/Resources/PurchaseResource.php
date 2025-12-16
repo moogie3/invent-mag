@@ -17,12 +17,13 @@ class PurchaseResource extends JsonResource
         return [
             'id' => $this->id,
             'supplier_id' => $this->supplier_id,
-            'invoice_no' => $this->invoice_no,
-            'purchase_date' => $this->purchase_date,
-            'total_amount' => $this->total_amount,
+            'invoice' => $this->invoice,
+            'order_date' => $this->order_date,
+            'due_date' => $this->due_date,
+            'total' => $this->total,
             'paid_amount' => $this->paid_amount,
             'due_amount' => $this->due_amount,
-            'payment_status' => $this->payment_status,
+            'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             // Add relationships if needed

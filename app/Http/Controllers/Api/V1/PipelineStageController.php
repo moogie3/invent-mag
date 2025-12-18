@@ -21,6 +21,8 @@ class PipelineStageController extends Controller
     public function __construct(SalesPipelineService $salesPipelineService)
     {
         $this->salesPipelineService = $salesPipelineService;
+        $this->middleware('permission:edit-pipeline-stages')->only(['update']);
+        $this->middleware('permission:delete-pipeline-stages')->only(['destroy']);
     }
 
     /**
@@ -38,10 +40,10 @@ class PipelineStageController extends Controller
      * @response 422 scenario="Validation Error" {"message":"The name field is required.","errors":{"name":["The name field is required."]}}
      * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function update(UpdatePipelineStageRequest $request, PipelineStage $stage)
+    public function update(UpdatePipelineStageRequest $request, PipelineStage $pipelineStage)
     {
-        $stage = $this->salesPipelineService->updateStage($stage, $request->validated());
-        return response()->json($stage);
+        $pipelineStage = $this->salesPipelineService->updateStage($pipelineStage, $request->validated());
+        return response()->json($pipelineStage);
     }
 
     /**
@@ -55,9 +57,9 @@ class PipelineStageController extends Controller
      * @response 404 scenario="Not Found" {"message": "Pipeline stage not found."}
      * @response 401 scenario="Unauthenticated" {"message": "Unauthenticated."}
      */
-    public function destroy(PipelineStage $stage)
+    public function destroy(PipelineStage $pipelineStage)
     {
-        $this->salesPipelineService->deleteStage($stage);
+        $this->salesPipelineService->deleteStage($pipelineStage);
         return response()->noContent();
     }
 }

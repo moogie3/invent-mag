@@ -18,9 +18,9 @@ class PipelineStageFactory extends Factory
     public function definition(): array
     {
         return [
-            'sales_pipeline_id' => SalesPipeline::factory(),
+            'sales_pipeline_id' => SalesPipeline::factory()->create()->id,
             'name' => $this->faker->unique()->word,
-            'position' => $this->faker->randomDigit(),
+            'position' => $this->faker->unique()->randomNumber(),
             'is_closed' => false,
         ];
     }

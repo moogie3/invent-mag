@@ -46,6 +46,32 @@ abstract class TestCase extends BaseTestCase
         }
     }
 
+    protected function setupUser(array $permissions = [])
+    {
+        foreach ($permissions as $permission) {
+            \Spatie\Permission\Models\Permission::findOrCreate($permission);
+        }
+
+        $user = \App\Models\User::factory()->create();
+        if (!empty($permissions)) {
+            $user->givePermissionTo($permissions);
+        }
+
+        $inventoryAccount = \App\Models\Account::firstOrCreate(['name' => 'Inventory'], ['type' => 'asset']);
+        $accountsPayableAccount = \App\Models\Account::firstOrCreate(['name' => 'Accounts Payable'], ['type' => 'liability']);
+        $cashAccount = \App\Models\Account::firstOrCreate(['name' => 'Cash'], ['type' => 'asset']);
+
+
+        $user->accounting_settings = [
+            'inventory_account_id' => $inventoryAccount->id,
+            'accounts_payable_account_id' => $accountsPayableAccount->id,
+            'cash_account_id' => $cashAccount->id,
+        ];
+        $user->save();
+
+        return $user;
+    }
+
     protected function tearDown(): void
     {
         CurrencyHelper::clearSettingsCache();

@@ -135,8 +135,6 @@ class PurchaseReturnService
             // Update Journal Entry if it exists, or create a new one.
             // For simplicity, we'll assume a new Journal Entry logic or that accounting is handled separately.
             // A more complex implementation might involve voiding the old entry and creating a new one.
-
-            \Log::info('Finishing updatePurchaseReturn for ID: ' . $purchaseReturn->id);
             return $purchaseReturn->fresh(); // Return the updated model with relations
         });
     }

@@ -20,11 +20,13 @@ class SupplierService
 
     public function createSupplier(array $data)
     {
+        \Log::debug('createSupplier: Starting with data', $data);
         if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
             $data['image'] = $this->storeImage($data['image']);
         }
 
         $supplier = Supplier::create($data);
+        \Log::debug('createSupplier: Supplier created', ['supplier' => $supplier]);
 
         return ['success' => true, 'message' => 'Supplier created successfully.', 'supplier' => $supplier];
     }

@@ -18,7 +18,7 @@ class TaxController extends Controller
 {
     protected $taxService;
 
-    public function __construct(\App\Services\TaxService $taxService)
+    public function __construct(TaxService $taxService)
     {
         $this->taxService = $taxService;
     }
@@ -87,7 +87,7 @@ class TaxController extends Controller
      */
     public function getActiveTax()
     {
-        $tax = \App\Models\Tax::where('is_active', 1)->first();
+        $tax = Tax::where('is_active', 1)->first();
         return response()->json(['tax_rate' => $tax ? $tax->rate : 0]);
     }
 }

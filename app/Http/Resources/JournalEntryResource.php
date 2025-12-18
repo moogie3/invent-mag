@@ -23,6 +23,8 @@ class JournalEntryResource extends JsonResource
             'sourceable_id' => $this->sourceable_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'total_debit' => $this->total_debit,
+            'total_credit' => $this->total_credit,
             'transactions' => TransactionResource::collection($this->whenLoaded('transactions')),
         ];
     }

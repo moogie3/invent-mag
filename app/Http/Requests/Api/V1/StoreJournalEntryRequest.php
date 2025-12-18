@@ -26,6 +26,7 @@ class StoreJournalEntryRequest extends FormRequest
             'description' => 'required|string',
             'sourceable_id' => 'nullable|integer',
             'sourceable_type' => 'nullable|string',
+            'transactions' => 'required|json',
         ];
     }
 
@@ -47,6 +48,10 @@ class StoreJournalEntryRequest extends FormRequest
             'sourceable_type' => [
                 'description' => 'The type of the sourceable model.',
                 'example' => 'App\\Models\\User',
+            ],
+            'transactions' => [
+                'description' => 'A JSON string of transactions.',
+                'example' => '[{"account_name":"Cash","type":"debit","amount":100},{"account_name":"Inventory","type":"credit","amount":100}]',
             ],
         ];
     }

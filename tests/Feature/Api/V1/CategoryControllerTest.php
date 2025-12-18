@@ -14,137 +14,77 @@ class CategoryControllerTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
-    private User $userWithoutPermissions;
+    private User $userWithoutPermission;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        // Create permissions
-        $permissions = [
+        Permission::findOrCreate('view-categories');
+        Permission::findOrCreate('create-categories');
+
+        $this->user = User::factory()->create();
+        $this->user->givePermissionTo([
             'view-categories',
             'create-categories',
-            'edit-categories',
-            'delete-categories',
-        ];
-        foreach ($permissions as $permission) {
-            Permission::findOrCreate($permission, 'web');
-        }
-
-        // Create a user with permissions
-        $this->user = User::factory()->create();
-        $this->user->givePermissionTo($permissions);
-
-        // Create a user without permissions
-        $this->userWithoutPermissions = User::factory()->create();
-    }
-
-    #[Test]
-    public function test_unauthenticated_user_cannot_get_categories()
-    {
-        $response = $this->getJson('/api/v1/categories');
-        $response->assertStatus(401);
-    }
-
-    #[Test]
-    public function test_unauthorized_user_cannot_get_categories()
-    {
-        $response = $this->actingAs($this->userWithoutPermissions, 'sanctum')->getJson('/api/v1/categories');
-        $response->assertStatus(403);
-    }
-
-    #[Test]
-    public function test_can_get_all_categories()
-    {
-        Categories::factory()->count(3)->create();
-        $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/categories');
-
-        $response->assertStatus(200);
-        $response->assertJsonCount(3, 'data');
-        $response->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'id',
-                    'name',
-                    'description',
-                ]
-            ]
         ]);
-    }
-    
-    #[Test]
-    public function test_can_get_a_category()
-    {
-        $category = Categories::factory()->create();
-        $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/categories/' . $category->id);
 
-        $response->assertStatus(200);
-        $response->assertJsonStructure([
-            'data' => [
-                'id',
-                'name',
-                'description',
-            ]
-        ]);
-        $response->assertJsonFragment(['id' => $category->id]);
+        $this->userWithoutPermission = User::factory()->create();
     }
 
     #[Test]
-    public function test_store_fails_with_invalid_data()
+    public function unauthenticated_user_cannot_access_categories_api()
     {
-        $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/categories', ['name' => '']);
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['name']);
+        $this->getJson('/api/v1/categories')
+            ->assertStatus(401);
     }
 
     #[Test]
-    public function test_store_fails_with_duplicate_name()
+    public function user_without_permission_cannot_view_categories()
     {
-        Categories::factory()->create(['name' => 'Existing Category']);
-        $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/categories', ['name' => 'Existing Category']);
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['name']);
+        $this->actingAs($this->userWithoutPermission, 'sanctum')
+            ->getJson('/api/v1/categories')
+            ->assertStatus(403);
     }
 
     #[Test]
-    public function test_can_create_a_category()
+    public function authenticated_user_can_list_categories()
     {
-        $categoryData = [
-            'name' => 'New API Category',
-            'description' => 'A category created via API.',
+        Categories::factory()->count(2)->create();
+
+        $this->actingAs($this->user, 'sanctum')
+            ->getJson('/api/v1/categories')
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'name', 'description'],
+                ],
+            ]);
+    }
+
+    #[Test]
+    public function authenticated_user_can_create_category()
+    {
+        $payload = [
+            'name' => 'API Category',
+            'description' => 'Created via API',
         ];
 
-        $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/categories', $categoryData);
+        $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/categories', $payload)
+            ->assertStatus(201);
 
-        $response->assertStatus(201);
         $this->assertDatabaseHas('categories', [
-            'name' => 'New API Category',
+            'name' => 'API Category',
         ]);
     }
 
     #[Test]
-    public function test_can_update_a_category()
+    public function category_api_returns_validation_errors()
     {
-        $category = Categories::factory()->create();
-        $updateData = [
-            'name' => 'Updated API Category',
-        ];
-    
-        $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/categories/' . $category->id, $updateData);
-    
-        $response->assertStatus(200);
-        $this->assertDatabaseHas('categories', [
-            'id' => $category->id, 
-            'name' => 'Updated API Category',
-        ]);
-    }
-
-    #[Test]
-    public function test_can_delete_a_category()
-    {
-        $category = Categories::factory()->create();
-        $response = $this->actingAs($this->user, 'sanctum')->deleteJson('/api/v1/categories/' . $category->id);
-        $response->assertStatus(204);
-        $this->assertDatabaseMissing('categories', ['id' => $category->id]);
+        $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/categories', [])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
     }
 }

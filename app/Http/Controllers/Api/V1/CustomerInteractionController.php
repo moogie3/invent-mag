@@ -22,6 +22,10 @@ class CustomerInteractionController extends Controller
     public function __construct(\App\Services\CrmService $crmService)
     {
         $this->crmService = $crmService;
+        $this->middleware('permission:view-customer-interactions')->only(['index', 'show']);
+        $this->middleware('permission:create-customer-interactions')->only(['store']);
+        $this->middleware('permission:edit-customer-interactions')->only(['update']);
+        $this->middleware('permission:delete-customer-interactions')->only(['destroy']);
     }
     /**
      * Display a listing of the customer interactions.

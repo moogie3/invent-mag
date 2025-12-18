@@ -16,6 +16,17 @@ use Illuminate\Http\Request;
  */
 class JournalEntryController extends Controller
 {
+    protected $accountingService;
+
+    public function __construct(\App\Services\AccountingService $accountingService)
+    {
+        $this->accountingService = $accountingService;
+        $this->middleware('permission:view-journal-entries')->only(['index', 'show']);
+        $this->middleware('permission:create-journal-entries')->only(['store']);
+        $this->middleware('permission:edit-journal-entries')->only(['update']);
+        $this->middleware('permission:delete-journal-entries')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the journal entries.
      *
@@ -50,8 +61,14 @@ class JournalEntryController extends Controller
     public function store(StoreJournalEntryRequest $request)
     {
         $validated = $request->validated();
+        $transactions = json_decode($validated['transactions'], true);
 
-        $journalEntry = JournalEntry::create($validated);
+        $journalEntry = $this->accountingService->createJournalEntry(
+            $validated['description'],
+            \Carbon\Carbon::parse($validated['date']),
+            $transactions,
+            auth()->user()
+        );
 
         return new JournalEntryResource($journalEntry);
     }

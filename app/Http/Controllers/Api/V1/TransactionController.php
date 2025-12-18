@@ -14,6 +14,10 @@ use Illuminate\Http\Request;
  */
 class TransactionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view-transactions')->only(['index', 'show']);
+    }
     /**
      * Display a listing of the transactions.
      *

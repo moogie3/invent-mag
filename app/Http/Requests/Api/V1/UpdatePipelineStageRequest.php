@@ -23,7 +23,7 @@ class UpdatePipelineStageRequest extends FormRequest
      */
     public function rules(): array
     {
-        $stage = PipelineStage::find($this->route('pipeline_stage'));
+        $stage = $this->route('pipeline_stage');
         return [
             'name' => ['required', 'string', 'max:255', Rule::unique('pipeline_stages')->ignore($stage?->id)->where(function ($query) use ($stage) {
                 return $query->where('sales_pipeline_id', $stage?->sales_pipeline_id);

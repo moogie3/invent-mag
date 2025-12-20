@@ -130,11 +130,23 @@ endpoints:
         exampleWasSpecified: true
         nullable: true
         deprecated: false
+      transactions:
+        custom: []
+        name: transactions
+        description: 'A JSON string of transactions. Must be a valid JSON string.'
+        required: true
+        example: '[{"account_name":"Cash","type":"debit","amount":100},{"account_name":"Inventory","type":"credit","amount":100}]'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
       date: '2025-11-28'
       description: 'Initial investment'
       sourceable_id: 1
       sourceable_type: App\\Models\\User
+      transactions: '[{"account_name":"Cash","type":"debit","amount":100},{"account_name":"Inventory","type":"credit","amount":100}]'
     fileParameters: []
     responses:
       -

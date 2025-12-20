@@ -29,6 +29,8 @@ class DatabaseSeeder extends Seeder
             CurrencySeeder::class,
             PurchaseSeeder::class,
             SalesSeeder::class,
+            PurchaseReturnSeeder::class,
+            SalesReturnSeeder::class,
             CustomerInteractionSeeder::class,
             SupplierInteractionSeeder::class,
             TaxSeeder::class,

@@ -186,3 +186,64 @@
         </div>
     </div>
 </div>
+
+<!-- Sales Return Status Warning Modal -->
+<div class="modal fade" id="srStatusWarningModal" tabindex="-1" aria-labelledby="srStatusWarningModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body text-center py-4">
+                <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4"></i>
+                <h3 class="mb-3">{{ __('messages.warning') }}</h3>
+                <div class="text-secondary">
+                    <div class="text-warning text-center" id="srStatusWarningMessage">
+                        {{-- Message will be set by JavaScript --}}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary w-100" data-bs-dismiss="modal">
+                    {{ __('messages.close') }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sales Return Detail Modal -->
+<div class="modal modal-blur fade" id="salesReturnDetailModal" tabindex="-1" aria-labelledby="salesReturnDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div id="salesReturnDetailModalContent">
+                <!-- Content will be loaded dynamically here -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="salesReturnDetailModalLabel">{{ __('messages.loading') }}...</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center align-items-center" style="min-height: 100px;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">{{ __('messages.loading') }}...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="text-muted me-auto">
+                    <small><i class="ti ti-info-circle me-1"></i>
+                        {{ __('messages.sr_modal_details_info_message') }}</small>
+                </div>
+                <a href="#" class="btn btn-info" id="srModalFullView">
+                    <i class="ti ti-zoom-scan me-1"></i> {{ __('messages.sr_full_view_button') }}
+                </a>
+                <button type="button" class="btn btn-secondary" id="srModalPrint">
+                    <i class="ti ti-printer me-1"></i> {{ __('messages.sr_modal_details_print_button') }}
+                </button>
+                <a href="#" class="btn btn-primary" id="srModalEdit">
+                    <i class="ti ti-edit me-1"></i> {{ __('messages.edit') }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

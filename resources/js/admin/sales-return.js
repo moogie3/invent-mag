@@ -130,6 +130,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     `;
                 });
 
+            // Set href for Full View and Edit buttons
+            const srModalFullView = salesReturnDetailModal.querySelector('#srModalFullView');
+            const srModalEdit = salesReturnDetailModal.querySelector('#srModalEdit');
+            
+            if (srModalFullView) {
+                srModalFullView.href = `/admin/sales-returns/${srId}`;
+            }
+            if (srModalEdit) {
+                srModalEdit.href = `/admin/sales-returns/${srId}/edit`;
+            }
+        });
+
+        // Add event listener for print button inside the modal
+        salesReturnDetailModal.addEventListener('click', function(event) {
+            if (event.target.id === 'srModalPrint') {
+                window.print();
+            }
         });
     }
 });

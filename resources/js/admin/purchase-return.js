@@ -145,9 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Add event listener for print button inside the modal
         purchaseReturnDetailModal.addEventListener('click', function(event) {
             if (event.target.id === 'prModalPrint') {
-                const prId = purchaseReturnDetailModal.querySelector('#prModalFullView').href.split('/').pop();
-                // Assuming the print route is similar to the view route, but for printing
-                window.open(`/admin/por/${prId}/print`, '_blank');
+                window.print();
             }
         });
     }

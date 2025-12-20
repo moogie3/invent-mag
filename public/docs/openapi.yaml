@@ -2229,9 +2229,15 @@ paths:
                   description: 'The type of the sourceable model.'
                   example: App\\Models\\User
                   nullable: true
+                transactions:
+                  type: string
+                  description: 'A JSON string of transactions. Must be a valid JSON string.'
+                  example: '[{"account_name":"Cash","type":"debit","amount":100},{"account_name":"Inventory","type":"credit","amount":100}]'
+                  nullable: false
               required:
                 - date
                 - description
+                - transactions
   '/api/v1/journal-entries/{id}':
     get:
       summary: 'Display the specified journal entry.'
@@ -2610,6 +2616,100 @@ paths:
                     example: Unauthenticated.
       tags:
         - Payments
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '{"data":{"id":1,"amount":100,"payment_date":"2025-11-28",...}}'
+        401:
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+        422:
+          description: 'Validation Error'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The amount field is required.'
+                  errors:
+                    amount:
+                      - 'The amount field is required.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The amount field is required.'
+                  errors:
+                    type: object
+                    properties:
+                      amount:
+                        type: array
+                        example:
+                          - 'The amount field is required.'
+                        items:
+                          type: string
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  description: 'The amount of the payment.'
+                  example: 100.0
+                  nullable: false
+                payment_date:
+                  type: date
+                  description: 'The date of the payment.'
+                  example: '2025-11-28'
+                  nullable: false
+                payment_method:
+                  type: string
+                  description: 'The payment method.'
+                  example: Cash
+                  nullable: false
+                notes:
+                  type: string
+                  description: 'The notes for the payment.'
+                  example: 'Paid in full'
+                  nullable: true
+                paymentable_id:
+                  type: integer
+                  description: 'The ID of the model the payment belongs to (e.g., Purchase, Sales).'
+                  example: 1
+                  nullable: false
+                paymentable_type:
+                  type: string
+                  description: 'The fully qualified class name of the model the payment belongs to (e.g., App\Models\Purchase, App\Models\Sales).'
+                  example: App\Models\Purchase
+                  nullable: false
+              required:
+                - amount
+                - payment_date
+                - payment_method
+                - paymentable_id
+                - paymentable_type
   '/api/v1/payments/{id}':
     get:
       summary: 'Display the specified payment.'
@@ -4134,6 +4234,107 @@ paths:
                     example: Unauthenticated.
       tags:
         - 'Purchase Order Items'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '{"data":{"id":1,"po_id":1,"product_id":1,"quantity":10,...}}'
+        401:
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+        422:
+          description: 'Validation Error'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The po_id field is required.'
+                  errors:
+                    po_id:
+                      - 'The po_id field is required.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The po_id field is required.'
+                  errors:
+                    type: object
+                    properties:
+                      po_id:
+                        type: array
+                        example:
+                          - 'The po_id field is required.'
+                        items:
+                          type: string
+      tags:
+        - 'Purchase Order Items'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                po_id:
+                  type: integer
+                  description: 'The ID of the purchase order.'
+                  example: 1
+                  nullable: false
+                product_id:
+                  type: integer
+                  description: 'The ID of the product.'
+                  example: 1
+                  nullable: false
+                quantity:
+                  type: integer
+                  description: 'The quantity of the product.'
+                  example: 10
+                  nullable: false
+                price:
+                  type: number
+                  description: 'The price of the product.'
+                  example: 100.0
+                  nullable: false
+                discount:
+                  type: number
+                  description: 'The discount applied to the item. Must be at least 0.'
+                  example: 5.0
+                  nullable: true
+                discount_type:
+                  type: string
+                  description: 'The type of discount (fixed or percentage).'
+                  example: fixed
+                  nullable: true
+                  enum:
+                    - fixed
+                    - percentage
+                expiry_date:
+                  type: string
+                  description: 'The expiry date of the product (if applicable). Must be a valid date.'
+                  example: '2025-12-31'
+                  nullable: true
+              required:
+                - po_id
+                - product_id
+                - quantity
+                - price
   '/api/v1/po-items/{id}':
     get:
       summary: 'Display the specified purchase order item.'
@@ -4148,6 +4349,156 @@ paths:
               schema:
                 type: string
                 example: '{"data":{"id":1,"po_id":1,"product_id":1,"quantity":10,...}}'
+        401:
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+        404:
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Purchase order item not found.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Purchase order item not found.'
+      tags:
+        - 'Purchase Order Items'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '{"data":{"id":1,"po_id":1,"product_id":1,"quantity":10,...}}'
+        401:
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+        404:
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Purchase order item not found.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Purchase order item not found.'
+        422:
+          description: 'Validation Error'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The quantity field is required.'
+                  errors:
+                    quantity:
+                      - 'The quantity field is required.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The quantity field is required.'
+                  errors:
+                    type: object
+                    properties:
+                      quantity:
+                        type: array
+                        example:
+                          - 'The quantity field is required.'
+                        items:
+                          type: string
+      tags:
+        - 'Purchase Order Items'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                po_id:
+                  type: integer
+                  description: 'The ID of the purchase order. The <code>id</code> of an existing record in the po table.'
+                  example: 1
+                  nullable: false
+                product_id:
+                  type: integer
+                  description: 'The ID of the product. The <code>id</code> of an existing record in the products table.'
+                  example: 1
+                  nullable: false
+                quantity:
+                  type: integer
+                  description: 'The quantity of the product.'
+                  example: 10
+                  nullable: false
+                price:
+                  type: number
+                  description: 'The price of the product.'
+                  example: 100.0
+                  nullable: false
+                discount:
+                  type: number
+                  description: 'The discount applied to the item. Must be at least 0.'
+                  example: 5.0
+                  nullable: true
+                discount_type:
+                  type: string
+                  description: 'The type of discount (fixed or percentage).'
+                  example: fixed
+                  nullable: true
+                  enum:
+                    - fixed
+                    - percentage
+                expiry_date:
+                  type: string
+                  description: 'The expiry date of the product (if applicable). Must be a valid date.'
+                  example: '2025-12-31'
+                  nullable: true
+              required:
+                - quantity
+                - price
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
         401:
           description: Unauthenticated
           content:

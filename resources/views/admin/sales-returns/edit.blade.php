@@ -7,4 +7,5 @@
         @include('admin.layouts.partials.sales-returns.edit.header')
         @include('admin.layouts.partials.sales-returns.edit.page-body')
     </div>
+    @include('admin.layouts.modals.sales.sales-return-modals')
 @endsection

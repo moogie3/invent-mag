@@ -127,18 +127,4 @@
     </div>
 
 </div>
-<div class="modal-footer">
-    <div class="text-muted me-auto">
-        <small><i class="ti ti-info-circle me-1"></i>
-            {{ __('messages.sr_modal_details_info_message') }}</small>
-    </div>
-    <a href="#" class="btn btn-info" id="srModalFullView">
-        <i class="ti ti-zoom-scan me-1"></i> {{ __('messages.sr_full_view_button') }}
-    </a>
-    <button type="button" class="btn btn-secondary" id="srModalPrint">
-        <i class="ti ti-printer me-1"></i> {{ __('messages.sr_modal_details_print_button') }}
-    </button>
-    <a href="#" class="btn btn-primary" id="srModalEdit">
-        <i class="ti ti-edit me-1"></i> {{ __('messages.edit') }}
-    </a>
-</div>
+

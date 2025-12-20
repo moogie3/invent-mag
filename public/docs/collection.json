@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "INVENT-MAG API Documentation",
-        "_postman_id": "668b8bd7-a328-43f4-81c2-0053b1b78248",
+        "_postman_id": "3b94fefc-dc9d-44e8-b54f-239c5eaf011d",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -468,7 +468,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "consequatur",
+                                    "value": "1",
                                     "description": "The ID of the category."
                                 },
                                 {
@@ -1541,7 +1541,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"date\":\"2025-11-28\",\"description\":\"Initial investment\",\"sourceable_id\":1,\"sourceable_type\":\"App\\\\\\\\Models\\\\\\\\User\"}"
+                            "raw": "{\"date\":\"2025-11-28\",\"description\":\"Initial investment\",\"sourceable_id\":1,\"sourceable_type\":\"App\\\\\\\\Models\\\\\\\\User\",\"transactions\":\"[{\\\"account_name\\\":\\\"Cash\\\",\\\"type\\\":\\\"debit\\\",\\\"amount\\\":100},{\\\"account_name\\\":\\\"Inventory\\\",\\\"type\\\":\\\"credit\\\",\\\"amount\\\":100}]\"}"
                         },
                         "description": ""
                     },
@@ -1931,6 +1931,53 @@
                             "code": 401,
                             "body": "{\"message\": \"Unauthenticated.\"}",
                             "name": "Unauthenticated"
+                        }
+                    ]
+                },
+                {
+                    "name": "Store a newly created resource in storage.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/payments",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/payments"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"amount\":100,\"payment_date\":\"2025-11-28\",\"payment_method\":\"Cash\",\"notes\":\"Paid in full\",\"paymentable_id\":1,\"paymentable_type\":\"App\\\\Models\\\\Purchase\"}"
+                        },
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"data\":{\"id\":1,\"amount\":100,\"payment_date\":\"2025-11-28\",...}}",
+                            "name": "Success"
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\": \"Unauthenticated.\"}",
+                            "name": "Unauthenticated"
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"The amount field is required.\",\"errors\":{\"amount\":[\"The amount field is required.\"]}}",
+                            "name": "Validation Error"
                         }
                     ]
                 },
@@ -3097,6 +3144,53 @@
                     ]
                 },
                 {
+                    "name": "Store a newly created resource in storage.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/po-items",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/po-items"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"po_id\":1,\"product_id\":1,\"quantity\":10,\"price\":100,\"discount\":5,\"discount_type\":\"fixed\",\"expiry_date\":\"2025-12-31\"}"
+                        },
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"data\":{\"id\":1,\"po_id\":1,\"product_id\":1,\"quantity\":10,...}}",
+                            "name": "Success"
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\": \"Unauthenticated.\"}",
+                            "name": "Unauthenticated"
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"The po_id field is required.\",\"errors\":{\"po_id\":[\"The po_id field is required.\"]}}",
+                            "name": "Validation Error"
+                        }
+                    ]
+                },
+                {
                     "name": "Display the specified purchase order item.",
                     "request": {
                         "url": {
@@ -3138,6 +3232,131 @@
                             "header": [],
                             "code": 200,
                             "body": "{\"data\":{\"id\":1,\"po_id\":1,\"product_id\":1,\"quantity\":10,...}}",
+                            "name": "Success"
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\": \"Unauthenticated.\"}",
+                            "name": "Unauthenticated"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\": \"Purchase order item not found.\"}",
+                            "name": "Not Found"
+                        }
+                    ]
+                },
+                {
+                    "name": "Update the specified resource in storage.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/po-items\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/po-items\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "The ID of the po item."
+                                },
+                                {
+                                    "id": "po_item",
+                                    "key": "po_item",
+                                    "value": "1",
+                                    "description": "The ID of the purchase order item."
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"po_id\":1,\"product_id\":1,\"quantity\":10,\"price\":100,\"discount\":5,\"discount_type\":\"fixed\",\"expiry_date\":\"2025-12-31\"}"
+                        },
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":{\"id\":1,\"po_id\":1,\"product_id\":1,\"quantity\":10,...}}",
+                            "name": "Success"
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\": \"Unauthenticated.\"}",
+                            "name": "Unauthenticated"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\": \"Purchase order item not found.\"}",
+                            "name": "Not Found"
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"The quantity field is required.\",\"errors\":{\"quantity\":[\"The quantity field is required.\"]}}",
+                            "name": "Validation Error"
+                        }
+                    ]
+                },
+                {
+                    "name": "Remove the specified resource from storage.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/po-items\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/po-items\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "The ID of the po item."
+                                },
+                                {
+                                    "id": "po_item",
+                                    "key": "po_item",
+                                    "value": "1",
+                                    "description": "The ID of the purchase order item."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 204,
+                            "body": "",
                             "name": "Success"
                         },
                         {

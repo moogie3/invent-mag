@@ -63,6 +63,131 @@ endpoints:
   -
     custom: []
     httpMethods:
+      - POST
+    uri: api/v1/payments
+    metadata:
+      custom: []
+      groupName: Payments
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Store a newly created resource in storage.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      amount:
+        custom: []
+        name: amount
+        description: 'The amount of the payment.'
+        required: true
+        example: 100.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      payment_date:
+        custom: []
+        name: payment_date
+        description: 'The date of the payment.'
+        required: true
+        example: '2025-11-28'
+        type: date
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      payment_method:
+        custom: []
+        name: payment_method
+        description: 'The payment method.'
+        required: true
+        example: Cash
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      notes:
+        custom: []
+        name: notes
+        description: 'The notes for the payment.'
+        required: false
+        example: 'Paid in full'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      paymentable_id:
+        custom: []
+        name: paymentable_id
+        description: 'The ID of the model the payment belongs to (e.g., Purchase, Sales).'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      paymentable_type:
+        custom: []
+        name: paymentable_type
+        description: 'The fully qualified class name of the model the payment belongs to (e.g., App\Models\Purchase, App\Models\Sales).'
+        required: true
+        example: App\Models\Purchase
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      amount: 100.0
+      payment_date: '2025-11-28'
+      payment_method: Cash
+      notes: 'Paid in full'
+      paymentable_id: 1
+      paymentable_type: App\Models\Purchase
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: '{"data":{"id":1,"amount":100,"payment_date":"2025-11-28",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 422
+        content: '{"message":"The amount field is required.","errors":{"amount":["The amount field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
       - GET
     uri: 'api/v1/payments/{id}'
     metadata:

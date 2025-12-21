@@ -243,6 +243,33 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * @group Products
+     * @summary Bulk Export Products
+     * @bodyParam ids array required An array of product IDs to export. Example: [1, 2, 3]
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function bulkExport(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:products,id',
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $file = $this->productService->bulkExportProducts($request->ids, $request->export_option);
+            return $file;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting products. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
     public function bulkUpdateStock(Request $request)
     {
         $request->validate([

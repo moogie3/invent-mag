@@ -8,6 +8,7 @@ import {
     initBulkSelection,
     clearProductSelection,
 } from "./partials/product/bulkActions/selection.js";
+import { bulkExportProducts } from "./partials/product/bulkActions/export.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
 
 initProductPage();
@@ -53,3 +54,5 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }, 250);
 });
+
+window.bulkExportProducts = bulkExportProducts;

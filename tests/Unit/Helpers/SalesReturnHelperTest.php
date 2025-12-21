@@ -3,55 +3,63 @@
 namespace Tests\Unit\Helpers;
 
 use App\Helpers\SalesReturnHelper;
-use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class SalesReturnHelperTest extends TestCase
 {
-    #[DataProvider('statusClassProvider')]
-    public function test_get_status_class($status, $expectedClass)
+    #[Test]
+    public function it_returns_correct_status_class_for_completed()
     {
-        $this->assertEquals($expectedClass, SalesReturnHelper::getStatusClass($status));
+        $this->assertEquals('bg-success-lt', SalesReturnHelper::getStatusClass('completed'));
+        $this->assertEquals('bg-success-lt', SalesReturnHelper::getStatusClass('Completed'));
     }
 
-    public static function statusClassProvider()
+    #[Test]
+    public function it_returns_correct_status_class_for_pending()
     {
-        return [
-            'completed' => ['completed', 'bg-success-lt'],
-            'pending' => ['pending', 'bg-warning-lt'],
-            'canceled' => ['canceled', 'bg-danger-lt'],
-            'unknown' => ['unknown', 'bg-secondary-lt'],
-            'Completed' => ['Completed', 'bg-success-lt'], // Test case insensitivity
-        ];
+        $this->assertEquals('bg-warning-lt', SalesReturnHelper::getStatusClass('pending'));
+        $this->assertEquals('bg-warning-lt', SalesReturnHelper::getStatusClass('Pending'));
     }
 
-    #[DataProvider('statusTextProvider')]
-    public function test_get_status_text($status, $expectedText)
+    #[Test]
+    public function it_returns_correct_status_class_for_canceled()
     {
-        // Mock the __ function if it doesn't exist, as it's used in the helper
-        // This is a simple mock for testing purposes; a more robust solution
-        // might involve Laravel's translation service testing utilities if available.
-        if (!function_exists('__')) {
-            function __($key) {
-                $translations = [
-                    'messages.sr_status_completed' => 'completed',
-                    'messages.sr_status_pending' => 'pending',
-                    'messages.sr_status_canceled' => 'canceled',
-                ];
-                return $translations[$key] ?? ucfirst(str_replace('messages.sr_status_', '', $key));
-            }
-        }
-        $this->assertEquals($expectedText, SalesReturnHelper::getStatusText($status));
+        $this->assertEquals('bg-danger-lt', SalesReturnHelper::getStatusClass('canceled'));
+        $this->assertEquals('bg-danger-lt', SalesReturnHelper::getStatusClass('Canceled'));
     }
 
-    public static function statusTextProvider()
+    #[Test]
+    public function it_returns_default_status_class_for_unknown_status()
     {
-        return [
-            'completed' => ['completed', '<span class="h4"><i class="ti ti-check me-1 fs-4"></i> completed</span>'],
-            'pending' => ['pending', '<span class="h4"><i class="ti ti-clock me-1 fs-4"></i> pending</span>'],
-            'canceled' => ['canceled', '<span class="h4"><i class="ti ti-x me-1 fs-4"></i> canceled</span>'],
-            'unknown' => ['unknown', '<span class="h4"><i class="ti ti-info-circle me-1 fs-4"></i> Unknown</span>'], // Note: 'Unknown' is ucfirst from mock
-            'Completed' => ['Completed', '<span class="h4"><i class="ti ti-check me-1 fs-4"></i> completed</span>'], // Test case insensitivity
-        ];
+        $this->assertEquals('bg-secondary-lt', SalesReturnHelper::getStatusClass('unknown'));
+    }
+
+    #[Test]
+    public function it_returns_correct_status_text_for_completed()
+    {
+        $expected = '<span class="h4"><i class="ti ti-check me-1 fs-4"></i> ' . __('messages.sr_status_completed') . '</span>';
+        $this->assertEquals($expected, SalesReturnHelper::getStatusText('completed'));
+    }
+
+    #[Test]
+    public function it_returns_correct_status_text_for_pending()
+    {
+        $expected = '<span class="h4"><i class="ti ti-clock me-1 fs-4"></i> ' . __('messages.sr_status_pending') . '</span>';
+        $this->assertEquals($expected, SalesReturnHelper::getStatusText('pending'));
+    }
+
+    #[Test]
+    public function it_returns_correct_status_text_for_canceled()
+    {
+        $expected = '<span class="h4"><i class="ti ti-x me-1 fs-4"></i> ' . __('messages.sr_status_canceled') . '</span>';
+        $this->assertEquals($expected, SalesReturnHelper::getStatusText('canceled'));
+    }
+
+    #[Test]
+    public function it_returns_default_status_text_for_unknown_status()
+    {
+        $expected = '<span class="h4"><i class="ti ti-info-circle me-1 fs-4"></i> ' . ucfirst('unknown') . '</span>';
+        $this->assertEquals($expected, SalesReturnHelper::getStatusText('unknown'));
     }
 }

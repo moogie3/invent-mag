@@ -40,7 +40,7 @@ export default defineConfig({
                 "resources/js/admin/sales-pipeline.js",
                 "resources/js/admin/layouts/settings.js",
                 "resources/css/menu-sidebar.css",
-                "resources/js/layouts/menu-sidebar.js",
+                "resources/js/admin/layouts/menu-sidebar.js",
                 "resources/js/admin/layouts/theme-toggle.js",
                 "resources/js/admin/layouts/theme-visibility.js",
                 "resources/js/admin/layouts/theme-initializer.js",

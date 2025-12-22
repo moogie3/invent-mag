@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use App\Models\Account;
 use App\Models\SalesReturn;
 use App\Models\SalesReturnItem;
+use Dompdf\Dompdf;
 
 class SalesService
 {
@@ -499,6 +500,59 @@ class SalesService
             }
         });
         return $updatedCount;
+    }
+
+    public function bulkExportSales(array $ids, string $exportOption)
+    {
+        $sales = Sales::with(['customer', 'salesItems'])->whereIn('id', $ids)->get();
+
+        if ($exportOption === 'pdf') {
+            $html = view('admin.sales.bulk-export-pdf', compact('sales'))->render();
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            return $dompdf->stream('sales-orders.pdf');
+        }
+
+        if ($exportOption === 'csv') {
+            $headers = [
+                'Content-type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=sales-orders.csv',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            $callback = function () use ($sales) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, [
+                    'Invoice',
+                    'Customer',
+                    'Order Date',
+                    'Due Date',
+                    'Total',
+                    'Status',
+                ]);
+
+                foreach ($sales as $sale) {
+                    fputcsv($file, [
+                        $sale->invoice,
+                        $sale->customer->name,
+                        $sale->order_date->format('Y-m-d'),
+                        $sale->due_date->format('Y-m-d'),
+                        CurrencyHelper::format($sale->total),
+                        $sale->status,
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        }
+
+        return null;
     }
 
     public function getSalesForModal($id)

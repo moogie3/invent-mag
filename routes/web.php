@@ -104,6 +104,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::put('/update/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update')->middleware('can:edit-supplier');
             Route::delete('/destroy/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy')->middleware('can:delete-supplier');
             Route::get('/metrics', [SupplierController::class, 'getMetrics'])->name('admin.supplier.metrics')->middleware('can:view-supplier');
+            Route::post('/export', [SupplierController::class, 'exportAll'])->name('admin.supplier.export');
+
         });
 
         // Customer Routes
@@ -118,6 +120,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::post('/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate')->middleware('can:create-customer');
             Route::get('/metrics', [CustomerController::class, 'getMetrics'])->name('admin.customer.metrics')->middleware('can:view-customer');
             Route::get('/{customer}/historical-purchases', [CustomerCrmController::class, 'getHistoricalPurchases'])->name('admin.customer.historical-purchases')->middleware('can:view-customer');
+            Route::post('/export', [CustomerController::class, 'exportAll'])->name('admin.customer.export');
         });
 
         // CRM Routes
@@ -157,6 +160,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::put('/opportunities/{opportunity}/move', [SalesPipelineController::class, 'moveOpportunity'])->name('admin.sales_pipeline.opportunities.move');
             Route::get('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'showConvertForm'])->name('admin.sales_pipeline.opportunities.convert.show');
             Route::post('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'convertToSalesOrder'])->name('admin.sales_pipeline.opportunities.convert');
+            Route::post('/export', [SalesPipelineController::class, 'exportAll'])->name('admin.sales-pipeline.export');
         });
 
         // Purchase Order Routes
@@ -185,6 +189,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
         Route::post('por/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.por.bulk-delete');
         Route::post('por/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.por.bulk-complete');
         Route::post('por/bulk-cancel', [PurchaseReturnController::class, 'bulkCancel'])->name('admin.por.bulk-cancel');
+Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])->name('admin.por.bulk-export');
 
 
         // Sales Routes
@@ -214,6 +219,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
         Route::post('sales-returns/bulk-delete', [SalesReturnController::class, 'bulkDelete'])->name('admin.sales-returns.bulk-delete');
         Route::post('sales-returns/bulk-complete', [SalesReturnController::class, 'bulkComplete'])->name('admin.sales-returns.bulk-complete');
         Route::post('sales-returns/bulk-cancel', [SalesReturnController::class, 'bulkCancel'])->name('admin.sales-returns.bulk-cancel');
+Route::post('sales-returns/bulk-export', [SalesReturnController::class, 'bulkExport'])->name('admin.sales-returns.bulk-export');
 
 
         // Warehouse Routes
@@ -227,6 +233,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::delete('/destroy/{id}', [WarehouseController::class, 'destroy'])->name('admin.warehouse.destroy');
             Route::get('/{id}/set-main', [WarehouseController::class, 'setMain'])->name('admin.warehouse.set-main');
             Route::get('/{id}/unset-main', [WarehouseController::class, 'unsetMain'])->name('admin.warehouse.unset-main');
+            Route::post('/export', [WarehouseController::class, 'exportAll'])->name('admin.warehouse.export');
         });
 
         // POS Routes
@@ -335,6 +342,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/journal', [\App\Http\Controllers\Admin\AccountingController::class, 'journal'])->name('admin.accounting.journal');
             Route::get('/general-ledger', [\App\Http\Controllers\Admin\AccountingController::class, 'generalLedger'])->name('admin.accounting.ledger');
             Route::get('/trial-balance', [\App\Http\Controllers\Admin\AccountingController::class, 'trialBalance'])->name('admin.accounting.trial_balance');
+            Route::post('/journal/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportJournal'])->name('admin.accounting.journal.export');
 
             // COA Management
             Route::get('/accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsIndex'])->name('admin.accounting.accounts.index');
@@ -343,6 +351,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/accounts/{account}/edit', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsEdit'])->name('admin.accounting.accounts.edit');
             Route::put('/accounts/{account}', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsUpdate'])->name('admin.accounting.accounts.update');
             Route::delete('/accounts/{account}', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsDestroy'])->name('admin.accounting.accounts.destroy');
+            Route::post('/accounts/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportAll'])->name('admin.accounting.accounts.export');
         });
     });
 });

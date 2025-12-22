@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\Customer;
 use App\Models\Sales;
+use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -83,5 +85,56 @@ class CustomerService
         return [
             'totalcustomer' => Customer::count(),
         ];
+    }
+
+    public function exportAllCustomers(string $exportOption)
+    {
+        $customers = Customer::all(); // Fetch all customers
+
+        if ($exportOption === 'pdf') {
+            $html = view('admin.customer.export-pdf', compact('customers'))->render();
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            return $dompdf->stream('customers.pdf');
+        }
+
+        if ($exportOption === 'csv') {
+            $headers = [
+                'Content-type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=customers.csv',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            $callback = function () use ($customers) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, [
+                    'Name',
+                    'Address',
+                    'Phone Number',
+                    'Payment Terms',
+                    'Email',
+                ]);
+
+                foreach ($customers as $customer) {
+                    fputcsv($file, [
+                        $customer->name,
+                        $customer->address,
+                        $customer->phone_number,
+                        $customer->payment_terms,
+                        $customer->email,
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        }
+
+        return null;
     }
 }

@@ -112,7 +112,7 @@ export function bulkDeleteSales() {
     );
 }
 
-export function bulkExportSales() {
+export function bulkExportSales(exportOption = 'csv') {
     const selected = Array.from(
         document.querySelectorAll(".row-checkbox:checked")
     ).map((cb) => cb.value);
@@ -148,6 +148,12 @@ export function bulkExportSales() {
         csrfInput.value = csrfToken.getAttribute("content");
         form.appendChild(csrfInput);
     }
+
+    const exportOptionInput = document.createElement("input");
+    exportOptionInput.type = "hidden";
+    exportOptionInput.name = "export_option";
+    exportOptionInput.value = exportOption;
+    form.appendChild(exportOptionInput);
 
     selected.forEach((id) => {
         const input = document.createElement("input");

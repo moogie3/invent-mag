@@ -123,4 +123,28 @@ class SupplierController extends Controller
             return redirect()->route('admin.supplier')->with('error', 'An unexpected error occurred.');
         }
     }
+
+    /**
+     * @group Suppliers
+     * @summary Export All Suppliers
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function exportAll(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $file = $this->supplierService->exportAllSuppliers($request->export_option);
+            return $file;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting suppliers. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
 }

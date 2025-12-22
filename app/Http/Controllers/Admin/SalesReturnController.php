@@ -122,4 +122,31 @@ class SalesReturnController extends Controller
 
         return view('admin.layouts.modals.sales.srmodals-view', compact('salesReturn', 'statusClass', 'statusText'));
     }
+
+    /**
+     * @group Sales Returns
+     * @summary Bulk Export Sales Returns
+     * @bodyParam ids array required An array of sales return IDs to export. Example: [1, 2, 3]
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function bulkExport(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:sales_returns,id',
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $file = $this->salesReturnService->bulkExportSalesReturns($request->ids, $request->export_option);
+            return $file;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting sales returns. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
 }

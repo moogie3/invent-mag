@@ -114,7 +114,7 @@
 @endif
 
 {{-- SCRIPT FOR ACCOUNTING settings --}}
-@if (request()->is('admin/accounting/accounting-setting'))
+@if (request()->is('admin/accounting/accounting-setting', 'admin/accounting/journal'))
     @vite('resources/js/admin/accounting.js')
 @endif
 

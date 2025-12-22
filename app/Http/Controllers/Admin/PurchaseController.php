@@ -217,4 +217,31 @@ class PurchaseController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @group Purchase Orders
+     * @summary Bulk Export Purchase Orders
+     * @bodyParam ids array required An array of purchase order IDs to export. Example: [1, 2, 3]
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function bulkExport(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:po,id',
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $file = $this->purchaseService->bulkExportPurchases($request->ids, $request->export_option);
+            return $file;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting purchase orders. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
 }

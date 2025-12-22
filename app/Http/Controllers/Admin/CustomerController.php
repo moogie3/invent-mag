@@ -124,5 +124,27 @@ class CustomerController extends Controller
         return redirect()->route('admin.customer')->with('success', 'Customer deleted');
     }
 
-    
+    /**
+     * @group Customers
+     * @summary Export All Customers
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function exportAll(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $file = $this->customerService->exportAllCustomers($request->export_option);
+            return $file;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting customers. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
 }

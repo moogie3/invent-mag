@@ -202,6 +202,33 @@ class SalesController extends Controller
         }
     }
 
+    /**
+     * @group Sales Orders
+     * @summary Bulk Export Sales Orders
+     * @bodyParam ids array required An array of sales order IDs to export. Example: [1, 2, 3]
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function bulkExport(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:sales,id',
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $file = $this->salesService->bulkExportSales($request->ids, $request->export_option);
+            return $file;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting sales orders. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
     public function destroy($id)
     {
         $sale = Sales::findOrFail($id);

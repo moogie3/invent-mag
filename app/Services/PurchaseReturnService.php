@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\PurchaseReturnItem;
 use App\Models\Product;
 use App\Models\Account;
+use Dompdf\Dompdf;
+use App\Helpers\CurrencyHelper;
 
 class PurchaseReturnService
 {
@@ -137,5 +139,56 @@ class PurchaseReturnService
             // A more complex implementation might involve voiding the old entry and creating a new one.
             return $purchaseReturn->fresh(); // Return the updated model with relations
         });
+    }
+
+    public function bulkExportPurchaseReturns(array $ids, string $exportOption)
+    {
+        $purchaseReturns = PurchaseReturn::with(['purchase', 'user'])->whereIn('id', $ids)->get();
+
+        if ($exportOption === 'pdf') {
+            $html = view('admin.por.bulk-export-pdf', compact('purchaseReturns'))->render();
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            return $dompdf->stream('purchase-returns.pdf');
+        }
+
+        if ($exportOption === 'csv') {
+            $headers = [
+                'Content-type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=purchase-returns.csv',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            $callback = function () use ($purchaseReturns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, [
+                    'Purchase Invoice',
+                    'Return Date',
+                    'Total Amount',
+                    'Status',
+                    'Returned By',
+                ]);
+
+                foreach ($purchaseReturns as $pr) {
+                    fputcsv($file, [
+                        $pr->purchase->invoice,
+                        $pr->return_date->format('Y-m-d'),
+                        CurrencyHelper::format($pr->total_amount),
+                        $pr->status,
+                        $pr->user->name,
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        }
+
+        return null;
     }
 }

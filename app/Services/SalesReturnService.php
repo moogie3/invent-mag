@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\SalesReturnItem;
 use App\Models\Product;
 use App\Models\Account;
+use Dompdf\Dompdf;
+use App\Helpers\CurrencyHelper;
 
 class SalesReturnService
 {
@@ -189,5 +191,56 @@ class SalesReturnService
 
             return $salesReturn->fresh();
         });
+    }
+
+    public function bulkExportSalesReturns(array $ids, string $exportOption)
+    {
+        $salesReturns = SalesReturn::with(['sale', 'user'])->whereIn('id', $ids)->get();
+
+        if ($exportOption === 'pdf') {
+            $html = view('admin.sales-returns.bulk-export-pdf', compact('salesReturns'))->render();
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            return $dompdf->stream('sales-returns.pdf');
+        }
+
+        if ($exportOption === 'csv') {
+            $headers = [
+                'Content-type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=sales-returns.csv',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            $callback = function () use ($salesReturns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, [
+                    'Sales Invoice',
+                    'Return Date',
+                    'Total Amount',
+                    'Status',
+                    'Returned By',
+                ]);
+
+                foreach ($salesReturns as $sr) {
+                    fputcsv($file, [
+                        $sr->sale->invoice,
+                        $sr->return_date->format('Y-m-d'),
+                        CurrencyHelper::format($sr->total_amount),
+                        $sr->status,
+                        $sr->user->name,
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        }
+
+        return null;
     }
 }

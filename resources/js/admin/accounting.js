@@ -76,3 +76,75 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+function exportAccounts(exportOption) {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/admin/accounting/export-all";
+    form.style.display = "none";
+
+    const csrf = document.querySelector('meta[name="csrf-token"]');
+    if (csrf) {
+        const token = document.createElement("input");
+        token.type = "hidden";
+        token.name = "_token";
+        token.value = csrf.getAttribute("content");
+        form.appendChild(token);
+    }
+
+    const exportOptionInput = document.createElement("input");
+    exportOptionInput.type = "hidden";
+    exportOptionInput.name = "export_option";
+    exportOptionInput.value = exportOption;
+    form.appendChild(exportOptionInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => document.body.removeChild(form), 2000);
+}
+
+window.exportAccounts = exportAccounts;
+
+function exportJournal(exportOption) {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/admin/accounting/journal/export";
+    form.style.display = "none";
+
+    const csrf = document.querySelector('meta[name="csrf-token"]');
+    if (csrf) {
+        const token = document.createElement("input");
+        token.type = "hidden";
+        token.name = "_token";
+        token.value = csrf.getAttribute("content");
+        form.appendChild(token);
+    }
+
+    const exportOptionInput = document.createElement("input");
+    exportOptionInput.type = "hidden";
+    exportOptionInput.name = "export_option";
+    exportOptionInput.value = exportOption;
+    form.appendChild(exportOptionInput);
+
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+
+    const startDateInput = document.createElement("input");
+    startDateInput.type = "hidden";
+    startDateInput.name = "start_date";
+    startDateInput.value = startDate;
+    form.appendChild(startDateInput);
+
+    const endDateInput = document.createElement("input");
+    endDateInput.type = "hidden";
+    endDateInput.name = "end_date";
+    endDateInput.value = endDate;
+    form.appendChild(endDateInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => document.body.removeChild(form), 2000);
+}
+
+window.exportJournal = exportJournal;
+

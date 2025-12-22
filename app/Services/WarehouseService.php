@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\Warehouse;
 
 use App\Models\User;
+use Dompdf\Dompdf;
 
 class WarehouseService
 {
@@ -78,5 +80,54 @@ class WarehouseService
 
             return ['success' => false, 'message' => 'This is not the main warehouse.'];
         });
+    }
+
+    public function exportAllWarehouses(string $exportOption)
+    {
+        $warehouses = Warehouse::all(); // Fetch all warehouses
+
+        if ($exportOption === 'pdf') {
+            $html = view('admin.warehouse.export-pdf', compact('warehouses'))->render();
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            return $dompdf->stream('warehouses.pdf');
+        }
+
+        if ($exportOption === 'csv') {
+            $headers = [
+                'Content-type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=warehouses.csv',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            $callback = function () use ($warehouses) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, [
+                    'Name',
+                    'Address',
+                    'Description',
+                    'Is Main',
+                ]);
+
+                foreach ($warehouses as $warehouse) {
+                    fputcsv($file, [
+                        $warehouse->name,
+                        $warehouse->address,
+                        $warehouse->description,
+                        $warehouse->is_main ? 'Yes' : 'No',
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        }
+
+        return null;
     }
 }

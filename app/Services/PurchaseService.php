@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use App\Models\Account;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnItem;
+use Dompdf\Dompdf;
 
 class PurchaseService
 {
@@ -374,6 +375,59 @@ class PurchaseService
             }
         });
         return $updatedCount;
+    }
+
+    public function bulkExportPurchases(array $ids, string $exportOption)
+    {
+        $purchases = Purchase::with(['items.product', 'supplier'])->whereIn('id', $ids)->get();
+
+        if ($exportOption === 'pdf') {
+            $html = view('admin.po.bulk-export-pdf', compact('purchases'))->render();
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            return $dompdf->stream('purchase-orders.pdf');
+        }
+
+        if ($exportOption === 'csv') {
+            $headers = [
+                'Content-type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=purchase-orders.csv',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            $callback = function () use ($purchases) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, [
+                    'Invoice',
+                    'Supplier',
+                    'Order Date',
+                    'Due Date',
+                    'Total',
+                    'Status',
+                ]);
+
+                foreach ($purchases as $purchase) {
+                    fputcsv($file, [
+                        $purchase->invoice,
+                        $purchase->supplier->name,
+                        $purchase->order_date->format('Y-m-d'),
+                        $purchase->due_date->format('Y-m-d'),
+                        CurrencyHelper::format($purchase->total),
+                        $purchase->status,
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        }
+
+        return null;
     }
 
     public function getPurchaseMetrics()

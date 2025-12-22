@@ -21,6 +21,18 @@
                     </div>
                 </div>
                 <div class="col-auto ms-auto d-print-none">
+                    <div class="btn-group d-none d-sm-inline-block me-2">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="ti ti-printer fs-4 me-2"></i> {{ __('messages.export') }}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="exportAccounts('csv')">Export as CSV</a>
+                            </li>
+                            <li><a class="dropdown-item" href="#" onclick="exportAccounts('pdf')">Export as PDF</a>
+                            </li>
+                        </ul>
+                    </div>
                     <a href="{{ route('admin.accounting.accounts.create') }}" class="btn btn-primary">
                         <i class="ti ti-plus"></i>
                         {{ __('messages.add_account') }}
@@ -39,7 +51,7 @@
                                 <th>{{ __('messages.code') }}</th>
                                 <th>{{ __('messages.type') }}</th>
                                 <th>{{ __('messages.active') }}</th>
-                                <th class="w-1"></th>
+                                <th class="w-1">{{ __('messages.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>

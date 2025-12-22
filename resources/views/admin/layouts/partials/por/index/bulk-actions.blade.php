@@ -24,6 +24,15 @@
                     <button onclick="bulkMarkCanceledPurchaseReturns()" class="btn btn-warning action-btn d-flex align-items-center">
                         <i class="ti ti-x me-2"></i> {{ __('messages.mark_as_canceled') }}
                     </button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="bulkExportPurchaseReturns('csv')">Export as CSV</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="bulkExportPurchaseReturns('pdf')">Export as PDF</a></li>
+                        </ul>
+                    </div>
                     <button onclick="bulkDeletePurchaseReturns()" class="btn btn-danger action-btn d-flex align-items-center">
                         <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
                     </button>

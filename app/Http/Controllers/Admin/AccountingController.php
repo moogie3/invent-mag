@@ -11,6 +11,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Dompdf\Dompdf;
+use App\Helpers\CurrencyHelper;
 
 class AccountingController extends Controller
 {
@@ -411,4 +413,252 @@ class AccountingController extends Controller
 
         return redirect()->route('admin.accounting.accounts.index')->with('success', 'Account deleted successfully.');
     }
+
+    /**
+     * @group Accounting
+     * @summary Export All Accounts
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function exportAll(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $accounts = Account::with('children')->whereNull('parent_id')->orderBy('code')->get();
+
+            if ($request->export_option === 'pdf') {
+                $html = view('admin.accounting.accounts.export-pdf', compact('accounts'))->render();
+                $dompdf = new Dompdf();
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4', 'landscape');
+                $dompdf->render();
+                return $dompdf->stream('chart-of-accounts.pdf');
+            }
+
+            if ($request->export_option === 'csv') {
+                $headers = [
+                    'Content-type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename=chart-of-accounts.csv',
+                    'Pragma' => 'no-cache',
+                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                    'Expires' => '0',
+                ];
+
+                $callback = function () use ($accounts) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, [
+                        'Code',
+                        'Name',
+                        'Type',
+                        'Level',
+                    ]);
+
+                    $accountList = function ($accounts, $level = 0) use (&$file, &$accountList) {
+                        foreach ($accounts as $account) {
+                            fputcsv($file, [
+                                $account->code,
+                                str_repeat('-', $level) . ' ' . $account->name,
+                                $account->type,
+                                $account->level,
+                            ]);
+                    
+                            if ($account->children->isNotEmpty()) {
+                                $accountList($account->children, $level + 1);
+                            }
+                        }
+                    };
+
+                    $accountList($accounts);
+
+                    fclose($file);
+                };
+
+                return response()->stream($callback, 200, $headers);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting accounts. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    
+
+    /**
+
+     * @group Accounting
+
+     * @summary Export General Journal
+
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+
+     * @bodyParam start_date string The start date for the export. Example: "2023-01-01"
+
+     * @bodyParam end_date string The end date for the export. Example: "2023-12-31"
+
+     * @response 200 "The exported file."
+
+     */
+
+    public function exportJournal(Request $request)
+
+    {
+
+        $request->validate([
+
+            'export_option' => 'required|string|in:pdf,csv',
+
+            'start_date' => 'nullable|date',
+
+            'end_date' => 'nullable|date',
+
+        ]);
+
+
+
+        try {
+
+            $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
+
+            $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
+
+
+
+            $query = JournalEntry::with('transactions.account')->latest('date')->latest('id');
+
+
+
+            if ($startDate) {
+
+                $query->where('date', '>=', $startDate);
+
+            }
+
+
+
+            if ($endDate) {
+
+                $query->where('date', '<=', $endDate);
+
+            }
+
+
+
+            $entries = $query->get();
+
+
+
+            if ($request->export_option === 'pdf') {
+
+                $html = view('admin.accounting.journal-export-pdf', compact('entries', 'startDate', 'endDate'))->render();
+
+                $dompdf = new Dompdf();
+
+                $dompdf->loadHtml($html);
+
+                $dompdf->setPaper('A4', 'landscape');
+
+                $dompdf->render();
+
+                return $dompdf->stream('journal.pdf');
+
+            }
+
+
+
+            if ($request->export_option === 'csv') {
+
+                $headers = [
+
+                    'Content-type' => 'text/csv',
+
+                    'Content-Disposition' => 'attachment; filename=journal.csv',
+
+                    'Pragma' => 'no-cache',
+
+                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+
+                    'Expires' => '0',
+
+                ];
+
+
+
+                $callback = function () use ($entries) {
+
+                    $file = fopen('php://output', 'w');
+
+                    fputcsv($file, [
+
+                        'Date',
+
+                        'Description',
+
+                        'Account',
+
+                        'Debit',
+
+                        'Credit',
+
+                    ]);
+
+
+
+                    foreach ($entries as $entry) {
+
+                        foreach ($entry->transactions as $index => $transaction) {
+
+                            $row = [
+
+                                $index === 0 ? $entry->date->format('Y-m-d') : '',
+
+                                $index === 0 ? $entry->description : '',
+
+                                $transaction->account->name,
+
+                                $transaction->type == 'debit' ? CurrencyHelper::format($transaction->amount) : '',
+
+                                $transaction->type == 'credit' ? CurrencyHelper::format($transaction->amount) : '',
+
+                            ];
+
+                            fputcsv($file, $row);
+
+                        }
+
+                    }
+
+
+
+                    fclose($file);
+
+                };
+
+
+
+                return response()->stream($callback, 200, $headers);
+
+            }
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Error exporting journal. Please try again.',
+
+                'error_details' => 'Internal server error',
+
+            ], 500);
+
+        }
+
+    }
+
 }

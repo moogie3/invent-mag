@@ -599,7 +599,7 @@ body.layout-navbar-v2 .navbar {
 
 .page-header {
     position: relative;
-    z-index: 1;
+    z-index: 10000; /* Extremely high z-index to dominate */
 }
 
 /* Styles for disabled options with transition */
@@ -627,4 +627,23 @@ body.layout-navbar-v2 .navbar {
 
 .selected-row {
     background-color: #dcebfd !important;
+}
+
+/* ============================
+   FORCE DROPDOWN Z-INDEX FIX
+   ============================ */
+.page-header .dropdown-menu {
+    position: absolute !important;
+    z-index: 99999 !important;
+}
+
+/* ============================
+   DROPDOWN Z-INDEX FIX
+   ============================ */
+.page-header .btn-group {
+    position: relative;
+}
+
+.page-header .dropdown-menu {
+    z-index: 9999 !important;
 }

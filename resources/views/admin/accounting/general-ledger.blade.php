@@ -59,6 +59,12 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">{{ __('messages.ledger_for') }} {{ __($selectedAccount->name) }}</h3>
+                        <div class="ms-auto">
+                            <button class="btn btn-primary" onclick="window.print()">
+                                <i class="ti ti-printer me-2"></i>
+                                {{ __('messages.print') }}
+                            </button>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-vcenter card-table">

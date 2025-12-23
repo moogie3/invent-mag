@@ -113,7 +113,7 @@ class PurchaseHelper
     {
         $dueDate = \Carbon\Carbon::parse($dueDate);
         $today = now();
-        $diffDays = $today->diffInDays($dueDate, false); // Cast to integer to remove decimals
+        $diffDays = (int) $today->diffInDays($dueDate, false); // Cast to integer to remove decimals
 
         if ($status === 'Paid') {
             return '<span class="h4"><i class="ti ti-check me-1 fs-4"></i> ' . __('messages.purchase_status_paid') . '</span>';

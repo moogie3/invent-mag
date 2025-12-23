@@ -46,6 +46,7 @@ export default defineConfig({
                 "resources/js/admin/layouts/theme-initializer.js",
                 "resources/js/admin/utils/sound.js",
                 "resources/js/admin/layouts/advanced-settings.js",
+                "resources/js/admin/layouts/global-keyboard-shortcuts.js",
             ],
             refresh: true,
         }),

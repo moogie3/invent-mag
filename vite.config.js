@@ -48,7 +48,8 @@ export default defineConfig({
                 "resources/js/admin/layouts/advanced-settings.js",
                 "resources/js/admin/layouts/global-keyboard-shortcuts.js",
                 "resources/js/admin/layouts/selectable-table.js",
-                "resources/js/admin/tax.js"
+                "resources/js/admin/tax.js",
+                "resources/css/pos-receipt.css",
             ],
             refresh: true,
         }),

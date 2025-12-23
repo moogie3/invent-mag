@@ -47,6 +47,8 @@ export default defineConfig({
                 "resources/js/admin/utils/sound.js",
                 "resources/js/admin/layouts/advanced-settings.js",
                 "resources/js/admin/layouts/global-keyboard-shortcuts.js",
+                "resources/js/admin/layouts/selectable-table.js",
+                "resources/js/admin/tax.js"
             ],
             refresh: true,
         }),

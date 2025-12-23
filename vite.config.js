@@ -50,6 +50,7 @@ export default defineConfig({
                 "resources/js/admin/layouts/selectable-table.js",
                 "resources/js/admin/tax.js",
                 "resources/css/pos-receipt.css",
+                "resources/css/error.css",
             ],
             refresh: true,
         }),

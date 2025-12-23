@@ -661,4 +661,258 @@ class AccountingController extends Controller
 
     }
 
+    /**
+     * @group Accounting
+     * @summary Export Trial Balance
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @bodyParam end_date string The end date for the export. Example: "2023-12-31"
+     * @response 200 "The exported file."
+     */
+    public function exportTrialBalance(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+            'end_date' => 'nullable|date',
+        ]);
+
+        try {
+            $endDate = $request->input('end_date', Carbon::now()->toDateString());
+
+            $accounts = Account::with(['transactions' => function ($query) use ($endDate) {
+                $query->whereHas('journalEntry', function ($q) use ($endDate) {
+                    $q->where('date', '<=', $endDate);
+                });
+            }])->orderBy('code')->get();
+
+            $reportData = [];
+            $totalDebits = 0;
+            $totalCredits = 0;
+
+            foreach ($accounts as $account) {
+                $debits = $account->transactions->where('type', 'debit')->sum('amount');
+                $credits = $account->transactions->where('type', 'credit')->sum('amount');
+                $balance = $debits - $credits;
+
+                if ($balance == 0 && $account->transactions->isEmpty()) {
+                    continue;
+                }
+
+                $debitBalance = 0;
+                $creditBalance = 0;
+
+                if (in_array($account->type, ['asset', 'expense'])) {
+                    if ($balance > 0) {
+                        $debitBalance = $balance;
+                    } else {
+                        $creditBalance = -$balance;
+                    }
+                } else {
+                    if ($balance < 0) {
+                        $creditBalance = -$balance;
+                    } else {
+                        $debitBalance = $balance;
+                    }
+                }
+
+                $reportData[] = [
+                    'code' => $account->code,
+                    'name' => $account->name,
+                    'debit' => $debitBalance,
+                    'credit' => $creditBalance,
+                ];
+
+                $totalDebits += $debitBalance;
+                $totalCredits += $creditBalance;
+            }
+
+            if ($request->export_option === 'pdf') {
+                $html = view('admin.accounting.trial-balance-export-pdf', compact('reportData', 'totalDebits', 'totalCredits', 'endDate'))->render();
+                $dompdf = new Dompdf();
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4', 'landscape');
+                $dompdf->render();
+                return $dompdf->stream('trial-balance.pdf');
+            }
+
+            if ($request->export_option === 'csv') {
+                $headers = [
+                    'Content-type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename=trial-balance.csv',
+                    'Pragma' => 'no-cache',
+                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                    'Expires' => '0',
+                ];
+
+                $callback = function () use ($reportData, $totalDebits, $totalCredits, $endDate) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, [
+                        'Trial Balance as of ' . $endDate,
+                    ]);
+                    fputcsv($file, []);
+                    fputcsv($file, [
+                        'Code',
+                        'Account',
+                        'Debit',
+                        'Credit',
+                    ]);
+
+                    foreach ($reportData as $item) {
+                        fputcsv($file, [
+                            $item['code'],
+                            $item['name'],
+                            $item['debit'] > 0 ? CurrencyHelper::format($item['debit']) : '-',
+                            $item['credit'] > 0 ? CurrencyHelper::format($item['credit']) : '-',
+                        ]);
+                    }
+
+                    fputcsv($file, [
+                        '',
+                        'Total',
+                        CurrencyHelper::format($totalDebits),
+                        CurrencyHelper::format($totalCredits),
+                    ]);
+
+                    fclose($file);
+                };
+
+                return response()->stream($callback, 200, $headers);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting trial balance. Please try again.',
+                'error_details' => 'Internal server error',
+            ], 500);
+        }
+    }
+
+
+
+
+    /**
+     * @group Accounting
+     * @summary Export General Ledger
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @bodyParam account_id integer required The ID of the account to export. Example: 1
+     * @bodyParam start_date string The start date for the export. Example: "2023-01-01"
+     * @bodyParam end_date string The end date for the export. Example: "2023-12-31"
+     * @response 200 "The exported file."
+     */
+    public function exportGeneralLedger(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+            'account_id' => 'required|integer|exists:accounts,id',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        try {
+            $accountId = $request->input('account_id');
+            $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
+            $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
+
+            $account = Account::findOrFail($accountId);
+
+            $openingBalance = Transaction::where('account_id', $accountId)
+                ->whereHas('journalEntry', function ($query) use ($startDate) {
+                    $query->where('date', '<', $startDate);
+                })
+                ->get()
+                ->sum(function ($transaction) {
+                    return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
+                });
+
+            $transactions = Transaction::with('journalEntry')
+                ->where('account_id', $accountId)
+                ->whereHas('journalEntry', function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                })
+                ->latest('journal_entry_id')
+                ->get();
+
+            $closingBalance = $openingBalance + $transactions->sum(function ($transaction) {
+                return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
+            });
+
+            if ($request->export_option === 'pdf') {
+                $html = view('admin.accounting.general-ledger-export-pdf', compact('account', 'transactions', 'openingBalance', 'closingBalance', 'startDate', 'endDate'))->render();
+                $dompdf = new Dompdf();
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4', 'landscape');
+                $dompdf->render();
+                return $dompdf->stream('general-ledger.pdf');
+            }
+
+            if ($request->export_option === 'csv') {
+                $headers = [
+                    'Content-type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename=general-ledger.csv',
+                    'Pragma' => 'no-cache',
+                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                    'Expires' => '0',
+                ];
+
+                $callback = function () use ($account, $transactions, $openingBalance, $closingBalance, $startDate, $endDate) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, [
+                        'Account:',
+                        $account->name,
+                    ]);
+                    fputcsv($file, [
+                        'Period:',
+                        $startDate . ' to ' . $endDate,
+                    ]);
+                    fputcsv($file, []); // Empty row
+                    fputcsv($file, [
+                        'Date',
+                        'Description',
+                        'Debit',
+                        'Credit',
+                        'Balance',
+                    ]);
+
+                    fputcsv($file, [
+                        '',
+                        'Opening Balance',
+                        '',
+                        '',
+                        CurrencyHelper::format($openingBalance),
+                    ]);
+
+                    $balance = $openingBalance;
+                    foreach ($transactions as $transaction) {
+                        $balance += $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
+                        fputcsv($file, [
+                            $transaction->journalEntry->date->format('Y-m-d'),
+                            $transaction->journalEntry->description,
+                            $transaction->type == 'debit' ? CurrencyHelper::format($transaction->amount) : '',
+                            $transaction->type == 'credit' ? CurrencyHelper::format($transaction->amount) : '',
+                            CurrencyHelper::format($balance),
+                        ]);
+                    }
+
+                    fputcsv($file, [
+                        '',
+                        'Closing Balance',
+                        '',
+                        '',
+                        CurrencyHelper::format($closingBalance),
+                    ]);
+
+                    fclose($file);
+                };
+
+                return response()->stream($callback, 200, $headers);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting general ledger. Please try again.',
+                'error_details' => 'Internal server error',
+            ], 500);
+        }
+    }
+
+
 }

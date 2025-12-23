@@ -4133,7 +4133,7 @@ paths:
                 has_expiry:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
                   nullable: true
               required:
                 - code

@@ -26,7 +26,7 @@
         <div class="page-body mt-4">
             <div class="card">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('admin.accounting.trial_balance') }}" class="row g-3">
+                    <form id="filter-form" method="GET" action="{{ route('admin.accounting.trial_balance') }}" class="row g-3">
                         <div class="col-md-3">
                             <label for="end_date" class="form-label">{{ __('messages.as_of_date') }}</label>
                             <input type="date" name="end_date" id="end_date" class="form-control"
@@ -34,6 +34,18 @@
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">{{ __('messages.filter') }}</button>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="ti ti-printer fs-4 me-2"></i> {{ __('messages.export') }}
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="window.print()">{{ __('messages.print') }}</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportTrialBalance('pdf')">Export as PDF</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportTrialBalance('csv')">Export as CSV</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </form>
                 </div>

@@ -60,10 +60,18 @@
                     <div class="card-header">
                         <h3 class="card-title">{{ __('messages.ledger_for') }} {{ __($selectedAccount->name) }}</h3>
                         <div class="ms-auto">
-                            <button class="btn btn-primary" onclick="window.print()">
-                                <i class="ti ti-printer me-2"></i>
-                                {{ __('messages.print') }}
-                            </button>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="exportGeneralLedger('pdf')">Export
+                                            as PDF</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportGeneralLedger('csv')">Export
+                                            as CSV</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -80,7 +88,8 @@
                             <tbody>
                                 <tr>
                                     <td colspan="4" class="text-end">
-                                        <strong>{{ __('messages.opening_balance') }}</strong></td>
+                                        <strong>{{ __('messages.opening_balance') }}</strong>
+                                    </td>
                                     <td class="text-end">
                                         <strong>{{ \App\Helpers\CurrencyHelper::format($openingBalance) }}</strong>
                                     </td>
@@ -123,7 +132,8 @@
                                 @endforelse
                                 <tr>
                                     <td colspan="4" class="text-end">
-                                        <strong>{{ __('messages.closing_balance') }}</strong></td>
+                                        <strong>{{ __('messages.closing_balance') }}</strong>
+                                    </td>
                                     <td class="text-end">
                                         <strong>{{ \App\Helpers\CurrencyHelper::format($closingBalance) }}</strong>
                                     </td>

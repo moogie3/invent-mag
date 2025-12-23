@@ -46,7 +46,7 @@ jobs:
       run: npm run build
 
     - name: Run Tests
-      run: php artisan test --stop-on-failure
+      run: php artisan test
 
     - name: Prepare Artifact
       run: |

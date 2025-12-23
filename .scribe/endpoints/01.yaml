@@ -1570,7 +1570,7 @@ endpoints:
         name: has_expiry
         description: ''
         required: false
-        example: true
+        example: false
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -1588,7 +1588,7 @@ endpoints:
       supplier_id: 1
       warehouse_id: 17
       description: 'Dolores dolorum amet iste laborum eius est dolor.'
-      has_expiry: true
+      has_expiry: false
     fileParameters:
       image: null
     responses:

@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "INVENT-MAG API Documentation",
-        "_postman_id": "3b94fefc-dc9d-44e8-b54f-239c5eaf011d",
+        "_postman_id": "4e66f2ed-882d-4d81-94d2-1c581537f590",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -3035,7 +3035,7 @@
                                 },
                                 {
                                     "key": "has_expiry",
-                                    "value": "1",
+                                    "value": "",
                                     "type": "text",
                                     "description": ""
                                 },

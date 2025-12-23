@@ -257,6 +257,9 @@ Route::post('sales-returns/bulk-export', [SalesReturnController::class, 'bulkExp
             Route::get('/aged-payables', [ReportController::class, 'agedPayables'])->name('admin.reports.aged-payables');
             Route::get('/adjustment-log', [ReportController::class, 'adjustmentLog'])->name('admin.reports.adjustment-log');
             Route::get('/recent-transactions', [ReportController::class, 'recentTransactions'])->name('admin.reports.recent-transactions');
+            Route::post('/income-statement/export', [ReportController::class, 'exportIncomeStatement'])->name('admin.reports.income-statement.export');
+            Route::post('/balance-sheet/export', [ReportController::class, 'exportBalanceSheet'])->name('admin.reports.balance-sheet.export');
+            Route::post('/aged-receivables/export', [ReportController::class, 'exportAgedReceivables'])->name('admin.reports.aged-receivables.export');
             Route::post('/{id}/mark-paid', [ReportController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');
             Route::post('/bulk-mark-paid', [ReportController::class, 'bulkMarkAsPaid'])->name('admin.transactions.bulk-mark-paid');
         });
@@ -343,7 +346,9 @@ Route::post('sales-returns/bulk-export', [SalesReturnController::class, 'bulkExp
             Route::get('/general-ledger', [\App\Http\Controllers\Admin\AccountingController::class, 'generalLedger'])->name('admin.accounting.ledger');
             Route::get('/trial-balance', [\App\Http\Controllers\Admin\AccountingController::class, 'trialBalance'])->name('admin.accounting.trial_balance');
             Route::post('/journal/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportJournal'])->name('admin.accounting.journal.export');
-
+            Route::post('/general-ledger/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportGeneralLedger'])->name('admin.accounting.ledger.export');
+            Route::post('/trial-balance/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportTrialBalance'])->name('admin.accounting.trial_balance.export');
+            
             // COA Management
             Route::get('/accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsIndex'])->name('admin.accounting.accounts.index');
             Route::get('/accounts/create', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsCreate'])->name('admin.accounting.accounts.create');

@@ -71,7 +71,7 @@
 @endif
 
 {{-- SCRIPT FOR WAREHOUSE --}}
-@if (request()->is('admin/warehouse'))
+@if (request()->is('admin/warehouses*'))
     @vite('resources/js/admin/warehouse.js')
 @endif
 
@@ -114,7 +114,7 @@
 @endif
 
 {{-- SCRIPT FOR ACCOUNTING settings --}}
-@if (request()->is('admin/accounting/accounting-setting', 'admin/accounting/journal'))
+@if (request()->is('admin/accounting/accounting-setting', 'admin/accounting/journal', 'admin/accounting/general-ledger', 'admin/reports/income-statement', 'admin/reports/balance-sheet', 'admin/reports/aged-receivables'))
     @vite('resources/js/admin/accounting.js')
 @endif
 

@@ -9,10 +9,6 @@
                 </h2>
             </div>
             <div class="col-auto ms-auto d-flex gap-2">
-                <button type="button" class="btn btn-secondary d-none d-sm-inline-block" onclick="window.print()">
-                    <i class="ti ti-printer fs-4"></i>
-                    {{ __('messages.export_pdf') }}
-                </button>
                 <a href="{{ route('admin.sales-returns.create') }}" class="btn btn-primary d-none d-sm-inline-block">
                     <i class="ti ti-plus fs-4"></i>
                     {{ __('messages.new_sales_return') }}

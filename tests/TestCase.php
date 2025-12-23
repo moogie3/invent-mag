@@ -25,11 +25,6 @@ abstract class TestCase extends BaseTestCase
 
         $app->make(Kernel::class)->bootstrap();
 
-        // Explicitly boot the application to ensure service providers are registered
-        $app->boot();
-
-        require __DIR__.'/../routes/web.php';
-
         $app['config']->set('app.key', 'base64:YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXowMTIzNDU=');
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite.database', ':memory:');

@@ -44,6 +44,7 @@ export default defineConfig({
                 "resources/js/admin/layouts/theme-toggle.js",
                 "resources/js/admin/layouts/theme-visibility.js",
                 "resources/js/admin/layouts/theme-initializer.js",
+                "resources/js/admin/utils/sound.js",
             ],
             refresh: true,
         }),

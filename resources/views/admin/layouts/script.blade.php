@@ -114,7 +114,7 @@
 @endif
 
 {{-- SCRIPT FOR ACCOUNTING settings --}}
-@if (request()->is('admin/accounting/accounting-setting', 'admin/accounting/journal', 'admin/accounting/general-ledger', 'admin/reports/income-statement', 'admin/reports/balance-sheet', 'admin/reports/aged-receivables'))
+@if (request()->is('admin/accounting/accounting-setting', 'admin/accounting/journal', 'admin/accounting/general-ledger', 'admin/reports/income-statement', 'admin/reports/balance-sheet', 'admin/reports/aged-receivables', 'admin/reports/aged-payables', 'admin/reports/adjustment-log', 'admin/reports/recent-transactions'))
     @vite('resources/js/admin/accounting.js')
 @endif
 

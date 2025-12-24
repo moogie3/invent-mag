@@ -18,10 +18,24 @@
                     <div class="col-auto ms-auto d-print-none">
                         <div class="btn-list">
                             <div class="dropdown">
-                                <button class="btn btn-secondary" onclick="exportTransactions()">
-                                    <i class="ti ti-printer me-1"></i>
-                                    {{ __('messages.export_pdf') }}
+                                <button class="btn btn-primary dropdown-toggle" type="button"
+                                    id="exportRecentTransactionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
                                 </button>
+                                <ul class="dropdown-menu" aria-labelledby="exportRecentTransactionsDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="exportRecentTransactions('pdf')">
+                                            Export as PDF
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="exportRecentTransactions('csv')">
+                                            Export as CSV
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="dropdown">
                                 <button class="btn btn-outline-primary dropdown-toggle" type="button"
                                     data-bs-toggle="dropdown">
                                     <i class="ti ti-filter me-1"></i>
@@ -35,8 +49,7 @@
                                                 <option value="">{{ __('messages.all_types') }}</option>
                                                 <option value="sale" {{ $type == 'sale' ? 'selected' : '' }}>
                                                     {{ __('messages.sales') }}</option>
-                                                <option value="purchase"
-                                                    {{ $type == 'purchase' ? 'selected' : '' }}>
+                                                <option value="purchase" {{ $type == 'purchase' ? 'selected' : '' }}>
                                                     {{ __('messages.purchasing') }}</option>
                                             </select>
                                         </div>
@@ -46,22 +59,18 @@
                                                 <option value="">{{ __('messages.all_status') }}</option>
                                                 <option value="Paid" {{ $status == 'Paid' ? 'selected' : '' }}>
                                                     {{ __('messages.paid') }}</option>
-                                                <option value="Partial"
-                                                    {{ $status == 'Partial' ? 'selected' : '' }}>
+                                                <option value="Partial" {{ $status == 'Partial' ? 'selected' : '' }}>
                                                     {{ __('messages.partial') }}</option>
-                                                <option value="Unpaid"
-                                                    {{ $status == 'Unpaid' ? 'selected' : '' }}>
+                                                <option value="Unpaid" {{ $status == 'Unpaid' ? 'selected' : '' }}>
                                                     {{ __('messages.unpaid') }}</option>
                                             </select>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">{{ __('messages.date_range') }}</label>
                                             <select name="date_range" class="form-select">
-                                                <option value="all"
-                                                    {{ $date_range == 'all' ? 'selected' : '' }}>
+                                                <option value="all" {{ $date_range == 'all' ? 'selected' : '' }}>
                                                     {{ __('messages.all_time') }}</option>
-                                                <option value="today"
-                                                    {{ $date_range == 'today' ? 'selected' : '' }}>
+                                                <option value="today" {{ $date_range == 'today' ? 'selected' : '' }}>
                                                     {{ __('messages.today') }}</option>
                                                 <option value="this_week"
                                                     {{ $date_range == 'this_week' ? 'selected' : '' }}>
@@ -75,8 +84,7 @@
                                                     {{ $date_range == 'last_month' ? 'selected' : '' }}>
                                                     {{ __('messages.last_month') }}
                                                 </option>
-                                                <option value="custom"
-                                                    {{ $date_range == 'custom' ? 'selected' : '' }}>
+                                                <option value="custom" {{ $date_range == 'custom' ? 'selected' : '' }}>
                                                     {{ __('messages.custom_range') }}
                                                 </option>
                                             </select>
@@ -101,7 +109,8 @@
                                                 <i class="ti ti-search me-1"></i>
                                                 {{ __('messages.apply') }}
                                             </button>
-                                            <a href="{{ route('admin.reports.recent-transactions') }}" class="btn btn-outline-secondary">
+                                            <a href="{{ route('admin.reports.recent-transactions') }}"
+                                                class="btn btn-outline-secondary">
                                                 <i class="ti ti-x me-1"></i>
                                                 {{ __('messages.clear') }}
                                             </a>
@@ -230,10 +239,24 @@
                                             class="btn btn-success action-btn d-flex align-items-center">
                                             <i class="ti ti-check me-2"></i> {{ __('messages.mark_as_paid') }}
                                         </button>
-                                        <button onclick="bulkExport()"
-                                            class="btn btn-secondary action-btn d-flex align-items-center">
-                                            <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
-                                        </button>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="#"
+                                                        onclick="bulkExport('pdf')">Export as PDF
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#"
+                                                        onclick="bulkExport('csv')">Export as CSV
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                         <button onclick="clearSelection()"
                                             class="btn btn-outline-secondary action-btn d-flex align-items-center">
                                             <i class="ti ti-x me-2"></i> {{ __('messages.clear_selection') }}

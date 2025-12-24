@@ -21,6 +21,31 @@
         <div class="page-body">
             <div class="container-xl">
                 <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ __('messages.adjustment_log') }}</h3>
+                        <div class="ms-auto">
+                            <div class="btn-list">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                                        id="exportAdjustmentLogDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="ti ti-printer me-2"></i> {{ __('messages.export') }}
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="exportAdjustmentLogDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="#" onclick="exportAdjustmentLog('pdf')">
+                                                Export as PDF
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" onclick="exportAdjustmentLog('csv')">
+                                                Export as CSV
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table card-table table-vcenter text-nowrap datatable">
                             <thead>
@@ -40,10 +65,11 @@
                                     <tr>
                                         <td>{{ $log->created_at->translatedFormat('d M Y, H:i') }}</td>
                                         <td>
-                                            @if($log->product)
-                                            <a href="{{ route('admin.product.edit', $log->product->id) }}">{{ $log->product->name }}</a>
+                                            @if ($log->product)
+                                                <a
+                                                    href="{{ route('admin.product.edit', $log->product->id) }}">{{ $log->product->name }}</a>
                                             @else
-                                            {{ __('messages.product_not_found') }}
+                                                {{ __('messages.product_not_found') }}
                                             @endif
                                         </td>
                                         <td>
@@ -53,11 +79,17 @@
                                         <td>{{ $log->quantity_after }}</td>
                                         @php
                                             $change = $log->quantity_after - $log->quantity_before;
-                                            $changeClass = $change > 0 ? 'text-success' : ($change < 0 ? 'text-danger' : 'text-muted');
+                                            $changeClass =
+                                                $change > 0
+                                                    ? 'text-success'
+                                                    : ($change < 0
+                                                        ? 'text-danger'
+                                                        : 'text-muted');
                                             $changeSign = $change > 0 ? '+' : '';
                                         @endphp
                                         <td>
-                                            <span class="{{ $changeClass }}">{{ $changeSign }}{{ $change }}</span>
+                                            <span
+                                                class="{{ $changeClass }}">{{ $changeSign }}{{ $change }}</span>
                                         </td>
                                         <td>{{ $log->reason ?: 'N/A' }}</td>
                                         <td>{{ $log->adjustedBy ? $log->adjustedBy->name : __('messages.system') }}</td>
@@ -81,9 +113,9 @@
                         </table>
                     </div>
                     @if ($adjustments->hasPages())
-                    <div class="card-footer d-flex align-items-center">
-                        {{ $adjustments->links() }}
-                    </div>
+                        <div class="card-footer d-flex align-items-center">
+                            {{ $adjustments->links() }}
+                        </div>
                     @endif
                 </div>
             </div>

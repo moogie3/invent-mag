@@ -645,4 +645,249 @@ class ReportController extends Controller
 
         return view('admin.reports.aged-payables', compact('aging'));
     }
+
+    /**
+     * @group Reports
+     * @summary Export Aged Payables Report
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function exportAgedPayables(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $now = Carbon::now();
+            $unpaidPurchases = Purchase::with('supplier')
+                ->whereIn('status', ['Unpaid', 'Partial'])
+                ->whereNotNull('due_date')
+                ->get()
+                ->map(function ($purchase) use ($now) {
+                    $daysOverdue = $now->diffInDays($purchase->due_date, false);
+                    $purchase->days_overdue = $daysOverdue < 0 ? abs($daysOverdue) : 0;
+                    return $purchase;
+                });
+
+            $aging = [
+                'current' => $unpaidPurchases->where('days_overdue', 0),
+                '1-30' => $unpaidPurchases->where('days_overdue', '>', 0)->where('days_overdue', '<=', 30),
+                '31-60' => $unpaidPurchases->where('days_overdue', '>', 30)->where('days_overdue', '<=', 60),
+                '61-90' => $unpaidPurchases->where('days_overdue', '>', 60)->where('days_overdue', '<=', 90),
+                '90+' => $unpaidPurchases->where('days_overdue', '>', 90),
+            ];
+
+            if ($request->export_option === 'pdf') {
+                $dompdf = new Dompdf();
+                $html = view('admin.reports.aged-payables-export-pdf', compact('aging'))->render();
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4', 'portrait');
+                $dompdf->render();
+                return $dompdf->stream('aged-payables.pdf');
+            }
+
+            if ($request->export_option === 'csv') {
+                $headers = [
+                    'Content-type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename=aged-payables.csv',
+                    'Pragma' => 'no-cache',
+                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                    'Expires' => '0',
+                ];
+
+                $callback = function () use ($aging) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, ['Aged Payables Report']);
+                    fputcsv($file, ["Report Date: " . Carbon::now()->format('Y-m-d')]);
+                    fputcsv($file, []);
+
+                    $buckets = [
+                        'current' => 'Current',
+                        '1-30' => '1-30 Days Overdue',
+                        '31-60' => '31-60 Days Overdue',
+                        '61-90' => '61-90 Days Overdue',
+                        '90+' => 'Over 90 Days Overdue',
+                    ];
+
+                    foreach ($aging as $bucketKey => $invoices) {
+                        if ($invoices->count() > 0) {
+                            fputcsv($file, [$buckets[$bucketKey]]);
+                            fputcsv($file, [
+                                'Supplier',
+                                'Invoice No',
+                                'Due Date',
+                                'Days Overdue',
+                                'Amount',
+                            ]);
+                            foreach ($invoices as $invoice) {
+                                fputcsv($file, [
+                                    $invoice->supplier->name ?? 'Unknown Supplier',
+                                    $invoice->invoice,
+                                    Carbon::parse($invoice->due_date)->format('Y-m-d'),
+                                    $invoice->days_overdue,
+                                    \App\Helpers\CurrencyHelper::format($invoice->total),
+                                ]);
+                            }
+                            fputcsv($file, ['Total for ' . $buckets[$bucketKey], '', '', '', \App\Helpers\CurrencyHelper::format($invoices->sum('total'))]);
+                            fputcsv($file, []);
+                        }
+                    }
+
+                    fclose($file);
+                };
+
+                return response()->stream($callback, 200, $headers);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting aged payables report. Please try again.',
+                'error_details' => 'Internal server error',
+            ], 500);
+        }
+    }
+
+    public function exportAdjustmentLog(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $adjustments = StockAdjustment::with(['product:id,name', 'adjustedBy:id,name'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            if ($request->export_option === 'pdf') {
+                $dompdf = new Dompdf();
+                $html = view('admin.reports.adjustment-log-export-pdf', compact('adjustments'))->render();
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4', 'portrait');
+                $dompdf->render();
+                return $dompdf->stream('adjustment-log.pdf');
+            }
+
+            if ($request->export_option === 'csv') {
+                $headers = [
+                    'Content-type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename=adjustment-log.csv',
+                    'Pragma' => 'no-cache',
+                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                    'Expires' => '0',
+                ];
+
+                $callback = function () use ($adjustments) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, [
+                        'Date',
+                        'Product',
+                        'Type',
+                        'Quantity Before',
+                        'Quantity After',
+                        'Change',
+                        'Reason',
+                        'Adjusted By',
+                    ]);
+
+                    foreach ($adjustments as $log) {
+                        $change = $log->quantity_after - $log->quantity_before;
+                        fputcsv($file, [
+                            $log->created_at->translatedFormat('d M Y, H:i'),
+                            $log->product ? $log->product->name : 'Product Not Found',
+                            $log->adjustment_type,
+                            $log->quantity_before,
+                            $log->quantity_after,
+                            $change,
+                            $log->reason ?: 'N/A',
+                            $log->adjustedBy ? $log->adjustedBy->name : 'System',
+                        ]);
+                    }
+
+                    fclose($file);
+                };
+
+                return response()->stream($callback, 200, $headers);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting adjustment log. Please try again.',
+                'error_details' => 'Internal server error',
+            ], 500);
+        }
+    }
+
+    public function exportRecentTransactions(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $selectedIds = $request->input('selected', []);
+            $filters = [
+                'type' => $request->get('type'),
+                'status' => $request->get('status'),
+                'date_range' => $request->get('date_range', 'all'),
+                'start_date' => $request->get('start_date'),
+                'end_date' => $request->get('end_date'),
+                'search' => $request->get('search'),
+            ];
+        
+            $transactions = $this->transactionService->getTransactionsForExport($filters, $selectedIds);
+
+            if ($request->export_option === 'pdf') {
+                $dompdf = new Dompdf();
+                $html = view('admin.reports.recent-transactions-export-pdf', compact('transactions'))->render();
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4', 'portrait');
+                $dompdf->render();
+                return $dompdf->stream('recent-transactions.pdf');
+            }
+
+            if ($request->export_option === 'csv') {
+                $headers = [
+                    'Content-type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename=recent-transactions.csv',
+                    'Pragma' => 'no-cache',
+                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                    'Expires' => '0',
+                ];
+
+                $callback = function () use ($transactions) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, [
+                        'Type',
+                        'Invoice',
+                        'Customer/Supplier',
+                        'Date',
+                        'Amount',
+                        'Status',
+                    ]);
+
+                    foreach ($transactions as $transaction) {
+                        fputcsv($file, [
+                            $transaction['type'],
+                            $transaction['invoice'],
+                            $transaction['customer_supplier'],
+                            Carbon::parse($transaction['date'])->format('Y-m-d H:i'),
+                            \App\Helpers\CurrencyHelper::format($transaction['amount']),
+                            $transaction['status'],
+                        ]);
+                    }
+
+                    fclose($file);
+                };
+
+                return response()->stream($callback, 200, $headers);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting recent transactions. Please try again.',
+                'error_details' => 'Internal server error',
+            ], 500);
+        }
+    }
 }

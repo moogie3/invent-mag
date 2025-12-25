@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
+use Dompdf\Dompdf;
 
 class TransactionService
 {
@@ -136,17 +137,24 @@ class TransactionService
 
     public function getTransactionsForExport(array $filters, ?array $selectedIds): Collection
     {
-        $dates = $this->calculateDateRange($filters['date_range'], $filters['start_date'], $filters['end_date']);
-        $salesQuery = $this->buildSalesQuery($dates, $filters['status'], $filters['search']);
-        $purchaseQuery = $this->buildPurchaseQuery($dates, $filters['status'], $filters['search']);
+        $dateRange = $filters['date_range'] ?? null;
+        $startDate = $filters['start_date'] ?? null;
+        $endDate = $filters['end_date'] ?? null;
+        $status = $filters['status'] ?? null;
+        $search = $filters['search'] ?? null;
+        $type = $filters['type'] ?? null;
+
+        $dates = $this->calculateDateRange($dateRange, $startDate, $endDate);
+        $salesQuery = $this->buildSalesQuery($dates, $status, $search);
+        $purchaseQuery = $this->buildPurchaseQuery($dates, $status, $search);
 
         $sales = collect();
-        if (!$filters['type'] || $filters['type'] === 'sale') {
+        if (!$type || $type === 'sale') {
             $sales = $salesQuery->get()->map(fn($sale) => $this->transformSaleToTransaction($sale, true));
         }
 
         $purchases = collect();
-        if (!$filters['type'] || $filters['type'] === 'purchase') {
+        if (!$type || $type === 'purchase') {
             $purchases = $purchaseQuery->get()->map(fn($purchase) => $this->transformPurchaseToTransaction($purchase, true));
         }
 
@@ -418,5 +426,61 @@ class TransactionService
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function bulkExportTransactions(array $ids, string $exportOption)
+    {
+        $transactions = $this->getTransactionsForExport([], $ids);
+
+        if ($exportOption === 'pdf') {
+            $html = view('admin.reports.recent-transactions-bulk-export-pdf', compact('transactions'))->render();
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            $output = $dompdf->output();
+            return response()->streamDownload(function () use ($output) {
+                echo $output;
+            }, 'transactions.pdf');
+        }
+
+        if ($exportOption === 'csv') {
+            $headers = [
+                'Content-type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=transactions.csv',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            $callback = function () use ($transactions) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, [
+                    'Type',
+                    'Invoice',
+                    'Customer/Supplier',
+                    'Date',
+                    'Amount',
+                    'Status',
+                ]);
+
+                foreach ($transactions as $transaction) {
+                    fputcsv($file, [
+                        $transaction['type'],
+                        $transaction['invoice'],
+                        $transaction['customer_supplier'],
+                        Carbon::parse($transaction['date'])->format('Y-m-d H:i'),
+                        \App\Helpers\CurrencyHelper::format($transaction['amount']),
+                        $transaction['status'],
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        }
+
+        return null;
     }
 }

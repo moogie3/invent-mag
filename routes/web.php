@@ -263,6 +263,7 @@ Route::post('sales-returns/bulk-export', [SalesReturnController::class, 'bulkExp
             Route::post('/aged-payables/export', [ReportController::class, 'exportAgedPayables'])->name('admin.reports.aged-payables.export');
             Route::post('/adjustment-log/export', [ReportController::class, 'exportAdjustmentLog'])->name('admin.reports.adjustment-log.export');
             Route::post('/recent-transactions/export', [ReportController::class, 'exportRecentTransactions'])->name('admin.reports.recent-transactions.export');
+            Route::post('/recent-transactions/bulk-export', [ReportController::class, 'bulkExport'])->name('admin.reports.recent-transactions.bulk-export');
             Route::post('/{id}/mark-paid', [ReportController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');
             Route::post('/bulk-mark-paid', [ReportController::class, 'bulkMarkAsPaid'])->name('admin.transactions.bulk-mark-paid');
         });

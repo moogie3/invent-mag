@@ -28,7 +28,7 @@ endpoints:
         name: opportunity_id
         description: 'The ID of the opportunity.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -46,7 +46,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      opportunity_id: 1
+      opportunity_id: 17
       opportunity: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -123,7 +123,7 @@ endpoints:
         name: opportunity_id
         description: 'The ID of the opportunity.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -141,7 +141,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      opportunity_id: 1
+      opportunity_id: 17
       opportunity: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -494,7 +494,7 @@ endpoints:
         name: id
         description: 'The ID of the sales opportunity.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -512,7 +512,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       sales_opportunity: '1'
     queryParameters: []
     cleanQueryParameters: []
@@ -572,7 +572,7 @@ endpoints:
         name: id
         description: 'The ID of the sales opportunity.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -590,7 +590,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       sales_opportunity: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -831,7 +831,7 @@ endpoints:
         name: id
         description: 'The ID of the sales opportunity.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -849,7 +849,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       sales_opportunity: 1
     queryParameters: []
     cleanQueryParameters: []

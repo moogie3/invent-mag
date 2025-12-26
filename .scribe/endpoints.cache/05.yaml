@@ -28,7 +28,7 @@ endpoints:
         name: pipeline_id
         description: 'The ID of the pipeline.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -46,7 +46,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      pipeline_id: 1
+      pipeline_id: 17
       pipeline: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -135,7 +135,7 @@ endpoints:
         name: pipeline_id
         description: 'The ID of the pipeline.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -153,7 +153,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      pipeline_id: 1
+      pipeline_id: 17
       pipeline: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -424,7 +424,7 @@ endpoints:
         name: id
         description: 'The ID of the sales pipeline.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -442,7 +442,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       sales_pipeline: '1'
     queryParameters: []
     cleanQueryParameters: []
@@ -502,7 +502,7 @@ endpoints:
         name: id
         description: 'The ID of the sales pipeline.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -520,7 +520,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       sales_pipeline: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -621,7 +621,7 @@ endpoints:
         name: id
         description: 'The ID of the sales pipeline.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -639,7 +639,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       sales_pipeline: 1
     queryParameters: []
     cleanQueryParameters: []

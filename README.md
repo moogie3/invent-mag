@@ -1,8 +1,6 @@
-# Invent-MAG: Advanced Inventory & CRM Management System
+# Invent-MAG: Advanced Inventory & Accounting System
 
-![Screenshot of Invent-MAG](screenshot.png)
-
-**Version:** 1.2
+**Version:** 2.0  
 **Author:** moogie3  
 **License:** MIT  
 
@@ -10,165 +8,141 @@
 
 ## 📘 Introduction
 
-Invent-MAG is a comprehensive, full-featured Inventory Management and Customer Relationship Management (CRM) system designed to streamline and optimize business operations. Built with a modern Laravel 11 stack, it provides robust tools for efficient stock tracking, sophisticated purchase and sales order management, real-time reporting, and granular user access control. This system is ideal for businesses requiring precise stock control, multi-user collaboration, and insightful data analytics to drive informed decisions.
+Invent-MAG is a comprehensive, modern, and feature-rich application designed to be a complete solution for managing your business. It combines inventory management, sales and purchases, customer and supplier relationship management (CRM/SRM), and a full accounting suite into a single, cohesive platform.
+
+Built on the latest Laravel 11 framework, Invent-MAG provides powerful tools for real-time stock tracking, sophisticated order management, insightful financial reporting, and granular user access control. It is the ideal solution for businesses looking to streamline operations, enhance collaboration, and leverage data-driven insights to make informed decisions.
+
+![Screenshot of Invent-MAG](screenshot.png)
+
+---
+
+## 🚀 Live Demo & Credentials
+
+Experience the power of Invent-MAG firsthand with our live demo.
+
+- **URL:** `https://invent-mag.com`
+- **Admin Login:**
+  - **Email:** `admin@example.com`
+  - **Password:** `password`
+- **Manager Login:**
+  - **Email:** `manager@example.com`
+  - **Password:** `password`
+- **Staff Login:**
+  - **Email:** `staff@example.com`
+  - **Password:** `password`
 
 ---
 
 ## ✨ Key Features
 
-Invent-MAG offers a powerful suite of functionalities to manage your business efficiently:
+Invent-MAG offers a powerful suite of functionalities to manage every aspect of your business.
 
-*   **Product & Stock Management:**
-    *   Add, update, delete, and categorize inventory items with detailed product information.
-    *   Track stock levels across multiple warehouses.
-    *   Implement low-stock threshold alerts for proactive inventory planning.
-    *   Manage stock adjustments (inflow/outflow) with clear reason codes.
-*   **Purchase Order Management:**
-    *   Create, manage, and track purchase orders from suppliers.
-    *   Streamline the order approval process.
-    *   Efficiently receive and reconcile stock upon order completion.
-*   **Sales Order & Point of Sale (POS):**
-    *   Generate and manage sales orders for customers.
-    *   Integrated Point of Sale (POS) interface for quick and easy transactions.
-    *   Track sales history and customer purchase patterns.
-*   **Customer Relationship Management (CRM):**
-    *   Manage customer profiles and interaction history.
-    *   Track sales opportunities and manage sales pipelines.
-    *   Analyze customer purchase history and preferences.
-*   **Supplier Relationship Management (SRM):**
-    *   Maintain detailed supplier profiles and interaction logs.
-    *   Track purchase history from each supplier.
-*   **Reporting & Analytics:**
-    *   Generate real-time stock level reports, transaction logs, and financial summaries.
-    *   Export reports to CSV/PDF for further analysis.
-    *   Dashboard with key metrics for quick business insights.
-*   **Multi-User Access & Security:**
-    *   Role-based authentication and authorization (Admin, Manager, Staff) powered by Laravel Fortify and Spatie Laravel Permission.
-    *   Secure user management with robust input validation and CSRF protection.
-*   **Modern & Scalable Architecture:**
-    *   Built on the robust Laravel 11 framework with a clean MVC design pattern.
-    *   Utilizes MySQL for high performance and data integrity.
+### **Inventory & Product Management**
+- **Product Catalog:** Full CRUD for products, including detailed information, images, and categorizations.
+- **Stock Control:** Track stock levels across multiple warehouses in real-time.
+- **Stock Adjustments:** Manage stock inflows and outflows with clear reason codes.
+- **Low Stock Alerts:** Proactive alerts for items falling below their low-stock threshold.
+- **Unit Management:** Define and manage different units of measurement for your products.
+
+### **Sales & Customer Management (CRM)**
+- **Sales Order Management:** Create, manage, and track sales orders from creation to payment.
+- **Point of Sale (POS):** A dedicated, user-friendly POS interface for fast and efficient in-person transactions with receipt printing.
+- **Customer Database:** Full CRUD for customer profiles, including interaction history and purchase tracking.
+- **Sales Pipeline:** A complete sales pipeline management system to track and convert sales opportunities into orders.
+- **Sales Returns:** Easily manage customer returns and process refunds.
+- **Advanced Analytics:**
+  - **Customer Retention & LTV:** Analyze customer loyalty and lifetime value.
+  - **Sales Forecasting:** Predict future sales trends based on historical data.
+
+### **Purchase & Supplier Management (SRM)**
+- **Purchase Order Management:** Full CRUD for purchase orders, from creation to stock reconciliation.
+- **Supplier Database:** Maintain detailed supplier profiles, track interaction history, and manage procurement.
+- **Purchase Returns:** Manage returns to suppliers efficiently.
+- **Supplier Analytics:** Analyze supplier performance and track purchase history.
+
+### **Financial & Accounting Suite**
+- **Chart of Accounts (COA):** A customizable COA to organize your company's finances.
+- **Journal & General Ledger:** Record all financial transactions and maintain a complete audit trail.
+- **Trial Balance:** Ensure the accuracy of your accounting entries.
+- **Financial Reporting:**
+  - **Income Statement:** Track your company's profitability.
+  - **Balance Sheet:** Get a snapshot of your company's financial health.
+- **Accounts Receivable & Payable:**
+  - **AR/AP Aging Reports:** Monitor outstanding invoices and bills.
+  - **Payment Tracking:** Record and manage payments for both sales and purchase orders.
+- **Multi-Currency Support:** Configure and manage transactions in different currencies.
+
+### **Administration & System**
+- **Interactive Dashboard:** A detailed dashboard with key metrics on sales, purchases, financial health, AR/AP aging, low stock alerts, and a sales forecast.
+- **User & Role Management:** Granular control over user access with pre-defined roles (Admin, Manager, Staff) powered by Spatie Laravel Permission.
+- **Settings:** Customize application settings, including currency, taxes, and theme.
+- **Notifications:** An in-app notification system to keep users informed of important events.
+- **RESTful API:** A versioned (v1) API with Sanctum authentication to integrate with other systems.
 
 ---
 
 ## 🚀 Technology Stack
 
-Invent-MAG is built using a powerful and modern technology stack:
-
-*   **Backend:**
-    *   [**Laravel 11**](https://laravel.com/) (PHP Framework)
-    *   **PHP 8.2+**
-    *   [**Laravel Fortify**](https://laravel.com/docs/11.x/fortify) for authentication scaffolding.
-    *   [**Laravel Sanctum**](https://laravel.com/docs/11.x/sanctum) for API authentication.
-    *   [**Spatie Laravel Permission**](https://spatie.be/docs/laravel-permission/v6) for role and permission management.
-    *   [**PHPUnit 11.0.1+**](https://phpunit.de/) for backend testing.
-*   **Frontend:**
-    *   **Blade Templates**
-    *   [**Alpine.js 3.4.2+**](https://alpinejs.dev/) for declarative JavaScript.
-    *   [**Tailwind CSS 3.1.0+**](https://tailwindcss.com/) for utility-first styling.
-    *   [**Vite 6.0+**](https://vitejs.dev/) for a fast development build experience.
-    *   [**Axios 1.7.4+**](https://axios-http.com/) for HTTP requests.
-    *   [**Vitest 4.0.9+**](https://vitest.dev/) for frontend testing.
-*   **Database:**
-    *   **MySQL** (Recommended)
-    *   SQLite (for development/testing)
+- **Backend:** Laravel 11, PHP 8.2+, Laravel Fortify, Laravel Sanctum, Spatie Laravel Permission
+- **Frontend:** Blade, Alpine.js, Tailwind CSS, Vite
+- **Database:** MySQL (Recommended), SQLite
+- **Testing:** PHPUnit, Vitest
 
 ---
 
 ## ⚙️ Getting Started
 
-Follow these steps to set up and run Invent-MAG on your local machine.
-
 ### Prerequisites
-
-Ensure you have the following installed:
-
-*   **PHP 8.2+**
-*   **Composer**
-*   **Node.js (LTS recommended)**
-*   **NPM or Yarn**
-*   **MySQL (or another compatible database)**
+- PHP 8.2+
+- Composer
+- Node.js & NPM/Yarn
+- MySQL
 
 ### Installation Steps
-
-1.  **Clone the Repository:**
+1.  **Clone the repository:**
     ```bash
     git clone https://github.com/moogie3/invent-mag.git
     cd invent-mag
     ```
-
-2.  **Install PHP Dependencies:**
+2.  **Install dependencies:**
     ```bash
     composer install
-    ```
-
-3.  **Install JavaScript Dependencies:**
-    ```bash
     npm install
-    # or yarn install
     ```
-
-4.  **Environment Configuration:**
-    *   Copy the example environment file:
-        ```bash
-        cp .env.example .env
-        ```
-    *   Generate an application key:
-        ```bash
-        php artisan key:generate
-        ```
-    *   Configure your database connection in the `.env` file. For MySQL, ensure `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` are correctly set.
-
-5.  **Run Database Migrations and Seeders:**
+3.  **Configure environment:**
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    # Configure your DB_DATABASE, DB_USERNAME, and DB_PASSWORD in .env
+    ```
+4.  **Run migrations and seeders:**
     ```bash
     php artisan migrate --seed
     ```
-    This will create the necessary database tables and populate them with initial data (including a superuser account).
-
-6.  **Build Frontend Assets:**
+5.  **Build assets:**
     ```bash
     npm run build
     ```
-    This compiles your CSS and JavaScript assets for production. For development, you can run `npm run dev` to watch for changes.
-
-7.  **Serve the Application:**
+6.  **Serve the application:**
     ```bash
     php artisan serve
     ```
-    The application will typically be available at `http://127.0.0.1:8000`.
 
 ---
 
 ## 🧪 Running Tests
 
-Invent-MAG includes a comprehensive test suite for both backend and frontend to ensure reliability and maintainability.
-
-### Backend Tests (PHPUnit)
-
-To run the PHPUnit tests for the Laravel backend:
-
-```bash
-php artisan test
-```
-
-### Frontend Tests (Vitest)
-
-To run the Vitest tests for the JavaScript frontend:
-
-```bash
-npm run test:js
-```
+- **Backend (PHPUnit):** `php artisan test`
+- **Frontend (Vitest):** `npm run test:js`
 
 ---
 
 ## 🤝 Support & Contributions
 
-If you encounter any issues, feel free to submit an issue on GitHub. Pull requests are welcome!
+If you encounter any issues or have suggestions, please submit an issue on GitHub. Pull requests are welcome!
 
 ---
 
 ## 📜 License
 
-Invent-MAG is software licensed under the **MIT License**. See the `LICENSE` file for more details.
-
----
+Invent-MAG is licensed under the **MIT License**. See the `LICENSE` file for more details.

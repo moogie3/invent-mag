@@ -1076,7 +1076,7 @@ endpoints:
         name: id
         description: 'The ID of the product.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -1094,7 +1094,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       product: '4'
     queryParameters: []
     cleanQueryParameters: []
@@ -1154,7 +1154,7 @@ endpoints:
         name: id
         description: 'The ID of the product.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -1172,7 +1172,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       product: '7'
     queryParameters: []
     cleanQueryParameters: []
@@ -1357,7 +1357,7 @@ endpoints:
         name: id
         description: 'The ID of the product.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -1375,7 +1375,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       product: '7'
     queryParameters: []
     cleanQueryParameters: []
@@ -1570,7 +1570,7 @@ endpoints:
         name: has_expiry
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -1588,7 +1588,7 @@ endpoints:
       supplier_id: 1
       warehouse_id: 17
       description: 'Dolores dolorum amet iste laborum eius est dolor.'
-      has_expiry: false
+      has_expiry: true
     fileParameters:
       image: null
     responses:

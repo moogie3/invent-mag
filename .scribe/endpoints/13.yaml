@@ -222,7 +222,7 @@ endpoints:
         name: id
         description: 'The ID of the account.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -240,7 +240,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       account: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -300,7 +300,7 @@ endpoints:
         name: id
         description: 'The ID of the account.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -318,7 +318,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       account: 1
     queryParameters: []
     cleanQueryParameters: []
@@ -467,7 +467,7 @@ endpoints:
         name: id
         description: 'The ID of the account.'
         required: true
-        example: 1
+        example: 17
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -485,7 +485,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: 17
       account: 1
     queryParameters: []
     cleanQueryParameters: []

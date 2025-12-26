@@ -446,7 +446,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the account.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -776,7 +776,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the category.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -1269,7 +1269,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the customer interaction.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -1561,7 +1561,7 @@ paths:
         in: path
         name: customer_id
         description: 'The ID of the customer.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -2100,7 +2100,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the customer.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -2415,7 +2415,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the journal entry.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -2900,7 +2900,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the payment.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -4014,7 +4014,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the product.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -4133,7 +4133,7 @@ paths:
                 has_expiry:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: true
               required:
                 - code
@@ -4530,7 +4530,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the po item.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -5296,7 +5296,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the purchase.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -6129,7 +6129,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the role.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -6225,7 +6225,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales item.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -6320,7 +6320,7 @@ paths:
         in: path
         name: opportunity_id
         description: 'The ID of the opportunity.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -6406,7 +6406,7 @@ paths:
         in: path
         name: opportunity_id
         description: 'The ID of the opportunity.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -6775,7 +6775,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales opportunity.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -6871,7 +6871,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales opportunity item.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -7321,7 +7321,7 @@ paths:
         in: path
         name: customer_id
         description: 'The ID of the customer.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -7329,7 +7329,7 @@ paths:
         in: path
         name: product_id
         description: 'The ID of the product.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -7807,7 +7807,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sale.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -7981,7 +7981,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the pipeline stage.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -8110,7 +8110,7 @@ paths:
         in: path
         name: pipeline_id
         description: 'The ID of the pipeline.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -8212,7 +8212,7 @@ paths:
         in: path
         name: pipeline_id
         description: 'The ID of the pipeline.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -8509,7 +8509,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the sales pipeline.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -8605,7 +8605,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the stock adjustment.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -8928,7 +8928,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the supplier interaction.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -9436,7 +9436,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the supplier.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -9653,7 +9653,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the tax.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -9749,7 +9749,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the transaction.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -10038,7 +10038,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the unit.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -10684,7 +10684,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the user.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer
@@ -11187,7 +11187,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the warehouse.'
-        example: 1
+        example: 17
         required: true
         schema:
           type: integer

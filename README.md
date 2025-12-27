@@ -128,15 +128,6 @@ Invent-MAG offers a powerful suite of functionalities to manage every aspect of 
     php artisan serve
     ```
 
----
-
-## 🧪 Running Tests
-
-- **Backend (PHPUnit):** `php artisan test`
-- **Frontend (Vitest):** `npm run test:js`
-
----
-
 ## 🤝 Support & Contributions
 
 If you encounter any issues or have suggestions, please submit an issue on GitHub. Pull requests are welcome!

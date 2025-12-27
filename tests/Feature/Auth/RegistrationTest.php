@@ -2,30 +2,41 @@
 
 namespace Tests\Feature\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Registered;
+use Tests\Feature\BaseFeatureTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
-class RegistrationTest extends TestCase
+class RegistrationTest extends BaseFeatureTestCase
 {
-    use RefreshDatabase;
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['auth.defaults.guard' => 'web']);
+    }
 
+    #[Test]
     public function test_registration_screen_can_be_rendered(): void
     {
-        $response = $this->get('/register');
+        $response = $this->get('/admin/register');
 
         $response->assertStatus(200);
     }
 
+    #[Test]
     public function test_new_users_can_register(): void
     {
-        $response = $this->post('/register', [
+        Event::fake();
+
+        $response = $this->post('/admin/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
         ]);
 
+        Event::assertDispatched(Registered::class);
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('verification.notice'));
     }
 }

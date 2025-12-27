@@ -13,16 +13,11 @@ return new class extends Migration {
             $table->string('decimal_separator')->default(',');
             $table->string('thousand_separator')->default('.');
             $table->integer('decimal_places')->default(0);
+            $table->string('position')->default('prefix');
+            $table->string('currency_code')->default('IDR');
+            $table->string('locale')->default('id-ID');
             $table->timestamps();
         });
-
-        // Insert default settings
-        DB::table('currency_settings')->insert([
-            'currency_symbol' => 'Rp',
-            'decimal_separator' => ',',
-            'thousand_separator' => '.',
-            'decimal_places' => 0,
-        ]);
     }
 
     public function down() {

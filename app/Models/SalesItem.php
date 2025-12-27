@@ -12,7 +12,6 @@ class SalesItem extends Model
     protected $fillable = [
         'sales_id',
         'product_id',
-        'name',
         'quantity',
         'discount',
         'discount_type',
@@ -20,10 +19,23 @@ class SalesItem extends Model
         'total',
     ];
 
+    protected $with = ['product'];
+    protected $appends = ['price'];
+
     public function product() {
         return $this->belongsTo(Product::class);
     }
-    public function sale(){
+    public function sales(){
         return $this->belongsTo(Sales::class , 'sales_id');
+    }
+
+    public function getPriceAttribute() {
+        return $this->customer_price;
+    }
+
+    // Explicitly define the factory for the model
+    protected static function newFactory()
+    {
+        return \Database\Factories\SalesItemFactory::new();
     }
 }

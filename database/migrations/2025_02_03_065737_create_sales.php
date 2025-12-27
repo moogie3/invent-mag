@@ -25,7 +25,6 @@ return new class extends Migration
             $table->decimal('total_tax', 10, 2)->nullable();
             $table->double('total');
             $table->enum('status', ['Unpaid', 'Paid', 'Partial'])->default('Unpaid');
-            $table->timestamp('payment_date')->nullable();
             $table->decimal('amount_received', 10, 2)->nullable();
             $table->decimal('change_amount', 10, 2)->nullable();
             $table->boolean('is_pos')->default(false);

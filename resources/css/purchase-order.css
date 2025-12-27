@@ -1,0 +1,78 @@
+/* ============================
+   9. MODAL STYLES
+   ============================ */
+#viewPoModal .modal-dialog {
+    max-width: 60%;
+    min-width: 40%;
+}
+
+#viewPoModal .modal-header {
+    border-bottom: 0;
+    padding: 1rem 1.2rem;
+}
+
+#viewPoModal .modal-footer {
+    padding: 1rem 1.2rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#viewPoModalContent {
+    padding: 0 !important;
+}
+
+#viewPoModalContent .card {
+    border: none;
+    margin-bottom: 0;
+    border-radius: 0;
+}
+
+#viewPoModalContent .card-header {
+    background: transparent;
+    padding: 1.2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#viewPoModalContent .card-body {
+    padding: 1.2rem;
+}
+
+#viewPoModalContent .bg-light {
+    background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+#viewPoModalContent .table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+#viewPoModalContent .table th {
+    font-weight: 600;
+    padding: 0.6rem 0.8rem;
+    border-bottom-width: 1px;
+    font-size: var(--small-font-size) !important;
+    /* Use consistent variable */
+}
+
+#viewPoModalContent .table td {
+    padding: 0.6rem 0.8rem;
+    vertical-align: middle;
+    font-size: 11.5px !important;
+    /* Keep this specific size but make it explicit */
+}
+
+#viewPoModalContent .table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+#viewPoModalContent .text-primary {
+    color: #206bc4 !important;
+}
+
+#viewPoModalContent .text-danger {
+    color: #d63939 !important;
+}
+
+#viewPoModalContent .spinner-border {
+    animation: pulse 1.5s infinite;
+}

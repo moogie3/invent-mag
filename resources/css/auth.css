@@ -45,3 +45,34 @@
         transform: translateY(0);
     }
 }
+
+html[data-bs-theme="dark"] {
+
+    /* Ensure Invent-MAG title is white in dark mode */
+    .navbar-brand,
+    .navbar-brand .nav-link {
+        color: white !important;
+    }
+
+    .page-center {
+        background: rgba(0, 0, 0, 0.6);
+    }
+}
+
+.input-group-text {
+    border-left: none;
+    background-color: transparent;
+}
+
+.input-group .form-control:focus+.input-group-text {
+    border-color: var(--tblr-form-control-focus-border-color);
+}
+
+/* Theme toggle button background to match page-center */
+html[data-bs-theme="light"] .theme-toggle-button {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+html[data-bs-theme="dark"] .theme-toggle-button {
+    background-color: rgba(0, 0, 0, 0.6);
+}

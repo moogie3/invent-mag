@@ -6,12 +6,12 @@
         $item->discount_type,
     );
 @endphp
-<tr>
+<tr class="product-row" data-product-id="{{ $item->product_id }}">
     <td class="text-center">{{ $index + 1 }}</td>
     <td>
         <div class="strong">{{ $item->product->name }}</div>
         @if (isset($item->product->sku) && $item->product->sku)
-            <small class="text-muted">SKU: {{ $item->product->sku }}</small>
+            <small class="text-muted">{{ __('messages.sku_colon') }} {{ $item->product->sku }}</small>
         @endif
     </td>
     <td>
@@ -32,9 +32,9 @@
             <select name="items[{{ $item->id }}][discount_type]" class="form-select discount-type-input"
                 style="min-width: 70px;" data-item-id="{{ $item->id }}">
                 <option value="percentage" {{ $item->discount_type === 'percentage' ? 'selected' : '' }}>
-                    %</option>
+                    {{ __('messages.percentage') }}</option>
                 <option value="fixed" {{ $item->discount_type === 'fixed' ? 'selected' : '' }}>
-                    Rp</option>
+                    {{ __('messages.fixed') }}</option>
             </select>
         </div>
     </td>

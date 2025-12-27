@@ -3,7 +3,7 @@
         <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <div class="me-3">
-                    <label class="form-label">Transaction Date</label>
+                    <label class="form-label">{{ __('messages.transaction_date') }}</label>
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="ti ti-calendar"></i>
@@ -13,9 +13,9 @@
                     </div>
                 </div>
                 <div class="me-3">
-                    <label class="form-label">Customer</label>
+                    <label class="form-label">{{ __('messages.customer') }}</label>
                     <select class="form-select" name="customer_id" id="customer_id">
-                        <option value="">Select Customer</option>
+                        <option value="">{{ __('messages.select_customer') }}</option>
                         @foreach ($customers as $customer)
                             <option value="{{ $customer->id }}" data-payment-terms="{{ $customer->payment_terms }}"
                                 {{ $customer->id === $walkInCustomerId ? 'selected' : '' }}>
@@ -26,7 +26,7 @@
                 </div>
             </div>
             <button type="button" id="clearCart" class="btn btn-outline-danger">
-                <i class="ti ti-trash me-1"></i> Clear Cart
+                <i class="ti ti-trash me-1"></i> {{ __('messages.clear_cart') }}
             </button>
         </div>
     </div>

@@ -4,40 +4,37 @@
             <input type="checkbox" id="selectAll" class="form-check-input">
         </th>
         <th class="sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-no">No</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-no">{{ __('messages.no') }}</button>
         </th>
         <th class="sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3">Picture</button>
+            <button class="table-sort fs-4 py-3">{{ __('messages.picture') }}</button>
         </th>
         <th class="no-print sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-code">Code</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-code">{{ __('messages.code') }}</button>
         </th>
         <th class="sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-name">Name</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-name">{{ __('messages.name') }}</button>
         </th>
         <th class="no-print sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-quantity">QTY</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-quantity">{{ __('messages.qty') }}</button>
         </th>
         <th class="no-print sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-category">CAT</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-category">{{ __('messages.cat') }}</button>
         </th>
         <th class="sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-unit">Unit</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-unit">{{ __('messages.unit') }}</button>
         </th>
         <th class="sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-price">Price</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-price">{{ __('messages.price') }}</button>
         </th>
         <th class="sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-sellingprice">Selling Price</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-sellingprice">{{ __('messages.product_selling_price') }}</button>
         </th>
-        <th class="sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-supplier">Supplier</button>
-        </th>
-        <th class="text-center sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-expiry">Expiry Date</button>
+        <th class="sticky-top text-center" style="z-index: 1020;">
+            <button class="table-sort fs-4 py-3" data-sort="sort-supplier">{{ __('messages.supplier') }}</button>
         </th>
         <th style="width:100px;text-align:center" class="fs-4 py-3 no-print sticky-top " style="z-index: 1020;">
-            Action
+            {{ __('messages.action') }}
         </th>
     </tr>
 </thead>

@@ -1,17 +1,17 @@
 <div class="card border mb-4">
     <div class="card-header py-2">
-        <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-info"></i>Order Items</h4>
+        <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-info"></i>{{ __('messages.sales_order_items_title') }}</h4>
     </div>
     <div class="table-responsive">
         <table class="table card-table table-vcenter table-hover">
             <thead>
                 <tr>
-                    <th class="text-center" style="width: 60px">No</th>
-                    <th>Product</th>
-                    <th class="text-center" style="width: 100px">QTY</th>
-                    <th class="text-end" style="width: 140px">Price</th>
-                    <th class="text-end" style="width: 140px">Discount</th>
-                    <th class="text-end" style="width: 140px">Amount</th>
+                    <th class="text-center" style="width: 60px">{{ __('messages.no') }}</th>
+                    <th>{{ __('messages.product') }}</th>
+                    <th class="text-center" style="width: 100px">{{ __('messages.qty') }}</th>
+                    <th class="text-end" style="width: 140px">{{ __('messages.price') }}</th>
+                    <th class="text-end" style="width: 140px">{{ __('messages.discount') }}</th>
+                    <th class="text-end" style="width: 140px">{{ __('messages.amount') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -19,14 +19,14 @@
                     // Use the SalesHelper to calculate summary info
                     // Fix the parameter names to match SalesHelper::calculateInvoiceSummary method
                     $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
-                        $sales->items,
+                        $sales->salesItems,
                         $sales->order_discount ?? 0,
-                        $sales->order_discount_type ?? 'percentage',
+                        $sales->order_discount_type ?? __('messages.percentage'),
                         $sales->tax_rate ?? 0,
                     );
                 @endphp
 
-                @foreach ($sales->items as $index => $item)
+                @foreach ($sales->salesItems as $index => $item)
                     @php
                         // Fix: Use customer_price instead of price for the calculation
                         $finalAmount = \App\Helpers\SalesHelper::calculateTotal(
@@ -42,24 +42,24 @@
                         <td>
                             <div class="strong">{{ $item->product->name }}</div>
                             @if (isset($item->product->sku) && $item->product->sku)
-                                <small class="text-muted">SKU: {{ $item->product->sku }}</small>
+                                <small class="text-muted">{{ __('messages.sku_colon') }} {{ $item->product->sku }}</small>
                             @endif
                         </td>
                         <td class="text-center">{{ $item->quantity }}</td>
                         <td class="text-end">
-                            {{ \App\Helpers\CurrencyHelper::format($item->customer_price) }}
+                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($item->customer_price) }}
                         </td>
                         <td class="text-end">
                             @if ($item->discount > 0)
                                 <span class="text-danger">
-                                    {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::format($item->discount) }}
+                                    {{ $item->discount_type === __('messages.percentage') ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
                                 </span>
                             @else
-                                -
+                                {{ __('messages.not_available') }}
                             @endif
                         </td>
                         <td class="text-end">
-                            {{ \App\Helpers\CurrencyHelper::format($finalAmount) }}
+                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalAmount) }}
                         </td>
                     </tr>
                 @endforeach

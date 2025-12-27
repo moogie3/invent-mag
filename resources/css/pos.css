@@ -1,0 +1,94 @@
+/* ============================
+   3. INVOICE CONTAINER STYLES
+   ============================ */
+#invoiceContainer {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+}
+
+#productList {
+    flex-grow: 1;
+    overflow-y: hidden;
+    border: 1px solid gainsboro;
+    padding: 10px;
+    max-height: 500px;
+}
+
+#productList:hover {
+    overflow-y: auto;
+}
+
+#productGrid {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+#totalPriceContainer {
+    padding-top: 10px;
+    background: white;
+}
+
+#productList .list-group-item {
+    transition: all 0.2s ease;
+}
+
+#productList .list-group-item:hover {
+    background-color: #f8f9fa;
+    color: #000000 !important;
+}
+
+#productList .list-group-item:hover strong,
+#productList .list-group-item:hover span,
+#productList .list-group-item:hover p,
+#productList .list-group-item:hover div,
+#productList .list-group-item:hover * {
+    color: #000000 !important;
+}
+
+.theme-dark #productList .list-group-item:hover {
+    background-color: var(--tblr-bg-surface-secondary) !important;
+    /* Darker background on hover in dark mode */
+}
+
+.theme-dark #productList .list-group-item:hover strong,
+.theme-dark #productList .list-group-item:hover span,
+.theme-dark #productList .list-group-item:hover p,
+.theme-dark #productList .list-group-item:hover div {
+    color: #000000 !important;
+    /* Force text to black */
+}
+
+.theme-dark #productList .list-group-item:hover * {
+    color: #000000 !important;
+    /* Force all text descendants to black */
+}
+
+.theme-dark #productList .list-group-item:hover .input-group-text {
+    color: #000000 !important;
+    /* Force input group text to black */
+}
+
+/* ============================
+   6. FORM & INPUT STYLES
+   ============================ */
+.discount-input-group,
+.tax-input-group {
+    width: auto;
+    max-width: 200px;
+}
+
+.discount-input-group .form-control,
+.tax-input-group .form-control {
+    max-width: 120px;
+    font-size: var(--base-font-size) !important;
+}
+
+.discount-input-group .form-select {
+    max-width: 80px;
+    font-size: var(--base-font-size) !important;
+}
+
+#paymentModal thead th {
+    font-size: 0.9rem !important;
+}

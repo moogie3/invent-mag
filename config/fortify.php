@@ -75,6 +75,10 @@ return [
 
     'home' => '/admin/dashboard',
 
+    'redirects' => [
+        'email-verification' => '/admin/email/verified',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Fortify Routes Prefix / Subdomain

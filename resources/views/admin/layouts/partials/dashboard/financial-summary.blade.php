@@ -1,8 +1,8 @@
-<div class="col-md-4 mb-4">
+<div>
     <div class="card shadow-sm border-1 h-100">
         <div class="card-status-top bg-secondary"></div>
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title"><i class="ti ti-currency-dollar fs-3 me-2"></i> Financial Summary
+            <h3 class="card-title"><i class="ti ti-currency-dollar fs-3 me-2"></i> {{ __('messages.financial_summary') }}
             </h3>
         </div>
         <div class="card-body p-3">

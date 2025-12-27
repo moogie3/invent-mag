@@ -14,6 +14,7 @@ class Product extends Model
     protected $table = 'products';
     protected $fillable = [
         'code',
+        'barcode',
         'name',
         'description',
         'image',
@@ -24,7 +25,6 @@ class Product extends Model
         'supplier_id',
         'units_id',
         'has_expiry',
-        'expiry_date',
         'low_stock_threshold',
         'warehouse_id', // Add this field to fillable
     ];
@@ -34,7 +34,6 @@ class Product extends Model
         'selling_price' => 'float',
         'stock_quantity' => 'float',
         'has_expiry' => 'boolean',
-        'expiry_date' => 'datetime:Y-m-d', // Changed from 'date' to 'datetime:Y-m-d'
         'low_stock_threshold' => 'integer',
         'warehouse_id' => 'integer', // Fixed the missing quote
     ];
@@ -69,12 +68,17 @@ class Product extends Model
         return $this->belongsTo(Unit::class, 'units_id');
     }
 
+    public function poItems()
+    {
+        return $this->hasMany(POItem::class);
+    }
+
     protected function image(): Attribute
     {
         return Attribute::make(
             get: fn($value) => $value
                 ? asset("storage/image/{$value}") // Convert filename to full URL
-                : asset('storage/default.jpg'), // Default image if no image exists
+                : asset('img/default_placeholder.png'), // Default image if no image exists
         );
     }
 
@@ -89,15 +93,7 @@ class Product extends Model
         return $this->low_stock_threshold ?? self::DEFAULT_LOW_STOCK_THRESHOLD;
     }
 
-    /**
-     * Check if the product has low stock
-     *
-     * @return bool
-     */
-    public function hasLowStock(): bool
-    {
-        return $this->stock_quantity <= $this->getLowStockThreshold();
-    }
+
 
     /**
      * Get all products with low stock
@@ -130,7 +126,16 @@ class Product extends Model
     {
         $thirtyDaysFromNow = now()->addDays(30);
 
-        return self::where('has_expiry', true)->whereNotNull('expiry_date')->where('expiry_date', '>', now())->where('expiry_date', '<=', $thirtyDaysFromNow)->get();
+        return self::whereHas('poItems', function ($query) use ($thirtyDaysFromNow) {
+            $query->whereNotNull('expiry_date')
+                  ->where('expiry_date', '>', now())
+                  ->where('expiry_date', '<=', $thirtyDaysFromNow);
+        })->with(['poItems' => function ($query) use ($thirtyDaysFromNow) {
+            $query->whereNotNull('expiry_date')
+                  ->where('expiry_date', '>', now())
+                  ->where('expiry_date', '<=', $thirtyDaysFromNow)
+                  ->orderBy('expiry_date', 'asc');
+        }])->get();
     }
 
     /**
@@ -142,6 +147,15 @@ class Product extends Model
     {
         $thirtyDaysFromNow = now()->addDays(30);
 
-        return self::where('has_expiry', true)->whereNotNull('expiry_date')->where('expiry_date', '>', now())->where('expiry_date', '<=', $thirtyDaysFromNow)->count();
+        return self::whereHas('poItems', function ($query) use ($thirtyDaysFromNow) {
+            $query->whereNotNull('expiry_date')
+                  ->where('expiry_date', '>', now())
+                  ->where('expiry_date', '<=', $thirtyDaysFromNow);
+        })->count();
+    }
+
+    public function getSoonestExpiryDateAttribute()
+    {
+        return $this->poItems->whereNotNull('expiry_date')->min('expiry_date');
     }
 }

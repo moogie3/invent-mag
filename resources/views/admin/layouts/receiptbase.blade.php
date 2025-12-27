@@ -1,5 +1,9 @@
+@php
+    $themeMode = auth()->user()->system_settings['theme_mode'] ?? 'light';
+@endphp
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="{{ $themeMode }}">
 
 <head>
     <meta charset="utf-8" />
@@ -30,12 +34,20 @@
         </div>
     </div>
     <div class="main-content">
-        @include('admin.layouts.navbar')
-        @yield('content')
+        <div class="no-print">
+            @include('admin.layouts.navbar')
+        </div>
+        <div class="receipt-container">
+            @yield('content')
+        </div>
     </div>
-    @include('admin.layouts.footer')
+    <div class="no-print">
+        @include('admin.layouts.footer')
+    </div>
     @include('admin.layouts.script')
     @vite('resources/js/admin/layouts/page-loader.js')
+    @vite('resources/js/admin/layouts/theme-toggle.js')
+    @vite('resources/js/admin/layouts/theme-visibility.js')
 </body>
 
 </html>

@@ -11,7 +11,7 @@
     <td>
         <div class="strong">{{ $item->product->name }}</div>
         @if (isset($item->product->sku) && $item->product->sku)
-            <small class="text-muted">SKU: {{ $item->product->sku }}</small>
+            <small class="text-muted">{{ __('messages.sku_colon') }} {{ $item->product->sku }}</small>
         @endif
     </td>
     <td>
@@ -32,14 +32,18 @@
             <select name="items[{{ $item->id }}][discountType]" class="form-select discount-type-input"
                 style="min-width: 70px;" data-item-id="{{ $item->id }}">
                 <option value="percentage" {{ $item->discount_type === 'percentage' ? 'selected' : '' }}>
-                    %</option>
+                    {{ __('messages.percentage') }}</option>
                 <option value="fixed" {{ $item->discount_type === 'fixed' ? 'selected' : '' }}>
-                    Rp</option>
+                    {{ __('messages.po_fixed') }}</option>
             </select>
         </div>
     </td>
     <td>
         <input type="text" name="items[{{ $item->id }}][amount]" value="{{ intval($finalAmount) }}"
             class="form-control text-end amount-input" data-item-id="{{ $item->id }}" readonly />
+    </td>
+    <td>
+        <input type="date" name="items[{{ $item->id }}][expiry_date]" value="{{ $item->expiry_date ? \Carbon\Carbon::parse($item->expiry_date)->format('Y-m-d') : '' }}"
+            class="form-control text-center expiry-date-input" data-item-id="{{ $item->id }}" />
     </td>
 </tr>

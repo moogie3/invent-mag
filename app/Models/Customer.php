@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Customer extends Model
 {
@@ -15,8 +16,22 @@ class Customer extends Model
         'name',
         'address',
         'phone_number',
-        'payment_terms'
+        'payment_terms',
+        'email',
+        'image'
     ];
+
+    protected function image(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: function ($value) {
+                if ($value && $value !== 'default_placeholder.png' && Storage::disk('public')->exists('image/' . $value)) {
+                    return asset("storage/image/{$value}");
+                }
+                return asset('img/default_placeholder.png');
+            }
+        );
+    }
 
     public function sales()
     {

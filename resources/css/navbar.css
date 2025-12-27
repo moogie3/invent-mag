@@ -1,9 +1,10 @@
 /* Navbar CSS Styles */
-@media (min-width: 768px) {
-    .nav-left {
-        width: 200px;
-    }
+
+.navbar-toggler {
+    display: block !important;
 }
+
+
 
 /* Parent container */
 .nav-container {
@@ -21,7 +22,7 @@
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.1s ease-in-out;
-    z-index: 998;
+    z-index: 99998;
 }
 
 /* Navigation dropdown */
@@ -36,7 +37,7 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease-in-out;
-    z-index: 999;
+    z-index: 99999; /* Increased z-index */
     border-radius: 8px;
     padding: 10px 20px;
 }
@@ -83,101 +84,18 @@
 }
 
 .nav-dropdown a i {
-    color: white;
+    color: lightblue;
     font-size: 18px;
 }
 
-/* Mobile Nav Styling */
-.mobile-nav {
-    position: fixed;
-    top: 0;
-    left: -100%;
-    width: 250px;
-    height: 100%;
-    background: rgba(20, 20, 20, 0.95);
-    box-shadow: 5px 0px 10px rgba(0, 0, 0, 0.2);
-    transition: left 0.3s ease-in-out;
-    z-index: 999;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.mobile-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.mobile-nav li {
-    padding: 10px 0;
-}
-
-.mobile-nav a {
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 15px;
-}
-
-/* Mobile nav active state */
-.mobile-nav.active {
-    left: 0;
-}
-
-.mobile-nav .avatar {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-}
-
-@media (max-width: 768px) {
-    .navbar-brand {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    /* FIX: Improve hamburger button clickability */
-    #mobile-menu-toggle {
-        position: relative;
-        z-index: 1000;
-        padding: 15px;
-        /* Increased padding for larger tap target */
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        display: block;
-        /* Ensure it's properly displayed */
-        margin: -10px;
-        /* Negative margin to offset increased padding */
-    }
-
-    /* FIX: Ensure the hamburger icon is visible and has a larger touch area */
-    #mobile-menu-toggle i {
-        font-size: 24px;
-        /* Larger icon */
-        pointer-events: none;
-        /* Prevent the icon from capturing events */
-    }
-
-    /* FIX: Ensure nav-left has proper positioning and doesn't block events */
-    .nav-left {
-        z-index: 1000;
-        position: relative;
-    }
-}
-
-/* Notification styling */
+/* Notification styling - Fixed positioning */
 #notification-dot {
     width: 10px;
     height: 10px;
-    bottom: 15px;
-    right: 5px;
+    top: 5px;
+    right: 6px;
     border-radius: 50%;
-    z-index: 1;
+    z-index: 10;
     background-color: red;
 }
 
@@ -212,15 +130,14 @@
 .notification-dropdown {
     width: 300px;
     max-height: 400px;
-    overflow-y: auto;
+    overflow: visible !important;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    overflow: hidden;
 }
 
 .notification-item {
     border-left: 3px solid transparent;
     padding: 10px 15px;
-    transition: background-color 0.2s;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .notification-item:hover {
@@ -228,21 +145,20 @@
     background-color: rgba(var(--tblr-primary-rgb), 0.05);
 }
 
-.notification-item .badge {
-    width: 10px;
-    height: 10px;
-    padding: 0;
-    display: inline-block;
-    border-radius: 50%;
-}
-
-/* Notification tabs styling */
 .notification-tabs .nav-link {
     border: none;
-    border-radius: 0;
-    font-size: 0.85rem;
-    font-weight: 500;
+    background: transparent;
     color: var(--tblr-body-color);
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding: 12px 16px;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-radius: 6px 6px 0 0;
+}
+
+.notification-tabs .nav-link:hover {
+    background: #f8fafc;
+    color: #1e293b;
 }
 
 .notification-tabs .nav-link.active {
@@ -255,12 +171,10 @@
     background-color: rgba(var(--tblr-primary-rgb), 0.05);
 }
 
-/* Notification groups */
 .notification-group .small.fw-medium {
     background-color: rgba(var(--tblr-secondary-rgb), 0.1);
 }
 
-/* Avatar styling in notification */
 .notification-item .avatar-sm {
     width: 32px;
     height: 32px;
@@ -269,7 +183,6 @@
     justify-content: center;
 }
 
-/* Urgency indicators */
 .notification-item .badge.bg-danger {
     background-color: #dc3545 !important;
 }
@@ -282,7 +195,6 @@
     background-color: #0dcaf0 !important;
 }
 
-/* Background colors */
 .bg-red {
     background-color: #d63939;
 }
@@ -342,4 +254,461 @@
     .notification-dropdown {
         width: 320px !important;
     }
+}
+
+.sidebar-open .nav-dropdown {
+    pointer-events: none;
+    opacity: 0;
+}
+
+.sidebar-open #navbar-brand-title,
+.sidebar-open #navbar-right-content {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+/* FIXED: Full background hover effects for navbar icons - matching sidebar style */
+.navbar .nav-link.px-0,
+.navbar .nav-link.px-2 {
+    border-radius: 8px !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    padding: 0.5rem !important;
+    /* Reduced padding to prevent cutoff */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
+    margin: 2px;
+    /* Add small margin to prevent cutoff */
+}
+
+/* FIXED: Light mode navbar hover - full background like sidebar */
+.navbar .nav-link.px-0:hover,
+.navbar .nav-link.px-2:hover {
+    background-color: #343a40 !important;
+    color: #fff !important;
+    transform: translateX(2px);
+}
+
+.navbar .nav-link:hover i {
+    color: #fff !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* FIXED: Notification bell dropdown hover - override Bootstrap defaults */
+.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:hover,
+.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus,
+.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"].show {
+    background-color: #343a40 !important;
+    color: #fff !important;
+    transform: translateX(2px);
+    outline: none !important;
+    box-shadow: none !important;
+    border-radius: 8px !important;
+    margin: 2px;
+    /* Add margin to prevent cutoff */
+}
+
+.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:hover i,
+.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus i,
+.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"].show i {
+    color: #fff !important;
+}
+
+/* Avatar dropdown hover functionality */
+.navbar .nav-item.dropdown {
+    position: relative;
+}
+
+.navbar .nav-item.dropdown .dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    pointer-events: none;
+}
+
+.navbar .nav-item.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Keep dropdown open when hovering over it */
+.navbar .nav-item.dropdown .dropdown-menu:hover {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* FIXED: Dropdown menu item hover effects - contained within dropdown */
+.dropdown-menu {
+    padding: 4px;
+}
+
+.dropdown-menu .dropdown-item {
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    margin: 0;
+    padding: 8px 12px;
+    position: relative;
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+    background-color: rgba(var(--tblr-primary-rgb), 0.1) !important;
+    color: var(--tblr-primary) !important;
+    border-color: transparent !important;
+    outline: none !important;
+}
+
+.dropdown-menu .dropdown-item i {
+    transition: color 0.2s ease;
+}
+
+.dropdown-menu .dropdown-item:hover i,
+.dropdown-menu .dropdown-item:focus i {
+    color: var(--tblr-primary) !important;
+}
+
+/* Avatar hover effects - reverted to subtle style */
+.navbar .nav-item.dropdown>.nav-link:hover .avatar {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px rgba(var(--tblr-primary-rgb), 0.3);
+    transition: all 0.3s ease;
+}
+
+/* FIXED: Dark mode navbar hover - consistent white background */
+[data-bs-theme="dark"] .navbar .nav-link.px-0,
+[data-bs-theme="dark"] .navbar .nav-link.px-2 {
+    color: white;
+}
+
+[data-bs-theme="dark"] .navbar .nav-item.dropdown>.nav-link {
+    color: white;
+}
+
+/* FIXED: Dark mode hover for bell and theme icons - consistent white background */
+[data-bs-theme="dark"] .navbar .nav-link.px-0:hover,
+[data-bs-theme="dark"] .navbar .nav-link.px-2:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    transform: translateX(2px);
+}
+
+/* FIXED: Dark icons on white background in dark mode hover */
+[data-bs-theme="dark"] #theme-toggle-navbar:hover i,
+[data-bs-theme="dark"] #notification-bell:hover i {
+    color: #000000 !important;
+}
+
+/* Custom: Make theme toggle and bell icons white in dark mode */
+[data-bs-theme="dark"] #theme-toggle-navbar i,
+[data-bs-theme="dark"] #notification-bell i {
+    color: #ffffff !important;
+}
+
+/* FIXED: Dark mode notification bell dropdown hover - override Bootstrap defaults */
+[data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:hover,
+[data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus,
+[data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"].show {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    transform: translateX(2px);
+    outline: none !important;
+    box-shadow: none !important;
+    border-radius: 8px !important;
+    margin: 2px;
+    /* Add margin to prevent cutoff */
+}
+
+[data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:hover i,
+[data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus i,
+[data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"].show i {
+    color: #000000 !important;
+}
+
+/* Dark mode hover for avatar - no background change */
+[data-bs-theme="dark"] .navbar .nav-item.dropdown>.nav-link:hover {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+[data-bs-theme="dark"] .navbar .nav-item.dropdown>.nav-link:hover .avatar {
+    color: var(--tblr-primary) !important;
+}
+
+[data-bs-theme="dark"] .dropdown-menu .dropdown-item:hover,
+[data-bs-theme="dark"] .dropdown-menu .dropdown-item:focus {
+    background-color: rgba(var(--tblr-primary-rgb), 0.15) !important;
+    color: var(--tblr-primary) !important;
+}
+
+[data-bs-theme="dark"] .dropdown-menu .dropdown-item:hover i,
+[data-bs-theme="dark"] .dropdown-menu .dropdown-item:focus i {
+    color: var(--tblr-primary) !important;
+}
+
+/* FIXED: Remove Bootstrap's default focus styles for all dropdown toggles */
+.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* FIXED: Override Bootstrap's btn-outline focus/active states if they exist */
+.navbar .nav-link.btn:focus,
+.navbar .nav-link.btn:active,
+.navbar .nav-link.btn.active,
+.navbar .nav-link.btn.show {
+    background-color: #343a40 !important;
+    color: #fff !important;
+    border-color: #343a40 !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+[data-bs-theme="dark"] .navbar .nav-link.btn:focus,
+[data-bs-theme="dark"] .navbar .nav-link.btn:active,
+[data-bs-theme="dark"] .navbar .nav-link.btn.active,
+[data-bs-theme="dark"] .navbar .nav-link.btn.show {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Notification bell hover when there's a notification dot */
+.nav-item.dropdown:hover #notification-dot {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Smooth transitions for all hover states */
+.navbar .nav-link,
+.navbar .nav-link i,
+.navbar .avatar {
+    transition: all 0.2s ease;
+}
+
+/* Additional enhancement for notification dropdown hover */
+.nav-item.dropdown:hover .notification-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Ensure notification dropdown stays open when hovering */
+.notification-dropdown:hover {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* FIXED: Ensure consistent hover states across all navbar elements */
+.navbar .nav-item .nav-link {
+    border-radius: var(--tblr-border-radius);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* FIXED: Universal override for any Bootstrap interference */
+.navbar .nav-item .nav-link:hover,
+.navbar .nav-item .nav-link:focus,
+.navbar .nav-item .nav-link.show,
+.navbar .nav-item .nav-link:active {
+    background-color: #343a40 !important;
+    color: #fff !important;
+    transform: translateX(2px);
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+}
+
+.navbar .nav-item .nav-link:hover i,
+.navbar .nav-item .nav-link:focus i,
+.navbar .nav-item .nav-link.show i,
+.navbar .nav-item .nav-link:active i {
+    color: #fff !important;
+}
+
+/* FIXED: Dark mode universal override */
+[data-bs-theme="dark"] .navbar .nav-item .nav-link:hover,
+[data-bs-theme="dark"] .navbar .nav-item .nav-link:focus,
+[data-bs-theme="dark"] .navbar .nav-item .nav-link.show,
+[data-bs-theme="dark"] .navbar .nav-item .nav-link:active {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    transform: translateX(2px);
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+}
+
+[data-bs-theme="dark"] .navbar .nav-item .nav-link:hover i,
+[data-bs-theme="dark"] .navbar .nav-item .nav-link:focus i,
+[data-bs-theme="dark"] .navbar .nav-item .nav-link.show i,
+[data-bs-theme="dark"] .navbar .nav-item .nav-link:active i {
+    color: #000000 !important;
+}
+
+/* EXCEPTION: Avatar dropdown should not have background hover effect */
+[data-bs-theme="dark"] .navbar .nav-item.dropdown#avatar-dropdown>.nav-link:hover,
+[data-bs-theme="dark"] .navbar .nav-item.dropdown#avatar-dropdown>.nav-link:focus {
+    background-color: transparent !important;
+    color: inherit !important;
+    transform: none !important;
+}
+
+.navbar .nav-item.dropdown#avatar-dropdown>.nav-link:hover,
+.navbar .nav-item.dropdown#avatar-dropdown>.nav-link:focus {
+    background-color: transparent !important;
+    color: inherit !important;
+    transform: none !important;
+}
+
+/* Navbar scrolled effect */
+body.sticky-navbar .navbar.scrolled {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, backdrop-filter 0.3s ease-in-out;
+}
+
+[data-bs-theme="dark"] body.sticky-navbar .navbar.scrolled {
+    background-color: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+/* Sticky Navbar */
+body.sticky-navbar .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+}
+
+body.layout-navbar-v2.sidebar-open #navbar-brand-title {
+    left: calc(50% - 125px);
+}
+
+/* New styles for collapsed navigation */
+.nav-dropdown.collapsed ul { /* Corrected selector */
+    gap: 0; /* Remove gap between items */
+}
+
+.nav-dropdown.collapsed li { /* Corrected selector */
+    position: relative;
+}
+
+.nav-dropdown.collapsed li a {
+    padding: 10px; /* Adjust padding for icon-only */
+    display: flex; /* Ensure flex behavior */
+    align-items: center; /* Center vertically */
+    height: 40px; /* Fixed height for icon */
+    overflow: hidden; /* Hide overflowing title initially */
+    position: relative;
+    transition: width 0.3s ease-in-out; /* Animate width change */
+}
+
+.nav-dropdown.collapsed li a .nav-link-title {
+    max-width: 0; /* Hide title by default */
+    opacity: 0;
+    visibility: hidden;
+    white-space: nowrap;
+    transition: max-width 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    margin-left: 8px; /* Space between icon and title */
+}
+
+.nav-dropdown.collapsed li a:hover {
+    width: auto; /* Allow width to expand */
+    justify-content: flex-start; /* Align icon and title to start */
+}
+
+.nav-dropdown.collapsed li a:hover .nav-link-title {
+    max-width: 200px; /* Max width for the title */
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Staggered dropdown children animation */
+.dropdown-menu.staggered-open .dropdown-item {
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: slideIn 0.3s forwards ease-out;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =================================================================
+   CUSTOM STYLES for Main Navigation Dropdown
+   - Isolates main nav dropdowns from icon dropdowns (avatar, bell).
+   - Sets custom background, font size, alignment, and hover effects.
+   ================================================================= */
+
+/* Variables for the main navigation dropdown */
+:root {
+    --main-nav-dropdown-bg: rgba(20, 20, 20, 0.98); /* Near-black background */
+    --main-nav-dropdown-item-color: #ffffff; /* White text */
+    --main-nav-dropdown-item-hover-bg: rgba(255, 255, 255, 0.1); /* Lighter grey hover */
+    --main-nav-dropdown-item-hover-color: #ffffff; /* White hover text */
+    --main-nav-dropdown-font-size: 0.8125rem; /* Smaller font size (13px) */
+}
+
+/* Apply styles to the main navigation dropdown menu */
+.nav-dropdown .dropdown-menu {
+    background-color: var(--main-nav-dropdown-bg) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.5rem;
+}
+
+/* Style for the dropdown items (the links) */
+.nav-dropdown .dropdown-menu .dropdown-item {
+    color: var(--main-nav-dropdown-item-color) !important;
+    font-size: var(--main-nav-dropdown-font-size) !important;
+    justify-content: center !important; /* Center content */
+    text-align: center !important;
+    gap: 0.75rem; /* Space between icon and text */
+}
+
+/* Hover/Focus state for the dropdown items */
+.nav-dropdown .dropdown-menu .dropdown-item:hover,
+.nav-dropdown .dropdown-menu .dropdown-item:focus {
+    color: var(--main-nav-dropdown-item-hover-color) !important;
+    background-color: var(--main-nav-dropdown-item-hover-bg) !important;
+    text-decoration: none !important; /* Remove underline on hover */
+}
+
+/* General override to remove underline from main nav links on hover */
+.nav-dropdown > ul > li > a:hover {
+    text-decoration: none !important;
 }

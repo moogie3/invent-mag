@@ -1,0 +1,132 @@
+@import url('https://rsms.me/inter/inter.css');
+
+:root {
+    --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue,
+        sans-serif;
+}
+
+.error-page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-feature-settings: "cv03", "cv04", "cv11";
+    overflow: hidden;
+    /* Prevent scrollbars from blur effect */
+}
+
+/* Create blurred background using pseudo-element */
+.error-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('@/images/background.jpeg') no-repeat center center;
+    background-size: cover;
+    filter: blur(5px);
+    /* Adjust blur intensity as needed */
+    z-index: -1;
+    /* Extend slightly beyond viewport to avoid edge blur artifacts */
+    transform: scale(1.1);
+}
+
+.error-page .page-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+.error-page .page-body {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.error-page .container-fluid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+.container-tight .empty {
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 525px;
+    margin: 0 auto;
+    animation: fadeInUp 0.8s ease-in-out;
+    position: relative;
+    z-index: 2;
+    /* Optional: Add semi-transparent background to improve readability */
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+}
+
+/* Dark theme support for the content container */
+[data-bs-theme="dark"] .container-tight .empty {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* ===========================
+   2. LAYOUT STRUCTURE
+   ============================ */
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: 85vh;
+}
+
+.page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    /* Or your desired background color */
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-content {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.page-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

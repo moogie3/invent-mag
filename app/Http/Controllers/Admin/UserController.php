@@ -4,37 +4,30 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
-    public function __construct()
+    protected $userService;
+
+    public function __construct(UserService $userService)
     {
         $this->middleware('permission:view-users', ['only' => ['index', 'show']]);
         $this->middleware('permission:create-users', ['only' => ['create', 'store']]);
         $this->middleware('permission:edit-users', ['only' => ['edit', 'update']]);
         $this->middleware('permission:delete-users', ['only' => ['destroy']]);
+        $this->userService = $userService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $users = User::all();
-        $roles = Role::all();
-        $permissions = Permission::all();
-        return view('admin.users.index', compact('users', 'roles', 'permissions'));
+        $data = $this->userService->getUserIndexData();
+        return view('admin.users.index', $data);
     }
 
-    
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -45,58 +38,31 @@ class UserController extends Controller
             'permissions' => 'nullable|array',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'shopname' => $request->shopname, // Assuming these fields exist in your User model
-            'address' => $request->address,
-            'avatar' => $request->avatar,
-            'timezone' => $request->timezone,
-        ]);
-
-        if ($request->has('roles')) {
-            $user->syncRoles($request->roles);
+        try {
+            $this->userService->createUser($request->all());
+            return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error creating user: ' . $e->getMessage())->withInput();
         }
-
-        if ($request->has('permissions')) {
-            $user->syncPermissions($request->permissions);
-        }
-
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(User $user)
     {
-        // Not typically used for user management, but can be implemented if needed
+        $data = $this->userService->getUserEditData($user);
+        return response()->json($data);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(User $user)
     {
-        $roles = Role::all();
-        $permissions = Permission::all();
-        $userRoles = $user->roles->pluck('name')->toArray();
-        $userPermissions = $user->getAllPermissions()->pluck('name')->toArray();
-
-        \Log::info('User Roles from server (backend):', ['roles' => $userRoles]);
-        \Log::info('User Permissions from server (backend):', ['permissions' => $userPermissions]);
+        $data = $this->userService->getUserEditData($user);
 
         if (request()->ajax()) {
-            return response()->json(compact('user', 'roles', 'permissions', 'userRoles', 'userPermissions'));
+            return response()->json($data);
         }
 
-        return view('admin.users.edit', compact('user', 'roles', 'permissions', 'userRoles', 'userPermissions'));
+        return view('admin.users.edit', $data);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -107,56 +73,64 @@ class UserController extends Controller
             'permissions' => 'nullable|array',
         ]);
 
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'shopname' => $request->shopname,
-            'address' => $request->address,
-            'avatar' => $request->avatar,
-            'timezone' => $request->timezone,
-        ]);
+        try {
+            $this->userService->updateUser($user, $request->all());
 
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-            $user->save();
+            if (request()->ajax()) {
+                $user->load('roles', 'permissions');
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User updated successfully.',
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'roles' => $user->getRoleNames(),
+                        'permissions' => $user->getAllPermissions()->pluck('name'),
+                    ],
+                ]);
+            }
+
+            return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        } catch (\Exception $e) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Error updating user: ' . $e->getMessage()], 500);
+            }
+            return back()->with('error', 'Error updating user: ' . $e->getMessage())->withInput();
         }
-
-        if ($request->has('roles')) {
-            $user->syncRoles($request->roles);
-        } else {
-            $user->syncRoles([]); // Remove all roles if none are selected
-        }
-
-        if ($request->has('permissions')) {
-            $user->syncPermissions($request->permissions);
-        } else {
-            $user->syncPermissions([]); // Remove all direct permissions if none are selected
-        }
-
-        if (request()->ajax()) {
-            $user->load('roles', 'permissions'); // Eager load relationships
-            return response()->json([
-                'success' => true,
-                'message' => 'User updated successfully.',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'roles' => $user->getRoleNames(),
-                    'permissions' => $user->getAllPermissions()->pluck('name'),
-                ]
-            ]);
-        }
-
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
-        $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        try {
+            $this->userService->deleteUser($user);
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'User deleted successfully.']);
+            }
+
+            return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Error deleting user: ' . $e->getMessage()], 500);
+            }
+            return redirect()->route('admin.users.index')->with('error', 'Error deleting user: ' . $e->getMessage());
+        }
+    }
+
+    public function getRolePermissions()
+    {
+        $roles = Role::with('permissions')->get();
+        $allPermissions = Permission::all()->pluck('name');
+
+        $rolePermissions = [];
+        foreach ($roles as $role) {
+            $rolePermissions[$role->name] = $role->permissions->pluck('name')->toArray();
+        }
+
+        return response()->json([
+            'rolePermissions' => $rolePermissions,
+            'allPermissions' => $allPermissions,
+        ]);
     }
 }

@@ -1,7 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+@php
+    $themeMode = auth()->user()->system_settings['theme_mode'] ?? 'light';
+@endphp
 
-{{-- HEAD --}}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
 
 <head>
     <meta charset="utf-8" />
@@ -12,7 +14,7 @@
     <link href="{{ asset('tabler/dist/css/tabler-flags.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-payments.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
-    @vite('resources/css/app.css')
+    @vite('resources/css/error.css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </head>
 
@@ -41,6 +43,8 @@
     @include('admin.layouts.footer')
     @include('admin.layouts.script')
     @vite('resources/js/admin/layouts/page-loader.js')
+    @vite('resources/js/admin/layouts/theme-toggle.js')
+    @vite('resources/js/admin/layouts/theme-visibility.js')
 </body>
 
 </html>

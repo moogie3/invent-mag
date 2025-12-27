@@ -1,0 +1,230 @@
+name: 'Currency Settings'
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/currency-settings
+    metadata:
+      custom: []
+      groupName: 'Currency Settings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Display a listing of the currency settings.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      per_page:
+        custom: []
+        name: per_page
+        description: 'The number of settings to return per page. Defaults to 15.'
+        required: false
+        example: 25
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      per_page: 25
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"currency_symbol":"$","decimal_separator":".",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/v1/currency-settings/{id}'
+    metadata:
+      custom: []
+      groupName: 'Currency Settings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update the specified resource in storage.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the currency setting.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      currency_setting:
+        custom: []
+        name: currency_setting
+        description: 'The ID of the currency setting.'
+        required: true
+        example: '1'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: consequatur
+      currency_setting: '1'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      currency_symbol:
+        custom: []
+        name: currency_symbol
+        description: 'The currency symbol.'
+        required: true
+        example: '"$"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      decimal_separator:
+        custom: []
+        name: decimal_separator
+        description: 'The decimal separator.'
+        required: true
+        example: '"."'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      thousand_separator:
+        custom: []
+        name: thousand_separator
+        description: 'The thousand separator.'
+        required: true
+        example: '","'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      decimal_places:
+        custom: []
+        name: decimal_places
+        description: 'The number of decimal places.'
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      position:
+        custom: []
+        name: position
+        description: 'The position of the currency symbol.'
+        required: true
+        example: '"prefix"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      currency_code:
+        custom: []
+        name: currency_code
+        description: 'The currency code.'
+        required: true
+        example: '"USD"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      locale:
+        custom: []
+        name: locale
+        description: 'The locale.'
+        required: true
+        example: '"en_US"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      currency_symbol: '"$"'
+      decimal_separator: '"."'
+      thousand_separator: '","'
+      decimal_places: 2
+      position: '"prefix"'
+      currency_code: '"USD"'
+      locale: '"en_US"'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"currency_symbol":"¥","decimal_separator":",",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Currency setting not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
+        status: 422
+        content: '{"message":"The currency_symbol field is required.","errors":{"currency_symbol":["The currency_symbol field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null

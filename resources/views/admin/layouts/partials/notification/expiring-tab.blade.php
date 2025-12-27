@@ -11,6 +11,7 @@
                             <div>
                                 <span class="fw-bold">{{ $item['title'] }}</span>
                                 <small class="text-muted d-block">{{ $item['description'] }}</small>
+                                <small class="text-muted d-block">{{ __('messages.po_id') }}: {{ $item['po_id'] }} | {{ __('messages.quantity') }}: {{ $item['quantity'] }} | {{ __('messages.expiring_in') }} {{ $item['days_remaining'] }} {{ __('messages.days') }}</small>
                             </div>
                         </div>
                         <span class="badge {{ str_replace('text-', 'bg-', $item['status_badge']) }}-lt">
@@ -21,6 +22,6 @@
             @endforeach
         </div>
     @else
-        <div class="text-muted text-center">No expiring products</div>
+        <div class="text-muted text-center">{{ __('messages.no_expiring_products') }}</div>
     @endif
 </div>

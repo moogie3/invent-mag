@@ -1,6 +1,6 @@
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-white">
-        <h3 class="card-title"><i class="ti ti-shopping-cart"></i> Purchase Order Information</h3>
+        <h3 class="card-title"><i class="ti ti-shopping-cart"></i> {{ __('messages.po_order_information_title') }}</h3>
     </div>
     <div class="card-body">
         @include('admin.layouts.partials.po.create.basic-info')

@@ -9,9 +9,9 @@
     <td class="sort-duedate" data-date="{{ $po->due_date->format('Y-m-d') }}">
         {{ $po->due_date->format('d F Y') }}
     </td>
-    <td class="sort-amount" data-amount="{{ $po->total }}">
-        {{ \App\Helpers\CurrencyHelper::format($po->total) }}
-        <span class="raw-amount" style="display: none;">{{ $po->total }}</span>
+    <td class="sort-amount" data-amount="{{ $po->total_amount }}">
+        {{ \App\Helpers\CurrencyHelper::format($po->total_amount) }}
+        <span class="raw-amount" style="display: none;">{{ $po->total_amount }}</span>
     </td>
     <td class="sort-payment no-print">{{ $po->payment_type }}</td>
     <td class="sort-status">

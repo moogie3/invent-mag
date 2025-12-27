@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
+class ProfileService
+{
+    public function updateUser(User $user, array $data)
+    {
+        $user->name = $data['name'];
+        if (isset($data['email'])) {
+            $user->email = $data['email'];
+        }
+        $user->shopname = $data['shopname'];
+        $user->address = $data['address'];
+        $user->timezone = $data['timezone'];
+
+        if (isset($data['avatar'])) {
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $user->avatar = $data['avatar']->store('avatars', 'public');
+        }
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        if (isset($data['password']) && !empty($data['password'])) {
+            if (!Hash::check($data['current_password'], $user->password)) {
+                return ['success' => false, 'message' => 'Current password is incorrect.'];
+            }
+            $user->password = Hash::make($data['password']);
+            $user->save(); // Save again if password was updated
+        }
+
+        return ['success' => true, 'message' => 'Profile updated successfully!'];
+    }
+
+    public function deleteAvatar(User $user)
+    {
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+            $user->avatar = null;
+            $user->save();
+        }
+
+        return ['success' => true, 'message' => 'Avatar deleted successfully!'];
+    }
+}

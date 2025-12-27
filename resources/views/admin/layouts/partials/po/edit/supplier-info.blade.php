@@ -1,9 +1,10 @@
 <div class="card border-0 h-100">
     <div class="card-body p-3">
         <h4 class="card-title mb-3">
-            <i class="ti ti-building-store me-2 text-primary"></i>Supplier
+            <i class="ti ti-building-store me-2 text-primary"></i>{{ __('messages.supplier') }}
         </h4>
-        <h5 class="mb-2">{{ $pos->supplier->name }}</h5>
+        <input type="hidden" name="supplier_id" value="{{ $pos->supplier->id }}">
+        <h4 class="mb-2">{{ $pos->supplier->name }}</h4>
         <div class="text-muted mb-1">
             <i class="ti ti-map-pin me-1"></i>
             {{ $pos->supplier->address }}

@@ -1,9 +1,9 @@
 <div class="mb-2 pb-2">
     <div class="row g-3">
         <div class="col-md-6">
-            <label class="form-label">Supplier</label>
+            <label class="form-label">{{ __('messages.supplier') }}</label>
             <select class="form-select" name="supplier_id">
-                <option value="">Select Supplier</option>
+                <option value="">{{ __('messages.select_supplier') }}</option>
                 @foreach ($suppliers as $supplier)
                     <option value="{{ $supplier->id }}">
                         {{ $supplier->name }}
@@ -12,9 +12,9 @@
             </select>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Category</label>
+            <label class="form-label">{{ __('messages.category') }}</label>
             <select class="form-select" name="category_id">
-                <option value="">Select Category</option>
+                <option value="">{{ __('messages.select_category') }}</option>
                 @foreach ($categories as $category)
                     <option value="{{ $category->id }}">
                         {{ $category->name }}

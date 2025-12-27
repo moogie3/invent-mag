@@ -3,7 +3,7 @@
 @section('title', 'Error 404')
 
 @section('content')
-    <div class="page page-center">
+    <div class="page">
         <div class="container-tight py-4">
             <div class="empty">
                 <div class="mb-5">
@@ -12,7 +12,7 @@
                 </div>
                 <div class="empty-header">404</div>
                 <p class="empty-title">Oops… You just found an error page</p>
-                <p class="empty-subtitle text-secondary">
+                <p class="empty-subtitle">
                     We are sorry but the page you are looking for was not found
                 </p>
             </div>

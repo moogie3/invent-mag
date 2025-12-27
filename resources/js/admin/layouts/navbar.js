@@ -1,6 +1,6 @@
 /**
- * Navbar functionality
- * Handles notifications, navigation hover effects, and mobile menu
+ * Enhanced Navbar functionality
+ * Handles notifications, navigation hover effects, avatar hover dropdown, and mobile menu
  */
 document.addEventListener("DOMContentLoaded", function () {
     // Initialize Bootstrap components
@@ -10,6 +10,85 @@ document.addEventListener("DOMContentLoaded", function () {
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    // Avatar dropdown hover functionality
+    const initAvatarHoverDropdown = () => {
+        const avatarDropdowns = document.querySelectorAll("#avatar-dropdown");
+
+        avatarDropdowns.forEach((dropdown) => {
+            const dropdownMenu = dropdown.querySelector(".dropdown-menu");
+            let hoverTimeout;
+
+            if (!dropdownMenu) return;
+
+            // Show dropdown on hover
+            dropdown.addEventListener("mouseenter", function () {
+                clearTimeout(hoverTimeout);
+
+                // Close any other open dropdowns first
+                document
+                    .querySelectorAll(".dropdown-menu.show")
+                    .forEach((menu) => {
+                        if (menu !== dropdownMenu) {
+                            menu.classList.remove("show");
+                            const otherDropdown = menu.closest(".dropdown");
+                            if (otherDropdown) {
+                                otherDropdown
+                                    .querySelector(
+                                        '[data-bs-toggle="dropdown"]'
+                                    )
+                                    ?.setAttribute("aria-expanded", "false");
+                            }
+                        }
+                    });
+
+                // Show current dropdown
+                dropdownMenu.classList.add("show");
+                this.querySelector('[data-bs-toggle="dropdown"]')?.setAttribute(
+                    "aria-expanded",
+                    "true"
+                );
+            });
+
+            // Hide dropdown when mouse leaves
+            dropdown.addEventListener("mouseleave", function () {
+                hoverTimeout = setTimeout(() => {
+                    dropdownMenu.classList.remove("show");
+                    this.querySelector(
+                        '[data-bs-toggle="dropdown"]'
+                    )?.setAttribute("aria-expanded", "false");
+                }, 300); // 300ms delay before hiding
+            });
+
+            // Keep dropdown open when hovering over the dropdown menu itself
+            dropdownMenu.addEventListener("mouseenter", function () {
+                clearTimeout(hoverTimeout);
+            });
+
+            dropdownMenu.addEventListener("mouseleave", function () {
+                hoverTimeout = setTimeout(() => {
+                    this.classList.remove("show");
+                    dropdown
+                        .querySelector('[data-bs-toggle="dropdown"]')
+                        ?.setAttribute("aria-expanded", "false");
+                }, 300);
+            });
+
+            // Prevent default Bootstrap click behavior for avatar dropdown on desktop
+            const dropdownToggle = dropdown.querySelector(
+                '[data-bs-toggle="dropdown"]'
+            );
+            if (dropdownToggle) {
+                dropdownToggle.addEventListener("click", function (e) {
+                    // Only prevent default if we're not on mobile
+                    if (window.innerWidth >= 768) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                });
+            }
+        });
+    };
 
     // Remember the active notification tab
     function handleTabClick(e) {
@@ -29,19 +108,45 @@ document.addEventListener("DOMContentLoaded", function () {
     // Set the active tab when dropdown is shown
     const notificationBell = document.getElementById("notification-bell");
     if (notificationBell) {
-        notificationBell.addEventListener("click", function () {
-            // Delay slightly to ensure dropdown is rendered
-            setTimeout(() => {
-                const savedTab = localStorage.getItem("activeNotificationTab");
-                if (savedTab) {
-                    const tabToActivate = document.getElementById(savedTab);
-                    if (tabToActivate) {
-                        // Create and dispatch a click event
-                        const clickEvent = new Event("click");
-                        tabToActivate.dispatchEvent(clickEvent);
+        // For click functionality (mobile)
+        notificationBell.addEventListener("click", function (e) {
+            // Only handle click on mobile devices
+            if (window.innerWidth < 768) {
+                setTimeout(() => {
+                    const savedTab = localStorage.getItem(
+                        "activeNotificationTab"
+                    );
+                    if (savedTab) {
+                        const tabToActivate = document.getElementById(savedTab);
+                        if (tabToActivate) {
+                            const clickEvent = new Event("click");
+                            tabToActivate.dispatchEvent(clickEvent);
+                        }
                     }
-                }
-            }, 100);
+                }, 100);
+            } else {
+                // Prevent default Bootstrap behavior on desktop (we handle with hover)
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+
+        // For hover functionality (desktop)
+        notificationBell.addEventListener("mouseenter", function () {
+            if (window.innerWidth >= 768) {
+                setTimeout(() => {
+                    const savedTab = localStorage.getItem(
+                        "activeNotificationTab"
+                    );
+                    if (savedTab) {
+                        const tabToActivate = document.getElementById(savedTab);
+                        if (tabToActivate) {
+                            const clickEvent = new Event("click");
+                            tabToActivate.dispatchEvent(clickEvent);
+                        }
+                    }
+                }, 100);
+            }
         });
     }
 
@@ -97,18 +202,18 @@ document.addEventListener("DOMContentLoaded", function () {
                                             }
                                         })
                                         .catch((error) => {
-                                            console.error(
-                                                "Error checking notification count:",
-                                                error
-                                            );
+                                            // console.error(
+                                            //     "Error checking notification count:",
+                                            //     error
+                                            // );
                                         });
                                 }
                             })
                             .catch((error) => {
-                                console.error(
-                                    "Error marking notification as read:",
-                                    error
-                                );
+                                // console.error(
+                                //     "Error marking notification as read:",
+                                //     error
+                                // );
                             });
                     }
                 });
@@ -173,10 +278,10 @@ document.addEventListener("DOMContentLoaded", function () {
                                 }
                             })
                             .catch((error) => {
-                                console.error(
-                                    "Error fetching notification list:",
-                                    error
-                                );
+                                // console.error(
+                                //     "Error fetching notification list:",
+                                //     error
+                                // );
                             });
                     }
                 } else if (data.count === 0 && notificationDot) {
@@ -185,143 +290,90 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             })
             .catch((error) => {
-                console.error("Error checking notifications:", error);
+                // console.error("Error checking notifications:", error);
             });
     };
 
     // Function to update notification dropdown content
     const updateNotificationDropdown = (notifications) => {
-        // Function implementation remains the same
-        // ...
+        // Implementation for updating notification content
+        // This would depend on your specific notification structure
     };
 
     // Navigation hover functionality
     const initNavHover = () => {
         const brandTrigger = document.getElementById("brand-trigger");
         const navContainer = document.querySelector(".nav-container");
+        const navDropdown = document.getElementById("nav-dropdown");
         const overlay = document.getElementById("nav-overlay");
-        const dropdown = document.getElementById("nav-dropdown");
-        let timeout;
+        let hoverTimeout;
 
-        if (!brandTrigger || !navContainer || !dropdown) return;
+        if (!brandTrigger || !navContainer || !navDropdown) return;
 
-        // Show dropdown on hover
+        const navItems = navDropdown.querySelectorAll('ul > li'); // Get all top-level nav items
+
+        // Show dropdown on hover of brand trigger (icon only)
         brandTrigger.addEventListener("mouseenter", function () {
-            clearTimeout(timeout);
-            navContainer.classList.add("active");
+            clearTimeout(hoverTimeout);
+            navContainer.classList.add("active"); // Show the main dropdown container
+            navDropdown.classList.add("collapsed"); // Collapse menu to icons
         });
 
-        // Hide dropdown when mouse leaves
+        // Hide dropdown and reset when mouse leaves nav-container
         navContainer.addEventListener("mouseleave", function () {
-            timeout = setTimeout(() => {
+            hoverTimeout = setTimeout(() => {
                 navContainer.classList.remove("active");
+                navDropdown.classList.remove("collapsed");
             }, 300);
         });
 
-        // Prevent dropdown from closing when hovering inside it
-        dropdown.addEventListener("mouseenter", function () {
-            clearTimeout(timeout);
-        });
-
-        dropdown.addEventListener("mouseleave", function () {
-            timeout = setTimeout(() => {
-                navContainer.classList.remove("active");
-            }, 300);
+        // Prevent dropdown from closing when hovering inside it (if not collapsed)
+        navDropdown.addEventListener("mouseenter", function () {
+            clearTimeout(hoverTimeout);
         });
 
         // Close dropdown when clicking overlay
         if (overlay) {
             overlay.addEventListener("click", function () {
                 navContainer.classList.remove("active");
+                navDropdown.classList.remove("collapsed");
+                
             });
         }
     };
 
-    // FIX: Improved Mobile navigation functionality
-    const initMobileNav = () => {
-        const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
-        const mobileNav = document.getElementById("mobile-nav");
-        const overlay = document.getElementById("nav-overlay");
-
-        if (!mobileMenuToggle || !mobileNav) {
-            console.error("Mobile menu elements not found");
-            return;
-        }
-
-        // FIX: Use touchstart event for mobile to improve responsiveness
-        ["click", "touchstart"].forEach((eventType) => {
-            mobileMenuToggle.addEventListener(eventType, function (event) {
-                event.preventDefault(); // Prevent default behavior
-                event.stopPropagation(); // Stop event from propagating
-
-                console.log("Mobile menu toggle clicked"); // Debugging
-                mobileNav.classList.toggle("active");
-
-                // Also toggle the overlay for better UX
-                if (overlay) {
-                    if (mobileNav.classList.contains("active")) {
-                        overlay.style.visibility = "visible";
-                        overlay.style.opacity = "1";
-                    } else {
-                        overlay.style.visibility = "hidden";
-                        overlay.style.opacity = "0";
-                    }
-                }
-            });
-        });
-
-        // Close menu when clicking on the overlay
-        if (overlay) {
-            overlay.addEventListener("click", function () {
-                mobileNav.classList.remove("active");
-                overlay.style.visibility = "hidden";
-                overlay.style.opacity = "0";
-            });
-        }
-
-        // Close menu when clicking outside
-        document.addEventListener("click", function (event) {
-            if (
-                mobileNav.classList.contains("active") &&
-                !mobileNav.contains(event.target) &&
-                !mobileMenuToggle.contains(event.target)
-            ) {
-                mobileNav.classList.remove("active");
-                if (overlay) {
-                    overlay.style.visibility = "hidden";
-                    overlay.style.opacity = "0";
-                }
+    // Staggered dropdown children animation
+    const initStaggeredDropdown = () => {
+        document.querySelectorAll('.nav-item.dropdown > .nav-link.dropdown-toggle').forEach(toggle => {
+            const dropdown = toggle.closest('.nav-item.dropdown');
+            if (dropdown && (dropdown.id === 'reports-nav-item' || dropdown.id === 'accounting-nav-item')) {
+                // For these menus, let the default Bootstrap data-bs-toggle handle it.
+                return;
             }
-        });
 
-        // FIX: Add touch event support for better mobile experience
-        document.addEventListener("touchstart", function (event) {
-            if (
-                mobileNav.classList.contains("active") &&
-                !mobileNav.contains(event.target) &&
-                !mobileMenuToggle.contains(event.target) &&
-                event.target !== overlay
-            ) {
-                mobileNav.classList.remove("active");
-                if (overlay) {
-                    overlay.style.visibility = "hidden";
-                    overlay.style.opacity = "0";
-                }
-            }
-        });
+            toggle.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent default Bootstrap dropdown behavior
+                e.stopPropagation(); // Stop propagation to prevent parent dropdowns from closing
 
-        // FIX: Make each nav item close the menu when clicked
-        const mobileNavItems = mobileNav.querySelectorAll("a");
-        mobileNavItems.forEach((item) => {
-            item.addEventListener("click", function () {
-                // Close mobile menu after selecting an item
-                // (unless it's a dropdown trigger)
-                if (!this.classList.contains("dropdown-toggle")) {
-                    mobileNav.classList.remove("active");
-                    if (overlay) {
-                        overlay.style.visibility = "hidden";
-                        overlay.style.opacity = "0";
-                    }
+                const dropdownMenu = this.closest('.dropdown').querySelector('.dropdown-menu');
+                if (!dropdownMenu) return;
+
+                // Toggle the 'show' class for Bootstrap's internal handling
+                dropdownMenu.classList.toggle('show');
+                this.setAttribute('aria-expanded', dropdownMenu.classList.contains('show'));
+
+                const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.add('staggered-open');
+                    dropdownItems.forEach((item, index) => {
+                        item.style.animationDelay = `${index * 0.05}s`; // Staggered delay
+                    });
+                } else {
+                    dropdownMenu.classList.remove('staggered-open');
+                    dropdownItems.forEach(item => {
+                        item.style.animationDelay = ''; // Clear delay
+                    });
                 }
             });
         });
@@ -339,18 +391,146 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
+    // Close dropdowns when clicking outside (for better UX)
+    const initOutsideClickHandler = () => {
+        document.addEventListener("click", function (e) {
+            // Close all hover dropdowns when clicking outside
+            if (!e.target.closest(".nav-item.dropdown") && !e.target.closest("#nav-dropdown")) {
+                document
+                    .querySelectorAll(".nav-item.dropdown .dropdown-menu.show")
+                    .forEach((menu) => {
+                        menu.classList.remove("show");
+                        const dropdown = menu.closest(".dropdown");
+                        if (dropdown) {
+                            dropdown
+                                .querySelector('[data-bs-toggle="dropdown"]')
+                                ?.setAttribute("aria-expanded", "false");
+                        }
+                    });
+                // Also close the main nav-dropdown if open and not clicked inside
+                const navContainer = document.querySelector(".nav-container");
+                const navDropdown = document.getElementById("nav-dropdown");
+                if (navContainer.classList.contains("active") && !e.target.closest("#nav-dropdown")) {
+                    navContainer.classList.remove("active");
+                    navDropdown.classList.remove("collapsed");
+                }
+            }
+        });
+    };
+
+    // Mobile responsive adjustments
+    const initResponsiveBehavior = () => {
+        const handleResize = () => {
+            // Re-enable click behavior on mobile
+            if (window.innerWidth < 768) {
+                // Remove hover effects on mobile
+                document
+                    .querySelectorAll(".nav-item.dropdown")
+                    .forEach((dropdown) => {
+                        dropdown.style.pointerEvents = "auto";
+                    });
+            }
+        };
+
+        window.addEventListener("resize", handleResize);
+        handleResize(); // Initial call
+    };
+
     // Initialize all navbar functionality
+    initAvatarHoverDropdown();
     initNotifications();
     initNavHover();
-    initMobileNav();
+    initStaggeredDropdown(); // New function call
     fixNotificationTabsDropdown();
+    initOutsideClickHandler();
+    initResponsiveBehavior();
 
     // Check for notifications immediately
     checkForNewNotifications();
 
     // Check for new notifications every 5 minutes
     setInterval(checkForNewNotifications, 5 * 60 * 1000);
+});
 
-    // Optional: Uncomment to enable more frequent notification count updates
-    // setInterval(updateNotificationCount, 60000); // Check every minute
+
+// Sticky Navbar functionality
+document.addEventListener("DOMContentLoaded", function () {
+    const navbar = document.querySelector(".navbar");
+    if (navbar) {
+        window.addEventListener("scroll", function () {
+            if (window.scrollY > 50) {
+                // Adjust this value as needed
+                navbar.classList.add("scrolled");
+            }
+            else {
+                navbar.classList.remove("scrolled");
+            }
+        });
+    }
+});
+
+// Sidebar toggle functionality
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebarToggle = document.getElementById("sidebar-toggle");
+    const body = document.body;
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener("click", function () {
+            body.classList.toggle("sidebar-open");
+        });
+    }
+});
+
+// HYBRID ANIMATION FOR REPORTS DROPDOWN
+document.addEventListener('DOMContentLoaded', function () {
+    const reportsNavItem = document.getElementById('reports-nav-item');
+
+    if (reportsNavItem) {
+        reportsNavItem.addEventListener('shown.bs.dropdown', function () {
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            dropdownMenu.classList.add('staggered-open');
+            dropdownItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.05}s`;
+            });
+        });
+
+        reportsNavItem.addEventListener('hide.bs.dropdown', function () {
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            dropdownMenu.classList.remove('staggered-open');
+            dropdownItems.forEach(item => {
+                item.style.animationDelay = '';
+            });
+        });
+    }
+});
+
+// HYBRID ANIMATION FOR ACCOUNTING DROPDOWN
+document.addEventListener('DOMContentLoaded', function () {
+    const accountingNavItem = document.getElementById('accounting-nav-item');
+
+    if (accountingNavItem) {
+        accountingNavItem.addEventListener('shown.bs.dropdown', function () {
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            dropdownMenu.classList.add('staggered-open');
+            dropdownItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.05}s`;
+            });
+        });
+
+        accountingNavItem.addEventListener('hide.bs.dropdown', function () {
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            dropdownMenu.classList.remove('staggered-open');
+            dropdownItems.forEach(item => {
+                item.style.animationDelay = '';
+            });
+        });
+    }
 });

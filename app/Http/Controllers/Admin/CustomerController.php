@@ -4,41 +4,50 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Services\CustomerService;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    public function index(Request $request){
-        $entries = $request->input('entries', 10);
-        $customers = Customer::paginate($entries);
-        $totalcustomer = Customer::count();
-        return view ('admin.customer.index', compact('customers','entries','totalcustomer'));
+    protected $customerService;
+
+    public function __construct(CustomerService $customerService)
+    {
+        $this->customerService = $customerService;
     }
 
-    public function store(Request $request) {
+    public function getMetrics()
+    {
+        $metrics = $this->customerService->getCustomerMetrics();
+        return response()->json($metrics);
+    }
+
+    public function index(Request $request)
+    {
+        $entries = $request->input('entries', 10);
+        $data = $this->customerService->getCustomerIndexData($entries);
+        return view('admin.customer.index', $data);
+    }
+
+    public function store(Request $request)
+    {
         $request->validate([
             'name' => 'required',
             'address' => 'required',
             'phone_number' => 'required',
             'payment_terms' => 'required',
+            'email' => 'nullable|email',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
-        $isCustomerExists = Customer::where('name', $request->name)->exists();
+        $result = $this->customerService->createCustomer($request->all());
 
-        if ($isCustomerExists) {
+        if (!$result['success']) {
             if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'This customer already exists.', 'errors' => ['name' => ['This customer already exists.']]], 422);
+                return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
-            return back()
-            ->withErrors([
-                'name' => 'This customer already exist'
-            ])
-            ->withInput();
+            return back()->withErrors(['name' => $result['message']])->withInput();
         }
-
-        $data = $request->except("_token");
-
-        Customer::create($data);
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Customer created successfully.']);
@@ -46,12 +55,6 @@ class CustomerController extends Controller
         return redirect()->route('admin.customer')->with('success', 'Customer created');
     }
 
-    /**
-     * Quick create a customer from POS page
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function quickCreate(Request $request)
     {
         $request->validate([
@@ -59,48 +62,89 @@ class CustomerController extends Controller
             'address' => 'required',
             'phone_number' => 'required',
             'payment_terms' => 'required',
+            'email' => 'nullable|email',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
-        $isCustomerExists = Customer::where('name', $request->name)->exists();
+        $result = $this->customerService->quickCreateCustomer($request->all());
 
-        if ($isCustomerExists) {
-            return response()->json([
-                'success' => false,
-                'message' => 'This customer already exists'
-            ], 422);
+        if (!$result['success']) {
+            return response()->json(['success' => false, 'message' => $result['message']], 422);
         }
-
-        $data = $request->except("_token");
-        $customer = Customer::create($data);
 
         return response()->json([
             'success' => true,
             'message' => 'Customer created successfully',
-            'customer' => $customer
+            'customer' => $result['customer']
         ]);
     }
 
-    public function update(Request $request, $id){
-        $data = $request->except("_token");
+    public function update(Request $request, $id)
+    {
         $request->validate([
             'name' => 'required',
             'address' => 'required',
             'phone_number' => 'required',
             'payment_terms' => 'required',
+            'email' => 'nullable|email',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
-        $customers = Customer::find($id);
-        $customers->update($data);
+        $customer = Customer::findOrFail($id);
+        $result = $this->customerService->updateCustomer($customer, $request->all()); // Get the result
+
+        if (!$result['success']) { // Check for service-level error
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $result['message']], 422);
+            }
+            return back()->with('error', $result['message'])->withInput(); // Redirect with error
+        }
+
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Customer updated successfully.']);
         }
         return redirect()->route('admin.customer')->with('success', 'Customer updated');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        Customer::find($id)->delete();
+        $customer = Customer::findOrFail($id);
+        $result = $this->customerService->deleteCustomer($customer); // Get the result
 
+        if (!$result['success']) { // Check for service-level error
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $result['message']], 500);
+            }
+            return redirect()->route('admin.customer')->with('error', $result['message']);
+        }
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Customer deleted successfully.']);
+        }
         return redirect()->route('admin.customer')->with('success', 'Customer deleted');
+    }
+
+    /**
+     * @group Customers
+     * @summary Export All Customers
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function exportAll(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $file = $this->customerService->exportAllCustomers($request->export_option);
+            return $file;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting customers. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
     }
 }

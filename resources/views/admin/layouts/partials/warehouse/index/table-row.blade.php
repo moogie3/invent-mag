@@ -5,9 +5,9 @@
     <td class="sort-description">{{ $wo->description }}</td>
     <td class="sort-is-main">
         @if ($wo->is_main)
-            <span class="badge bg-green-lt">Main</span>
+            <span class="badge bg-green-lt">{{ __('messages.table_main') }}</span>
         @else
-            <span class="badge bg-secondary-lt">Sub</span>
+            <span class="badge bg-secondary-lt">{{ __('messages.table_sub') }}</span>
         @endif
     </td>
     <td class="no-print" style="text-align:center">

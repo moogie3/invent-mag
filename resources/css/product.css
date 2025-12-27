@@ -1,0 +1,42 @@
+/* ============================
+   4. PRODUCT STYLES
+   ============================ */
+.product-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.product-card .card-title {
+    font-size: var(--small-font-size) !important;
+    /* Use CSS variable for consistency */
+}
+
+.product-card .card-text {
+    font-size: var(--tiny-font-size) !important;
+    /* Use CSS variable for consistency */
+}
+
+.product-image-container {
+    height: 120px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+    cursor: pointer;
+}
+
+.card-product-catalog {
+    height: 795px;
+    overflow-y: auto;
+}

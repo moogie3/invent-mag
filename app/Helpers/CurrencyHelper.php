@@ -6,20 +6,14 @@ use App\Models\CurrencySetting;
 
 class CurrencyHelper
 {
+    protected static $settings = null;
+
     /**
      * Format amount with currency settings
      */
     public static function format($amount)
     {
-        $settings = self::getSettings();
-
-        return $settings->currency_symbol . ' ' .
-            number_format(
-                $amount,
-                $settings->decimal_places,
-                $settings->decimal_separator,
-                $settings->thousand_separator
-            );
+        return self::formatWithPosition($amount);
     }
 
     /**
@@ -41,29 +35,45 @@ class CurrencyHelper
     /**
      * Get all currency settings with caching
      */
-    protected static function getSettings()
+    public static function getSettings()
     {
-        static $settings = null;
-
-        if ($settings === null) {
-            $settings = CurrencySetting::first() ?? self::getDefaultSettings();
+        if (self::$settings === null) {
+            self::$settings = CurrencySetting::first() ?? self::getDefaultSettings();
         }
 
-        return $settings;
+        return self::$settings;
     }
 
     /**
      * Default fallback settings
      */
-    protected static function getDefaultSettings()
+    public static function getDefaultSettings()
     {
         return (object) [
+            'currency_code' => 'IDR',
             'currency_symbol' => 'Rp',
             'decimal_places' => 0,
             'decimal_separator' => ',',
             'thousand_separator' => '.',
-            'position' => 'prefix'
+            'position' => 'prefix',
+            'locale' => 'id-ID',
         ];
+    }
+
+    /**
+     * Clear the cached settings for testing purposes.
+     */
+    public static function clearSettingsCache()
+    {
+        self::$settings = null;
+    }
+
+    /**
+     * Set settings for testing purposes.
+     */
+    public static function setSettingsForTesting($settings)
+    {
+        self::$settings = $settings;
     }
 
     /**
@@ -72,15 +82,25 @@ class CurrencyHelper
     public static function formatWithPosition($amount)
     {
         $settings = self::getSettings();
+        $isNegative = $amount < 0;
+        $absoluteAmount = abs($amount);
+
         $formatted = number_format(
-            $amount,
+            (float) $absoluteAmount, // Use absolute amount here
             $settings->decimal_places,
             $settings->decimal_separator,
             $settings->thousand_separator
         );
 
-        return $settings->position === 'prefix'
+        $result = $settings->position === 'prefix'
             ? $settings->currency_symbol . ' ' . $formatted
             : $formatted . ' ' . $settings->currency_symbol;
+
+        return $isNegative ? '-' . $result : $result;
+    }
+
+    public static function formatDate($date)
+    {
+        return \Carbon\Carbon::parse($date)->format('d M Y');
     }
 }

@@ -180,28 +180,36 @@
         display: none !important;
     }
 
-    body {
+    html, body {
+        width: 80mm;
+        margin: 0;
+        padding: 0;
         background-color: white;
-        font-size: 12px;
+        font-size: 10pt;
     }
 
     .receipt-card {
         box-shadow: none !important;
         border: none !important;
+        margin: 0;
+        padding: 0;
     }
 
     .card-body {
         padding: 0;
+        margin: 0;
     }
 
     .receipt-container {
-        width: 80mm;
-        max-width: 100%;
+        width: 100%;
         padding: 0;
+        margin: 0;
+        box-shadow: none;
     }
 
     .page-wrapper {
         padding-top: 0 !important;
+        margin: 0;
     }
 
     .table-items thead th {

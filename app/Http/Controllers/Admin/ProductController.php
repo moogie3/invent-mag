@@ -8,73 +8,63 @@ use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    protected $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
     public function index(Request $request)
     {
-        $entries = $request->input('entries', 10); // Pagination
-        $products = Product::with(['category', 'supplier', 'unit', 'warehouse'])->paginate($entries);
-        $totalproduct = Product::count();
-        $lowStockCount = Product::lowStockCount(); // Get count of low stock products
-        $expiringSoonCount = Product::expiringSoonCount(); // Get count of expiring soon products
-        $categories = Categories::all();
-        $units = Unit::all();
-        $suppliers = Supplier::all();
-        $warehouses = Warehouse::all();
-        $mainWarehouse = Warehouse::where('is_main', true)->first();
-        $lowStockProducts = Product::getLowStockProducts();
-        $expiringSoonProducts = Product::getExpiringSoonProducts(); // Get expiring soon products
-        $totalcategory = Categories::count();
-        return view('admin.product.index', compact('totalcategory', 'products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts'));
+        try {
+            $entries = $request->input('entries', 10);
+            $products = $this->productService->getPaginatedProducts($entries);
+            $totalproduct = Product::count();
+            $lowStockCount = Product::lowStockCount();
+            $expiringSoonCount = $this->productService->getExpiringSoonPOItemsCount();
+            $totalcategory = Categories::count();
+
+            $formData = $this->productService->getProductFormData();
+
+            $lowStockProducts = Product::getLowStockProducts();
+            $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
+
+            return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts') + $formData);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error loading products. Please try again.');
+        }
     }
 
     public function create()
     {
-        $categories = Categories::all();
-        $units = Unit::all();
-        $suppliers = Supplier::all();
-        $warehouses = Warehouse::all();
-        $mainWarehouse = Warehouse::where('is_main', true)->first();
-        $lowStockProducts = Product::getLowStockProducts();
-        $expiringSoonProducts = Product::getExpiringSoonProducts();
-        return view('admin.product.product-create', compact('expiringSoonProducts','lowStockProducts','categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
+        try {
+            $formData = $this->productService->getProductFormData();
+            return view('admin.product.product-create', $formData);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.product')->with('error', 'Error loading form. Please try again.');
+        }
     }
 
     public function modalView($id)
     {
         try {
-            $product = Product::with(['category', 'supplier', 'unit', 'warehouse'])->findOrFail($id);
-
-            $product->formatted_price = \App\Helpers\CurrencyHelper::format($product->price);
-            $product->formatted_selling_price = \App\Helpers\CurrencyHelper::format($product->selling_price);
-
-            // Format dates if needed
-            // Format dates if needed
-if ($product->has_expiry && $product->expiry_date) {
-    try {
-        $product->expiry_date = Carbon::parse($product->expiry_date)->format('Y-m-d');
-    } catch (\Exception $e) {
-        $product->expiry_date = null;
-    }
-}
-
+            $product = Product::with(['category', 'supplier', 'unit', 'warehouse', 'poItems' => function($query) {
+                $query->where('remaining_quantity', '>', 0)->orderBy('expiry_date', 'asc');
+            }])->findOrFail($id);
+            $product->formatted_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->price);
+            $product->formatted_selling_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price);
             return response()->json($product);
         } catch (\Exception $e) {
-            return response()->json(
-                [
-                    'error' => 'Product not found',
-                    'message' => $e->getMessage(),
-                ],
-                404,
-            );
+            return response()->json([
+                'error' => 'Product not found',
+                'message' => $e->getMessage(),
+            ], 404);
         }
     }
 
@@ -87,8 +77,8 @@ if ($product->has_expiry && $product->expiry_date) {
         $warehouses = Warehouse::all();
         $mainWarehouse = Warehouse::where('is_main', true)->first();
         $lowStockProducts = Product::getLowStockProducts();
-        $expiringSoonProducts = Product::getExpiringSoonProducts();
-        return view('admin.product.product-edit', compact('expiringSoonProducts','lowStockProducts','products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
+
+        return view('admin.product.product-edit', compact('lowStockProducts', 'products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
     }
 
     public function store(Request $request)
@@ -107,36 +97,31 @@ if ($product->has_expiry && $product->expiry_date) {
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'has_expiry' => 'sometimes|boolean',
-            'expiry_date' => 'nullable|date|required_if:has_expiry,1',
         ]);
 
-        $data = $request->except('_token', 'image');
-
-        $data['has_expiry'] = $request->boolean('has_expiry');
-
-        // If warehouse_id is not provided, use the main warehouse
-        if (empty($data['warehouse_id'])) {
-            $mainWarehouse = Warehouse::where('is_main', true)->first();
-            if ($mainWarehouse) {
-                $data['warehouse_id'] = $mainWarehouse->id;
-            }
+        try {
+            $this->productService->createProduct($request->all());
+            return redirect()->route('admin.product')->with('success', 'Product created');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error creating product. Please try again.');
         }
-
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/image', $imageName);
-
-            // Store only the relative path
-            $data['image'] = $imageName;
-        }
-
-        Product::create($data);
-
-        return redirect()->route('admin.product')->with('success', 'Product created');
     }
 
-    // Update the quickCreate method similarly:
+    /**
+     * @group Products
+     * @summary Quickly Create a Product
+     * @bodyParam code string required The product code. Example: "PROD-001"
+     * @bodyParam name string required The product name. Example: "New Product"
+     * @bodyParam stock_quantity integer required The initial stock quantity. Example: 100
+     * @bodyParam price number required The purchase price of the product. Example: 99.99
+     * @bodyParam selling_price number required The selling price of the product. Example: 149.99
+     * @bodyParam category_id integer required The ID of the product category. Example: 1
+     * @bodyParam units_id integer required The ID of the product unit. Example: 1
+     * @bodyParam supplier_id integer required The ID of the product supplier. Example: 1
+     * @response 200 {"success": true, "message": "Product created successfully", "product": {"id": 1, "name": "New Product"}}
+     */
     public function quickCreate(Request $request)
     {
         $request->validate([
@@ -146,67 +131,39 @@ if ($product->has_expiry && $product->expiry_date) {
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
-            'category_id' => 'required|integer',
-            'units_id' => 'required|integer',
-            'supplier_id' => 'required|integer',
+            'category_id' => 'required|integer|exists:categories,id',
+            'units_id' => 'required|integer|exists:units,id',
+            'supplier_id' => 'required|integer|exists:suppliers,id',
             'warehouse_id' => 'nullable|integer|exists:warehouses,id',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'has_expiry' => 'nullable|sometimes|boolean',
-            'expiry_date' => 'nullable|date|required_if:has_expiry,1',
         ]);
 
-        $data = $request->except('_token', 'image');
+        try {
+            $product = $this->productService->quickCreateProduct($request->all());
 
-        // Set has_expiry to false if not provided
-        $data['has_expiry'] = $request->boolean('has_expiry');
-
-        // If warehouse_id is not provided, use the main warehouse
-        if (empty($data['warehouse_id'])) {
-            $mainWarehouse = Warehouse::where('is_main', true)->first();
-            if ($mainWarehouse) {
-                $data['warehouse_id'] = $mainWarehouse->id;
-            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Product created successfully',
+                'product' => $product,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating product. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
         }
-
-        // Clear expiry_date if has_expiry is false
-        if (!$data['has_expiry']) {
-            $data['expiry_date'] = null;
-        }
-
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/image', $imageName);
-
-            // Store only the relative path
-            $data['image'] = $imageName;
-        }
-
-        $product = Product::create($data);
-
-        // Load the relationships
-        $product->load(['unit', 'warehouse']);
-
-        // Add unit symbol to the product for the frontend
-        $product->unit_symbol = $product->unit->symbol;
-        $product->warehouse_name = $product->warehouse ? $product->warehouse->name : 'None';
-        $product->image_url = $product->image ? asset('storage/image/' . $product->image) : asset('/images/default-product.png');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Product created successfully',
-            'product' => $product,
-        ]);
     }
 
-    // Update the update method to handle warehouse_id:
     public function update(Request $request, $id)
     {
-        $products = Product::findOrFail($id);
+        $product = Product::findOrFail($id);
 
         $request->validate([
             'code' => 'string',
+            'barcode' => 'nullable|string|unique:products,barcode,' . $product->id,
             'name' => 'string',
             'stock_quantity' => 'integer',
             'low_stock_threshold' => 'nullable|integer|min:1',
@@ -219,487 +176,246 @@ if ($product->has_expiry && $product->expiry_date) {
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'has_expiry' => 'sometimes|boolean',
-            'expiry_date' => 'nullable|date|required_if:has_expiry,1',
         ]);
 
-        $data = $request->except(['_token', 'image']);
-
-        $data['has_expiry'] = $request->boolean('has_expiry');
-
-        // If warehouse_id is not provided, use the main warehouse
-        if (empty($data['warehouse_id'])) {
-            $mainWarehouse = Warehouse::where('is_main', true)->first();
-            if ($mainWarehouse) {
-                $data['warehouse_id'] = $mainWarehouse->id;
-            }
+        try {
+            $this->productService->updateProduct($product, $request->all());
+            return redirect()->route('admin.product')->with('success', 'Product updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error updating product. Please try again.');
         }
-
-        // Clear expiry_date if has_expiry is false
-        if (!$data['has_expiry']) {
-            $data['expiry_date'] = null;
-        }
-        // Check if a new image is uploaded
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            $oldImagePath = 'public/image/' . basename($products->image); // Use only filename
-
-            if (!empty($products->image) && Storage::exists($oldImagePath)) {
-                Storage::delete($oldImagePath);
-            }
-
-            // Upload new image
-            $image = $request->file('image');
-            $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/image', $imageName);
-
-            // Store only the image filename, NOT the full URL
-            $data['image'] = $imageName;
-        }
-
-        $products->update($data);
-
-        return redirect()->route('admin.product')->with('success', 'Product updated successfully');
     }
 
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
-
-        // Delete image from storage if exists
-        if (!empty($product->image)) {
-            Storage::delete('public/' . $product->image);
+        try {
+            $product = Product::findOrFail($id);
+            $this->productService->deleteProduct($product);
+            return redirect()->route('admin.product')->with('success', 'Product deleted');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error deleting product. Please try again.');
         }
+    }
 
-        $product->delete();
+    public function getProductMetrics()
+    {
+        $totalproduct = Product::count();
+        $totalcategory = Categories::count();
+        $lowStockCount = Product::lowStockCount();
 
-        return redirect()->route('admin.product')->with('success', 'Product deleted');
+        return response()->json([
+            'totalproduct' => $totalproduct,
+            'totalcategory' => $totalcategory,
+            'lowStockCount' => $lowStockCount,
+        ]);
     }
 
     /**
-     * Bulk delete products
+     * @group Products
+     * @summary Bulk Delete Products
+     * @bodyParam ids array required An array of product IDs to delete. Example: [1, 2, 3]
+     * @response 200 {"success": true, "message": "Successfully deleted 2 product(s)", "deleted_count": 2, "images_deleted": 1}
      */
     public function bulkDelete(Request $request)
     {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:products,id',
+        ]);
+
         try {
-            // Log the incoming request for debugging
-            Log::info('Bulk delete products request received', [
-                'request_data' => $request->all(),
-                'user_id' => Auth::id(),
-            ]);
-
-            // Validate the incoming request
-            $request->validate([
-                'ids' => 'required|array|min:1',
-                'ids.*' => 'required|integer|exists:products,id',
-            ]);
-
-            $ids = $request->ids;
-            $deletedCount = 0;
-            $imagesDeleted = 0;
-
-            Log::info('Validation passed, proceeding with deletion', [
-                'ids' => $ids,
-                'count' => count($ids),
-            ]);
-
-            // Use database transaction for data integrity
-            DB::transaction(function () use ($ids, &$deletedCount, &$imagesDeleted) {
-                // First, get all products to be deleted for logging and image cleanup
-                $products = Product::whereIn('id', $ids)->get();
-
-                if ($products->isEmpty()) {
-                    throw new \Exception('No products found with the provided IDs');
-                }
-
-                Log::info('Found products to delete', [
-                    'found_count' => $products->count(),
-                    'product_codes' => $products->pluck('code')->toArray(),
-                ]);
-
-                // Log the deletion attempt
-                Log::info('Bulk delete products initiated', [
-                    'user_id' => Auth::id(),
-                    'product_ids' => $ids,
-                    'product_count' => count($ids),
-                ]);
-
-                // Delete associated images first
-                foreach ($products as $product) {
-                    if (!empty($product->image)) {
-                        $imagePath = 'public/image/' . basename($product->image);
-
-                        if (Storage::exists($imagePath)) {
-                            Storage::delete($imagePath);
-                            $imagesDeleted++;
-
-                            Log::info('Deleted product image', [
-                                'product_id' => $product->id,
-                                'product_code' => $product->code,
-                                'image_path' => $imagePath,
-                            ]);
-                        }
-                    }
-                }
-
-                // Delete the products
-                $deletedCount = Product::whereIn('id', $ids)->delete();
-                Log::info("Successfully deleted {$deletedCount} products");
-            });
-
-            // Return success response with detailed information
-            $response = [
+            $result = $this->productService->bulkDeleteProducts($request->ids);
+            return response()->json([
                 'success' => true,
-                'message' => "Successfully deleted {$deletedCount} product(s)",
-                'deleted_count' => $deletedCount,
-                'images_deleted' => $imagesDeleted,
-                'details' => [
-                    'products_deleted' => $deletedCount,
-                    'images_cleaned' => $imagesDeleted,
-                ],
-            ];
-
-            Log::info('Bulk delete completed successfully', $response);
-
-            return response()->json($response);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Bulk delete validation failed', [
-                'errors' => $e->errors(),
-                'user_id' => Auth::id(),
+                'message' => "Successfully deleted {$result['deleted_count']} product(s)",
+                'deleted_count' => $result['deleted_count'],
+                'images_deleted' => $result['images_deleted'],
             ]);
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Invalid data provided',
-                    'errors' => $e->errors(),
-                ],
-                422,
-            );
         } catch (\Exception $e) {
-            // Log the error for debugging
-            Log::error('Bulk delete products failed', [
-                'user_id' => Auth::id(),
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all(),
-            ]);
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Error deleting products. Please try again.',
-                    'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-                ],
-                500,
-            );
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting products. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
         }
     }
 
     /**
-     * Bulk export products to CSV
+     * @group Products
+     * @summary Bulk Export Products
+     * @bodyParam ids array required An array of product IDs to export. Example: [1, 2, 3]
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
      */
     public function bulkExport(Request $request)
     {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:products,id',
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
         try {
-            $request->validate([
-                'ids' => 'required|array',
-                'ids.*' => 'exists:products,id',
-            ]);
-
-            $ids = $request->ids;
-
-            // Get products with related data
-            $products = Product::with(['category', 'supplier', 'unit', 'warehouse'])
-                ->whereIn('id', $ids)
-                ->get();
-
-            // Create CSV content
-            $filename = 'products_' . date('Y-m-d_H-i-s') . '.csv';
-            $headers = [
-                'Content-Type' => 'text/csv',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-            ];
-
-            $callback = function () use ($products) {
-                $file = fopen('php://output', 'w');
-
-                // CSV Headers
-                fputcsv($file, ['Code', 'Name', 'Category', 'Supplier', 'Unit', 'Warehouse', 'Stock Quantity', 'Low Stock Threshold', 'Price', 'Selling Price', 'Has Expiry', 'Expiry Date', 'Description']);
-
-                // CSV Data
-                foreach ($products as $product) {
-                    fputcsv($file, [$product->code, $product->name, $product->category->name ?? 'N/A', $product->supplier->name ?? 'N/A', $product->unit->name ?? 'N/A', $product->warehouse->name ?? 'N/A', $product->stock_quantity, $product->low_stock_threshold ?? 'N/A', $product->price, $product->selling_price, $product->has_expiry ? 'Yes' : 'No', $product->expiry_date ?? 'N/A', $product->description ?? 'N/A']);
-                }
-
-                fclose($file);
-            };
-
-            return response()->stream($callback, 200, $headers);
+            $file = $this->productService->bulkExportProducts($request->ids, $request->export_option);
+            return $file;
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Error exporting products: ' . $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting products. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
         }
     }
 
-    /**
-     * Bulk update stock quantities with enhanced error handling
-     */
     public function bulkUpdateStock(Request $request)
     {
+        $request->validate([
+            'updates' => 'required|array|min:1',
+            'updates.*.id' => 'required|integer|exists:products,id',
+            'updates.*.stock_quantity' => 'required|integer|min:0',
+            'reason' => 'nullable|string|max:500',
+        ]);
+
         try {
-            // Validate the incoming request
-            $request->validate([
-                'updates' => 'required|array|min:1',
-                'updates.*.id' => 'required|integer|exists:products,id',
-                'updates.*.stock_quantity' => 'required|integer|min:0',
-                'updates.*.original_stock' => 'sometimes|integer|min:0',
-            ]);
-
-            $updates = $request->updates;
-            $updatedCount = 0;
-            $stockChanges = [];
-
-            Log::info('Bulk stock update initiated', [
-                'user_id' => Auth::id(),
-                'updates_count' => count($updates),
-            ]);
-
-            // Use database transaction for data integrity
-            DB::transaction(function () use ($updates, &$updatedCount, &$stockChanges) {
-                foreach ($updates as $update) {
-                    $product = Product::findOrFail($update['id']);
-                    $originalStock = $product->stock_quantity;
-                    $newStock = $update['stock_quantity'];
-
-                    // Only update if there's actually a change
-                    if ($originalStock != $newStock) {
-                        $product->update([
-                            'stock_quantity' => $newStock,
-                        ]);
-
-                        $updatedCount++;
-
-                        $stockChanges[] = [
-                            'product_id' => $product->id,
-                            'product_code' => $product->code,
-                            'original_stock' => $originalStock,
-                            'new_stock' => $newStock,
-                            'change' => $newStock - $originalStock,
-                        ];
-                    }
-                }
-            });
-
-            Log::info('Bulk stock update completed', [
-                'user_id' => Auth::id(),
-                'updated_count' => $updatedCount,
-            ]);
+            $result = $this->productService->bulkUpdateStock(
+                $request->updates,
+                $request->reason,
+                auth()->id()
+            );
+            $updatedProductsWithBadges = [];
+            foreach ($result['changes'] as $change) {
+                // Assuming 'low_stock_threshold' is returned in the $change array from ProductService
+                $lowStockThreshold = $change['low_stock_threshold'] ?? 10; // Default to 10 if not provided
+                [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($change['new_stock_quantity'], $lowStockThreshold);
+                $updatedProductsWithBadges[] = array_merge($change, [
+                    'badge_class' => $badgeClass,
+                    'badge_text' => $badgeText,
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
-                'message' => "Successfully updated stock for {$updatedCount} product(s)",
-                'updated_count' => $updatedCount,
-                'changes' => $stockChanges,
+                'message' => "Successfully updated stock for {$result['updated_count']} product(s)",
+                'updated_count' => $result['updated_count'],
+                'changes' => $updatedProductsWithBadges,
             ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Bulk stock update validation failed', [
-                'errors' => $e->errors(),
-                'user_id' => Auth::id(),
-            ]);
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Invalid data provided',
-                    'errors' => $e->errors(),
-                ],
-                422,
-            );
         } catch (\Exception $e) {
-            Log::error('Bulk stock update failed', [
-                'user_id' => Auth::id(),
-                'error' => $e->getMessage(),
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating stock quantities. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
 
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Error updating stock quantities. Please try again.',
-                    'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-                ],
-                500,
+    public function adjustStock(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|integer|exists:products,id',
+            'adjustment_amount' => 'required|numeric|min:1', // Can be positive or negative, validation for negative will be handled by adjustment_type
+            'adjustment_type' => 'required|in:increase,decrease,correction',
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $product = Product::findOrFail($request->product_id);
+            $adjustedProduct = $this->productService->adjustProductStock(
+                $product,
+                $request->adjustment_amount,
+                $request->adjustment_type,
+                $request->reason,
+                auth()->id() // Pass the authenticated user's ID
             );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Stock adjusted successfully.',
+                'product' => $adjustedProduct,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error adjusting stock: ' . $e->getMessage(),
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
         }
     }
 
     public function search(Request $request)
-{
-    try {
-        // Log the incoming request for debugging
-        Log::info('Product search request', [
-            'query' => $request->get('q'),
-            'method' => $request->method(),
-            'user_id' => Auth::id()
-        ]);
+    {
+        try {
+            $query = trim($request->get('q', ''));
 
-        $query = trim($request->get('q', ''));
+            if (empty($query)) {
+                // If the query is empty, return all products
+                $products = Product::all();
+            } else {
+                // Otherwise, perform the search
+                $products = $this->productService->searchProducts($query);
+            }
 
-        if (empty($query)) {
+            return response()->json($products);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Search query is required',
-                'products' => [],
-                'count' => 0
-            ]);
+                'message' => 'Error searching products.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
         }
-
-        // Build the search query with proper error handling
-        $productsQuery = Product::query();
-
-        // Add eager loading with null checks
-        $productsQuery->with([
-            'category' => function($q) {
-                $q->select('id', 'name');
-            },
-            'unit' => function($q) {
-                $q->select('id', 'name', 'symbol');
-            },
-            'supplier' => function($q) {
-                $q->select('id', 'name');
-            }
-        ]);
-
-        // Apply search filters
-        $productsQuery->where(function ($q) use ($query) {
-            $q->where('name', 'LIKE', "%{$query}%")
-              ->orWhere('code', 'LIKE', "%{$query}%");
-
-            // Search in category name with existence check
-            $q->orWhereHas('category', function ($cat) use ($query) {
-                $cat->where('name', 'LIKE', "%{$query}%");
-            });
-
-            // Search in supplier name with existence check
-            $q->orWhereHas('supplier', function ($sup) use ($query) {
-                $sup->where('name', 'LIKE', "%{$query}%");
-            });
-        });
-
-        // Order and limit results
-        $products = $productsQuery
-            ->orderBy('name', 'asc')
-            ->limit(50)
-            ->get();
-
-        Log::info('Product search results', [
-            'query' => $query,
-            'count' => $products->count()
-        ]);
-
-        // Format products for frontend with proper null handling
-        $formattedProducts = $products->map(function ($product) {
-            // Handle expiry date formatting properly
-            $expiryDate = null;
-            if ($product->has_expiry && $product->expiry_date) {
-                try {
-                    // Get the raw attribute value to avoid casting issues
-                    $rawExpiryDate = $product->getAttributes()['expiry_date'] ?? null;
-
-                    if ($rawExpiryDate) {
-                        // Create Carbon instance from raw date string
-                        $carbonDate = Carbon::createFromFormat('Y-m-d', $rawExpiryDate);
-                        $expiryDate = $carbonDate->format('Y-m-d');
-                    }
-                } catch (\Exception $e) {
-                    // Fallback: try to work with the casted value
-                    try {
-                        if ($product->expiry_date instanceof Carbon) {
-                            $expiryDate = $product->expiry_date->format('Y-m-d');
-                        } elseif ($product->expiry_date instanceof \DateTime) {
-                            $expiryDate = $product->expiry_date->format('Y-m-d');
-                        } elseif (method_exists($product->expiry_date, 'format')) {
-                            $expiryDate = $product->expiry_date->format('Y-m-d');
-                        }
-                    } catch (\Exception $fallbackError) {
-                        Log::warning('Failed to format expiry date for product', [
-                            'product_id' => $product->id,
-                            'expiry_date_raw' => $product->getAttributes()['expiry_date'] ?? 'N/A',
-                            'expiry_date_casted' => $product->expiry_date,
-                            'expiry_date_type' => gettype($product->expiry_date),
-                            'original_error' => $e->getMessage(),
-                            'fallback_error' => $fallbackError->getMessage()
-                        ]);
-                        $expiryDate = null;
-                    }
-                }
-            }
-
-            return [
-                'id' => $product->id,
-                'name' => $product->name ?? 'Unknown Product',
-                'code' => $product->code ?? null,
-                'stock_quantity' => $product->stock_quantity ?? 0,
-                'low_stock_threshold' => $product->low_stock_threshold ?? 0,
-                'image' => $product->image ? asset($product->image) : null,
-                'price' => $product->price ?? 0,
-                'selling_price' => $product->selling_price ?? 0,
-                'has_expiry' => $product->has_expiry ?? false,
-                'expiry_date' => $expiryDate,
-                'category' => $product->category ? [
-                    'id' => $product->category->id,
-                    'name' => $product->category->name
-                ] : null,
-                'unit' => $product->unit ? [
-                    'id' => $product->unit->id,
-                    'name' => $product->unit->name,
-                    'symbol' => $product->unit->symbol
-                ] : null,
-                'supplier' => $product->supplier ? [
-                    'id' => $product->supplier->id,
-                    'name' => $product->supplier->name
-                ] : null,
-            ];
-        });
-
-        return response()->json([
-            'success' => true,
-            'products' => $formattedProducts,
-            'count' => $products->count(),
-            'query' => $query,
-            'message' => $products->count() > 0 ? 'Products found' : 'No products found'
-        ]);
-
-    } catch (\Illuminate\Database\QueryException $e) {
-        Log::error('Database error in product search', [
-            'error' => $e->getMessage(),
-            'sql' => $e->getSql() ?? 'N/A',
-            'bindings' => $e->getBindings() ?? [],
-            'query' => $request->get('q')
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Database error occurred while searching',
-            'error' => config('app.debug') ? $e->getMessage() : 'Database query failed',
-            'products' => [],
-            'count' => 0
-        ], 500);
-
-    } catch (\Exception $e) {
-        Log::error('General error in product search', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile(),
-            'query' => $request->get('q')
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'An unexpected error occurred while searching',
-            'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            'products' => [],
-            'count' => 0
-        ], 500);
     }
-}
+
+    public function getExpiringSoonProducts()
+    {
+        try {
+            $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
+            return response()->json($expiringSoonProducts);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching expiring products.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    public function getAdjustmentLog($id)
+    {
+        try {
+            $adjustments = \App\Models\StockAdjustment::where('product_id', $id)
+                ->with('adjustedBy:id,name') // Eager load user name
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json($adjustments);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching adjustment log.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    public function searchByBarcode(Request $request)
+    {
+        try {
+            $request->validate(['barcode' => 'required|string']);
+            $product = $this->productService->searchByBarcode($request->barcode);
+
+            if ($product) {
+                return response()->json($product);
+            }
+
+            return response()->json(['message' => 'Product not found'], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error searching by barcode.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
 }

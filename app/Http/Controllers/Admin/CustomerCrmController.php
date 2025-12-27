@@ -2,47 +2,28 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Http\Controllers\Controller;
+use App\Services\CrmService;
 use Illuminate\Http\Request;
 
 class CustomerCrmController extends Controller
 {
+    protected $crmService;
+
+    public function __construct(CrmService $crmService)
+    {
+        $this->crmService = $crmService;
+    }
+
     public function show(Request $request, $id)
     {
-        $customer = Customer::with(['interactions.user'])->findOrFail($id);
-
-        // Calculate lifetime value and favorite category from ALL sales for accuracy
-        $allSales = $customer->sales()->with('items.product.category')->get();
-        $lifetimeValue = $allSales->sum('grand_total');
-
-        $categoryCounts = [];
-        foreach ($allSales as $sale) {
-            foreach ($sale->items as $item) {
-                if ($item->product && $item->product->category) {
-                    $categoryName = $item->product->category->name;
-                    if (!isset($categoryCounts[$categoryName])) {
-                        $categoryCounts[$categoryName] = 0;
-                    }
-                    $categoryCounts[$categoryName]++;
-                }
-            }
+        try {
+            $data = $this->crmService->getCustomerCrmData($id, $request->input('page', 1));
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to load CRM data: ' . $e->getMessage()], 500);
         }
-        arsort($categoryCounts);
-        $favoriteCategory = !empty($categoryCounts) ? key($categoryCounts) : 'N/A';
-
-        // Paginate sales for display in the modal
-        $sales = $customer->sales()->with('items.product')
-                        ->orderByDesc('created_at')
-                        ->paginate(10, ['*'], 'page', $request->input('page', 1));
-
-        return response()->json([
-            'customer' => $customer,
-            'lifetimeValue' => $lifetimeValue,
-            'favoriteCategory' => $favoriteCategory,
-            'lastPurchaseDate' => $allSales->max('created_at'),
-            'sales' => $sales, // Pass paginated sales data
-        ]);
     }
 
     public function storeInteraction(Request $request, $customerId)
@@ -53,15 +34,34 @@ class CustomerCrmController extends Controller
             'interaction_date' => 'required|date',
         ]);
 
-        $interaction = new \App\Models\CustomerInteraction([
-            'customer_id' => $customerId,
-            'user_id' => auth()->id(),
-            'type' => $request->type,
-            'notes' => $request->notes,
-            'interaction_date' => $request->interaction_date,
-        ]);
-        $interaction->save();
+        try {
+            $interaction = $this->crmService->storeCustomerInteraction($request->all(), $customerId);
+            return response()->json($interaction);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to store interaction: ' . $e->getMessage()], 500);
+        }
+    }
 
-        return response()->json($interaction->load('user'));
+    public function getProductHistory(Request $request, $id)
+    {
+        try {
+            $productHistory = $this->crmService->getCustomerProductHistory($id);
+            return response()->json($productHistory);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to load product history: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function getHistoricalPurchases(Customer $customer)
+    {
+        try {
+            $historicalPurchases = $this->crmService->getHistoricalPurchases($customer);
+            return response()->json([
+                'success' => true,
+                'historical_purchases' => $historicalPurchases,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to load historical purchases: ' . $e->getMessage()], 500);
+        }
     }
 }

@@ -17,6 +17,10 @@ class CustomerInteraction extends Model
         'interaction_date',
     ];
 
+    protected $casts = [
+        'interaction_date' => 'datetime',
+    ];
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
@@ -25,5 +29,15 @@ class CustomerInteraction extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\CustomerInteractionFactory::new();
     }
 }

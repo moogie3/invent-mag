@@ -5,14 +5,15 @@
 {{-- Load Tabler JS (remove defer since jQuery is already loaded) --}}
 <script src="{{ asset('tabler/dist/js/tabler.min.js?1692870487') }}"></script>
 <script src="{{ asset('tabler/dist/js/demo.min.js?1692870487') }}"></script>
-<script src="{{ asset('tabler/dist/js/demo-theme.min.js?1692870487') }}"></script>
+
 
 {{-- Load other external libraries --}}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 
-{{-- Global Toast Helper --}}
-@vite('resources/js/admin/helpers/toast.js')
+{{-- Global Notification Helper --}}
+@vite('resources/js/admin/utils/sound.js')
+@vite('resources/js/admin/helpers/notification.js')
 
 {{-- SCRIPT FOR ADMIN POS  --}}
 @if (request()->is('admin/pos'))
@@ -20,7 +21,7 @@
 @endif
 
 {{-- SCRIPT FOR RECENT TRANSACTIONS  --}}
-@if (request()->is('admin/transactions'))
+@if (request()->is('admin/reports/recent-transactions'))
     @vite('resources/js/admin/recentts.js')
 @endif
 
@@ -44,9 +45,19 @@
     @vite('resources/js/admin/sales-order.js')
 @endif
 
+{{-- SCRIPT FOR ADMIN SALES RETURN CREATE & EDIT --}}
+@if (request()->is('admin/sales-returns', 'admin/sales-returns/create', 'admin/sales-returns/*/edit'))
+    @vite('resources/js/admin/sales-return.js')
+@endif
+
 {{-- SCRIPT FOR ADMIN PO CREATE & EDIT --}}
 @if (request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*'))
     @vite('resources/js/admin/purchase-order.js')
+@endif
+
+{{-- SCRIPT FOR ADMIN PURCHASE RETURN CREATE & EDIT --}}
+@if (request()->is('admin/por', 'admin/por/create', 'admin/por/*/edit'))
+    @vite('resources/js/admin/purchase-return.js')
 @endif
 
 {{-- SCRIPT FOR PRODUCT --}}
@@ -60,17 +71,17 @@
 @endif
 
 {{-- SCRIPT FOR WAREHOUSE --}}
-@if (request()->is('admin/warehouse'))
+@if (request()->is('admin/warehouses*'))
     @vite('resources/js/admin/warehouse.js')
 @endif
 
 {{-- SCRIPT FOR UNIT --}}
-@if (request()->is('admin/settings/unit'))
+@if (request()->is('admin/settings/unit*'))
     @vite('resources/js/admin/unit.js')
 @endif
 
 {{-- SCRIPT FOR CATEGORY --}}
-@if (request()->is('admin/settings/category'))
+@if (request()->is('admin/settings/categories*'))
     @vite('resources/js/admin/category.js')
 @endif
 
@@ -102,11 +113,32 @@
     @vite('resources/js/admin/currency.js')
 @endif
 
-{{--  MODAL --}}
-@if ($errors->any() || session('success'))
-    @include('admin.layouts.modals')
-    @vite('resources/js/admin/layouts/modal.js')
+{{-- SCRIPT FOR ACCOUNTING settings --}}
+@if (request()->is('admin/accounting/accounting-setting', 'admin/accounting/journal', 'admin/accounting/general-ledger', 'admin/reports/income-statement', 'admin/reports/balance-sheet', 'admin/reports/aged-receivables', 'admin/reports/aged-payables'))
+    @vite('resources/js/admin/accounting.js')
 @endif
+
+{{-- SCRIPT FOR ADJUSTMENT LOG --}}
+@if (request()->is('admin/reports/adjustment-log'))
+    @vite('resources/js/admin/adjustment-log.js')
+@endif
+
+{{-- SCRIPT FOR TAX settings --}}
+@if (request()->is('admin/settings/tax'))
+    @vite('resources/js/admin/tax.js')
+@endif
+
+{{-- SCRIPT FOR SALES PIPELINE --}}
+@if (request()->is('admin/sales-pipeline'))
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    @vite('resources/js/admin/sales-pipeline.js')
+@endif
+
+{{-- SCRIPT FOR SETTINGS --}}
+@vite('resources/js/admin/layouts/settings.js')
+@vite('resources/js/admin/layouts/advanced-settings.js')
+@vite('resources/js/admin/layouts/global-keyboard-shortcuts.js')
+@vite('resources/js/admin/layouts/selectable-table.js')
 
 {{-- DELETE MODAL --}}
 <script>

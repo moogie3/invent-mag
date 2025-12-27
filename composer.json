@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "dompdf/dompdf": "^3.1",
         "laravel/fortify": "^1.25",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
@@ -17,7 +18,11 @@
         "spatie/laravel-permission": "^6.20"
     },
     "require-dev": {
+        "beyondcode/laravel-er-diagram-generator": "^5.0",
+        "brianium/paratest": "^7.7",
         "fakerphp/faker": "^1.23",
+        "knuckleswtf/scribe": "^5.5",
+        "laravel-lang/lang": "^15.25",
         "laravel/pail": "^1.1",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",

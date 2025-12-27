@@ -5,7 +5,7 @@
                 <div class="card shadow-sm border">
                     <div class="card-header bg-light">
                         <h3 class="card-title d-flex align-items-center">
-                            <i class="ti ti-package me-2"></i> Product Information
+                            <i class="ti ti-package me-2"></i> {{ __('messages.product_information') }}
                         </h3>
                     </div>
                     <div class="card-body">

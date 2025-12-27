@@ -7,7 +7,7 @@
         @php
             // Use the helper to calculate summary info
             $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
-                $sales->items,
+                $sales->salesItems,
                 $sales->order_discount ?? 0,
                 $sales->order_discount_type ?? 'percentage',
                 $sales->tax_rate ?? 0,
@@ -17,5 +17,6 @@
         @include('admin.layouts.partials.sales.edit.sales-info-section')
         @include('admin.layouts.partials.sales.edit.items-table')
         @include('admin.layouts.partials.sales.edit.summary-section')
+        <input type="hidden" name="products" id="products-json">
     </div>
 </form>

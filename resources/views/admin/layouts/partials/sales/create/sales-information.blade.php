@@ -1,6 +1,6 @@
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-white">
-        <h3 class="card-title"><i class="ti ti-report-money"></i> Sales Information</h3>
+        <h3 class="card-title"><i class="ti ti-report-money"></i> {{ __('messages.sales_information') }}</h3>
     </div>
     <div class="card-body">
         @include('admin.layouts.partials.sales.create.basic-info')

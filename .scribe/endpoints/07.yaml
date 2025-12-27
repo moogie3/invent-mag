@@ -1,0 +1,603 @@
+name: Warehouses
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/warehouses/{id}/set-main'
+    metadata:
+      custom: []
+      groupName: Warehouses
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Set as Main Warehouse'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the warehouse to set as main.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success":true,"message":"Main warehouse updated successfully."}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"success": false, "message": "Warehouse not found."}'
+        headers: []
+        description: 'Warehouse Not Found'
+      -
+        custom: []
+        status: 500
+        content: '{"success":false,"message":"Failed to set main warehouse: Internal server error."}'
+        headers: []
+        description: 'Error Setting Main Warehouse'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/warehouses/{id}/unset-main'
+    metadata:
+      custom: []
+      groupName: Warehouses
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Unset as Main Warehouse'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the warehouse to unset as main.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success":true,"message":"Main warehouse status removed."}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"success": false, "message": "Warehouse not found."}'
+        headers: []
+        description: 'Warehouse Not Found'
+      -
+        custom: []
+        status: 500
+        content: '{"success":false,"message":"Failed to unset main warehouse: Internal server error."}'
+        headers: []
+        description: 'Error Unsetting Main Warehouse'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/warehouses
+    metadata:
+      custom: []
+      groupName: Warehouses
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Display a listing of the warehouses.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      per_page:
+        custom: []
+        name: per_page
+        description: 'The number of warehouses to return per page. Defaults to 15.'
+        required: false
+        example: 25
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      per_page: 25
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":1,"name":"Main Warehouse",...}],"links":{...},"meta":{...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/warehouses
+    metadata:
+      custom: []
+      groupName: Warehouses
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Store a newly created resource in storage.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the warehouse.'
+        required: true
+        example: 'Secondary Warehouse'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'The address of the warehouse.'
+        required: false
+        example: '456 Storage Rd'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the warehouse.'
+        required: false
+        example: 'Overflow storage.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      is_main:
+        custom: []
+        name: is_main
+        description: 'Is this the main warehouse.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: 'Secondary Warehouse'
+      address: '456 Storage Rd'
+      description: 'Overflow storage.'
+      is_main: false
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: '{"data":{"id":1,"name":"Secondary Warehouse",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 422
+        content: '{"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/warehouses/{id}'
+    metadata:
+      custom: []
+      groupName: Warehouses
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Display the specified warehouse.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the warehouse.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      warehouse:
+        custom: []
+        name: warehouse
+        description: 'The ID of the warehouse.'
+        required: true
+        example: '1'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 17
+      warehouse: '1'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"name":"Main Warehouse",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Warehouse not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/v1/warehouses/{id}'
+    metadata:
+      custom: []
+      groupName: Warehouses
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update the specified resource in storage.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the warehouse.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      warehouse:
+        custom: []
+        name: warehouse
+        description: 'The ID of the warehouse.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 17
+      warehouse: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      address:
+        custom: []
+        name: address
+        description: 'The address of the warehouse.'
+        required: false
+        example: '123 Warehouse St'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description of the warehouse.'
+        required: false
+        example: 'Primary storage facility.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      is_main:
+        custom: []
+        name: is_main
+        description: 'Is this the main warehouse.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the warehouse.'
+        required: true
+        example: 'Main Warehouse'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      address: '123 Warehouse St'
+      description: 'Primary storage facility.'
+      is_main: true
+      name: 'Main Warehouse'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"name":"Main Warehouse (Updated)",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Warehouse not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
+        status: 422
+        content: '{"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+      -
+        custom: []
+        status: 500
+        content: '{"success":false,"message":"Failed to update warehouse: Internal server error."}'
+        headers: []
+        description: 'Error Updating Warehouse'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/warehouses/{id}'
+    metadata:
+      custom: []
+      groupName: Warehouses
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Remove the specified resource from storage.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the warehouse.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      warehouse:
+        custom: []
+        name: warehouse
+        description: 'The ID of the warehouse to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 17
+      warehouse: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Warehouse not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
+        status: 500
+        content: '{"success":false,"message":"Failed to delete warehouse: Internal server error."}'
+        headers: []
+        description: 'Error Deleting Warehouse'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null

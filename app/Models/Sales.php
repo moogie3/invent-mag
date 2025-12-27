@@ -8,6 +8,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @property int $id
+ * @property string $invoice
+ * @property \Illuminate\Support\Carbon $order_date
+ * @property float $total
+ * @property string $order_discount_type
+ * @property float $order_discount
+ * @property float $tax_rate
+ * @property float $amount_received
+ * @property float $total_tax
+ * @property \Illuminate\Support\Carbon $due_date
+ * @property string $payment_type
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property string $status
+ * @property \Illuminate\Support\Carbon $updated_at
+ */
 class Sales extends Model
 {
     use HasFactory;
@@ -19,7 +35,6 @@ class Sales extends Model
         'user_id',
         'order_date',
         'due_date',
-        'payment_date',
         'payment_type',
         'order_discount',
         'order_discount_type',
@@ -29,8 +44,11 @@ class Sales extends Model
         'total_tax',
         'amount_received',
         'change_amount',
-        'is_pos'
+        'is_pos',
+        'sales_opportunity_id'
     ];
+
+    protected $with = ['salesItems'];
 
     protected $attributes = [
         'status' => 'Unpaid',
@@ -41,6 +59,7 @@ class Sales extends Model
         'Paid',
         'Partial',
         'Unpaid',
+        'Returned',
     ];
 
     public static $paymentTypes = [
@@ -61,9 +80,14 @@ class Sales extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function items(): HasMany
+    public function salesItems(): HasMany
     {
         return $this->hasMany(SalesItem::class, 'sales_id');
+    }
+
+    public function salesReturns(): HasMany
+    {
+        return $this->hasMany(SalesReturn::class);
     }
 
     public function product(): BelongsTo
@@ -76,6 +100,26 @@ class Sales extends Model
         return $this->belongsTo(Tax::class, 'tax_id');
     }
 
+    public function payments()
+    {
+        return $this->morphMany(Payment::class, 'paymentable');
+    }
+
+    public function getTotalPaidAttribute()
+    {
+        return $this->payments->sum('amount');
+    }
+
+    public function getBalanceAttribute()
+    {
+        return $this->total - $this->total_paid;
+    }
+
+    public function salesOpportunity(): BelongsTo
+    {
+        return $this->belongsTo(SalesOpportunity::class, 'sales_opportunity_id');
+    }
+
     protected $casts = [
         'total' => 'float',
         'total_tax' => 'float',
@@ -83,9 +127,14 @@ class Sales extends Model
         'order_discount' => 'float',
         'amount_received' => 'float',
         'change_amount' => 'float',
-        'is_pos' => 'boolean'
-        // Removed datetime casts here since we'll handle them with accessors/mutators
+        'is_pos' => 'boolean',
     ];
+
+    // Explicitly define the factory for the model
+    protected static function newFactory()
+    {
+        return \Database\Factories\SalesFactory::new();
+    }
 
     // Get user timezone or fallback to app timezone
     protected function getUserTimezone()
@@ -146,21 +195,13 @@ class Sales extends Model
             ->setTimezone('UTC');
     }
 
-    // Payment Date Accessors & Mutators
-    public function getPaymentDateAttribute($value)
+    /**
+     * Get the path to view the model.
+     *
+     * @return string
+     */
+    public function path(): string
     {
-        if (!$value) return null;
-        return \Carbon\Carbon::parse($value)->setTimezone($this->getUserTimezone());
-    }
-
-    public function setPaymentDateAttribute($value)
-    {
-        if (!$value) {
-            $this->attributes['payment_date'] = null;
-            return;
-        }
-
-        $this->attributes['payment_date'] = \Carbon\Carbon::parse($value, $this->getUserTimezone())
-            ->setTimezone('UTC');
+        return route('admin.sales.view', $this);
     }
 }

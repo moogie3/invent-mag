@@ -1,15 +1,15 @@
 <div class="card border">
     <div class="card-body p-3">
-        <h5 class="mb-3 card-title">Amount Summary</h5>
+        <h5 class="mb-3 card-title">{{ __('messages.amount_summary') }}</h5>
         <div class="d-flex justify-content-between mb-2">
-            <div>Subtotal:</div>
+            <div>{{ __('messages.subtotal') }}:</div>
             <div id="subtotal">
                 {{ \App\Helpers\CurrencyHelper::format($summary['subtotal']) }}
             </div>
         </div>
         <div class="d-flex justify-content-between mb-2">
             <div>
-                <span>Order Discount:</span>
+                <span>{{ __('messages.order_discount') }}:</span>
             </div>
             <div class="d-flex align-items-center">
                 <div class="input-group me-2" style="width: 200px;">
@@ -23,7 +23,7 @@
                             {{ ($sales->order_discount_type ?? '') === 'percentage' ? 'selected' : '' }}>
                             %</option>
                         <option value="fixed" {{ ($sales->order_discount_type ?? '') === 'fixed' ? 'selected' : '' }}>
-                            Rp</option>
+                            {{ __('messages.fixed') }}</option>
                     </select>
                 </div>
                 <div class="text-danger" id="orderDiscountTotal">
@@ -32,21 +32,27 @@
             </div>
         </div>
 
-        @if (($sales->tax_rate ?? 0) > 0)
-            <div class="d-flex justify-content-between mb-2">
-                <div>Tax ({{ $sales->tax_rate }}%):</div>
+        <div class="d-flex justify-content-between mb-2">
+                <div>{{ __('messages.tax') }} ({{ $sales->tax_rate ?? 0 }}%):</div>
                 <div class="text-muted" id="totalTax">
                     {{ \App\Helpers\CurrencyHelper::format($summary['taxAmount']) }}
                 </div>
             </div>
-        @endif
 
         <hr>
         <div class="d-flex justify-content-between align-items-center">
-            <div class="fs-5"><strong>Grand Total:</strong></div>
+            <div class="fs-5"><strong>{{ __('messages.grand_total') }}:</strong></div>
             <div class="fs-3 fw-bold text-primary" id="finalTotal">
                 {{ \App\Helpers\CurrencyHelper::format($summary['finalTotal']) }}
             </div>
+        </div>
+        <div class="d-flex justify-content-between text-success mb-2">
+            <span>{{ __('messages.total_paid') }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($sales->total_paid) }}</span>
+        </div>
+        <div class="d-flex justify-content-between text-danger fw-bold">
+            <span>{{ __('messages.balance') }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($sales->balance) }}</span>
         </div>
 
         <!-- Hidden inputs for form submission -->

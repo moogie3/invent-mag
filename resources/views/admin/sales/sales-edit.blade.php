@@ -1,11 +1,11 @@
 @extends('admin.layouts.base')
 
-@section('title', 'Sales Order')
+@section('title', __('messages.edit_sales_order'))
 
 @section('content')
     <div class="page-wrapper">
         @include('admin.layouts.partials.sales.edit.header')
         @include('admin.layouts.partials.sales.edit.page-body')
     </div>
-    @include('admin.layouts.modals.pomodals')
+    @include('admin.layouts.modals.sales.salesmodals')
 @endsection

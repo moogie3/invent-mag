@@ -1,78 +1,200 @@
 <div class="card-body border-bottom py-3">
     <div class="d-flex justify-content-between">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">Store information</div>
-                    <div class="purchase-info row">
-                        <div class="col-md-4">
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-building-store fs-2"></i>
-                                </span>
-                                User Store : <strong>{{ $shopname }}</strong>
-                            </div>
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-map fs-2"></i>
-                                </span>
-                                Store Address : <strong>{{ $address }}</strong>
-                            </div>
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-file-invoice fs-2"></i>
-                                </span>
-                                Total Invoice : <strong>{{ $totalinvoice }}</strong>
+        <div class="col-md-12">
+            <div class="card card-primary">
+                <div class="card-body border-bottom py-3">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="ti ti-building-store fs-1 me-3 text-primary"></i>
+                            <div>
+                                <h2 class="mb-1">
+                                    {{ __('messages.store_information') }}
+                                </h2>
+                                <div class="text-muted">
+                                    {{ __('messages.overview_store_performance_metrics') }}
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-step-out fs-2"></i>
-                                </span>
-                                Invoice OUT: <strong>{{ $outCount }}</strong>
-                            </div>
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-basket-dollar fs-2"></i>
-                                </span>
-                                Amount OUT:
-                                <strong>{{ \App\Helpers\CurrencyHelper::format($outCountamount) }}</strong>
-                            </div>
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-currency fs-2"></i>
-                                </span>
-                                This Month PO:
-                                <strong>{{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</strong>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <!-- Store Details -->
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body py-3">
+                                    <div class="mb-2">
+                                        <label class="form-label text-muted mb-2 d-block">
+                                            {{ __('messages.store_details') }}
+                                        </label>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded badge"
+                                            style="width: 40px; height: 40px;">
+                                            <i class="ti ti-building-store fs-3 text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="small text-muted">{{ __('messages.user_store') }}</div>
+                                            <div class="fw-bold fs-4">{{ $shopname }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded badge"
+                                            style="width: 40px; height: 40px;"">
+                                            <i class="ti ti-map fs-3 text-success"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="small text-muted">{{ __('messages.store_address') }}</div>
+                                            <div class="fw-bold fs-4">{{ $address }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded badge"
+                                            style="width: 40px; height: 40px">
+                                            <i class="ti ti-file-invoice fs-3 text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="small text-muted">{{ __('messages.total_invoice') }}</div>
+                                            <div class="fw-bold fs-4" id="totalInvoiceCount">{{ $totalinvoice }}</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Financial Overview -->
                         <div class="col-md-4">
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-step-into fs-2"></i>
-                                </span>
-                                Invoice IN: <strong>{{ $inCount }}</strong>
+                            <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                                <div class="card-body py-3">
+                                    <div class="mb-2">
+                                        <label class="form-label text-white-50 mb-2 d-block">
+                                            {{ __('messages.financial_overview') }}
+                                        </label>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="me-2">
+                                                    <i class="ti ti-step-out fs-2"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-white-50 small">{{ __('messages.invoice_out') }}
+                                                    </div>
+                                                    <div class="h4 mb-0" id="invoiceOutCount">{{ $outCount }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="me-2">
+                                                    <i class="ti ti-basket-dollar fs-2"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-white-50 small">{{ __('messages.amount_out') }}
+                                                    </div>
+                                                    <div class="h4 mb-0" id="amountOutCount">
+                                                        {{ \App\Helpers\CurrencyHelper::format($outCountamount) }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="me-2">
+                                                    <i class="ti ti-step-into fs-2"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-white-50 small">{{ __('messages.invoice_in') }}
+                                                    </div>
+                                                    <div class="h4 mb-0" id="invoiceInCount">{{ $inCount }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="me-2">
+                                                    <i class="ti ti-basket-dollar fs-2"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-white-50 small">{{ __('messages.amount_in') }}
+                                                    </div>
+                                                    <div class="h4 mb-0" id="amountInCount">
+                                                        {{ \App\Helpers\CurrencyHelper::format($inCountamount) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    <i class="ti ti-currency fs-2"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-white-50 small">
+                                                        {{ __('messages.monthly_purchase') }}</div>
+                                                    <div class="h4 mb-0" id="monthlyPurchase">
+                                                        {{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    <i class="ti ti-credit-card-pay fs-2"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-white-50 small">
+                                                        {{ __('messages.monthly_payment') }}</div>
+                                                    <div class="h4 mb-0" id="monthlyPayment">
+                                                        {{ \App\Helpers\CurrencyHelper::format($paymentMonthly) }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-basket-dollar fs-2"></i>
-                                </span>
-                                Amount IN:
-                                <strong>{{ \App\Helpers\CurrencyHelper::format($inCountamount) }}</strong>
+                        </div>
+
+                        <!-- Expiry Status with Blue Background -->
+                        <div class="col-md-2">
+                            <div class="card border-0 shadow-sm bg-info text-white h-100">
+                                <div class="card-body py-3">
+                                    <div class="mb-2">
+                                        <label class="form-label text-white-50 mb-2 d-block">
+                                            {{ __('messages.expiry_status') }}
+                                        </label>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3 d-flex align-items-center justify-content-center rounded"
+                                            style="width: 50px; height: 50px;">
+                                            <i class="ti ti-calendar-time fs-2 text-white"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="text-white-50 small">
+                                                {{ __('messages.expiring_soon_purchase_orders') }}</div>
+                                            <div class="h4 mb-0" id="expiringPurchaseItemsCount">
+                                                {{ $expiringPurchaseCount }}</div>
+                                            @if ($expiringPurchaseCount > 0)
+                                                <a href="#" class="mt-1 btn btn-sm btn-outline-light"
+                                                    id="viewExpiringPurchase" data-bs-toggle="modal"
+                                                    data-bs-target="#expiringPurchaseModal">
+                                                    {{ __('messages.view_details') }}
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-2">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                    <i class="ti ti-credit-card-pay fs-2"></i>
-                                </span>
-                                This Month Paid:
-                                <strong>{{ \App\Helpers\CurrencyHelper::format($paymentMonthly) }}</strong>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm bg-light h-100">
+                                <div class="card-body py-3">
+                                    @include('admin.layouts.partials.po.index.filters')
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        @include('admin.layouts.partials.po.index.filters')
     </div>
 </div>

@@ -15,20 +15,16 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->index('name');
             $table->string('address');
             $table->string('phone_number');
+            $table->string('email')->nullable();
+            $table->string('image')->nullable();
             $table->string('payment_terms');
             $table->timestamps();
         });
 
-        DB::table('customers')->insert([
-            'name' => 'Walk In Customer',
-            'address' => '-',
-            'phone_number' => '0',
-            'payment_terms' => '0',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+
     }
 
 

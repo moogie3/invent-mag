@@ -1,6 +1,6 @@
 # Invent-MAG: Advanced Inventory & Accounting System
 
-**Version:** 2.0  
+**Version:** 1.2  
 **Author:** moogie3  
 **License:** MIT  
 

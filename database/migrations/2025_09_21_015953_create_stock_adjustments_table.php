@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('stock_adjustments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->string('adjustment_type'); // 'increase', 'decrease', 'correction'
             $table->float('quantity_before');

@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::create('po', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->string('invoice');
             $table->integer('supplier_id');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null')->after('supplier_id');

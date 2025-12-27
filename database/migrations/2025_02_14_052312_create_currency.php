@@ -9,6 +9,7 @@ return new class extends Migration {
     public function up() {
         Schema::create('currency_settings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->string('currency_symbol')->default('Rp');
             $table->string('decimal_separator')->default(',');
             $table->string('thousand_separator')->default('.');

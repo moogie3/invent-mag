@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('taxes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->string('name'); // e.g., "VAT", "Sales Tax"
             $table->decimal('rate', 5, 2); // e.g., 10.00 for 10%
             $table->boolean('is_active')->default(true);

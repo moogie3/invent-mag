@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\BelongsToTenant;
 
 class Warehouse extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToTenant;
     protected $table = 'warehouses';
     protected $fillable = [
+        'tenant_id',
         'name',
         'address',
         'description',

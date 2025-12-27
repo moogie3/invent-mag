@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Concerns\BelongsToTenant;
 
 class Customer extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToTenant;
 
     protected $table = 'customers';
 
     protected $fillable = [
+        'tenant_id',
         'name',
         'address',
         'phone_number',

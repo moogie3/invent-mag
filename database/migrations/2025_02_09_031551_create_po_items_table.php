@@ -14,6 +14,7 @@ return new class extends Migration
         if (!Schema::hasTable('po_items')) {
             Schema::create('po_items', function (Blueprint $table) {
                 $table->id();
+                $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
                 $table->unsignedBigInteger('po_id');
                 $table->unsignedBigInteger('product_id');
                 $table->integer('quantity');

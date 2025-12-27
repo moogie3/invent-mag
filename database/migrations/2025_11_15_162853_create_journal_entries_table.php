@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('journal_entries', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->date('date');
             $table->text('description');
             $table->morphs('sourceable'); // For polymorphic relationship (e.g., Sales, Purchase models)

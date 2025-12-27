@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Concerns\BelongsToTenant;
 
 /**
  * @property int $id
@@ -26,10 +27,11 @@ use Illuminate\Support\Facades\Auth;
  */
 class Sales extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToTenant;
 
     protected $table = 'sales';
     protected $fillable = [
+        'tenant_id',
         'invoice',
         'customer_id',
         'user_id',

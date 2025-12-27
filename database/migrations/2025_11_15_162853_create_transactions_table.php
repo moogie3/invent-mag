@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('journal_entry_id')->constrained('journal_entries')->onDelete('cascade');
             $table->foreignId('account_id')->constrained('accounts')->onDelete('restrict');
             $table->enum('type', ['debit', 'credit']);

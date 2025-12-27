@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\BelongsToTenant;
 
 /**
  * @property int $id
@@ -24,9 +25,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Purchase extends Model
 {
-        use HasFactory;
+        use HasFactory, BelongsToTenant;
         protected $table = 'po';
         protected $fillable = [
+            'tenant_id',
             'invoice',
             'supplier_id',
             'user_id',

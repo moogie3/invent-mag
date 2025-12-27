@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('name')->unique();
             $table->string('code')->unique()->nullable();

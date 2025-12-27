@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('pipeline_stages', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('sales_pipeline_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->integer('position');

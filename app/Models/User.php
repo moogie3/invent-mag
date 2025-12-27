@@ -8,13 +8,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use Spatie\Multitenancy\Models\Concerns\BelongsToTenant;
+use App\Models\Concerns\BelongsToTenant;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, HasRoles, HasApiTokens, BelongsToTenant;
     protected $table = 'users';
     protected $fillable = [
+        'tenant_id',
         'name',
         'shopname',
         'address',

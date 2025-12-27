@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->morphs('paymentable');
             $table->decimal('amount', 15, 2);
             $table->timestamp('payment_date');

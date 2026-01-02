@@ -6,16 +6,20 @@ use App\Models\Unit;
 use App\Services\UnitService;
 use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class UnitServiceTest extends BaseUnitTestCase
 {
-    protected UnitService $unitService;
+    use RefreshDatabase, CreatesTenant;
 
-    protected bool $seedDatabase = false; // Disable seeding for this test class
+    protected UnitService $unitService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
+        $this->user->assignRole('superuser'); // Ensure the user has permissions for services
         $this->unitService = new UnitService();
     }
 
@@ -56,7 +60,7 @@ class UnitServiceTest extends BaseUnitTestCase
     #[Test]
     public function it_returns_error_if_unit_already_exists()
     {
-        Unit::create(['name' => 'Kilogram', 'symbol' => 'kg']);
+        Unit::factory()->create(['name' => 'Kilogram', 'symbol' => 'kg']);
 
         $data = ['name' => 'Kilogram', 'symbol' => 'kg'];
         $result = $this->unitService->createUnit($data);
@@ -69,7 +73,7 @@ class UnitServiceTest extends BaseUnitTestCase
     #[Test]
     public function it_can_update_a_unit_successfully()
     {
-        $unit = Unit::create(['name' => 'Gram', 'symbol' => 'g']);
+        $unit = Unit::factory()->create(['name' => 'Gram', 'symbol' => 'g']);
         $updatedData = ['name' => 'Kilogram', 'symbol' => 'kg'];
 
         $result = $this->unitService->updateUnit($unit, $updatedData);
@@ -82,7 +86,7 @@ class UnitServiceTest extends BaseUnitTestCase
     #[Test]
     public function it_can_delete_a_unit_successfully()
     {
-        $unit = Unit::create(['name' => 'Liter', 'short_name' => 'L', 'allow_decimal' => true, 'symbol' => 'l']);
+        $unit = Unit::factory()->create(['name' => 'Liter', 'symbol' => 'l']);
 
         $result = $this->unitService->deleteUnit($unit);
 

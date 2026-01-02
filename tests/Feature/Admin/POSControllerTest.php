@@ -10,14 +10,17 @@ use App\Models\SalesItem;
 use App\Models\Warehouse;
 use Database\Factories\SalesFactory;
 use Illuminate\Support\Facades\Storage;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
 use Carbon\Carbon;
 use App\Services\PosService;
 use Mockery;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class POSControllerTest extends BaseFeatureTestCase
+class POSControllerTest extends TestCase
 {
-    protected User $user;
+    use RefreshDatabase, CreatesTenant;
+
     protected Customer $customer;
     protected Product $product;
 
@@ -25,11 +28,8 @@ class POSControllerTest extends BaseFeatureTestCase
     {
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
-
-        $this->user = User::factory()->create();
+        $this->setupTenant();
         $this->user->assignRole('superuser');
-
-        $this->actingAs($this->user);
 
         Warehouse::factory()->create(['is_main' => true]);
         $this->customer = Customer::factory()->create();

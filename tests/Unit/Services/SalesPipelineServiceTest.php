@@ -11,14 +11,20 @@ use App\Models\SalesPipeline;
 use App\Services\SalesPipelineService;
 use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class SalesPipelineServiceTest extends BaseUnitTestCase
 {
+    use RefreshDatabase, CreatesTenant;
+
     protected SalesPipelineService $salesPipelineService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
+        $this->user->assignRole('superuser'); // Ensure the user has permissions for services
         $this->salesPipelineService = new SalesPipelineService();
     }
 
@@ -196,7 +202,6 @@ class SalesPipelineServiceTest extends BaseUnitTestCase
     #[Test]
     public function it_can_convert_an_opportunity_to_a_sales_order()
     {
-        $this->actingAs(\App\Models\User::factory()->create());
         $opportunity = SalesOpportunity::factory()->hasItems(1, ['quantity' => 2, 'price' => 100])->create(['status' => 'won']);
         Product::find($opportunity->items->first()->product_id)->update(['stock_quantity' => 10]);
 
@@ -245,7 +250,6 @@ class SalesPipelineServiceTest extends BaseUnitTestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessageMatches('/Insufficient stock for product:/');
 
-        $this->actingAs(\App\Models\User::factory()->create());
         $opportunity = SalesOpportunity::factory()->hasItems(1, ['quantity' => 10, 'price' => 100])->create(['status' => 'won']);
         Product::find($opportunity->items->first()->product_id)->update(['stock_quantity' => 5]);
 
@@ -255,7 +259,6 @@ class SalesPipelineServiceTest extends BaseUnitTestCase
     #[Test]
     public function it_rolls_back_stock_when_deleting_a_converted_opportunity()
     {
-        $this->actingAs(\App\Models\User::factory()->create());
         $opportunity = SalesOpportunity::factory()->hasItems(1, ['quantity' => 3, 'price' => 100])->create(['status' => 'won']);
         $product = Product::find($opportunity->items->first()->product_id);
         $product->update(['stock_quantity' => 10]);

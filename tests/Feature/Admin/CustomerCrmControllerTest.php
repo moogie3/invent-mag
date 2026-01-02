@@ -5,20 +5,19 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use App\Models\Customer;
 use Tests\Feature\BaseFeatureTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class CustomerCrmControllerTest extends BaseFeatureTestCase
 {
-    protected User $user;
+    use RefreshDatabase, CreatesTenant;
 
     protected function setUp(): void
     {
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
-
-        $this->user = User::factory()->create();
+        $this->setupTenant();
         $this->user->assignRole('superuser');
-
-        $this->actingAs($this->user);
     }
 
     public function test_it_can_display_customer_crm_data()

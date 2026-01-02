@@ -8,16 +8,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Carbon\Carbon;
+use Tests\Traits\CreatesTenant;
 
 class SalesForecastServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
     protected SalesForecastService $salesForecastService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->salesForecastService = new SalesForecastService();
     }
 

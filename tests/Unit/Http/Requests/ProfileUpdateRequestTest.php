@@ -9,28 +9,27 @@ use Illuminate\Support\Facades\Validator;
 use Tests\TestCase;
 use Illuminate\Validation\Rule;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Traits\CreatesTenant;
 
 class ProfileUpdateRequestTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
     private ProfileUpdateRequest $request;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->request = new ProfileUpdateRequest();
     }
 
     #[Test]
     public function test_authorize_returns_true_for_authenticated_user()
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         // We need to set the user on the request for the authorize method to work
-        $this->request->setUserResolver(function () use ($user) {
-            return $user;
+        $this->request->setUserResolver(function () {
+            return $this->user;
         });
 
         $this->assertTrue($this->request->authorize());
@@ -52,11 +51,8 @@ class ProfileUpdateRequestTest extends TestCase
     #[Test]
     public function test_rules_are_correct()
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        $this->request->setUserResolver(function () use ($user) {
-            return $user;
+        $this->request->setUserResolver(function () {
+            return $this->user;
         });
 
         $expectedRules = [
@@ -67,7 +63,7 @@ class ProfileUpdateRequestTest extends TestCase
                 'lowercase',
                 'email',
                 'max:255',
-                Rule::unique(User::class)->ignore($user->id),
+                Rule::unique(User::class)->ignore($this->user->id),
             ],
         ];
 
@@ -77,10 +73,8 @@ class ProfileUpdateRequestTest extends TestCase
     #[Test]
     public function test_name_is_required()
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-        $this->request->setUserResolver(function () use ($user) {
-            return $user;
+        $this->request->setUserResolver(function () {
+            return $this->user;
         });
 
         $validator = Validator::make(['email' => 'test@example.com'], $this->request->rules());
@@ -92,15 +86,13 @@ class ProfileUpdateRequestTest extends TestCase
     #[Test]
     public function test_email_must_be_unique_except_for_the_current_user()
     {
-        $user1 = User::factory()->create();
         $user2 = User::factory()->create();
-        $this->actingAs($user1);
-        $this->request->setUserResolver(function () use ($user1) {
-            return $user1;
+        $this->request->setUserResolver(function () {
+            return $this->user;
         });
 
         // Test with user1's own email (should pass)
-        $validator = Validator::make(['name' => 'Test', 'email' => $user1->email], $this->request->rules());
+        $validator = Validator::make(['name' => 'Test', 'email' => $this->user->email], $this->request->rules());
         $this->assertFalse($validator->fails());
 
         // Test with user2's email (should fail)

@@ -8,16 +8,20 @@ use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class CustomerServiceTest extends BaseUnitTestCase
 {
+    use RefreshDatabase, CreatesTenant;
+
     protected CustomerService $customerService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->customerService = new CustomerService();
-        Customer::truncate();
     }
 
     #[Test]

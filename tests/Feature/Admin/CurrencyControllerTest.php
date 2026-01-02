@@ -9,23 +9,26 @@ use Illuminate\Http\Request;
 use Mockery;
 use Tests\Feature\BaseFeatureTestCase;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class CurrencyControllerTest extends BaseFeatureTestCase
 {
-    protected User $user;
+    use RefreshDatabase, CreatesTenant;
+
     protected CurrencyService $currencyService;
     protected array $validData;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->user = User::factory()->create();
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->user->assignRole('superuser');
 
-        $this->actingAs($this->user);
-
         $this->currencyService = $this->app->make(CurrencyService::class);
+
+        // Create a default currency setting for the tenant
+        CurrencySetting::factory()->create();
 
         $this->validData = [
             'currency_symbol' => '$',

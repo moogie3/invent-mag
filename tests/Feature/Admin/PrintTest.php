@@ -10,27 +10,24 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class PrintTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private User $user;
+    use RefreshDatabase, CreatesTenant;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+        
         $role = Role::firstOrCreate(['name' => 'admin']);
 
         // Grant necessary permissions for the new tests
         Permission::firstOrCreate(['name' => 'view-supplier']);
         Permission::firstOrCreate(['name' => 'view-customer']);
         $role->givePermissionTo(['view-supplier', 'view-customer']);
-
         $this->user->assignRole($role);
-        $this->actingAs($this->user);
     }
 
     public function test_pos_receipt_can_be_rendered()

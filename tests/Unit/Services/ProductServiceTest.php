@@ -15,23 +15,20 @@ use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class ProductServiceTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected ProductService $productService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->productService = new ProductService();
-        Product::truncate();
-        Categories::truncate();
-        Supplier::truncate();
-        Unit::truncate();
-        Warehouse::truncate();
-        StockAdjustment::truncate();
-        User::truncate();
-        POItem::truncate();
     }
 
     #[Test]

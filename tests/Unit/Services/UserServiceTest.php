@@ -8,14 +8,19 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class UserServiceTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected UserService $userService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->userService = new UserService();
 
         // Ensure roles and permissions exist for tests that need them
@@ -46,7 +51,7 @@ class UserServiceTest extends BaseUnitTestCase
         $this->assertArrayHasKey('users', $data);
         $this->assertArrayHasKey('roles', $data);
         $this->assertArrayHasKey('permissions', $data);
-        $this->assertCount(3, $data['users']); // Now only expects the 3 users created in this test
+        $this->assertCount(4, $data['users']);
     }
 
     #[Test]

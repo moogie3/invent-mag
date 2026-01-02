@@ -8,14 +8,20 @@ use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class SupplierServiceTest extends BaseUnitTestCase
 {
+    use RefreshDatabase, CreatesTenant;
+
     protected SupplierService $supplierService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
+        $this->user->assignRole('superuser'); // Ensure the user has permissions for services
         $this->supplierService = new SupplierService();
     }
 

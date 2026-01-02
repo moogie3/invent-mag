@@ -6,14 +6,20 @@ use App\Models\Tax;
 use App\Services\TaxService;
 use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class TaxServiceTest extends BaseUnitTestCase
 {
+    use RefreshDatabase, CreatesTenant;
+
     protected TaxService $taxService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
+        $this->user->assignRole('superuser'); // Ensure the user has permissions for services
         $this->taxService = new TaxService();
     }
 

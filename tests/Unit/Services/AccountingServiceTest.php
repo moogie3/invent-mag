@@ -11,21 +11,24 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class AccountingServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
     protected AccountingService $accountingService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->accountingService = new AccountingService();
         // Seed the accounts
         $this->seed(\Database\Seeders\AccountSeeder::class);
     }
 
+    #[Test]
     public function it_creates_a_valid_journal_entry()
     {
         $sale = Sales::factory()->create();

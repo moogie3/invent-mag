@@ -10,16 +10,18 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Traits\CreatesTenant;
 
 class SetLocaleTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
     private SetLocale $middleware;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->middleware = new SetLocale();
     }
 
@@ -27,10 +29,7 @@ class SetLocaleTest extends TestCase
     public function test_sets_locale_from_user_settings_if_authenticated_and_setting_exists()
     {
         // 1. Arrange
-        $user = User::factory()->create([
-            'system_settings' => ['system_language' => 'id']
-        ]);
-        $this->actingAs($user);
+        $this->user->update(['system_settings' => ['system_language' => 'id']]);
         $request = new Request();
         $next = function ($req) {
             // This is a dummy "next" middleware in the chain.
@@ -48,10 +47,7 @@ class SetLocaleTest extends TestCase
     public function test_uses_fallback_locale_if_user_has_no_setting()
     {
         // 1. Arrange
-        $user = User::factory()->create([
-            'system_settings' => [] // No language setting
-        ]);
-        $this->actingAs($user);
+        $this->user->update(['system_settings' => []]); // No language setting
 
         // Set a specific fallback for this test
         config(['app.fallback_locale' => 'fr']);
@@ -74,6 +70,10 @@ class SetLocaleTest extends TestCase
         // 1. Arrange
         // Ensure no user is authenticated
         Auth::logout();
+        
+        // Make sure the tenant context is forgotten as well
+        \App\Models\Tenant::forgetCurrent();
+
 
         // Set a known initial locale
         $initialLocale = 'en';

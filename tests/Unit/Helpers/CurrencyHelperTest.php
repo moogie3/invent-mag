@@ -8,15 +8,19 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\BaseUnitTestCase;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class CurrencyHelperTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         // Ensure the cache is cleared before each test
         CurrencyHelper::clearSettingsCache();
-        CurrencySetting::truncate();
     }
 
     protected function tearDown(): void

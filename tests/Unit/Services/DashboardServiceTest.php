@@ -15,24 +15,20 @@ use App\Services\DashboardService;
 use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class DashboardServiceTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected DashboardService $dashboardService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->dashboardService = new DashboardService();
-        User::truncate();
-        Customer::truncate();
-        Supplier::truncate();
-        Categories::truncate();
-        Product::truncate();
-        Sales::truncate();
-        SalesItem::truncate();
-        Purchase::truncate();
-        POItem::truncate();
     }
 
     #[Test]

@@ -7,17 +7,20 @@ use App\Models\Unit;
 use App\Services\CurrencyService;
 use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class CurrencyServiceTest extends BaseUnitTestCase
 {
+    use RefreshDatabase, CreatesTenant;
+
     protected CurrencyService $currencyService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->currencyService = new CurrencyService();
-        CurrencySetting::truncate();
-        Unit::truncate();
     }
 
     #[Test]

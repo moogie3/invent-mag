@@ -173,10 +173,12 @@ class DashboardService
 
     private function getTopCategories($dates)
     {
+        $tenantId = app('currentTenant')->id;
         $categoryRevenue = DB::table('sales_items')
             ->join('sales', 'sales_items.sales_id', '=', 'sales.id')
             ->join('products', 'sales_items.product_id', '=', 'products.id')
             ->select(['products.category_id', DB::raw('COUNT(DISTINCT products.id) as products_count'), DB::raw('SUM(sales_items.quantity * sales_items.customer_price) as revenue')])
+            ->where('sales.tenant_id', $tenantId)
             ->whereBetween('sales.order_date', [$dates['start'], $dates['end']])
             ->groupBy('products.category_id')
             ->orderBy('revenue', 'desc')
@@ -538,24 +540,31 @@ class DashboardService
 
     private function prepareCustomerInsights()
     {
+        $tenantId = app('currentTenant')->id;
+
         $dateDiffRaw = DB::connection()->getDriverName() === 'sqlite'
             ? 'julianday(payments.payment_date) - julianday(sales.due_date)'
             : 'DATEDIFF(payments.payment_date, sales.due_date)';
 
         $avgDueDays = Sales::where('sales.status', 'Paid')
+            ->where('sales.tenant_id', $tenantId)
             ->whereNotNull('sales.due_date')
-            ->join('payments', function ($join) {
+            ->join('payments', function ($join) use ($tenantId) {
                 $join->on('sales.id', '=', 'payments.paymentable_id')
-                    ->where('payments.paymentable_type', Sales::class);
+                    ->where('payments.paymentable_type', Sales::class)
+                    ->where('payments.tenant_id', $tenantId);
             })
             ->select(DB::raw("AVG($dateDiffRaw) as avg_days"))
             ->value('avg_days') ?? 0;
 
-        $totalInvoices = Sales::count();
-        $paidInvoices = Sales::where('status', 'Paid')->count();
+        $totalInvoices = Sales::where('tenant_id', $tenantId)->count();
+        $paidInvoices = Sales::where('status', 'Paid')->where('tenant_id', $tenantId)->count();
         $collectionRate = $totalInvoices > 0 ? ($paidInvoices / $totalInvoices) * 100 : 0;
 
-        $paymentTermsRaw = Customer::select('payment_terms', DB::raw('count(*) as count'))->groupBy('payment_terms')->get();
+        $paymentTermsRaw = Customer::where('tenant_id', $tenantId)
+            ->select('payment_terms', DB::raw('count(*) as count'))
+            ->groupBy('payment_terms')
+            ->get();
 
         $paymentTerms = $paymentTermsRaw
             ->map(function ($row) {
@@ -665,17 +674,26 @@ class DashboardService
 
     private function getTopSellingProducts()
     {
-        return SalesItem::select('product_id', DB::raw('SUM(quantity) as units_sold'), DB::raw('SUM(total) as revenue'))->with('product')->whereHas('product')->groupBy('product_id')->orderByDesc('units_sold')->limit(5)->get()->map(
-            fn($item) => (object) [
-                'id' => $item->product_id,
-                'name' => $item->product->name ?? 'Unknown Product',
-                'code' => $item->product->code ?? 'N/A',
-                'image' => $item->product->image ?? null,
-                'category' => $item->product->category ?? null,
-                'units_sold' => $item->units_sold,
-                'revenue' => $item->revenue,
-            ],
-        );
+        $tenantId = app('currentTenant')->id;
+        return SalesItem::select('product_id', DB::raw('SUM(quantity) as units_sold'), DB::raw('SUM(total) as revenue'))
+            ->where('sales_items.tenant_id', $tenantId)
+            ->with('product')
+            ->whereHas('product')
+            ->groupBy('product_id')
+            ->orderByDesc('units_sold')
+            ->limit(5)
+            ->get()
+            ->map(
+                fn($item) => (object) [
+                    'id' => $item->product_id,
+                    'name' => $item->product->name ?? 'Unknown Product',
+                    'code' => $item->product->code ?? 'N/A',
+                    'image' => $item->product->image ?? null,
+                    'category' => $item->product->category ?? null,
+                    'units_sold' => $item->units_sold,
+                    'revenue' => $item->revenue,
+                ],
+            );
     }
 
     private function getCustomerAnalytics($dates)

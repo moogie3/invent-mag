@@ -14,9 +14,13 @@ use Illuminate\Support\Facades\Auth;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Mockery\MockInterface;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class PurchaseServiceTest extends BaseUnitTestCase
 {
+    use RefreshDatabase, CreatesTenant;
+
     protected PurchaseService $purchaseService;
     protected User $user;
     protected MockInterface $accountingServiceMock;
@@ -24,30 +28,33 @@ class PurchaseServiceTest extends BaseUnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
+        $this->user->assignRole('superuser'); // Ensure the user has permissions for services
+
         $this->accountingServiceMock = Mockery::mock(AccountingService::class);
         $this->purchaseService = new PurchaseService($this->accountingServiceMock);
         
-        // Seed the accounts
+        // Seed the accounts for the current tenant
         $this->seed(\Database\Seeders\AccountSeeder::class);
 
-        // Retrieve SAK-compliant accounts from the seeder
+        // Retrieve SAK-compliant accounts from the seeder, scoped to the current tenant
         $cash = Account::where('name', 'accounting.accounts.cash.name')->first();
         $accountsPayable = Account::where('name', 'accounting.accounts.accounts_payable.name')->first();
         $inventory = Account::where('name', 'accounting.accounts.inventory.name')->first();
 
-        // Ensure accounts exist
+        // Ensure accounts exist (they should, due to AccountSeeder)
         $this->assertNotNull($cash, 'Cash account not found in seeder.');
         $this->assertNotNull($accountsPayable, 'Accounts Payable account not found in seeder.');
         $this->assertNotNull($inventory, 'Inventory account not found in seeder.');
 
-        $this->user = User::factory()->create([
+        // Update the existing user (created by setupTenant) with accounting settings
+        $this->user->update([
             'accounting_settings' => [
                 'accounts_payable_account_id' => $accountsPayable->id,
                 'inventory_account_id' => $inventory->id,
                 'cash_account_id' => $cash->id,
             ]
         ]);
-        $this->actingAs($this->user);
     }
 
     #[Test]

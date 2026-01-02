@@ -10,24 +10,27 @@ use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class AccountingControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    protected User $user;
+    protected User $user; // Changed to protected in CreatesTenant
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\AccountSeeder::class);
-        $permission = Permission::create(['name' => 'view-accounting']);
-        $role = Role::create(['name' => 'accountant'])->givePermissionTo($permission);
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
 
-        $this->user = User::factory()->create();
+        // Roles and permissions are global (not tenant-aware)
+        // Ensure they exist for the user created by setupTenant
+        $permission = Permission::firstOrCreate(['name' => 'view-accounting']);
+        $role = Role::firstOrCreate(['name' => 'accountant'])->givePermissionTo($permission);
         $this->user->assignRole($role);
 
-        $this->actingAs($this->user);
+        // Seed accounts within the tenant context
+        $this->seed(\Database\Seeders\AccountSeeder::class);
     }
 
     #[Test]

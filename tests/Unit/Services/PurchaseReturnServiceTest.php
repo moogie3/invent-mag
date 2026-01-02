@@ -14,10 +14,11 @@ use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Traits\CreatesTenant;
 
 class PurchaseReturnServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
     protected User $user;
     protected Purchase $purchase;
@@ -28,9 +29,9 @@ class PurchaseReturnServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
-        Auth::login($this->user);
-
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
+        $this->user->assignRole('superuser'); // Ensure the user has permissions for services
+        
         $this->product = Product::factory()->create(['stock_quantity' => 100]);
         $this->purchase = Purchase::factory()->create();
         

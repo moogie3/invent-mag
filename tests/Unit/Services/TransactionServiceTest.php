@@ -7,14 +7,19 @@ use App\Models\Sales;
 use App\Services\TransactionService;
 use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class TransactionServiceTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected TransactionService $transactionService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->transactionService = new TransactionService();
     }
 

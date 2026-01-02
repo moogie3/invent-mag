@@ -4,18 +4,23 @@ namespace Tests\Unit\Services;
 
 use App\Models\Categories;
 use App\Services\CategoryService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class CategoryServiceTest extends BaseUnitTestCase
+class CategoryServiceTest extends TestCase
 {
+    use RefreshDatabase, CreatesTenant;
+
     protected CategoryService $categoryService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
+        $this->user->assignRole('superuser'); // Ensure the user has permissions for services
         $this->categoryService = new CategoryService();
-        \App\Models\Categories::truncate(); // Explicitly clear the table
     }
 
     #[Test]
@@ -55,7 +60,7 @@ class CategoryServiceTest extends BaseUnitTestCase
     #[Test]
     public function it_returns_error_if_category_already_exists()
     {
-        Categories::create(['name' => 'Electronics', 'description' => 'Electronic gadgets and devices']);
+        Categories::factory()->create(['name' => 'Electronics', 'description' => 'Electronic gadgets and devices']);
 
         $data = ['name' => 'Electronics', 'description' => 'Another description'];
         $result = $this->categoryService->createCategory($data);
@@ -68,7 +73,7 @@ class CategoryServiceTest extends BaseUnitTestCase
     #[Test]
     public function it_can_update_a_category_successfully()
     {
-        $category = Categories::create(['name' => 'Books', 'description' => 'Various books']);
+        $category = Categories::factory()->create(['name' => 'Books', 'description' => 'Various books']);
         $updatedData = ['name' => 'Fiction Books', 'description' => 'Books of the fiction genre'];
 
         $result = $this->categoryService->updateCategory($category, $updatedData);
@@ -81,7 +86,7 @@ class CategoryServiceTest extends BaseUnitTestCase
     #[Test]
     public function it_can_delete_a_category_successfully()
     {
-        $category = Categories::create(['name' => 'Clothing', 'description' => 'Apparel and accessories']);
+        $category = Categories::factory()->create(['name' => 'Clothing', 'description' => 'Apparel and accessories']);
 
         $result = $this->categoryService->deleteCategory($category);
 

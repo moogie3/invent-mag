@@ -14,18 +14,19 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class ProductControllerTest extends BaseFeatureTestCase
+class ProductControllerTest extends TestCase
 {
-    use WithFaker;
-
-    protected $user;
+    use WithFaker, CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+        $this->user->assignRole('superuser');
         Storage::fake('public');
     }
 

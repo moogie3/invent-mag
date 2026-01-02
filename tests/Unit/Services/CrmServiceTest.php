@@ -17,26 +17,20 @@ use App\Services\CrmService;
 use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class CrmServiceTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected CrmService $crmService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->crmService = new CrmService();
-        Categories::truncate();
-        Customer::truncate();
-        Supplier::truncate();
-        CustomerInteraction::truncate();
-        SupplierInteraction::truncate();
-        Sales::truncate();
-        SalesItem::truncate();
-        Product::truncate();
-        User::truncate();
-        Purchase::truncate();
-        POItem::truncate();
     }
 
     #[Test]

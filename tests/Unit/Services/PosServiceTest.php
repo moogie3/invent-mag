@@ -14,26 +14,20 @@ use App\Services\PosService;
 use Tests\Unit\BaseUnitTestCase;
 use Illuminate\Support\Facades\Auth;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class PosServiceTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected PosService $posService;
-    protected User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->posService = new PosService();
-        $this->user = User::factory()->create();
-        $this->actingAs($this->user);
-        Product::truncate();
-        Customer::truncate();
-        Categories::truncate();
-        Unit::truncate();
-        Supplier::truncate();
-        Sales::truncate();
-        SalesItem::truncate();
-        User::truncate();
     }
 
     #[Test]

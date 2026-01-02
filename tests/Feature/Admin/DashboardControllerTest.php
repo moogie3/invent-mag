@@ -7,26 +7,20 @@ use App\Services\DashboardService;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\Feature\BaseFeatureTestCase;
 use Mockery;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Tenant;
 
 class DashboardControllerTest extends BaseFeatureTestCase
 {
-    use WithFaker;
-
-    protected $adminUser;
+    use WithFaker, CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        // Create an admin user for authentication
-        $this->adminUser = User::factory()->create([
-            'email_verified_at' => now(),
-        ]);
-
-        // Create the superuser role if it doesn't exist
-        $superUserRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'superuser']);
-        // Assign the superuser role to the admin user
-        $this->adminUser->assignRole($superUserRole);
+        $this->setupTenant();
+        $this->user->assignRole('superuser');
     }
 
     public function test_it_displays_the_dashboard_page_for_authenticated_users()
@@ -135,17 +129,17 @@ class DashboardControllerTest extends BaseFeatureTestCase
                 'historical' => [],
                 'forecast' => [],
             ],
-        ]); 
+        ]);
 
         $this->app->instance(DashboardService::class, $mockDashboardService);
 
-        $response = $this->actingAs($this->adminUser)->get(route('admin.dashboard'));
+        $response = $this->actingAs($this->user)->get(route('admin.dashboard'));
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.dashboard');
 
         Mockery::close();
-    } 
+    }
 
     public function test_it_returns_chart_data_for_ajax_requests()
     {
@@ -158,7 +152,7 @@ class DashboardControllerTest extends BaseFeatureTestCase
 
         $this->app->instance(DashboardService::class, $mockDashboardService);
 
-        $response = $this->actingAs($this->adminUser)
+        $response = $this->actingAs($this->user)
             ->get(route('admin.dashboard', ['period' => '30days', 'type' => 'sales']), ['X-Requested-With' => 'XMLHttpRequest']);
 
         $response->assertStatus(200);
@@ -284,11 +278,11 @@ class DashboardControllerTest extends BaseFeatureTestCase
                 'historical' => [],
                 'forecast' => [],
             ],
-        ]); 
-        
+        ]);
+
         $this->app->instance(DashboardService::class, $mockDashboardService);
 
-        $response = $this->actingAs($this->adminUser)
+        $response = $this->actingAs($this->user)
             ->get(route('admin.dashboard', ['date_range' => 'last_month', 'category_id' => 1]));
 
         $response->assertStatus(200);
@@ -299,6 +293,8 @@ class DashboardControllerTest extends BaseFeatureTestCase
 
     public function test_it_redirects_unauthenticated_users()
     {
+        Auth::logout();
+        Tenant::forgetCurrent();
         $response = $this->get(route('admin.dashboard'));
 
         $response->assertRedirect(route('login'));

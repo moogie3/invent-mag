@@ -9,16 +9,20 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class ProfileServiceTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected ProfileService $profileService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->profileService = new ProfileService();
-        User::truncate();
     }
 
     #[Test]

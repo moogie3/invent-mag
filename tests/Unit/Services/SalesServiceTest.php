@@ -15,20 +15,24 @@ use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class SalesServiceTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected SalesService $salesService;
-    protected User $user;
     protected MockInterface $accountingServiceMock;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->accountingServiceMock = Mockery::mock(AccountingService::class);
         $this->salesService = new SalesService($this->accountingServiceMock);
         
-        // Seed the accounts
+        // Seed the accounts for the current tenant
         $this->seed(\Database\Seeders\AccountSeeder::class);
 
         // Retrieve SAK-compliant accounts from the seeder
@@ -45,7 +49,9 @@ class SalesServiceTest extends BaseUnitTestCase
         $this->assertNotNull($costOfGoodsSold, 'Cost of Goods Sold account not found in seeder.');
         $this->assertNotNull($inventory, 'Inventory account not found in seeder.');
 
-        $this->user = User::factory()->create([
+        // The user is already created and logged in by the CreatesTenant trait.
+        // We just need to update their accounting settings.
+        $this->user->update([
             'accounting_settings' => [
                 'cash_account_id' => $cash->id,
                 'accounts_receivable_account_id' => $accountsReceivable->id,
@@ -54,7 +60,6 @@ class SalesServiceTest extends BaseUnitTestCase
                 'inventory_account_id' => $inventory->id,
             ]
         ]);
-        $this->actingAs($this->user);
     }
 
     #[Test]

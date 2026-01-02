@@ -8,14 +8,19 @@ use App\Services\WarehouseService;
 use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class WarehouseServiceTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected WarehouseService $warehouseService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->warehouseService = new WarehouseService();
     }
 

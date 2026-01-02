@@ -11,20 +11,20 @@ use App\Services\NotificationService;
 use Carbon\Carbon;
 use Tests\Unit\BaseUnitTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
 class NotificationServiceTest extends BaseUnitTestCase
 {
+    use CreatesTenant, RefreshDatabase;
+
     protected NotificationService $notificationService;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
         $this->notificationService = new NotificationService();
-        Purchase::truncate();
-        Sales::truncate();
-        Product::truncate();
-        POItem::truncate();
-        Payment::truncate();
     }
 
     #[Test]

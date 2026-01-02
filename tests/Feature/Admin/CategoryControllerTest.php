@@ -6,23 +6,23 @@ use App\Models\User;
 use App\Models\Categories;
 use App\Services\CategoryService;
 use Mockery;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class CategoryControllerTest extends BaseFeatureTestCase
+class CategoryControllerTest extends TestCase
 {
-    protected User $user;
+    use CreatesTenant, RefreshDatabase;
+
     protected $categoryServiceMock;
 
     protected function setUp(): void
     {
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
-
-        $this->user = User::factory()->create();
+        $this->setupTenant();
         $this->user->assignRole('superuser');
-
-        $this->actingAs($this->user);
 
         // Mock the CategoryService
         $this->categoryServiceMock = Mockery::mock(CategoryService::class);

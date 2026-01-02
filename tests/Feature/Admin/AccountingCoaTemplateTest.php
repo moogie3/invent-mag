@@ -11,20 +11,17 @@ use Illuminate\Support\Facades\File;
 use Spatie\Permission\Models\Role;
 use Pest\Faker\fake;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Traits\CreatesTenant;
 
 class AccountingCoaTemplateTest extends TestCase
 {
-    use RefreshDatabase; // Resets the database for each test
+    use RefreshDatabase, CreatesTenant;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        // Create a superuser role and assign it to the user
-        $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'superuser']);
-        $user = User::factory()->create();
-        $user->assignRole($role);
-        $this->actingAs($user);
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
+        $this->user->assignRole('superuser'); // Ensure the user has permissions for services
 
         // Ensure template files exist for testing
         File::makeDirectory(database_path('data/coa_templates'), 0755, true, true);

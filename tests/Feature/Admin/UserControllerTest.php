@@ -13,6 +13,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Database\Seeders\RoleSeeder;
 
 class UserControllerTest extends TestCase
 {
@@ -22,7 +23,7 @@ class UserControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
         $this->actingAs($this->user);
     }
@@ -168,7 +169,7 @@ class UserControllerTest extends TestCase
         $response->assertJson($showData);
     }
 
-    
+
 
     public function test_edit_user_returns_json_for_ajax_request()
     {

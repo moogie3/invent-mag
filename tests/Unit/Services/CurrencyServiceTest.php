@@ -5,12 +5,12 @@ namespace Tests\Unit\Services;
 use App\Models\CurrencySetting;
 use App\Models\Unit;
 use App\Services\CurrencyService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class CurrencyServiceTest extends BaseUnitTestCase
+class CurrencyServiceTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 

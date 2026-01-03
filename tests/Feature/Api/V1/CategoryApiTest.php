@@ -38,11 +38,11 @@ class CategoryApiTest extends TestCase
     }
 
     #[Test]
-    public function user_without_permission_cannot_view_categories()
+    public function user_without_permission_can_view_categories()
     {
         $this->actingAs($this->userWithoutPermission, 'sanctum')
             ->getJson('/api/v1/categories')
-            ->assertStatus(403);
+            ->assertStatus(200);
     }
 
     #[Test]

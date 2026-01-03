@@ -9,12 +9,12 @@ use App\Models\Sales;
 use App\Models\SalesOpportunity;
 use App\Models\SalesPipeline;
 use App\Services\SalesPipelineService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class SalesPipelineServiceTest extends BaseUnitTestCase
+class SalesPipelineServiceTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 

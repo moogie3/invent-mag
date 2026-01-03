@@ -14,13 +14,13 @@ use App\Models\Supplier;
 use App\Models\SupplierInteraction;
 use App\Models\User;
 use App\Services\CrmService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class CrmServiceTest extends BaseUnitTestCase
+class CrmServiceTest extends TestCase
 {
     use CreatesTenant, RefreshDatabase;
 

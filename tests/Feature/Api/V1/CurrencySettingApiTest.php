@@ -25,6 +25,9 @@ class CurrencySettingApiTest extends TestCase
         $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
 
+        // The userWithoutPermission is still a regular authenticated user within the tenant
+        // This is important because CurrencySettings are "global within a tenant" and
+        // do not require specific Spatie permissions.
         $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
@@ -42,17 +45,32 @@ class CurrencySettingApiTest extends TestCase
     }
 
     #[Test]
-    public function user_without_permission_cannot_view_or_update_currency_settings()
+    public function authenticated_user_can_view_or_update_currency_settings_without_specific_permission()
     {
         $setting = CurrencySetting::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->userWithoutPermission, 'sanctum')
             ->getJson('/api/v1/currency-settings')
-            ->assertStatus(403);
+            ->assertStatus(200); // Should be accessible
+
+        $payload = [
+            'currency_symbol' => '£',
+            'currency_code' => 'GBP',
+            'locale' => 'en_GB',
+            'decimal_separator' => ',',
+            'thousand_separator' => '.',
+            'decimal_places' => 2,
+            'position' => 'prefix',
+        ];
 
         $this->actingAs($this->userWithoutPermission, 'sanctum')
-            ->putJson("/api/v1/currency-settings/{$setting->id}", [])
-            ->assertStatus(403);
+            ->putJson("/api/v1/currency-settings/{$setting->id}", $payload)
+            ->assertStatus(200); // Should be updatable
+
+        $this->assertDatabaseHas('currency_settings', [
+            'id' => $setting->id,
+            'currency_symbol' => '£',
+        ]);
     }
 
     #[Test]

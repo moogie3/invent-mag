@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Models\Account; // Added
 use App\Services\AccountingService;
 use App\Services\SalesService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Mockery\MockInterface;
@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class SalesServiceTest extends BaseUnitTestCase
+class SalesServiceTest extends TestCase
 {
     use CreatesTenant, RefreshDatabase;
 

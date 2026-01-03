@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
 
 class ProfileControllerTest extends TestCase
 {
@@ -23,7 +24,7 @@ class ProfileControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
 
         // Mock the ProfileService
@@ -66,7 +67,7 @@ class ProfileControllerTest extends TestCase
         $response->assertSessionHas('success', 'Profile updated successfully!');
     }
 
-    
+
     public function test_update_handles_failed_update()
     {
         $updateData = ['name' => 'New Name', 'email' => 'new@example.com', 'timezone' => 'UTC'];
@@ -81,7 +82,7 @@ class ProfileControllerTest extends TestCase
         $response->assertSessionHasErrors(['profile_update_error' => 'Incorrect password']);
     }
 
-    
+
     public function test_update_validates_request_data()
     {
         $response = $this->actingAs($this->user)->put(route('admin.setting.profile.update'), ['name' => '']);
@@ -91,7 +92,7 @@ class ProfileControllerTest extends TestCase
         $response->assertSessionHasErrors('email');
     }
 
-    
+
     public function test_update_handles_ajax_request_on_failure()
     {
         $updateData = ['name' => 'New Name', 'email' => 'new@example.com', 'timezone' => 'UTC'];
@@ -124,7 +125,7 @@ class ProfileControllerTest extends TestCase
         $response->assertJson(['success' => true, 'message' => 'Profile updated successfully!']);
     }
 
-    
+
     public function test_delete_avatar_deletes_avatar_successfully()
     {
         $this->profileServiceMock->shouldReceive('deleteAvatar')
@@ -137,7 +138,7 @@ class ProfileControllerTest extends TestCase
         $response->assertSessionHas('success', 'Avatar deleted successfully!');
     }
 
-    
+
     public function test_delete_avatar_handles_ajax_request()
     {
         $this->profileServiceMock->shouldReceive('deleteAvatar')

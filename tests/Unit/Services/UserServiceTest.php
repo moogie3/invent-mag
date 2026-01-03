@@ -6,12 +6,12 @@ use App\Models\User;
 use App\Services\UserService;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class UserServiceTest extends BaseUnitTestCase
+class UserServiceTest extends TestCase
 {
     use CreatesTenant, RefreshDatabase;
 

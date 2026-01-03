@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
 
 class ProductControllerTest extends TestCase
 {
@@ -26,7 +27,7 @@ class ProductControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
         Storage::fake('public');
     }

@@ -16,6 +16,7 @@ use App\Services\PosService;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
 
 class POSControllerTest extends TestCase
 {
@@ -29,7 +30,7 @@ class POSControllerTest extends TestCase
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
 
         Warehouse::factory()->create(['is_main' => true]);

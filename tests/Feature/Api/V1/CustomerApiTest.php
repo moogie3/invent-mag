@@ -9,16 +9,21 @@ use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
+use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Support\Facades\Auth;
+
 class CustomerApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermission;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
+        $this->seed(RoleSeeder::class); // Seed roles and permissions once
 
         $permissions = [
             'view-customers',
@@ -26,24 +31,27 @@ class CustomerApiTest extends TestCase
             'edit-customers',
             'delete-customers',
         ];
-
         foreach ($permissions as $permission) {
-            Permission::findOrCreate($permission);
+            Permission::findOrCreate($permission, 'web');
+            Permission::findOrCreate($permission, 'api');
         }
 
-        $this->user = User::factory()->create();
+        // Assign all necessary permissions to the main authenticated user for the tenant
+        $this->user->assignRole('superuser');
         $this->user->givePermissionTo($permissions);
 
-        $this->userWithoutPermission = User::factory()->create();
+        // Create a user without permissions for forbidden access tests, scoped to the tenant
+        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     #[Test]
     public function unauthenticated_user_cannot_access_customer_api()
     {
+        Auth::guard('web')->logout();
         $this->getJson('/api/v1/customers')->assertStatus(401);
         $this->postJson('/api/v1/customers')->assertStatus(401);
 
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->putJson("/api/v1/customers/{$customer->id}")->assertStatus(401);
         $this->deleteJson("/api/v1/customers/{$customer->id}")->assertStatus(401);
@@ -52,7 +60,7 @@ class CustomerApiTest extends TestCase
     #[Test]
     public function user_without_permission_is_forbidden_from_customer_api()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->userWithoutPermission, 'sanctum')
             ->getJson('/api/v1/customers')
@@ -74,7 +82,7 @@ class CustomerApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_list_customers()
     {
-        Customer::factory()->count(3)->create();
+        Customer::factory()->count(3)->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->getJson('/api/v1/customers')
@@ -85,7 +93,7 @@ class CustomerApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_view_a_customer()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->getJson("/api/v1/customers/{$customer->id}")
@@ -116,7 +124,7 @@ class CustomerApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_update_a_customer()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->putJson("/api/v1/customers/{$customer->id}", [
@@ -133,7 +141,7 @@ class CustomerApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_delete_a_customer()
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->deleteJson("/api/v1/customers/{$customer->id}")

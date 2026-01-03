@@ -10,6 +10,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
 
 class AccountingControllerTest extends TestCase
 {
@@ -19,11 +21,11 @@ class AccountingControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
 
         // Seed accounts within the tenant context
-        $this->seed(\Database\Seeders\AccountSeeder::class);
+        $this->seed(AccountSeeder::class);
     }
 
     #[Test]

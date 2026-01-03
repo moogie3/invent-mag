@@ -13,6 +13,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Carbon\Carbon;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\AccountSeeder;
+use App\Models\Account;
 
 class SalesReturnControllerTest extends TestCase
 {
@@ -25,23 +28,23 @@ class SalesReturnControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
-        $this->seed(\Database\Seeders\AccountSeeder::class);
+        $this->seed(RoleSeeder::class);
+        $this->seed(AccountSeeder::class);
         $this->user->assignRole('superuser');
 
         // Ensure the authenticated user has the necessary accounting settings
         $this->user->accounting_settings = [
-            'cash_account_id' => \App\Models\Account::where('name', 'accounting.accounts.cash.name')->first()->id,
-            'accounts_receivable_account_id' => \App\Models\Account::where('name', 'accounting.accounts.accounts_receivable.name')->first()->id,
-            'sales_revenue_account_id' => \App\Models\Account::where('name', 'accounting.accounts.sales_revenue.name')->first()->id,
-            'cost_of_goods_sold_account_id' => \App\Models\Account::where('name', 'accounting.accounts.cost_of_goods_sold.name')->first()->id,
-            'inventory_account_id' => \App\Models\Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
+            'cash_account_id' => Account::where('name', 'accounting.accounts.cash.name')->first()->id,
+            'accounts_receivable_account_id' => Account::where('name', 'accounting.accounts.accounts_receivable.name')->first()->id,
+            'sales_revenue_account_id' => Account::where('name', 'accounting.accounts.sales_revenue.name')->first()->id,
+            'cost_of_goods_sold_account_id' => Account::where('name', 'accounting.accounts.cost_of_goods_sold.name')->first()->id,
+            'inventory_account_id' => Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
         ];
         $this->user->save();
         $this->actingAs($this->user);
 
         $this->product = Product::factory()->create(['stock_quantity' => 10]);
-        $customer = \App\Models\Customer::factory()->create(); // Create a customer
+        $customer = Customer::factory()->create(); // Create a customer
         $this->sale = Sales::factory()->create(['customer_id' => $customer->id]); // Associate customer with sale
         SalesItem::factory()->create([
             'sales_id' => $this->sale->id,

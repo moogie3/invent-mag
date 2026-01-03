@@ -12,6 +12,7 @@ use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
 
 class TaxControllerTest extends TestCase
 {
@@ -21,7 +22,7 @@ class TaxControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
         $this->actingAs($this->user);
     }

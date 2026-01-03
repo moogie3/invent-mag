@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\POItem;
 use App\Models\Warehouse;
+use App\Models\Account;
 use Database\Factories\PurchaseFactory;
 use Database\Factories\POItemFactory;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +18,8 @@ use App\Services\PurchaseService;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\AccountSeeder;
 
 class PurchaseControllerTest extends TestCase
 {
@@ -29,15 +32,15 @@ class PurchaseControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
-        $this->seed(\Database\Seeders\AccountSeeder::class);
+        $this->seed(RoleSeeder::class);
+        $this->seed(AccountSeeder::class);
         $this->user->assignRole('superuser');
 
         // Ensure the authenticated user has the necessary accounting settings
         $this->user->accounting_settings = [
-            'cash_account_id' => \App\Models\Account::where('name', 'accounting.accounts.cash.name')->first()->id,
-            'accounts_payable_account_id' => \App\Models\Account::where('name', 'accounting.accounts.accounts_payable.name')->first()->id,
-            'inventory_account_id' => \App\Models\Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
+            'cash_account_id' => Account::where('name', 'accounting.accounts.cash.name')->first()->id,
+            'accounts_payable_account_id' => Account::where('name', 'accounting.accounts.accounts_payable.name')->first()->id,
+            'inventory_account_id' => Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
         ];
         $this->user->save();
         $this->actingAs($this->user);
@@ -301,11 +304,11 @@ class PurchaseControllerTest extends TestCase
             'totalUnpaid' => 5,
         ];
 
-        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('getPurchaseMetrics')
                     ->once()
                     ->andReturn($expectedMetrics);
-        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+        $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->get(route('admin.po.metrics'));
 
@@ -320,11 +323,11 @@ class PurchaseControllerTest extends TestCase
             ['id' => 2, 'name' => 'Purchase 2'],
         ];
 
-        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('getExpiringPurchases')
                     ->once()
                     ->andReturn($expectedPurchases);
-        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+        $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->get(route('admin.po.expiring-soon'));
 
@@ -335,12 +338,12 @@ class PurchaseControllerTest extends TestCase
     public function test_modal_view_returns_view()
     {
         $purchase = PurchaseFactory::new()->create();
-        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('getPurchaseForModal')
                     ->once()
                     ->with($purchase->id)
                     ->andReturn($purchase);
-        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+        $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->get(route('admin.po.modal-view', $purchase->id));
 
@@ -351,12 +354,12 @@ class PurchaseControllerTest extends TestCase
 
     public function test_modal_view_handles_not_found()
     {
-        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('getPurchaseForModal')
                     ->once()
                     ->with(999)
                     ->andThrow(new \Illuminate\Database\Eloquent\ModelNotFoundException());
-        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+        $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->get(route('admin.po.modal-view', 999));
 
@@ -431,11 +434,11 @@ class PurchaseControllerTest extends TestCase
             ]),
         ];
 
-        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('createPurchase')
                     ->once()
                     ->andThrow(new \Exception('Service exception'));
-        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+        $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->post(route('admin.po.store'), $purchaseData);
 
@@ -462,11 +465,11 @@ class PurchaseControllerTest extends TestCase
             ]),
         ];
 
-        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('updatePurchase')
                     ->once()
                     ->andThrow(new \Exception('Service exception'));
-        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+        $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->put(route('admin.po.update', $purchase->id), $updateData);
 
@@ -478,11 +481,11 @@ class PurchaseControllerTest extends TestCase
     {
         $purchase = PurchaseFactory::new()->create();
 
-        $mockService = \Mockery::mock(\App\Services\PurchaseService::class);
+        $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('deletePurchase')
                     ->once()
                     ->andThrow(new \Exception('Service exception'));
-        $this->app->instance(\App\Services\PurchaseService::class, $mockService);
+        $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->delete(route('admin.po.destroy', $purchase->id));
 

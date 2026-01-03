@@ -5,12 +5,12 @@ namespace Tests\Unit\Services;
 use App\Models\Purchase;
 use App\Models\Sales;
 use App\Services\TransactionService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class TransactionServiceTest extends BaseUnitTestCase
+class TransactionServiceTest extends TestCase
 {
     use CreatesTenant, RefreshDatabase;
 

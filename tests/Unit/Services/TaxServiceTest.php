@@ -4,12 +4,12 @@ namespace Tests\Unit\Services;
 
 use App\Models\Tax;
 use App\Services\TaxService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class TaxServiceTest extends BaseUnitTestCase
+class TaxServiceTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 

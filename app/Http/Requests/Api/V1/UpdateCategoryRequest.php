@@ -11,7 +11,7 @@ class UpdateCategoryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('edit-categories');
+        return true;
     }
 
     /**

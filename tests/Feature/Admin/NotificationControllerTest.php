@@ -10,6 +10,7 @@ use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
 
 class NotificationControllerTest extends TestCase
 {
@@ -21,7 +22,7 @@ class NotificationControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
 
         // Mock the NotificationService

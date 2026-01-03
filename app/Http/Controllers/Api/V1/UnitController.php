@@ -19,7 +19,7 @@ class UnitController extends Controller
 {
     protected $unitService;
 
-    public function __construct(\App\Services\UnitService $unitService)
+    public function __construct(UnitService $unitService)
     {
         $this->unitService = $unitService;
     }

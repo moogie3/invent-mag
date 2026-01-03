@@ -23,8 +23,8 @@ class AccountingCoaTemplateTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
-        $this->seed(\Database\Seeders\AccountSeeder::class); // Ensure initial accounts are present
+        $this->seed(RoleSeeder::class);
+        $this->seed(AccountSeeder::class); // Ensure initial accounts are present
         $this->user->assignRole('superuser');
         $this->actingAs($this->user);
 

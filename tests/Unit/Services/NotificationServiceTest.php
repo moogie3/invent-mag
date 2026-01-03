@@ -9,12 +9,12 @@ use App\Models\Sales;
 use App\Models\Payment;
 use App\Services\NotificationService;
 use Carbon\Carbon;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class NotificationServiceTest extends BaseUnitTestCase
+class NotificationServiceTest extends TestCase
 {
     use CreatesTenant, RefreshDatabase;
 

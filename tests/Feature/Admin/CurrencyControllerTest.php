@@ -11,6 +11,7 @@ use Tests\TestCase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
 
 class CurrencyControllerTest extends TestCase
 {
@@ -23,7 +24,7 @@ class CurrencyControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
-        $this->seed(\Database\Seeders\RoleSeeder::class); // Seed roles and permissions
+        $this->seed(RoleSeeder::class); // Seed roles and permissions
         $this->user->assignRole('superuser');
 
         $this->currencyService = $this->app->make(CurrencyService::class);

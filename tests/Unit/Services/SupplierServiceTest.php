@@ -4,14 +4,14 @@ namespace Tests\Unit\Services;
 
 use App\Models\Supplier;
 use App\Services\SupplierService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class SupplierServiceTest extends BaseUnitTestCase
+class SupplierServiceTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 

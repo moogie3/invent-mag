@@ -14,6 +14,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Carbon\Carbon;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\AccountSeeder;
 
 class PurchaseReturnControllerTest extends TestCase
 {
@@ -26,15 +28,15 @@ class PurchaseReturnControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
-        $this->seed(\Database\Seeders\AccountSeeder::class);
+        $this->seed(RoleSeeder::class);
+        $this->seed(AccountSeeder::class);
         $this->user->assignRole('superuser');
 
         // Ensure the authenticated user has the necessary accounting settings
         $this->user->accounting_settings = [
-            'cash_account_id' => \App\Models\Account::where('name', 'accounting.accounts.cash.name')->first()->id,
-            'accounts_payable_account_id' => \App\Models\Account::where('name', 'accounting.accounts.accounts_payable.name')->first()->id,
-            'inventory_account_id' => \App\Models\Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
+            'cash_account_id' => Account::where('name', 'accounting.accounts.cash.name')->first()->id,
+            'accounts_payable_account_id' => Account::where('name', 'accounting.accounts.accounts_payable.name')->first()->id,
+            'inventory_account_id' => Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
         ];
         $this->user->save();
         $this->actingAs($this->user);

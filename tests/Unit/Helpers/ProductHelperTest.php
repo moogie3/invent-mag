@@ -6,9 +6,9 @@ use App\Helpers\ProductHelper;
 use Carbon\Carbon;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 
-class ProductHelperTest extends BaseUnitTestCase
+class ProductHelperTest extends TestCase
 {
     #[Test]
     #[Group('helpers')]

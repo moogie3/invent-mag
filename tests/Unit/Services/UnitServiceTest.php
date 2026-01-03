@@ -4,12 +4,12 @@ namespace Tests\Unit\Services;
 
 use App\Models\Unit;
 use App\Services\UnitService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class UnitServiceTest extends BaseUnitTestCase
+class UnitServiceTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 

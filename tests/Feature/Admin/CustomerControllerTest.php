@@ -8,8 +8,10 @@ use App\Models\Warehouse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
+use App\Services\CustomerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
 
 class CustomerControllerTest extends TestCase
 {
@@ -20,9 +22,9 @@ class CustomerControllerTest extends TestCase
                 parent::setUp();
                 config(['auth.defaults.guard' => 'web']);
                 $this->setupTenant();
-                $this->seed(\Database\Seeders\RoleSeeder::class); // Seed roles and permissions
+                $this->seed(RoleSeeder::class); // Seed roles and permissions
                 $this->user->assignRole('superuser');
-        
+
                 Warehouse::factory()->create(['is_main' => true]);    }
 
     public function test_it_can_display_the_customer_index_page()
@@ -45,11 +47,11 @@ class CustomerControllerTest extends TestCase
         ];
 
         // Mock the CustomerService
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('getCustomerMetrics')
                     ->once()
                     ->andReturn($expectedMetrics);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->get(route('admin.customer.metrics'));
 
@@ -96,7 +98,7 @@ class CustomerControllerTest extends TestCase
         $errorMessage = 'Service creation failed.';
 
         // Mock the CustomerService to return a failure
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('createCustomer')
                     ->once()
                     ->andReturn(['success' => false, 'message' => $errorMessage]);
@@ -106,7 +108,7 @@ class CustomerControllerTest extends TestCase
                         'entries' => 10,
                         'totalcustomer' => 0,
                     ]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $this->get(route('admin.customer')); // Set previous URL for back() redirect
         $response = $this->post(route('admin.customer.store'), $customerData);
@@ -147,11 +149,11 @@ class CustomerControllerTest extends TestCase
         $mockCustomer = Customer::factory()->make($customerData);
 
         // Mock the CustomerService
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('quickCreateCustomer')
                     ->once()
                     ->andReturn(['success' => true, 'customer' => $mockCustomer]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->post(route('admin.customer.quickCreate'), $customerData);
 
@@ -194,11 +196,11 @@ class CustomerControllerTest extends TestCase
         $errorMessage = 'Service quick create failed.';
 
         // Mock the CustomerService to return a failure
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('quickCreateCustomer')
                     ->once()
                     ->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->post(route('admin.customer.quickCreate'), $customerData, ['Accept' => 'application/json']);
 
@@ -209,7 +211,7 @@ class CustomerControllerTest extends TestCase
         ]);
     }
 
-    
+
 
     public function test_it_can_update_a_customer()
     {
@@ -266,7 +268,7 @@ class CustomerControllerTest extends TestCase
         $errorMessage = 'Service update failed.';
 
         // Mock the CustomerService to return a failure
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('updateCustomer')
                     ->once()
                     ->andReturn(['success' => false, 'message' => $errorMessage]);
@@ -276,7 +278,7 @@ class CustomerControllerTest extends TestCase
                         'entries' => 10,
                         'totalcustomer' => 0,
                     ]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $this->get(route('admin.customer')); // Set previous URL for back() redirect
         $response = $this->put(route('admin.customer.update', $customer->id), $updateData);
@@ -321,11 +323,11 @@ class CustomerControllerTest extends TestCase
         $errorMessage = 'Service deletion failed.';
 
         // Mock the CustomerService to return a failure
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('deleteCustomer')
                     ->once()
                     ->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->delete(route('admin.customer.destroy', $customer->id));
 
@@ -352,9 +354,9 @@ class CustomerControllerTest extends TestCase
             'payment_terms' => 'On Receipt',
         ];
 
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('createCustomer')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('POST', route('admin.customer.store'), $customerData);
@@ -373,9 +375,9 @@ class CustomerControllerTest extends TestCase
         ];
         $errorMessage = 'AJAX creation failed.';
 
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('createCustomer')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('POST', route('admin.customer.store'), $customerData);
@@ -398,9 +400,9 @@ class CustomerControllerTest extends TestCase
             'payment_terms' => 'Net 15',
         ];
 
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('updateCustomer')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('PUT', route('admin.customer.update', $customer->id), $updateData);
@@ -420,9 +422,9 @@ class CustomerControllerTest extends TestCase
         ];
         $errorMessage = 'AJAX update failed.';
 
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('updateCustomer')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('PUT', route('admin.customer.update', $customer->id), $updateData);
@@ -435,9 +437,9 @@ class CustomerControllerTest extends TestCase
     {
         $customer = Customer::factory()->create();
 
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('deleteCustomer')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('DELETE', route('admin.customer.destroy', $customer->id));
@@ -451,9 +453,9 @@ class CustomerControllerTest extends TestCase
         $customer = Customer::factory()->create();
         $errorMessage = 'AJAX deletion failed.';
 
-        $mockService = \Mockery::mock(\App\Services\CustomerService::class);
+        $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('deleteCustomer')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\CustomerService::class, $mockService);
+        $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('DELETE', route('admin.customer.destroy', $customer->id));

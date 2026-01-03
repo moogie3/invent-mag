@@ -11,13 +11,13 @@ use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\User;
 use App\Services\PosService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use Illuminate\Support\Facades\Auth;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class PosServiceTest extends BaseUnitTestCase
+class PosServiceTest extends TestCase
 {
     use CreatesTenant, RefreshDatabase;
 

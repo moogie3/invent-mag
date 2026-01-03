@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use App\Services\SupplierService;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SupplierControllerTest extends TestCase
 {
@@ -19,7 +22,7 @@ class SupplierControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
         $this->actingAs($this->user);
 
@@ -46,11 +49,11 @@ class SupplierControllerTest extends TestCase
         ];
 
         // Mock the SupplierService
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('getSupplierMetrics')
                     ->once()
                     ->andReturn($expectedMetrics);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->get(route('admin.supplier.metrics'));
 
@@ -119,19 +122,19 @@ class SupplierControllerTest extends TestCase
         $errorMessage = 'Service creation failed.';
 
         // Mock the SupplierService to return a failure
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('createSupplier')
                     ->once()
                     ->andReturn(['success' => false, 'message' => $errorMessage]);
         $mockService->shouldReceive('getSupplierIndexData') // Add expectation for index method call
                     ->andReturn([
-                        'suppliers' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10),
+                        'suppliers' => new LengthAwarePaginator([], 0, 10),
                         'entries' => 10,
                         'totalsupplier' => 0,
                         'inCount' => 0,
                         'outCount' => 0,
                     ]);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $this->get(route('admin.supplier')); // Set previous URL for back() redirect
         $response = $this->post(route('admin.supplier.store'), $supplierData);
@@ -205,11 +208,11 @@ class SupplierControllerTest extends TestCase
         ];
         $errorMessage = 'Service update failed.';
 
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('updateSupplier')
                     ->once()
                     ->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->put(route('admin.supplier.update', $supplier->id), $updateData);
 
@@ -221,9 +224,9 @@ class SupplierControllerTest extends TestCase
     {
         $supplier = Supplier::factory()->create();
 
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('deleteSupplier')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->delete(route('admin.supplier.destroy', $supplier->id));
 
@@ -236,11 +239,11 @@ class SupplierControllerTest extends TestCase
         $supplier = Supplier::factory()->create();
         $errorMessage = 'Service deletion failed.';
 
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('deleteSupplier')
                     ->once()
                     ->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->delete(route('admin.supplier.destroy', $supplier->id));
 
@@ -259,9 +262,9 @@ class SupplierControllerTest extends TestCase
             'payment_terms' => 'Net 30',
         ];
 
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('createSupplier')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('POST', route('admin.supplier.store'), $supplierData);
@@ -282,9 +285,9 @@ class SupplierControllerTest extends TestCase
         ];
         $errorMessage = 'AJAX creation failed.';
 
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('createSupplier')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('POST', route('admin.supplier.store'), $supplierData);
@@ -309,9 +312,9 @@ class SupplierControllerTest extends TestCase
             'payment_terms' => 'Net 15',
         ];
 
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('updateSupplier')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('PUT', route('admin.supplier.update', $supplier->id), $updateData);
@@ -333,9 +336,9 @@ class SupplierControllerTest extends TestCase
         ];
         $errorMessage = 'AJAX update failed.';
 
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('updateSupplier')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('PUT', route('admin.supplier.update', $supplier->id), $updateData);
@@ -348,9 +351,9 @@ class SupplierControllerTest extends TestCase
     {
         $supplier = Supplier::factory()->create();
 
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('deleteSupplier')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('DELETE', route('admin.supplier.destroy', $supplier->id));
@@ -364,9 +367,9 @@ class SupplierControllerTest extends TestCase
         $supplier = Supplier::factory()->create();
         $errorMessage = 'AJAX deletion failed.';
 
-        $mockService = \Mockery::mock(\App\Services\SupplierService::class);
+        $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('deleteSupplier')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\SupplierService::class, $mockService);
+        $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('DELETE', route('admin.supplier.destroy', $supplier->id));

@@ -4,10 +4,10 @@ namespace Tests\Unit\DTOs;
 
 use App\DTOs\TransactionDTO;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use Carbon\Carbon;
 
-class TransactionDTOTest extends BaseUnitTestCase
+class TransactionDTOTest extends TestCase
 {
     #[Test]
     public function it_constructs_with_all_provided_data()

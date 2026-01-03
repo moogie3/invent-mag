@@ -11,6 +11,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
 
 class PrintTest extends TestCase
 {
@@ -20,7 +21,7 @@ class PrintTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
     }
 
@@ -36,7 +37,7 @@ class PrintTest extends TestCase
             'customer_price' => 150,
             'total' => 300,
         ]);
-        
+
         $sale->refresh();
 
         $response = $this->get(route('admin.pos.receipt', $sale->id));

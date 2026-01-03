@@ -12,13 +12,13 @@ use App\Models\SalesItem;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Services\DashboardService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class DashboardServiceTest extends BaseUnitTestCase
+class DashboardServiceTest extends TestCase
 {
     use CreatesTenant, RefreshDatabase;
 

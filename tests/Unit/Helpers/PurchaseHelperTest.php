@@ -5,9 +5,9 @@ namespace Tests\Unit\Helpers;
 use App\Helpers\PurchaseHelper;
 use Carbon\Carbon;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 
-class PurchaseHelperTest extends BaseUnitTestCase
+class PurchaseHelperTest extends TestCase
 {
     // Test cases for calculateTotal
     #[Test]

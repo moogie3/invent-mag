@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Tenant;
+use Database\Seeders\RoleSeeder;
 
 class DashboardControllerTest extends TestCase
 {
@@ -20,7 +21,7 @@ class DashboardControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class); // Seed roles and permissions
+        $this->seed(RoleSeeder::class); // Seed roles and permissions
         $this->user->assignRole('superuser');
     }
 

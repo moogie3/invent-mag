@@ -4,7 +4,7 @@ namespace Tests\Unit\Services;
 
 use App\Models\User;
 use App\Services\ProfileService;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class ProfileServiceTest extends BaseUnitTestCase
+class ProfileServiceTest extends TestCase
 {
     use CreatesTenant, RefreshDatabase;
 

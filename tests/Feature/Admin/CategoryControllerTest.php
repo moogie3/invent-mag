@@ -10,6 +10,7 @@ use Tests\TestCase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
 
 class CategoryControllerTest extends TestCase
 {
@@ -22,7 +23,7 @@ class CategoryControllerTest extends TestCase
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
         $this->setupTenant();
-        $this->seed(\Database\Seeders\RoleSeeder::class); // Seed roles and permissions
+        $this->seed(RoleSeeder::class); // Seed roles and permissions
         $this->user->assignRole('superuser');
 
         // Mock the CategoryService

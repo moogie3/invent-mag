@@ -6,12 +6,12 @@ use App\Helpers\CurrencyHelper;
 use App\Models\CurrencySetting;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Unit\BaseUnitTestCase;
+use Tests\TestCase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class CurrencyHelperTest extends BaseUnitTestCase
+class CurrencyHelperTest extends TestCase
 {
     use CreatesTenant, RefreshDatabase;
 

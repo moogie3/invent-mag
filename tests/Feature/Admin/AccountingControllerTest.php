@@ -7,7 +7,6 @@ use App\Models\JournalEntry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
@@ -16,18 +15,12 @@ class AccountingControllerTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 
-    protected User $user; // Changed to protected in CreatesTenant
-
     protected function setUp(): void
     {
         parent::setUp();
-        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
-
-        // Roles and permissions are global (not tenant-aware)
-        // Ensure they exist for the user created by setupTenant
-        $permission = Permission::firstOrCreate(['name' => 'view-accounting']);
-        $role = Role::firstOrCreate(['name' => 'accountant'])->givePermissionTo($permission);
-        $this->user->assignRole($role);
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->user->assignRole('superuser');
 
         // Seed accounts within the tenant context
         $this->seed(\Database\Seeders\AccountSeeder::class);

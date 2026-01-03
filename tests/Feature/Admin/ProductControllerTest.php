@@ -26,6 +26,7 @@ class ProductControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
         $this->user->assignRole('superuser');
         Storage::fake('public');
     }
@@ -722,6 +723,9 @@ class ProductControllerTest extends TestCase
     #[Test]
     public function bulk_delete_handles_service_exception()
     {
+        $products = Product::factory()->count(2)->create();
+        $idsToDelete = $products->pluck('id')->toArray();
+
         $mockService = Mockery::mock(ProductService::class);
         $mockService->shouldReceive('bulkDeleteProducts')
             ->once()
@@ -730,7 +734,7 @@ class ProductControllerTest extends TestCase
         $this->app->instance(ProductService::class, $mockService);
 
         $response = $this->actingAs($this->user)
-            ->postJson(route('product.bulk-delete'), ['ids' => [1, 2]]);
+            ->postJson(route('product.bulk-delete'), ['ids' => $idsToDelete]);
 
         $response->assertStatus(500)
             ->assertJson([
@@ -742,6 +746,7 @@ class ProductControllerTest extends TestCase
     #[Test]
     public function bulk_update_stock_handles_service_exception()
     {
+        $product = Product::factory()->create();
         $mockService = Mockery::mock(ProductService::class);
         $mockService->shouldReceive('bulkUpdateStock')
             ->once()
@@ -751,7 +756,7 @@ class ProductControllerTest extends TestCase
 
         $response = $this->actingAs($this->user)
             ->postJson(route('product.bulk-update-stock'), [
-                'updates' => [['id' => 1, 'stock_quantity' => 15]],
+                'updates' => [['id' => $product->id, 'stock_quantity' => 15]],
                 'reason' => 'Test',
             ]);
 
@@ -911,10 +916,13 @@ class ProductControllerTest extends TestCase
     #[Test]
     public function bulk_delete_returns_correct_counts_from_service()
     {
+        $products = Product::factory()->count(3)->create();
+        $idsToDelete = $products->pluck('id')->toArray();
+
         $mockService = Mockery::mock(ProductService::class);
         $mockService->shouldReceive('bulkDeleteProducts')
             ->once()
-            ->with([1, 2, 3])
+            ->with($idsToDelete)
             ->andReturn([
                 'deleted_count' => 3,
                 'images_deleted' => 2,
@@ -923,7 +931,7 @@ class ProductControllerTest extends TestCase
         $this->app->instance(ProductService::class, $mockService);
 
         $response = $this->actingAs($this->user)
-            ->postJson(route('product.bulk-delete'), ['ids' => [1, 2, 3]]);
+            ->postJson(route('product.bulk-delete'), ['ids' => $idsToDelete]);
 
         $response->assertStatus(200)
             ->assertJson([

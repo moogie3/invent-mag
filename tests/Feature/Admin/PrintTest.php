@@ -20,14 +20,8 @@ class PrintTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        
-        $role = Role::firstOrCreate(['name' => 'admin']);
-
-        // Grant necessary permissions for the new tests
-        Permission::firstOrCreate(['name' => 'view-supplier']);
-        Permission::firstOrCreate(['name' => 'view-customer']);
-        $role->givePermissionTo(['view-supplier', 'view-customer']);
-        $this->user->assignRole($role);
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->user->assignRole('superuser');
     }
 
     public function test_pos_receipt_can_be_rendered()

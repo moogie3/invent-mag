@@ -8,34 +8,32 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermission;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        Permission::findOrCreate('view-categories');
-        Permission::findOrCreate('create-categories');
-
-        $this->user = User::factory()->create();
-        $this->user->givePermissionTo([
-            'view-categories',
-            'create-categories',
-        ]);
-
-        $this->userWithoutPermission = User::factory()->create();
+        $this->setupTenant();
+        $this->seed(RoleSeeder::class);
+        $this->user->assignRole('superuser');
+        
+        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     #[Test]
     public function unauthenticated_user_cannot_access_categories_api()
     {
-        $this->getJson('/api/v1/categories')
+        Auth::guard('web')->logout();
+        $this->withHeaders(['Accept' => 'application/json'])
+            ->getJson('/api/v1/categories')
             ->assertStatus(401);
     }
 
@@ -50,7 +48,7 @@ class CategoryApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_list_categories()
     {
-        Categories::factory()->count(2)->create();
+        Categories::factory()->count(2)->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->getJson('/api/v1/categories')
@@ -75,6 +73,7 @@ class CategoryApiTest extends TestCase
             ->assertStatus(201);
 
         $this->assertDatabaseHas('categories', [
+            'tenant_id' => $this->tenant->id,
             'name' => 'API Category',
         ]);
     }

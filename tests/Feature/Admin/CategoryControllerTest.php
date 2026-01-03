@@ -22,6 +22,7 @@ class CategoryControllerTest extends TestCase
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
         $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class); // Seed roles and permissions
         $this->user->assignRole('superuser');
 
         // Mock the CategoryService

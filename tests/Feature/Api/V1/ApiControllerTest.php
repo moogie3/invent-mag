@@ -8,36 +8,23 @@ use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Support\Facades\Auth;
 
 class ApiControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermissions;
 
     public function setUp(): void
     {
         parent::setUp();
-
-        // Create a role and some permissions
-        $role = Role::create(['name' => 'Test Role']);
-        $permissions = [
-            'view-users',
-            'view-roles',
-            'view-products', // Added for api protection test
-        ];
-        foreach ($permissions as $permission) {
-            Permission::findOrCreate($permission, 'web');
-            $role->givePermissionTo($permission);
-        }
-
-        // Create a user with the role
-        $this->user = User::factory()->create();
-        $this->user->assignRole($role);
-
-        // Create a user without any roles or permissions
-        $this->userWithoutPermissions = User::factory()->create();
+        $this->setupTenant();
+        $this->seed(RoleSeeder::class);
+        $this->user->assignRole('superuser');
+        $this->userWithoutPermissions = User::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     #[Test]
@@ -50,6 +37,7 @@ class ApiControllerTest extends TestCase
     #[Test]
     public function test_unauthenticated_user_receives_401()
     {
+        Auth::guard('web')->logout();
         // Use a real, simple endpoint for this check
         $response = $this->getJson('/api/v1/users/roles-permissions');
         $response->assertStatus(401);
@@ -78,12 +66,13 @@ class ApiControllerTest extends TestCase
     #[Test]
     public function test_api_is_protected_by_auth_sanctum()
     {
+        Auth::guard('web')->logout();
         // Attempt to access a protected route without authentication
         $response = $this->getJson('/api/v1/products');
         $response->assertStatus(401); // Expect Unauthenticated
 
         // Attempt to access the same route with authentication
-        $user = User::factory()->create();
+        $user = User::factory()->create(['tenant_id' => $this->tenant->id]);
         $user->givePermissionTo('view-products'); // Assuming this permission exists
         $response = $this->actingAs($user, 'sanctum')->getJson('/api/v1/products');
         $response->assertStatus(200); // Expect OK

@@ -9,26 +9,27 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Mockery;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class TaxControllerTest extends BaseFeatureTestCase
+class TaxControllerTest extends TestCase
 {
-    use WithFaker;
-
-    protected $admin;
+    use WithFaker, CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->user->assignRole('superuser');
+        $this->actingAs($this->user);
+    }
 
-        // Reset cached roles and permissions
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
-
-        // Create an admin user and assign the 'superuser' role
-        $this->admin = User::factory()->create();
-        Role::findOrCreate('superuser', 'web');
-        $this->admin->assignRole('superuser');
-        $this->actingAs($this->admin);
+    public function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 
     public function test_index_displays_tax_settings_page()

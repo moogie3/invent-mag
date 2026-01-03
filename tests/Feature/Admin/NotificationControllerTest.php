@@ -21,6 +21,7 @@ class NotificationControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
         $this->user->assignRole('superuser');
 
         // Mock the NotificationService

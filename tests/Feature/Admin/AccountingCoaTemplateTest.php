@@ -12,6 +12,8 @@ use Spatie\Permission\Models\Role;
 use Pest\Faker\fake;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
 
 class AccountingCoaTemplateTest extends TestCase
 {
@@ -20,8 +22,11 @@ class AccountingCoaTemplateTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
-        $this->user->assignRole('superuser'); // Ensure the user has permissions for services
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(\Database\Seeders\AccountSeeder::class); // Ensure initial accounts are present
+        $this->user->assignRole('superuser');
+        $this->actingAs($this->user);
 
         // Ensure template files exist for testing
         File::makeDirectory(database_path('data/coa_templates'), 0755, true, true);
@@ -447,11 +452,9 @@ class AccountingCoaTemplateTest extends TestCase
     }
 
     #[Test]
-    public function a_user_can_apply_the_universal_coa_template()
-    {
-        // Ensure some accounts exist before applying template to test truncation
-        Account::factory()->create(['name' => 'Old Account']);
-        $this->assertCount(1, Account::all());
+    public function a_user_can_apply_the_universal_coa_template(){
+        // AccountSeeder already creates accounts, which will be truncated
+        $this->assertCount(44, Account::all());
 
         $response = $this->post(route('admin.setting.apply-coa-template'), [
             'template' => 'universal.json',
@@ -468,9 +471,8 @@ class AccountingCoaTemplateTest extends TestCase
     #[Test]
     public function a_user_can_apply_the_indonesian_coa_template()
     {
-        // Ensure some accounts exist before applying template to test truncation
-        Account::factory()->create(['name' => 'Another Old Account']);
-        $this->assertCount(1, Account::all());
+        // AccountSeeder already creates accounts, which will be truncated
+        $this->assertCount(44, Account::all());
 
         $response = $this->post(route('admin.setting.apply-coa-template'), [
             'template' => 'indonesian.json',

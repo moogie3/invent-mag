@@ -7,12 +7,12 @@ use App\Models\CurrencySetting;
 use App\Services\CurrencyService;
 use Illuminate\Http\Request;
 use Mockery;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class CurrencyControllerTest extends BaseFeatureTestCase
+class CurrencyControllerTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 
@@ -23,6 +23,7 @@ class CurrencyControllerTest extends BaseFeatureTestCase
     {
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
+        $this->seed(\Database\Seeders\RoleSeeder::class); // Seed roles and permissions
         $this->user->assignRole('superuser');
 
         $this->currencyService = $this->app->make(CurrencyService::class);

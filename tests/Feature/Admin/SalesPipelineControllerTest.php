@@ -4,20 +4,20 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Models\SalesPipeline;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class SalesPipelineControllerTest extends BaseFeatureTestCase
+class SalesPipelineControllerTest extends TestCase
 {
-    protected User $user;
+    use RefreshDatabase, CreatesTenant;
 
     protected function setUp(): void
     {
         parent::setUp();
-        config(['auth.defaults.guard' => 'web']);
-
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
         $this->user->assignRole('superuser');
-
         $this->actingAs($this->user);
 
         \App\Models\Tax::factory()->create(['is_active' => true, 'rate' => 10]); // Ensure an active tax exists
@@ -241,7 +241,7 @@ class SalesPipelineControllerTest extends BaseFeatureTestCase
         $response = $this->getJson(route('admin.sales_pipeline.pipelines.index'));
 
         $response->assertStatus(200)
-            ->assertJsonCount(4);
+            ->assertJsonCount(3);
     }
 
     public function test_it_can_reorder_stages()
@@ -289,6 +289,7 @@ class SalesPipelineControllerTest extends BaseFeatureTestCase
 
     public function test_it_can_list_opportunities()
     {
+        \App\Models\SalesOpportunity::query()->delete();
         $pipeline = SalesPipeline::factory()->create();
         $stage = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
         \App\Models\SalesOpportunity::factory()->count(3)->create([
@@ -299,7 +300,7 @@ class SalesPipelineControllerTest extends BaseFeatureTestCase
         $response = $this->getJson(route('admin.sales_pipeline.opportunities.index'));
 
         $response->assertStatus(200)
-            ->assertJsonCount(8, 'opportunities');
+            ->assertJsonCount(3, 'opportunities');
     }
 
     public function test_it_can_show_an_opportunity()

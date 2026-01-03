@@ -94,5 +94,9 @@ class PermissionSeeder extends Seeder
         // Accounting Permissions
         Permission::firstOrCreate(['name' => 'view-accounting']);
         Permission::firstOrCreate(['name' => 'view-accounts']);
+
+        // Category Management Permissions
+        Permission::firstOrCreate(['name' => 'view-categories']);
+        Permission::firstOrCreate(['name' => 'create-categories']);
     }
 }

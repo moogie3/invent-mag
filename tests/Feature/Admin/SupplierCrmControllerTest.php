@@ -7,20 +7,20 @@ use App\Models\Supplier;
 use App\Models\Purchase;
 use App\Models\POItem;
 use App\Models\Product;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class SupplierCrmControllerTest extends BaseFeatureTestCase
+class SupplierCrmControllerTest extends TestCase
 {
-    protected User $user;
+    use RefreshDatabase, CreatesTenant;
 
     protected function setUp(): void
     {
         parent::setUp();
-        config(['auth.defaults.guard' => 'web']);
-
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
         $this->user->assignRole('superuser');
-
         $this->actingAs($this->user);
     }
 

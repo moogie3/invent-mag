@@ -8,34 +8,35 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\AccountSeeder;
+use Illuminate\Support\Facades\Auth;
 
 class AccountApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
-    private User $userWithoutPermission;
+    protected User $userWithoutPermission;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
+        $this->seed(RoleSeeder::class);
+        $this->seed(AccountSeeder::class); // Ensure initial accounts are present
+        $this->user->assignRole('superuser');
 
-        Permission::findOrCreate('view-accounts');
-        Permission::findOrCreate('create-accounts');
-
-        $this->user = User::factory()->create();
-        $this->user->givePermissionTo([
-            'view-accounts',
-            'create-accounts',
-        ]);
-
-        $this->userWithoutPermission = User::factory()->create();
+        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     #[Test]
     public function unauthenticated_user_cannot_access_accounts_api()
     {
-        $this->getJson('/api/v1/accounts')->assertStatus(401);
+        Auth::guard('web')->logout();
+        $this->withHeaders(['Accept' => 'application/json'])
+            ->getJson('/api/v1/accounts')
+            ->assertStatus(401);
     }
 
     #[Test]
@@ -49,7 +50,7 @@ class AccountApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_list_accounts()
     {
-        Account::factory()->count(2)->create();
+        Account::factory()->count(2)->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->getJson('/api/v1/accounts')
@@ -76,6 +77,7 @@ class AccountApiTest extends TestCase
             ->assertStatus(201);
 
         $this->assertDatabaseHas('accounts', [
+            'tenant_id' => $this->tenant->id,
             'name' => 'Cash',
             'code' => '1001',
         ]);

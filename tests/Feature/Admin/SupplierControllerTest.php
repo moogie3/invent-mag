@@ -7,20 +7,20 @@ use App\Models\Supplier;
 use App\Models\Warehouse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class SupplierControllerTest extends BaseFeatureTestCase
+class SupplierControllerTest extends TestCase
 {
-    protected User $user;
+    use RefreshDatabase, CreatesTenant;
 
     protected function setUp(): void
     {
         parent::setUp();
-        config(['auth.defaults.guard' => 'web']);
-
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
         $this->user->assignRole('superuser');
-
         $this->actingAs($this->user);
 
         Warehouse::factory()->create(['is_main' => true]);

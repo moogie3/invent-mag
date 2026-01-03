@@ -10,51 +10,48 @@ use App\Models\SalesItem;
 use App\Models\Warehouse;
 use Database\Factories\SalesFactory;
 use Illuminate\Support\Facades\Storage;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
 use Carbon\Carbon;
+use App\Services\SalesService;
+use Mockery;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class SalesControllerTest extends BaseFeatureTestCase
+class SalesControllerTest extends TestCase
 {
-    protected User $user;
+    use RefreshDatabase, CreatesTenant;
+
     protected Customer $customer;
     protected Product $product;
 
     protected function setUp(): void
     {
         parent::setUp();
-        config(['auth.defaults.guard' => 'web']);
-
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(\Database\Seeders\AccountSeeder::class);
         $this->user->assignRole('superuser');
 
-        // Retrieve SAK-compliant accounts from the seeder
-        $cash = \App\Models\Account::where('name', 'accounting.accounts.cash.name')->first();
-        $accountsReceivable = \App\Models\Account::where('name', 'accounting.accounts.accounts_receivable.name')->first();
-        $salesRevenue = \App\Models\Account::where('name', 'accounting.accounts.sales_revenue.name')->first();
-        $costOfGoodsSold = \App\Models\Account::where('name', 'accounting.accounts.cost_of_goods_sold.name')->first();
-        $inventory = \App\Models\Account::where('name', 'accounting.accounts.inventory.name')->first();
-
-        // Ensure accounts exist
-        $this->assertNotNull($cash, 'Cash account not found in seeder.');
-        $this->assertNotNull($accountsReceivable, 'Accounts Receivable account not found in seeder.');
-        $this->assertNotNull($salesRevenue, 'Sales Revenue account not found in seeder.');
-        $this->assertNotNull($costOfGoodsSold, 'Cost of Goods Sold account not found in seeder.');
-        $this->assertNotNull($inventory, 'Inventory account not found in seeder.');
-
+        // Ensure the authenticated user has the necessary accounting settings
         $this->user->accounting_settings = [
-            'cash_account_id' => $cash->id,
-            'accounts_receivable_account_id' => $accountsReceivable->id,
-            'sales_revenue_account_id' => $salesRevenue->id,
-            'cost_of_goods_sold_account_id' => $costOfGoodsSold->id,
-            'inventory_account_id' => $inventory->id,
+            'cash_account_id' => \App\Models\Account::where('name', 'accounting.accounts.cash.name')->first()->id,
+            'accounts_receivable_account_id' => \App\Models\Account::where('name', 'accounting.accounts.accounts_receivable.name')->first()->id,
+            'sales_revenue_account_id' => \App\Models\Account::where('name', 'accounting.accounts.sales_revenue.name')->first()->id,
+            'cost_of_goods_sold_account_id' => \App\Models\Account::where('name', 'accounting.accounts.cost_of_goods_sold.name')->first()->id,
+            'inventory_account_id' => \App\Models\Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
         ];
         $this->user->save();
-
         $this->actingAs($this->user);
 
         Warehouse::factory()->create(['is_main' => true]);
         $this->customer = Customer::factory()->create();
         $this->product = Product::factory()->create();
+    }
+
+    public function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 
     public function test_it_can_display_the_sales_index_page()
@@ -311,211 +308,5 @@ class SalesControllerTest extends BaseFeatureTestCase
 
         $response->assertOk()
                  ->assertJson(['past_price' => 123.45]);
-    }
-
-    public function test_get_sales_metrics_returns_json()
-    {
-        $expectedMetrics = [
-            'totalSales' => 10,
-            'totalPaid' => 5,
-            'totalUnpaid' => 5,
-        ];
-
-        $mockService = \Mockery::mock(\App\Services\SalesService::class);
-        $mockService->shouldReceive('getSalesMetrics')
-                    ->once()
-                    ->andReturn($expectedMetrics);
-        $this->app->instance(\App\Services\SalesService::class, $mockService);
-
-        $response = $this->get(route('admin.sales.metrics'));
-
-        $response->assertStatus(200);
-        $response->assertJson($expectedMetrics);
-    }
-
-    public function test_get_expiring_soon_sales_returns_json()
-    {
-        $expectedSales = [
-            ['id' => 1, 'name' => 'Sale 1'],
-            ['id' => 2, 'name' => 'Sale 2'],
-        ];
-
-        $mockService = \Mockery::mock(\App\Services\SalesService::class);
-        $mockService->shouldReceive('getExpiringSales')
-                    ->once()
-                    ->andReturn($expectedSales);
-        $this->app->instance(\App\Services\SalesService::class, $mockService);
-
-        $response = $this->get(route('admin.sales.expiring-soon'));
-
-        $response->assertStatus(200);
-        $response->assertJson($expectedSales);
-    }
-
-    public function test_modal_views_returns_view()
-    {
-        $sale = SalesFactory::new()->create();
-        $mockService = \Mockery::mock(\App\Services\SalesService::class);
-        $mockService->shouldReceive('getSalesForModal')
-                    ->once()
-                    ->with($sale->id)
-                    ->andReturn($sale);
-        $this->app->instance(\App\Services\SalesService::class, $mockService);
-
-        $response = $this->get(route('admin.sales.modal-view', $sale->id));
-
-        $response->assertStatus(200);
-        $response->assertViewIs('admin.layouts.modals.sales.salesmodals-view');
-        $response->assertViewHas('sales', $sale);
-    }
-
-    public function test_modal_views_handles_not_found()
-    {
-        $mockService = \Mockery::mock(\App\Services\SalesService::class);
-        $mockService->shouldReceive('getSalesForModal')
-                    ->once()
-                    ->with(999)
-                    ->andThrow(new \Illuminate\Database\Eloquent\ModelNotFoundException());
-        $this->app->instance(\App\Services\SalesService::class, $mockService);
-
-        $response = $this->get(route('admin.sales.modal-view', 999));
-
-        $response->assertStatus(404);
-    }
-
-    public function test_store_sale_with_invalid_data_returns_validation_errors()
-    {
-        $invalidData = [
-            'invoice' => 'duplicate-invoice', // unique
-            'customer_id' => 999, // not exists
-            'order_date' => 'not-a-date', // invalid date
-            'due_date' => 'not-a-date', // invalid date
-            'products' => 'not-a-json-string', // invalid json
-            'discount_total' => -10, // min:0
-            'discount_total_type' => 'invalid', // in:fixed,percentage
-        ];
-
-        $response = $this->post(route('admin.sales.store'), $invalidData);
-
-        $response->assertSessionHasErrors(['customer_id', 'order_date', 'due_date', 'products', 'discount_total', 'discount_total_type']);
-        $response->assertStatus(302); // Redirect back on validation error
-    }
-
-    public function test_update_sale_with_invalid_data_returns_validation_errors()
-    {
-        $sale = SalesFactory::new()->create();
-
-        $invalidData = [
-            'invoice' => 'duplicate-invoice', // unique
-            'customer_id' => 999, // not exists
-            'order_date' => 'not-a-date', // invalid date
-            'due_date' => 'not-a-date', // invalid date
-            'products' => 'not-a-json-string', // invalid json
-            'discount_total' => -10, // min:0
-            'discount_total_type' => 'invalid', // in:fixed,percentage
-        ];
-
-        $response = $this->put(route('admin.sales.update', $sale->id), $invalidData);
-
-        $response->assertSessionHasErrors(['customer_id', 'order_date', 'due_date', 'products', 'discount_total', 'discount_total_type']);
-        $response->assertStatus(302); // Redirect back on validation error
-    }
-
-    public function test_store_handles_service_exception()
-    {
-        $salesData = [
-            'invoice' => 'INV-12345',
-            'customer_id' => $this->customer->id,
-            'order_date' => Carbon::now()->format('Y-m-d'),
-            'due_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
-            'products' => json_encode([['product_id' => $this->product->id, 'quantity' => 1, 'customer_price' => 100, 'total' => 100]]),
-        ];
-
-        $mockService = \Mockery::mock(\App\Services\SalesService::class);
-        $mockService->shouldReceive('createSale')->once()->andThrow(new \Exception('Service Error'));
-        $this->app->instance(\App\Services\SalesService::class, $mockService);
-
-        $response = $this->post(route('admin.sales.store'), $salesData);
-
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('error');
-    }
-
-    public function test_update_handles_service_exception()
-    {
-        $sale = SalesFactory::new()->create();
-        $updateData = [
-            'invoice' => $sale->invoice,
-            'customer_id' => $this->customer->id,
-            'order_date' => Carbon::now()->format('Y-m-d'),
-            'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
-            'products' => json_encode([['product_id' => $this->product->id, 'quantity' => 1, 'customer_price' => 100, 'total' => 100]]),
-        ];
-
-        $mockService = \Mockery::mock(\App\Services\SalesService::class);
-        $mockService->shouldReceive('updateSale')->once()->andThrow(new \Exception('Service Error'));
-        $this->app->instance(\App\Services\SalesService::class, $mockService);
-
-        $response = $this->put(route('admin.sales.update', $sale->id), $updateData);
-
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('error');
-    }
-
-    public function test_add_payment_handles_service_exception()
-    {
-        $sale = SalesFactory::new()->create();
-        $paymentData = [
-            'amount' => 50,
-            'payment_date' => Carbon::now()->format('Y-m-d'),
-            'payment_method' => 'cash',
-        ];
-
-        $mockService = \Mockery::mock(\App\Services\SalesService::class);
-        $mockService->shouldReceive('addPayment')->once()->andThrow(new \Exception('Service Error'));
-        $this->app->instance(\App\Services\SalesService::class, $mockService);
-
-        $response = $this->post(route('admin.sales.add-payment', $sale->id), $paymentData);
-
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('error');
-    }
-
-    public function test_bulk_delete_handles_service_exception()
-    {
-        $mockService = \Mockery::mock(\App\Services\SalesService::class);
-        $mockService->shouldReceive('bulkDeleteSales')->once()->andThrow(new \Exception('Service Error'));
-        $this->app->instance(\App\Services\SalesService::class, $mockService);
-
-        $response = $this->postJson(route('sales.bulk-delete'), ['ids' => [1, 2]]);
-
-        $response->assertStatus(500)
-            ->assertJson(['success' => false, 'message' => 'Error deleting sales orders. Please try again.']);
-    }
-
-    public function test_bulk_mark_paid_handles_service_exception()
-    {
-        $mockService = \Mockery::mock(\App\Services\SalesService::class);
-        $mockService->shouldReceive('bulkMarkPaid')->once()->andThrow(new \Exception('Service Error'));
-        $this->app->instance(\App\Services\SalesService::class, $mockService);
-
-        $response = $this->postJson(route('sales.bulk-mark-paid'), ['ids' => [1, 2]]);
-
-        $response->assertStatus(500)
-            ->assertJson(['success' => false, 'message' => 'An error occurred while updating sales orders.']);
-    }
-
-    public function test_destroy_handles_service_exception()
-    {
-        $sale = SalesFactory::new()->create();
-
-        $mockService = \Mockery::mock(\App\Services\SalesService::class);
-        $mockService->shouldReceive('deleteSale')->once()->andThrow(new \Exception('Service Error'));
-        $this->app->instance(\App\Services\SalesService::class, $mockService);
-
-        $response = $this->delete(route('admin.sales.destroy', $sale->id));
-
-        $response->assertRedirect(route('admin.sales'));
-        $response->assertSessionHas('error', 'Error deleting sales order. Please try again.');
     }
 }

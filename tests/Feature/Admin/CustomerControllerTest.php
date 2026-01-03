@@ -7,23 +7,23 @@ use App\Models\Customer;
 use App\Models\Warehouse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class CustomerControllerTest extends BaseFeatureTestCase
+class CustomerControllerTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 
     protected function setUp(): void
     {
-        parent::setUp();
-        config(['auth.defaults.guard' => 'web']);
-        $this->setupTenant();
-        $this->user->assignRole('superuser');
-
-        Warehouse::factory()->create(['is_main' => true]);
-    }
+                parent::setUp();
+                config(['auth.defaults.guard' => 'web']);
+                $this->setupTenant();
+                $this->seed(\Database\Seeders\RoleSeeder::class); // Seed roles and permissions
+                $this->user->assignRole('superuser');
+        
+                Warehouse::factory()->create(['is_main' => true]);    }
 
     public function test_it_can_display_the_customer_index_page()
     {

@@ -5,14 +5,14 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use App\Services\DashboardService;
 use Illuminate\Foundation\Testing\WithFaker;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Tenant;
 
-class DashboardControllerTest extends BaseFeatureTestCase
+class DashboardControllerTest extends TestCase
 {
     use WithFaker, CreatesTenant, RefreshDatabase;
 
@@ -20,6 +20,7 @@ class DashboardControllerTest extends BaseFeatureTestCase
     {
         parent::setUp();
         $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class); // Seed roles and permissions
         $this->user->assignRole('superuser');
     }
 

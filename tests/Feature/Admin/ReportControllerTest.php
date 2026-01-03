@@ -8,37 +8,37 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Spatie\Permission\Models\Role;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class ReportControllerTest extends BaseFeatureTestCase
+class ReportControllerTest extends TestCase
 {
-    use WithFaker;
+    use WithFaker, CreatesTenant, RefreshDatabase;
 
-    protected $adminUser;
     protected $transactionServiceMock;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        // Create an admin user for authentication
-        $this->adminUser = User::factory()->create([
-            'email_verified_at' => now(),
-        ]);
-
-        // Create the superuser role if it doesn't exist
-        $superUserRole = Role::firstOrCreate(['name' => 'superuser']);
-        // Assign the superuser role to the admin user
-        $this->adminUser->assignRole($superUserRole);
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->user->assignRole('superuser');
 
         // Mock the TransactionService
         $this->transactionServiceMock = Mockery::mock(TransactionService::class);
         $this->app->instance(TransactionService::class, $this->transactionServiceMock);
     }
 
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
+    }
+
     public function test_adjustment_log_displays_adjustment_log_page()
     {
-        $response = $this->actingAs($this->adminUser)->get(route('admin.reports.adjustment-log'));
+        $response = $this->actingAs($this->user)->get(route('admin.reports.adjustment-log'));
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.reports.adjustment-log');
@@ -62,7 +62,7 @@ class ReportControllerTest extends BaseFeatureTestCase
             'unpaid_amount' => 0,
         ]);
 
-        $response = $this->actingAs($this->adminUser)->get(route('admin.reports.recent-transactions'));
+        $response = $this->actingAs($this->user)->get(route('admin.reports.recent-transactions'));
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.reports.recentts');
@@ -88,7 +88,7 @@ class ReportControllerTest extends BaseFeatureTestCase
         ]);
         $this->transactionServiceMock->shouldReceive('exportTransactions')->andReturn(response('excel'));
 
-        $response = $this->actingAs($this->adminUser)->get(route('admin.reports.recent-transactions', ['export' => 'excel']));
+        $response = $this->actingAs($this->user)->get(route('admin.reports.recent-transactions', ['export' => 'excel']));
 
         $response->assertStatus(200);
         $this->assertEquals('excel', $response->getContent());
@@ -99,7 +99,7 @@ class ReportControllerTest extends BaseFeatureTestCase
         $transactionIds = [1, 2, 3];
         $this->transactionServiceMock->shouldReceive('bulkMarkAsPaid')->with($transactionIds)->andReturn(3);
 
-        $response = $this->actingAs($this->adminUser)->post(route('admin.transactions.bulk-mark-paid'), ['transaction_ids' => $transactionIds]);
+        $response = $this->actingAs($this->user)->post(route('admin.transactions.bulk-mark-paid'), ['transaction_ids' => $transactionIds]);
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -111,7 +111,7 @@ class ReportControllerTest extends BaseFeatureTestCase
 
     public function test_bulk_mark_as_paid_handles_no_transactions_selected()
     {
-        $response = $this->actingAs($this->adminUser)->post(route('admin.transactions.bulk-mark-paid'), ['transaction_ids' => []]);
+        $response = $this->actingAs($this->user)->post(route('admin.transactions.bulk-mark-paid'), ['transaction_ids' => []]);
 
         $response->assertStatus(400);
         $response->assertJson([
@@ -124,15 +124,9 @@ class ReportControllerTest extends BaseFeatureTestCase
     {
         $this->transactionServiceMock->shouldReceive('markTransactionAsPaid')->with(1, 'sale')->andReturn(['success' => true]);
 
-        $response = $this->actingAs($this->adminUser)->post(route('admin.transactions.mark-paid', 1), ['type' => 'sale']);
+        $response = $this->actingAs($this->user)->post(route('admin.transactions.mark-paid', 1), ['type' => 'sale']);
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
-    }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
     }
 }

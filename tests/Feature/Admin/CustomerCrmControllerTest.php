@@ -4,11 +4,11 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Models\Customer;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
-class CustomerCrmControllerTest extends BaseFeatureTestCase
+class CustomerCrmControllerTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 
@@ -17,7 +17,12 @@ class CustomerCrmControllerTest extends BaseFeatureTestCase
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
         $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class); // Seed roles and permissions
         $this->user->assignRole('superuser');
+        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view-customer', 'guard_name' => 'web']);
+        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'create-customer', 'guard_name' => 'web']);
+        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'edit-customer', 'guard_name' => 'web']);
+        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view-sales', 'guard_name' => 'web']);
     }
 
     public function test_it_can_display_customer_crm_data()

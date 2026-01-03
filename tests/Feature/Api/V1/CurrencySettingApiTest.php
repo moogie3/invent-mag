@@ -8,44 +8,43 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Support\Facades\Auth;
 
 class CurrencySettingApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermission;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
+        $this->seed(RoleSeeder::class);
+        $this->user->assignRole('superuser');
 
-        Permission::findOrCreate('view-currency-settings');
-        Permission::findOrCreate('edit-currency-settings');
-
-        $this->user = User::factory()->create();
-        $this->user->givePermissionTo([
-            'view-currency-settings',
-            'edit-currency-settings',
-        ]);
-
-        $this->userWithoutPermission = User::factory()->create();
+        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     #[Test]
     public function unauthenticated_user_cannot_access_currency_settings_api()
     {
-        $this->getJson('/api/v1/currency-settings')
+        Auth::guard('web')->logout();
+        $this->withHeaders(['Accept' => 'application/json'])
+            ->getJson('/api/v1/currency-settings')
             ->assertStatus(401);
 
-        $this->putJson('/api/v1/currency-settings/1', [])
+        $this->withHeaders(['Accept' => 'application/json'])
+            ->putJson('/api/v1/currency-settings/1', [])
             ->assertStatus(401);
     }
 
     #[Test]
     public function user_without_permission_cannot_view_or_update_currency_settings()
     {
-        $setting = CurrencySetting::factory()->create();
+        $setting = CurrencySetting::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->userWithoutPermission, 'sanctum')
             ->getJson('/api/v1/currency-settings')
@@ -59,7 +58,7 @@ class CurrencySettingApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_get_currency_settings()
     {
-        CurrencySetting::factory()->create();
+        CurrencySetting::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->getJson('/api/v1/currency-settings')
@@ -77,7 +76,7 @@ class CurrencySettingApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_update_currency_settings()
     {
-        $setting = CurrencySetting::factory()->create();
+        $setting = CurrencySetting::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $payload = [
             'currency_symbol' => '€',

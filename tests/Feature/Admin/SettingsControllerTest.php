@@ -5,29 +5,25 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Spatie\Permission\Models\Role;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTenant;
 
-class SettingsControllerTest extends BaseFeatureTestCase
+class SettingsControllerTest extends TestCase
 {
-    use WithFaker;
-
-    protected $adminUser;
+    use WithFaker, CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->adminUser = User::factory()->create([
-            'email_verified_at' => now(),
-        ]);
-
-        $superUserRole = Role::firstOrCreate(['name' => 'superuser']);
-        $this->adminUser->assignRole($superUserRole);
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->user->assignRole('superuser');
     }
 
     public function test_index_displays_settings_page()
     {
-        $response = $this->actingAs($this->adminUser)->get(route('admin.setting.index'));
+        $response = $this->actingAs($this->user)->get(route('admin.setting.index'));
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.settings.settings');
@@ -57,16 +53,16 @@ class SettingsControllerTest extends BaseFeatureTestCase
             'sticky_navbar' => true,
         ];
 
-        $response = $this->actingAs($this->adminUser)->put(route('admin.setting.update'), $settingsData);
+        $response = $this->actingAs($this->user)->put(route('admin.setting.update'), $settingsData);
 
         $response->assertRedirect(route('admin.setting.index'));
         $response->assertSessionHas('success', 'System settings updated successfully.');
 
-        $this->adminUser->refresh();
-        $this->assertEquals('navbar', $this->adminUser->system_settings['navigation_type']);
-        $this->assertEquals('dark', $this->adminUser->system_settings['theme_mode']);
-        $this->assertTrue($this->adminUser->system_settings['sidebar_lock']);
-        $this->assertFalse($this->adminUser->system_settings['show_theme_toggle']);
+        $this->user->refresh();
+        $this->assertEquals('navbar', $this->user->system_settings['navigation_type']);
+        $this->assertEquals('dark', $this->user->system_settings['theme_mode']);
+        $this->assertTrue($this->user->system_settings['sidebar_lock']);
+        $this->assertFalse($this->user->system_settings['show_theme_toggle']);
     }
 
     public function test_update_settings_with_invalid_data_returns_validation_errors()
@@ -79,7 +75,7 @@ class SettingsControllerTest extends BaseFeatureTestCase
             'system_language' => 'fr', // Invalid value
         ];
 
-        $response = $this->actingAs($this->adminUser)->putJson(route('admin.setting.update'), $settingsData);
+        $response = $this->actingAs($this->user)->putJson(route('admin.setting.update'), $settingsData);
 
         $response->assertStatus(422)->assertJsonValidationErrors([
             'navigation_type',
@@ -93,14 +89,14 @@ class SettingsControllerTest extends BaseFeatureTestCase
     public function test_get_settings_returns_user_settings_with_defaults()
     {
         // Set some custom settings for the user
-        $this->adminUser->system_settings = [
+        $this->user->system_settings = [
             'navigation_type' => 'navbar',
             'theme_mode' => 'dark',
             'notification_duration' => 10,
         ];
-        $this->adminUser->save();
+        $this->user->save();
 
-        $response = $this->actingAs($this->adminUser)->get(route('admin.api.settings'));
+        $response = $this->actingAs($this->user)->get(route('admin.api.settings'));
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -114,7 +110,7 @@ class SettingsControllerTest extends BaseFeatureTestCase
 
     public function test_update_theme_mode_successfully()
     {
-        $response = $this->actingAs($this->adminUser)->put(route('admin.setting.update-theme-mode'), [
+        $response = $this->actingAs($this->user)->put(route('admin.setting.update-theme-mode'), [
             'theme_mode' => 'dark'
         ]);
 
@@ -125,13 +121,13 @@ class SettingsControllerTest extends BaseFeatureTestCase
             'theme_mode' => 'dark'
         ]);
 
-        $this->adminUser->refresh();
-        $this->assertEquals('dark', $this->adminUser->system_settings['theme_mode']);
+        $this->user->refresh();
+        $this->assertEquals('dark', $this->user->system_settings['theme_mode']);
     }
 
     public function test_update_theme_mode_with_invalid_data_returns_validation_errors()
     {
-        $response = $this->actingAs($this->adminUser)->putJson(route('admin.setting.update-theme-mode'), [
+        $response = $this->actingAs($this->user)->putJson(route('admin.setting.update-theme-mode'), [
                 'theme_mode' => 'invalid'
             ]);
 

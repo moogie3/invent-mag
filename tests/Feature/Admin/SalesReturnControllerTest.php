@@ -10,35 +10,35 @@ use App\Models\Customer;
 use App\Models\SalesItem;
 use App\Models\SalesReturnItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
 use Carbon\Carbon;
+use Tests\Traits\CreatesTenant;
 
-class SalesReturnControllerTest extends BaseFeatureTestCase
+class SalesReturnControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    protected User $user;
     protected Sales $sale;
     protected Product $product;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(\Database\Seeders\AccountSeeder::class);
         $this->user->assignRole('superuser');
-        $this->actingAs($this->user);
 
-        $inventoryAccount = \App\Models\Account::where('code', '1140')->first();
-        $accountsReceivableAccount = \App\Models\Account::where('code', '1130')->first();
-        $cashAccount = \App\Models\Account::where('code', '1110')->first();
-
+        // Ensure the authenticated user has the necessary accounting settings
         $this->user->accounting_settings = [
-            'inventory_account_id' => $inventoryAccount->id,
-            'accounts_receivable_account_id' => $accountsReceivableAccount->id,
-            'cash_account_id' => $cashAccount->id,
+            'cash_account_id' => \App\Models\Account::where('name', 'accounting.accounts.cash.name')->first()->id,
+            'accounts_receivable_account_id' => \App\Models\Account::where('name', 'accounting.accounts.accounts_receivable.name')->first()->id,
+            'sales_revenue_account_id' => \App\Models\Account::where('name', 'accounting.accounts.sales_revenue.name')->first()->id,
+            'cost_of_goods_sold_account_id' => \App\Models\Account::where('name', 'accounting.accounts.cost_of_goods_sold.name')->first()->id,
+            'inventory_account_id' => \App\Models\Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
         ];
         $this->user->save();
-        $this->user->refresh(); // Refresh the user model to ensure latest settings are loaded
+        $this->actingAs($this->user);
 
         $this->product = Product::factory()->create(['stock_quantity' => 10]);
         $customer = \App\Models\Customer::factory()->create(); // Create a customer

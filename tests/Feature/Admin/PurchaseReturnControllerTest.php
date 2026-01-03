@@ -11,41 +11,33 @@ use App\Models\POItem;
 use App\Models\PurchaseReturnItem;
 use App\Models\Account;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Feature\BaseFeatureTestCase;
+use Tests\TestCase;
 use Carbon\Carbon;
+use Tests\Traits\CreatesTenant;
 
-class PurchaseReturnControllerTest extends BaseFeatureTestCase
+class PurchaseReturnControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    protected $seed = true;
-    protected $seeder = \Database\Seeders\AccountSeeder::class;
-    protected $permissionSeeder = \Database\Seeders\PermissionSeeder::class;
-
-    protected User $user;
     protected Purchase $purchase;
     protected Product $product;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(\Database\Seeders\AccountSeeder::class);
         $this->user->assignRole('superuser');
-        $this->actingAs($this->user);
-        
-        $inventoryAccount = Account::where('code', '1140')->first();
-        $accountsPayableAccount = Account::where('code', '2110')->first();
-        $cashAccount = Account::where('code', '1110')->first();
 
-        // Set accounting settings for the user
+        // Ensure the authenticated user has the necessary accounting settings
         $this->user->accounting_settings = [
-            'inventory_account_id' => $inventoryAccount->id,
-            'accounts_payable_account_id' => $accountsPayableAccount->id,
-            'cash_account_id' => $cashAccount->id,
+            'cash_account_id' => \App\Models\Account::where('name', 'accounting.accounts.cash.name')->first()->id,
+            'accounts_payable_account_id' => \App\Models\Account::where('name', 'accounting.accounts.accounts_payable.name')->first()->id,
+            'inventory_account_id' => \App\Models\Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
         ];
         $this->user->save();
-        $this->user->refresh(); // Refresh the user model to ensure latest settings are loaded
+        $this->actingAs($this->user);
 
         $this->product = Product::factory()->create();
         $this->purchase = Purchase::factory()->create();

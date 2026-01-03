@@ -29,6 +29,7 @@ class POSControllerTest extends TestCase
         parent::setUp();
         config(['auth.defaults.guard' => 'web']);
         $this->setupTenant();
+        $this->seed(\Database\Seeders\RoleSeeder::class);
         $this->user->assignRole('superuser');
 
         Warehouse::factory()->create(['is_main' => true]);

@@ -6,24 +6,25 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class SettingsApiTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private $user;
+    use RefreshDatabase, CreatesTenant;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+
         $role = Role::firstOrCreate(['name' => 'admin']);
         $this->user->assignRole($role);
     }
 
     public function test_get_settings_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/settings');
 
         $response->assertUnauthorized();
@@ -47,6 +48,7 @@ class SettingsApiTest extends TestCase
 
     public function test_update_theme_mode_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->putJson('/api/v1/settings/theme-mode', ['theme_mode' => 'light']);
 
         $response->assertUnauthorized();

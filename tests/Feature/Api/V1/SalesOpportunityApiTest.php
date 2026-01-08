@@ -12,12 +12,13 @@ use App\Models\SalesPipeline;
 use App\Models\PipelineStage;
 use App\Models\Product;
 use Spatie\Permission\Models\Role;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class SalesOpportunityApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private $user;
     private $customer;
     private $pipeline;
     private $stage;
@@ -27,24 +28,24 @@ class SalesOpportunityApiTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+
         $role = Role::firstOrCreate(['name' => 'admin']);
         $this->user->assignRole($role);
-        $this->customer = Customer::factory()->create();
-        $this->pipeline = SalesPipeline::factory()->create();
+        $this->customer = Customer::factory()->create(['tenant_id' => $this->tenant->id]);
+        $this->pipeline = SalesPipeline::factory()->create(['tenant_id' => $this->tenant->id]);
         $this->stage = PipelineStage::factory()->create([
             'sales_pipeline_id' => $this->pipeline->id,
             'position' => 1, // Ensure unique position
         ]);
-        $this->product = Product::factory()->create();
+        $this->product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
 
         // Configure accounting settings for the user
-        $cashAccount = \App\Models\Account::factory()->create(['name' => 'Cash Account for Test', 'code' => '1001']);
-        $accountsReceivableAccount = \App\Models\Account::factory()->create(['name' => 'Accounts Receivable for Test', 'code' => '1002']);
-        $salesRevenueAccount = \App\Models\Account::factory()->create(['name' => 'Sales Revenue for Test', 'code' => '1003']);
-        $costOfGoodsSoldAccount = \App\Models\Account::factory()->create(['name' => 'Cost of Goods Sold for Test', 'code' => '1004']);
-        $inventoryAccount = \App\Models\Account::factory()->create(['name' => 'Inventory for Test', 'code' => '1005']);
+        $cashAccount = \App\Models\Account::factory()->create(['name' => 'Cash Account for Test', 'code' => '1001', 'tenant_id' => $this->tenant->id]);
+        $accountsReceivableAccount = \App\Models\Account::factory()->create(['name' => 'Accounts Receivable for Test', 'code' => '1002', 'tenant_id' => $this->tenant->id]);
+        $salesRevenueAccount = \App\Models\Account::factory()->create(['name' => 'Sales Revenue for Test', 'code' => '1003', 'tenant_id' => $this->tenant->id]);
+        $costOfGoodsSoldAccount = \App\Models\Account::factory()->create(['name' => 'Cost of Goods Sold for Test', 'code' => '1004', 'tenant_id' => $this->tenant->id]);
+        $inventoryAccount = \App\Models\Account::factory()->create(['name' => 'Inventory for Test', 'code' => '1005', 'tenant_id' => $this->tenant->id]);
 
         $this->user->accounting_settings = [
             'cash_account_id' => $cashAccount->id,
@@ -61,6 +62,7 @@ class SalesOpportunityApiTest extends TestCase
             'pipeline_stage_id' => $this->stage->id,
             'amount' => 100.00,
             'status' => 'won', // Set status to 'won' for conversion tests
+            'tenant_id' => $this->tenant->id,
         ]);
         $this->opportunity->items()->create([
             'product_id' => $this->product->id,
@@ -71,6 +73,7 @@ class SalesOpportunityApiTest extends TestCase
 
     public function test_index_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/sales-opportunities');
 
         $response->assertUnauthorized();
@@ -99,6 +102,7 @@ class SalesOpportunityApiTest extends TestCase
 
     public function test_store_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->postJson('/api/v1/sales-opportunities', []);
 
         $response->assertUnauthorized();
@@ -137,15 +141,18 @@ class SalesOpportunityApiTest extends TestCase
         $this->assertDatabaseHas('sales_opportunities', [
             'name' => 'New Sales Opportunity',
             'amount' => 100.00, // This will be recalculated by the service and should be 100.00
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_show_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $opportunity = SalesOpportunity::factory()->create([
             'customer_id' => $this->customer->id,
             'sales_pipeline_id' => $this->pipeline->id,
             'pipeline_stage_id' => $this->stage->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->getJson("/api/v1/sales-opportunities/{$opportunity->id}");
@@ -159,6 +166,7 @@ class SalesOpportunityApiTest extends TestCase
             'customer_id' => $this->customer->id,
             'sales_pipeline_id' => $this->pipeline->id,
             'pipeline_stage_id' => $this->stage->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson("/api/v1/sales-opportunities/{$opportunity->id}");
@@ -174,10 +182,12 @@ class SalesOpportunityApiTest extends TestCase
 
     public function test_update_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $opportunity = SalesOpportunity::factory()->create([
             'customer_id' => $this->customer->id,
             'sales_pipeline_id' => $this->pipeline->id,
             'pipeline_stage_id' => $this->stage->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->putJson("/api/v1/sales-opportunities/{$opportunity->id}", ['amount' => 2000.00]);
@@ -195,6 +205,7 @@ class SalesOpportunityApiTest extends TestCase
             'name' => 'Existing Opportunity',
             'expected_close_date' => now()->addMonths(2),
             'status' => 'open',
+            'tenant_id' => $this->tenant->id,
         ]);
         $opportunity->items()->create([
             'product_id' => $this->product->id,
@@ -232,15 +243,18 @@ class SalesOpportunityApiTest extends TestCase
         $this->assertDatabaseHas('sales_opportunities', [
             'id' => $opportunity->id,
             'amount' => $newAmount,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_destroy_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $opportunity = SalesOpportunity::factory()->create([
             'customer_id' => $this->customer->id,
             'sales_pipeline_id' => $this->pipeline->id,
             'pipeline_stage_id' => $this->stage->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->deleteJson("/api/v1/sales-opportunities/{$opportunity->id}");
@@ -254,6 +268,7 @@ class SalesOpportunityApiTest extends TestCase
             'customer_id' => $this->customer->id,
             'sales_pipeline_id' => $this->pipeline->id,
             'pipeline_stage_id' => $this->stage->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->deleteJson("/api/v1/sales-opportunities/{$opportunity->id}");
@@ -262,15 +277,18 @@ class SalesOpportunityApiTest extends TestCase
 
         $this->assertDatabaseMissing('sales_opportunities', [
             'id' => $opportunity->id,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_move_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $opportunity = SalesOpportunity::factory()->create([
             'customer_id' => $this->customer->id,
             'sales_pipeline_id' => $this->pipeline->id,
             'pipeline_stage_id' => $this->stage->id,
+            'tenant_id' => $this->tenant->id,
         ]);
         $newStage = PipelineStage::factory()->create(['sales_pipeline_id' => $this->pipeline->id]);
 
@@ -285,10 +303,12 @@ class SalesOpportunityApiTest extends TestCase
             'customer_id' => $this->customer->id,
             'sales_pipeline_id' => $this->pipeline->id,
             'pipeline_stage_id' => $this->stage->id,
+            'tenant_id' => $this->tenant->id,
         ]);
         $newStage = PipelineStage::factory()->create([
             'sales_pipeline_id' => $this->pipeline->id,
             'position' => 2, // Ensure unique position
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->putJson("/api/v1/sales-opportunities/{$opportunity->id}/move", [
@@ -306,15 +326,18 @@ class SalesOpportunityApiTest extends TestCase
         $this->assertDatabaseHas('sales_opportunities', [
             'id' => $opportunity->id,
             'pipeline_stage_id' => $newStage->id,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_convert_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $opportunity = SalesOpportunity::factory()->create([
             'customer_id' => $this->customer->id,
             'sales_pipeline_id' => $this->pipeline->id,
             'pipeline_stage_id' => $this->stage->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->postJson("/api/v1/sales-opportunities/{$opportunity->id}/convert");
@@ -339,11 +362,13 @@ class SalesOpportunityApiTest extends TestCase
         $this->assertDatabaseHas('sales', [
             'sales_opportunity_id' => $opportunity->id,
             'total' => $opportunity->amount,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $this->assertDatabaseHas('sales_opportunities', [
             'id' => $opportunity->id,
             'status' => 'converted', // Status will be 'converted'
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 }

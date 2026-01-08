@@ -7,31 +7,32 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class WarehouseApiTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private User $user;
+    use RefreshDatabase, CreatesTenant;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+
         $role = Role::firstOrCreate(['name' => 'admin']);
         $this->user->assignRole($role);
     }
 
     public function test_unauthenticated_user_cannot_access_warehouses_index()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/warehouses');
         $response->assertUnauthorized();
     }
 
     public function test_authenticated_user_can_list_warehouses()
     {
-        Warehouse::factory()->count(3)->create();
+        Warehouse::factory()->count(3)->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/warehouses');
 
@@ -51,14 +52,15 @@ class WarehouseApiTest extends TestCase
 
     public function test_unauthenticated_user_cannot_access_warehouse_show()
     {
-        $warehouse = Warehouse::factory()->create();
+        Auth::guard('web')->logout();
+        $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $response = $this->getJson("/api/v1/warehouses/{$warehouse->id}");
         $response->assertUnauthorized();
     }
 
     public function test_authenticated_user_can_view_warehouse()
     {
-        $warehouse = Warehouse::factory()->create();
+        $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $response = $this->actingAs($this->user, 'sanctum')->getJson("/api/v1/warehouses/{$warehouse->id}");
         $response->assertOk()
             ->assertJson([

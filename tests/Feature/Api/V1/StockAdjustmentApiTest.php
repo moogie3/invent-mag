@@ -8,26 +8,28 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\StockAdjustment;
 use Spatie\Permission\Models\Role;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class StockAdjustmentApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private $user;
     private $product;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+
         $role = Role::firstOrCreate(['name' => 'admin']);
         $this->user->assignRole($role);
-        $this->product = Product::factory()->create();
+        $this->product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     public function test_index_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/stock-adjustments');
 
         $response->assertUnauthorized();
@@ -38,6 +40,7 @@ class StockAdjustmentApiTest extends TestCase
         StockAdjustment::factory()->count(3)->create([
             'product_id' => $this->product->id,
             'adjusted_by' => $this->user->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/stock-adjustments');
@@ -70,9 +73,11 @@ class StockAdjustmentApiTest extends TestCase
 
     public function test_show_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $adjustment = StockAdjustment::factory()->create([
             'product_id' => $this->product->id,
             'adjusted_by' => $this->user->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->getJson("/api/v1/stock-adjustments/{$adjustment->id}");
@@ -88,6 +93,7 @@ class StockAdjustmentApiTest extends TestCase
             'quantity_before' => 50.5,
             'quantity_after' => 60.5,
             'adjustment_amount' => 10.0,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson("/api/v1/stock-adjustments/{$adjustment->id}");

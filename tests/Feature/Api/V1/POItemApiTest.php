@@ -9,12 +9,14 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Auth;
 
 class POItemApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermission;
     private Purchase $purchase;
     private Product $product;
@@ -23,18 +25,24 @@ class POItemApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
 
-        $this->user = $this->setupUser([
+        $permissions = [
             'view-po-items',
             'create-po-items',
             'edit-po-items',
             'delete-po-items',
-        ]);
+        ];
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission, 'web');
+            Permission::findOrCreate($permission, 'api');
+        }
 
-        $this->userWithoutPermission = $this->setupUser();
+        $this->user->givePermissionTo($permissions);
+        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
 
-        $this->purchase = Purchase::factory()->create();
-        $this->product = Product::factory()->create();
+        $this->purchase = Purchase::factory()->create(['tenant_id' => $this->tenant->id]);
+        $this->product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->poItem = POItem::factory()->create([
             'po_id' => $this->purchase->id,
@@ -45,6 +53,7 @@ class POItemApiTest extends TestCase
     #[Test]
     public function unauthenticated_user_cannot_access_po_items_api()
     {
+        Auth::guard('web')->logout();
         $this->getJson('/api/v1/po-items')->assertStatus(401);
         $this->postJson('/api/v1/po-items')->assertStatus(401);
         $this->getJson("/api/v1/po-items/{$this->poItem->id}")->assertStatus(401);

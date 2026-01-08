@@ -8,7 +8,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
-
 use Tests\Traits\CreatesTenant;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Support\Facades\Auth;

@@ -8,17 +8,19 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermissions;
 
     public function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
 
         $permissions = [
             'view-transactions',
@@ -28,21 +30,22 @@ class TransactionApiTest extends TestCase
         ];
         foreach ($permissions as $permission) {
             Permission::findOrCreate($permission, 'web');
+            Permission::findOrCreate($permission, 'api');
         }
 
-        $this->user = User::factory()->create();
         $this->user->givePermissionTo($permissions);
 
-        $this->userWithoutPermissions = User::factory()->create();
+        $this->userWithoutPermissions = User::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     #[Test]
     public function test_unauthenticated_user_cannot_access_transaction_endpoints()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/transactions');
         $response->assertStatus(401);
 
-        $transaction = Transaction::factory()->create();
+        $transaction = Transaction::factory()->create(['tenant_id' => $this->tenant->id]);
         $response = $this->getJson('/api/v1/transactions/' . $transaction->id);
         $response->assertStatus(401);
     }
@@ -50,7 +53,7 @@ class TransactionApiTest extends TestCase
     #[Test]
     public function test_unauthorized_user_cannot_access_transaction_endpoints()
     {
-        $transaction = Transaction::factory()->create();
+        $transaction = Transaction::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->userWithoutPermissions, 'sanctum')->getJson('/api/v1/transactions');
         $response->assertStatus(403);
@@ -62,7 +65,7 @@ class TransactionApiTest extends TestCase
     #[Test]
     public function test_can_get_all_transactions()
     {
-        Transaction::factory()->count(3)->create();
+        Transaction::factory()->count(3)->create(['tenant_id' => $this->tenant->id]);
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/transactions');
 
         $response->assertStatus(200);
@@ -85,7 +88,7 @@ class TransactionApiTest extends TestCase
     #[Test]
     public function test_can_get_a_transaction()
     {
-        $transaction = Transaction::factory()->create();
+        $transaction = Transaction::factory()->create(['tenant_id' => $this->tenant->id]);
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/transactions/' . $transaction->id);
 
         $response->assertStatus(200);

@@ -9,38 +9,38 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Account;
 
 class PurchaseApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermission;
     private Supplier $supplier;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
 
-        Permission::findOrCreate('view-purchases');
-        Permission::findOrCreate('create-purchases');
+        $permissions = ['view-purchases', 'create-purchases'];
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission, 'web');
+            Permission::findOrCreate($permission, 'api');
+        }
 
-        $this->user = User::factory()->create();
-        $this->user->givePermissionTo([
-            'view-purchases',
-            'create-purchases',
-        ]);
+        $this->user->givePermissionTo($permissions);
+        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
+        $this->supplier = Supplier::factory()->create(['tenant_id' => $this->tenant->id]);
 
-        $this->userWithoutPermission = User::factory()->create();
-        $this->supplier = Supplier::factory()->create();
-
-        // Configure accounting settings for the user
-        $cashAccount = \App\Models\Account::factory()->create(['name' => 'Cash Account for Purchase Test', 'code' => 'P1001']);
-        $accountsReceivableAccount = \App\Models\Account::factory()->create(['name' => 'Accounts Receivable for Purchase Test', 'code' => 'P1002']);
-        $salesRevenueAccount = \App\Models\Account::factory()->create(['name' => 'Sales Revenue for Purchase Test', 'code' => 'P1003']);
-        $costOfGoodsSoldAccount = \App\Models\Account::factory()->create(['name' => 'Cost of Goods Sold for Purchase Test', 'code' => 'P1004']);
-        $inventoryAccount = \App\Models\Account::factory()->create(['name' => 'Inventory for Purchase Test', 'code' => 'P1005']);
-        $accountsPayableAccount = \App\Models\Account::factory()->create(['name' => 'Accounts Payable for Purchase Test', 'code' => 'P1006']); // New
+        $cashAccount = Account::factory()->create(['name' => 'Cash Account for Purchase Test', 'code' => 'P1001', 'tenant_id' => $this->tenant->id]);
+        $accountsReceivableAccount = Account::factory()->create(['name' => 'Accounts Receivable for Purchase Test', 'code' => 'P1002', 'tenant_id' => $this->tenant->id]);
+        $salesRevenueAccount = Account::factory()->create(['name' => 'Sales Revenue for Purchase Test', 'code' => 'P1003', 'tenant_id' => $this->tenant->id]);
+        $costOfGoodsSoldAccount = Account::factory()->create(['name' => 'Cost of Goods Sold for Purchase Test', 'code' => 'P1004', 'tenant_id' => $this->tenant->id]);
+        $inventoryAccount = Account::factory()->create(['name' => 'Inventory for Purchase Test', 'code' => 'P1005', 'tenant_id' => $this->tenant->id]);
+        $accountsPayableAccount = Account::factory()->create(['name' => 'Accounts Payable for Purchase Test', 'code' => 'P1006', 'tenant_id' => $this->tenant->id]);
 
         $this->user->accounting_settings = [
             'cash_account_id' => $cashAccount->id,
@@ -48,7 +48,7 @@ class PurchaseApiTest extends TestCase
             'sales_revenue_account_id' => $salesRevenueAccount->id,
             'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
             'inventory_account_id' => $inventoryAccount->id,
-            'accounts_payable_account_id' => $accountsPayableAccount->id, // New
+            'accounts_payable_account_id' => $accountsPayableAccount->id,
         ];
         $this->user->save();
     }
@@ -56,6 +56,7 @@ class PurchaseApiTest extends TestCase
     #[Test]
     public function unauthenticated_user_cannot_access_purchase_api()
     {
+        Auth::guard('web')->logout();
         $this->getJson('/api/v1/purchases')->assertStatus(401);
         $this->postJson('/api/v1/purchases', [])->assertStatus(401);
     }
@@ -73,6 +74,7 @@ class PurchaseApiTest extends TestCase
     {
         Purchase::factory()->count(2)->create([
             'supplier_id' => $this->supplier->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')
@@ -96,7 +98,7 @@ class PurchaseApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_create_purchase()
     {
-        $product = \App\Models\Product::factory()->create();
+        $product = \App\Models\Product::factory()->create(['tenant_id' => $this->tenant->id]);
         $payload = [
             'invoice' => 'API-INV-001',
             'supplier_id' => $this->supplier->id,
@@ -122,6 +124,7 @@ class PurchaseApiTest extends TestCase
         $this->assertDatabaseHas('po', [
             'invoice' => 'API-INV-001',
             'supplier_id' => $this->supplier->id,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 

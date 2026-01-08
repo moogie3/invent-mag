@@ -9,34 +9,54 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerInteractionApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermission;
     private Customer $customer;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
+        $this->seed(RoleSeeder::class);
 
-        $this->user = $this->setupUser(['view-customer-interactions', 'create-customer-interactions']);
-        $this->userWithoutPermission = $this->setupUser();
-        $this->customer = Customer::factory()->create();
+        $permissions = [
+            'view-customer-interactions',
+            'create-customer-interactions',
+            'edit-customer-interactions',
+            'delete-customer-interactions',
+        ];
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission, 'web');
+            Permission::findOrCreate($permission, 'api');
+        }
+
+        $this->user->assignRole('superuser');
+        $this->user->givePermissionTo($permissions);
+
+        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
+        $this->customer = Customer::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     #[Test]
     public function unauthenticated_user_cannot_access_customer_interactions_api()
     {
-        $this->getJson('/api/v1/customer-interactions')->assertStatus(401);
+        Auth::guard('web')->logout();
+        $this->withHeaders(['Accept' => 'application/json'])
+            ->getJson('/api/v1/customer-interactions')->assertStatus(401);
     }
 
     #[Test]
     public function user_without_permission_cannot_view_customer_interactions()
     {
         $this->actingAs($this->userWithoutPermission, 'sanctum')
+            ->withHeaders(['Accept' => 'application/json'])
             ->getJson('/api/v1/customer-interactions')
             ->assertStatus(403);
     }
@@ -45,7 +65,9 @@ class CustomerInteractionApiTest extends TestCase
     public function authenticated_user_can_list_customer_interactions()
     {
         CustomerInteraction::factory()->count(2)->create([
+            'tenant_id' => $this->tenant->id,
             'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
         ]);
 
         $this->actingAs($this->user, 'sanctum')
@@ -66,13 +88,16 @@ class CustomerInteractionApiTest extends TestCase
             'type' => 'call',
             'interaction_date' => now()->toDateString(),
             'notes' => 'Test interaction',
+            'user_id' => $this->user->id,
         ];
 
         $this->actingAs($this->user, 'sanctum')
+            ->withoutExceptionHandling() // Add this line
             ->postJson('/api/v1/customer-interactions', $payload)
             ->assertStatus(201);
 
         $this->assertDatabaseHas('customer_interactions', [
+            'tenant_id' => $this->tenant->id,
             'notes' => 'Test interaction',
         ]);
     }

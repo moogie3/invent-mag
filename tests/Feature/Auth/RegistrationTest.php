@@ -4,21 +4,20 @@ namespace Tests\Feature\Auth;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
-use Tests\Feature\BaseFeatureTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Support\Facades\Auth;
 
-class RegistrationTest extends BaseFeatureTestCase
+class RegistrationTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        config(['auth.defaults.guard' => 'web']);
-    }
+    use RefreshDatabase;
 
     #[Test]
     public function test_registration_screen_can_be_rendered(): void
     {
-        $response = $this->get('/admin/register');
+        Auth::guard('web')->logout();
+        $response = $this->withoutMiddleware(\App\Http\Middleware\IdentifyTenant::class)->get('/admin/register');
 
         $response->assertStatus(200);
     }
@@ -28,8 +27,9 @@ class RegistrationTest extends BaseFeatureTestCase
     {
         Event::fake();
 
-        $response = $this->post('/admin/register', [
+        $response = $this->withoutMiddleware(\App\Http\Middleware\IdentifyTenant::class)->post('/admin/register', [
             'name' => 'Test User',
+            'shopname' => 'Test Shop',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',

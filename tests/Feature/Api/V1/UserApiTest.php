@@ -7,34 +7,36 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class UserApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $regularUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+
         $role = Role::firstOrCreate(['name' => 'admin']);
         $this->user->assignRole($role);
 
-        $this->regularUser = User::factory()->create();
+        $this->regularUser = User::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     public function test_unauthenticated_user_cannot_access_users_index()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/users');
         $response->assertUnauthorized();
     }
 
     public function test_authenticated_user_can_list_users()
     {
-        User::factory()->count(3)->create();
+        User::factory()->count(3)->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/users');
 
@@ -52,6 +54,7 @@ class UserApiTest extends TestCase
 
     public function test_unauthenticated_user_cannot_access_user_show()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson("/api/v1/users/{$this->regularUser->id}");
         $response->assertUnauthorized();
     }
@@ -72,6 +75,7 @@ class UserApiTest extends TestCase
 
     public function test_unauthenticated_user_cannot_get_roles_permissions()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/users/roles-permissions');
         $response->assertUnauthorized();
     }

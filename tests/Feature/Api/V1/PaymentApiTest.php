@@ -2,32 +2,45 @@
 
 namespace Tests\Feature\Api\V1;
 
+use App\Models\Purchase;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
-use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermission;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
+        $this->seed(RoleSeeder::class);
+        $this->seed(PermissionSeeder::class);
 
-        $this->user = $this->setupUser(['view-payments', 'create-payments']);
-        $this->userWithoutPermission = $this->setupUser();
+        $this->user->assignRole('superuser');
+        $this->user->givePermissionTo(['view-payments', 'create-payments']);
+
+        $this->userWithoutPermission = User::factory()->create([
+            'tenant_id' => $this->tenant->id,
+        ]);
     }
 
     #[Test]
     public function unauthenticated_user_cannot_access_payments_api()
     {
-        $this->getJson('/api/v1/payments')->assertStatus(401);
+        Auth::guard('web')->logout(); // Ensure no user is authenticated
+        $this->withHeaders(['Accept' => 'application/json'])
+            ->getJson('/api/v1/payments')
+            ->assertStatus(401);
     }
 
     #[Test]
@@ -41,7 +54,7 @@ class PaymentApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_list_payments()
     {
-        Payment::factory()->count(2)->create();
+        Payment::factory()->count(2)->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->getJson('/api/v1/payments')
@@ -56,7 +69,7 @@ class PaymentApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_create_payment()
     {
-        $purchase = \App\Models\Purchase::factory()->create();
+        $purchase = Purchase::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $payload = [
             'amount' => 100,
@@ -64,7 +77,7 @@ class PaymentApiTest extends TestCase
             'payment_method' => 'Cash',
             'notes' => 'Test payment',
             'paymentable_id' => $purchase->id,
-            'paymentable_type' => \App\Models\Purchase::class,
+            'paymentable_type' => Purchase::class,
         ];
 
         $this->actingAs($this->user, 'sanctum')
@@ -72,10 +85,11 @@ class PaymentApiTest extends TestCase
             ->assertStatus(201);
 
         $this->assertDatabaseHas('payments', [
+            'tenant_id' => $this->tenant->id,
             'amount' => 100,
             'payment_method' => 'Cash',
             'paymentable_id' => $purchase->id,
-            'paymentable_type' => \App\Models\Purchase::class,
+            'paymentable_type' => Purchase::class,
         ]);
     }
 

@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\AccountSeeder;
 
 class AccountingServiceTest extends TestCase
 {
@@ -25,7 +26,7 @@ class AccountingServiceTest extends TestCase
         $this->setupTenant();
         $this->accountingService = new AccountingService();
         // Seed the accounts
-        $this->seed(\Database\Seeders\AccountSeeder::class);
+        $this->seed(AccountSeeder::class);
     }
 
     #[Test]

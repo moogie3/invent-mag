@@ -12,12 +12,13 @@ use App\Models\SalesPipeline;
 use App\Models\PipelineStage;
 use App\Models\Product;
 use Spatie\Permission\Models\Role;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class SalesOpportunityItemApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private $user;
     private $customer;
     private $pipeline;
     private $stage;
@@ -27,26 +28,29 @@ class SalesOpportunityItemApiTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+
         $role = Role::firstOrCreate(['name' => 'admin']);
         $this->user->assignRole($role);
-        $this->customer = Customer::factory()->create();
-        $this->pipeline = SalesPipeline::factory()->create();
+        $this->customer = Customer::factory()->create(['tenant_id' => $this->tenant->id]);
+        $this->pipeline = SalesPipeline::factory()->create(['tenant_id' => $this->tenant->id]);
         $this->stage = PipelineStage::factory()->create([
             'sales_pipeline_id' => $this->pipeline->id,
             'position' => 1,
+            'tenant_id' => $this->tenant->id,
         ]);
-        $this->product = Product::factory()->create();
+        $this->product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
         $this->opportunity = SalesOpportunity::factory()->create([
             'customer_id' => $this->customer->id,
             'sales_pipeline_id' => $this->pipeline->id,
             'pipeline_stage_id' => $this->stage->id,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_index_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/sales-opportunity-items');
 
         $response->assertUnauthorized();
@@ -57,6 +61,7 @@ class SalesOpportunityItemApiTest extends TestCase
         SalesOpportunityItem::factory()->count(3)->create([
             'sales_opportunity_id' => $this->opportunity->id,
             'product_id' => $this->product->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/sales-opportunity-items');
@@ -87,9 +92,11 @@ class SalesOpportunityItemApiTest extends TestCase
 
     public function test_show_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $item = SalesOpportunityItem::factory()->create([
             'sales_opportunity_id' => $this->opportunity->id,
             'product_id' => $this->product->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->getJson("/api/v1/sales-opportunity-items/{$item->id}");
@@ -102,6 +109,7 @@ class SalesOpportunityItemApiTest extends TestCase
         $item = SalesOpportunityItem::factory()->create([
             'sales_opportunity_id' => $this->opportunity->id,
             'product_id' => $this->product->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson("/api/v1/sales-opportunity-items/{$item->id}");

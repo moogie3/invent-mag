@@ -19,7 +19,7 @@ class CustomerInteractionController extends Controller
 {
     protected $crmService;
 
-    public function __construct(\App\Services\CrmService $crmService)
+    public function __construct(CrmService $crmService)
     {
         $this->crmService = $crmService;
         $this->middleware('permission:view-customer-interactions')->only(['index', 'show']);

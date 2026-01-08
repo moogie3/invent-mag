@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Mockery\MockInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\AccountSeeder;
 
 class PurchaseServiceTest extends TestCase
 {
@@ -33,9 +34,9 @@ class PurchaseServiceTest extends TestCase
 
         $this->accountingServiceMock = Mockery::mock(AccountingService::class);
         $this->purchaseService = new PurchaseService($this->accountingServiceMock);
-        
+
         // Seed the accounts for the current tenant
-        $this->seed(\Database\Seeders\AccountSeeder::class);
+        $this->seed(AccountSeeder::class);
 
         // Retrieve SAK-compliant accounts from the seeder, scoped to the current tenant
         $cash = Account::where('name', 'accounting.accounts.cash.name')->first();

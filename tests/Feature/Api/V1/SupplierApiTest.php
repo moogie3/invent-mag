@@ -10,28 +10,30 @@ use App\Models\Purchase;
 use App\Models\Product;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Str;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class SupplierApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private $user;
     private $supplier;
     private $product;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+
         $role = Role::firstOrCreate(['name' => 'admin']);
         $this->user->assignRole($role);
-        $this->supplier = Supplier::factory()->create();
-        $this->product = Product::factory()->create();
+        $this->supplier = Supplier::factory()->create(['tenant_id' => $this->tenant->id]);
+        $this->product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     public function test_index_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/suppliers');
 
         $response->assertUnauthorized();
@@ -39,7 +41,7 @@ class SupplierApiTest extends TestCase
 
     public function test_index_returns_json_data()
     {
-        Supplier::factory()->count(3)->create();
+        Supplier::factory()->count(3)->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/suppliers');
 
@@ -60,6 +62,7 @@ class SupplierApiTest extends TestCase
 
     public function test_store_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->postJson('/api/v1/suppliers', []);
 
         $response->assertUnauthorized();
@@ -67,6 +70,7 @@ class SupplierApiTest extends TestCase
 
     public function test_show_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson("/api/v1/suppliers/{$this->supplier->id}");
 
         $response->assertUnauthorized();
@@ -87,6 +91,7 @@ class SupplierApiTest extends TestCase
 
     public function test_update_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->putJson("/api/v1/suppliers/{$this->supplier->id}", ['name' => 'Updated Supplier']);
 
         $response->assertUnauthorized();
@@ -111,11 +116,13 @@ class SupplierApiTest extends TestCase
         $this->assertDatabaseHas('suppliers', [
             'id' => $this->supplier->id,
             'name' => $newName,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_destroy_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->deleteJson("/api/v1/suppliers/{$this->supplier->id}");
 
         $response->assertUnauthorized();
@@ -129,11 +136,13 @@ class SupplierApiTest extends TestCase
 
         $this->assertDatabaseMissing('suppliers', [
             'id' => $this->supplier->id,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_metrics_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/suppliers/metrics');
 
         $response->assertUnauthorized();
@@ -141,7 +150,7 @@ class SupplierApiTest extends TestCase
 
     public function test_metrics_returns_json_data()
     {
-        Purchase::factory()->count(3)->create(['supplier_id' => $this->supplier->id]);
+        Purchase::factory()->count(3)->create(['supplier_id' => $this->supplier->id, 'tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/suppliers/metrics');
 
@@ -155,6 +164,7 @@ class SupplierApiTest extends TestCase
 
     public function test_historical_purchases_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson("/api/v1/suppliers/{$this->supplier->id}/historical-purchases");
 
         $response->assertUnauthorized();
@@ -162,7 +172,7 @@ class SupplierApiTest extends TestCase
 
     public function test_historical_purchases_returns_json_data()
     {
-        Purchase::factory()->count(3)->create(['supplier_id' => $this->supplier->id]);
+        Purchase::factory()->count(3)->create(['supplier_id' => $this->supplier->id, 'tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson("/api/v1/suppliers/{$this->supplier->id}/historical-purchases");
 
@@ -182,6 +192,7 @@ class SupplierApiTest extends TestCase
 
     public function test_product_history_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson("/api/v1/suppliers/{$this->supplier->id}/product-history");
 
         $response->assertUnauthorized();
@@ -189,7 +200,7 @@ class SupplierApiTest extends TestCase
 
     public function test_product_history_returns_json_data()
     {
-        Purchase::factory()->count(1)->create(['supplier_id' => $this->supplier->id])
+        Purchase::factory()->count(1)->create(['supplier_id' => $this->supplier->id, 'tenant_id' => $this->tenant->id])
             ->each(function ($purchase) {
                 $purchase->items()->create([
                     'product_id' => $this->product->id,

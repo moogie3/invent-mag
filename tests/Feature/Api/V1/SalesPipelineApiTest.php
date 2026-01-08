@@ -8,26 +8,28 @@ use App\Models\User;
 use App\Models\SalesPipeline;
 use App\Models\PipelineStage;
 use Spatie\Permission\Models\Role;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class SalesPipelineApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private $user;
     private $pipeline;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+
         $role = Role::firstOrCreate(['name' => 'admin']);
         $this->user->assignRole($role);
-        $this->pipeline = SalesPipeline::factory()->create();
+        $this->pipeline = SalesPipeline::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     public function test_index_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/sales-pipelines');
 
         $response->assertUnauthorized();
@@ -35,7 +37,7 @@ class SalesPipelineApiTest extends TestCase
 
     public function test_index_returns_json_data()
     {
-        SalesPipeline::factory()->count(3)->create();
+        SalesPipeline::factory()->count(3)->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/sales-pipelines');
 
@@ -59,6 +61,7 @@ class SalesPipelineApiTest extends TestCase
 
     public function test_store_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->postJson('/api/v1/sales-pipelines', []);
 
         $response->assertUnauthorized();
@@ -82,11 +85,13 @@ class SalesPipelineApiTest extends TestCase
 
         $this->assertDatabaseHas('sales_pipelines', [
             'name' => 'New Sales Pipeline',
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_show_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson("/api/v1/sales-pipelines/{$this->pipeline->id}");
 
         $response->assertUnauthorized();
@@ -107,6 +112,7 @@ class SalesPipelineApiTest extends TestCase
 
     public function test_update_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->putJson("/api/v1/sales-pipelines/{$this->pipeline->id}", ['name' => 'Updated Pipeline']);
 
         $response->assertUnauthorized();
@@ -130,11 +136,13 @@ class SalesPipelineApiTest extends TestCase
         $this->assertDatabaseHas('sales_pipelines', [
             'id' => $this->pipeline->id,
             'name' => $newName,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_destroy_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->deleteJson("/api/v1/sales-pipelines/{$this->pipeline->id}");
 
         $response->assertUnauthorized();
@@ -148,11 +156,13 @@ class SalesPipelineApiTest extends TestCase
 
         $this->assertDatabaseMissing('sales_pipelines', [
             'id' => $this->pipeline->id,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_store_stage_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->postJson("/api/v1/sales-pipelines/{$this->pipeline->id}/stages", ['name' => 'New Stage']);
 
         $response->assertUnauthorized();
@@ -174,13 +184,15 @@ class SalesPipelineApiTest extends TestCase
         $this->assertDatabaseHas('pipeline_stages', [
             'sales_pipeline_id' => $this->pipeline->id,
             'name' => 'New Pipeline Stage',
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_reorder_stages_returns_unauthorized_if_user_is_not_authenticated()
     {
-        $stage1 = PipelineStage::factory()->create(['sales_pipeline_id' => $this->pipeline->id, 'position' => 1]);
-        $stage2 = PipelineStage::factory()->create(['sales_pipeline_id' => $this->pipeline->id, 'position' => 2]);
+        Auth::guard('web')->logout();
+        $stage1 = PipelineStage::factory()->create(['sales_pipeline_id' => $this->pipeline->id, 'position' => 1, 'tenant_id' => $this->tenant->id]);
+        $stage2 = PipelineStage::factory()->create(['sales_pipeline_id' => $this->pipeline->id, 'position' => 2, 'tenant_id' => $this->tenant->id]);
 
         $response = $this->postJson("/api/v1/sales-pipelines/{$this->pipeline->id}/stages/reorder", ['stages' => [
             ['id' => $stage2->id, 'position' => 1],
@@ -192,8 +204,8 @@ class SalesPipelineApiTest extends TestCase
 
     public function test_reorder_stages_modifies_pipeline_stage_order()
     {
-        $stage1 = PipelineStage::factory()->create(['sales_pipeline_id' => $this->pipeline->id, 'position' => 1]);
-        $stage2 = PipelineStage::factory()->create(['sales_pipeline_id' => $this->pipeline->id, 'position' => 2]);
+        $stage1 = PipelineStage::factory()->create(['sales_pipeline_id' => $this->pipeline->id, 'position' => 1, 'tenant_id' => $this->tenant->id]);
+        $stage2 = PipelineStage::factory()->create(['sales_pipeline_id' => $this->pipeline->id, 'position' => 2, 'tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')->postJson("/api/v1/sales-pipelines/{$this->pipeline->id}/stages/reorder", [
             'stages' => [
@@ -210,10 +222,12 @@ class SalesPipelineApiTest extends TestCase
         $this->assertDatabaseHas('pipeline_stages', [
             'id' => $stage1->id,
             'position' => 2,
+            'tenant_id' => $this->tenant->id,
         ]);
         $this->assertDatabaseHas('pipeline_stages', [
             'id' => $stage2->id,
             'position' => 1,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 }

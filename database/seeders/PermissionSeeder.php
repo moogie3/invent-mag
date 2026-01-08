@@ -94,5 +94,17 @@ class PermissionSeeder extends Seeder
         // Accounting Permissions
         Permission::firstOrCreate(['name' => 'view-accounting']);
         Permission::firstOrCreate(['name' => 'view-accounts']);
+
+        // Payment Permissions
+        Permission::firstOrCreate(['name' => 'view-payments']);
+        Permission::firstOrCreate(['name' => 'create-payments']);
+        Permission::firstOrCreate(['name' => 'edit-payments']);
+        Permission::firstOrCreate(['name' => 'delete-payments']);
+
+        // Customer Interaction Permissions
+        Permission::firstOrCreate(['name' => 'view-customer-interactions']);
+        Permission::firstOrCreate(['name' => 'create-customer-interactions']);
+        Permission::firstOrCreate(['name' => 'edit-customer-interactions']);
+        Permission::firstOrCreate(['name' => 'delete-customer-interactions']);
     }
 }

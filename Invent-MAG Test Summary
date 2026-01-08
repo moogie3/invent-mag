@@ -69,7 +69,7 @@
    2. SetLocaleTest: Good coverage (validates that the locale is correctly set for users with a language preference, falls back to the default for users without a preference, and does nothing for unauthenticated requests).
    3. ProfileUpdateRequestTest: Excellent coverage (full validation of authorization logic for authenticated/unauthenticated users and thorough testing of validation rules, especially the unique email constraint).
 
-   MULTI TENANCY UPATE
+MULTI TENANCY UPATE
 
 **Multi-Tenancy Status of Reviewed Admin (`tests/Feature/Admin`) Tests and Application Code:**
 

@@ -6,16 +6,26 @@ use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
-use Tests\Feature\BaseFeatureTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 use PHPUnit\Framework\Attributes\Test;
 
-class EmailVerificationTest extends BaseFeatureTestCase
+class EmailVerificationTest extends TestCase
 {
+    use RefreshDatabase, CreatesTenant;
+    use RefreshDatabase, CreatesTenant;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->setupTenant();
+    }
 
     #[Test]
     public function test_email_verification_screen_can_be_rendered(): void
     {
-        $user = User::factory()->unverified()->create();
+        $user = User::factory()->unverified()->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($user)->get(route('verification.notice'));
 
@@ -25,7 +35,7 @@ class EmailVerificationTest extends BaseFeatureTestCase
     #[Test]
     public function test_email_can_be_verified(): void
     {
-        $user = User::factory()->unverified()->create();
+        $user = User::factory()->unverified()->create(['tenant_id' => $this->tenant->id]);
 
         Event::fake();
 
@@ -46,7 +56,7 @@ class EmailVerificationTest extends BaseFeatureTestCase
     #[Test]
     public function test_email_is_not_verified_with_invalid_hash(): void
     {
-        $user = User::factory()->unverified()->create();
+        $user = User::factory()->unverified()->create(['tenant_id' => $this->tenant->id]);
 
         $verificationUrl = URL::temporarySignedRoute(
             'verification.verify',

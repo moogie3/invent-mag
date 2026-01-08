@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Tenant;
 use Illuminate\Database\Seeder;
+use Spatie\Multitenancy\Multitenancy;
+use App\Models\User; // Add this line
 
 class DatabaseSeeder extends Seeder
 {

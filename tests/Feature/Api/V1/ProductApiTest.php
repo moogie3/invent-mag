@@ -4,21 +4,26 @@ namespace Tests\Feature\Api\V1;
 
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Categories;
+use App\Models\Unit;
+use App\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class ProductApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermission;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
 
         $permissions = [
             'view-products',
@@ -28,21 +33,20 @@ class ProductApiTest extends TestCase
         ];
 
         foreach ($permissions as $permission) {
-            Permission::findOrCreate($permission);
+            Permission::findOrCreate($permission, 'web');
+            Permission::findOrCreate($permission, 'api');
         }
 
-        $this->user = User::factory()->create();
         $this->user->givePermissionTo($permissions);
+        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
 
-        $this->userWithoutPermission = User::factory()->create();
-
-        // Minimal bootstrap for ProductService
-        \App\Models\Warehouse::factory()->create(['is_main' => true]);
+        \App\Models\Warehouse::factory()->create(['is_main' => true, 'tenant_id' => $this->tenant->id]);
     }
 
     #[Test]
     public function unauthenticated_user_cannot_access_products_api()
     {
+        Auth::guard('web')->logout();
         $this->getJson('/api/v1/products')->assertStatus(401);
     }
 
@@ -57,7 +61,7 @@ class ProductApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_list_products()
     {
-        Product::factory()->count(3)->create();
+        Product::factory()->count(3)->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->getJson('/api/v1/products')
@@ -68,7 +72,7 @@ class ProductApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_view_a_product()
     {
-        $product = Product::factory()->create();
+        $product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->getJson("/api/v1/products/{$product->id}")
@@ -82,9 +86,9 @@ class ProductApiTest extends TestCase
         $payload = [
             'name' => 'API Product',
             'code' => 'API-001',
-            'category_id' => \App\Models\Categories::factory()->create()->id,
-            'units_id' => \App\Models\Unit::factory()->create()->id,
-            'supplier_id' => \App\Models\Supplier::factory()->create()->id,
+            'category_id' => Categories::factory()->create(['tenant_id' => $this->tenant->id])->id,
+            'units_id' => Unit::factory()->create(['tenant_id' => $this->tenant->id])->id,
+            'supplier_id' => Supplier::factory()->create(['tenant_id' => $this->tenant->id])->id,
             'price' => 100,
             'selling_price' => 150,
             'stock_quantity' => 10,
@@ -96,13 +100,14 @@ class ProductApiTest extends TestCase
 
         $this->assertDatabaseHas('products', [
             'code' => 'API-001',
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     #[Test]
     public function authenticated_user_can_update_a_product()
     {
-        $product = Product::factory()->create();
+        $product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->putJson("/api/v1/products/{$product->id}", [
@@ -113,13 +118,14 @@ class ProductApiTest extends TestCase
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
             'name' => 'Updated Product',
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     #[Test]
     public function authenticated_user_can_delete_a_product()
     {
-        $product = Product::factory()->create();
+        $product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->deleteJson("/api/v1/products/{$product->id}")

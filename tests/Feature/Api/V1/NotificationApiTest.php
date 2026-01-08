@@ -8,23 +8,23 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationApiTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private User $user;
+    use RefreshDatabase, CreatesTenant;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->user = $this->setupUser();
+        $this->setupTenant();
     }
 
     #[Test]
     public function unauthenticated_user_cannot_access_notifications_api()
     {
+        Auth::guard('web')->logout();
         $this->getJson('/api/v1/notifications')->assertStatus(401);
         $this->getJson('/api/v1/notifications/count')->assertStatus(401);
         $this->postJson('/api/v1/notifications/1/mark-as-read')->assertStatus(401);

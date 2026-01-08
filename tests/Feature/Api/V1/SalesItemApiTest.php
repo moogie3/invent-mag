@@ -9,28 +9,30 @@ use App\Models\Sales;
 use App\Models\Product;
 use App\Models\SalesItem;
 use Spatie\Permission\Models\Role;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class SalesItemApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private $user;
     private $sales;
     private $product;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+
         $role = Role::firstOrCreate(['name' => 'admin']);
         $this->user->assignRole($role);
-        $this->sales = Sales::factory()->create();
-        $this->product = Product::factory()->create();
+        $this->sales = Sales::factory()->create(['tenant_id' => $this->tenant->id]);
+        $this->product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     public function test_index_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/sales-items');
 
         $response->assertUnauthorized();
@@ -41,6 +43,7 @@ class SalesItemApiTest extends TestCase
         SalesItem::factory()->count(3)->create([
             'sales_id' => $this->sales->id,
             'product_id' => $this->product->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/sales-items');
@@ -71,9 +74,11 @@ class SalesItemApiTest extends TestCase
 
     public function test_show_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $salesItem = SalesItem::factory()->create([
             'sales_id' => $this->sales->id,
             'product_id' => $this->product->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->getJson("/api/v1/sales-items/{$salesItem->id}");
@@ -86,6 +91,7 @@ class SalesItemApiTest extends TestCase
         $salesItem = SalesItem::factory()->create([
             'sales_id' => $this->sales->id,
             'product_id' => $this->product->id,
+            'tenant_id' => $this->tenant->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson("/api/v1/sales-items/{$salesItem->id}");

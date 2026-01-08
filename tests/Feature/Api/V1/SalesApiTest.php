@@ -11,44 +11,45 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Sales;
 use Spatie\Permission\Models\Role;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class SalesApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private $user;
     private $customer;
     private $product;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $this->user = User::factory()->create();
+        $this->setupTenant();
+
         $role = Role::firstOrCreate(['name' => 'admin']);
         $this->user->assignRole($role);
-        $this->customer = Customer::factory()->create();
-        $this->product = Product::factory()->create();
+        $this->customer = Customer::factory()->create(['tenant_id' => $this->tenant->id]);
+        $this->product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
 
         // Configure accounting settings for the user
         $cashAccount = Account::firstOrCreate(
-            ['name' => 'Cash Account'],
+            ['name' => 'Cash Account', 'tenant_id' => $this->tenant->id],
             ['code' => '1010', 'type' => 'asset']
         );
         $accountsReceivableAccount = Account::firstOrCreate(
-            ['name' => 'Accounts Receivable'],
+            ['name' => 'Accounts Receivable', 'tenant_id' => $this->tenant->id],
             ['code' => '1020', 'type' => 'asset']
         );
         $salesRevenueAccount = Account::firstOrCreate(
-            ['name' => 'Sales Revenue'],
+            ['name' => 'Sales Revenue', 'tenant_id' => $this->tenant->id],
             ['code' => '4010', 'type' => 'revenue']
         );
         $costOfGoodsSoldAccount = Account::firstOrCreate(
-            ['name' => 'Cost of Goods Sold'],
+            ['name' => 'Cost of Goods Sold', 'tenant_id' => $this->tenant->id],
             ['code' => '5010', 'type' => 'expense']
         );
         $inventoryAccount = Account::firstOrCreate(
-            ['name' => 'Inventory'],
+            ['name' => 'Inventory', 'tenant_id' => $this->tenant->id],
             ['code' => '1030', 'type' => 'asset']
         );
 
@@ -68,6 +69,7 @@ class SalesApiTest extends TestCase
             'order_date' => now()->subMonths(2),
             'due_date' => now()->subMonth(),
             'customer_id' => $this->customer->id,
+            'tenant_id' => $this->tenant->id,
         ]);
         Sales::factory()->count(1)->create([
             'status' => 'Unpaid',
@@ -75,6 +77,7 @@ class SalesApiTest extends TestCase
             'order_date' => now()->subDays(5),
             'due_date' => now()->addDays(5), // Expiring soon
             'customer_id' => $this->customer->id,
+            'tenant_id' => $this->tenant->id,
         ]);
         Sales::factory()->count(1)->create([
             'status' => 'Partial',
@@ -82,11 +85,13 @@ class SalesApiTest extends TestCase
             'order_date' => now()->subDays(10),
             'due_date' => now()->addDays(15), // Expiring soon
             'customer_id' => $this->customer->id,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_index_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/sales');
 
         $response->assertUnauthorized();
@@ -94,7 +99,7 @@ class SalesApiTest extends TestCase
 
     public function test_index_returns_json_data()
     {
-        Sales::factory()->count(3)->create();
+        Sales::factory()->count(3)->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson('/api/v1/sales');
 
@@ -115,6 +120,7 @@ class SalesApiTest extends TestCase
 
     public function test_store_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->postJson('/api/v1/sales', []);
 
         $response->assertUnauthorized();
@@ -155,12 +161,14 @@ class SalesApiTest extends TestCase
         $this->assertDatabaseHas('sales', [
             'invoice' => 'INV-2025-001',
             'total' => 100.00,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_show_returns_unauthorized_if_user_is_not_authenticated()
     {
-        $sale = Sales::factory()->create();
+        Auth::guard('web')->logout();
+        $sale = Sales::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->getJson("/api/v1/sales/{$sale->id}");
 
@@ -169,7 +177,7 @@ class SalesApiTest extends TestCase
 
     public function test_show_returns_json_data()
     {
-        $sale = Sales::factory()->create();
+        $sale = Sales::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')->getJson("/api/v1/sales/{$sale->id}");
 
@@ -184,7 +192,8 @@ class SalesApiTest extends TestCase
 
     public function test_update_returns_unauthorized_if_user_is_not_authenticated()
     {
-        $sale = Sales::factory()->create();
+        Auth::guard('web')->logout();
+        $sale = Sales::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->putJson("/api/v1/sales/{$sale->id}", ['status' => 'Paid']);
 
@@ -193,7 +202,7 @@ class SalesApiTest extends TestCase
 
     public function test_update_modifies_an_existing_sale()
     {
-        $sale = Sales::factory()->create(['status' => 'Unpaid', 'customer_id' => $this->customer->id, 'user_id' => $this->user->id]);
+        $sale = Sales::factory()->create(['status' => 'Unpaid', 'customer_id' => $this->customer->id, 'user_id' => $this->user->id, 'tenant_id' => $this->tenant->id]);
         $newStatus = 'Paid';
 
         // Create a product and associate it with the sale's customer
@@ -238,12 +247,14 @@ class SalesApiTest extends TestCase
         $this->assertDatabaseHas('sales', [
             'id' => $sale->id,
             'status' => $newStatus,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_destroy_returns_unauthorized_if_user_is_not_authenticated()
     {
-        $sale = Sales::factory()->create();
+        Auth::guard('web')->logout();
+        $sale = Sales::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->deleteJson("/api/v1/sales/{$sale->id}");
 
@@ -252,7 +263,7 @@ class SalesApiTest extends TestCase
 
     public function test_destroy_deletes_a_sale()
     {
-        $sale = Sales::factory()->create();
+        $sale = Sales::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->actingAs($this->user, 'sanctum')->deleteJson("/api/v1/sales/{$sale->id}");
 
@@ -260,11 +271,13 @@ class SalesApiTest extends TestCase
 
         $this->assertDatabaseMissing('sales', [
             'id' => $sale->id,
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_bulk_delete_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->postJson('/api/v1/sales/bulk-delete', ['sale_ids' => []]);
 
         $response->assertUnauthorized();
@@ -272,7 +285,7 @@ class SalesApiTest extends TestCase
 
     public function test_bulk_delete_deletes_multiple_sales()
     {
-        $sales = Sales::factory()->count(3)->create();
+        $sales = Sales::factory()->count(3)->create(['tenant_id' => $this->tenant->id]);
         $saleIds = $sales->pluck('id')->toArray();
 
         $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/sales/bulk-delete', [
@@ -288,12 +301,14 @@ class SalesApiTest extends TestCase
         foreach ($saleIds as $id) {
             $this->assertDatabaseMissing('sales', [
                 'id' => $id,
+                'tenant_id' => $this->tenant->id,
             ]);
         }
     }
 
     public function test_bulk_mark_paid_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->putJson('/api/v1/sales/bulk-mark-paid', ['sale_ids' => []]);
 
         $response->assertUnauthorized();
@@ -301,7 +316,7 @@ class SalesApiTest extends TestCase
 
     public function test_bulk_mark_paid_marks_multiple_sales_as_paid()
     {
-        $sales = Sales::factory()->count(3)->create(['status' => 'Unpaid']);
+        $sales = Sales::factory()->count(3)->create(['status' => 'Unpaid', 'tenant_id' => $this->tenant->id]);
         $saleIds = $sales->pluck('id')->toArray();
 
         $response = $this->actingAs($this->user, 'sanctum')->putJson('/api/v1/sales/bulk-mark-paid', [
@@ -319,12 +334,14 @@ class SalesApiTest extends TestCase
             $this->assertDatabaseHas('sales', [
                 'id' => $id,
                 'status' => 'Paid',
+                'tenant_id' => $this->tenant->id,
             ]);
         }
     }
 
     public function test_metrics_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/sales/metrics');
 
         $response->assertUnauthorized();
@@ -347,6 +364,7 @@ class SalesApiTest extends TestCase
 
     public function test_expiring_soon_returns_unauthorized_if_user_is_not_authenticated()
     {
+        Auth::guard('web')->logout();
         $response = $this->getJson('/api/v1/sales/expiring-soon');
 
         $response->assertUnauthorized();
@@ -373,7 +391,8 @@ class SalesApiTest extends TestCase
 
     public function test_add_payment_returns_unauthorized_if_user_is_not_authenticated()
     {
-        $sale = Sales::factory()->create();
+        Auth::guard('web')->logout();
+        $sale = Sales::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->postJson("/api/v1/sales/{$sale->id}/payment", ['amount' => 10]);
 
@@ -401,17 +420,20 @@ class SalesApiTest extends TestCase
             'paymentable_id' => $sale->id,
             'paymentable_type' => Sales::class,
             'amount' => 50,
+            'tenant_id' => $this->tenant->id,
         ]);
         $this->assertDatabaseHas('sales', [
             'id' => $sale->id,
             'status' => 'Partial',
+            'tenant_id' => $this->tenant->id,
         ]);
     }
 
     public function test_get_customer_price_returns_unauthorized_if_user_is_not_authenticated()
     {
-        $customer = Customer::factory()->create();
-        $product = Product::factory()->create();
+        Auth::guard('web')->logout();
+        $customer = Customer::factory()->create(['tenant_id' => $this->tenant->id]);
+        $product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $response = $this->getJson("/api/v1/sales/customer-price/{$customer->id}/{$product->id}");
 

@@ -9,12 +9,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Illuminate\Support\Facades\Auth;
 
 class PipelineStageApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermission;
     private SalesPipeline $salesPipeline;
     private PipelineStage $pipelineStage;
@@ -22,11 +23,18 @@ class PipelineStageApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
 
-        $this->user = $this->setupUser(['edit-pipeline-stages', 'delete-pipeline-stages']);
-        $this->userWithoutPermission = $this->setupUser();
+        $permissions = ['edit-pipeline-stages', 'delete-pipeline-stages'];
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission, 'web');
+            Permission::findOrCreate($permission, 'api');
+        }
 
-        $this->salesPipeline = SalesPipeline::factory()->create();
+        $this->user->givePermissionTo(['edit-pipeline-stages', 'delete-pipeline-stages']);
+        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
+
+        $this->salesPipeline = SalesPipeline::factory()->create(['tenant_id' => $this->tenant->id]);
         $this->pipelineStage = PipelineStage::factory()->create([
             'sales_pipeline_id' => $this->salesPipeline->id,
             'position' => $this->salesPipeline->stages()->count(), // Ensure unique position
@@ -36,6 +44,7 @@ class PipelineStageApiTest extends TestCase
     #[Test]
     public function unauthenticated_user_cannot_access_pipeline_stages_api()
     {
+        Auth::guard('web')->logout();
         $this->putJson("/api/v1/pipeline-stages/{$this->pipelineStage->id}", [])->assertStatus(401);
         $this->deleteJson("/api/v1/pipeline-stages/{$this->pipelineStage->id}")->assertStatus(401);
     }

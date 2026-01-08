@@ -3,6 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1;
+use App\Http\Controllers\Api\Auth\RegisteredUserController;
+
+// Public registration route
+Route::post('/register', [RegisteredUserController::class, 'store']);
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Customer routes

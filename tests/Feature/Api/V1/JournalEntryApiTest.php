@@ -4,28 +4,44 @@ namespace Tests\Feature\Api\V1;
 
 use App\Models\JournalEntry;
 use App\Models\User;
+use App\Models\Account;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
+use Database\Seeders\RoleSeeder;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Auth;
 
 class JournalEntryApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreatesTenant;
 
-    private User $user;
     private User $userWithoutPermission;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->setupTenant();
+        $this->seed(RoleSeeder::class);
 
-        $this->user = $this->setupUser(['view-journal-entries', 'create-journal-entries']);
-        $this->userWithoutPermission = $this->setupUser();
+        Account::factory()->create(['name' => 'Cash', 'tenant_id' => $this->tenant->id]);
+        Account::factory()->create(['name' => 'Inventory', 'tenant_id' => $this->tenant->id]);
+
+        $permissions = ['view-journal-entries', 'create-journal-entries'];
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission, 'web');
+            Permission::findOrCreate($permission, 'api');
+        }
+        $this->user->givePermissionTo($permissions);
+        
+        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
     }
 
     #[Test]
     public function unauthenticated_user_cannot_access_journal_entries_api()
     {
+        Auth::guard('web')->logout();
         $this->getJson('/api/v1/journal-entries')->assertStatus(401);
     }
 
@@ -40,7 +56,7 @@ class JournalEntryApiTest extends TestCase
     #[Test]
     public function authenticated_user_can_list_journal_entries()
     {
-        JournalEntry::factory()->count(2)->create();
+        JournalEntry::factory()->count(2)->create(['tenant_id' => $this->tenant->id]);
 
         $this->actingAs($this->user, 'sanctum')
             ->getJson('/api/v1/journal-entries')
@@ -69,9 +85,11 @@ class JournalEntryApiTest extends TestCase
             ->assertStatus(201);
 
         $this->assertDatabaseHas('journal_entries', [
+            'tenant_id' => $this->tenant->id,
             'description' => 'Test journal entry',
         ]);
     }
+
 
     #[Test]
     public function journal_entry_api_returns_validation_errors()

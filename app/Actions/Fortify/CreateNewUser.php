@@ -11,6 +11,8 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Registered;
+use App\Models\CurrencySetting;
+use App\Models\Tax;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -53,8 +55,44 @@ class CreateNewUser implements CreatesNewUsers
         ]);
 
         // Assign role inside tenant context
+
         $superuserRole = Role::firstOrCreate(['name' => 'superuser']);
         $user->assignRole($superuserRole);
+
+
+        // Create default CurrencySetting for the new tenant
+
+        try {
+            CurrencySetting::create([
+                'tenant_id' => $tenant->id,
+                'currency_symbol' => 'Rp',
+                'decimal_separator' => ',',
+                'thousand_separator' => '.',
+                'decimal_places' => 0,
+                'position' => 'prefix',
+                'currency_code' => 'IDR',
+                'locale' => 'id-ID',
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Error creating CurrencySetting: ' . $e->getMessage());
+            throw $e; // Re-throw to see the original error in test output
+        }
+
+
+        // Create default Tax for the new tenant
+
+        try {
+            Tax::create([
+                'tenant_id' => $tenant->id,
+                'name' => 'Default Tax',
+                'rate' => 0.00,
+                'is_active' => true,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Error creating Tax: ' . $e->getMessage());
+            throw $e; // Re-throw to see the original error in test output
+        }
+
 
         event(new Registered($user));
 

@@ -8,16 +8,16 @@ class TaxService
 {
     public function getTaxData()
     {
-        return Tax::first();
+        return Tax::firstOrCreate([]);
     }
 
     public function updateTax(array $data)
     {
-        $tax = Tax::firstOrNew();
-        $tax->name = $data['name'];
-        $tax->rate = $data['rate'];
-        $tax->is_active = $data['is_active'] ?? false;
-        $tax->save();
+        Tax::updateOrCreate([], [
+            'name' => $data['name'],
+            'rate' => $data['rate'],
+            'is_active' => $data['is_active'] ?? false,
+        ]);
 
         return ['success' => true, 'message' => 'Tax settings updated successfully!'];
     }

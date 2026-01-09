@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Dompdf\Dompdf;
 use App\Helpers\CurrencyHelper;
+use Illuminate\Validation\Rule;
 
 class AccountingController extends Controller
 {
@@ -360,7 +361,12 @@ class AccountingController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255|unique:accounts,code',
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('accounts', 'code')->where('tenant_id', auth()->user()->tenant_id)
+            ],
             'type' => 'required|in:asset,liability,equity,revenue,expense',
             'parent_id' => 'nullable|exists:accounts,id',
         ]);
@@ -386,7 +392,12 @@ class AccountingController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255|unique:accounts,code,' . $account->id,
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('accounts', 'code')->where('tenant_id', auth()->user()->tenant_id)->ignore($account->id)
+            ],
             'type' => 'required|in:asset,liability,equity,revenue,expense',
             'parent_id' => 'nullable|exists:accounts,id',
         ]);

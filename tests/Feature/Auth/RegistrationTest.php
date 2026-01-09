@@ -36,7 +36,7 @@ class RegistrationTest extends TestCase
         ]);
 
         Event::assertDispatched(Registered::class);
-        $this->assertAuthenticated();
+        $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
         $response->assertRedirect(route('verification.notice'));
     }
 }

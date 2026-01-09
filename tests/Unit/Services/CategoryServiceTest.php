@@ -60,14 +60,12 @@ class CategoryServiceTest extends TestCase
     #[Test]
     public function it_returns_error_if_category_already_exists()
     {
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
         Categories::factory()->create(['name' => 'Electronics', 'description' => 'Electronic gadgets and devices']);
 
         $data = ['name' => 'Electronics', 'description' => 'Another description'];
-        $result = $this->categoryService->createCategory($data);
-
-        $this->assertFalse($result['success']);
-        $this->assertEquals('This category already exists.', $result['message']);
-        $this->assertDatabaseCount('categories', 1);
+        $this->categoryService->createCategory($data);
     }
 
     #[Test]

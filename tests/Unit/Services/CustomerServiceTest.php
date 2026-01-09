@@ -89,6 +89,8 @@ class CustomerServiceTest extends TestCase
     #[Test]
     public function it_returns_error_if_customer_already_exists()
     {
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
         Customer::factory()->create(['name' => 'John Doe', 'email' => 'john.doe@example.com']);
 
         $data = [
@@ -98,11 +100,7 @@ class CustomerServiceTest extends TestCase
             'payment_terms' => 'Net 30',
             'email' => 'john.doe.new@example.com', // Different email, but same name
         ];
-        $result = $this->customerService->createCustomer($data);
-
-        $this->assertFalse($result['success']);
-        $this->assertEquals('This customer already exists.', $result['message']);
-        $this->assertDatabaseCount('customers', 1);
+        $this->customerService->createCustomer($data);
     }
 
     #[Test]

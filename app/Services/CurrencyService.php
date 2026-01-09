@@ -9,7 +9,7 @@ class CurrencyService
 {
     public function getCurrencyEditData(int $entries)
     {
-        $setting = CurrencySetting::first();
+        $setting = CurrencySetting::firstOrCreate([]);
         $units = Unit::paginate($entries);
         $totalunit = Unit::count();
         $predefinedCurrencies = $this->getPredefinedCurrencies();
@@ -19,8 +19,7 @@ class CurrencyService
 
     public function updateCurrency(array $data)
     {
-        $setting = CurrencySetting::first();
-        $setting->update($data);
+        CurrencySetting::updateOrCreate([], $data);
         \App\Helpers\CurrencyHelper::clearSettingsCache();
 
         return ['success' => true, 'message' => 'Currency settings updated successfully.'];

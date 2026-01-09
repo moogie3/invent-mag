@@ -8,6 +8,8 @@ use App\Models\Sales;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CustomerService
 {
@@ -20,9 +22,15 @@ class CustomerService
 
     public function createCustomer(array $data)
     {
-        if (Customer::whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->first()) {
-            return ['success' => false, 'message' => 'This customer already exists.'];
-        }
+        Validator::make($data, [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('customers', 'name')->where('tenant_id', auth()->user()->tenant_id),
+            ],
+            // Add other validation rules here if needed
+        ])->validate();
 
         if (isset($data['image'])) {
             $data['image'] = $this->storeImage($data['image']);

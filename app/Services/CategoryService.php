@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Categories;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CategoryService
 {
@@ -15,9 +17,16 @@ class CategoryService
 
     public function createCategory(array $data)
     {
-        if (Categories::whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->first()) {
-            return ['success' => false, 'message' => 'This category already exists.'];
-        }
+        Validator::make($data, [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('categories', 'name')->where('tenant_id', auth()->user()->tenant_id),
+            ],
+            // Add other validation rules here if needed
+        ])->validate();
+        
         $category = Categories::create($data);
 
         return ['success' => true, 'message' => 'Category created successfully.', 'category' => $category];

@@ -40,6 +40,7 @@ class RegisteredUserController extends Controller
             'user' => $user,
             'access_token' => $token,
             'token_type' => 'Bearer',
+            'tenant_domain' => $user->tenant->domain,
         ], 201);
     }
 }

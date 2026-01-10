@@ -67,4 +67,12 @@ export default defineConfig({
     esbuild: {
         target: "es2015", // Transpile to ES2015 for broader browser compatibility
     },
+    server: {
+        cors: {
+            origin: '*'
+        },
+        hmr: {
+            host: 'localhost',
+        }
+    },
 });

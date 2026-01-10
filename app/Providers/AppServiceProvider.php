@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Purchase;
 use Illuminate\Support\Facades\URL;
+use Spatie\Multitenancy\Multitenancy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,12 +26,18 @@ class AppServiceProvider extends ServiceProvider
     {
         if (! app()->environment('testing')) {
             View::composer(['admin.layouts.*', 'admin.*'], function ($view) {
-                $notificationService = app(NotificationService::class);
-                $notifications = $notificationService->getDueNotifications();
-                $notificationCount = $notifications->count();
+                if (app()->has('currentTenant')) { // Check if a tenant is active
+                    $notificationService = app(NotificationService::class);
+                    $notifications = $notificationService->getDueNotifications();
+                    $notificationCount = $notifications->count();
 
-                $view->with('notificationCount', $notificationCount);
-                $view->with('notifications', $notifications);
+                    $view->with('notificationCount', $notificationCount);
+                    $view->with('notifications', $notifications);
+                } else {
+                    // Provide empty defaults for pages without a tenant (like the central login page)
+                    $view->with('notificationCount', 0);
+                    $view->with('notifications', collect());
+                }
             });
         }
 

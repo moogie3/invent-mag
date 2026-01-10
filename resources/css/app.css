@@ -1,18 +1,17 @@
-@import url('https://rsms.me/inter/inter.css');
-@import "tailwindcss";
-@import './auth.css';
-@import './navbar.css';
-@import './dark.css';
-@import './pos.css';
-@import './product.css';
-@import './purchase-order.css';
-@import './crm.css';
-@import './srm.css';
-@import './print-receipt.css';
-@import './print-a4.css';
-@import './settings.css';
-@import './alerts.css';
-@import './compact-mode.css';
+@import url("https://rsms.me/inter/inter.css");
+@import "./auth.css";
+@import "./navbar.css";
+@import "./dark.css";
+@import "./pos.css";
+@import "./product.css";
+@import "./purchase-order.css";
+@import "./crm.css";
+@import "./srm.css";
+@import "./print-receipt.css";
+@import "./print-a4.css";
+@import "./settings.css";
+@import "./alerts.css";
+@import "./compact-mode.css";
 
 /* ============================
    CSS RESET & NORMALIZATION
@@ -75,7 +74,8 @@ html {
    1. ROOT VARIABLES & DEFAULTS
    ============================ */
 :root {
-    --tblr-font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+    --tblr-font-sans-serif: "Inter", -apple-system, BlinkMacSystemFont,
+        San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
     /* Add consistent base font size */
     --base-font-size: 14px;
     --small-font-size: 12px;
@@ -201,8 +201,6 @@ body {
     z-index: calc(var(--z-dropdown-menu) + 1) !important;
 }
 
-
-
 /* Emergency fix for table-responsive containers */
 .table-responsive {
     position: relative;
@@ -235,8 +233,6 @@ body {
 .dropdown-backdrop {
     z-index: calc(var(--z-dropdown-menu) - 1) !important;
 }
-
-
 
 /* ============================
    7. PROGRESS & UI ELEMENTS
@@ -371,13 +367,18 @@ body {
 }
 
 .selection-indicator::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
     animation: shine 2s infinite;
 }
 

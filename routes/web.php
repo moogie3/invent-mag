@@ -10,6 +10,7 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\Auth\LoginController;
 
 // Admin Authentication Routes
 Route::middleware('web')->prefix('admin')->group(function () {
@@ -34,7 +35,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             return view('admin.auth.login');
         })->name('admin.login');
 
-        Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('admin.login.post');
+        Route::post('/login', [LoginController::class, 'store'])->name('admin.login.post');
 
         // Forgot Password
         Route::get('/forgot-password', fn() => view('admin.auth.forgot-password'))->name('admin.password.request');
@@ -56,12 +57,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
         return back()->with('status', 'verification-link-sent');
     })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
-    Route::post('/logout', function (Request $request) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/admin/login')->with('success', 'You just logged out!');
-    })->middleware('auth')->name('admin.logout');
+    Route::post('/logout', [LoginController::class, 'destroy'])->name('admin.logout');
 
     // Protected Admin Routes
     Route::middleware(['auth', 'verified'])->group(function () {

@@ -6,7 +6,7 @@
     <div class="card card-md">
         <div class="card-body">
             <h2 class="h2 text-center mb-5">Forgot Password</h2>
-            <form action="{{ route('password.email') }}" method="POST" autocomplete="off" novalidate>
+            <form action="{{ route('admin.password.email') }}" method="POST" autocomplete="off" novalidate>
                 @csrf
                 <p class="text-secondary mb-4">Enter your email address and password reset form will be emailed to you.
                 </p>
@@ -24,6 +24,6 @@
         </div>
     </div>
     <div class="text-center text-secondary mt-3">
-        <a href="{{ route('login') }}">Send me back</a> to the sign-in screen.
+        <a href="{{ route('admin.login') }}">Send me back</a> to the sign-in screen.
     </div>
 @endsection

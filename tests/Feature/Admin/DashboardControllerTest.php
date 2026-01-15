@@ -299,6 +299,6 @@ class DashboardControllerTest extends TestCase
         Tenant::forgetCurrent();
         $response = $this->get(route('admin.dashboard'));
 
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect(route('admin.login'));
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\User; // Added
+use App\Scopes\TenantScope; // Added
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -26,6 +28,7 @@ use Laravel\Fortify\Actions\EnsureLoginIsNotThrottled;
 use Laravel\Fortify\Actions\PrepareAuthenticatedSession;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth; // Added for Auth::attempt in case needed.
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -59,40 +62,57 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
-        // Define authentication pipeline
+        // Define authentication pipeline, REMOVING the default rate limiter.
         Fortify::authenticateThrough(function (Request $request) {
-            return array_filter([config('fortify.limiters.login') ? null : EnsureLoginIsNotThrottled::class, Features::enabled(Features::twoFactorAuthentication()) ? RedirectIfTwoFactorAuthenticatable::class : null, AttemptToAuthenticate::class, PrepareAuthenticatedSession::class]);
+            return array_filter([
+                // EnsureLoginIsNotThrottled::class has been removed
+                Features::enabled(Features::twoFactorAuthentication()) ? RedirectIfTwoFactorAuthenticatable::class : null,
+                AttemptToAuthenticate::class,
+                PrepareAuthenticatedSession::class
+            ]);
         });
-
+        
+        // Custom, self-contained authentication logic for multi-tenancy with direct rate limiting
         Fortify::authenticateUsing(function (Request $request) {
             $throttleKey = Str::lower($request->input('email')) . '|' . $request->ip();
 
             // Store the attempted email in session for back button protection
             $request->session()->put('attempted_email', $request->input('email'));
 
-            $user = \App\Models\User::where('email', $request->email)->first();
+            // Manually handle the rate limiting directly.
+            if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+                $seconds = RateLimiter::availableIn($throttleKey);
+                // Abort directly with the 429 error page. This stops everything.
+                abort(response()->view('errors.429', ['seconds' => $seconds], 429));
+            }
 
-            if ($user && Hash::check($request->password, $user->password)) {
-                // Reset login attempts on success
+            // Find the user by email, ignoring the tenant scope
+            $user = User::withoutGlobalScope(TenantScope::class)
+                        ->where('email', $request->email)
+                        ->first();
+
+            // If no user/tenant, hit the limiter and fail.
+            if (! $user || ! $user->tenant) {
+                RateLimiter::hit($throttleKey);
+                throw ValidationException::withMessages(['email' => [__('auth.failed')]]);
+            }
+
+            // If wrong domain, hit the limiter and redirect.
+            if ($user->tenant->domain !== $request->getHost()) {
+                RateLimiter::hit($throttleKey);
+                $redirectUrl = "http://{$user->tenant->domain}" . $request->getRequestUri();
+                abort(redirect()->away($redirectUrl)->withInput($request->only('email')));
+            }
+
+            // If password matches, clear the limiter and return the user.
+            if (Hash::check($request->password, $user->password)) {
                 RateLimiter::clear($throttleKey);
                 return $user;
             }
 
-            // Check if we've now hit the limit (5 attempts)
-            if (RateLimiter::attempts($throttleKey) >= 5) {
-                $seconds = RateLimiter::availableIn($throttleKey);
-                // Instead of returning a response, throw an exception
-                throw ValidationException::withMessages([
-                    'email' => [
-                        trans('auth.throttle', [
-                            'seconds' => $seconds,
-                            'minutes' => ceil($seconds / 60),
-                        ]),
-                    ],
-                ]);
-            }
-
-            return null;
+            // If password fails, hit the limiter and fail.
+            RateLimiter::hit($throttleKey);
+            throw ValidationException::withMessages(['email' => [__('auth.failed')]]);
         });
 
         // Rate limiting configuration

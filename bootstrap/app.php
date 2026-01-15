@@ -25,6 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\DebugModeMiddleware::class,
         ]);
 
+        $middleware->redirectGuestsTo(fn () => route('admin.login'));
+
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,

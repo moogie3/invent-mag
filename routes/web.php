@@ -35,7 +35,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             return view('admin.auth.login');
         })->name('admin.login');
 
-        Route::post('/login', [LoginController::class, 'store'])->name('admin.login.post');
+
 
         // Forgot Password
         Route::get('/forgot-password', fn() => view('admin.auth.forgot-password'))->name('admin.password.request');

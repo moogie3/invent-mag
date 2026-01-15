@@ -6,6 +6,7 @@ use App\Services\NotificationService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Purchase;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\URL;
 use Spatie\Multitenancy\Multitenancy;
 
@@ -24,6 +25,30 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        VerifyEmail::createUrlUsing(function ($notifiable) {
+            $tenantDomain = $notifiable->tenant->domain;
+            $isSecure = $this->app->environment('production');
+            $schema = $isSecure ? 'https' : 'http';
+            $rootUrl = "{$schema}://{$tenantDomain}";
+
+            // Temporarily force the root URL to the tenant's domain for signing
+            URL::forceRootUrl($rootUrl);
+
+            $url = URL::temporarySignedRoute(
+                'verification.verify',
+                now()->addMinutes(config('auth.verification.expire', 60)),
+                [
+                    'id' => $notifiable->getKey(),
+                    'hash' => sha1($notifiable->getEmailForVerification()),
+                ]
+            );
+
+            // Revert the URL generator to its default state
+            URL::forceRootUrl(null);
+
+            return $url;
+        });
+
         if (! app()->environment('testing')) {
             View::composer(['admin.layouts.*', 'admin.*'], function ($view) {
                 if (app()->has('currentTenant')) { // Check if a tenant is active

@@ -42,6 +42,6 @@
         </div>
     </div>
     <div class="text-center text-secondary mt-3">
-        Already have an account? <a href="{{ route('login') }}" tabindex="-1">Sign in</a>
+        Already have an account? <a href="{{ route('admin.login') }}" tabindex="-1">Sign in</a>
     </div>
 @endsection

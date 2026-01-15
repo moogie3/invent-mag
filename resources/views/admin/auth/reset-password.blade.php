@@ -6,7 +6,7 @@
     <div class="card card-md">
         <div class="card-body">
             <h2 class="h2 text-center mb-5">Forgot Password</h2>
-            <form method="POST" action="{{ route('password.update') }}">
+            <form method="POST" action="{{ route('admin.password.update') }}">
                 @csrf
                 <input type="hidden" name="token" value="{{ $token }}">
                 <div class="mb-3">

@@ -82,6 +82,6 @@ class LoginController extends Controller
 
         $request->session()->regenerateToken();
 
-        return app(LogoutResponse::class);
+        return redirect()->route('admin.login');
     }
 }

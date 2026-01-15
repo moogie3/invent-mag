@@ -6,7 +6,7 @@
     <div class="card card-md">
         <div class="card-body">
             <h2 class="h2 text-center mb-5">Login to your account</h2>
-            <form action="{{ route('admin.login.post') }}" method="POST" autocomplete="off" novalidate>
+            <form action="{{ route('admin.login') }}" method="POST" autocomplete="off" novalidate>
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Email</label>
@@ -17,7 +17,7 @@
                     <label class="form-label">
                         Password
                         <span class="form-label-description">
-                            <a href="{{ route('password.request') }}">Forgot password</a>
+                            <a href="{{ route('admin.password.request') }}">Forgot password</a>
                         </span>
                     </label>
                     <div class="input-group input-group-flat">

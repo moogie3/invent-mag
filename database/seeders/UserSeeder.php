@@ -16,14 +16,16 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        $tenantId = app('currentTenant')->id;
+        $tenantName = strtolower(str_replace(' ', '-', app('currentTenant')->name));
         $user = User::updateOrCreate(
-            ['email' => 'admin@gmail.com'],
+            ['email' => 'admin-' . $tenantName . '@gmail.com', 'tenant_id' => $tenantId],
             [
-                'name' => 'admin',
+                'name' => 'admin-' . $tenantName,
                 'password' => Hash::make('password'),
                 'avatar' => '',
                 'created_at' => now(),
-                'updated_at'=> now()
+                'updated_at' => now(),
             ]
         );
 

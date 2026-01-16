@@ -13,17 +13,19 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        Categories::create([
-            'name' => 'TR',
-            'description' => 'Transistor',
-        ]);
-        Categories::create([
-            'name' => 'FBT',
-            'description' => 'Flyback',
-        ]);
-        Categories::create([
-            'name' => 'IC',
-            'description' => 'Integrated Circuit',
-        ]);
+        $tenantId = app('currentTenant')->id;
+
+        Categories::updateOrCreate(
+            ['name' => 'TR', 'tenant_id' => $tenantId],
+            ['description' => 'Transistor']
+        );
+        Categories::updateOrCreate(
+            ['name' => 'FBT', 'tenant_id' => $tenantId],
+            ['description' => 'Flyback']
+        );
+        Categories::updateOrCreate(
+            ['name' => 'IC', 'tenant_id' => $tenantId],
+            ['description' => 'Integrated Circuit']
+        );
     }
 }

@@ -12,8 +12,10 @@ class WarehouseSeeder extends Seeder
      */
     public function run(): void
     {
+        $tenantId = app('currentTenant')->id;
+
         Warehouse::updateOrCreate(
-            ['name' => 'Gudang Utama Jakarta'],
+            ['name' => 'Gudang Utama Jakarta', 'tenant_id' => $tenantId],
             [
                 'address' => 'Jl. Raya Cakung No. 10, Jakarta Timur',
                 'description' => 'Gudang utama untuk distribusi pusat.',
@@ -22,7 +24,7 @@ class WarehouseSeeder extends Seeder
         );
 
         Warehouse::updateOrCreate(
-            ['name' => 'Gudang Surabaya'],
+            ['name' => 'Gudang Surabaya', 'tenant_id' => $tenantId],
             [
                 'address' => 'Jl. Ahmad Yani No. 50, Surabaya',
                 'description' => 'Gudang cabang di Jawa Timur.',
@@ -31,7 +33,7 @@ class WarehouseSeeder extends Seeder
         );
 
         Warehouse::updateOrCreate(
-            ['name' => 'Gudang Bandung'],
+            ['name' => 'Gudang Bandung', 'tenant_id' => $tenantId],
             [
                 'address' => 'Jl. Pasteur No. 23, Bandung',
                 'description' => 'Gudang cabang untuk area Jawa Barat.',

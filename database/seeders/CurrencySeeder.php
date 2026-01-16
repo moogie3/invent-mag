@@ -13,8 +13,10 @@ class CurrencySeeder extends Seeder
      */
     public function run(): void
     {
+        $tenantId = app('currentTenant')->id;
+
         CurrencySetting::updateOrCreate(
-            ['id' => 1], // Assuming there is only one setting row
+            ['tenant_id' => $tenantId], // Use tenant_id as the unique identifier
             [
                 'currency_symbol' => 'Rp',
                 'decimal_separator' => ',',

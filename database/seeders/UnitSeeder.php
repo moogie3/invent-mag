@@ -13,18 +13,20 @@ class UnitSeeder extends Seeder
      */
     public function run(): void
     {
+        $tenantId = app('currentTenant')->id;
+
         Unit::updateOrCreate(
-            ['name' => 'Pieces'],
+            ['name' => 'Pieces', 'tenant_id' => $tenantId],
             ['symbol' => 'PCS']
         );
 
         Unit::updateOrCreate(
-            ['name' => 'Roll'],
+            ['name' => 'Roll', 'tenant_id' => $tenantId],
             ['symbol' => 'Roll']
         );
 
         Unit::updateOrCreate(
-            ['name' => 'Meters'],
+            ['name' => 'Meters', 'tenant_id' => $tenantId],
             ['symbol' => 'M']
         );
     }

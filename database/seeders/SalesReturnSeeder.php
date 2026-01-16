@@ -30,16 +30,19 @@ class SalesReturnSeeder extends Seeder
      */
     public function run()
     {
+        $tenantId = app('currentTenant')->id;
+
         Schema::disableForeignKeyConstraints();
-        SalesReturn::truncate();
-        SalesReturnItem::truncate();
+        SalesReturn::where('tenant_id', $tenantId)->delete();
+        $salesReturnIds = SalesReturn::where('tenant_id', $tenantId)->pluck('id');
+        SalesReturnItem::whereIn('sales_return_id', $salesReturnIds)->delete();
         Schema::enableForeignKeyConstraints();
 
-        $users = User::all();
-        $sales = Sales::has('salesItems')->get(); // Only sales with items
+        $users = User::where('tenant_id', $tenantId)->get();
+        $sales = Sales::where('tenant_id', $tenantId)->has('salesItems')->get(); // Only sales with items
 
         if ($users->isEmpty() || $sales->isEmpty()) {
-            $this->command->info('Skipping SalesReturnSeeder: No users or sales with items found. Please run UserSeeder and SalesSeeder first.');
+            $this->command->info('Skipping SalesReturnSeeder for tenant ' . app('currentTenant')->name . ': No users or sales with items found. Please run UserSeeder and SalesSeeder first.');
             return;
         }
 
@@ -75,6 +78,7 @@ class SalesReturnSeeder extends Seeder
                     'quantity' => $returnQuantity,
                     'price' => $salesItem->price,
                     'total' => $itemTotal,
+                    'tenant_id' => $tenantId,
                 ];
             }
 
@@ -90,6 +94,7 @@ class SalesReturnSeeder extends Seeder
                 'reason' => $faker->sentence(),
                 'total_amount' => $totalReturnAmount,
                 'status' => $status,
+                'tenant_id' => $tenantId,
             ]);
 
             // Create SalesReturnItems
@@ -104,13 +109,14 @@ class SalesReturnSeeder extends Seeder
             }
 
             // Create Journal Entry for Sales Return
+            $tenantName = app('currentTenant')->name;
             $description = "Sales Return for Sales Invoice {$sale->invoice}, Return #{$salesReturn->id}";
             $transactions = [];
 
             // Debit Sales Returns (or a specific return expense account)
             // Credit Accounts Receivable / Cash (depending on original payment type or refund status)
-            $transactions[] = ['account_name' => 'accounting.accounts.sales_revenue.name', 'type' => 'debit', 'amount' => $totalReturnAmount]; // Reduce revenue
-            $transactions[] = ['account_name' => 'accounting.accounts.accounts_receivable.name', 'type' => 'credit', 'amount' => $totalReturnAmount]; // Reduce AR
+            $transactions[] = ['account_name' => 'accounting.accounts.sales_revenue.name - ' . $tenantName, 'type' => 'debit', 'amount' => $totalReturnAmount]; // Reduce revenue
+            $transactions[] = ['account_name' => 'accounting.accounts.accounts_receivable.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Reduce AR
 
             try {
                 $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $salesReturn);

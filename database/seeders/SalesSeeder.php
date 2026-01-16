@@ -29,17 +29,21 @@ class SalesSeeder extends Seeder
      */
     public function run()
     {
+        $tenantId = app('currentTenant')->id;
+
         Schema::disableForeignKeyConstraints();
-        Sales::truncate();
-        SalesItem::truncate();
+        Sales::where('tenant_id', $tenantId)->delete();
+        // We can't truncate SalesItem directly without a tenant_id, so we'll delete them based on the sales of the current tenant
+        $salesIds = Sales::where('tenant_id', $tenantId)->pluck('id');
+        SalesItem::whereIn('sales_id', $salesIds)->delete();
         Schema::enableForeignKeyConstraints();
 
-        $customers = Customer::all();
-        $users = User::all();
-        $products = Product::all();
+        $customers = Customer::where('tenant_id', $tenantId)->get();
+        $users = User::where('tenant_id', $tenantId)->get();
+        $products = Product::where('tenant_id', $tenantId)->get();
 
         if ($customers->isEmpty() || $users->isEmpty() || $products->isEmpty()) {
-            $this->command->info('Skipping SalesSeeder: No customers, users, or products found. Please run CustomerSeeder, UserSeeder, and ProductSeeder first.');
+            $this->command->info('Skipping SalesSeeder for tenant ' . app('currentTenant')->name . ': No customers, users, or products found. Please run their respective seeders first.');
             return;
         }
 
@@ -52,12 +56,12 @@ class SalesSeeder extends Seeder
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
 
             $invoiceNumber = $i + 1; // Use loop counter for invoice number
-            $invoice = 'INV-' . str_pad($invoiceNumber, 5, '0', STR_PAD_LEFT);
+            $invoice = 'INV-' . str_pad($invoiceNumber, 5, '0', STR_PAD_LEFT) . '-' . $tenantId;
 
             $sales = Sales::create([
                 'invoice' => $invoice,
                 'customer_id' => $customer->id,
-                'user_id' => 1, // Assuming user with ID 1 exists
+                'user_id' => $user->id,
                 'order_date' => $orderDate,
                 'due_date' => $dueDate,
                 'payment_type' => $paymentType,
@@ -68,6 +72,7 @@ class SalesSeeder extends Seeder
                 'total' => 0, // Will be calculated from items
                 'status' => $status,
                 'is_pos' => false,
+                'tenant_id' => $tenantId,
             ]);
 
             $totalSalesAmount = 0;
@@ -98,6 +103,7 @@ class SalesSeeder extends Seeder
                         'discount' => 0,
                         'discount_type' => 'fixed',
                         'total' => $total,
+                        'tenant_id' => $tenantId,
                     ];
                 }
 
@@ -148,6 +154,7 @@ class SalesSeeder extends Seeder
                         'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
                         'payment_method' => $paymentType,
                         'notes' => 'Full payment during seeding.',
+                        'tenant_id' => $tenantId,
                     ]);
                 } elseif ($status === 'Partial') {
                     $paidAmount = rand(1, (int)($finalCalculatedTotal * 0.8)); // Pay between 1 and 80%
@@ -156,27 +163,29 @@ class SalesSeeder extends Seeder
                         'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
                         'payment_method' => $paymentType,
                         'notes' => 'Partial payment during seeding.',
+                        'tenant_id' => $tenantId,
                     ]);
                 }
             }
 
             // Create Journal Entry for the sale
+            $tenantName = app('currentTenant')->name;
             try {
                 // 1. Record the revenue and accounts receivable
                 $revenueTransactions = [
-                    ['account_name' => 'accounting.accounts.accounts_receivable.name', 'type' => 'debit', 'amount' => $finalCalculatedTotal],
-                    ['account_name' => 'accounting.accounts.sales_revenue.name', 'type' => 'credit', 'amount' => $totalSalesAmount],
+                    ['account_name' => 'accounting.accounts.accounts_receivable.name - ' . $tenantName, 'type' => 'debit', 'amount' => $finalCalculatedTotal],
+                    ['account_name' => 'accounting.accounts.sales_revenue.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalSalesAmount],
                 ];
                 if ($totalTaxAmount > 0) {
-                    $revenueTransactions[] = ['account_name' => 'accounting.accounts.output_vat.name', 'type' => 'credit', 'amount' => $totalTaxAmount];
+                    $revenueTransactions[] = ['account_name' => 'accounting.accounts.output_vat.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalTaxAmount];
                 }
                 $this->accountingService->createJournalEntry("Sale - Invoice {$sales->invoice}", $orderDate, $revenueTransactions, $sales);
 
                 // 2. Record the cost of goods sold
                 if ($totalCostOfGoods > 0) {
                     $cogsTransactions = [
-                        ['account_name' => 'accounting.accounts.cost_of_goods_sold.name', 'type' => 'debit', 'amount' => $totalCostOfGoods],
-                        ['account_name' => 'accounting.accounts.inventory.name', 'type' => 'credit', 'amount' => $totalCostOfGoods],
+                        ['account_name' => 'accounting.accounts.cost_of_goods_sold.name - ' . $tenantName, 'type' => 'debit', 'amount' => $totalCostOfGoods],
+                        ['account_name' => 'accounting.accounts.inventory.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalCostOfGoods],
                     ];
                     $this->accountingService->createJournalEntry("COGS for Invoice {$sales->invoice}", $orderDate, $cogsTransactions, $sales);
                 }
@@ -184,8 +193,8 @@ class SalesSeeder extends Seeder
                 // 3. Record the payment, if any
                 if ($paidAmount > 0) {
                     $paymentTransactions = [
-                        ['account_name' => 'accounting.accounts.cash.name', 'type' => 'debit', 'amount' => $paidAmount],
-                        ['account_name' => 'accounting.accounts.accounts_receivable.name', 'type' => 'credit', 'amount' => $paidAmount],
+                        ['account_name' => 'accounting.accounts.cash.name - ' . $tenantName, 'type' => 'debit', 'amount' => $paidAmount],
+                        ['account_name' => 'accounting.accounts.accounts_receivable.name - ' . $tenantName, 'type' => 'credit', 'amount' => $paidAmount],
                     ];
                     $this->accountingService->createJournalEntry("Payment for Invoice {$sales->invoice}", $orderDate, $paymentTransactions, $sales);
                 }

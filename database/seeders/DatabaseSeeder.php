@@ -21,38 +21,46 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
         ]);
 
-        // 2. Create a default tenant for initial seeding
-        $defaultTenant = Tenant::firstOrCreate([
-            'name' => 'Main Tenant',
-            'domain' => 'localhost',
-        ]);
+        // 2. Create tenants
+        $tenants = [
+            [
+                'name' => 'Tenant A',
+                'domain' => 'tenant-a.localhost',
+            ],
+            [
+                'name' => 'Tenant B',
+                'domain' => 'tenant-b.localhost',
+            ],
+        ];
 
-        // 3. Set the current tenant
-        $defaultTenant->makeCurrent();
+        foreach ($tenants as $tenantData) {
+            $tenant = Tenant::create($tenantData);
+            $tenant->makeCurrent();
 
-        // 4. Run all other tenant-specific seeders
-        $this->call([
-            AccountSeeder::class,
-            UserSeeder::class,
-            CategorySeeder::class,
-            UnitSeeder::class,
-            SupplierSeeder::class,
-            WarehouseSeeder::class,
-            ProductSeeder::class,
-            CustomerSeeder::class,
-            CurrencySeeder::class,
-            PurchaseSeeder::class,
-            SalesSeeder::class,
-            PurchaseReturnSeeder::class,
-            SalesReturnSeeder::class,
-            CustomerInteractionSeeder::class,
-            SupplierInteractionSeeder::class,
-            TaxSeeder::class,
-            StockAdjustmentSeeder::class,
-            SalesPipelineSeeder::class,
-            PipelineStageSeeder::class,
-            SalesOpportunitySeeder::class,
-        ]);
+            // 4. Run all other tenant-specific seeders
+            $this->call([
+                AccountSeeder::class,
+                UserSeeder::class,
+                CategorySeeder::class,
+                UnitSeeder::class,
+                SupplierSeeder::class,
+                WarehouseSeeder::class,
+                ProductSeeder::class,
+                CustomerSeeder::class,
+                CurrencySeeder::class,
+                PurchaseSeeder::class,
+                SalesSeeder::class,
+                PurchaseReturnSeeder::class,
+                SalesReturnSeeder::class,
+                CustomerInteractionSeeder::class,
+                SupplierInteractionSeeder::class,
+                TaxSeeder::class,
+                StockAdjustmentSeeder::class,
+                SalesPipelineSeeder::class,
+                PipelineStageSeeder::class,
+                SalesOpportunitySeeder::class,
+            ]);
+        }
 
         // 5. Forget the current tenant to clean up
         Tenant::forgetCurrent();

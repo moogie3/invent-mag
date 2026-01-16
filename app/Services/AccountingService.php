@@ -33,9 +33,10 @@ class AccountingService
             ]);
 
             foreach ($transactions as $tx) {
-                $account = Account::where('name', $tx['account_name'])->first();
+                $tenantId = app('currentTenant')->id;
+                $account = Account::where('name', $tx['account_name'])->where('tenant_id', $tenantId)->first();
                 if (!$account) {
-                    throw new Exception("Account '{$tx['account_name']}' not found.");
+                    throw new Exception("Account '{$tx['account_name']}' not found for the current tenant.");
                 }
 
                 $journalEntry->transactions()->create([

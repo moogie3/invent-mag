@@ -17,26 +17,23 @@ class CustomerInteractionSeeder extends Seeder
      */
     public function run()
     {
+        $tenantId = app('currentTenant')->id;
+
         Schema::disableForeignKeyConstraints();
-        CustomerInteraction::truncate();
+        CustomerInteraction::where('tenant_id', $tenantId)->delete();
         Schema::enableForeignKeyConstraints();
 
-        $customers = Customer::all();
-        $user = User::find(1); // Assuming user with ID 1 exists and is used for sales
+        $customers = Customer::where('tenant_id', $tenantId)->get();
+        $user = User::where('tenant_id', $tenantId)->first(); // Get the first user for the tenant
 
         if ($customers->isEmpty()) {
-            $this->command->info('Skipping CustomerInteractionSeeder: No customers found. Please run CustomerSeeder first.');
+            $this->command->info('Skipping CustomerInteractionSeeder for tenant ' . app('currentTenant')->name . ': No customers found. Please run CustomerSeeder first.');
             return;
         }
 
         if (!$user) {
-            $this->command->info('Skipping CustomerInteractionSeeder: User with ID 1 not found. Please ensure UserSeeder has been run.');
-            // Fallback to a random user if user 1 doesn't exist
-            $user = User::inRandomOrder()->first();
-            if (!$user) {
-                $this->command->info('Skipping CustomerInteractionSeeder: No users found at all.');
-                return;
-            }
+            $this->command->info('Skipping CustomerInteractionSeeder for tenant ' . app('currentTenant')->name . ': No users found. Please ensure UserSeeder has been run for this tenant.');
+            return;
         }
 
         foreach ($customers as $customer) {
@@ -44,9 +41,10 @@ class CustomerInteractionSeeder extends Seeder
             CustomerInteraction::factory()->count(rand(1, 3))->create([
                 'customer_id' => $customer->id,
                 'user_id' => $user->id,
+                'tenant_id' => $tenantId,
             ]);
         }
 
-        $this->command->info('Customer interactions seeded successfully.');
+        $this->command->info('Customer interactions for tenant ' . app('currentTenant')->name . ' seeded successfully.');
     }
 }

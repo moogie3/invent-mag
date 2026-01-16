@@ -26,11 +26,13 @@ class PurchaseSeeder extends Seeder
      */
     public function run()
     {
-        $suppliers = Supplier::all();
-        $products = Product::all();
+        $tenantId = app('currentTenant')->id;
+
+        $suppliers = Supplier::where('tenant_id', $tenantId)->get();
+        $products = Product::where('tenant_id', $tenantId)->get();
 
         if ($suppliers->isEmpty() || $products->isEmpty()) {
-            $this->command->info('Skipping PurchaseSeeder: No suppliers or products found. Please run SupplierSeeder and ProductSeeder first.');
+            $this->command->info('Skipping PurchaseSeeder for tenant ' . app('currentTenant')->name . ': No suppliers or products found. Please run SupplierSeeder and ProductSeeder first.');
             return;
         }
 
@@ -42,7 +44,7 @@ class PurchaseSeeder extends Seeder
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
 
             $purchase = Purchase::create([
-                'invoice' => 'PO-' . str_pad(Purchase::count() + 1, 5, '0', STR_PAD_LEFT),
+                'invoice' => 'PO-' . str_pad(Purchase::where('tenant_id', $tenantId)->count() + 1, 5, '0', STR_PAD_LEFT),
                 'supplier_id' => $supplier->id,
                 'order_date' => $orderDate,
                 'due_date' => $dueDate,
@@ -51,6 +53,7 @@ class PurchaseSeeder extends Seeder
                 'discount_total_type' => collect(['percentage', 'fixed'])->random(),
                 'total' => 0, // Will be calculated from items
                 'status' => $status,
+                'tenant_id' => $tenantId,
             ]);
 
             $totalPurchaseAmount = 0;
@@ -95,7 +98,12 @@ class PurchaseSeeder extends Seeder
                     $expiryDate = Carbon::now()->addDays(rand(1, 90));
                 }
 
-                POItem::create(array_merge(['po_id' => $purchase->id, 'expiry_date' => $expiryDate, 'remaining_quantity' => $itemData['quantity']], $itemData));
+                POItem::create(array_merge([
+                    'po_id' => $purchase->id,
+                    'expiry_date' => $expiryDate,
+                    'remaining_quantity' => $itemData['quantity'],
+                    'tenant_id' => $tenantId,
+                ], $itemData));
 
                 // Update product stock_quantity
                 if ($product) {
@@ -116,6 +124,7 @@ class PurchaseSeeder extends Seeder
                         'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
                         'payment_method' => $paymentType,
                         'notes' => 'Full payment during seeding.',
+                        'tenant_id' => $tenantId,
                     ]);
                 } elseif ($status === 'Partial') {
                     $paidAmount = rand(1, (int)($totalPurchaseAmount * 0.8)); // Pay between 1 and 80%
@@ -124,32 +133,34 @@ class PurchaseSeeder extends Seeder
                         'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
                         'payment_method' => $paymentType,
                         'notes' => 'Partial payment during seeding.',
+                        'tenant_id' => $tenantId,
                     ]);
                 }
             }
 
             // Create Journal Entry
+            $tenantName = app('currentTenant')->name;
             $transactions = [];
             $description = "Purchase of goods, invoice {$purchase->invoice}";
 
             // Debit Inventory for the full purchase amount
-            $transactions[] = ['account_name' => 'accounting.accounts.inventory.name', 'type' => 'debit', 'amount' => $totalPurchaseAmount];
+            $transactions[] = ['account_name' => 'accounting.accounts.inventory.name - ' . $tenantName, 'type' => 'debit', 'amount' => $totalPurchaseAmount];
 
             if ($status === 'Paid') {
                 // Credit Cash for the full amount
-                $transactions[] = ['account_name' => 'accounting.accounts.cash.name', 'type' => 'credit', 'amount' => $totalPurchaseAmount];
+                $transactions[] = ['account_name' => 'accounting.accounts.cash.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalPurchaseAmount];
             } elseif ($status === 'Unpaid') {
                 // Credit Accounts Payable for the full amount
-                $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name', 'type' => 'credit', 'amount' => $totalPurchaseAmount];
+                $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalPurchaseAmount];
             } elseif ($status === 'Partial') {
                 // Credit Cash for the paid amount
                 if ($paidAmount > 0) {
-                    $transactions[] = ['account_name' => 'accounting.accounts.cash.name', 'type' => 'credit', 'amount' => $paidAmount];
+                    $transactions[] = ['account_name' => 'accounting.accounts.cash.name - ' . $tenantName, 'type' => 'credit', 'amount' => $paidAmount];
                 }
                 // Credit Accounts Payable for the remaining balance
                 $remainingBalance = $totalPurchaseAmount - $paidAmount;
                 if ($remainingBalance > 0) {
-                    $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name', 'type' => 'credit', 'amount' => $remainingBalance];
+                    $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name - ' . $tenantName, 'type' => 'credit', 'amount' => $remainingBalance];
                 }
             }
             

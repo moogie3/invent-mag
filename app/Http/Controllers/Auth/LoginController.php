@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Scopes\TenantScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Fortify\Contracts\LogoutResponse;
+use App\Http\Responses\LogoutResponse;
 
 class LoginController extends Controller
 {
@@ -72,9 +72,9 @@ class LoginController extends Controller
      * Log the user out of the application.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Laravel\Fortify\Contracts\LogoutResponse
+     * @return \App\Http\Responses\LogoutResponse
      */
-    public function destroy(Request $request): LogoutResponse
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
@@ -82,6 +82,6 @@ class LoginController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login');
+        return new LogoutResponse();
     }
 }

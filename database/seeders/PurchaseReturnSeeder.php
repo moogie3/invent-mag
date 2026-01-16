@@ -30,16 +30,19 @@ class PurchaseReturnSeeder extends Seeder
      */
     public function run()
     {
+        $tenantId = app('currentTenant')->id;
+
         Schema::disableForeignKeyConstraints();
-        PurchaseReturn::truncate();
-        PurchaseReturnItem::truncate();
+        PurchaseReturn::where('tenant_id', $tenantId)->delete();
+        $purchaseReturnIds = PurchaseReturn::where('tenant_id', $tenantId)->pluck('id');
+        PurchaseReturnItem::whereIn('purchase_return_id', $purchaseReturnIds)->delete();
         Schema::enableForeignKeyConstraints();
 
-        $users = User::all();
-        $purchases = Purchase::has('items')->get(); // Only purchases with items
+        $users = User::where('tenant_id', $tenantId)->get();
+        $purchases = Purchase::where('tenant_id', $tenantId)->has('items')->get(); // Only purchases with items
 
         if ($users->isEmpty() || $purchases->isEmpty()) {
-            $this->command->info('Skipping PurchaseReturnSeeder: No users or purchases with items found. Please run UserSeeder and PurchaseSeeder first.');
+            $this->command->info('Skipping PurchaseReturnSeeder for tenant ' . app('currentTenant')->name . ': No users or purchases with items found. Please run UserSeeder and PurchaseSeeder first.');
             return;
         }
 
@@ -75,6 +78,7 @@ class PurchaseReturnSeeder extends Seeder
                     'quantity' => $returnQuantity,
                     'price' => $poItem->price,
                     'total' => $itemTotal,
+                    'tenant_id' => $tenantId,
                 ];
             }
 
@@ -90,6 +94,7 @@ class PurchaseReturnSeeder extends Seeder
                 'reason' => $faker->sentence(),
                 'total_amount' => $totalReturnAmount,
                 'status' => $status,
+                'tenant_id' => $tenantId,
             ]);
 
             // Create PurchaseReturnItems
@@ -104,14 +109,15 @@ class PurchaseReturnSeeder extends Seeder
             }
 
             // Create Journal Entry for Purchase Return
+            $tenantName = app('currentTenant')->name;
             $description = "Purchase Return for PO {$purchase->invoice}, Return #{$purchaseReturn->id}";
             $transactions = [];
 
             // Debit Accounts Payable / Cash (depending on original payment type or refund status)
             // For simplicity, we'll assume a credit to a Purchase Returns account and debit to AP/Cash
             // More complex logic might be needed here based on refund status
-            $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name', 'type' => 'debit', 'amount' => $totalReturnAmount];
-            $transactions[] = ['account_name' => 'accounting.accounts.inventory.name', 'type' => 'credit', 'amount' => $totalReturnAmount]; // Adjust inventory
+            $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name - ' . $tenantName, 'type' => 'debit', 'amount' => $totalReturnAmount];
+            $transactions[] = ['account_name' => 'accounting.accounts.inventory.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Adjust inventory
 
             try {
                 $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $purchaseReturn);

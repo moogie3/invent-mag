@@ -18,13 +18,15 @@ class SalesOpportunitySeeder extends Seeder
      */
     public function run(): void
     {
-        $pipeline = SalesPipeline::where('is_default', true)->first();
-        $customers = Customer::all();
-        $products = Product::all();
-        $stages = PipelineStage::all();
+        $tenantId = app('currentTenant')->id;
+
+        $pipeline = SalesPipeline::where('is_default', true)->where('tenant_id', $tenantId)->first();
+        $customers = Customer::where('tenant_id', $tenantId)->get();
+        $products = Product::where('tenant_id', $tenantId)->get();
+        $stages = $pipeline ? PipelineStage::where('sales_pipeline_id', $pipeline->id)->where('tenant_id', $tenantId)->get() : collect();
 
         if (!$pipeline || $customers->isEmpty() || $products->isEmpty() || $stages->isEmpty()) {
-            $this->command->info('Skipping SalesOpportunitySeeder: Default pipeline, customers, products, or stages not found.');
+            $this->command->info('Skipping SalesOpportunitySeeder for tenant ' . app('currentTenant')->name . ': Default pipeline, customers, products, or stages not found.');
             return;
         }
 
@@ -37,6 +39,7 @@ class SalesOpportunitySeeder extends Seeder
                 'name' => 'Opportunity ' . ($i + 1),
                 'amount' => rand(1000, 10000),
                 'status' => $status,
+                'tenant_id' => $tenantId,
             ]);
 
             for ($j = 0; $j < rand(1, 3); $j++) {
@@ -46,6 +49,7 @@ class SalesOpportunitySeeder extends Seeder
                     'product_id' => $product->id,
                     'quantity' => rand(1, 5),
                     'price' => $product->selling_price,
+                    'tenant_id' => $tenantId,
                 ]);
             }
         }

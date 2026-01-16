@@ -13,10 +13,15 @@ class SalesPipelineSeeder extends Seeder
      */
     public function run(): void
     {
-        SalesPipeline::create([
-            'name' => 'Default Pipeline',
-            'description' => 'The default sales pipeline.',
-            'is_default' => true,
-        ]);
+        $tenantId = app('currentTenant')->id;
+        $tenantName = app('currentTenant')->name;
+
+        SalesPipeline::updateOrCreate(
+            ['name' => 'Default Pipeline - ' . $tenantName, 'tenant_id' => $tenantId],
+            [
+                'description' => 'The default sales pipeline.',
+                'is_default' => true,
+            ]
+        );
     }
 }

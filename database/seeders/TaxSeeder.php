@@ -13,16 +13,22 @@ class TaxSeeder extends Seeder
      */
     public function run(): void
     {
-        Tax::create([
-            'name' => 'No Tax',
-            'rate' => 0,
-            'is_active' => true,
-        ]);
+        $tenantId = app('currentTenant')->id;
 
-        Tax::create([
-            'name' => 'VAT',
-            'rate' => 10,
-            'is_active' => false,
-        ]);
+        Tax::updateOrCreate(
+            ['name' => 'No Tax', 'tenant_id' => $tenantId],
+            [
+                'rate' => 0,
+                'is_active' => true,
+            ]
+        );
+
+        Tax::updateOrCreate(
+            ['name' => 'VAT', 'tenant_id' => $tenantId],
+            [
+                'rate' => 10,
+                'is_active' => false,
+            ]
+        );
     }
 }

@@ -104,14 +104,14 @@ class SalesReturnController extends Controller
     public function bulkComplete(Request $request)
     {
         $ids = $request->input('ids');
-        SalesReturn::whereIn('id', $ids)->update(['status' => 'Completed']);
+        $this->salesReturnService->bulkCompleteSalesReturns($ids);
         return response()->json(['success' => true, 'message' => 'Selected sales returns have been marked as completed.']);
     }
 
     public function bulkCancel(Request $request)
     {
         $ids = $request->input('ids');
-        SalesReturn::whereIn('id', $ids)->update(['status' => 'Canceled']);
+        $this->salesReturnService->bulkCancelSalesReturns($ids);
         return response()->json(['success' => true, 'message' => 'Selected sales returns have been marked as canceled.']);
     }
 

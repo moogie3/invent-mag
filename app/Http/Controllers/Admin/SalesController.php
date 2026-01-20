@@ -9,6 +9,7 @@ use App\Models\Sales;
 use App\Services\SalesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class SalesController extends Controller
 {
@@ -106,7 +107,7 @@ class SalesController extends Controller
         $sale = Sales::findOrFail($id);
 
         $request->validate([
-            'invoice' => 'nullable|string|unique:sales,invoice,' . $sale->id,
+            'invoice' => ['nullable', 'string', Rule::unique('sales', 'invoice')->ignore($sale->id)->where('tenant_id', $sale->tenant_id)],
             'customer_id' => 'required|exists:customers,id',
             'order_date' => 'required|date',
             'due_date' => 'required|date',
@@ -195,6 +196,15 @@ class SalesController extends Controller
                 'updated_count' => $updatedCount,
             ]);
         } catch (\Exception $e) {
+            Log::error($e);
+
+            if (str_contains($e->getMessage(), 'Accounting settings')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed: Please configure default accounts for Accounts Receivable and Cash in Accounting Settings.',
+                ], 400);
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while updating sales orders.',

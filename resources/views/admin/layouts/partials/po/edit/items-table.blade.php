@@ -26,7 +26,7 @@
                     <th class="text-center" style="width: 140px">{{ __('messages.table_expiry_date') }}</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="po-items-table-body">
                 @foreach ($pos->items as $index => $item)
                     @include('admin.layouts.partials.po.edit.item-row', [
                         'item' => $item,

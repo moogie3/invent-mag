@@ -21,15 +21,16 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
         ]);
 
+        $domain = config('app.domain', 'localhost');
         // 2. Create tenants
         $tenants = [
             [
                 'name' => 'Tenant A',
-                'domain' => 'tenant-a.localhost',
+                'domain' => 'tenant-a.' . $domain,
             ],
             [
                 'name' => 'Tenant B',
-                'domain' => 'tenant-b.localhost',
+                'domain' => 'tenant-b.' . $domain,
             ],
         ];
 

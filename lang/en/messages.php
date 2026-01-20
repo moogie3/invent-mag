@@ -752,6 +752,7 @@ return [
     'paid' => 'Paid',
     'unpaid' => 'Unpaid',
     'view_po_invoice' => 'View PO Invoice',
+    'po_invoice' => "PO Invoice",
     'print_invoice' => 'Print Invoice',
     'edit_invoice' => 'Edit Invoice',
     'no_sales_pipelines_found' => 'No sales pipelines found',

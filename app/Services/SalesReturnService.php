@@ -91,7 +91,7 @@ class SalesReturnService
                     $product->increment('stock_quantity', $itemData['returned_quantity']);
                 }
             }
-            
+
             $sale = Sales::find($data['sales_id']);
             $totalOriginalQuantitySold = $sale->salesItems()->sum('quantity');
             $totalQuantityReturnedSoFar = $sale->salesReturns->flatMap(function ($sr) {
@@ -103,7 +103,7 @@ class SalesReturnService
             } elseif ($totalQuantityReturnedSoFar > 0) {
                 $sale->status = 'Partial';
             } else {
-                $sale->status = 'Completed'; // Or original status, if no returns at all
+                // Do nothing, leave the status as is
             }
             $sale->save();
 
@@ -186,7 +186,7 @@ class SalesReturnService
             } elseif ($totalQuantityReturnedSoFar > 0) {
                 $sale->update(['status' => 'Partial']);
             } else {
-                $sale->update(['status' => 'Completed']);
+                // Do nothing, leave the status as is
             }
 
             return $salesReturn->fresh();
@@ -242,5 +242,15 @@ class SalesReturnService
         }
 
         return null;
+    }
+
+    public function bulkCompleteSalesReturns(array $ids): void
+    {
+        SalesReturn::whereIn('id', $ids)->update(['status' => 'Completed']);
+    }
+
+    public function bulkCancelSalesReturns(array $ids): void
+    {
+        SalesReturn::whereIn('id', $ids)->update(['status' => 'Canceled']);
     }
 }

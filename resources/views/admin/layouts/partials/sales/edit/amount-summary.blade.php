@@ -48,11 +48,11 @@
         </div>
         <div class="d-flex justify-content-between text-success mb-2">
             <span>{{ __('messages.total_paid') }}</span>
-            <span>{{ \App\Helpers\CurrencyHelper::format($sales->total_paid) }}</span>
+            <span id="total-paid-amount" data-total-paid="{{ $sales->total_paid }}">{{ \App\Helpers\CurrencyHelper::format($sales->total_paid) }}</span>
         </div>
         <div class="d-flex justify-content-between text-danger fw-bold">
             <span>{{ __('messages.balance') }}</span>
-            <span>{{ \App\Helpers\CurrencyHelper::format($sales->balance) }}</span>
+            <span id="balance-amount" data-balance="{{ $sales->balance }}">{{ \App\Helpers\CurrencyHelper::format($sales->balance) }}</span>
         </div>
 
         <!-- Hidden inputs for form submission -->

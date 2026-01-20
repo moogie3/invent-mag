@@ -98,7 +98,7 @@ class PurchaseService
 
     public function getPurchaseEditData($id)
     {
-        $pos = Purchase::with(['items', 'supplier'])->find($id);
+        $pos = Purchase::with(['items', 'supplier', 'payments'])->find($id);
 
         if (!$pos) {
             return []; // Or throw an exception, depending on desired behavior
@@ -174,7 +174,9 @@ class PurchaseService
                 ]);
                 $totalAmount += $itemTotal;
 
-                $product = Product::find($productData['product_id']);
+                $product = Product::where('id', $productData['product_id'])
+                                  ->where('tenant_id', $purchase->tenant_id)
+                                  ->first();
                 if ($product) {
                     $product->increment('stock_quantity', $productData['quantity']);
                 }
@@ -214,24 +216,24 @@ class PurchaseService
 
     public function updatePurchase(Purchase $purchase, array $data): Purchase
     {
-        \Illuminate\Support\Facades\Log::info('Updating purchase with data: ', $data);
         return DB::transaction(function () use ($purchase, $data) {
-            /** @var \App\Models\Purchase $purchase */
             $products = json_decode($data['products'], true);
             if (!$products || !is_array($products)) {
                 throw new \Exception('Invalid product data');
             }
 
-            // Revert old stock quantities
+            // Revert old stock quantities before deleting items
             foreach ($purchase->items as $oldItem) {
-                $product = Product::find($oldItem->product_id);
+                $product = Product::where('id', $oldItem->product_id)
+                                  ->where('tenant_id', $purchase->tenant_id)
+                                  ->first();
                 if ($product) {
                     $product->decrement('stock_quantity', $oldItem->quantity);
                 }
             }
-
             $purchase->items()->delete();
 
+            // Update the main purchase details, excluding status for now
             $purchase->update([
                 'invoice' => $data['invoice'],
                 'supplier_id' => $data['supplier_id'],
@@ -239,7 +241,6 @@ class PurchaseService
                 'due_date' => $data['due_date'],
                 'discount_total' => $data['discount_total'] ?? 0,
                 'discount_total_type' => $data['discount_total_type'] ?? 'fixed',
-                'status' => $data['status'] ?? 'Unpaid',
                 'payment_type' => $data['payment_type'] ?? '-',
             ]);
 
@@ -259,7 +260,9 @@ class PurchaseService
                 ]);
                 $totalAmount += $itemTotal;
 
-                $product = Product::find($productData['product_id']);
+                $product = Product::where('id', $productData['product_id'])
+                                  ->where('tenant_id', $purchase->tenant_id)
+                                  ->first();
                 if ($product) {
                     $product->increment('stock_quantity', $productData['quantity']);
                 }
@@ -268,6 +271,28 @@ class PurchaseService
             $orderDiscount = PurchaseHelper::calculateDiscount($totalAmount, $purchase->discount_total, $purchase->discount_total_type);
             $finalTotal = $totalAmount - $orderDiscount;
             $purchase->update(['total' => $finalTotal]);
+
+            // Refresh model to get grand_total attribute updated
+            $purchase->refresh();
+
+            // If status is changed to 'Paid' and there's a balance, create a payment.
+            if (isset($data['status']) && $data['status'] === 'Paid' && $purchase->balance > 0) {
+                $this->addPayment($purchase, [
+                    'amount' => $purchase->balance,
+                    'payment_date' => now(),
+                    'payment_method' => $data['payment_type'] ?? 'Manual',
+                    'notes' => 'Invoice manually marked as paid from edit page.',
+                ]);
+            } else {
+                // For other status changes or if already paid, just update the status field if provided
+                if (isset($data['status']) && $purchase->status !== $data['status']) {
+                    $purchase->status = $data['status'];
+                    $purchase->save();
+                }
+            }
+            
+            // Recalculate status based on payments at the end
+            $this->updatePurchaseStatus($purchase);
 
             return $purchase;
         });
@@ -316,11 +341,11 @@ class PurchaseService
 
     public function updatePurchaseStatus(Purchase $purchase)
     {
-        $purchase->load('payments'); // Always get the latest payments
+        $purchase->load('payments', 'items'); // Always get the latest payments
         $totalPaid = $purchase->payments->sum('amount');
-        $grandTotal = $purchase->total;
+        $grandTotal = $purchase->grand_total;
 
-        if ($totalPaid >= $grandTotal) {
+        if (round($totalPaid, 2) >= round($grandTotal, 2)) {
             $purchase->status = 'Paid';
         } elseif ($totalPaid > 0 && $totalPaid < $grandTotal) {
             $purchase->status = 'Partial';
@@ -370,7 +395,8 @@ class PurchaseService
                         'notes' => 'Bulk marked as paid.',
                     ]);
                 }
-                $purchase->refresh(); // Refresh the purchase model to get the latest status
+                // Ensure the status is updated even if balance was 0
+                $this->updatePurchaseStatus($purchase);
                 $updatedCount++;
             }
         });

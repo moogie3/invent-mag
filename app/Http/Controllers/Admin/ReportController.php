@@ -73,16 +73,16 @@ class ReportController extends Controller
     public function bulkMarkAsPaid(Request $request)
     {
         try {
-            $transactionIds = $request->input('transaction_ids', []);
+            $transactions = $request->input('transactions', []);
 
-            if (empty($transactionIds)) {
+            if (empty($transactions)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No transactions selected.'
                 ], 400);
             }
 
-            $updatedCount = $this->transactionService->bulkMarkAsPaid($transactionIds);
+            $updatedCount = $this->transactionService->bulkMarkAsPaid($transactions);
 
             return response()->json([
                 'success' => true,

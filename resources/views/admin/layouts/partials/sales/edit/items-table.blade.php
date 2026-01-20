@@ -25,7 +25,7 @@
                     <th class="text-end" style="width: 140px">{{ __('messages.amount') }}</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="sales-items-table-body">
                 @foreach ($sales->salesItems as $index => $item)
                     @include('admin.layouts.partials.sales.edit.item-row', [
                         'item' => $item,

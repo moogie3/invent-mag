@@ -20,6 +20,7 @@ return [
     'light_theme' => 'Tema Terang',
     'dark_theme' => 'Tema Gelap',
     'theme_toggle_visibility' => 'Visibilitas Tombol Temas',
+    'po_invoice' => "PO Invoice",
     'show_theme_toggle_button' => 'Tampilkan Tombol Beralih Tema',
     'notifications_alerts' => 'Notifikasi & Peringatan',
     'active' => 'Aktif',

@@ -5,60 +5,25 @@ export class SalesOrderEdit extends SalesOrderModule {
     constructor(config = {}) {
         super(config);
 
-        this.elements = {
+        this.elements = this.initializeEditElements();
+        this.initEventListeners();
+        this.calculateTotals();
+        this.isSubmitting = false;
+    }
+
+    initializeEditElements() {
+        return {
             orderDate: document.getElementById("order_date"),
             dueDate: document.getElementById("due_date"),
             customerSelect: document.getElementById("customer_id"),
             discountTotalValue: document.getElementById("discountTotalValue"),
             discountTotalType: document.getElementById("discountTotalType"),
+            statusSelect: document.getElementById("status"),
+            balanceAmount: document.getElementById("balance-amount"),
+            totalPaidAmount: document.getElementById("total-paid-amount"),
+            form: document.getElementById("edit-sales-form"),
+            productsJsonInput: document.getElementById("products-json"),
         };
-
-        this.initFlatpickr(this.elements.orderDate, this.elements.dueDate);
-
-        this.initEventListeners();
-        this.calculateTotals();
-
-        this.elements.form = document.getElementById("edit-sales-form");
-        this.elements.productsJsonInput =
-            document.getElementById("products-json");
-
-        if (this.elements.form) {
-            this.elements.form.addEventListener(
-                "submit",
-                this.serializeProducts.bind(this)
-            );
-        }
-    }
-
-    serializeProducts() {
-        const products = [];
-        const productRows = document.querySelectorAll("tbody tr");
-
-        productRows.forEach((row) => {
-            const productId = row.dataset.productId;
-            if (!productId) {
-                return;
-            }
-
-            const quantity = row.querySelector(".quantity-input").value;
-            const price = row.querySelector(".price-input").value;
-            const discount = row.querySelector(".discount-input").value;
-            const discountType = row.querySelector(
-                ".discount-type-input"
-            ).value;
-
-            products.push({
-                product_id: productId,
-                quantity: quantity,
-                customer_price: price,
-                discount: discount,
-                discount_type: discountType,
-            });
-        });
-
-        if (this.elements.productsJsonInput) {
-            this.elements.productsJsonInput.value = JSON.stringify(products);
-        }
     }
 
     initEventListeners() {
@@ -95,6 +60,13 @@ export class SalesOrderEdit extends SalesOrderModule {
                 this.calculateTotals();
             }
         });
+
+        if (this.elements.form) {
+            this.elements.form.addEventListener(
+                "submit",
+                this.serializeProducts.bind(this)
+            );
+        }
     }
 
     calculateDueDate() {
@@ -134,7 +106,7 @@ export class SalesOrderEdit extends SalesOrderModule {
         let subtotal = 0;
         let subtotalBeforeDiscounts = 0;
 
-        document.querySelectorAll("tbody tr").forEach((row) => {
+        document.querySelectorAll("#sales-items-table-body tr").forEach((row) => {
             const itemId = row.querySelector(".quantity-input")?.dataset.itemId;
             if (!itemId) return;
 
@@ -162,27 +134,21 @@ export class SalesOrderEdit extends SalesOrderModule {
             const discountValue = parseFloat(discountInput?.value) || 0;
             const discountType = discountTypeSelect?.value || "percentage";
 
-            const discountAmount = this.calculateDiscountAmount(
+            const itemTotal = this.calculateTotal(
                 price,
-                1,
+                quantity,
                 discountValue,
                 discountType
             );
-            const netUnitPrice =
-                price -
-                (discountType === "percentage"
-                    ? (price * discountValue) / 100
-                    : discountValue);
-            const netAmount = netUnitPrice * quantity;
 
             const amountInput = row.querySelector(
                 `.amount-input[data-item-id='${itemId}']`
             );
             if (amountInput) {
-                amountInput.value = Math.round(netAmount);
+                amountInput.value = Math.round(itemTotal);
             }
 
-            subtotal += price * quantity;
+            subtotal += itemTotal;
         });
 
         const discountTotalValue =
@@ -225,5 +191,78 @@ export class SalesOrderEdit extends SalesOrderModule {
         if (totalTaxInput) {
             totalTaxInput.value = Math.floor(taxAmount);
         }
+        
+        const totalPaid = parseFloat(this.elements.totalPaidAmount.dataset.totalPaid);
+        const newBalance = grandTotal - totalPaid;
+
+        if (this.elements.balanceAmount) {
+            this.elements.balanceAmount.textContent = formatCurrency(newBalance);
+            this.elements.balanceAmount.dataset.balance = newBalance;
+        }
+    }
+
+    serializeProducts(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        if (this.isSubmitting) {
+            return; // Prevent multiple submissions
+        }
+
+        const status = this.elements.statusSelect.value;
+        const balance = parseFloat(this.elements.balanceAmount.dataset.balance);
+
+        if (status === 'Paid' && balance > 0) {
+            InventMagApp.showToast(
+                "Warning",
+                "Cannot mark as Paid. Please add a payment to cover the outstanding balance.",
+                "warning"
+            );
+            return; // Stop further execution
+        }
+
+        const products = [];
+        const productRows = document.querySelectorAll("#sales-items-table-body tr");
+
+        productRows.forEach((row) => {
+            const productId = row.querySelector(".quantity-input")?.dataset.itemId;
+            if (!productId) {
+                return;
+            }
+
+            const quantity = row.querySelector( `.quantity-input[data-item-id="${productId}"]`).value;
+            const price = row.querySelector(`.price-input[data-item-id="${productId}"]`).value;
+            const discount = row.querySelector(`.discount-input[data-item-id="${productId}"]`).value;
+            const discountType = row.querySelector(
+                `.discount-type-input[data-item-id="${productId}"]`
+            ).value;
+
+            products.push({
+                product_id: productId,
+                quantity: quantity,
+                customer_price: price,
+                discount: discount,
+                discount_type: discountType,
+            });
+        });
+
+        if (this.elements.productsJsonInput) {
+            this.elements.productsJsonInput.value = JSON.stringify(products);
+        }
+        
+        this.isSubmitting = true;
+        this.elements.form.submit(); // Manually submit the form after serialization
+    }
+
+    calculateTotal(price, quantity, discount, discountType) {
+        let itemTotal = price * quantity;
+        let discountAmount = 0;
+        if (discount > 0) {
+            if (discountType === 'percentage') {
+                discountAmount = itemTotal * (discount / 100);
+            } else {
+                discountAmount = discount * quantity;
+            }
+        }
+        return itemTotal - discountAmount;
     }
 }

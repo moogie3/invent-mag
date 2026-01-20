@@ -4,6 +4,12 @@
             <i class="ti ti-calendar-event me-2 text-primary"></i>{{ __('messages.po_order_information_title') }}
         </h4>
         <div class="d-flex justify-content-between mb-2">
+            <div><strong>{{ __('messages.po_invoice') }}</strong></div>
+            <div>
+                <input type="text" class="form-control form-control-sm" name="invoice" value="{{ $pos->invoice }}" required>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
             <div><strong>{{ __('messages.po_order_date') }}</strong></div>
             <div>{{ $pos->order_date->format('d F Y') }}</div>
             <input type="hidden" name="order_date" value="{{ $pos->order_date }}">

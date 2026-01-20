@@ -27,8 +27,7 @@ export function smartSelectUnpaidOnly() {
         const status = statusBadge ? statusBadge.textContent.trim() : "";
 
         const isPaid =
-            status === "Paid" ||
-            status.toLowerCase().includes("paid") ||
+            status.toLowerCase() === "paid" ||
             statusBadge?.classList.contains("bg-success-lt") ||
             statusBadge?.classList.contains("bg-success");
 
@@ -82,8 +81,7 @@ export function bulkMarkAsPaid() {
             const statusBadge = row.querySelector(".badge");
             const status = statusBadge ? statusBadge.textContent.trim() : "";
             const isPaid =
-                status === "Paid" ||
-                status.toLowerCase().includes("paid") ||
+                status.toLowerCase() === "paid" ||
                 statusBadge?.classList.contains("bg-success-lt") ||
                 statusBadge?.classList.contains("bg-success");
             return isPaid;

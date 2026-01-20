@@ -7,6 +7,7 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
         this.elements = this.initializeEditElements();
         this.initEventListeners();
         this.calculateAllAmounts();
+        this.isSubmitting = false;
     }
 
     initializeEditElements() {
@@ -26,6 +27,9 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
             ),
             form: document.getElementById("edit-po-form"),
             productsJsonInput: document.getElementById("products-json"),
+            statusSelect: document.getElementById("status"),
+            balanceAmount: document.getElementById("balance-amount"),
+            totalPaidAmount: document.getElementById("total-paid-amount"),
         };
     }
 
@@ -71,7 +75,7 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
     calculateOrderTotal() {
         let subtotal = 0;
 
-        document.querySelectorAll("tbody tr").forEach((row) => {
+        document.querySelectorAll("#po-items-table-body tr").forEach((row) => {
             const itemId = row.querySelector(".quantity-input")?.dataset.itemId;
             if (!itemId) return;
 
@@ -143,7 +147,7 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
 
         if (this.elements.productsJsonInput) {
             const products = [];
-            document.querySelectorAll("tbody tr").forEach((row) => {
+            document.querySelectorAll("#po-items-table-body tr").forEach((row) => {
                 const itemId =
                     row.querySelector(".quantity-input")?.dataset.itemId;
                 if (!itemId) {
@@ -172,6 +176,10 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
                     `.discount-type-input[data-item-id="${itemId}"]`
                 ).value;
 
+                const expiryDateInput = row.querySelector(
+                    `.expiry-date-input[data-item-id="${itemId}"]`
+                );
+
                 products.push({
                     product_id: itemId,
                     quantity: quantity,
@@ -183,13 +191,37 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
             });
             this.elements.productsJsonInput.value = JSON.stringify(products);
         }
+
+        const totalPaid = parseFloat(this.elements.totalPaidAmount.dataset.totalPaid);
+        const newBalance = finalTotal - totalPaid;
+
+        if (this.elements.balanceAmount) {
+            this.elements.balanceAmount.textContent = this.formatCurrency(newBalance);
+            this.elements.balanceAmount.dataset.balance = newBalance;
+        }
     }
 
     serializeProducts(event) {
-        event.preventDefault(); // Prevent default form submission
+        event.preventDefault();
+
+        if (this.isSubmitting) {
+            return;
+        }
+
+        const status = this.elements.statusSelect.value;
+        const balance = parseFloat(this.elements.balanceAmount.dataset.balance);
+
+        if (status === 'Paid' && balance > 0) {
+            InventMagApp.showToast(
+                "Warning",
+                "Cannot mark as Paid. Please add a payment to cover the outstanding balance.",
+                "warning"
+            );
+            return;
+        }
 
         const products = [];
-        document.querySelectorAll("tbody tr").forEach((row) => {
+        document.querySelectorAll("#po-items-table-body tr").forEach((row) => {
             const itemId = row.querySelector(".quantity-input")?.dataset.itemId;
             if (!itemId) {
                 return;
@@ -216,7 +248,7 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
             const expiry_date = expiryDateInput ? expiryDateInput.value : null;
 
             products.push({
-                id: itemId, // Include item ID for updating existing POItems
+                product_id: itemId, // Corrected key
                 quantity: quantity,
                 price: price,
                 discount: discount,
@@ -229,7 +261,7 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
             this.elements.productsJsonInput.value = JSON.stringify(products);
         }
 
-        // Manually submit the form after serialization
+        this.isSubmitting = true;
         this.elements.form.submit();
     }
 }

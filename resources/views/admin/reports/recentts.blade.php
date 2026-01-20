@@ -374,10 +374,10 @@
                             </thead>
                             <tbody>
                                 @forelse ($transactions as $transaction)
-                                    <tr>
+                                    <tr data-id="{{ $transaction->id ?? '' }}">
                                         <td>
                                             <input class="form-check-input row-checkbox" type="checkbox"
-                                                value="{{ $transaction->id ?? '' }}">
+                                                value="{{ $transaction->id ?? '' }}" data-type="{{ $transaction->type }}">
                                         </td>
                                         <td>
                                             <span

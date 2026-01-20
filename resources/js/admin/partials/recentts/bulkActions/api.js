@@ -5,7 +5,12 @@ import { updateBulkActions } from '../utils/dom.js';
 export function confirmBulkMarkAsPaid() {
     const selected = Array.from(
         document.querySelectorAll(".row-checkbox:checked")
-    ).map((cb) => cb.value);
+    ).map((cb) => {
+        return {
+            id: cb.value,
+            type: cb.dataset.type
+        }
+    });
 
     if (selected.length === 0) return;
 
@@ -16,7 +21,7 @@ export function confirmBulkMarkAsPaid() {
         '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
     submitBtn.disabled = true;
 
-    fetch("/admin/transactions/bulk-mark-paid", {
+    fetch("/admin/reports/bulk-mark-paid", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -25,7 +30,7 @@ export function confirmBulkMarkAsPaid() {
                 .getAttribute("content"),
         },
         body: JSON.stringify({
-            transaction_ids: selected,
+            transactions: selected,
         }),
     })
         .then((response) => response.json())
@@ -51,14 +56,14 @@ export function confirmBulkMarkAsPaid() {
 
                 clearSelection();
 
-                selected.forEach(id => {
-                    const row = document.querySelector(`tr[data-id="${id}"]`);
+                selected.forEach(item => {
+                    const row = document.querySelector(`input[value="${item.id}"]`).closest('tr');
                     if (row) {
                         const statusBadge = row.querySelector('.badge');
                         if (statusBadge) {
                             statusBadge.textContent = 'Paid';
                             statusBadge.classList.remove('bg-warning', 'bg-danger', 'bg-info');
-                            statusBadge.classList.add('bg-success');
+                            statusBadge.classList.add('bg-success-lt');
                         }
                         const checkbox = row.querySelector('.row-checkbox');
                         if (checkbox) {

@@ -53,7 +53,7 @@ export class SalesReturnEdit {
                         const matchedItem = tempExisting[matchIndex];
                         this.returnedItems[salesItem.id] = { // Key by sales_item_id
                             product_id: salesItem.product_id,
-                            quantity: matchedItem.quantity,
+                            returned_quantity: matchedItem.quantity,
                             price: matchedItem.price,
                         };
                         // Remove the matched item so it's not used again for another sales line
@@ -93,7 +93,7 @@ export class SalesReturnEdit {
         this.allSalesItems.forEach(item => {
             const unitPrice = parseFloat(item.price || 0);
             const returnedItem = this.returnedItems[item.id]; // Use Sales item ID as key
-            const returnedQuantity = returnedItem ? returnedItem.quantity : 0;
+            const returnedQuantity = returnedItem ? returnedItem.returned_quantity : 0;
             const itemTotal = unitPrice * returnedQuantity;
 
             tableHTML += `
@@ -155,7 +155,7 @@ export class SalesReturnEdit {
         if (quantity > 0) {
             this.returnedItems[itemId] = {
                 product_id: productId,
-                quantity: quantity,
+                returned_quantity: quantity,
                 price: price,
             };
         } else {
@@ -169,7 +169,7 @@ export class SalesReturnEdit {
         let totalAmount = 0;
         for (const itemId in this.returnedItems) {
             const item = this.returnedItems[itemId];
-            totalAmount += item.price * item.quantity;
+            totalAmount += item.price * item.returned_quantity;
         }
         this.totalAmountInput.value = formatCurrency(totalAmount);
     }
@@ -182,12 +182,12 @@ export class SalesReturnEdit {
             return;
         }
 
-        const plainTotalAmount = Object.values(this.returnedItems).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const plainTotalAmount = Object.values(this.returnedItems).reduce((sum, item) => sum + (item.price * item.returned_quantity), 0);
         this.totalAmountInput.value = plainTotalAmount.toFixed(2);
 
         this.itemsInput.value = JSON.stringify(itemsArray.map(item => ({
             ...item,
-            quantity: parseInt(item.quantity, 10)
+            returned_quantity: parseInt(item.returned_quantity, 10)
         })));
     }
 }

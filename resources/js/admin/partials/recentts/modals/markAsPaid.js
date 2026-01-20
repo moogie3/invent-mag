@@ -32,7 +32,7 @@ export function confirmMarkAsPaid() {
         '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
     submitBtn.disabled = true;
 
-    fetch("/admin/transactions/" + currentTransactionId + "/mark-paid", {
+    fetch("/admin/reports/" + currentTransactionId + "/mark-paid", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -69,7 +69,7 @@ export function confirmMarkAsPaid() {
                     if (statusBadge) {
                         statusBadge.textContent = 'Paid';
                         statusBadge.classList.remove('bg-warning', 'bg-danger', 'bg-info');
-                        statusBadge.classList.add('bg-success');
+                        statusBadge.classList.add('bg-success-lt');
                     }
                     const checkbox = row.querySelector('.row-checkbox');
                     if (checkbox) {

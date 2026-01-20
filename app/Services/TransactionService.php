@@ -10,9 +10,20 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Dompdf\Dompdf;
+use App\Services\SalesService;
+use App\Services\PurchaseService;
 
 class TransactionService
 {
+    protected $salesService;
+    protected $purchaseService;
+
+    public function __construct(SalesService $salesService, PurchaseService $purchaseService)
+    {
+        $this->salesService = $salesService;
+        $this->purchaseService = $purchaseService;
+    }
+
     public function getTransactions(array $filters, int $perPage = 25): LengthAwarePaginator
     {
         $dates = $this->calculateDateRange($filters['date_range'], $filters['start_date'], $filters['end_date']);
@@ -99,37 +110,27 @@ class TransactionService
         ];
     }
 
-    public function bulkMarkAsPaid(array $transactionIds): int
+    public function bulkMarkAsPaid(array $transactions): int
     {
         $updatedCount = 0;
-        $transactions = $this->getTransactionsByIds($transactionIds);
+
+        $salesIds = [];
+        $purchaseIds = [];
 
         foreach ($transactions as $transaction) {
-            if ($transaction->status === 'Paid') {
-                continue;
+            if ($transaction['type'] === 'sale') {
+                $salesIds[] = $transaction['id'];
+            } elseif ($transaction['type'] === 'purchase') {
+                $purchaseIds[] = $transaction['id'];
             }
+        }
 
-            if ($transaction->type === 'sale') {
-                $sale = Sales::find($transaction->sale_id);
-                if ($sale) {
-                    $sale->update([
-                        'status' => 'Paid',
-                        'payment_date' => now(),
-                        'amount_received' => $sale->total,
-                        'change_amount' => 0
-                    ]);
-                    $updatedCount++;
-                }
-            } elseif ($transaction->type === 'purchase') {
-                $purchase = Purchase::find($transaction->purchase_id);
-                if ($purchase) {
-                    $purchase->update([
-                        'status' => 'Paid',
-                        'payment_date' => now()
-                    ]);
-                    $updatedCount++;
-                }
-            }
+        if (!empty($salesIds)) {
+            $updatedCount += $this->salesService->bulkMarkPaid($salesIds);
+        }
+
+        if (!empty($purchaseIds)) {
+            $updatedCount += $this->purchaseService->bulkMarkPaid($purchaseIds);
         }
 
         return $updatedCount;
@@ -170,21 +171,33 @@ class TransactionService
     public function markTransactionAsPaid(int $id, string $type): array
     {
         if ($type === 'sale') {
-            $transaction = Sales::findOrFail($id);
+            $sale = Sales::findOrFail($id);
+            if ($sale->balance > 0) {
+                $this->salesService->addPayment($sale, [
+                    'amount' => $sale->balance,
+                    'payment_date' => now(),
+                    'payment_method' => 'Unknown', // Or fetch a default
+                    'notes' => 'Marked as paid from recent transactions.',
+                ]);
+            } else {
+                // If already paid (balance is 0), ensure status is 'Paid'
+                $sale->update(['status' => 'Paid', 'payment_date' => now()]);
+            }
+        } elseif ($type === 'purchase') {
+            $purchase = Purchase::findOrFail($id);
+            if ($purchase->balance > 0) {
+                $this->purchaseService->addPayment($purchase, [
+                    'amount' => $purchase->balance,
+                    'payment_date' => now(),
+                    'payment_method' => 'Unknown', // Or fetch a default
+                    'notes' => 'Marked as paid from recent transactions.',
+                ]);
+            } else {
+                // If already paid (balance is 0), ensure status is 'Paid'
+                $purchase->update(['status' => 'Paid', 'payment_date' => now()]);
+            }
         } else {
-            $transaction = Purchase::findOrFail($id);
-        }
-
-        $transaction->update([
-            'status' => 'Paid',
-            'payment_date' => now(),
-            'updated_at' => now(),
-        ]);
-
-        if ($type === 'sale') {
-            $transaction->update([
-                'amount_received' => $transaction->total,
-            ]);
+            return ['success' => false, 'message' => 'Invalid transaction type.'];
         }
 
         return ['success' => true, 'message' => 'Transaction marked as paid successfully.'];

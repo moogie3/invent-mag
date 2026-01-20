@@ -5,6 +5,7 @@ export class PurchaseOrderModule {
         this.config = {
             ...config,
         };
+        this.formatCurrency = formatCurrency; // Add this line
     }
 
     calculateTotal(price, quantity, discount, discountType) {

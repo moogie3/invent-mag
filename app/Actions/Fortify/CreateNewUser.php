@@ -13,6 +13,8 @@ use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Registered;
 use App\Models\CurrencySetting;
 use App\Models\Tax;
+use App\Models\Account;
+use Database\Seeders\AccountSeeder;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -91,6 +93,25 @@ class CreateNewUser implements CreatesNewUsers
         } catch (\Throwable $e) {
             \Log::error('Error creating Tax: ' . $e->getMessage());
             throw $e; // Re-throw to see the original error in test output
+        }
+
+        // Seed accounts for the new tenant
+        $accountSeeder = new AccountSeeder();
+        $accountSeeder->run();
+
+        // Set default accounting settings
+        $tenantName = $tenant->name;
+        $cashAccount = Account::where('name', 'accounting.accounts.cash.name - ' . $tenantName)->first();
+        $accountsPayableAccount = Account::where('name', 'accounting.accounts.accounts_payable.name - ' . $tenantName)->first();
+        $inventoryAccount = Account::where('name', 'accounting.accounts.inventory.name - ' . $tenantName)->first();
+
+        if ($cashAccount && $accountsPayableAccount && $inventoryAccount) {
+            $user->accounting_settings = [
+                'cash_account_id' => $cashAccount->id,
+                'accounts_payable_account_id' => $accountsPayableAccount->id,
+                'inventory_account_id' => $inventoryAccount->id,
+            ];
+            $user->save();
         }
 
 

@@ -69,7 +69,7 @@ class SalesService
 
     public function getSalesEditData($id)
     {
-        $sales = Sales::with(['salesItems', 'customer'])->find($id);
+        $sales = Sales::with(['salesItems', 'customer', 'payments'])->find($id);
         $customers = Customer::all();
         $tax = Tax::where('is_active', 1)->first();
         $isPaid = $sales->status == 'Paid';
@@ -201,9 +201,11 @@ class SalesService
             $totalCostOfGoods = 0;
 
             foreach ($products as $productData) {
-                $product = Product::find($productData['product_id']);
+                $product = Product::where('id', $productData['product_id'])
+                                  ->where('tenant_id', $sale->tenant_id)
+                                  ->first();
                 if (!$product) {
-                    throw new \Exception("Product with ID {$productData['product_id']} not found.");
+                    throw new \Exception("Product with ID {$productData['product_id']} not found in this tenant.");
                 }
                 $totalCostOfGoods += $product->price * $productData['quantity'];
 
@@ -271,12 +273,7 @@ class SalesService
 
     public function updateSale(Sales $sale, array $data): Sales
     {
-        Log::info('Updating sale with data: ', $data);
         return DB::transaction(function () use ($sale, $data) {
-            // Note: Proper accounting for updates is complex.
-            // A simple approach is to create a reversing entry and then a new entry.
-            // For now, this is left as a future improvement.
-
             $products = json_decode($data['products'], true);
             if (!$products || !is_array($products)) {
                 throw new \Exception('Invalid product data');
@@ -284,7 +281,9 @@ class SalesService
 
             // Revert old stock quantities
             foreach ($sale->salesItems as $oldItem) {
-                $product = Product::find($oldItem->product_id);
+                $product = Product::where('id', $oldItem->product_id)
+                                  ->where('tenant_id', $sale->tenant_id)
+                                  ->first();
                 if ($product) {
                     $product->increment('stock_quantity', $oldItem->quantity);
 
@@ -310,7 +309,7 @@ class SalesService
             $sale->salesItems()->delete();
 
             $subTotal = 0;
-            $subtotalBeforeDiscounts = 0; // New variable
+            $subtotalBeforeDiscounts = 0;
             foreach ($products as $productData) {
                 $subTotal += SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed');
                 $subtotalBeforeDiscounts += $productData['customer_price'] * $productData['quantity'];
@@ -335,16 +334,19 @@ class SalesService
                 'total' => $grandTotal,
                 'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
-                'status' => $data['status'] ?? 'Unpaid',
                 'payment_type' => $data['payment_type'] ?? '-',
             ]);
 
             foreach ($products as $productData) {
-                $product = Product::find($productData['product_id']); // Find product to get its name
+                $product = Product::where('id', $productData['product_id'])
+                                  ->where('tenant_id', $sale->tenant_id)
+                                  ->first();
+                if (!$product) continue;
+
                 SalesItem::create([
                     'sales_id' => $sale->id,
                     'product_id' => $productData['product_id'],
-                    'name' => $product->name, // Added product name
+                    'name' => $product->name,
                     'quantity' => $productData['quantity'],
                     'customer_price' => $productData['customer_price'],
                     'discount' => $productData['discount'] ?? 0,
@@ -352,29 +354,38 @@ class SalesService
                     'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed'),
                 ]);
 
-                $product = Product::find($productData['product_id']);
-                if ($product) {
-                    $product->decrement('stock_quantity', $productData['quantity']);
+                $product->decrement('stock_quantity', $productData['quantity']);
 
-                    // FEFO Logic
-                    $poItems = POItem::where('product_id', $product->id)
-                        ->where('remaining_quantity', '>', 0)
-                        ->orderBy('expiry_date', 'asc')
-                        ->get();
-
-                    $quantityToDecrement = $productData['quantity'];
-
-                    foreach ($poItems as $poItem) {
-                        if ($quantityToDecrement <= 0) {
-                            break;
-                        }
-
-                        $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
-                        $poItem->decrement('remaining_quantity', $decrement);
-                        $quantityToDecrement -= $decrement;
-                    }
+                $poItems = POItem::where('product_id', $product->id)
+                    ->where('remaining_quantity', '>', 0)
+                    ->orderBy('expiry_date', 'asc')
+                    ->get();
+                $quantityToDecrement = $productData['quantity'];
+                foreach ($poItems as $poItem) {
+                    if ($quantityToDecrement <= 0) break;
+                    $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
+                    $poItem->decrement('remaining_quantity', $decrement);
+                    $quantityToDecrement -= $decrement;
                 }
             }
+
+            $sale->refresh();
+
+            if (isset($data['status']) && $data['status'] === 'Paid' && $sale->balance > 0) {
+                $this->addPayment($sale, [
+                    'amount' => $sale->balance,
+                    'payment_date' => now(),
+                    'payment_method' => $data['payment_type'] ?? 'Manual',
+                    'notes' => 'Invoice manually marked as paid from edit page.',
+                ]);
+            } else {
+                if (isset($data['status']) && $sale->status !== $data['status']) {
+                    $sale->status = $data['status'];
+                    $sale->save();
+                }
+            }
+
+            $this->updateSaleStatus($sale);
 
             return $sale;
         });
@@ -445,7 +456,9 @@ class SalesService
             // This is left as a future improvement.
 
             foreach ($sale->salesItems as $item) {
-                $product = Product::find($item->product_id);
+                $product = Product::where('id', $item->product_id)
+                                  ->where('tenant_id', $sale->tenant_id)
+                                  ->first();
                 if ($product) {
                     $product->increment('stock_quantity', $item->quantity);
 
@@ -495,7 +508,8 @@ class SalesService
                         'notes' => 'Bulk marked as paid.',
                     ]);
                 }
-                $sale->refresh(); // Refresh the sale model to get the latest status
+                // Ensure the status is updated even if balance was 0
+                $this->updateSaleStatus($sale);
                 $updatedCount++;
             }
         });
@@ -650,7 +664,9 @@ class SalesService
                     'total' => $itemData['price'] * $itemData['quantity'],
                 ]);
 
-                $product = Product::find($itemData['product_id']);
+                $product = Product::where('id', $itemData['product_id'])
+                                  ->where('tenant_id', $sale->tenant_id)
+                                  ->first();
                 if ($product) {
                     $product->increment('stock_quantity', $itemData['quantity']);
                 }

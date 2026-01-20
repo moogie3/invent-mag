@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class PurchaseController extends Controller
 {
@@ -104,7 +105,7 @@ class PurchaseController extends Controller
         $purchase = Purchase::findOrFail($id);
 
         $request->validate([
-            'invoice' => 'required|string|unique:po,invoice,' . $purchase->id,
+            'invoice' => ['required', 'string', Rule::unique('po', 'invoice')->ignore($purchase->id)->where('tenant_id', $purchase->tenant_id)],
             'supplier_id' => 'required|exists:suppliers,id',
             'order_date' => 'required|date',
             'due_date' => 'required|date',
@@ -211,6 +212,15 @@ class PurchaseController extends Controller
                 'updated_count' => $updatedCount,
             ]);
         } catch (\Exception $e) {
+            Log::error($e);
+
+            if (str_contains($e->getMessage(), 'Accounting settings')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed: Please configure default accounts for Accounts Payable and Cash in Accounting Settings.',
+                ], 400); // 400 Bad Request is more appropriate here
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while updating purchase orders.',

@@ -40,5 +40,17 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    
+    /**
+     * Get the user's avatar URL
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function avatar(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn($value) => $value
+                ? asset("storage/{$value}")
+                : asset('img/default-avatar.png'),
+        );
+    }
 }

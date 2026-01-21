@@ -18,6 +18,13 @@ class ProfileService
         $user->address = $data['address'];
         $user->timezone = $data['timezone'];
 
+        if (isset($data['delete_avatar']) && $data['delete_avatar'] == '1') {
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $user->avatar = null;
+        }
+
         if (isset($data['avatar'])) {
             if ($user->avatar) {
                 Storage::disk('public')->delete($user->avatar);

@@ -14,7 +14,7 @@
             <a href="{{ route('admin.setting.profile.edit') }}" class="user-avatar">
                 @if (Auth::check())
                     <span class="avatar avatar-sm"
-                        style="background-image: url('{{ Auth::user()->avatar && Storage::disk('public')->exists(Auth::user()->avatar) ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=random' }}');"></span>
+                        style="background-image: url('{{ Auth::user()->getRawOriginal('avatar') ? Auth::user()->avatar : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=random' }}');"></span>
                 @else
                     <span class="avatar avatar-sm"
                         style="background-image: url('{{ asset('storage/default-avatar.png') }}');"></span>

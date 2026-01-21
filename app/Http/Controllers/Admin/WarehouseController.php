@@ -65,7 +65,10 @@ class WarehouseController extends Controller
             return redirect()->route('admin.warehouse')->with('error', 'Warehouse not found.');
         }
 
-        $result = $this->warehouseService->updateWarehouse($warehouse, $request->all());
+        $data = $request->all();
+        $data['is_main'] = $request->has('is_main') ? 1 : 0;
+
+        $result = $this->warehouseService->updateWarehouse($warehouse, $data);
 
         if (!$result['success']) {
             if ($request->ajax()) {

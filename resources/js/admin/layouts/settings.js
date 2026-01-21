@@ -133,6 +133,11 @@ function initSettingsPage() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    // Sync theme to localStorage before reload
+                    const themeSelect = systemSettingsForm.querySelector('select[name="theme_mode"]');
+                    if (themeSelect) {
+                        localStorage.setItem('theme', themeSelect.value);
+                    }
                     window.location.href = window.location.pathname + '?status=success&message=' + encodeURIComponent(data.message);
                 } else {
                     InventMagApp.showToast('Error', data.message || 'An error occurred.', 'error');

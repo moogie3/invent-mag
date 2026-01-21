@@ -19,24 +19,25 @@
             </div>
             <div class="settings-section-content">
                 <div class="d-flex align-items-center gap-3">
-                    @if (auth()->user()->avatar)
-                        <span class="avatar avatar-xl"
-                            style="background-image: url('{{ asset('storage/' . auth()->user()->avatar) }}'); width: 100px; height: 100px;">
-                        </span>
-                    @else
-                        <span class="avatar avatar-xl avatar-initial rounded-circle"
-                            style="width: 100px; height: 100px;">
-                            <i class="ti ti-person" style="font-size: 4rem;"></i>
-                        </span>
-                    @endif
-                    <div class="d-flex flex-column gap-2">
-                        <input type="file" name="avatar" class="form-control">
-                        @if (auth()->user()->avatar)
-                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
-                                data-bs-target="#deleteAvatarModal">
+                    @if (auth()->user()->getRawOriginal('avatar'))
+                    <span class="avatar avatar-xl"
+                        style="background-image: url('{{ auth()->user()->avatar }}'); width: 100px; height: 100px;">
+                    </span>
+                @else
+                    <span class="avatar avatar-xl avatar-initial rounded-circle"
+                        style="width: 100px; height: 100px;">
+                        <i class="ti ti-person" style="font-size: 4rem;"></i>
+                    </span>
+                @endif
+                        <div class="d-flex flex-column gap-2">
+                            <input type="file" name="avatar" class="form-control" id="avatarInput" accept="image/*">
+                            <input type="hidden" name="delete_avatar" id="deleteAvatarInput" value="0">
+                            
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="removeAvatarBtn" 
+                                style="{{ auth()->user()->getRawOriginal('avatar') ? '' : 'display: none;' }}">
                                 <i class="ti ti-trash me-1"></i>{{ __('messages.remove_current_picture') }}
                             </button>
-                        @endif
+                        </div>
                     </div>
                 </div>
             </div>

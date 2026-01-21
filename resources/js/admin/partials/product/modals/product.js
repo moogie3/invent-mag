@@ -139,76 +139,94 @@ function renderProductDetails(data) {
     const expiryStatusPane = document.getElementById('expiry-status-pane');
     const productExpiryStatusContent = document.getElementById('productExpiryStatusContent');
 
-    if (data.has_expiry && data.po_items && data.po_items.length > 0) {
-        if (expiryStatusTab) expiryStatusTab.style.display = 'block';
-        let expiryTableHtml = `
-            <div class="table-responsive">
-                <table class="table table-vcenter card-table">
-                    <thead>
-                        <tr>
-                            <th>PO ID</th>
-                            <th>Quantity</th>
-                            <th>Expiry Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-        data.po_items.forEach(item => {
-            const expiryDate = item.expiry_date ? new Date(item.expiry_date).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : 'N/A';
-            const today = new Date();
-            const itemExpiryDate = item.expiry_date ? new Date(item.expiry_date) : null;
-            let status = 'N/A';
-            let statusClass = '';
+    if (data.has_expiry) {
+        // Show the tab - product has expiry tracking enabled
+        if (expiryStatusTab && expiryStatusTab.parentElement) {
+            expiryStatusTab.parentElement.style.display = '';
+        }
+        if (expiryStatusPane) expiryStatusPane.style.display = '';
+        
+        if (data.po_items && data.po_items.length > 0) {
+            // Has purchase history - show expiry table
+            let expiryTableHtml = `
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table">
+                        <thead>
+                            <tr>
+                                <th>PO ID</th>
+                                <th>Quantity</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            data.po_items.forEach(item => {
+                const expiryDate = item.expiry_date ? new Date(item.expiry_date).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : 'N/A';
+                const today = new Date();
+                const itemExpiryDate = item.expiry_date ? new Date(item.expiry_date) : null;
+                let status = 'N/A';
+                let statusClass = '';
 
-            if (itemExpiryDate) {
-                if (itemExpiryDate < today) {
-                    status = 'Expired';
-                    statusClass = 'badge bg-danger-lt';
-                } else {
-                    const diffTime = Math.abs(itemExpiryDate - today);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    if (diffDays <= 7) {
-                        status = `Expiring in ${diffDays} days`;
-                        statusClass = 'badge bg-danger-lt'; // Critical warning
-                    } else if (diffDays <= 30) {
-                        status = `Expiring in ${diffDays} days`;
-                        statusClass = 'badge bg-warning-lt'; // Warning
-                    } else if (diffDays <= 90) {
-                        status = `Expiring in ${diffDays} days`;
-                        statusClass = 'badge bg-info-lt'; // Mild warning (using info for less critical)
+                if (itemExpiryDate) {
+                    if (itemExpiryDate < today) {
+                        status = 'Expired';
+                        statusClass = 'badge bg-danger-lt';
                     } else {
-                        status = 'Long Shelf Life';
-                        statusClass = 'badge bg-success-lt';
+                        const diffTime = Math.abs(itemExpiryDate - today);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        if (diffDays <= 7) {
+                            status = `Expiring in ${diffDays} days`;
+                            statusClass = 'badge bg-danger-lt';
+                        } else if (diffDays <= 30) {
+                            status = `Expiring in ${diffDays} days`;
+                            statusClass = 'badge bg-warning-lt';
+                        } else if (diffDays <= 90) {
+                            status = `Expiring in ${diffDays} days`;
+                            statusClass = 'badge bg-info-lt';
+                        } else {
+                            status = 'Long Shelf Life';
+                            statusClass = 'badge bg-success-lt';
+                        }
                     }
                 }
-            }
 
+                expiryTableHtml += `
+                    <tr>
+                        <td><a href="/admin/po/edit/${item.po_id}">${item.po_id}</a></td>
+                        <td>${item.quantity}</td>
+                        <td>${expiryDate}</td>
+                        <td><span class="${statusClass}">${status}</span></td>
+                    </tr>
+                `;
+            });
             expiryTableHtml += `
-                <tr>
-                    <td><a href="/admin/po/edit/${item.po_id}">${item.po_id}</a></td>
-                    <td>${item.quantity}</td>
-                    <td>${expiryDate}</td>
-                    <td><span class="${statusClass}">${status}</span></td>
-                </tr>
-            `;
-        });
-        expiryTableHtml += `
-                    </tbody>
-                </table>
-            </div>
-        `;
-        if (productExpiryStatusContent) {
-            productExpiryStatusContent.innerHTML = expiryTableHtml;
-        }
-    } else {
-        if (expiryStatusTab) expiryStatusTab.style.display = 'none';
-        if (productExpiryStatusContent) {
-            productExpiryStatusContent.innerHTML = `
-                <div class="text-center text-muted py-4">
-                    ${data.has_expiry ? 'No expiry data available for this product.' : 'This product does not have an expiry date.'}
+                        </tbody>
+                    </table>
                 </div>
             `;
+            if (productExpiryStatusContent) {
+                productExpiryStatusContent.innerHTML = expiryTableHtml;
+            }
+        } else {
+            // No purchase history yet - show message
+            if (productExpiryStatusContent) {
+                productExpiryStatusContent.innerHTML = `
+                    <div class="text-center text-muted py-5">
+                        <i class="ti ti-shopping-cart-off" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <h4 class="mt-3">No Purchase Orders Yet</h4>
+                        <p>Expiry dates will be tracked when you create purchase orders for this product.</p>
+                    </div>
+                `;
+            }
+        }
+    } else {
+        // Product doesn't have expiry tracking - hide the tab completely
+        if (expiryStatusTab && expiryStatusTab.parentElement) {
+            expiryStatusTab.parentElement.style.display = 'none';
+        }
+        if (expiryStatusPane) {
+            expiryStatusPane.style.display = 'none';
         }
     }
 }
@@ -296,7 +314,13 @@ function renderAdjustmentLog(logData) {
     if (!logContent) return;
 
     if (!logData || logData.length === 0) {
-        logContent.innerHTML = `<div class="text-center text-muted py-4">No adjustment history for this product.</div>`;
+        logContent.innerHTML = `
+            <div class="text-center text-muted py-5">
+                <i class="ti ti-history-off" style="font-size: 3rem; opacity: 0.3;"></i>
+                <h4 class="mt-3">No Adjustments Yet</h4>
+                <p>Stock adjustments will appear here when you modify inventory levels.</p>
+            </div>
+        `;
         return;
     }
 

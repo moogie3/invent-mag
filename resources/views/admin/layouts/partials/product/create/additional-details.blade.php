@@ -19,9 +19,6 @@
                         <label class="form-check-label ms-2" for="has_expiry">{{ __('messages.has_expiry') }}</label>
                     </div>
                 </div>
-                <div class="col">
-                    
-                </div>
             </div>
         </div>
     </div>

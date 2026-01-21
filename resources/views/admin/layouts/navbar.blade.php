@@ -332,13 +332,13 @@
             <div class="nav-item dropdown ms-2" id="avatar-dropdown">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
                     @if (Auth::check())
-                        <span class="avatar avatar-sm"
-                            style="background-image: url('{{ Auth::user()->avatar && Storage::disk('public')->exists(Auth::user()->avatar) ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=random' }}');"></span>
-                        <div class="d-none d-xl-block ps-2">
-                            <div>{{ Auth::user()->name }}</div>
-                            <div class="mt-1 small text-secondary">{{ Auth::user()->getRoleNames()->first() }}</div>
-                        </div>
-                    @else
+                    <span class="avatar avatar-sm"
+                        style="background-image: url('{{ Auth::user()->getRawOriginal('avatar') ? Auth::user()->avatar : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=random' }}');"></span>
+                    <div class="d-none d-xl-block ps-2">
+                        <div>{{ Auth::user()->name }}</div>
+                        <div class="mt-1 small text-secondary">{{ Auth::user()->getRoleNames()->first() }}</div>
+                    </div>
+                @else
                         <span class="avatar avatar-sm"
                             style="background-image: url('{{ asset('storage/default-avatar.png') }}');"></span>
                         <div class="d-none d-xl-block ps-2">

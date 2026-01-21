@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
 
         $middleware->web(append: [
+            \Spatie\Multitenancy\Http\Middleware\NeedsTenant::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\DebugModeMiddleware::class,
         ]);

@@ -1,15 +1,19 @@
 import { SalesReturnCreate } from "./partials/sales-returns/create/SalesReturnCreate.js";
 import { SalesReturnEdit } from "./partials/sales-returns/edit/SalesReturnEdit.js";
-import { initBulkSelection, getSelectedSalesReturnIds, clearSalesReturnSelection } from './partials/sales-returns/bulkActions/selection.js';
+import {
+    initBulkSelection,
+    getSelectedSalesReturnIds,
+    clearSalesReturnSelection,
+} from "./partials/sales-returns/bulkActions/selection.js";
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
     const pathname = window.location.pathname;
 
     if (sessionStorage.getItem("salesReturnBulkDeleteSuccess")) {
         InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("salesReturnBulkDeleteSuccess"),
-            "success"
+            "success",
         );
         sessionStorage.removeItem("salesReturnBulkDeleteSuccess");
     }
@@ -17,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("salesReturnBulkCompleteSuccess"),
-            "success"
+            "success",
         );
         sessionStorage.removeItem("salesReturnBulkCompleteSuccess");
     }
@@ -25,67 +29,89 @@ document.addEventListener('DOMContentLoaded', function () {
         InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("salesReturnBulkCancelSuccess"),
-            "success"
+            "success",
         );
         sessionStorage.removeItem("salesReturnBulkCancelSuccess");
     }
 
     if (pathname.includes("/admin/sales-returns/create")) {
         new SalesReturnCreate();
-    } else if (pathname.includes("/admin/sales-returns") && pathname.includes("/edit")) {
+    } else if (
+        pathname.includes("/admin/sales-returns") &&
+        pathname.includes("/edit")
+    ) {
         new SalesReturnEdit();
 
         // Logic for srStatusWarningModal
-        const editForm = document.getElementById('sales-return-edit-form');
+        const editForm = document.getElementById("sales-return-edit-form");
         if (editForm) {
-            const isCompletedOrCanceled = editForm.dataset.isCompletedOrCanceled === 'true';
+            const isCompletedOrCanceled =
+                editForm.dataset.isCompletedOrCanceled === "true";
             const status = editForm.dataset.status;
 
             if (isCompletedOrCanceled) {
-                var srStatusWarningModal = new bootstrap.Modal(document.getElementById('srStatusWarningModal'));
+                var srStatusWarningModal = new bootstrap.Modal(
+                    document.getElementById("srStatusWarningModal"),
+                );
                 var message = "";
 
-                if (status === 'Completed') {
-                    message = window.translations?.sr_modal_completed_warning_message || 'This sales return is completed and cannot be edited.';
-                } else if (status === 'Canceled') {
-                    message = window.translations?.sr_modal_canceled_warning_message || 'This sales return is canceled and cannot be edited.';
+                if (status === "Completed") {
+                    message =
+                        window.translations
+                            ?.sr_modal_completed_warning_message ||
+                        "This sales return is completed and cannot be edited.";
+                } else if (status === "Canceled") {
+                    message =
+                        window.translations
+                            ?.sr_modal_canceled_warning_message ||
+                        "This sales return is canceled and cannot be edited.";
                 }
 
-                document.getElementById('srStatusWarningMessage').innerHTML = message;
+                document.getElementById("srStatusWarningMessage").innerHTML =
+                    message;
                 srStatusWarningModal.show();
 
                 // Make form fields readonly
-                const formElements = document.querySelectorAll('#sales-return-edit-form input, #sales-return-edit-form select, #sales-return-edit-form textarea');
-                formElements.forEach(element => {
-                    element.setAttribute('readonly', true);
-                    if (element.tagName === 'SELECT') {
-                        element.setAttribute('disabled', true);
+                const formElements = document.querySelectorAll(
+                    "#sales-return-edit-form input, #sales-return-edit-form select, #sales-return-edit-form textarea",
+                );
+                formElements.forEach((element) => {
+                    element.setAttribute("readonly", true);
+                    if (element.tagName === "SELECT") {
+                        element.setAttribute("disabled", true);
                     }
                 });
 
                 // Hide submit buttons
-                const submitButtons = document.querySelectorAll('#sales-return-edit-form button[type="submit"]');
-                submitButtons.forEach(button => {
-                    button.style.display = 'none';
+                const submitButtons = document.querySelectorAll(
+                    '#sales-return-edit-form button[type="submit"]',
+                );
+                submitButtons.forEach((button) => {
+                    button.style.display = "none";
                 });
             }
         }
-
     } else if (pathname.includes("/admin/sales-returns")) {
         initBulkSelection();
     }
 
-    const salesReturnDetailModal = document.getElementById('salesReturnDetailModal');
+    const salesReturnDetailModal = document.getElementById(
+        "salesReturnDetailModal",
+    );
     if (salesReturnDetailModal) {
-        salesReturnDetailModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const srId = button.getAttribute('data-sr-id');
-            const modalContent = salesReturnDetailModal.querySelector('#salesReturnDetailModalContent');
+        salesReturnDetailModal.addEventListener(
+            "show.bs.modal",
+            function (event) {
+                const button = event.relatedTarget;
+                const srId = button.getAttribute("data-sr-id");
+                const modalContent = salesReturnDetailModal.querySelector(
+                    "#salesReturnDetailModalContent",
+                );
 
-            const loadingText = window.translations?.loading || 'Loading';
-            const closeText = window.translations?.close || 'Close';
+                const loadingText = window.translations?.loading || "Loading";
+                const closeText = window.translations?.close || "Close";
 
-            modalContent.innerHTML = `
+                modalContent.innerHTML = `
                 <div class="modal-header">
                     <h5 class="modal-title">${loadingText}...</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${closeText}"></button>
@@ -99,24 +125,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
 
-            fetch(`/admin/sales-returns/${srId}/modal-view`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.text();
-                })
-                .then(html => {
-                    modalContent.innerHTML = html;
-                })
-                .catch(error => {
-                    console.error('Error loading sales return details:', error);
-                    
-                    const errorText = window.translations?.error || 'Error';
-                    const closeText = window.translations?.close || 'Close';
-                    const failedToLoadDetailsText = window.translations?.failed_to_load_details || 'Failed to load details.';
+                fetch(`/admin/sales-returns/${srId}/modal-view`)
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        return response.text();
+                    })
+                    .then((html) => {
+                        modalContent.innerHTML = html;
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "Error loading sales return details:",
+                            error,
+                        );
 
-                    modalContent.innerHTML = `
+                        const errorText = window.translations?.error || "Error";
+                        const closeText = window.translations?.close || "Close";
+                        const failedToLoadDetailsText =
+                            window.translations?.failed_to_load_details ||
+                            "Failed to load details.";
+
+                        modalContent.innerHTML = `
                         <div class="modal-header">
                             <h5 class="modal-title text-danger">${errorText}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${closeText}"></button>
@@ -128,24 +159,45 @@ document.addEventListener('DOMContentLoaded', function () {
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${closeText}</button>
                         </div>
                     `;
-                });
+                    });
 
-            // Set href for Full View and Edit buttons
-            const srModalFullView = salesReturnDetailModal.querySelector('#srModalFullView');
-            const srModalEdit = salesReturnDetailModal.querySelector('#srModalEdit');
-            
-            if (srModalFullView) {
-                srModalFullView.href = `/admin/sales-returns/${srId}`;
-            }
-            if (srModalEdit) {
-                srModalEdit.href = `/admin/sales-returns/${srId}/edit`;
-            }
-        });
+                // Set href for Full View and Edit buttons
+                const srModalFullView =
+                    salesReturnDetailModal.querySelector("#srModalFullView");
+                const srModalEdit =
+                    salesReturnDetailModal.querySelector("#srModalEdit");
+
+                if (srModalFullView) {
+                    srModalFullView.href = `/admin/sales-returns/${srId}`;
+                }
+                if (srModalEdit) {
+                    srModalEdit.href = `/admin/sales-returns/${srId}/edit`;
+                }
+            },
+        );
 
         // Add event listener for print button inside the modal
-        salesReturnDetailModal.addEventListener('click', function(event) {
-            if (event.target.id === 'srModalPrint') {
-                window.print();
+        salesReturnDetailModal.addEventListener("click", function (event) {
+            if (event.target.id === "srModalPrint") {
+                const srId =
+                    salesReturnDetailModal.querySelector("[data-sr-id-storage]")
+                        ?.dataset.srIdStorage ||
+                    event.target
+                        .closest(".modal")
+                        .querySelector("#srModalEdit")
+                        ?.href.split("/")
+                        .slice(-2)[0] ||
+                    event.target
+                        .closest(".modal")
+                        .querySelector("#srModalFullView")
+                        ?.href.split("/")
+                        .slice(-1)[0];
+
+                if (srId) {
+                    window.open(`/admin/sales-returns/print/${srId}`, "_blank");
+                } else {
+                    window.print();
+                }
             }
         });
     }
@@ -154,124 +206,184 @@ document.addEventListener('DOMContentLoaded', function () {
 window.bulkDeleteSalesReturns = function () {
     const selectedIds = getSelectedSalesReturnIds();
     if (selectedIds.length === 0) {
-        InventMagApp.showToast('Warning', window.translations?.select_one_to_delete || 'Please select at least one sales return to delete.', 'warning');
+        InventMagApp.showToast(
+            "Warning",
+            window.translations?.select_one_to_delete ||
+                "Please select at least one sales return to delete.",
+            "warning",
+        );
         return;
     }
 
-    document.getElementById('bulkDeleteCount').textContent = selectedIds.length;
+    document.getElementById("bulkDeleteCount").textContent = selectedIds.length;
 
-    var bulkDeleteModal = new bootstrap.Modal(document.getElementById('bulkDeleteSalesReturnModal'));
+    var bulkDeleteModal = new bootstrap.Modal(
+        document.getElementById("bulkDeleteSalesReturnModal"),
+    );
     bulkDeleteModal.show();
 
-    document.getElementById('confirmBulkDeleteBtn').onclick = function () {
-        fetch('/admin/sales-returns/bulk-delete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ ids: selectedIds })
-            })
-            .then(response => response.json())
-            .then(data => {
+    document.getElementById("confirmBulkDeleteBtn").onclick = function () {
+        fetch("/admin/sales-returns/bulk-delete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+            body: JSON.stringify({ ids: selectedIds }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
                 if (data.success) {
-                    sessionStorage.setItem('salesReturnBulkDeleteSuccess', data.message || 'Sales returns deleted successfully.');
+                    sessionStorage.setItem(
+                        "salesReturnBulkDeleteSuccess",
+                        data.message || "Sales returns deleted successfully.",
+                    );
                     window.location.reload();
                 } else {
-                    InventMagApp.showToast('Error', data.message || 'Failed to delete sales returns.', 'error');
+                    InventMagApp.showToast(
+                        "Error",
+                        data.message || "Failed to delete sales returns.",
+                        "error",
+                    );
                 }
             })
-            .catch(error => {
-                InventMagApp.showToast('Error', 'An error occurred while deleting sales returns.', 'error');
+            .catch((error) => {
+                InventMagApp.showToast(
+                    "Error",
+                    "An error occurred while deleting sales returns.",
+                    "error",
+                );
             })
             .finally(() => {
                 bulkDeleteModal.hide();
             });
     };
-}
+};
 
 window.bulkMarkCompletedSalesReturns = function () {
     const selectedIds = getSelectedSalesReturnIds();
     if (selectedIds.length === 0) {
-        InventMagApp.showToast('Warning', window.translations?.select_one_to_mark_completed || 'Please select at least one sales return to mark as completed.', 'warning');
+        InventMagApp.showToast(
+            "Warning",
+            window.translations?.select_one_to_mark_completed ||
+                "Please select at least one sales return to mark as completed.",
+            "warning",
+        );
         return;
     }
 
-    document.getElementById('bulkCompletedCount').textContent = selectedIds.length;
+    document.getElementById("bulkCompletedCount").textContent =
+        selectedIds.length;
 
-    var bulkMarkCompletedModal = new bootstrap.Modal(document.getElementById('bulkMarkCompletedSalesReturnModal'));
+    var bulkMarkCompletedModal = new bootstrap.Modal(
+        document.getElementById("bulkMarkCompletedSalesReturnModal"),
+    );
     bulkMarkCompletedModal.show();
 
-    document.getElementById('confirmBulkCompletedBtn').onclick = function () {
-        fetch('/admin/sales-returns/bulk-complete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ ids: selectedIds })
-            })
-            .then(response => response.json())
-            .then(data => {
+    document.getElementById("confirmBulkCompletedBtn").onclick = function () {
+        fetch("/admin/sales-returns/bulk-complete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+            body: JSON.stringify({ ids: selectedIds }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
                 if (data.success) {
-                    sessionStorage.setItem('salesReturnBulkCompleteSuccess', data.message || 'Sales returns marked as completed.');
+                    sessionStorage.setItem(
+                        "salesReturnBulkCompleteSuccess",
+                        data.message || "Sales returns marked as completed.",
+                    );
                     window.location.reload();
                 } else {
-                    InventMagApp.showToast('Error', data.message || 'Failed to mark sales returns as completed.', 'error');
+                    InventMagApp.showToast(
+                        "Error",
+                        data.message ||
+                            "Failed to mark sales returns as completed.",
+                        "error",
+                    );
                 }
             })
-            .catch(error => {
-                InventMagApp.showToast('Error', 'An error occurred.', 'error');
+            .catch((error) => {
+                InventMagApp.showToast("Error", "An error occurred.", "error");
             })
             .finally(() => {
                 bulkMarkCompletedModal.hide();
             });
     };
-}
+};
 
 window.bulkMarkCanceledSalesReturns = function () {
     const selectedIds = getSelectedSalesReturnIds();
     if (selectedIds.length === 0) {
-        InventMagApp.showToast('Warning', window.translations?.select_one_to_mark_canceled || 'Please select at least one sales return to mark as canceled.', 'warning');
+        InventMagApp.showToast(
+            "Warning",
+            window.translations?.select_one_to_mark_canceled ||
+                "Please select at least one sales return to mark as canceled.",
+            "warning",
+        );
         return;
     }
 
-    document.getElementById('bulkCanceledCount').textContent = selectedIds.length;
+    document.getElementById("bulkCanceledCount").textContent =
+        selectedIds.length;
 
-    var bulkMarkCanceledModal = new bootstrap.Modal(document.getElementById('bulkMarkCanceledSalesReturnModal'));
+    var bulkMarkCanceledModal = new bootstrap.Modal(
+        document.getElementById("bulkMarkCanceledSalesReturnModal"),
+    );
     bulkMarkCanceledModal.show();
 
-    document.getElementById('confirmBulkCanceledBtn').onclick = function () {
-        fetch('/admin/sales-returns/bulk-cancel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ ids: selectedIds })
-            })
-            .then(response => response.json())
-            .then(data => {
+    document.getElementById("confirmBulkCanceledBtn").onclick = function () {
+        fetch("/admin/sales-returns/bulk-cancel", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+            body: JSON.stringify({ ids: selectedIds }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
                 if (data.success) {
-                    sessionStorage.setItem('salesReturnBulkCancelSuccess', data.message || 'Sales returns marked as canceled.');
+                    sessionStorage.setItem(
+                        "salesReturnBulkCancelSuccess",
+                        data.message || "Sales returns marked as canceled.",
+                    );
                     window.location.reload();
                 } else {
-                    InventMagApp.showToast('Error', data.message || 'Failed to mark sales returns as canceled.', 'error');
+                    InventMagApp.showToast(
+                        "Error",
+                        data.message ||
+                            "Failed to mark sales returns as canceled.",
+                        "error",
+                    );
                 }
             })
-            .catch(error => {
-                InventMagApp.showToast('Error', 'An error occurred.', 'error');
+            .catch((error) => {
+                InventMagApp.showToast("Error", "An error occurred.", "error");
             })
             .finally(() => {
                 bulkMarkCanceledModal.hide();
             });
     };
-}
+};
 
-export function bulkExportSalesReturns(exportOption = 'csv') {
+export function bulkExportSalesReturns(exportOption = "csv") {
     const selected = getSelectedSalesReturnIds();
     if (!selected.length) {
-        InventMagApp.showToast("Warning", "Please select sales returns to export.", "warning");
+        InventMagApp.showToast(
+            "Warning",
+            "Please select sales returns to export.",
+            "warning",
+        );
         return;
     }
 
@@ -308,5 +420,61 @@ export function bulkExportSalesReturns(exportOption = 'csv') {
     setTimeout(() => document.body.removeChild(form), 2000);
 }
 
+export function exportAllSalesReturns(exportOption = "csv") {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/admin/sales-returns/bulk-export";
+    form.style.display = "none";
+
+    const csrf = document.querySelector('meta[name="csrf-token"]');
+    if (csrf) {
+        const token = document.createElement("input");
+        token.type = "hidden";
+        token.name = "_token";
+        token.value = csrf.getAttribute("content");
+        form.appendChild(token);
+    }
+
+    const exportOptionInput = document.createElement("input");
+    exportOptionInput.type = "hidden";
+    exportOptionInput.name = "export_option";
+    exportOptionInput.value = exportOption;
+    form.appendChild(exportOptionInput);
+
+    // Add filters from the page
+    const monthSelect = document.querySelector('select[name="month"]');
+    const yearSelect = document.querySelector('select[name="year"]');
+    const searchInput = document.getElementById("searchInput");
+
+    if (monthSelect && monthSelect.value) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "month";
+        input.value = monthSelect.value;
+        form.appendChild(input);
+    }
+
+    if (yearSelect && yearSelect.value) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "year";
+        input.value = yearSelect.value;
+        form.appendChild(input);
+    }
+
+    if (searchInput && searchInput.value) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "search";
+        input.value = searchInput.value;
+        form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => document.body.removeChild(form), 2000);
+}
+
 window.bulkExportSalesReturns = bulkExportSalesReturns;
+window.exportAllSalesReturns = exportAllSalesReturns;
 window.clearSalesReturnSelection = clearSalesReturnSelection;

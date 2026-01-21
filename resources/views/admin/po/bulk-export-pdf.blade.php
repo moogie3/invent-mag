@@ -40,7 +40,7 @@
                     <td>{{ $purchase->supplier->name }}</td>
                     <td>{{ $purchase->order_date->format('Y-m-d') }}</td>
                     <td>{{ $purchase->due_date->format('Y-m-d') }}</td>
-                    <td>{{ \App\Helpers\CurrencyHelper::format($purchase->total) }}</td>
+                    <td>{{ \App\Helpers\CurrencyHelper::format($purchase->total_amount) }}</td>
                     <td>{{ $purchase->status }}</td>
                 </tr>
             @endforeach

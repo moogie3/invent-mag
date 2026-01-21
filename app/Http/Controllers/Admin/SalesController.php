@@ -222,13 +222,13 @@ class SalesController extends Controller
     public function bulkExport(Request $request)
     {
         $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'required|integer|exists:sales,id',
+            'ids' => 'nullable|array',
+            'ids.*' => 'integer', // Sales IDs are currently integers
             'export_option' => 'required|string|in:pdf,csv',
         ]);
 
         try {
-            $file = $this->salesService->bulkExportSales($request->ids, $request->export_option);
+            $file = $this->salesService->bulkExportSales($request->all(), $request->ids, $request->export_option);
             return $file;
         } catch (\Exception $e) {
             return response()->json([
@@ -236,6 +236,15 @@ class SalesController extends Controller
                 'message' => 'Error exporting sales orders. Please try again.',
                 'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
+        }
+    }
+
+    public function print($id)
+    {
+        try {
+            return $this->salesService->printInvoice($id);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error generating invoice. ' . $e->getMessage());
         }
     }
 

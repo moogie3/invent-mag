@@ -6,6 +6,7 @@ import {
     bulkDeleteSales,
     bulkExportSales,
     bulkMarkAsPaidSales,
+    exportAllSales,
 } from "./partials/sales-order/bulkActions/actions.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
 
@@ -23,6 +24,7 @@ window.getSalesSelectedIds = function () {
 window.bulkDeleteSales = bulkDeleteSales;
 window.bulkExportSales = bulkExportSales;
 window.bulkMarkAsPaidSales = bulkMarkAsPaidSales;
+window.exportAllSales = exportAllSales;
 
 document.addEventListener("DOMContentLoaded", function () {
     const pathname = window.location.pathname;
@@ -36,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
             () => {
                 document.getElementById("save-sales-button").click();
             },
-            "Save Sales Order"
+            "Save Sales Order",
         );
     } else {
         initSelectableTable();
@@ -46,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
         InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("salesOrderBulkDeleteSuccess"),
-            "success"
+            "success",
         );
         sessionStorage.removeItem("salesOrderBulkDeleteSuccess");
     }
@@ -55,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
         InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("salesOrderBulkMarkAsPaidSuccess"),
-            "success"
+            "success",
         );
         sessionStorage.removeItem("salesOrderBulkMarkAsPaidSuccess");
     }
@@ -71,21 +73,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     () => {
                         document.getElementById("addProduct").click();
                     },
-                    "Add Product"
+                    "Add Product",
                 );
                 window.shortcutManager.register(
                     "alt+c",
                     () => {
                         document.getElementById("clearProducts").click();
                     },
-                    "Clear All Products"
+                    "Clear All Products",
                 );
                 window.shortcutManager.register(
                     "ctrl+s",
                     () => {
                         document.getElementById("invoiceForm").submit();
                     },
-                    "Save Sales Order"
+                    "Save Sales Order",
                 );
                 window.shortcutManager.unregister("alt+d");
                 window.shortcutManager.unregister("alt+e");
@@ -99,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     () => {
                         document.getElementById("save-sales-button").click();
                     },
-                    "Save Sales Order"
+                    "Save Sales Order",
                 );
                 window.shortcutManager.unregister("alt+d");
                 window.shortcutManager.unregister("alt+e");
@@ -137,13 +139,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     () => {
                         window.location.href = "/admin/sales/create";
                     },
-                    "Create New Sales Order"
+                    "Create New Sales Order",
                 );
             }
 
             if (pathname.includes("edit") && pathname.includes("sales")) {
                 console.log(
-                    "Force initializing SalesOrderEdit due to edit page detection"
+                    "Force initializing SalesOrderEdit due to edit page detection",
                 );
                 window.salesApp = new SalesOrderEdit();
             }
@@ -153,13 +155,13 @@ document.addEventListener("DOMContentLoaded", function () {
             if (pathname.includes("edit") && pathname.includes("sales")) {
                 try {
                     console.log(
-                        "Emergency fallback: Attempting to initialize SalesOrderEdit"
+                        "Emergency fallback: Attempting to initialize SalesOrderEdit",
                     );
                     window.salesApp = new SalesOrderEdit();
                 } catch (fallbackError) {
                     console.error(
                         "Fallback initialization also failed:",
-                        fallbackError
+                        fallbackError,
                     );
                 }
             }
@@ -196,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "show.bs.modal",
             function () {
                 const tableBody = document.getElementById(
-                    "expiringSalesTableBody"
+                    "expiringSalesTableBody",
                 );
                 tableBody.innerHTML =
                     '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3 text-muted">Loading expiring sales invoices...</p></td></tr>';
@@ -206,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (!response.ok) {
                             throw new Error(
                                 "Network response was not ok " +
-                                    response.statusText
+                                    response.statusText,
                             );
                         }
                         return response.json();
@@ -242,12 +244,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     .catch((error) => {
                         console.error(
                             "Error fetching expiring sales invoices:",
-                            error
+                            error,
                         );
                         tableBody.innerHTML =
                             '<tr><td colspan="5" class="text-center py-4 text-danger">Error loading data. Please try again.</td></tr>';
                     });
-            }
+            },
         );
     }
 });

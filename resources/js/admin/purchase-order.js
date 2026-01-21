@@ -8,24 +8,29 @@ import {
     bulkDeletePO,
     bulkExportPO,
     bulkMarkAsPaidPO,
+    exportAllPurchases,
 } from "./partials/purchase-order/bulkActions/actions.js";
 
 // Expose global functions for inline event handlers
 window.bulkDeletePO = bulkDeletePO;
 window.bulkExportPO = bulkExportPO;
 window.bulkMarkAsPaidPO = bulkMarkAsPaidPO;
+window.exportAllPurchases = exportAllPurchases;
 
 // Keep the existing DOMContentLoaded initialization
 document.addEventListener("DOMContentLoaded", function () {
     const pathname = window.location.pathname;
     if (pathname.includes("/admin/po/edit")) {
-        initSelectableTable({ registerEditShortcut: false, registerDeleteShortcut: false });
+        initSelectableTable({
+            registerEditShortcut: false,
+            registerDeleteShortcut: false,
+        });
         window.shortcutManager.register(
             "ctrl+s",
             () => {
                 document.getElementById("save-po-button").click();
             },
-            "Save Purchase Order"
+            "Save Purchase Order",
         );
     } else {
         initSelectableTable();
@@ -34,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
         InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("purchaseOrderBulkDeleteSuccess"),
-            "success"
+            "success",
         );
         sessionStorage.removeItem("purchaseOrderBulkDeleteSuccess");
     }
@@ -43,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
         InventMagApp.showToast(
             "Success",
             sessionStorage.getItem("purchaseOrderBulkMarkAsPaidSuccess"),
-            "success"
+            "success",
         );
         sessionStorage.removeItem("purchaseOrderBulkMarkAsPaidSuccess");
     }
@@ -59,14 +64,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     () => {
                         document.getElementById("addProduct").click();
                     },
-                    "Add Product"
+                    "Add Product",
                 );
                 window.shortcutManager.register(
                     "alt+c",
                     () => {
                         document.getElementById("clearProducts").click();
                     },
-                    "Clear All Products"
+                    "Clear All Products",
                 );
 
                 // Unregister alt+d and alt+e after selectable-table.js has registered them
@@ -77,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     () => {
                         document.getElementById("invoiceForm").submit();
                     },
-                    "Save Purchase Order"
+                    "Save Purchase Order",
                 );
             } else if (
                 pathname.includes("/admin/po/edit") ||
@@ -90,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     () => {
                         document.getElementById("save-po-button").click();
                     },
-                    "Save Purchase Order"
+                    "Save Purchase Order",
                 );
 
                 // Unregister alt+d and alt+e after selectable-table.js has registered them
@@ -129,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     () => {
                         window.location.href = "/admin/po/create";
                     },
-                    "Create New Purchase Order"
+                    "Create New Purchase Order",
                 );
             }
         } catch (error) {
@@ -154,14 +159,14 @@ document.addEventListener("DOMContentLoaded", function () {
 // JavaScript for Purchase Order Expiring Soon functionality
 document.addEventListener("DOMContentLoaded", function () {
     const expiringPurchaseModalElement = document.getElementById(
-        "expiringPurchaseModal"
+        "expiringPurchaseModal",
     );
     if (expiringPurchaseModalElement) {
         expiringPurchaseModalElement.addEventListener(
             "show.bs.modal",
             function () {
                 const tableBody = document.getElementById(
-                    "expiringPurchaseTableBody"
+                    "expiringPurchaseTableBody",
                 );
                 tableBody.innerHTML =
                     '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3 text-muted">Loading expiring purchase orders...</p></td></tr>';
@@ -171,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (!response.ok) {
                             throw new Error(
                                 "Network response was not ok " +
-                                    response.statusText
+                                    response.statusText,
                             );
                         }
                         return response.json();
@@ -205,12 +210,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     .catch((error) => {
                         console.error(
                             "Error fetching expiring purchase orders:",
-                            error
+                            error,
                         );
                         tableBody.innerHTML =
                             '<tr><td colspan="5" class="text-center py-4 text-danger">Error loading data. Please try again.</td></tr>';
                     });
-            }
+            },
         );
     }
 });

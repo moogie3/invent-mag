@@ -137,15 +137,33 @@ class SalesService
 
     public function getSalesMetrics()
     {
-        $totalinvoice = Sales::count();
-        $unpaidDebt = Sales::where('status', 'Unpaid')->sum('total');
-        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
-        $pendingOrders = Sales::where('status', 'Unpaid')->count();
-        $dueInvoices = Sales::where('status', 'Unpaid')
-            ->whereDate('due_date', '>=', now())
-            ->whereDate('due_date', '<=', now()->addDays(7))
-            ->count();
-        $posTotal = Sales::where('is_pos', true)->sum('total');
+        $totalinvoice = 0;
+        $unpaidDebt = 0;
+        $totalMonthly = 0;
+        $pendingOrders = 0;
+        $dueInvoices = 0;
+        $posTotal = 0;
+
+        $sales = Sales::with(['salesItems', 'payments'])->get();
+        foreach ($sales as $sale) {
+            $totalinvoice += $sale->total_amount;
+            $unpaidDebt += ($sale->status !== 'Paid') ? $sale->balance : 0;
+            
+            if ($sale->order_date->isCurrentMonth()) {
+                $totalMonthly += $sale->total_amount;
+            }
+
+            if ($sale->status === 'Unpaid') {
+                $pendingOrders++;
+                if ($sale->due_date && $sale->due_date->isPast()) {
+                     $dueInvoices++;
+                }
+            }
+
+            if ($sale->is_pos) {
+                $posTotal += $sale->total_amount;
+            }
+        }
 
         return [
             'totalinvoice' => $totalinvoice,
@@ -516,9 +534,22 @@ class SalesService
         return $updatedCount;
     }
 
-    public function bulkExportSales(array $ids, string $exportOption)
+    public function bulkExportSales(array $filters, ?array $ids, string $exportOption)
     {
-        $sales = Sales::with(['customer', 'salesItems'])->whereIn('id', $ids)->get();
+        $query = Sales::with(['customer', 'salesItems']);
+        
+        if ($ids) {
+            $query->whereIn('id', $ids);
+        } else {
+            if (isset($filters['month']) && $filters['month']) {
+                $query->whereMonth('order_date', $filters['month']);
+            }
+            if (isset($filters['year']) && $filters['year']) {
+                $query->whereYear('order_date', $filters['year']);
+            }
+        }
+
+        $sales = $query->get();
 
         if ($exportOption === 'pdf') {
             $html = view('admin.sales.bulk-export-pdf', compact('sales'))->render();
@@ -555,7 +586,7 @@ class SalesService
                         $sale->customer->name,
                         $sale->order_date->format('Y-m-d'),
                         $sale->due_date->format('Y-m-d'),
-                        CurrencyHelper::format($sale->total),
+                        CurrencyHelper::format($sale->total_amount),
                         $sale->status,
                     ]);
                 }
@@ -567,6 +598,21 @@ class SalesService
         }
 
         return null;
+    }
+
+    public function printInvoice($id)
+    {
+        $sales = Sales::with(['customer', 'salesItems.product', 'payments'])->findOrFail($id);
+        $shopname = User::whereNotNull('shopname')->value('shopname');
+        $address = User::whereNotNull('address')->value('address');
+
+        $html = view('admin.sales.print-pdf', compact('sales', 'shopname', 'address'))->render();
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return $dompdf->stream('invoice-' . $sales->invoice . '.pdf', ['Attachment' => false]);
     }
 
     public function getSalesForModal($id)

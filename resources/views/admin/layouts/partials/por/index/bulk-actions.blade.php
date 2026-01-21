@@ -29,8 +29,8 @@
                             <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="bulkExportPurchaseReturns('csv')">Export as CSV</a></li>
                             <li><a class="dropdown-item" href="#" onclick="bulkExportPurchaseReturns('pdf')">Export as PDF</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="bulkExportPurchaseReturns('csv')">Export as CSV</a></li>
                         </ul>
                     </div>
                     <button onclick="bulkDeletePurchaseReturns()" class="btn btn-danger action-btn d-flex align-items-center">

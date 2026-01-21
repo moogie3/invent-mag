@@ -1,5 +1,5 @@
-import { SalesOrderModule } from '../common/SalesOrderModule.js';
-import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+import { SalesOrderModule } from "../common/SalesOrderModule.js";
+import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 
 export class SalesOrderEdit extends SalesOrderModule {
     constructor(config = {}) {
@@ -29,24 +29,24 @@ export class SalesOrderEdit extends SalesOrderModule {
     initEventListeners() {
         if (this.elements.customerSelect) {
             this.elements.customerSelect.addEventListener("change", () =>
-                this.calculateDueDate()
+                this.calculateDueDate(),
             );
         }
 
         if (this.elements.orderDate && this.elements.orderDate._flatpickr) {
             this.elements.orderDate._flatpickr.config.onChange.push(() =>
-                this.calculateDueDate()
+                this.calculateDueDate(),
             );
         } else if (this.elements.orderDate) {
             this.elements.orderDate.addEventListener("change", () =>
-                this.calculateDueDate()
+                this.calculateDueDate(),
             );
         }
 
         document.addEventListener("input", (event) => {
             if (
                 event.target.matches(
-                    ".quantity-input, .price-input, .discount-input, #discountTotalValue"
+                    ".quantity-input, .price-input, .discount-input, #discountTotalValue",
                 )
             ) {
                 this.calculateTotals();
@@ -64,7 +64,7 @@ export class SalesOrderEdit extends SalesOrderModule {
         if (this.elements.form) {
             this.elements.form.addEventListener(
                 "submit",
-                this.serializeProducts.bind(this)
+                this.serializeProducts.bind(this),
             );
         }
     }
@@ -106,50 +106,55 @@ export class SalesOrderEdit extends SalesOrderModule {
         let subtotal = 0;
         let subtotalBeforeDiscounts = 0;
 
-        document.querySelectorAll("#sales-items-table-body tr").forEach((row) => {
-            const itemId = row.querySelector(".quantity-input")?.dataset.itemId;
-            if (!itemId) return;
+        document
+            .querySelectorAll("#sales-items-table-body tr")
+            .forEach((row) => {
+                const itemId =
+                    row.querySelector(".quantity-input")?.dataset.itemId;
+                if (!itemId) return;
 
-            const quantity =
-                parseFloat(
-                    row.querySelector(
-                        `.quantity-input[data-item-id='${itemId}']`
-                    ).value
-                ) || 0;
-            const price =
-                parseFloat(
-                    row.querySelector(`.price-input[data-item-id='${itemId}']`)
-                        .value
-                ) || 0;
+                const quantity =
+                    parseFloat(
+                        row.querySelector(
+                            `.quantity-input[data-item-id='${itemId}']`,
+                        ).value,
+                    ) || 0;
+                const price =
+                    parseFloat(
+                        row.querySelector(
+                            `.price-input[data-item-id='${itemId}']`,
+                        ).value,
+                    ) || 0;
 
-            subtotalBeforeDiscounts += price * quantity;
+                const priceInCents = Math.round(price * 100);
+                subtotalBeforeDiscounts += (priceInCents * quantity) / 100;
 
-            const discountInput = row.querySelector(
-                `.discount-input[data-item-id='${itemId}']`
-            );
-            const discountTypeSelect = row.querySelector(
-                `.discount-type-input[data-item-id='${itemId}']`
-            );
+                const discountInput = row.querySelector(
+                    `.discount-input[data-item-id='${itemId}']`,
+                );
+                const discountTypeSelect = row.querySelector(
+                    `.discount-type-input[data-item-id='${itemId}']`,
+                );
 
-            const discountValue = parseFloat(discountInput?.value) || 0;
-            const discountType = discountTypeSelect?.value || "percentage";
+                const discountValue = parseFloat(discountInput?.value) || 0;
+                const discountType = discountTypeSelect?.value || "percentage";
 
-            const itemTotal = this.calculateTotal(
-                price,
-                quantity,
-                discountValue,
-                discountType
-            );
+                const itemTotal = this.calculateTotal(
+                    price,
+                    quantity,
+                    discountValue,
+                    discountType,
+                );
 
-            const amountInput = row.querySelector(
-                `.amount-input[data-item-id='${itemId}']`
-            );
-            if (amountInput) {
-                amountInput.value = Math.round(itemTotal);
-            }
+                const amountInput = row.querySelector(
+                    `.amount-input[data-item-id='${itemId}']`,
+                );
+                if (amountInput) {
+                    amountInput.value = itemTotal.toFixed(2);
+                }
 
-            subtotal += itemTotal;
-        });
+                subtotal += itemTotal;
+            });
 
         const discountTotalValue =
             parseFloat(this.elements.discountTotalValue?.value) || 0;
@@ -182,21 +187,24 @@ export class SalesOrderEdit extends SalesOrderModule {
             formatCurrency(grandTotal);
 
         document.getElementById("grandTotalInput").value =
-            Math.floor(grandTotal);
+            grandTotal.toFixed(2);
         document.getElementById("totalDiscountInput").value =
-            Math.floor(orderDiscountAmount);
-        document.getElementById("taxInput").value = Math.floor(taxAmount);
+            orderDiscountAmount.toFixed(2);
+        document.getElementById("taxInput").value = taxAmount.toFixed(2);
 
         const totalTaxInput = document.getElementById("total_tax_input");
         if (totalTaxInput) {
-            totalTaxInput.value = Math.floor(taxAmount);
+            totalTaxInput.value = taxAmount.toFixed(2);
         }
-        
-        const totalPaid = parseFloat(this.elements.totalPaidAmount.dataset.totalPaid);
+
+        const totalPaid = parseFloat(
+            this.elements.totalPaidAmount.dataset.totalPaid,
+        );
         const newBalance = grandTotal - totalPaid;
 
         if (this.elements.balanceAmount) {
-            this.elements.balanceAmount.textContent = formatCurrency(newBalance);
+            this.elements.balanceAmount.textContent =
+                formatCurrency(newBalance);
             this.elements.balanceAmount.dataset.balance = newBalance;
         }
     }
@@ -211,29 +219,38 @@ export class SalesOrderEdit extends SalesOrderModule {
         const status = this.elements.statusSelect.value;
         const balance = parseFloat(this.elements.balanceAmount.dataset.balance);
 
-        if (status === 'Paid' && balance > 0) {
+        if (status === "Paid" && balance > 0) {
             InventMagApp.showToast(
                 "Warning",
                 "Cannot mark as Paid. Please add a payment to cover the outstanding balance.",
-                "warning"
+                "warning",
             );
             return; // Stop further execution
         }
 
         const products = [];
-        const productRows = document.querySelectorAll("#sales-items-table-body tr");
+        const productRows = document.querySelectorAll(
+            "#sales-items-table-body tr",
+        );
 
         productRows.forEach((row) => {
-            const productId = row.querySelector(".quantity-input")?.dataset.itemId;
+            const productId =
+                row.querySelector(".quantity-input")?.dataset.itemId;
             if (!productId) {
                 return;
             }
 
-            const quantity = row.querySelector( `.quantity-input[data-item-id="${productId}"]`).value;
-            const price = row.querySelector(`.price-input[data-item-id="${productId}"]`).value;
-            const discount = row.querySelector(`.discount-input[data-item-id="${productId}"]`).value;
+            const quantity = row.querySelector(
+                `.quantity-input[data-item-id="${productId}"]`,
+            ).value;
+            const price = row.querySelector(
+                `.price-input[data-item-id="${productId}"]`,
+            ).value;
+            const discount = row.querySelector(
+                `.discount-input[data-item-id="${productId}"]`,
+            ).value;
             const discountType = row.querySelector(
-                `.discount-type-input[data-item-id="${productId}"]`
+                `.discount-type-input[data-item-id="${productId}"]`,
             ).value;
 
             products.push({
@@ -248,7 +265,7 @@ export class SalesOrderEdit extends SalesOrderModule {
         if (this.elements.productsJsonInput) {
             this.elements.productsJsonInput.value = JSON.stringify(products);
         }
-        
+
         this.isSubmitting = true;
         this.elements.form.submit(); // Manually submit the form after serialization
     }
@@ -257,7 +274,7 @@ export class SalesOrderEdit extends SalesOrderModule {
         let itemTotal = price * quantity;
         let discountAmount = 0;
         if (discount > 0) {
-            if (discountType === 'percentage') {
+            if (discountType === "percentage") {
                 discountAmount = itemTotal * (discount / 100);
             } else {
                 discountAmount = discount * quantity;

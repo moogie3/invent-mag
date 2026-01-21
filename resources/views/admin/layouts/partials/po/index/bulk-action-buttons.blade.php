@@ -6,8 +6,8 @@
         <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
     </button>
     <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#" onclick="bulkExportPO('csv')">Export as CSV</a></li>
         <li><a class="dropdown-item" href="#" onclick="bulkExportPO('pdf')">Export as PDF</a></li>
+        <li><a class="dropdown-item" href="#" onclick="bulkExportPO('csv')">Export as CSV</a></li>
     </ul>
 </div>
 <button onclick="bulkDeletePO()" class="btn btn-danger action-btn d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#bulkDeleteModal">

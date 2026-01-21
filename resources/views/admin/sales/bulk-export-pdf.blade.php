@@ -40,7 +40,7 @@
                     <td>{{ $sale->customer->name }}</td>
                     <td>{{ $sale->order_date->format('Y-m-d') }}</td>
                     <td>{{ $sale->due_date->format('Y-m-d') }}</td>
-                    <td>{{ \App\Helpers\CurrencyHelper::format($sale->total) }}</td>
+                    <td>{{ \App\Helpers\CurrencyHelper::format($sale->total_amount) }}</td>
                     <td>{{ $sale->status }}</td>
                 </tr>
             @endforeach

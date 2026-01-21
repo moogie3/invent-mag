@@ -1,4 +1,4 @@
-import { PurchaseOrderModule } from '../common/PurchaseOrderModule.js';
+import { PurchaseOrderModule } from "../common/PurchaseOrderModule.js";
 
 export class PurchaseOrderEdit extends PurchaseOrderModule {
     constructor(config = {}) {
@@ -23,7 +23,7 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
             priceInputs: document.querySelectorAll(".price-input"),
             discountInputs: document.querySelectorAll(".discount-input"),
             discountTypeInputs: document.querySelectorAll(
-                ".discount-type-input"
+                ".discount-type-input",
             ),
             form: document.getElementById("edit-po-form"),
             productsJsonInput: document.getElementById("products-json"),
@@ -37,7 +37,7 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
         document.addEventListener("input", (event) => {
             if (
                 event.target.matches(
-                    ".quantity-input, .price-input, .discount-input"
+                    ".quantity-input, .price-input, .discount-input",
                 )
             ) {
                 const itemId = event.target.dataset.itemId;
@@ -63,7 +63,7 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
         if (this.elements.form) {
             this.elements.form.addEventListener(
                 "submit",
-                this.serializeProducts.bind(this)
+                this.serializeProducts.bind(this),
             );
         }
     }
@@ -82,19 +82,19 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
             const quantity =
                 parseFloat(
                     row.querySelector(
-                        `.quantity-input[data-item-id="${itemId}"]`
-                    ).value
+                        `.quantity-input[data-item-id="${itemId}"]`,
+                    ).value,
                 ) || 0;
             const price =
                 parseFloat(
                     row.querySelector(`.price-input[data-item-id="${itemId}"]`)
-                        .value
+                        .value,
                 ) || 0;
             const discountInput = row.querySelector(
-                `.discount-input[data-item-id="${itemId}"]`
+                `.discount-input[data-item-id="${itemId}"]`,
             );
             const discountTypeSelect = row.querySelector(
-                `.discount-type-input[data-item-id="${itemId}"]`
+                `.discount-type-input[data-item-id="${itemId}"]`,
             );
 
             const discountValue = parseFloat(discountInput?.value) || 0;
@@ -104,14 +104,14 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
                 price,
                 quantity,
                 discountValue,
-                discountType
+                discountType,
             );
 
             const amountInput = row.querySelector(
-                `.amount-input[data-item-id="${itemId}"]`
+                `.amount-input[data-item-id="${itemId}"]`,
             );
             if (amountInput) {
-                amountInput.value = Math.round(itemTotal);
+                amountInput.value = itemTotal.toFixed(2);
             }
 
             subtotal += itemTotal;
@@ -125,7 +125,7 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
         const orderDiscountAmount = this.calculateDiscount(
             subtotal,
             discountTotalValue,
-            discountTotalType
+            discountTotalType,
         );
         const finalTotal = subtotal - orderDiscountAmount;
 
@@ -147,56 +147,63 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
 
         if (this.elements.productsJsonInput) {
             const products = [];
-            document.querySelectorAll("#po-items-table-body tr").forEach((row) => {
-                const itemId =
-                    row.querySelector(".quantity-input")?.dataset.itemId;
-                if (!itemId) {
-                    return;
-                }
+            document
+                .querySelectorAll("#po-items-table-body tr")
+                .forEach((row) => {
+                    const itemId =
+                        row.querySelector(".quantity-input")?.dataset.itemId;
+                    if (!itemId) {
+                        return;
+                    }
 
-                const quantity =
-                    parseFloat(
-                        row.querySelector(
-                            `.quantity-input[data-item-id="${itemId}"]`
-                        ).value
-                    ) || 0;
-                const price =
-                    parseFloat(
-                        row.querySelector(
-                            `.price-input[data-item-id="${itemId}"]`
-                        ).value
-                    ) || 0;
-                const discount =
-                    parseFloat(
-                        row.querySelector(
-                            `.discount-input[data-item-id="${itemId}"]`
-                        ).value
-                    ) || 0;
-                const discountType = row.querySelector(
-                    `.discount-type-input[data-item-id="${itemId}"]`
-                ).value;
+                    const quantity =
+                        parseFloat(
+                            row.querySelector(
+                                `.quantity-input[data-item-id="${itemId}"]`,
+                            ).value,
+                        ) || 0;
+                    const price =
+                        parseFloat(
+                            row.querySelector(
+                                `.price-input[data-item-id="${itemId}"]`,
+                            ).value,
+                        ) || 0;
+                    const discount =
+                        parseFloat(
+                            row.querySelector(
+                                `.discount-input[data-item-id="${itemId}"]`,
+                            ).value,
+                        ) || 0;
+                    const discountType = row.querySelector(
+                        `.discount-type-input[data-item-id="${itemId}"]`,
+                    ).value;
 
-                const expiryDateInput = row.querySelector(
-                    `.expiry-date-input[data-item-id="${itemId}"]`
-                );
+                    const expiryDateInput = row.querySelector(
+                        `.expiry-date-input[data-item-id="${itemId}"]`,
+                    );
 
-                products.push({
-                    product_id: itemId,
-                    quantity: quantity,
-                    price: price,
-                    discount: discount,
-                    discount_type: discountType,
-                    expiry_date: expiryDateInput ? expiryDateInput.value : null,
+                    products.push({
+                        product_id: itemId,
+                        quantity: quantity,
+                        price: price,
+                        discount: discount,
+                        discount_type: discountType,
+                        expiry_date: expiryDateInput
+                            ? expiryDateInput.value
+                            : null,
+                    });
                 });
-            });
             this.elements.productsJsonInput.value = JSON.stringify(products);
         }
 
-        const totalPaid = parseFloat(this.elements.totalPaidAmount.dataset.totalPaid);
+        const totalPaid = parseFloat(
+            this.elements.totalPaidAmount.dataset.totalPaid,
+        );
         const newBalance = finalTotal - totalPaid;
 
         if (this.elements.balanceAmount) {
-            this.elements.balanceAmount.textContent = this.formatCurrency(newBalance);
+            this.elements.balanceAmount.textContent =
+                this.formatCurrency(newBalance);
             this.elements.balanceAmount.dataset.balance = newBalance;
         }
     }
@@ -211,11 +218,11 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
         const status = this.elements.statusSelect.value;
         const balance = parseFloat(this.elements.balanceAmount.dataset.balance);
 
-        if (status === 'Paid' && balance > 0) {
+        if (status === "Paid" && balance > 0) {
             InventMagApp.showToast(
                 "Warning",
                 "Cannot mark as Paid. Please add a payment to cover the outstanding balance.",
-                "warning"
+                "warning",
             );
             return;
         }
@@ -229,21 +236,21 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
 
             const quantity = parseFloat(
                 row.querySelector(`.quantity-input[data-item-id="${itemId}"]`)
-                    .value
+                    .value,
             );
             const price = parseFloat(
                 row.querySelector(`.price-input[data-item-id="${itemId}"]`)
-                    .value
+                    .value,
             );
             const discount = parseFloat(
                 row.querySelector(`.discount-input[data-item-id="${itemId}"]`)
-                    .value
+                    .value,
             );
             const discountType = row.querySelector(
-                `.discount-type-input[data-item-id="${itemId}"]`
+                `.discount-type-input[data-item-id="${itemId}"]`,
             ).value;
             const expiryDateInput = row.querySelector(
-                `.expiry-date-input[data-item-id="${itemId}"]`
+                `.expiry-date-input[data-item-id="${itemId}"]`,
             );
             const expiry_date = expiryDateInput ? expiryDateInput.value : null;
 

@@ -1,4 +1,4 @@
-import { PurchaseOrderModule } from '../common/PurchaseOrderModule.js';
+import { PurchaseOrderModule } from "../common/PurchaseOrderModule.js";
 
 export class PurchaseOrderView extends PurchaseOrderModule {
     constructor(config = {}) {
@@ -28,7 +28,7 @@ export class PurchaseOrderView extends PurchaseOrderModule {
     initModalListeners() {
         if (this.elements.poModalPrint) {
             this.elements.poModalPrint.addEventListener("click", () =>
-                this.printModalContent()
+                this.printModalContent(),
             );
         }
     }
@@ -90,20 +90,25 @@ export class PurchaseOrderView extends PurchaseOrderModule {
     printModalContent() {
         if (!this.elements.viewPoModalContent) return;
 
-        const printContent = this.elements.viewPoModalContent.innerHTML;
-        const originalContent = document.body.innerHTML;
+        // Retrieve ID from the Edit button href which is set in loadPoDetails
+        let poId = null;
+        if (this.elements.poModalEdit && this.elements.poModalEdit.href) {
+            const parts = this.elements.poModalEdit.href.split("/");
+            // Form: .../admin/po/edit/{id}
+            poId = parts[parts.length - 1];
+        } else if (
+            this.elements.poModalFullView &&
+            this.elements.poModalFullView.href
+        ) {
+            const parts = this.elements.poModalFullView.href.split("/");
+            poId = parts[parts.length - 1];
+        }
 
-        document.body.innerHTML = `
-                <div class="container print-container">
-                    <div class="card">
-                        <div class="card-body">${printContent}</div>
-                    </div>
-                </div>
-            `;
-
-        window.print();
-        document.body.innerHTML = originalContent;
-
-        setTimeout(() => window.location.reload(), 100);
+        if (poId) {
+            window.open(`/admin/po/print/${poId}`, "_blank");
+        } else {
+            // Fallback if ID not found, though unlikely if modal is loaded
+            window.print();
+        }
     }
 }

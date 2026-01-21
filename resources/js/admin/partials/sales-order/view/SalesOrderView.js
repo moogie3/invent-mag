@@ -1,4 +1,4 @@
-import { SalesOrderModule } from '../common/SalesOrderModule.js';
+import { SalesOrderModule } from "../common/SalesOrderModule.js";
 
 export class SalesOrderView extends SalesOrderModule {
     constructor(config = {}) {
@@ -37,7 +37,7 @@ export class SalesOrderView extends SalesOrderModule {
     initModalListeners() {
         if (this.elements.salesModalPrint) {
             this.elements.salesModalPrint.addEventListener("click", () =>
-                this.printModalContent()
+                this.printModalContent(),
             );
         }
 
@@ -50,7 +50,7 @@ export class SalesOrderView extends SalesOrderModule {
                     if (salesId) {
                         this.loadSalesDetails(salesId);
                     }
-                }
+                },
             );
         }
     }
@@ -88,9 +88,7 @@ export class SalesOrderView extends SalesOrderModule {
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error(
-                        `HTTP error! Status: ${response.status}`
-                    );
+                    throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 return response.text();
             })
@@ -116,28 +114,19 @@ export class SalesOrderView extends SalesOrderModule {
                 InventMagApp.showToast(
                     "Error",
                     "Failed to load sales details.",
-                    "error"
+                    "error",
                 );
             });
     }
 
     printModalContent() {
         if (!this.elements.viewSalesModalContent) return;
+        const viewSalesModalElement = document.getElementById("viewSalesModal");
+        if (!viewSalesModalElement) return;
 
-        const printContent = this.elements.viewSalesModalContent.innerHTML;
-        const originalContent = document.body.innerHTML;
-
-        document.body.innerHTML = `
-            <div class="container print-container">
-                <div class="card">
-                    <div class="card-body">${printContent}</div>
-                </div>
-            </div>
-        `;
-
-        window.print();
-        document.body.innerHTML = originalContent;
-
-        setTimeout(() => window.location.reload(), 100);
+        const salesId = viewSalesModalElement.dataset.salesId;
+        if (salesId) {
+            window.open(`/admin/sales/print/${salesId}`, "_blank");
+        }
     }
 }

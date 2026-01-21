@@ -175,6 +175,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::post('/bulk-export', [PurchaseController::class, 'bulkExport'])->name('po.bulk-export');
             Route::get('/metrics', [PurchaseController::class, 'getPurchaseMetrics'])->name('admin.po.metrics');
             Route::get('/expiring-soon', [PurchaseController::class, 'getExpiringSoonPurchases'])->name('admin.po.expiring-soon');
+            Route::get('/print/{id}', [PurchaseController::class, 'print'])->name('admin.po.print');
             Route::post('/{id}/payment', [PurchaseController::class, 'addPayment'])->name('admin.po.add-payment');
         });
 
@@ -205,6 +206,7 @@ Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])-
             Route::get('/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
             Route::get('/metrics', [SalesController::class, 'getSalesMetrics'])->name('admin.sales.metrics');
             Route::get('/expiring-soon', [SalesController::class, 'getExpiringSoonSales'])->name('admin.sales.expiring-soon');
+            Route::get('/print/{id}', [SalesController::class, 'print'])->name('admin.sales.print');
             Route::post('/{id}/payment', [SalesController::class, 'addPayment'])->name('admin.sales.add-payment');
         });
 
@@ -215,7 +217,18 @@ Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])-
         Route::post('sales-returns/bulk-delete', [SalesReturnController::class, 'bulkDelete'])->name('admin.sales-returns.bulk-delete');
         Route::post('sales-returns/bulk-complete', [SalesReturnController::class, 'bulkComplete'])->name('admin.sales-returns.bulk-complete');
         Route::post('sales-returns/bulk-cancel', [SalesReturnController::class, 'bulkCancel'])->name('admin.sales-returns.bulk-cancel');
-Route::post('sales-returns/bulk-export', [SalesReturnController::class, 'bulkExport'])->name('admin.sales-returns.bulk-export');
+        Route::post('sales-returns/bulk-export', [SalesReturnController::class, 'bulkExport'])->name('admin.sales-returns.bulk-export');
+        Route::get('sales-returns/print/{id}', [SalesReturnController::class, 'print'])->name('admin.sales-returns.print');
+
+        // Purchase Return Routes
+        Route::resource('por', PurchaseReturnController::class)->names('admin.por');
+        Route::get('por/{por}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.por.modal-view');
+        Route::get('por/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.por.items');
+        Route::post('por/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.por.bulk-delete');
+        Route::post('por/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.por.bulk-complete');
+        Route::post('por/bulk-cancel', [PurchaseReturnController::class, 'bulkCancel'])->name('admin.por.bulk-cancel');
+        Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])->name('admin.por.bulk-export');
+        Route::get('por/print/{id}', [PurchaseReturnController::class, 'print'])->name('admin.por.print');
 
 
         // Warehouse Routes

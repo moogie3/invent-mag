@@ -74,8 +74,9 @@ html {
    1. ROOT VARIABLES & DEFAULTS
    ============================ */
 :root {
-    --tblr-font-sans-serif: "Inter", -apple-system, BlinkMacSystemFont,
-        San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+    --tblr-font-sans-serif:
+        "Inter", -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI,
+        Roboto, Helvetica Neue, sans-serif;
     /* Add consistent base font size */
     --base-font-size: 14px;
     --small-font-size: 12px;
@@ -269,7 +270,9 @@ body {
 }
 
 .modal.fade .modal-dialog {
-    transition: transform 0.3s ease-out, opacity 0.2s ease-out;
+    transition:
+        transform 0.3s ease-out,
+        opacity 0.2s ease-out;
     transform: translate(0, -30px);
     opacity: 0;
 }
@@ -601,7 +604,7 @@ body.layout-navbar-v2 .navbar {
 
 .page-header {
     position: relative;
-    z-index: 10000; /* Extremely high z-index to dominate */
+    z-index: 100; /* Increased from var(--z-base) to prevent dropdown overlap */
 }
 
 /* Styles for disabled options with transition */

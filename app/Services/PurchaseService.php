@@ -403,9 +403,22 @@ class PurchaseService
         return $updatedCount;
     }
 
-    public function bulkExportPurchases(array $ids, string $exportOption)
+    public function bulkExportPurchases(array $filters, ?array $ids, string $exportOption)
     {
-        $purchases = Purchase::with(['items.product', 'supplier'])->whereIn('id', $ids)->get();
+        $query = Purchase::with(['items.product', 'supplier']);
+        
+        if ($ids) {
+            $query->whereIn('id', $ids);
+        } else {
+            if (isset($filters['month']) && $filters['month']) {
+                $query->whereMonth('order_date', $filters['month']);
+            }
+            if (isset($filters['year']) && $filters['year']) {
+                $query->whereYear('order_date', $filters['year']);
+            }
+        }
+
+        $purchases = $query->get();
 
         if ($exportOption === 'pdf') {
             $html = view('admin.po.bulk-export-pdf', compact('purchases'))->render();
@@ -442,7 +455,7 @@ class PurchaseService
                         $purchase->supplier->name,
                         $purchase->order_date->format('Y-m-d'),
                         $purchase->due_date->format('Y-m-d'),
-                        CurrencyHelper::format($purchase->total),
+                        CurrencyHelper::format($purchase->total_amount),
                         $purchase->status,
                     ]);
                 }
@@ -456,6 +469,21 @@ class PurchaseService
         return null;
     }
 
+    public function printPo($id)
+    {
+        $pos = Purchase::with(['supplier', 'items.product', 'payments'])->findOrFail($id);
+        $shopname = User::whereNotNull('shopname')->value('shopname');
+        $address = User::whereNotNull('address')->value('address');
+
+        $html = view('admin.po.print-pdf', compact('pos', 'shopname', 'address'))->render();
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return $dompdf->stream('po-' . $pos->invoice . '.pdf', ['Attachment' => false]);
+    }
+
     public function getPurchaseMetrics()
     {
         $totalinvoice = Purchase::count();
@@ -466,28 +494,28 @@ class PurchaseService
         $totalMonthly = 0;
         $paymentMonthly = 0;
 
-        $allPurchases = Purchase::with('supplier')->get();
+        $allPurchases = Purchase::with(['supplier', 'items'])->get();
         foreach ($allPurchases as $p) {
             if ($p->supplier->location === 'IN') {
                 $inCount++;
                 if ($p->status === 'Unpaid') {
-                    $inCountamount += $p->total;
+                    $inCountamount += $p->total_amount;
                 }
             }
 
             if ($p->supplier->location === 'OUT') {
                 $outCount++;
                 if ($p->status === 'Unpaid') {
-                    $outCountamount += $p->total;
+                    $outCountamount += $p->total_amount;
                 }
             }
 
             if ($p->order_date->isCurrentMonth()) {
-                $totalMonthly += $p->total;
+                $totalMonthly += $p->total_amount;
             }
 
             if ($p->status === 'Paid' && $p->order_date->isCurrentMonth()) {
-                $paymentMonthly += $p->total;
+                $paymentMonthly += $p->total_amount;
             }
         }
 
@@ -523,7 +551,7 @@ class PurchaseService
                 'invoice' => $purchase->invoice,
                 'supplier' => $purchase->supplier,
                 'due_date' => Carbon::parse($purchase->due_date)->format('d M Y'),
-                'total' => CurrencyHelper::format($purchase->total),
+                'total' => CurrencyHelper::format($purchase->total_amount),
             ];
         });
     }

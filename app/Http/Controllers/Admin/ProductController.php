@@ -253,13 +253,13 @@ class ProductController extends Controller
     public function bulkExport(Request $request)
     {
         $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'required|integer|exists:products,id',
+            'ids' => 'nullable|array',
+            'ids.*' => 'integer',
             'export_option' => 'required|string|in:pdf,csv',
         ]);
 
         try {
-            $file = $this->productService->bulkExportProducts($request->ids, $request->export_option);
+            $file = $this->productService->bulkExportProducts($request->all(), $request->ids, $request->export_option);
             return $file;
         } catch (\Exception $e) {
             return response()->json([

@@ -70,6 +70,17 @@ class ReportController extends Controller
         return $this->transactionService->exportTransactions($filters, $request->get('selected') ? explode(',', $request->get('selected')) : null);
     }
 
+    public function bulkExport(Request $request)
+    {
+        $request->validate([
+            'ids' => 'nullable|array',
+            'ids.*' => 'string',
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        return $this->transactionService->bulkExportTransactions($request->all(), $request->ids, $request->export_option);
+    }
+
     public function bulkMarkAsPaid(Request $request)
     {
         try {

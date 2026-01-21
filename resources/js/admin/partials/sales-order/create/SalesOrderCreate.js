@@ -1,5 +1,5 @@
-import { SalesOrderModule } from '../common/SalesOrderModule.js';
-import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+import { SalesOrderModule } from "../common/SalesOrderModule.js";
+import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 
 export class SalesOrderCreate extends SalesOrderModule {
     constructor(config = {}) {
@@ -77,16 +77,16 @@ export class SalesOrderCreate extends SalesOrderModule {
 
     initEventListeners() {
         this.elements.customerSelect.addEventListener("change", () =>
-            this.calculateDueDate()
+            this.calculateDueDate(),
         );
 
         if (this.elements.orderDate && this.elements.orderDate._flatpickr) {
             this.elements.orderDate._flatpickr.config.onChange.push(() =>
-                this.calculateDueDate()
+                this.calculateDueDate(),
             );
         } else {
             this.elements.orderDate.addEventListener("change", () =>
-                this.calculateDueDate()
+                this.calculateDueDate(),
             );
         }
 
@@ -95,32 +95,32 @@ export class SalesOrderCreate extends SalesOrderModule {
             this.updateStockDisplay();
         });
         this.elements.customerSelect.addEventListener("change", () =>
-            this.fetchCustomerPastPrice()
+            this.fetchCustomerPastPrice(),
         );
 
         if (this.elements.quantity) {
             this.elements.quantity.addEventListener("input", () =>
-                this.validateQuantity()
+                this.validateQuantity(),
             );
             this.elements.quantity.addEventListener("change", () =>
-                this.validateQuantity()
+                this.validateQuantity(),
             );
         }
 
         this.elements.addProductBtn.addEventListener("click", () =>
-            this.addProduct()
+            this.addProduct(),
         );
 
         this.elements.clearProductsBtn.addEventListener("click", () =>
-            this.clearProducts()
+            this.clearProducts(),
         );
 
         this.elements.applyTotalDiscount.addEventListener("click", () =>
-            this.applyOrderDiscount()
+            this.applyOrderDiscount(),
         );
 
         this.elements.form.addEventListener("submit", (e) =>
-            this.handleSubmit(e)
+            this.handleSubmit(e),
         );
     }
 
@@ -178,20 +178,20 @@ export class SalesOrderCreate extends SalesOrderModule {
         const productId = selectedOption.value;
 
         fetch(`/admin/product/modal-view/${productId}`)
-            .then(response => {
+            .then((response) => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error("Network response was not ok");
                 }
                 return response.json();
             })
-            .then(data => {
+            .then((data) => {
                 this.selectedProductData = data; // Store the full product data
                 this.elements.priceField.value = data.price;
                 this.elements.sellingPriceField.value = data.selling_price;
                 this.fetchCustomerPastPrice();
                 this.updateStockDisplay(); // Update stock display after data is fetched
             })
-            .catch(error => {
+            .catch((error) => {
                 // // console.error('Error fetching product details:', error);
                 this.elements.priceField.value = "";
                 this.elements.sellingPriceField.value = "";
@@ -223,9 +223,12 @@ export class SalesOrderCreate extends SalesOrderModule {
         this.currentStock = totalStockQuantity;
 
         const orderedQuantity = this.getOrderedQuantityForProduct(
-            this.selectedProductData.id
+            this.selectedProductData.id,
         );
-        const availableForSale = Math.max(0, totalStockQuantity - orderedQuantity); // Changed from totalRemainingQuantity
+        const availableForSale = Math.max(
+            0,
+            totalStockQuantity - orderedQuantity,
+        ); // Changed from totalRemainingQuantity
 
         this.elements.stock_available.textContent = availableForSale;
 
@@ -250,7 +253,7 @@ export class SalesOrderCreate extends SalesOrderModule {
         this.elements.stock_available.classList.remove(
             "text-primary",
             "text-warning",
-            "text-danger"
+            "text-danger",
         );
 
         if (remainingStock === 0) {
@@ -263,7 +266,11 @@ export class SalesOrderCreate extends SalesOrderModule {
     }
 
     validateQuantity() {
-        if (!this.elements.quantity || !this.elements.productSelect || !this.selectedProductData) {
+        if (
+            !this.elements.quantity ||
+            !this.elements.productSelect ||
+            !this.selectedProductData
+        ) {
             return true;
         }
 
@@ -272,7 +279,10 @@ export class SalesOrderCreate extends SalesOrderModule {
 
         const totalStockQuantity = this.selectedProductData.stock_quantity;
         const orderedQuantity = this.getOrderedQuantityForProduct(productId);
-        const availableForSale = Math.max(0, totalStockQuantity - orderedQuantity); // Changed from totalRemainingQuantity
+        const availableForSale = Math.max(
+            0,
+            totalStockQuantity - orderedQuantity,
+        ); // Changed from totalRemainingQuantity
 
         if (quantity > availableForSale) {
             this.showQuantityWarning();
@@ -348,8 +358,8 @@ export class SalesOrderCreate extends SalesOrderModule {
         let itemDiscount = 0;
 
         this.products.forEach((product) => {
-            const productSubtotal =
-                Number(product.price) * Number(product.quantity);
+            const priceInCents = Math.round(product.price * 100);
+            const productSubtotal = (priceInCents * product.quantity) / 100;
             totalBeforeDiscounts += productSubtotal;
 
             subtotal += product.total;
@@ -358,7 +368,7 @@ export class SalesOrderCreate extends SalesOrderModule {
                 product.price,
                 product.quantity,
                 product.discount,
-                product.discountType
+                product.discountType,
             );
 
             itemDiscount += productDiscount;
@@ -367,7 +377,7 @@ export class SalesOrderCreate extends SalesOrderModule {
         const orderDiscountAmount = this.calculateOrderDiscount(
             totalBeforeDiscounts,
             this.orderDiscount,
-            this.orderDiscountType
+            this.orderDiscountType,
         );
         const totalDiscount = itemDiscount + orderDiscountAmount;
         const taxableAmount = subtotal - orderDiscountAmount;
@@ -430,7 +440,7 @@ export class SalesOrderCreate extends SalesOrderModule {
             price,
             quantity,
             discount,
-            discountType
+            discountType,
         );
 
         this.products.push({
@@ -499,7 +509,11 @@ export class SalesOrderCreate extends SalesOrderModule {
     handleSubmit(e) {
         if (this.products.length === 0) {
             e.preventDefault();
-            InventMagApp.showToast("Warning", "Please add at least one product before submitting.", "warning");
+            InventMagApp.showToast(
+                "Warning",
+                "Please add at least one product before submitting.",
+                "warning",
+            );
             return false;
         }
 
@@ -514,7 +528,10 @@ export class SalesOrderCreate extends SalesOrderModule {
             const totalOrderedForProduct = this.products
                 .filter((p) => p.product_id === product.product_id)
                 .reduce((sum, p) => sum + p.quantity, 0);
-            const availableForSale = Math.max(0, totalStockQuantity - totalOrderedForProduct + product.quantity); // Add back current product's quantity for its own row
+            const availableForSale = Math.max(
+                0,
+                totalStockQuantity - totalOrderedForProduct + product.quantity,
+            ); // Add back current product's quantity for its own row
 
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -525,8 +542,8 @@ export class SalesOrderCreate extends SalesOrderModule {
                         availableForSale === 0
                             ? "bg-danger"
                             : availableForSale <= 5
-                            ? "bg-warning"
-                            : "bg-success"
+                              ? "bg-warning"
+                              : "bg-success"
                     }">
                         ${availableForSale}
                     </span>
@@ -534,23 +551,23 @@ export class SalesOrderCreate extends SalesOrderModule {
                 <td class="text-center">
                     <input type="number" class="form-control quantity-input text-center"
                         value="${product.quantity}" data-unique-id="${
-                product.uniqueId
-            }"
+                            product.uniqueId
+                        }"
                         min="1" max="${availableForSale}" style="width:80px;" />
                 </td>
                 <td class="text-center">
                     <input type="number" class="form-control price-input text-center"
                         value="${product.customer_price}" data-unique-id="${
-                product.uniqueId
-            }"
+                            product.uniqueId
+                        }"
                         min="0" step="0.01" style="width:100px;" />
                 </td>
                 <td class="text-center">
                     <div class="input-group" style="width:200px;">
                         <input type="number" class="form-control discount-input text-center"
                             value="${product.discount}" data-unique-id="${
-                product.uniqueId
-            }"
+                                product.uniqueId
+                            }"
                             min="0" step="0.01" />
                         <select class="form-select discount-type" data-unique-id="${
                             product.uniqueId
@@ -569,7 +586,7 @@ export class SalesOrderCreate extends SalesOrderModule {
                     </div>
                 </td>
                 <td class="text-end product-total fw-bold">${formatCurrency(
-                    product.total
+                    product.total,
                 )}</td>
                 <td class="text-center">
                     <button type="button" class="btn btn-danger btn-sm removeProduct"
@@ -591,7 +608,7 @@ export class SalesOrderCreate extends SalesOrderModule {
         const newTableBody = this.elements.productTableBody.cloneNode(true);
         this.elements.productTableBody.parentNode.replaceChild(
             newTableBody,
-            this.elements.productTableBody
+            this.elements.productTableBody,
         );
         this.elements.productTableBody = newTableBody;
 
@@ -668,7 +685,7 @@ export class SalesOrderCreate extends SalesOrderModule {
             product.price,
             product.quantity,
             product.discount,
-            product.discountType
+            product.discountType,
         );
 
         const totalElement = targetElement

@@ -141,9 +141,22 @@ class PurchaseReturnService
         });
     }
 
-    public function bulkExportPurchaseReturns(array $ids, string $exportOption)
+    public function bulkExportPurchaseReturns(array $filters, ?array $ids, string $exportOption)
     {
-        $purchaseReturns = PurchaseReturn::with(['purchase', 'user'])->whereIn('id', $ids)->get();
+        $query = PurchaseReturn::with(['purchase', 'user']);
+        
+        if ($ids) {
+            $query->whereIn('id', $ids);
+        } else {
+            if (isset($filters['month']) && $filters['month']) {
+                $query->whereMonth('return_date', $filters['month']);
+            }
+            if (isset($filters['year']) && $filters['year']) {
+                $query->whereYear('return_date', $filters['year']);
+            }
+        }
+
+        $purchaseReturns = $query->get();
 
         if ($exportOption === 'pdf') {
             $html = view('admin.por.bulk-export-pdf', compact('purchaseReturns'))->render();
@@ -176,7 +189,7 @@ class PurchaseReturnService
                 foreach ($purchaseReturns as $pr) {
                     fputcsv($file, [
                         $pr->purchase->invoice,
-                        $pr->return_date->format('Y-m-d'),
+                        \Carbon\Carbon::parse($pr->return_date)->format('Y-m-d'),
                         CurrencyHelper::format($pr->total_amount),
                         $pr->status,
                         $pr->user->name,
@@ -190,5 +203,20 @@ class PurchaseReturnService
         }
 
         return null;
+    }
+
+    public function printReturn($id)
+    {
+        $por = PurchaseReturn::with(['purchase.supplier', 'items.product', 'user'])->findOrFail($id);
+        $shopname = User::whereNotNull('shopname')->value('shopname');
+        $address = User::whereNotNull('address')->value('address');
+
+        $html = view('admin.por.print-pdf', compact('por', 'shopname', 'address'))->render();
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return $dompdf->stream('purchase-return-' . $por->id . '.pdf', ['Attachment' => false]);
     }
 }

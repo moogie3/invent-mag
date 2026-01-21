@@ -193,9 +193,22 @@ class SalesReturnService
         });
     }
 
-    public function bulkExportSalesReturns(array $ids, string $exportOption)
+    public function bulkExportSalesReturns(array $filters, ?array $ids, string $exportOption)
     {
-        $salesReturns = SalesReturn::with(['sale', 'user'])->whereIn('id', $ids)->get();
+        $query = SalesReturn::with(['sale', 'user']);
+        
+        if ($ids) {
+            $query->whereIn('id', $ids);
+        } else {
+            if (isset($filters['month']) && $filters['month']) {
+                $query->whereMonth('return_date', $filters['month']);
+            }
+            if (isset($filters['year']) && $filters['year']) {
+                $query->whereYear('return_date', $filters['year']);
+            }
+        }
+
+        $salesReturns = $query->get();
 
         if ($exportOption === 'pdf') {
             $html = view('admin.sales-returns.bulk-export-pdf', compact('salesReturns'))->render();
@@ -228,7 +241,7 @@ class SalesReturnService
                 foreach ($salesReturns as $sr) {
                     fputcsv($file, [
                         $sr->sale->invoice,
-                        $sr->return_date->format('Y-m-d'),
+                        \Carbon\Carbon::parse($sr->return_date)->format('Y-m-d'),
                         CurrencyHelper::format($sr->total_amount),
                         $sr->status,
                         $sr->user->name,
@@ -252,5 +265,20 @@ class SalesReturnService
     public function bulkCancelSalesReturns(array $ids): void
     {
         SalesReturn::whereIn('id', $ids)->update(['status' => 'Canceled']);
+    }
+
+    public function printReturn($id)
+    {
+        $salesReturn = SalesReturn::with(['sale.customer', 'items.product', 'user'])->findOrFail($id);
+        $shopname = User::whereNotNull('shopname')->value('shopname');
+        $address = User::whereNotNull('address')->value('address');
+
+        $html = view('admin.sales-returns.print-pdf', compact('salesReturn', 'shopname', 'address'))->render();
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return $dompdf->stream('sales-return-' . $salesReturn->id . '.pdf', ['Attachment' => false]);
     }
 }

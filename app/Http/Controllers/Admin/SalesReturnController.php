@@ -123,6 +123,15 @@ class SalesReturnController extends Controller
         return view('admin.layouts.modals.sales.srmodals-view', compact('salesReturn', 'statusClass', 'statusText'));
     }
 
+    public function print($id)
+    {
+        try {
+            return $this->salesReturnService->printReturn($id);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error generating return slip. ' . $e->getMessage());
+        }
+    }
+
     /**
      * @group Sales Returns
      * @summary Bulk Export Sales Returns
@@ -133,13 +142,13 @@ class SalesReturnController extends Controller
     public function bulkExport(Request $request)
     {
         $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'required|integer|exists:sales_returns,id',
+            'ids' => 'nullable|array',
+            'ids.*' => 'integer',
             'export_option' => 'required|string|in:pdf,csv',
         ]);
 
         try {
-            $file = $this->salesReturnService->bulkExportSalesReturns($request->ids, $request->export_option);
+            $file = $this->salesReturnService->bulkExportSalesReturns($request->all(), $request->ids, $request->export_option);
             return $file;
         } catch (\Exception $e) {
             return response()->json([

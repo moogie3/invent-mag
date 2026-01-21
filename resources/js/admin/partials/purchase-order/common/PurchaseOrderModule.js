@@ -1,4 +1,4 @@
-import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 
 export class PurchaseOrderModule {
     constructor(config = {}) {
@@ -18,12 +18,12 @@ export class PurchaseOrderModule {
         const totalPerUnitInCents = priceInCents - discountInCents;
         const totalInCents = totalPerUnitInCents * quantity;
 
-        return Math.round(totalInCents / 100);
+        return totalInCents / 100;
     }
 
     calculateDiscount(subtotal, discountValue, discountType) {
         if (discountType === "percentage") {
-            return Math.round((subtotal * discountValue) / 100);
+            return (subtotal * discountValue) / 100;
         }
         return discountValue;
     }

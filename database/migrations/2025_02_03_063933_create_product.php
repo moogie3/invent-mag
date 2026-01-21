@@ -20,8 +20,8 @@ return new class extends Migration
             $table->index('name');
             $table->integer('stock_quantity');
             $table->integer('low_stock_threshold')->nullable();
-            $table->double('price');
-            $table->double('selling_price');
+            $table->decimal('price', 15, 2);
+            $table->decimal('selling_price', 15, 2);
             $table->integer('category_id');
             $table->integer('units_id');
             $table->integer('supplier_id');

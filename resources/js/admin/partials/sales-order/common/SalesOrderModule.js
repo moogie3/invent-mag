@@ -1,4 +1,4 @@
-import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 
 export class SalesOrderModule {
     constructor(config = {}) {
@@ -11,27 +11,33 @@ export class SalesOrderModule {
     }
 
     calculateDiscountAmount(price, quantity, discount, discountType) {
-        if (discountType === "percentage") {
-            return ((price * discount) / 100) * quantity;
-        }
-        return discount * quantity;
+        const priceInCents = Math.round(price * 100);
+        const discountInCents =
+            discountType === "percentage"
+                ? Math.round((priceInCents * discount) / 100)
+                : Math.round(discount * 100);
+
+        return (discountInCents * quantity) / 100;
     }
 
     calculateTotal(price, quantity, discount, discountType) {
-        const discountAmount = this.calculateDiscountAmount(
-            price,
-            quantity,
-            discount,
-            discountType
-        );
-        return price * quantity - discountAmount;
+        const priceInCents = Math.round(price * 100);
+        const discountInCents =
+            discountType === "percentage"
+                ? Math.round((priceInCents * discount) / 100)
+                : Math.round(discount * 100);
+
+        const totalPerUnitInCents = priceInCents - discountInCents;
+        const totalInCents = totalPerUnitInCents * quantity;
+
+        return totalInCents / 100;
     }
 
-    calculateOrderDiscount(subtotal, discount, discountType) {
+    calculateOrderDiscount(subtotal, discountValue, discountType) {
         if (discountType === "percentage") {
-            return (subtotal * discount) / 100;
+            return (subtotal * discountValue) / 100;
         }
-        return discount;
+        return discountValue;
     }
 
     initFlatpickr(orderDateElement, dueDateElement) {

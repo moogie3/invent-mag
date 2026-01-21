@@ -9,6 +9,24 @@
                 </h2>
             </div>
             <div class="col-auto ms-auto d-flex gap-2">
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                        id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="exportAllPurchaseReturns('pdf'); return false;">
+                                Export as PDF
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="exportAllPurchaseReturns('csv'); return false;">
+                                Export as CSV
+                            </a>
+                        </li>
+                    </ul>
+                </div>
                 <a href="{{ route('admin.por.create') }}" class="btn btn-primary d-none d-sm-inline-block">
                     <i class="ti ti-plus fs-4"></i>
                     {{ __('messages.new_purchase_return') }}

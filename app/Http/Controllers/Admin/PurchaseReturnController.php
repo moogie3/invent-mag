@@ -122,6 +122,15 @@ class PurchaseReturnController extends Controller
         return view('admin.layouts.modals.po.pormodals-view', compact('por', 'statusClass', 'statusText'));
     }
 
+    public function print($id)
+    {
+        try {
+            return $this->purchaseReturnService->printReturn($id);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error generating return slip. ' . $e->getMessage());
+        }
+    }
+
     /**
      * @group Purchase Returns
      * @summary Bulk Export Purchase Returns
@@ -132,13 +141,13 @@ class PurchaseReturnController extends Controller
     public function bulkExport(Request $request)
     {
         $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'required|integer|exists:purchase_returns,id',
+            'ids' => 'nullable|array',
+            'ids.*' => 'integer',
             'export_option' => 'required|string|in:pdf,csv',
         ]);
 
         try {
-            $file = $this->purchaseReturnService->bulkExportPurchaseReturns($request->ids, $request->export_option);
+            $file = $this->purchaseReturnService->bulkExportPurchaseReturns($request->all(), $request->ids, $request->export_option);
             return $file;
         } catch (\Exception $e) {
             return response()->json([

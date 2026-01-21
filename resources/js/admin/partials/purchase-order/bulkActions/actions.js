@@ -1,6 +1,4 @@
-import { PurchaseOrderBulkSelection } from './PurchaseOrderBulkSelection.js';
-
-
+import { PurchaseOrderBulkSelection } from "./PurchaseOrderBulkSelection.js";
 
 function getSelectedIds() {
     return window.bulkSelection ? window.bulkSelection.getSelectedIds() : [];
@@ -29,7 +27,7 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
         InventMagApp.showToast(
             "Error",
             "Security token not found. Please refresh the page.",
-            "error"
+            "error",
         );
         resetButton(confirmButton, originalText);
         return;
@@ -49,15 +47,18 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                sessionStorage.setItem('purchaseOrderBulkDeleteSuccess', `Bulk delete ${
-                    data.deleted_count || selectedIds.length
-                } purchase order(s) successfully!`);
+                sessionStorage.setItem(
+                    "purchaseOrderBulkDeleteSuccess",
+                    `Bulk delete ${
+                        data.deleted_count || selectedIds.length
+                    } purchase order(s) successfully!`,
+                );
                 location.reload();
             } else {
                 InventMagApp.showToast(
                     "Error",
                     data.message || "Failed to delete purchase orders.",
-                    "error"
+                    "error",
                 );
             }
         })
@@ -66,7 +67,7 @@ function performBulkDelete(selectedIds, confirmButton, modal) {
             InventMagApp.showToast(
                 "Error",
                 "An error occurred while deleting purchase orders.",
-                "error"
+                "error",
             );
         })
         .finally(() => {
@@ -82,14 +83,14 @@ export function bulkDeletePO() {
         InventMagApp.showToast(
             "Warning",
             "Please select purchase orders to delete.",
-            "warning"
+            "warning",
         );
         return;
     }
 
     document.getElementById("bulkDeleteCount").textContent = selected.length;
     const modal = new bootstrap.Modal(
-        document.getElementById("bulkDeleteModal")
+        document.getElementById("bulkDeleteModal"),
     );
     modal.show();
 
@@ -98,20 +99,20 @@ export function bulkDeletePO() {
     confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
 
     newBtn.addEventListener("click", () =>
-        performBulkDelete(selected, newBtn, modal)
+        performBulkDelete(selected, newBtn, modal),
     );
 }
 
-export function bulkExportPO(exportOption = 'csv') {
+export function bulkExportPO(exportOption = "csv") {
     const selected = Array.from(
-        document.querySelectorAll(".row-checkbox:checked")
+        document.querySelectorAll(".row-checkbox:checked"),
     ).map((cb) => cb.value);
 
     if (selected.length === 0) {
         InventMagApp.showToast(
             "Warning",
             "Please select at least one purchase order to export.",
-            "warning"
+            "warning",
         );
         return;
     }
@@ -165,23 +166,81 @@ export function bulkExportPO(exportOption = 'csv') {
     }, 2000);
 }
 
+export function exportAllPurchases(exportOption = "csv") {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/admin/po/bulk-export";
+    form.style.display = "none";
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const csrfInput = document.createElement("input");
+        csrfInput.type = "hidden";
+        csrfInput.name = "_token";
+        csrfInput.value = csrfToken.getAttribute("content");
+        form.appendChild(csrfInput);
+    }
+
+    const exportOptionInput = document.createElement("input");
+    exportOptionInput.type = "hidden";
+    exportOptionInput.name = "export_option";
+    exportOptionInput.value = exportOption;
+    form.appendChild(exportOptionInput);
+
+    // Add filters from the page
+    const monthSelect = document.querySelector('select[name="month"]');
+    const yearSelect = document.querySelector('select[name="year"]');
+    const searchInput = document.getElementById("searchInput");
+
+    if (monthSelect && monthSelect.value) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "month";
+        input.value = monthSelect.value;
+        form.appendChild(input);
+    }
+
+    if (yearSelect && yearSelect.value) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "year";
+        input.value = yearSelect.value;
+        form.appendChild(input);
+    }
+
+    if (searchInput && searchInput.value) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "search";
+        input.value = searchInput.value;
+        form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+
+    setTimeout(() => {
+        document.body.removeChild(form);
+    }, 2000);
+}
+
 export function bulkMarkAsPaidPO() {
     const selected = Array.from(
-        document.querySelectorAll(".row-checkbox:checked")
+        document.querySelectorAll(".row-checkbox:checked"),
     );
 
     if (selected.length === 0) {
         smartSelectUnpaidOnlyPO();
 
         const newSelected = Array.from(
-            document.querySelectorAll(".row-checkbox:checked")
+            document.querySelectorAll(".row-checkbox:checked"),
         );
 
         if (newSelected.length === 0) {
             InventMagApp.showToast(
                 "Info",
                 "No unpaid purchase orders available to mark as paid.",
-                "info"
+                "info",
             );
             return;
         }
@@ -226,11 +285,11 @@ export function bulkMarkAsPaidPO() {
             InventMagApp.showToast(
                 "Warning",
                 `${selectedPaidPOs.length} paid purchase order(s) were excluded from selection.`,
-                "warning"
+                "warning",
             );
 
             const remainingSelected = Array.from(
-                document.querySelectorAll(".row-checkbox:checked")
+                document.querySelectorAll(".row-checkbox:checked"),
             );
 
             if (remainingSelected.length === 0) {
@@ -240,7 +299,7 @@ export function bulkMarkAsPaidPO() {
     }
 
     const finalSelected = Array.from(
-        document.querySelectorAll(".row-checkbox:checked")
+        document.querySelectorAll(".row-checkbox:checked"),
     ).map((cb) => cb.value);
 
     const bulkPaidCount = document.getElementById("bulkPaidCount");
@@ -249,7 +308,7 @@ export function bulkMarkAsPaidPO() {
     }
 
     const bulkMarkAsPaidModal = new bootstrap.Modal(
-        document.getElementById("bulkMarkAsPaidModal")
+        document.getElementById("bulkMarkAsPaidModal"),
     );
     bulkMarkAsPaidModal.show();
 
@@ -309,7 +368,7 @@ function smartSelectUnpaidOnlyPO() {
             "Info",
             `${excludedCount} paid purchase order(s) were excluded from selection.`,
             "info",
-            3000
+            3000,
         );
     }
 }
@@ -330,7 +389,7 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
         InventMagApp.showToast(
             "Error",
             "Security token not found. Please refresh the page.",
-            "error"
+            "error",
         );
         resetButton(confirmButton, originalText);
         return;
@@ -350,15 +409,18 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                sessionStorage.setItem('purchaseOrderBulkMarkAsPaidSuccess', `${
-                    data.updated_count || selectedIds.length
-                } purchase order(s) marked as paid successfully!`);
+                sessionStorage.setItem(
+                    "purchaseOrderBulkMarkAsPaidSuccess",
+                    `${
+                        data.updated_count || selectedIds.length
+                    } purchase order(s) marked as paid successfully!`,
+                );
                 location.reload();
             } else {
                 InventMagApp.showToast(
                     "Error",
                     data.message || "Failed to update purchase orders.",
-                    "error"
+                    "error",
                 );
             }
         })
@@ -367,7 +429,7 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
             InventMagApp.showToast(
                 "Error",
                 "An error occurred while updating purchase orders.",
-                "error"
+                "error",
             );
         })
         .finally(() => {

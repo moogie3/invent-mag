@@ -163,6 +163,15 @@ class PurchaseController extends Controller
         return response()->json($metrics);
     }
 
+    public function print($id)
+    {
+         try {
+            return $this->purchaseService->printPo($id);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error generating purchase order. ' . $e->getMessage());
+        }
+    }
+
     /**
      * @group Purchase Orders
      * @summary Bulk Delete Purchase Orders
@@ -238,13 +247,13 @@ class PurchaseController extends Controller
     public function bulkExport(Request $request)
     {
         $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'required|integer|exists:po,id',
+            'ids' => 'nullable|array',
+            'ids.*' => 'integer',
             'export_option' => 'required|string|in:pdf,csv',
         ]);
 
         try {
-            $file = $this->purchaseService->bulkExportPurchases($request->ids, $request->export_option);
+            $file = $this->purchaseService->bulkExportPurchases($request->all(), $request->ids, $request->export_option);
             return $file;
         } catch (\Exception $e) {
             return response()->json([

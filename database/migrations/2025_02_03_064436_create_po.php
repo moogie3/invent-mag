@@ -23,7 +23,7 @@ return new class extends Migration
             $table->enum('payment_type', ['Cash', 'Card', 'Transfer', 'eWallet', '-'])->default('-');
             $table->decimal('discount_total', 10, 2)->default(0);
             $table->enum('discount_total_type', ['percentage', 'fixed'])->default('fixed');
-            $table->float('total');
+            $table->decimal('total', 15, 2);
             $table->enum('status', ['Unpaid', 'Paid', 'Partial', 'Returned']);
             $table->timestamps();
         });

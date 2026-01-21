@@ -137,9 +137,36 @@ class ProductService
         ];
     }
 
-    public function bulkExportProducts(array $ids, string $exportOption)
+    public function bulkExportProducts(array $filters, ?array $ids, string $exportOption)
     {
-        $products = Product::with(['category', 'supplier', 'unit', 'warehouse'])->whereIn('id', $ids)->get();
+        $query = Product::with(['category', 'supplier', 'unit', 'warehouse']);
+        
+        if ($ids) {
+            $query->whereIn('id', $ids);
+        } else {
+            if (isset($filters['category_id']) && $filters['category_id']) {
+                $query->where('category_id', $filters['category_id']);
+            }
+            if (isset($filters['supplier_id']) && $filters['supplier_id']) {
+                $query->where('supplier_id', $filters['supplier_id']);
+            }
+            if (isset($filters['warehouse_id']) && $filters['warehouse_id']) {
+                $query->where('warehouse_id', $filters['warehouse_id']);
+            }
+            if (isset($filters['units_id']) && $filters['units_id']) {
+                $query->where('units_id', $filters['units_id']);
+            }
+            if (isset($filters['search']) && $filters['search']) {
+                $search = $filters['search'];
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('code', 'LIKE', "%{$search}%")
+                      ->orWhere('barcode', 'LIKE', "%{$search}%");
+                });
+            }
+        }
+
+        $products = $query->get();
 
         if ($exportOption === 'pdf') {
             $html = view('admin.product.bulk-export-pdf', compact('products'))->render();

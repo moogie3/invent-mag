@@ -17,10 +17,10 @@ return new class extends Migration
             $table->foreignId('sales_id')->constrained('sales')->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->integer('quantity');
-            $table->decimal('discount', 10);
+            $table->decimal('discount', 15, 2);
             $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage');
-            $table->decimal('customer_price', 10);
-            $table->decimal('total', 10);
+            $table->decimal('customer_price', 15, 2);
+            $table->decimal('total', 15, 2);
             $table->timestamps();
         });
     }

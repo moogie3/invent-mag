@@ -146,25 +146,56 @@ class TransactionService
         $type = $filters['type'] ?? null;
 
         $dates = $this->calculateDateRange($dateRange, $startDate, $endDate);
+        
+        $salesIds = [];
+        $purchaseIds = [];
+        if ($selectedIds) {
+            foreach ($selectedIds as $compositeId) {
+                if (strpos($compositeId, '_') !== false) {
+                    [$t, $id] = explode('_', $compositeId);
+                    if ($t === 'sale') $salesIds[] = $id;
+                    if ($t === 'purchase') $purchaseIds[] = $id;
+                } else {
+                     // Fallback if integer IDs are passed (e.g. from existing code?)
+                     // but we expect strings now.
+                }
+            }
+        }
+
         $salesQuery = $this->buildSalesQuery($dates, $status, $search);
+        if ($selectedIds) {
+            if (!empty($salesIds)) {
+                $salesQuery->whereIn('id', $salesIds);
+            } else {
+                $salesQuery->whereRaw('1 = 0'); // No sales selected
+            }
+        }
+
         $purchaseQuery = $this->buildPurchaseQuery($dates, $status, $search);
+        if ($selectedIds) {
+            if (!empty($purchaseIds)) {
+                $purchaseQuery->whereIn('id', $purchaseIds);
+            } else {
+                $purchaseQuery->whereRaw('1 = 0'); // No purchases selected
+            }
+        }
 
         $sales = collect();
         if (!$type || $type === 'sale') {
-            $sales = $salesQuery->get()->map(fn($sale) => $this->transformSaleToTransaction($sale, true));
+             // If selectedIds provided, only run query if salesIds is not empty
+             // The query update above handles this via whereRaw('1=0') but we can also skip here.
+            $sales = $salesQuery->get()->toBase()->map(fn($sale) => $this->transformSaleToTransaction($sale, true));
         }
 
         $purchases = collect();
         if (!$type || $type === 'purchase') {
-            $purchases = $purchaseQuery->get()->map(fn($purchase) => $this->transformPurchaseToTransaction($purchase, true));
+            $purchases = $purchaseQuery->get()->toBase()->map(fn($purchase) => $this->transformPurchaseToTransaction($purchase, true));
         }
 
         $transactions = $sales->merge($purchases)->sortByDesc('date');
 
-        if ($selectedIds) {
-            return $transactions->whereIn('id', $selectedIds);
-        }
-
+        // ID filtering is already done at query level
+        
         return $transactions;
     }
 
@@ -441,9 +472,9 @@ class TransactionService
         return response()->stream($callback, 200, $headers);
     }
 
-    public function bulkExportTransactions(array $ids, string $exportOption)
+    public function bulkExportTransactions(array $filters, ?array $ids, string $exportOption)
     {
-        $transactions = $this->getTransactionsForExport([], $ids);
+        $transactions = $this->getTransactionsForExport($filters, $ids);
 
         if ($exportOption === 'pdf') {
             $html = view('admin.reports.recent-transactions-bulk-export-pdf', compact('transactions'))->render();

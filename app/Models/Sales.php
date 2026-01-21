@@ -112,6 +112,23 @@ class Sales extends Model
         return $this->payments->sum('amount');
     }
 
+    public function getGrandTotalAttribute()
+    {
+        // If the items relationship is loaded, calculate precisely from items + order-level tax/discount.
+        if ($this->relationLoaded('salesItems')) {
+            $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary($this->salesItems, $this->order_discount, $this->order_discount_type, $this->tax_rate);
+            return round($summary['finalTotal'], 2);
+        }
+
+        // Otherwise, fall back to the stored total.
+        return round(($this->attributes['total'] ?? 0), 2);
+    }
+
+    public function getTotalAmountAttribute()
+    {
+        return $this->grand_total;
+    }
+
     public function getBalanceAttribute()
     {
         return $this->total - $this->total_paid;

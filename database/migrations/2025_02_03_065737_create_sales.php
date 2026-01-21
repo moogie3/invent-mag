@@ -24,7 +24,7 @@ return new class extends Migration
             $table->enum('order_discount_type', ['percentage', 'fixed'])->default('fixed');
             $table->decimal('tax_rate', 5, 2)->nullable();
             $table->decimal('total_tax', 10, 2)->nullable();
-            $table->double('total');
+            $table->decimal('total', 15, 2);
             $table->enum('status', ['Unpaid', 'Paid', 'Partial', 'Returned'])->default('Unpaid');
             $table->decimal('amount_received', 10, 2)->nullable();
             $table->decimal('change_amount', 10, 2)->nullable();

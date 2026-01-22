@@ -1,18 +1,18 @@
-name: 'Sales Opportunities'
+name: 'Sales Pipelines'
 description: ''
 endpoints:
   -
     custom: []
     httpMethods:
-      - PUT
-    uri: 'api/v1/sales-opportunities/{opportunity_id}/move'
+      - POST
+    uri: 'api/v1/sales-pipelines/{pipeline_id}/stages'
     metadata:
       custom: []
-      groupName: 'Sales Opportunities'
+      groupName: 'Sales Pipelines'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Move Opportunity to a new Stage'
+      title: 'Add Stage to Pipeline'
       description: ''
       authenticated: true
       deprecated: false
@@ -21,10 +21,10 @@ endpoints:
       Content-Type: application/json
       Accept: application/json
     urlParameters:
-      opportunity_id:
+      pipeline_id:
         custom: []
-        name: opportunity_id
-        description: 'The ID of the opportunity.'
+        name: pipeline_id
+        description: 'The ID of the pipeline.'
         required: true
         example: 17
         type: integer
@@ -32,10 +32,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      opportunity:
+      pipeline:
         custom: []
-        name: opportunity
-        description: 'The ID of the sales opportunity.'
+        name: pipeline
+        description: 'The ID of the sales pipeline.'
         required: true
         example: 1
         type: integer
@@ -44,32 +44,44 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      opportunity_id: 17
-      opportunity: 1
+      pipeline_id: 17
+      pipeline: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      pipeline_stage_id:
+      name:
         custom: []
-        name: pipeline_stage_id
-        description: 'The ID of the new pipeline stage.'
+        name: name
+        description: 'The name of the new stage.'
         required: true
-        example: 2
-        type: integer
+        example: '"Qualification"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      is_closed:
+        custom: []
+        name: is_closed
+        description: 'Whether this stage represents a closed state.'
+        required: false
+        example: false
+        type: boolean
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      pipeline_stage_id: 2
+      name: '"Qualification"'
+      is_closed: false
     fileParameters: []
     responses:
       -
         custom: []
-        status: 200
-        content: '{"data":{"id":1,"name":"New Client Project","pipeline_stage_id":2,...}}'
+        status: 201
+        content: '{"id":1,"sales_pipeline_id":1,"name":"Qualification","position":0,"is_closed":false,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}'
         headers: []
-        description: Success
+        description: 'Stage Created'
       -
         custom: []
         status: 401
@@ -79,13 +91,13 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Sales opportunity or stage not found."}'
+        content: '{"message": "Sales pipeline not found."}'
         headers: []
-        description: 'Opportunity or Stage Not Found'
+        description: 'Pipeline Not Found'
       -
         custom: []
         status: 422
-        content: '{"message":"The pipeline_stage_id field is required.","errors":{"pipeline_stage_id":["The pipeline_stage_id field is required."]}}'
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
         headers: []
         description: 'Validation Error'
     responseFields: []
@@ -100,14 +112,14 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: 'api/v1/sales-opportunities/{opportunity_id}/convert'
+    uri: 'api/v1/sales-pipelines/{pipeline_id}/stages/reorder'
     metadata:
       custom: []
-      groupName: 'Sales Opportunities'
+      groupName: 'Sales Pipelines'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Convert Opportunity to Sales Order'
+      title: 'Reorder Stages in Pipeline'
       description: ''
       authenticated: true
       deprecated: false
@@ -116,10 +128,10 @@ endpoints:
       Content-Type: application/json
       Accept: application/json
     urlParameters:
-      opportunity_id:
+      pipeline_id:
         custom: []
-        name: opportunity_id
-        description: 'The ID of the opportunity.'
+        name: pipeline_id
+        description: 'The ID of the pipeline.'
         required: true
         example: 17
         type: integer
@@ -127,10 +139,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      opportunity:
+      pipeline:
         custom: []
-        name: opportunity
-        description: 'The ID of the sales opportunity.'
+        name: pipeline
+        description: 'The ID of the sales pipeline.'
         required: true
         example: 1
         type: integer
@@ -139,18 +151,76 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      opportunity_id: 17
-      opportunity: 1
+      pipeline_id: 17
+      pipeline: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      stages:
+        custom: []
+        name: stages
+        description: 'An array of stage objects with id and new position.'
+        required: true
+        example:
+          - consequatur
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'stages[].id':
+        custom: []
+        name: 'stages[].id'
+        description: 'The <code>id</code> of an existing record in the pipeline_stages table.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'stages[].position':
+        custom: []
+        name: 'stages[].position'
+        description: 'Must be at least 0.'
+        required: true
+        example: 45
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'stages.*.id':
+        custom: []
+        name: 'stages.*.id'
+        description: 'The ID of the stage.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      'stages.*.position':
+        custom: []
+        name: 'stages.*.position'
+        description: 'The new position of the stage.'
+        required: true
+        example: 0
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      stages:
+        - consequatur
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"message": "Opportunity successfully converted to Sales Order.", "type": "success", "sales_id": 1}'
+        content: '{"message": "Stages reordered successfully"}'
         headers: []
         description: Success
       -
@@ -162,15 +232,15 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Sales opportunity not found."}'
+        content: '{"message": "Sales pipeline not found."}'
         headers: []
-        description: 'Opportunity Not Found'
+        description: 'Pipeline Not Found'
       -
         custom: []
-        status: 500
-        content: '{"message": "Failed to convert opportunity to sales order: Internal server error.", "type": "error"}'
+        status: 422
+        content: '{"message":"The stages field is required.","errors":{"stages":["The stages field is required."]}}'
         headers: []
-        description: 'Error converting to Sales Order'
+        description: 'Validation Error'
     responseFields: []
     auth:
       - headers
@@ -183,14 +253,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/sales-opportunities
+    uri: api/v1/sales-pipelines
     metadata:
       custom: []
-      groupName: 'Sales Opportunities'
+      groupName: 'Sales Pipelines'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the sales opportunities.'
+      title: 'Display a listing of the sales pipelines.'
       description: ''
       authenticated: true
       deprecated: false
@@ -204,7 +274,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of opportunities to return per page. Defaults to 15.'
+        description: 'The number of pipelines to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -221,7 +291,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"New Client Project","amount":50000,...}],"links":{...},"meta":{...}}'
+        content: '{"data":[{"id":1,"name":"Main Pipeline",...}],"links":{...},"meta":{...}}'
         headers: []
         description: Success
       -
@@ -242,10 +312,10 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/sales-opportunities
+    uri: api/v1/sales-pipelines
     metadata:
       custom: []
-      groupName: 'Sales Opportunities'
+      groupName: 'Sales Pipelines'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -262,45 +332,12 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      customer_id:
-        custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      sales_pipeline_id:
-        custom: []
-        name: sales_pipeline_id
-        description: 'The ID of the sales pipeline.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      pipeline_stage_id:
-        custom: []
-        name: pipeline_stage_id
-        description: 'The ID of the pipeline stage.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
       name:
         custom: []
         name: name
-        description: 'The name of the sales opportunity.'
+        description: 'The name of the sales pipeline.'
         required: true
-        example: 'New Client Project'
+        example: 'Initial Sales Pipeline'
         type: string
         enumValues: []
         exampleWasSpecified: true
@@ -309,142 +346,35 @@ endpoints:
       description:
         custom: []
         name: description
-        description: 'A description of the sales opportunity.'
+        description: 'A description of the sales pipeline.'
         required: false
-        example: 'Develop a new e-commerce platform.'
+        example: 'Pipeline for initial customer contact.'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      expected_close_date:
+      is_default:
         custom: []
-        name: expected_close_date
-        description: 'The expected close date of the opportunity.'
+        name: is_default
+        description: 'Is this the default pipeline.'
         required: false
-        example: '2024-12-31'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
-        required: false
-        example: Open
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      amount:
-        custom: []
-        name: amount
-        description: 'The estimated amount of the opportunity.'
-        required: false
-        example: '50000.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      items:
-        custom: []
-        name: items
-        description: 'A list of product items for the opportunity.'
-        required: true
-        example:
-          - consequatur
-        type: 'string[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'items[].product_id':
-        custom: []
-        name: 'items[].product_id'
-        description: 'The <code>id</code> of an existing record in the products table.'
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'items[].quantity':
-        custom: []
-        name: 'items[].quantity'
-        description: 'Must be at least 1.'
-        required: true
-        example: 45
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'items[].price':
-        custom: []
-        name: 'items[].price'
-        description: 'Must be at least 0.'
-        required: true
-        example: 56
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'items.*.product_id':
-        custom: []
-        name: 'items.*.product_id'
-        description: 'The ID of the product.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      'items.*.quantity':
-        custom: []
-        name: 'items.*.quantity'
-        description: 'The quantity of the product.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      'items.*.price':
-        custom: []
-        name: 'items.*.price'
-        description: 'The price of the product.'
-        required: true
-        example: '100.00'
-        type: numeric
+        example: false
+        type: boolean
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      customer_id: 1
-      sales_pipeline_id: 1
-      pipeline_stage_id: 1
-      name: 'New Client Project'
-      description: 'Develop a new e-commerce platform.'
-      expected_close_date: '2024-12-31'
-      status: Open
-      amount: '50000.00'
-      items:
-        - consequatur
+      name: 'Initial Sales Pipeline'
+      description: 'Pipeline for initial customer contact.'
+      is_default: false
     fileParameters: []
     responses:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":1,"name":"New Client Project","amount":50000,...}}'
+        content: '{"data":{"id":1,"name":"Initial Sales Pipeline",...}}'
         headers: []
         description: Success
       -
@@ -471,14 +401,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/sales-opportunities/{id}'
+    uri: 'api/v1/sales-pipelines/{id}'
     metadata:
       custom: []
-      groupName: 'Sales Opportunities'
+      groupName: 'Sales Pipelines'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified sales opportunity.'
+      title: 'Display the specified sales pipeline.'
       description: ''
       authenticated: true
       deprecated: false
@@ -490,7 +420,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the sales opportunity.'
+        description: 'The ID of the sales pipeline.'
         required: true
         example: 17
         type: integer
@@ -498,10 +428,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      sales_opportunity:
+      sales_pipeline:
         custom: []
-        name: sales_opportunity
-        description: 'The ID of the sales opportunity.'
+        name: sales_pipeline
+        description: 'The ID of the sales pipeline.'
         required: true
         example: '1'
         type: string
@@ -511,7 +441,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      sales_opportunity: '1'
+      sales_pipeline: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -521,7 +451,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"New Client Project","amount":50000,...}}'
+        content: '{"data":{"id":1,"name":"Main Pipeline","description":"Main sales pipeline.","is_default":true,...}}'
         headers: []
         description: Success
       -
@@ -533,7 +463,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Sales opportunity not found."}'
+        content: '{"message": "Sales pipeline not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []
@@ -549,10 +479,10 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/sales-opportunities/{id}'
+    uri: 'api/v1/sales-pipelines/{id}'
     metadata:
       custom: []
-      groupName: 'Sales Opportunities'
+      groupName: 'Sales Pipelines'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -568,7 +498,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the sales opportunity.'
+        description: 'The ID of the sales pipeline.'
         required: true
         example: 17
         type: integer
@@ -576,10 +506,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      sales_opportunity:
+      sales_pipeline:
         custom: []
-        name: sales_opportunity
-        description: 'The ID of the sales opportunity.'
+        name: sales_pipeline
+        description: 'The ID of the sales pipeline.'
         required: true
         example: 1
         type: integer
@@ -589,39 +519,28 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      sales_opportunity: 1
+      sales_pipeline: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      customer_id:
+      description:
         custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: true
-        example: 1
-        type: integer
+        name: description
+        description: 'A description of the sales pipeline.'
+        required: false
+        example: 'Pipeline for new leads.'
+        type: string
         enumValues: []
         exampleWasSpecified: true
-        nullable: false
+        nullable: true
         deprecated: false
-      sales_pipeline_id:
+      is_default:
         custom: []
-        name: sales_pipeline_id
-        description: 'The ID of the sales pipeline.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      pipeline_stage_id:
-        custom: []
-        name: pipeline_stage_id
-        description: 'The ID of the pipeline stage.'
-        required: true
-        example: 1
-        type: integer
+        name: is_default
+        description: 'Is this the default pipeline.'
+        required: false
+        example: true
+        type: boolean
         enumValues: []
         exampleWasSpecified: true
         nullable: false
@@ -629,153 +548,24 @@ endpoints:
       name:
         custom: []
         name: name
-        description: 'The name of the sales opportunity.'
+        description: 'The name of the sales pipeline.'
         required: true
-        example: 'New Client Project'
+        example: 'New Sales Pipeline'
         type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'A description of the sales opportunity.'
-        required: false
-        example: 'Develop a new e-commerce platform.'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      expected_close_date:
-        custom: []
-        name: expected_close_date
-        description: 'The expected close date of the opportunity.'
-        required: false
-        example: '2024-12-31'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the opportunity (e.g., Open, Won, Lost).'
-        required: false
-        example: Open
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      items:
-        custom: []
-        name: items
-        description: 'A list of product items for the opportunity.'
-        required: true
-        example:
-          - consequatur
-        type: 'string[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'items[].product_id':
-        custom: []
-        name: 'items[].product_id'
-        description: 'The <code>id</code> of an existing record in the products table.'
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'items[].quantity':
-        custom: []
-        name: 'items[].quantity'
-        description: 'Must be at least 1.'
-        required: true
-        example: 45
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'items[].price':
-        custom: []
-        name: 'items[].price'
-        description: 'Must be at least 0.'
-        required: true
-        example: 56
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      amount:
-        custom: []
-        name: amount
-        description: 'The estimated amount of the opportunity.'
-        required: false
-        example: '50000.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      'items.*.product_id':
-        custom: []
-        name: 'items.*.product_id'
-        description: 'The ID of the product.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      'items.*.quantity':
-        custom: []
-        name: 'items.*.quantity'
-        description: 'The quantity of the product.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      'items.*.price':
-        custom: []
-        name: 'items.*.price'
-        description: 'The price of the product.'
-        required: true
-        example: '100.00'
-        type: numeric
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      customer_id: 1
-      sales_pipeline_id: 1
-      pipeline_stage_id: 1
-      name: 'New Client Project'
-      description: 'Develop a new e-commerce platform.'
-      expected_close_date: '2024-12-31'
-      status: Open
-      items:
-        - consequatur
-      amount: '50000.00'
+      description: 'Pipeline for new leads.'
+      is_default: true
+      name: 'New Sales Pipeline'
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"New Client Project (Updated)",...}}'
+        content: '{"data":{"id":1,"name":"New Sales Pipeline",...}}'
         headers: []
         description: Success
       -
@@ -787,7 +577,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Sales opportunity not found."}'
+        content: '{"message": "Sales pipeline not found."}'
         headers: []
         description: 'Not Found'
       -
@@ -808,10 +598,10 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/v1/sales-opportunities/{id}'
+    uri: 'api/v1/sales-pipelines/{id}'
     metadata:
       custom: []
-      groupName: 'Sales Opportunities'
+      groupName: 'Sales Pipelines'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -827,7 +617,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the sales opportunity.'
+        description: 'The ID of the sales pipeline.'
         required: true
         example: 17
         type: integer
@@ -835,10 +625,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      sales_opportunity:
+      sales_pipeline:
         custom: []
-        name: sales_opportunity
-        description: 'The ID of the sales opportunity to delete.'
+        name: sales_pipeline
+        description: 'The ID of the sales pipeline to delete.'
         required: true
         example: 1
         type: integer
@@ -848,7 +638,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      sales_opportunity: 1
+      sales_pipeline: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -870,7 +660,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Sales opportunity not found."}'
+        content: '{"message": "Sales pipeline not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []

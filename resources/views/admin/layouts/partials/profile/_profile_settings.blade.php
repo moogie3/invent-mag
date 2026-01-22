@@ -18,22 +18,23 @@
                 </div>
             </div>
             <div class="settings-section-content">
-                <div class="d-flex align-items-center gap-3">
-                    @if (auth()->user()->getRawOriginal('avatar'))
-                    <span class="avatar avatar-xl"
-                        style="background-image: url('{{ auth()->user()->avatar }}'); width: 100px; height: 100px;">
-                    </span>
-                @else
-                    <span class="avatar avatar-xl avatar-initial rounded-circle"
-                        style="width: 100px; height: 100px;">
-                        <i class="ti ti-person" style="font-size: 4rem;"></i>
-                    </span>
-                @endif
+                <div class="row g-3">
+                    <div class="d-flex align-items-center gap-3">
+                        @if (auth()->user()->getRawOriginal('avatar'))
+                            <span class="avatar avatar-xl"
+                                style="background-image: url('{{ auth()->user()->avatar }}'); width: 100px; height: 100px;">
+                            </span>
+                        @else
+                            <span class="avatar avatar-xl avatar-initial rounded-circle"
+                                style="width: 100px; height: 100px;">
+                                <i class="ti ti-person" style="font-size: 4rem;"></i>
+                            </span>
+                        @endif
                         <div class="d-flex flex-column gap-2">
                             <input type="file" name="avatar" class="form-control" id="avatarInput" accept="image/*">
                             <input type="hidden" name="delete_avatar" id="deleteAvatarInput" value="0">
-                            
-                            <button type="button" class="btn btn-sm btn-outline-danger" id="removeAvatarBtn" 
+
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="removeAvatarBtn"
                                 style="{{ auth()->user()->getRawOriginal('avatar') ? '' : 'display: none;' }}">
                                 <i class="ti ti-trash me-1"></i>{{ __('messages.remove_current_picture') }}
                             </button>
@@ -118,10 +119,10 @@
                         </select>
                     </div>
                 </div>
-            </div>
         </div>
+    </div>
 
-        <div class="card-footer bg-transparent mt-auto">
+    <div class="card-footer bg-transparent mt-auto">
             <div class="btn-list justify-content-end">
                 <button type="submit" class="btn btn-primary">{{ __('messages.update_profile') }}</button>
             </div>
@@ -147,21 +148,53 @@
             </div>
             <div class="settings-section-content">
                 <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-label">{{ __('messages.current_password') }}</div>
+                        <input type="password" 
+                               name="current_password" 
+                               id="current_password" 
+                               class="form-control @error('current_password') is-invalid @enderror" 
+                               required>
+                        @error('current_password')
+                            <div class="invalid-feedback" style="display: block;">{{ $message }}</div>
+                        @enderror
+                    </div>
                     <div class="col-md-6">
                         <div class="form-label">{{ __('messages.new_password') }}</div>
-                        <input type="password" name="password" id="password" class="form-control" required>
+                        <input type="password" 
+                               name="password" 
+                               id="password" 
+                               class="form-control @error('password') is-invalid @enderror" 
+                               required>
+                        <!-- Real-time strength validation feedback -->
+                        <div class="invalid-feedback" id="password-strength-error" style="display: none;">
+                            {{ __('messages.password_strength_requirements') }}
+                        </div>
+                        @error('password')
+                            <div class="invalid-feedback" style="display: block;">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-6">
                         <div class="form-label">{{ __('messages.confirm_new_password') }}</div>
-                        <input type="password" name="password_confirmation" id="password_confirmation"
-                            class="form-control" required>
+                        <input type="password" 
+                               name="password_confirmation" 
+                               id="password_confirmation"
+                               class="form-control @error('password') is-invalid @enderror" 
+                               required>
+                        <!-- Password mismatch feedback -->
+                        <div class="invalid-feedback" id="password-mismatch-error" style="display: none;">
+                            {{ __('messages.passwords_do_not_match') }}
+                        </div>
+                        @error('password')
+                            <div class="invalid-feedback" style="display: block;">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
             </div>
         </div>
         <div class="card-footer bg-transparent mt-auto">
             <div class="btn-list justify-content-end">
-                <button type="submit" class="btn btn-secondary">{{ __('messages.update_password') }}</button>
+                <button type="submit" id="updatePasswordBtn" class="btn btn-secondary">{{ __('messages.update_password') }}</button>
             </div>
         </div>
     </form>

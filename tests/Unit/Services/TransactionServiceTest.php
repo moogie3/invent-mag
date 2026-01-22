@@ -4,11 +4,13 @@ namespace Tests\Unit\Services;
 
 use App\Models\Purchase;
 use App\Models\Sales;
+use App\Models\Account;
 use App\Services\TransactionService;
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
+use Database\Seeders\AccountSeeder;
 
 class TransactionServiceTest extends TestCase
 {
@@ -20,7 +22,23 @@ class TransactionServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->transactionService = new TransactionService();
+        
+        // Seed accounts
+        $this->seed(AccountSeeder::class);
+        
+        // Configure user accounting settings
+        $tenantId = app('currentTenant')->id;
+        $this->user->accounting_settings = [
+            'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
+            'accounts_receivable_account_id' => Account::where('code', '1130-' . $tenantId)->first()->id,
+            'sales_revenue_account_id' => Account::where('code', '4100-' . $tenantId)->first()->id,
+            'cost_of_goods_sold_account_id' => Account::where('code', '5200-' . $tenantId)->first()->id,
+            'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
+            'accounts_payable_account_id' => Account::where('code', '2110-' . $tenantId)->first()->id,
+        ];
+        $this->user->save();
+
+        $this->transactionService = app(TransactionService::class);
     }
 
     #[Test]
@@ -114,7 +132,10 @@ class TransactionServiceTest extends TestCase
         $sale = Sales::factory()->create(['status' => 'Unpaid']);
         $purchase = Purchase::factory()->create(['status' => 'Unpaid']);
 
-        $this->transactionService->bulkMarkAsPaid([$sale->id, $purchase->id]);
+        $this->transactionService->bulkMarkAsPaid([
+            ['id' => $sale->id, 'type' => 'sale'],
+            ['id' => $purchase->id, 'type' => 'purchase']
+        ]);
 
         $this->assertEquals('Paid', $sale->fresh()->status);
         $this->assertEquals('Paid', $purchase->fresh()->status);
@@ -141,7 +162,7 @@ class TransactionServiceTest extends TestCase
         Purchase::factory()->create();
 
         $filters = ['date_range' => null, 'start_date' => null, 'end_date' => null, 'status' => null, 'type' => null, 'search' => null];
-        $transactions = $this->transactionService->getTransactionsForExport($filters, [$sale1->id, $purchase1->id]);
+        $transactions = $this->transactionService->getTransactionsForExport($filters, ['sale_' . $sale1->id, 'purchase_' . $purchase1->id]);
 
         $this->assertCount(2, $transactions);
     }

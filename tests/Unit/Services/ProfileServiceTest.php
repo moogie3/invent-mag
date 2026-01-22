@@ -131,8 +131,8 @@ class ProfileServiceTest extends TestCase
         $result = $this->profileService->updateUser($user, $data);
 
         $this->assertTrue($result['success']);
-        $this->assertNotNull($user->fresh()->avatar);
-        Storage::disk('public')->assertExists($user->fresh()->avatar);
+        $this->assertNotNull($user->fresh()->getRawOriginal('avatar'));
+        Storage::disk('public')->assertExists($user->fresh()->getRawOriginal('avatar'));
     }
 
     #[Test]
@@ -142,7 +142,11 @@ class ProfileServiceTest extends TestCase
         $oldAvatarPath = 'avatars/old_avatar.jpg';
         Storage::disk('public')->put($oldAvatarPath, 'old content');
 
-        $user = User::factory()->create(['avatar' => $oldAvatarPath]);
+        $user = User::factory()->create();
+        // Manually set raw avatar to bypass accessor/mutator if any during creation, or just update it
+        $user->setRawAttributes(['avatar' => $oldAvatarPath] + $user->getAttributes());
+        $user->save();
+
         $newFile = UploadedFile::fake()->image('new_avatar.png');
 
         $data = [
@@ -157,7 +161,7 @@ class ProfileServiceTest extends TestCase
 
         $this->assertTrue($result['success']);
         Storage::disk('public')->assertMissing($oldAvatarPath);
-        Storage::disk('public')->assertExists($user->fresh()->avatar);
+        Storage::disk('public')->assertExists($user->fresh()->getRawOriginal('avatar'));
     }
 
     #[Test]
@@ -167,13 +171,15 @@ class ProfileServiceTest extends TestCase
         $avatarPath = 'avatars/user_avatar.jpg';
         Storage::disk('public')->put($avatarPath, 'content');
 
-        $user = User::factory()->create(['avatar' => $avatarPath]);
+        $user = User::factory()->create();
+        $user->setRawAttributes(['avatar' => $avatarPath] + $user->getAttributes());
+        $user->save();
 
         $result = $this->profileService->deleteAvatar($user);
 
         $this->assertTrue($result['success']);
         $this->assertEquals('Avatar deleted successfully!', $result['message']);
-        $this->assertNull($user->fresh()->avatar);
+        $this->assertNull($user->fresh()->getRawOriginal('avatar'));
         Storage::disk('public')->assertMissing($avatarPath);
     }
 }

@@ -305,8 +305,7 @@ Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])-
             Route::prefix('profile')->group(function () {
                 Route::get('/', [ProfileController::class, 'edit'])->name('admin.setting.profile.edit');
                 Route::put('/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update');
-                Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('admin.setting.profile.update-password')->middleware('password.confirm');
-                Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('admin.setting.profile.update-password')->middleware('password.confirm');
+                Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('admin.setting.profile.update-password');
                 Route::delete('/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
                 Route::post('/token', [ProfileController::class, 'generateApiToken'])->name('admin.setting.profile.token');
             });

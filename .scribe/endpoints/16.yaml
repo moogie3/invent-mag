@@ -1,18 +1,18 @@
-name: 'Customer Interactions'
+name: 'Currency Settings'
 description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/customer-interactions
+    uri: api/v1/currency-settings
     metadata:
       custom: []
-      groupName: 'Customer Interactions'
+      groupName: 'Currency Settings'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the customer interactions.'
+      title: 'Display a listing of the currency settings.'
       description: ''
       authenticated: true
       deprecated: false
@@ -26,7 +26,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of interactions to return per page. Defaults to 15.'
+        description: 'The number of settings to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -43,7 +43,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"customer_id":1,"user_id":1,"type":"call",...}],"links":{...},"meta":{...}}'
+        content: '{"data":{"id":1,"currency_symbol":"$","decimal_separator":".",...}}'
         headers: []
         description: Success
       -
@@ -52,196 +52,6 @@ endpoints:
         content: '{"message": "Unauthenticated."}'
         headers: []
         description: Unauthenticated
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - POST
-    uri: api/v1/customer-interactions
-    metadata:
-      custom: []
-      groupName: 'Customer Interactions'
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Store a newly created resource in storage.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      customer_id:
-        custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of interaction.'
-        required: true
-        example: '"call"'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'The notes for the interaction.'
-        required: false
-        example: '"Followed up on the recent order."'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      interaction_date:
-        custom: []
-        name: interaction_date
-        description: 'The date of the interaction.'
-        required: true
-        example: '"2025-11-28"'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      customer_id: 1
-      type: '"call"'
-      notes: '"Followed up on the recent order."'
-      interaction_date: '"2025-11-28"'
-      user_id: 1
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 201
-        content: '{"data":{"id":1,"customer_id":1,"user_id":1,"type":"call",...}}'
-        headers: []
-        description: Success
-      -
-        custom: []
-        status: 401
-        content: '{"message": "Unauthenticated."}'
-        headers: []
-        description: Unauthenticated
-      -
-        custom: []
-        status: 422
-        content: '{"message":"The customer_id field is required.","errors":{"customer_id":["The customer_id field is required."]}}'
-        headers: []
-        description: 'Validation Error'
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/customer-interactions/{id}'
-    metadata:
-      custom: []
-      groupName: 'Customer Interactions'
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Display the specified customer interaction.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the customer interaction.'
-        required: true
-        example: 17
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_interaction:
-        custom: []
-        name: customer_interaction
-        description: 'The ID of the customer interaction.'
-        required: true
-        example: '1'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 17
-      customer_interaction: '1'
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"data":{"id":1,"customer_id":1,"user_id":1,"type":"call",...}}'
-        headers: []
-        description: Success
-      -
-        custom: []
-        status: 401
-        content: '{"message": "Unauthenticated."}'
-        headers: []
-        description: Unauthenticated
-      -
-        custom: []
-        status: 404
-        content: '{"message": "Customer interaction not found."}'
-        headers: []
-        description: 'Not Found'
     responseFields: []
     auth:
       - headers
@@ -255,10 +65,10 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/customer-interactions/{id}'
+    uri: 'api/v1/currency-settings/{id}'
     metadata:
       custom: []
-      groupName: 'Customer Interactions'
+      groupName: 'Currency Settings'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -274,18 +84,18 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the customer interaction.'
+        description: 'The ID of the currency setting.'
         required: true
-        example: 17
-        type: integer
+        example: consequatur
+        type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      customer_interaction:
+      currency_setting:
         custom: []
-        name: customer_interaction
-        description: 'The ID of the customer interaction.'
+        name: currency_setting
+        description: 'The ID of the currency setting.'
         required: true
         example: '1'
         type: string
@@ -294,78 +104,102 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 17
-      customer_interaction: '1'
+      id: consequatur
+      currency_setting: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      customer_id:
+      currency_symbol:
         custom: []
-        name: customer_id
-        description: 'The ID of the customer.'
+        name: currency_symbol
+        description: 'The currency symbol.'
         required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of interaction.'
-        required: true
-        example: '"call"'
+        example: '"$"'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      notes:
+      decimal_separator:
         custom: []
-        name: notes
-        description: 'The notes for the interaction.'
-        required: false
-        example: '"Followed up on the recent order."'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      interaction_date:
-        custom: []
-        name: interaction_date
-        description: 'The date of the interaction.'
+        name: decimal_separator
+        description: 'The decimal separator.'
         required: true
-        example: '"2025-11-28"'
-        type: date
+        example: '"."'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      user_id:
+      thousand_separator:
         custom: []
-        name: user_id
-        description: 'The ID of the user.'
+        name: thousand_separator
+        description: 'The thousand separator.'
         required: true
-        example: 1
+        example: '","'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      decimal_places:
+        custom: []
+        name: decimal_places
+        description: 'The number of decimal places.'
+        required: true
+        example: 2
         type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      position:
+        custom: []
+        name: position
+        description: 'The position of the currency symbol.'
+        required: true
+        example: '"prefix"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      currency_code:
+        custom: []
+        name: currency_code
+        description: 'The currency code.'
+        required: true
+        example: '"USD"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      locale:
+        custom: []
+        name: locale
+        description: 'The locale.'
+        required: true
+        example: '"en_US"'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      customer_id: 1
-      type: '"call"'
-      notes: '"Followed up on the recent order."'
-      interaction_date: '"2025-11-28"'
-      user_id: 1
+      currency_symbol: '"$"'
+      decimal_separator: '"."'
+      thousand_separator: '","'
+      decimal_places: 2
+      position: '"prefix"'
+      currency_code: '"USD"'
+      locale: '"en_US"'
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"customer_id":1,"user_id":1,"type":"call",...}}'
+        content: '{"data":{"id":1,"currency_symbol":"¥","decimal_separator":",",...}}'
         headers: []
         description: Success
       -
@@ -377,92 +211,15 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Customer interaction not found."}'
+        content: '{"message": "Currency setting not found."}'
         headers: []
         description: 'Not Found'
       -
         custom: []
         status: 422
-        content: '{"message":"The customer_id field is required.","errors":{"customer_id":["The customer_id field is required."]}}'
+        content: '{"message":"The currency_symbol field is required.","errors":{"currency_symbol":["The currency_symbol field is required."]}}'
         headers: []
         description: 'Validation Error'
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - DELETE
-    uri: 'api/v1/customer-interactions/{id}'
-    metadata:
-      custom: []
-      groupName: 'Customer Interactions'
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Remove the specified resource from storage.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the customer interaction.'
-        required: true
-        example: 17
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      customer_interaction:
-        custom: []
-        name: customer_interaction
-        description: 'The ID of the customer interaction.'
-        required: true
-        example: '1'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 17
-      customer_interaction: '1'
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 204
-        content: ''
-        headers: []
-        description: Success
-      -
-        custom: []
-        status: 401
-        content: '{"message": "Unauthenticated."}'
-        headers: []
-        description: Unauthenticated
-      -
-        custom: []
-        status: 404
-        content: '{"message": "Customer interaction not found."}'
-        headers: []
-        description: 'Not Found'
     responseFields: []
     auth:
       - headers

@@ -1,18 +1,18 @@
-name: 'Stock Adjustments'
+name: 'Sales Opportunity Items'
 description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/stock-adjustments
+    uri: api/v1/sales-opportunity-items
     metadata:
       custom: []
-      groupName: 'Stock Adjustments'
+      groupName: 'Sales Opportunity Items'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the stock adjustments.'
+      title: 'Display a listing of the sales opportunity items.'
       description: ''
       authenticated: true
       deprecated: false
@@ -26,7 +26,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of adjustments to return per page. Defaults to 15.'
+        description: 'The number of items to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -43,7 +43,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"product_id":1,"adjustment_type":"increase",...}],"links":{...},"meta":{...}}'
+        content: '{"data":[{"id":1,"sales_opportunity_id":1,"product_id":1,"quantity":1,...}],"links":{...},"meta":{...}}'
         headers: []
         description: Success
       -
@@ -64,14 +64,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/stock-adjustments/{id}'
+    uri: 'api/v1/sales-opportunity-items/{id}'
     metadata:
       custom: []
-      groupName: 'Stock Adjustments'
+      groupName: 'Sales Opportunity Items'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified stock adjustment.'
+      title: 'Display the specified sales opportunity item.'
       description: ''
       authenticated: true
       deprecated: false
@@ -83,7 +83,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the stock adjustment.'
+        description: 'The ID of the sales opportunity item.'
         required: true
         example: 17
         type: integer
@@ -91,10 +91,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      stock_adjustment:
+      sales_opportunity_item:
         custom: []
-        name: stock_adjustment
-        description: 'The ID of the stock adjustment.'
+        name: sales_opportunity_item
+        description: 'The ID of the sales opportunity item.'
         required: true
         example: '1'
         type: string
@@ -104,7 +104,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      stock_adjustment: '1'
+      sales_opportunity_item: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -114,7 +114,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"product_id":1,"adjustment_type":"increase",...}}'
+        content: '{"data":{"id":1,"sales_opportunity_id":1,"product_id":1,"quantity":1,...}}'
         headers: []
         description: Success
       -
@@ -126,7 +126,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Stock adjustment not found."}'
+        content: '{"message": "Sales opportunity item not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []

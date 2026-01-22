@@ -36,12 +36,13 @@ class SalesControllerTest extends TestCase
         $this->user->assignRole('superuser');
 
         // Ensure the authenticated user has the necessary accounting settings
+        $tenantId = app('currentTenant')->id;
         $this->user->accounting_settings = [
-            'cash_account_id' => Account::where('name', 'accounting.accounts.cash.name')->first()->id,
-            'accounts_receivable_account_id' => Account::where('name', 'accounting.accounts.accounts_receivable.name')->first()->id,
-            'sales_revenue_account_id' => Account::where('name', 'accounting.accounts.sales_revenue.name')->first()->id,
-            'cost_of_goods_sold_account_id' => Account::where('name', 'accounting.accounts.cost_of_goods_sold.name')->first()->id,
-            'inventory_account_id' => Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
+            'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
+            'accounts_receivable_account_id' => Account::where('code', '1130-' . $tenantId)->first()->id,
+            'sales_revenue_account_id' => Account::where('code', '4100-' . $tenantId)->first()->id,
+            'cost_of_goods_sold_account_id' => Account::where('code', '5200-' . $tenantId)->first()->id,
+            'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
         ];
         $this->user->save();
         $this->actingAs($this->user);

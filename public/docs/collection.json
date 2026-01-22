@@ -5,12 +5,12 @@
             "key": "baseUrl",
             "type": "string",
             "name": "string",
-            "value": "http:\/\/localhost"
+            "value": "http:\/\/127.0.0.1.nip.io"
         }
     ],
     "info": {
         "name": "INVENT-MAG API Documentation",
-        "_postman_id": "666e41b7-4248-450d-bb7e-fb6a31388ae8",
+        "_postman_id": "d86fabfa-7735-4a21-881e-3d2bdb2498ef",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -1465,6 +1465,60 @@
                             "code": 404,
                             "body": "{\"message\": \"Customer not found.\"}",
                             "name": "Not Found"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Endpoints",
+            "description": "",
+            "item": [
+                {
+                    "name": "Handle an incoming registration request.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/register",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/register"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"vmqeopfuudtdsufvyvddq\",\"shopname\":\"amniihfqcoynlazghdtqt\",\"email\":\"andreanne00@example.org\",\"password\":\"O[2UZ5ij-e\\\/dl4m{o,\"}"
+                        },
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [
+                                {
+                                    "key": "cache-control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "content-type",
+                                    "value": "application\/json"
+                                },
+                                {
+                                    "key": "access-control-allow-origin",
+                                    "value": "http:\/\/localhost:4321"
+                                }
+                            ],
+                            "code": 422,
+                            "body": "{\"message\":\"The password field confirmation does not match.\",\"errors\":{\"password\":[\"The password field confirmation does not match.\"]}}",
+                            "name": ""
                         }
                     ]
                 }
@@ -3035,7 +3089,7 @@
                                 },
                                 {
                                     "key": "has_expiry",
-                                    "value": "1",
+                                    "value": "",
                                     "type": "text",
                                     "description": ""
                                 },
@@ -4323,7 +4377,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "17",
+                                    "value": "1",
                                     "description": "The ID of the role."
                                 },
                                 {
@@ -4381,7 +4435,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "17",
+                                    "value": "1",
                                     "description": "The ID of the role."
                                 },
                                 {
@@ -4448,7 +4502,7 @@
                                 {
                                     "id": "id",
                                     "key": "id",
-                                    "value": "17",
+                                    "value": "1",
                                     "description": "The ID of the role."
                                 },
                                 {

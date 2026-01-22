@@ -1,18 +1,227 @@
-name: 'Purchase Orders'
+name: Products
 description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/purchases/bulk-delete
+    uri: api/v1/products/quick-create
     metadata:
       custom: []
-      groupName: 'Purchase Orders'
+      groupName: Products
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Bulk Delete Purchase Orders'
+      title: 'Quick Create Product'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: multipart/form-data
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      code:
+        custom: []
+        name: code
+        description: 'The product code.'
+        required: true
+        example: '"PROD-001"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The name of the product.'
+        required: true
+        example: '"New Product"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      stock_quantity:
+        custom: []
+        name: stock_quantity
+        description: 'The initial stock quantity.'
+        required: true
+        example: 100
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      low_stock_threshold:
+        custom: []
+        name: low_stock_threshold
+        description: 'Must be at least 1.'
+        required: false
+        example: 45
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'The purchase price.'
+        required: true
+        example: 99.99
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      selling_price:
+        custom: []
+        name: selling_price
+        description: 'The selling price.'
+        required: true
+        example: 149.99
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'The ID of the category.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      units_id:
+        custom: []
+        name: units_id
+        description: 'The ID of the unit.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      supplier_id:
+        custom: []
+        name: supplier_id
+        description: 'The ID of the supplier.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      warehouse_id:
+        custom: []
+        name: warehouse_id
+        description: 'nullable The ID of the warehouse.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'nullable A description of the product.'
+        required: false
+        example: 'Dolores dolorum amet iste laborum eius est dolor.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      image:
+        custom: []
+        name: image
+        description: 'nullable An image of the product.'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      has_expiry:
+        custom: []
+        name: has_expiry
+        description: 'nullable Whether the product has an expiry date.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      code: '"PROD-001"'
+      name: '"New Product"'
+      stock_quantity: 100
+      low_stock_threshold: 45
+      price: 99.99
+      selling_price: 149.99
+      category_id: 1
+      units_id: 1
+      supplier_id: 1
+      warehouse_id: 1
+      description: 'Dolores dolorum amet iste laborum eius est dolor.'
+      has_expiry: false
+    fileParameters:
+      image: null
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success":true,"message":"Product created successfully","product":{"id":16,"code":"PROD-001",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 422
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/products/bulk-delete
+    metadata:
+      custom: []
+      groupName: Products
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Bulk Delete Products'
       description: ''
       authenticated: true
       deprecated: false
@@ -28,9 +237,12 @@ endpoints:
       ids:
         custom: []
         name: ids
-        description: 'An array of purchase order IDs to delete.'
+        description: 'An array of product IDs to delete.'
         required: true
-        example: '[1, 2, 3]'
+        example:
+          - 1
+          - 2
+          - 3
         type: 'string[]'
         enumValues: []
         exampleWasSpecified: true
@@ -39,7 +251,7 @@ endpoints:
       'ids.*':
         custom: []
         name: 'ids.*'
-        description: 'A purchase order ID.'
+        description: 'A product ID.'
         required: true
         example: 17
         type: integer
@@ -48,13 +260,16 @@ endpoints:
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      ids: '[1, 2, 3]'
+      ids:
+        - 1
+        - 2
+        - 3
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"success":true,"message":"Successfully deleted purchase order(s)"}'
+        content: '{"success":true,"message":"Successfully deleted 3 product(s)","deleted_count":3,"images_deleted":0}'
         headers: []
         description: Success
       -
@@ -81,14 +296,14 @@ endpoints:
     custom: []
     httpMethods:
       - PUT
-    uri: api/v1/purchases/bulk-mark-paid
+    uri: api/v1/products/bulk-update-stock
     metadata:
       custom: []
-      groupName: 'Purchase Orders'
+      groupName: Products
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Bulk Mark Purchase Orders as Paid'
+      title: 'Bulk Update Product Stock'
       description: ''
       authenticated: true
       deprecated: false
@@ -101,21 +316,33 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      ids:
+      updates:
         custom: []
-        name: ids
-        description: 'An array of purchase order IDs to mark as paid.'
+        name: updates
+        description: 'Must have at least 1 items.'
         required: true
-        example: '[1, 2, 3]'
-        type: 'string[]'
+        example:
+          - []
+        type: 'object[]'
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         deprecated: false
-      'ids.*':
+      reason:
         custom: []
-        name: 'ids.*'
-        description: 'A purchase order ID.'
+        name: reason
+        description: 'nullable A reason for the stock adjustment.'
+        required: false
+        example: 'Annual stock take'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      'updates[].id':
+        custom: []
+        name: 'updates[].id'
+        description: 'The <code>id</code> of an existing record in the products table.'
         required: true
         example: 17
         type: integer
@@ -123,14 +350,51 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      'updates[].stock_quantity':
+        custom: []
+        name: 'updates[].stock_quantity'
+        description: 'Must be at least 0.'
+        required: true
+        example: 45
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'updates.*.id':
+        custom: []
+        name: 'updates.*.id'
+        description: 'The ID of the product to update.'
+        required: true
+        example: 4
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      'updates.*.stock_quantity':
+        custom: []
+        name: 'updates.*.stock_quantity'
+        description: 'The new stock quantity.'
+        required: true
+        example: 100
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
-      ids: '[1, 2, 3]'
+      updates:
+        -
+          id: 17
+          stock_quantity: 45
+      reason: 'Annual stock take'
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"success":true,"message":"Successfully marked 3 purchase order(s) as paid.","updated_count":3}'
+        content: '{"success":true,"message":"Successfully updated stock for 2 product(s)","updated_count":2,"changes":[{"id":4,"old_stock":50,"new_stock":100,...}]}'
         headers: []
         description: Success
       -
@@ -142,103 +406,9 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"The ids field is required.","errors":{"ids":["The ids field is required."]}}'
+        content: '{"message":"The updates field is required.","errors":{"updates":["The updates field is required."]}}'
         headers: []
         description: 'Validation Error'
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: api/v1/purchases/metrics
-    metadata:
-      custom: []
-      groupName: 'Purchase Orders'
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Get Purchase Metrics'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"total_purchases":10,"total_paid":5000,"total_due":2500}'
-        headers: []
-        description: Success
-      -
-        custom: []
-        status: 401
-        content: '{"message": "Unauthenticated."}'
-        headers: []
-        description: Unauthenticated
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: api/v1/purchases/expiring-soon
-    metadata:
-      custom: []
-      groupName: 'Purchase Orders'
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Get Expiring Soon Purchases'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '[{"id":1,"invoice":"PO-001","supplier":{"id":1,"name":"Supplier 1"},"order_date":"2025-11-20","due_date":"2025-12-20","total":1000,"status":"pending","remaining_days":19}]'
-        headers: []
-        description: Success
-      -
-        custom: []
-        status: 401
-        content: '{"message": "Unauthenticated."}'
-        headers: []
-        description: Unauthenticated
     responseFields: []
     auth:
       - headers
@@ -251,14 +421,14 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: 'api/v1/purchases/{id}/payment'
+    uri: api/v1/products/adjust-stock
     metadata:
       custom: []
-      groupName: 'Purchase Orders'
+      groupName: Products
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Add Payment to Purchase Order'
+      title: 'Adjust Product Stock'
       description: ''
       authenticated: true
       deprecated: false
@@ -266,78 +436,66 @@ endpoints:
       Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters:
-      id:
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      product_id:
         custom: []
-        name: id
-        description: 'The ID of the purchase order.'
+        name: product_id
+        description: 'The ID of the product to adjust.'
         required: true
-        example: 1
+        example: 4
         type: integer
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-    cleanUrlParameters:
-      id: 1
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      amount:
+      adjustment_amount:
         custom: []
-        name: amount
-        description: 'The payment amount.'
+        name: adjustment_amount
+        description: 'The amount to adjust the stock by. Example : 100'
         required: true
-        example: 100.0
+        example: 11613.31890586
         type: number
         enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      payment_date:
-        custom: []
-        name: payment_date
-        description: 'The date of the payment.'
-        required: true
-        example: '2023-10-27'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      payment_method:
-        custom: []
-        name: payment_method
-        description: 'The method of payment.'
-        required: true
-        example: 'Bank Transfer'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'nullable Any notes about the payment.'
-        required: false
-        example: consequatur
-        type: string
-        enumValues: []
         exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      adjustment_type:
+        custom: []
+        name: adjustment_type
+        description: 'The type of adjustment. Must be one of increase, decrease, correction.'
+        required: true
+        example: increase
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      reason:
+        custom: []
+        name: reason
+        description: 'nullable A reason for the adjustment.'
+        required: false
+        example: 'Found extra unit during count'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
         nullable: true
         deprecated: false
     cleanBodyParameters:
-      amount: 100.0
-      payment_date: '2023-10-27'
-      payment_method: 'Bank Transfer'
-      notes: consequatur
+      product_id: 4
+      adjustment_amount: 11613.31890586
+      adjustment_type: increase
+      reason: 'Found extra unit during count'
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"success":true,"message":"Payment added successfully."}'
+        content: '{"success":true,"message":"Stock adjusted successfully.","product":{"id":4,...}}'
         headers: []
         description: Success
       -
@@ -349,13 +507,13 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Purchase order not found."}'
+        content: '{"message": "Product not found."}'
         headers: []
         description: 'Not Found'
       -
         custom: []
         status: 422
-        content: '{"message":"The amount must be a number.","errors":{"amount":["The amount must be a number."]}}'
+        content: '{"message":"The adjustment_amount must be a number.","errors":{"adjustment_amount":["The adjustment_amount must be a number."]}}'
         headers: []
         description: 'Validation Error'
     responseFields: []
@@ -370,15 +528,310 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/purchases
+    uri: api/v1/products/search
     metadata:
       custom: []
-      groupName: 'Purchase Orders'
+      groupName: Products
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the purchase orders.'
-      description: 'Retrieves a paginated list of purchase orders.'
+      title: 'Search Products'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      q:
+        custom: []
+        name: q
+        description: 'The search query.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      q: consequatur
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":1,"code":"P-001","name":"Product Name",...}]}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/products/expiring-soon
+    metadata:
+      custom: []
+      groupName: Products
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get Expiring Soon Products'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '[{"id":1,"po_id":1,"product_id":1,"quantity":10,"remaining_quantity":10,"price":100,"discount":0,"discount_type":"fixed","total":1000,"expiry_date":"2025-12-31","created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}]'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/products/metrics
+    metadata:
+      custom: []
+      groupName: Products
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get Product Metrics'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"total_products":10,"total_categories":5,"low_stock_count":2}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/products/{id}/adjustment-log'
+    metadata:
+      custom: []
+      groupName: Products
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get Product Adjustment Log'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the product.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '[{"id":1,"product_id":1,"adjustment_type":"increase","quantity_before":10,"quantity_after":20,"adjustment_amount":10,"reason":"Stock correction","adjusted_by":{"id":1,"name":"Admin"},"created_at":"2025-12-01T12:00:00.000000Z"}]'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Product not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/products/search-by-barcode
+    metadata:
+      custom: []
+      groupName: Products
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Search Product by Barcode'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      barcode:
+        custom: []
+        name: barcode
+        description: 'The barcode to search for.'
+        required: true
+        example: '7981373950433'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      barcode: '7981373950433'
+    bodyParameters:
+      barcode:
+        custom: []
+        name: barcode
+        description: ''
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      barcode: consequatur
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"code":"P-001","name":"Product Name",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Product not found"}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/products
+    metadata:
+      custom: []
+      groupName: Products
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Display a listing of the products.'
+      description: 'Retrieves a paginated list of products. You can specify the number of products per page.'
       authenticated: true
       deprecated: false
     headers:
@@ -391,7 +844,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of purchase orders to return per page. Defaults to 15.'
+        description: 'The number of products to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -408,7 +861,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"invoice":"PO-001","supplier":{"id":1,"name":"Supplier 1"},...}],"links":{...},"meta":{...}}'
+        content: '{"data":[{"id":1,"code":"P-001","name":"Product Name","stock_quantity":100,...}],"links":{"first":"...","last":"...","prev":null,"next":"..."},"meta":{"current_page":1,"from":1,"total":10,...}}'
         headers: []
         description: Success
       -
@@ -429,15 +882,15 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/purchases
+    uri: api/v1/products
     metadata:
       custom: []
-      groupName: 'Purchase Orders'
+      groupName: Products
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Store a newly created resource in storage.'
-      description: ''
+      title: 'Create a new product.'
+      description: 'Creates a new product with the provided data.'
       authenticated: true
       deprecated: false
     headers:
@@ -449,13 +902,57 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      invoice:
+      name:
         custom: []
-        name: invoice
-        description: 'The invoice number.'
+        name: name
+        description: 'The name of the product.'
         required: true
-        example: '"INV-2023-001"'
+        example: 'Laptop Pro'
         type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      code:
+        custom: []
+        name: code
+        description: 'A unique code for the product.'
+        required: true
+        example: LP-001
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'The cost price of the product.'
+        required: true
+        example: 1200.5
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      selling_price:
+        custom: []
+        name: selling_price
+        description: 'The selling price of the product.'
+        required: true
+        example: 1499.99
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'The ID of the category.'
+        required: true
+        example: 2
+        type: integer
         enumValues: []
         exampleWasSpecified: true
         nullable: false
@@ -464,6 +961,17 @@ endpoints:
         custom: []
         name: supplier_id
         description: 'The ID of the supplier.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      units_id:
+        custom: []
+        name: units_id
+        description: 'The ID of the unit.'
         required: true
         example: 1
         type: integer
@@ -471,123 +979,56 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      order_date:
+      warehouse_id:
         custom: []
-        name: order_date
-        description: 'The date of the order.'
-        required: true
-        example: '"2023-10-26"'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      due_date:
-        custom: []
-        name: due_date
-        description: 'The due date of the payment.'
+        name: warehouse_id
+        description: 'The ID of the warehouse.'
         required: false
-        example: '2023-11-26'
-        type: date
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: true
-        nullable: false
+        nullable: true
         deprecated: false
-      products:
+      stock_quantity:
         custom: []
-        name: products
-        description: 'A JSON string of products. Must be a valid JSON string.'
-        required: true
-        example: '[{"product_id":1,"quantity":10,"price":100,"discount":0,"discount_type":"fixed","expiry_date":"2025-12-31"}]'
+        name: stock_quantity
+        description: 'The initial stock quantity.'
+        required: false
+        example: 50.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description for the product.'
+        required: false
+        example: 'Dolores dolorum amet iste laborum eius est dolor.'
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      discount_total:
-        custom: []
-        name: discount_total
-        description: 'The total discount applied.'
-        required: false
-        example: '5.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
         nullable: true
-        deprecated: false
-      discount_total_type:
-        custom: []
-        name: discount_total_type
-        description: 'The type of discount (e.g., percentage, fixed).'
-        required: false
-        example: '"fixed"'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      payment_type:
-        custom: []
-        name: payment_type
-        description: 'The payment type (e.g., Cash, Credit Card).'
-        required: true
-        example: '"Cash"'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      total:
-        custom: []
-        name: total
-        description: 'The total amount of the purchase order.'
-        required: true
-        example: '1500.00'
-        type: numeric
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the purchase order (e.g., Pending, Paid).'
-        required: true
-        example: '"Pending"'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
         deprecated: false
     cleanBodyParameters:
-      invoice: '"INV-2023-001"'
+      name: 'Laptop Pro'
+      code: LP-001
+      price: 1200.5
+      selling_price: 1499.99
+      category_id: 2
       supplier_id: 1
-      order_date: '"2023-10-26"'
-      due_date: '2023-11-26'
-      products: '[{"product_id":1,"quantity":10,"price":100,"discount":0,"discount_type":"fixed","expiry_date":"2025-12-31"}]'
-      discount_total: '5.00'
-      discount_total_type: '"fixed"'
-      user_id: 1
-      payment_type: '"Cash"'
-      total: '1500.00'
-      status: '"Pending"'
+      units_id: 1
+      warehouse_id: 1
+      stock_quantity: 50.0
+      description: 'Dolores dolorum amet iste laborum eius est dolor.'
     fileParameters: []
     responses:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":1,"invoice":"INV-2023-001",...}}'
+        content: '{"data":{"id":15,"code":"LP-001","name":"Laptop Pro","price":1200.5,"selling_price":1499.99,"stock_quantity":50,...}}'
         headers: []
         description: Success
       -
@@ -599,7 +1040,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"The invoice field is required.","errors":{"invoice":["The invoice field is required."]}}'
+        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
         headers: []
         description: 'Validation Error'
     responseFields: []
@@ -614,15 +1055,15 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/purchases/{id}'
+    uri: 'api/v1/products/{id}'
     metadata:
       custom: []
-      groupName: 'Purchase Orders'
+      groupName: Products
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified purchase order.'
-      description: 'Retrieves a single purchase order by its ID.'
+      title: 'Display the specified product.'
+      description: 'Retrieves a single product by its ID.'
       authenticated: true
       deprecated: false
     headers:
@@ -633,7 +1074,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the purchase.'
+        description: 'The ID of the product.'
         required: true
         example: 17
         type: integer
@@ -641,10 +1082,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      purchase:
+      product:
         custom: []
-        name: purchase
-        description: 'The ID of the purchase order.'
+        name: product
+        description: 'The ID of the product.'
         required: true
         example: '4'
         type: string
@@ -654,7 +1095,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      purchase: '4'
+      product: '4'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -664,7 +1105,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":4,"invoice":"PO-004",...}}'
+        content: '{"data":{"id":4,"code":"TR14","name":"Low Stock LED","price":90,"selling_price":160,...}}'
         headers: []
         description: Success
       -
@@ -676,7 +1117,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Purchase order not found."}'
+        content: '{"message": "Product not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []
@@ -692,15 +1133,15 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/purchases/{id}'
+    uri: 'api/v1/products/{id}'
     metadata:
       custom: []
-      groupName: 'Purchase Orders'
+      groupName: Products
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Update the specified resource in storage.'
-      description: ''
+      title: 'Update the specified product.'
+      description: 'Updates a product with the provided data.'
       authenticated: true
       deprecated: false
     headers:
@@ -711,7 +1152,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the purchase.'
+        description: 'The ID of the product.'
         required: true
         example: 17
         type: integer
@@ -719,27 +1160,71 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      purchase:
+      product:
         custom: []
-        name: purchase
-        description: 'The ID of the purchase order.'
+        name: product
+        description: 'The ID of the product to update.'
         required: true
-        example: 1
-        type: integer
+        example: '7'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
       id: 17
-      purchase: 1
+      product: '7'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      supplier_id:
+      name:
         custom: []
-        name: supplier_id
-        description: 'The ID of the supplier.'
+        name: name
+        description: 'The name of the product.'
+        required: false
+        example: 'Laptop Pro v2'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      code:
+        custom: []
+        name: code
+        description: 'The product code. Must be unique.'
+        required: false
+        example: LP-001
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'The cost price of the product.'
+        required: false
+        example: 1250.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      selling_price:
+        custom: []
+        name: selling_price
+        description: 'The selling price of the product.'
+        required: false
+        example: 1499.99
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'The ID of the category.'
         required: false
         example: 2
         type: integer
@@ -747,98 +1232,21 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      order_date:
+      supplier_id:
         custom: []
-        name: order_date
-        description: 'The date of the order.'
+        name: supplier_id
+        description: 'The ID of the supplier.'
         required: false
-        example: '2023-10-27'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      due_date:
-        custom: []
-        name: due_date
-        description: 'The due date of the payment.'
-        required: false
-        example: '2023-11-27'
-        type: date
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      products:
-        custom: []
-        name: products
-        description: 'A JSON string of products. Must be a valid JSON string.'
-        required: true
-        example: '[{"product_id":1,"quantity":10,"price":100,"discount":0,"discount_type":"fixed","expiry_date":"2025-12-31"}]'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      discount_total:
-        custom: []
-        name: discount_total
-        description: 'The total discount applied.'
-        required: false
-        example: '10.00'
-        type: numeric
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      discount_total_type:
+      units_id:
         custom: []
-        name: discount_total_type
-        description: 'The type of discount (e.g., percentage, fixed).'
-        required: false
-        example: percentage
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      status:
-        custom: []
-        name: status
-        description: 'The status of the purchase order (e.g., Pending, Paid).'
-        required: false
-        example: Paid
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      payment_type:
-        custom: []
-        name: payment_type
-        description: 'The payment type (e.g., Cash, Card, Transfer, eWallet).'
-        required: false
-        example: Card
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      invoice:
-        custom: []
-        name: invoice
-        description: 'The invoice number.'
-        required: false
-        example: INV-2023-002
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      user_id:
-        custom: []
-        name: user_id
-        description: 'The ID of the user.'
+        name: units_id
+        description: 'The ID of the unit.'
         required: false
         example: 1
         type: integer
@@ -846,35 +1254,56 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      total:
+      warehouse_id:
         custom: []
-        name: total
-        description: 'The total amount of the purchase order.'
+        name: warehouse_id
+        description: 'The ID of the warehouse.'
         required: false
-        example: '2000.00'
-        type: numeric
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: true
-        nullable: false
+        nullable: true
+        deprecated: false
+      stock_quantity:
+        custom: []
+        name: stock_quantity
+        description: 'The initial stock quantity.'
+        required: false
+        example: 50.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'A description for the product.'
+        required: false
+        example: 'Dolores dolorum amet iste laborum eius est dolor.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
         deprecated: false
     cleanBodyParameters:
-      supplier_id: 2
-      order_date: '2023-10-27'
-      due_date: '2023-11-27'
-      products: '[{"product_id":1,"quantity":10,"price":100,"discount":0,"discount_type":"fixed","expiry_date":"2025-12-31"}]'
-      discount_total: '10.00'
-      discount_total_type: percentage
-      status: Paid
-      payment_type: Card
-      invoice: INV-2023-002
-      user_id: 1
-      total: '2000.00'
+      name: 'Laptop Pro v2'
+      code: LP-001
+      price: 1250.0
+      selling_price: 1499.99
+      category_id: 2
+      supplier_id: 1
+      units_id: 1
+      warehouse_id: 1
+      stock_quantity: 50.0
+      description: 'Dolores dolorum amet iste laborum eius est dolor.'
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"invoice":"INV-2023-002",...}}'
+        content: '{"data":{"id":7,"code":"LP-001","name":"Laptop Pro v2",...}}'
         headers: []
         description: Success
       -
@@ -886,13 +1315,13 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Purchase order not found."}'
+        content: '{"message": "Product not found."}'
         headers: []
         description: 'Not Found'
       -
         custom: []
         status: 422
-        content: '{"message":"The status field is required.","errors":{"status":["The status field is required."]}}'
+        content: '{"message":"The code has already been taken.","errors":{"code":["The code has already been taken."]}}'
         headers: []
         description: 'Validation Error'
     responseFields: []
@@ -907,15 +1336,15 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/v1/purchases/{id}'
+    uri: 'api/v1/products/{id}'
     metadata:
       custom: []
-      groupName: 'Purchase Orders'
+      groupName: Products
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Remove the specified resource from storage.'
-      description: ''
+      title: 'Delete the specified product.'
+      description: 'Deletes a single product by its ID.'
       authenticated: true
       deprecated: false
     headers:
@@ -926,7 +1355,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the purchase.'
+        description: 'The ID of the product.'
         required: true
         example: 17
         type: integer
@@ -934,20 +1363,20 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      purchase:
+      product:
         custom: []
-        name: purchase
-        description: 'The ID of the purchase order to delete.'
+        name: product
+        description: 'The ID of the product to delete.'
         required: true
-        example: 1
-        type: integer
+        example: '7'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
       id: 17
-      purchase: 1
+      product: '7'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -969,7 +1398,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Purchase order not found."}'
+        content: '{"message": "Product not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []
@@ -984,10 +1413,10 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: admin/po/bulk-delete
+    uri: admin/product/quick-create
     metadata:
       custom: []
-      groupName: 'Purchase Orders'
+      groupName: Products
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -997,38 +1426,176 @@ endpoints:
       deprecated: false
     headers:
       Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      ids:
+      code:
         custom: []
-        name: ids
-        description: 'An array of purchase order IDs to delete.'
+        name: code
+        description: 'The product code.'
         required: true
-        example:
-          - 1
-          - 2
-          - 3
-        type: 'string[]'
+        example: '"PROD-001"'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
+      name:
+        custom: []
+        name: name
+        description: 'The product name.'
+        required: true
+        example: '"New Product"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      stock_quantity:
+        custom: []
+        name: stock_quantity
+        description: 'The initial stock quantity.'
+        required: true
+        example: 100
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      low_stock_threshold:
+        custom: []
+        name: low_stock_threshold
+        description: 'Must be at least 1.'
+        required: false
+        example: 45
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'The purchase price of the product.'
+        required: true
+        example: 99.99
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      selling_price:
+        custom: []
+        name: selling_price
+        description: 'The selling price of the product.'
+        required: true
+        example: 149.99
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'The ID of the product category.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      units_id:
+        custom: []
+        name: units_id
+        description: 'The ID of the product unit.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      supplier_id:
+        custom: []
+        name: supplier_id
+        description: 'The ID of the product supplier.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      warehouse_id:
+        custom: []
+        name: warehouse_id
+        description: 'The <code>id</code> of an existing record in the warehouses table.'
+        required: false
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: ''
+        required: false
+        example: 'Dolores dolorum amet iste laborum eius est dolor.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      image:
+        custom: []
+        name: image
+        description: 'Must be an image.'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      has_expiry:
+        custom: []
+        name: has_expiry
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     cleanBodyParameters:
-      ids:
-        - 1
-        - 2
-        - 3
-    fileParameters: []
+      code: '"PROD-001"'
+      name: '"New Product"'
+      stock_quantity: 100
+      low_stock_threshold: 45
+      price: 99.99
+      selling_price: 149.99
+      category_id: 1
+      units_id: 1
+      supplier_id: 1
+      warehouse_id: 17
+      description: 'Dolores dolorum amet iste laborum eius est dolor.'
+      has_expiry: false
+    fileParameters:
+      image: null
     responses:
       -
         custom: []
         status: 200
-        content: '{"success": true, "message": "Successfully deleted purchase order(s)"}'
+        content: '{"success": true, "message": "Product created successfully", "product": {"id": 1, "name": "New Product"}}'
         headers: []
         description: ''
     responseFields: []
@@ -1043,10 +1610,10 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: admin/po/bulk-mark-paid
+    uri: admin/product/bulk-delete
     metadata:
       custom: []
-      groupName: 'Purchase Orders'
+      groupName: Products
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -1066,7 +1633,7 @@ endpoints:
       ids:
         custom: []
         name: ids
-        description: 'An array of purchase order IDs to mark as paid.'
+        description: 'An array of product IDs to delete.'
         required: true
         example:
           - 1
@@ -1087,7 +1654,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"success": true, "message": "Successfully marked 2 purchase order(s) as paid.", "updated_count": 2}'
+        content: '{"success": true, "message": "Successfully deleted 2 product(s)", "deleted_count": 2, "images_deleted": 1}'
         headers: []
         description: ''
     responseFields: []

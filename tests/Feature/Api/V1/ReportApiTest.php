@@ -134,7 +134,13 @@ class ReportApiTest extends TestCase
         $sales = Sales::factory()->count(2)->create(['status' => 'Unpaid', 'tenant_id' => $this->tenant->id]);
         $purchases = Purchase::factory()->count(2)->create(['status' => 'Unpaid', 'tenant_id' => $this->tenant->id]);
 
-        $transactionIds = $sales->pluck('id')->concat($purchases->pluck('id'))->toArray();
+        $transactionIds = [];
+        foreach ($sales as $sale) {
+            $transactionIds[] = ['id' => $sale->id, 'type' => 'sale'];
+        }
+        foreach ($purchases as $purchase) {
+            $transactionIds[] = ['id' => $purchase->id, 'type' => 'purchase'];
+        }
 
         $response = $this->actingAs($this->user, 'sanctum')->postJson('/api/v1/reports/transactions/bulk-mark-paid', [
             'transaction_ids' => $transactionIds,

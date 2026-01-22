@@ -61,7 +61,8 @@ class AccountingControllerTest extends TestCase
     #[Test]
     public function it_can_filter_the_general_ledger()
     {
-        $account = Account::where('name', 'accounting.accounts.cash.name')->first();
+        $tenantId = app('currentTenant')->id;
+        $account = Account::where('code', '1110-' . $tenantId)->first();
         JournalEntry::factory()->hasTransactions(1, ['account_id' => $account->id])->create();
 
         $response = $this->get(route('admin.accounting.ledger', [
@@ -80,9 +81,10 @@ class AccountingControllerTest extends TestCase
     public function it_can_display_the_trial_balance()
     {
         // Create some transactions to ensure balances exist
-        $cash = Account::where('name', 'accounting.accounts.cash.name')->first();
-        $salesRevenue = Account::where('name', 'accounting.accounts.sales_revenue.name')->first();
-        $ar = Account::where('name', 'accounting.accounts.accounts_receivable.name')->first();
+        $tenantId = app('currentTenant')->id;
+        $cash = Account::where('code', '1110-' . $tenantId)->first();
+        $salesRevenue = Account::where('code', '4100-' . $tenantId)->first();
+        $ar = Account::where('code', '1130-' . $tenantId)->first();
 
         $sale = \App\Models\Sales::factory()->create();
         $payment = \App\Models\Payment::factory()->for($sale, 'paymentable')->create(['amount' => 100]);
@@ -149,7 +151,8 @@ class AccountingControllerTest extends TestCase
     #[Test]
     public function it_can_store_a_new_account()
     {
-        $parentAccount = Account::where('code', '1000')->first(); // Assets
+        $tenantId = app('currentTenant')->id;
+        $parentAccount = Account::where('code', '1000-' . $tenantId)->first(); // Assets
         $this->assertNotNull($parentAccount, 'Parent account with code 1000 not found.');
 
         $response = $this->post(route('admin.accounting.accounts.store'), [
@@ -200,7 +203,8 @@ class AccountingControllerTest extends TestCase
     public function it_can_update_an_account()
     {
         $account = Account::factory()->create(['name' => 'Old Name', 'code' => 'OLD1', 'type' => 'asset']);
-        $parentAccount = Account::where('code', '1000')->first(); // Assets
+        $tenantId = app('currentTenant')->id;
+        $parentAccount = Account::where('code', '1000-' . $tenantId)->first(); // Assets
 
         $response = $this->put(route('admin.accounting.accounts.update', $account), [
             'name' => 'Updated Name',
@@ -251,7 +255,8 @@ class AccountingControllerTest extends TestCase
     #[Test]
     public function it_cannot_delete_account_with_transactions()
     {
-        $account = Account::where('name', 'accounting.accounts.cash.name')->first();
+        $tenantId = app('currentTenant')->id;
+        $account = Account::where('code', '1110-' . $tenantId)->first();
         JournalEntry::factory()->hasTransactions(1, ['account_id' => $account->id])->create();
 
         $response = $this->delete(route('admin.accounting.accounts.destroy', $account));
@@ -264,7 +269,8 @@ class AccountingControllerTest extends TestCase
     #[Test]
     public function it_cannot_delete_account_with_children()
     {
-        $parent = Account::where('code', '1000')->first(); // Assets
+        $tenantId = app('currentTenant')->id;
+        $parent = Account::where('code', '1000-' . $tenantId)->first(); // Assets
         $child = Account::factory()->create(['parent_id' => $parent->id]);
 
         $response = $this->delete(route('admin.accounting.accounts.destroy', $parent));

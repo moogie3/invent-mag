@@ -39,9 +39,10 @@ class PurchaseServiceTest extends TestCase
         $this->seed(AccountSeeder::class);
 
         // Retrieve SAK-compliant accounts from the seeder, scoped to the current tenant
-        $cash = Account::where('name', 'accounting.accounts.cash.name')->first();
-        $accountsPayable = Account::where('name', 'accounting.accounts.accounts_payable.name')->first();
-        $inventory = Account::where('name', 'accounting.accounts.inventory.name')->first();
+        $tenantId = app('currentTenant')->id;
+        $cash = Account::where('code', '1110-' . $tenantId)->first();
+        $accountsPayable = Account::where('code', '2110-' . $tenantId)->first();
+        $inventory = Account::where('code', '1140-' . $tenantId)->first();
 
         // Ensure accounts exist (they should, due to AccountSeeder)
         $this->assertNotNull($cash, 'Cash account not found in seeder.');
@@ -252,6 +253,9 @@ class PurchaseServiceTest extends TestCase
             ]),
         ];
 
+        // Expect createJournalEntry to be called for the payment
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
         $this->purchaseService->updatePurchase($purchase, $updateData);
 
         $this->assertDatabaseHas('po', ['id' => $purchase->id, 'status' => 'Paid']);
@@ -264,7 +268,15 @@ class PurchaseServiceTest extends TestCase
     #[Test]
     public function test_add_payment()
     {
-        $purchase = Purchase::factory()->create(['total' => 1000]);
+        $purchase = Purchase::factory()
+            ->hasItems(1, [
+                'quantity' => 10,
+                'price' => 100,
+                'total' => 1000,
+                'discount' => 0
+            ])
+            ->create(['discount_total' => 0]);
+
         $paymentData = [
             'amount' => 500,
             'payment_date' => now()->toDateString(),
@@ -280,7 +292,14 @@ class PurchaseServiceTest extends TestCase
     #[Test]
     public function test_update_purchase_status()
     {
-        $purchase = Purchase::factory()->create(['total' => 1000]);
+        $purchase = Purchase::factory()
+            ->hasItems(1, [
+                'quantity' => 10,
+                'price' => 100,
+                'total' => 1000,
+                'discount' => 0
+            ])
+            ->create(['discount_total' => 0]);
 
         // Test Partial
         $purchase->payments()->create(['amount' => 500, 'payment_date' => now()->toDateString(), 'payment_method' => 'Cash']);
@@ -288,7 +307,10 @@ class PurchaseServiceTest extends TestCase
         $this->assertEquals('Partial', $purchase->fresh()->status);
 
         // Test Paid
-        $purchase->payments()->create(['amount' => 500, 'payment_date' => now()->toDateString(), 'payment_method' => 'Cash']);
+        // Calculate exact remaining balance to pay
+        $remaining = $purchase->grand_total - 500;
+        $purchase->payments()->create(['amount' => $remaining, 'payment_date' => now()->toDateString(), 'payment_method' => 'Cash']);
+        
         $this->purchaseService->updatePurchaseStatus($purchase);
         $this->assertEquals('Paid', $purchase->fresh()->status);
 

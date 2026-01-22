@@ -19,15 +19,15 @@ class ProfileService
         $user->timezone = $data['timezone'];
 
         if (isset($data['delete_avatar']) && $data['delete_avatar'] == '1') {
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
+            if ($user->getRawOriginal('avatar')) {
+                Storage::disk('public')->delete($user->getRawOriginal('avatar'));
             }
             $user->avatar = null;
         }
 
         if (isset($data['avatar'])) {
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
+            if ($user->getRawOriginal('avatar')) {
+                Storage::disk('public')->delete($user->getRawOriginal('avatar'));
             }
             $user->avatar = $data['avatar']->store('avatars', 'public');
         }
@@ -36,23 +36,48 @@ class ProfileService
             $user->email_verified_at = null;
         }
 
-        $user->save();
-
-        if (isset($data['password']) && !empty($data['password'])) {
+        if (isset($data['current_password']) && isset($data['password'])) {
             if (!Hash::check($data['current_password'], $user->password)) {
                 return ['success' => false, 'message' => 'Current password is incorrect.'];
             }
             $user->password = Hash::make($data['password']);
-            $user->save(); // Save again if password was updated
         }
+
+        $user->save();
 
         return ['success' => true, 'message' => 'Profile updated successfully!'];
     }
 
+    /**
+     * Update user password
+     * 
+     * @param User $user
+     * @param string $password
+     * @return array
+     */
+    public function updatePassword(User $user, string $password): array
+    {
+        try {
+            $user->password = Hash::make($password);
+            $user->save();
+            
+            return [
+                'success' => true, 
+                'message' => 'Password updated successfully!'
+            ];
+        } catch (\Exception $e) {
+            \Log::error('Password update failed: ' . $e->getMessage());
+            return [
+                'success' => false, 
+                'message' => 'Failed to update password. Please try again.'
+            ];
+        }
+    }
+
     public function deleteAvatar(User $user)
     {
-        if ($user->avatar) {
-            Storage::disk('public')->delete($user->avatar);
+        if ($user->getRawOriginal('avatar')) {
+            Storage::disk('public')->delete($user->getRawOriginal('avatar'));
             $user->avatar = null;
             $user->save();
         }

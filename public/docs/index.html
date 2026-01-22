@@ -26,13 +26,13 @@
             </style>
 
     <script>
-        var tryItOutBaseUrl = "http://localhost";
+        var tryItOutBaseUrl = "http://127.0.0.1.nip.io";
         var useCsrf = Boolean();
         var csrfUrl = "/sanctum/csrf-cookie";
     </script>
-    <script src="../docs/js/tryitout-5.5.0.js"></script>
+    <script src="../docs/js/tryitout-5.6.0.js"></script>
 
-    <script src="../docs/js/theme-default-5.5.0.js"></script>
+    <script src="../docs/js/theme-default-5.6.0.js"></script>
 
 </head>
 
@@ -176,6 +176,16 @@
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="customers-DELETEapi-v1-customers--id-">
                                 <a href="#customers-DELETEapi-v1-customers--id-">Delete the specified customer.</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
+                    <ul id="tocify-header-endpoints" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="endpoints">
+                    <a href="#endpoints">Endpoints</a>
+                </li>
+                                    <ul id="tocify-subheader-endpoints" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="endpoints-POSTapi-register">
+                                <a href="#endpoints-POSTapi-register">Handle an incoming registration request.</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -730,7 +740,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: December 26, 2025</li>
+        <li>Last updated: January 22, 2026</li>
     </ul>
 </div>
 
@@ -739,7 +749,7 @@
     <div class="content">
         <h1 id="introduction">Introduction</h1>
 <aside>
-    <strong>Base URL</strong>: <code>http://localhost</code>
+    <strong>Base URL</strong>: <code>http://127.0.0.1.nip.io</code>
 </aside>
 <pre><code>This documentation aims to provide all the information you need to work with our API.
 
@@ -769,7 +779,7 @@ You can switch the language used with the tabs at the top right (or from the nav
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/accounts?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/accounts?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -777,7 +787,7 @@ You can switch the language used with the tabs at the top right (or from the nav
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/accounts"
+    "http://127.0.0.1.nip.io/api/v1/accounts"
 );
 
 const params = {
@@ -929,7 +939,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/accounts" \
+    "http://127.0.0.1.nip.io/api/v1/accounts" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -947,7 +957,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/accounts"
+    "http://127.0.0.1.nip.io/api/v1/accounts"
 );
 
 const headers = {
@@ -1200,7 +1210,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/accounts/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/accounts/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1208,7 +1218,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/accounts/17"
+    "http://127.0.0.1.nip.io/api/v1/accounts/17"
 );
 
 const headers = {
@@ -1375,7 +1385,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/accounts/17" \
+    "http://127.0.0.1.nip.io/api/v1/accounts/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -1393,7 +1403,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/accounts/17"
+    "http://127.0.0.1.nip.io/api/v1/accounts/17"
 );
 
 const headers = {
@@ -1684,7 +1694,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/accounts/17" \
+    "http://127.0.0.1.nip.io/api/v1/accounts/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1692,7 +1702,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/accounts/17"
+    "http://127.0.0.1.nip.io/api/v1/accounts/17"
 );
 
 const headers = {
@@ -1871,7 +1881,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/categories?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/categories?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1879,7 +1889,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/categories"
+    "http://127.0.0.1.nip.io/api/v1/categories"
 );
 
 const params = {
@@ -2031,7 +2041,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/categories" \
+    "http://127.0.0.1.nip.io/api/v1/categories" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -2045,7 +2055,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/categories"
+    "http://127.0.0.1.nip.io/api/v1/categories"
 );
 
 const headers = {
@@ -2237,7 +2247,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/categories/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/categories/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2245,7 +2255,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/categories/17"
+    "http://127.0.0.1.nip.io/api/v1/categories/17"
 );
 
 const headers = {
@@ -2412,7 +2422,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/categories/17" \
+    "http://127.0.0.1.nip.io/api/v1/categories/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -2426,7 +2436,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/categories/17"
+    "http://127.0.0.1.nip.io/api/v1/categories/17"
 );
 
 const headers = {
@@ -2664,7 +2674,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/categories/17" \
+    "http://127.0.0.1.nip.io/api/v1/categories/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2672,7 +2682,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/categories/17"
+    "http://127.0.0.1.nip.io/api/v1/categories/17"
 );
 
 const headers = {
@@ -2842,7 +2852,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/currency-settings?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/currency-settings?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2850,7 +2860,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/currency-settings"
+    "http://127.0.0.1.nip.io/api/v1/currency-settings"
 );
 
 const params = {
@@ -3002,7 +3012,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/currency-settings/consequatur" \
+    "http://127.0.0.1.nip.io/api/v1/currency-settings/consequatur" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -3020,7 +3030,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/currency-settings/consequatur"
+    "http://127.0.0.1.nip.io/api/v1/currency-settings/consequatur"
 );
 
 const headers = {
@@ -3305,7 +3315,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/customer-interactions?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/customer-interactions?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -3313,7 +3323,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customer-interactions"
+    "http://127.0.0.1.nip.io/api/v1/customer-interactions"
 );
 
 const params = {
@@ -3465,7 +3475,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/customer-interactions" \
+    "http://127.0.0.1.nip.io/api/v1/customer-interactions" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -3481,7 +3491,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customer-interactions"
+    "http://127.0.0.1.nip.io/api/v1/customer-interactions"
 );
 
 const headers = {
@@ -3698,7 +3708,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/customer-interactions/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/customer-interactions/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -3706,7 +3716,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customer-interactions/17"
+    "http://127.0.0.1.nip.io/api/v1/customer-interactions/17"
 );
 
 const headers = {
@@ -3873,7 +3883,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/customer-interactions/17" \
+    "http://127.0.0.1.nip.io/api/v1/customer-interactions/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -3889,7 +3899,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customer-interactions/17"
+    "http://127.0.0.1.nip.io/api/v1/customer-interactions/17"
 );
 
 const headers = {
@@ -4144,7 +4154,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/customer-interactions/17" \
+    "http://127.0.0.1.nip.io/api/v1/customer-interactions/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4152,7 +4162,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customer-interactions/17"
+    "http://127.0.0.1.nip.io/api/v1/customer-interactions/17"
 );
 
 const headers = {
@@ -4322,7 +4332,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/customers/quick-create" \
+    "http://127.0.0.1.nip.io/api/v1/customers/quick-create" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -4338,7 +4348,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customers/quick-create"
+    "http://127.0.0.1.nip.io/api/v1/customers/quick-create"
 );
 
 const headers = {
@@ -4566,7 +4576,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/customers/metrics" \
+    --get "http://127.0.0.1.nip.io/api/v1/customers/metrics" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4574,7 +4584,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customers/metrics"
+    "http://127.0.0.1.nip.io/api/v1/customers/metrics"
 );
 
 const headers = {
@@ -4710,7 +4720,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/customers/17/historical-purchases" \
+    --get "http://127.0.0.1.nip.io/api/v1/customers/17/historical-purchases" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4718,7 +4728,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customers/17/historical-purchases"
+    "http://127.0.0.1.nip.io/api/v1/customers/17/historical-purchases"
 );
 
 const headers = {
@@ -4909,7 +4919,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/customers/1/product-history" \
+    --get "http://127.0.0.1.nip.io/api/v1/customers/1/product-history" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4917,7 +4927,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customers/1/product-history"
+    "http://127.0.0.1.nip.io/api/v1/customers/1/product-history"
 );
 
 const headers = {
@@ -5094,7 +5104,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/customers?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/customers?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5102,7 +5112,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customers"
+    "http://127.0.0.1.nip.io/api/v1/customers"
 );
 
 const params = {
@@ -5254,7 +5264,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/customers" \
+    "http://127.0.0.1.nip.io/api/v1/customers" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -5270,7 +5280,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customers"
+    "http://127.0.0.1.nip.io/api/v1/customers"
 );
 
 const headers = {
@@ -5498,7 +5508,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/customers/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/customers/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5506,7 +5516,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customers/17"
+    "http://127.0.0.1.nip.io/api/v1/customers/17"
 );
 
 const headers = {
@@ -5685,7 +5695,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/customers/17" \
+    "http://127.0.0.1.nip.io/api/v1/customers/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -5701,7 +5711,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customers/17"
+    "http://127.0.0.1.nip.io/api/v1/customers/17"
 );
 
 const headers = {
@@ -5968,7 +5978,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/customers/17" \
+    "http://127.0.0.1.nip.io/api/v1/customers/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5976,7 +5986,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/customers/17"
+    "http://127.0.0.1.nip.io/api/v1/customers/17"
 );
 
 const headers = {
@@ -6128,6 +6138,220 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
+                <h1 id="endpoints">Endpoints</h1>
+
+    
+
+                                <h2 id="endpoints-POSTapi-register">Handle an incoming registration request.</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-POSTapi-register">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://127.0.0.1.nip.io/api/register" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"vmqeopfuudtdsufvyvddq\",
+    \"shopname\": \"amniihfqcoynlazghdtqt\",
+    \"email\": \"andreanne00@example.org\",
+    \"password\": \"O[2UZ5ij-e\\/dl4m{o,\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1.nip.io/api/register"
+);
+
+const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "name": "vmqeopfuudtdsufvyvddq",
+    "shopname": "amniihfqcoynlazghdtqt",
+    "email": "andreanne00@example.org",
+    "password": "O[2UZ5ij-e\/dl4m{o,"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-register">
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+access-control-allow-origin: http://localhost:4321
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;The password field confirmation does not match.&quot;,
+    &quot;errors&quot;: {
+        &quot;password&quot;: [
+            &quot;The password field confirmation does not match.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-register" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-register"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-register"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-register" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-register">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-register" data-method="POST"
+      data-path="api/register"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-register', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-register"
+                    onclick="tryItOut('POSTapi-register');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-register"
+                    onclick="cancelTryOut('POSTapi-register');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-register"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/register</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-register"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-register"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-register"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-register"
+               value="vmqeopfuudtdsufvyvddq"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>vmqeopfuudtdsufvyvddq</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>shopname</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="shopname"                data-endpoint="POSTapi-register"
+               value="amniihfqcoynlazghdtqt"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>amniihfqcoynlazghdtqt</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-register"
+               value="andreanne00@example.org"
+               data-component="body">
+    <br>
+<p>Must be a valid email address. Must not be greater than 255 characters. Example: <code>andreanne00@example.org</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>password</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="password"                data-endpoint="POSTapi-register"
+               value="O[2UZ5ij-e/dl4m{o,"
+               data-component="body">
+    <br>
+<p>Example: <code>O[2UZ5ij-e/dl4m{o,</code></p>
+        </div>
+        </form>
+
                 <h1 id="journal-entries">Journal Entries</h1>
 
     
@@ -6146,7 +6370,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/journal-entries?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/journal-entries?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -6154,7 +6378,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/journal-entries"
+    "http://127.0.0.1.nip.io/api/v1/journal-entries"
 );
 
 const params = {
@@ -6306,7 +6530,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/journal-entries" \
+    "http://127.0.0.1.nip.io/api/v1/journal-entries" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -6322,7 +6546,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/journal-entries"
+    "http://127.0.0.1.nip.io/api/v1/journal-entries"
 );
 
 const headers = {
@@ -6539,7 +6763,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/journal-entries/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/journal-entries/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -6547,7 +6771,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/journal-entries/17"
+    "http://127.0.0.1.nip.io/api/v1/journal-entries/17"
 );
 
 const headers = {
@@ -6714,7 +6938,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/journal-entries/17" \
+    "http://127.0.0.1.nip.io/api/v1/journal-entries/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -6729,7 +6953,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/journal-entries/17"
+    "http://127.0.0.1.nip.io/api/v1/journal-entries/17"
 );
 
 const headers = {
@@ -6971,7 +7195,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/journal-entries/17" \
+    "http://127.0.0.1.nip.io/api/v1/journal-entries/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -6979,7 +7203,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/journal-entries/17"
+    "http://127.0.0.1.nip.io/api/v1/journal-entries/17"
 );
 
 const headers = {
@@ -7149,7 +7373,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/notifications/count" \
+    --get "http://127.0.0.1.nip.io/api/v1/notifications/count" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7157,7 +7381,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/notifications/count"
+    "http://127.0.0.1.nip.io/api/v1/notifications/count"
 );
 
 const headers = {
@@ -7292,7 +7516,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/notifications" \
+    --get "http://127.0.0.1.nip.io/api/v1/notifications" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7300,7 +7524,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/notifications"
+    "http://127.0.0.1.nip.io/api/v1/notifications"
 );
 
 const headers = {
@@ -7443,7 +7667,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/notifications/&amp;quot;po::1&amp;quot;/mark-as-read" \
+    "http://127.0.0.1.nip.io/api/v1/notifications/&amp;quot;po::1&amp;quot;/mark-as-read" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7451,7 +7675,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/notifications/&amp;quot;po::1&amp;quot;/mark-as-read"
+    "http://127.0.0.1.nip.io/api/v1/notifications/&amp;quot;po::1&amp;quot;/mark-as-read"
 );
 
 const headers = {
@@ -7612,7 +7836,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/payments?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/payments?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7620,7 +7844,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/payments"
+    "http://127.0.0.1.nip.io/api/v1/payments"
 );
 
 const params = {
@@ -7772,7 +7996,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/payments" \
+    "http://127.0.0.1.nip.io/api/v1/payments" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -7789,7 +8013,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/payments"
+    "http://127.0.0.1.nip.io/api/v1/payments"
 );
 
 const headers = {
@@ -8019,7 +8243,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/payments/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/payments/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -8027,7 +8251,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/payments/17"
+    "http://127.0.0.1.nip.io/api/v1/payments/17"
 );
 
 const headers = {
@@ -8194,7 +8418,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/payments/17" \
+    "http://127.0.0.1.nip.io/api/v1/payments/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -8211,7 +8435,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/payments/17"
+    "http://127.0.0.1.nip.io/api/v1/payments/17"
 );
 
 const headers = {
@@ -8479,7 +8703,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/payments/17" \
+    "http://127.0.0.1.nip.io/api/v1/payments/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -8487,7 +8711,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/payments/17"
+    "http://127.0.0.1.nip.io/api/v1/payments/17"
 );
 
 const headers = {
@@ -8657,7 +8881,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/products/quick-create" \
+    "http://127.0.0.1.nip.io/api/v1/products/quick-create" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
@@ -8673,12 +8897,12 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --form "warehouse_id=1"\
     --form "description=Dolores dolorum amet iste laborum eius est dolor."\
     --form "has_expiry="\
-    --form "image=@C:\Users\123\AppData\Local\Temp\php2B92.tmp" </code></pre></div>
+    --form "image=@C:\Users\123\AppData\Local\Temp\phpE71A.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/quick-create"
+    "http://127.0.0.1.nip.io/api/v1/products/quick-create"
 );
 
 const headers = {
@@ -8968,7 +9192,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>nullable An image of the product. Example: <code>C:\Users\123\AppData\Local\Temp\php2B92.tmp</code></p>
+<p>nullable An image of the product. Example: <code>C:\Users\123\AppData\Local\Temp\phpE71A.tmp</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>has_expiry</code></b>&nbsp;&nbsp;
@@ -9008,7 +9232,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/products/bulk-delete" \
+    "http://127.0.0.1.nip.io/api/v1/products/bulk-delete" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -9024,7 +9248,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/bulk-delete"
+    "http://127.0.0.1.nip.io/api/v1/products/bulk-delete"
 );
 
 const headers = {
@@ -9210,7 +9434,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/products/bulk-update-stock" \
+    "http://127.0.0.1.nip.io/api/v1/products/bulk-update-stock" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -9228,7 +9452,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/bulk-update-stock"
+    "http://127.0.0.1.nip.io/api/v1/products/bulk-update-stock"
 );
 
 const headers = {
@@ -9471,7 +9695,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/products/adjust-stock" \
+    "http://127.0.0.1.nip.io/api/v1/products/adjust-stock" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -9486,7 +9710,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/adjust-stock"
+    "http://127.0.0.1.nip.io/api/v1/products/adjust-stock"
 );
 
 const headers = {
@@ -9699,7 +9923,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/products/search?q=consequatur" \
+    --get "http://127.0.0.1.nip.io/api/v1/products/search?q=consequatur" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -9707,7 +9931,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/search"
+    "http://127.0.0.1.nip.io/api/v1/products/search"
 );
 
 const params = {
@@ -9859,7 +10083,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/products/expiring-soon" \
+    --get "http://127.0.0.1.nip.io/api/v1/products/expiring-soon" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -9867,7 +10091,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/expiring-soon"
+    "http://127.0.0.1.nip.io/api/v1/products/expiring-soon"
 );
 
 const headers = {
@@ -10015,7 +10239,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/products/metrics" \
+    --get "http://127.0.0.1.nip.io/api/v1/products/metrics" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -10023,7 +10247,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/metrics"
+    "http://127.0.0.1.nip.io/api/v1/products/metrics"
 );
 
 const headers = {
@@ -10160,7 +10384,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/products/1/adjustment-log" \
+    --get "http://127.0.0.1.nip.io/api/v1/products/1/adjustment-log" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -10168,7 +10392,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/1/adjustment-log"
+    "http://127.0.0.1.nip.io/api/v1/products/1/adjustment-log"
 );
 
 const headers = {
@@ -10338,7 +10562,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/products/search-by-barcode?barcode=7981373950433" \
+    --get "http://127.0.0.1.nip.io/api/v1/products/search-by-barcode?barcode=7981373950433" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -10350,7 +10574,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/search-by-barcode"
+    "http://127.0.0.1.nip.io/api/v1/products/search-by-barcode"
 );
 
 const params = {
@@ -10529,7 +10753,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/products?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/products?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -10537,7 +10761,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products"
+    "http://127.0.0.1.nip.io/api/v1/products"
 );
 
 const params = {
@@ -10689,7 +10913,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/products" \
+    "http://127.0.0.1.nip.io/api/v1/products" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -10710,7 +10934,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products"
+    "http://127.0.0.1.nip.io/api/v1/products"
 );
 
 const headers = {
@@ -10992,7 +11216,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/products/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/products/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -11000,7 +11224,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/17"
+    "http://127.0.0.1.nip.io/api/v1/products/17"
 );
 
 const headers = {
@@ -11167,7 +11391,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/products/17" \
+    "http://127.0.0.1.nip.io/api/v1/products/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -11188,7 +11412,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/17"
+    "http://127.0.0.1.nip.io/api/v1/products/17"
 );
 
 const headers = {
@@ -11508,7 +11732,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/products/17" \
+    "http://127.0.0.1.nip.io/api/v1/products/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -11516,7 +11740,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/products/17"
+    "http://127.0.0.1.nip.io/api/v1/products/17"
 );
 
 const headers = {
@@ -11682,7 +11906,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/admin/product/quick-create" \
+    "http://127.0.0.1.nip.io/admin/product/quick-create" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
@@ -11697,13 +11921,13 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --form "supplier_id=1"\
     --form "warehouse_id=17"\
     --form "description=Dolores dolorum amet iste laborum eius est dolor."\
-    --form "has_expiry=1"\
-    --form "image=@C:\Users\123\AppData\Local\Temp\phpA81F.tmp" </code></pre></div>
+    --form "has_expiry="\
+    --form "image=@C:\Users\123\AppData\Local\Temp\phpEAE4.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/admin/product/quick-create"
+    "http://127.0.0.1.nip.io/admin/product/quick-create"
 );
 
 const headers = {
@@ -11724,7 +11948,7 @@ body.append('units_id', '1');
 body.append('supplier_id', '1');
 body.append('warehouse_id', '17');
 body.append('description', 'Dolores dolorum amet iste laborum eius est dolor.');
-body.append('has_expiry', '1');
+body.append('has_expiry', '');
 body.append('image', document.querySelector('input[name="image"]').files[0]);
 
 fetch(url, {
@@ -11977,7 +12201,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Must be an image. Example: <code>C:\Users\123\AppData\Local\Temp\phpA81F.tmp</code></p>
+<p>Must be an image. Example: <code>C:\Users\123\AppData\Local\Temp\phpEAE4.tmp</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>has_expiry</code></b>&nbsp;&nbsp;
@@ -11999,7 +12223,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>true</code></p>
+<p>Example: <code>false</code></p>
         </div>
         </form>
 
@@ -12017,7 +12241,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/admin/product/bulk-delete" \
+    "http://127.0.0.1.nip.io/admin/product/bulk-delete" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -12033,7 +12257,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/admin/product/bulk-delete"
+    "http://127.0.0.1.nip.io/admin/product/bulk-delete"
 );
 
 const headers = {
@@ -12190,7 +12414,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/po-items?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/po-items?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -12198,7 +12422,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/po-items"
+    "http://127.0.0.1.nip.io/api/v1/po-items"
 );
 
 const params = {
@@ -12350,7 +12574,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/po-items" \
+    "http://127.0.0.1.nip.io/api/v1/po-items" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -12368,7 +12592,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/po-items"
+    "http://127.0.0.1.nip.io/api/v1/po-items"
 );
 
 const headers = {
@@ -12613,7 +12837,7 @@ Must be one of:
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/po-items/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/po-items/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -12621,7 +12845,7 @@ Must be one of:
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/po-items/17"
+    "http://127.0.0.1.nip.io/api/v1/po-items/17"
 );
 
 const headers = {
@@ -12788,7 +13012,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/po-items/17" \
+    "http://127.0.0.1.nip.io/api/v1/po-items/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -12806,7 +13030,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/po-items/17"
+    "http://127.0.0.1.nip.io/api/v1/po-items/17"
 );
 
 const headers = {
@@ -13089,7 +13313,7 @@ Must be one of:
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/po-items/17" \
+    "http://127.0.0.1.nip.io/api/v1/po-items/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -13097,7 +13321,7 @@ Must be one of:
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/po-items/17"
+    "http://127.0.0.1.nip.io/api/v1/po-items/17"
 );
 
 const headers = {
@@ -13267,7 +13491,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/purchases/bulk-delete" \
+    "http://127.0.0.1.nip.io/api/v1/purchases/bulk-delete" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -13279,7 +13503,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/purchases/bulk-delete"
+    "http://127.0.0.1.nip.io/api/v1/purchases/bulk-delete"
 );
 
 const headers = {
@@ -13459,7 +13683,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/purchases/bulk-mark-paid" \
+    "http://127.0.0.1.nip.io/api/v1/purchases/bulk-mark-paid" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -13471,7 +13695,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/purchases/bulk-mark-paid"
+    "http://127.0.0.1.nip.io/api/v1/purchases/bulk-mark-paid"
 );
 
 const headers = {
@@ -13652,7 +13876,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/purchases/metrics" \
+    --get "http://127.0.0.1.nip.io/api/v1/purchases/metrics" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -13660,7 +13884,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/purchases/metrics"
+    "http://127.0.0.1.nip.io/api/v1/purchases/metrics"
 );
 
 const headers = {
@@ -13797,7 +14021,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/purchases/expiring-soon" \
+    --get "http://127.0.0.1.nip.io/api/v1/purchases/expiring-soon" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -13805,7 +14029,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/purchases/expiring-soon"
+    "http://127.0.0.1.nip.io/api/v1/purchases/expiring-soon"
 );
 
 const headers = {
@@ -13952,7 +14176,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/purchases/1/payment" \
+    "http://127.0.0.1.nip.io/api/v1/purchases/1/payment" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -13967,7 +14191,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/purchases/1/payment"
+    "http://127.0.0.1.nip.io/api/v1/purchases/1/payment"
 );
 
 const headers = {
@@ -14196,7 +14420,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/purchases?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/purchases?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -14204,7 +14428,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/purchases"
+    "http://127.0.0.1.nip.io/api/v1/purchases"
 );
 
 const params = {
@@ -14356,7 +14580,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/purchases" \
+    "http://127.0.0.1.nip.io/api/v1/purchases" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -14378,7 +14602,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/purchases"
+    "http://127.0.0.1.nip.io/api/v1/purchases"
 );
 
 const headers = {
@@ -14673,7 +14897,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/purchases/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/purchases/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -14681,7 +14905,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/purchases/17"
+    "http://127.0.0.1.nip.io/api/v1/purchases/17"
 );
 
 const headers = {
@@ -14848,7 +15072,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/purchases/17" \
+    "http://127.0.0.1.nip.io/api/v1/purchases/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -14870,7 +15094,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/purchases/17"
+    "http://127.0.0.1.nip.io/api/v1/purchases/17"
 );
 
 const headers = {
@@ -15203,7 +15427,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/purchases/17" \
+    "http://127.0.0.1.nip.io/api/v1/purchases/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -15211,7 +15435,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/purchases/17"
+    "http://127.0.0.1.nip.io/api/v1/purchases/17"
 );
 
 const headers = {
@@ -15377,7 +15601,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/admin/po/bulk-delete" \
+    "http://127.0.0.1.nip.io/admin/po/bulk-delete" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -15393,7 +15617,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/admin/po/bulk-delete"
+    "http://127.0.0.1.nip.io/admin/po/bulk-delete"
 );
 
 const headers = {
@@ -15544,7 +15768,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/admin/po/bulk-mark-paid" \
+    "http://127.0.0.1.nip.io/admin/po/bulk-mark-paid" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -15560,7 +15784,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/admin/po/bulk-mark-paid"
+    "http://127.0.0.1.nip.io/admin/po/bulk-mark-paid"
 );
 
 const headers = {
@@ -15716,7 +15940,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/reports/adjustment-log?page=1&amp;per_page=20" \
+    --get "http://127.0.0.1.nip.io/api/v1/reports/adjustment-log?page=1&amp;per_page=20" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -15724,7 +15948,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/reports/adjustment-log"
+    "http://127.0.0.1.nip.io/api/v1/reports/adjustment-log"
 );
 
 const params = {
@@ -15889,7 +16113,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/reports/recent-transactions?per_page=25&amp;type=consequatur&amp;status=consequatur&amp;date_range=%27this_month%27&amp;search=consequatur&amp;start_date=2023-01-01&amp;end_date=2023-12-31&amp;sort=date&amp;direction=desc" \
+    --get "http://127.0.0.1.nip.io/api/v1/reports/recent-transactions?per_page=25&amp;type=consequatur&amp;status=consequatur&amp;date_range=%27this_month%27&amp;search=consequatur&amp;start_date=2023-01-01&amp;end_date=2023-12-31&amp;sort=date&amp;direction=desc" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -15897,7 +16121,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/reports/recent-transactions"
+    "http://127.0.0.1.nip.io/api/v1/reports/recent-transactions"
 );
 
 const params = {
@@ -16173,7 +16397,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/reports/transactions/bulk-mark-paid" \
+    "http://127.0.0.1.nip.io/api/v1/reports/transactions/bulk-mark-paid" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -16189,7 +16413,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/reports/transactions/bulk-mark-paid"
+    "http://127.0.0.1.nip.io/api/v1/reports/transactions/bulk-mark-paid"
 );
 
 const headers = {
@@ -16364,7 +16588,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/reports/transactions/1/mark-paid" \
+    "http://127.0.0.1.nip.io/api/v1/reports/transactions/1/mark-paid" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -16376,7 +16600,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/reports/transactions/1/mark-paid"
+    "http://127.0.0.1.nip.io/api/v1/reports/transactions/1/mark-paid"
 );
 
 const headers = {
@@ -16570,7 +16794,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/roles?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/roles?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -16578,7 +16802,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/roles"
+    "http://127.0.0.1.nip.io/api/v1/roles"
 );
 
 const params = {
@@ -16730,7 +16954,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/roles" \
+    "http://127.0.0.1.nip.io/api/v1/roles" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -16745,7 +16969,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/roles"
+    "http://127.0.0.1.nip.io/api/v1/roles"
 );
 
 const headers = {
@@ -16927,7 +17151,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/roles/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/roles/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -16935,7 +17159,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/roles/17"
+    "http://127.0.0.1.nip.io/api/v1/roles/1"
 );
 
 const headers = {
@@ -17079,10 +17303,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="GETapi-v1-roles--id-"
-               value="17"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the role. Example: <code>17</code></p>
+<p>The ID of the role. Example: <code>1</code></p>
             </div>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>role</code></b>&nbsp;&nbsp;
@@ -17112,7 +17336,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/roles/17" \
+    "http://127.0.0.1.nip.io/api/v1/roles/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -17127,7 +17351,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/roles/17"
+    "http://127.0.0.1.nip.io/api/v1/roles/1"
 );
 
 const headers = {
@@ -17287,10 +17511,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="PUTapi-v1-roles--id-"
-               value="17"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the role. Example: <code>17</code></p>
+<p>The ID of the role. Example: <code>1</code></p>
             </div>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>role</code></b>&nbsp;&nbsp;
@@ -17347,7 +17571,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/roles/17" \
+    "http://127.0.0.1.nip.io/api/v1/roles/1" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -17355,7 +17579,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/roles/17"
+    "http://127.0.0.1.nip.io/api/v1/roles/1"
 );
 
 const headers = {
@@ -17488,10 +17712,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="DELETEapi-v1-roles--id-"
-               value="17"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the role. Example: <code>17</code></p>
+<p>The ID of the role. Example: <code>1</code></p>
             </div>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>role</code></b>&nbsp;&nbsp;
@@ -17525,7 +17749,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales-items?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales-items?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -17533,7 +17757,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-items"
+    "http://127.0.0.1.nip.io/api/v1/sales-items"
 );
 
 const params = {
@@ -17685,7 +17909,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales-items/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales-items/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -17693,7 +17917,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-items/17"
+    "http://127.0.0.1.nip.io/api/v1/sales-items/17"
 );
 
 const headers = {
@@ -17864,7 +18088,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/sales-opportunities/17/move" \
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities/17/move" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -17876,7 +18100,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-opportunities/17/move"
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities/17/move"
 );
 
 const headers = {
@@ -18075,7 +18299,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/sales-opportunities/17/convert" \
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities/17/convert" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -18083,7 +18307,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-opportunities/17/convert"
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities/17/convert"
 );
 
 const headers = {
@@ -18264,7 +18488,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales-opportunities?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales-opportunities?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -18272,7 +18496,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-opportunities"
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities"
 );
 
 const params = {
@@ -18424,7 +18648,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/sales-opportunities" \
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -18446,7 +18670,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-opportunities"
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities"
 );
 
 const headers = {
@@ -18801,7 +19025,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales-opportunities/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales-opportunities/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -18809,7 +19033,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-opportunities/17"
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities/17"
 );
 
 const headers = {
@@ -18976,7 +19200,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/sales-opportunities/17" \
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -18998,7 +19222,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-opportunities/17"
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities/17"
 );
 
 const headers = {
@@ -19391,7 +19615,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/sales-opportunities/17" \
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -19399,7 +19623,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-opportunities/17"
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunities/17"
 );
 
 const headers = {
@@ -19569,7 +19793,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales-opportunity-items?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales-opportunity-items?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -19577,7 +19801,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-opportunity-items"
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunity-items"
 );
 
 const params = {
@@ -19729,7 +19953,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales-opportunity-items/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales-opportunity-items/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -19737,7 +19961,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-opportunity-items/17"
+    "http://127.0.0.1.nip.io/api/v1/sales-opportunity-items/17"
 );
 
 const headers = {
@@ -19908,7 +20132,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/sales/bulk-delete" \
+    "http://127.0.0.1.nip.io/api/v1/sales/bulk-delete" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -19924,7 +20148,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales/bulk-delete"
+    "http://127.0.0.1.nip.io/api/v1/sales/bulk-delete"
 );
 
 const headers = {
@@ -20108,7 +20332,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/sales/bulk-mark-paid" \
+    "http://127.0.0.1.nip.io/api/v1/sales/bulk-mark-paid" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -20124,7 +20348,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales/bulk-mark-paid"
+    "http://127.0.0.1.nip.io/api/v1/sales/bulk-mark-paid"
 );
 
 const headers = {
@@ -20309,7 +20533,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales/metrics" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales/metrics" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -20317,7 +20541,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales/metrics"
+    "http://127.0.0.1.nip.io/api/v1/sales/metrics"
 );
 
 const headers = {
@@ -20454,7 +20678,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales/expiring-soon" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales/expiring-soon" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -20462,7 +20686,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales/expiring-soon"
+    "http://127.0.0.1.nip.io/api/v1/sales/expiring-soon"
 );
 
 const headers = {
@@ -20609,7 +20833,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/sales/1/payment" \
+    "http://127.0.0.1.nip.io/api/v1/sales/1/payment" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -20624,7 +20848,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales/1/payment"
+    "http://127.0.0.1.nip.io/api/v1/sales/1/payment"
 );
 
 const headers = {
@@ -20853,7 +21077,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales/customer-price/17/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales/customer-price/17/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -20861,7 +21085,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales/customer-price/17/17"
+    "http://127.0.0.1.nip.io/api/v1/sales/customer-price/17/17"
 );
 
 const headers = {
@@ -21054,7 +21278,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -21062,7 +21286,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales"
+    "http://127.0.0.1.nip.io/api/v1/sales"
 );
 
 const params = {
@@ -21214,7 +21438,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/sales" \
+    "http://127.0.0.1.nip.io/api/v1/sales" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -21244,7 +21468,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales"
+    "http://127.0.0.1.nip.io/api/v1/sales"
 );
 
 const headers = {
@@ -21655,7 +21879,7 @@ Must be one of:
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -21663,7 +21887,7 @@ Must be one of:
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales/17"
+    "http://127.0.0.1.nip.io/api/v1/sales/17"
 );
 
 const headers = {
@@ -21830,7 +22054,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/sales/17" \
+    "http://127.0.0.1.nip.io/api/v1/sales/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -21860,7 +22084,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales/17"
+    "http://127.0.0.1.nip.io/api/v1/sales/17"
 );
 
 const headers = {
@@ -22309,7 +22533,7 @@ Must be one of:
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/sales/17" \
+    "http://127.0.0.1.nip.io/api/v1/sales/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -22317,7 +22541,7 @@ Must be one of:
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales/17"
+    "http://127.0.0.1.nip.io/api/v1/sales/17"
 );
 
 const headers = {
@@ -22487,7 +22711,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/pipeline-stages/17" \
+    "http://127.0.0.1.nip.io/api/v1/pipeline-stages/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -22501,7 +22725,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/pipeline-stages/17"
+    "http://127.0.0.1.nip.io/api/v1/pipeline-stages/17"
 );
 
 const headers = {
@@ -22748,7 +22972,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/pipeline-stages/17" \
+    "http://127.0.0.1.nip.io/api/v1/pipeline-stages/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -22756,7 +22980,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/pipeline-stages/17"
+    "http://127.0.0.1.nip.io/api/v1/pipeline-stages/17"
 );
 
 const headers = {
@@ -22926,7 +23150,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/sales-pipelines/17/stages" \
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines/17/stages" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -22939,7 +23163,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-pipelines/17/stages"
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines/17/stages"
 );
 
 const headers = {
@@ -23169,7 +23393,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/sales-pipelines/17/stages/reorder" \
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines/17/stages/reorder" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -23183,7 +23407,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-pipelines/17/stages/reorder"
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines/17/stages/reorder"
 );
 
 const headers = {
@@ -23446,7 +23670,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales-pipelines?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales-pipelines?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -23454,7 +23678,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-pipelines"
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines"
 );
 
 const params = {
@@ -23606,7 +23830,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/sales-pipelines" \
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -23620,7 +23844,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-pipelines"
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines"
 );
 
 const headers = {
@@ -23821,7 +24045,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/sales-pipelines/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/sales-pipelines/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -23829,7 +24053,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-pipelines/17"
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines/17"
 );
 
 const headers = {
@@ -23996,7 +24220,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/sales-pipelines/17" \
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -24010,7 +24234,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-pipelines/17"
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines/17"
 );
 
 const headers = {
@@ -24249,7 +24473,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/sales-pipelines/17" \
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -24257,7 +24481,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/sales-pipelines/17"
+    "http://127.0.0.1.nip.io/api/v1/sales-pipelines/17"
 );
 
 const headers = {
@@ -24427,7 +24651,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/stock-adjustments?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/stock-adjustments?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -24435,7 +24659,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/stock-adjustments"
+    "http://127.0.0.1.nip.io/api/v1/stock-adjustments"
 );
 
 const params = {
@@ -24587,7 +24811,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/stock-adjustments/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/stock-adjustments/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -24595,7 +24819,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/stock-adjustments/17"
+    "http://127.0.0.1.nip.io/api/v1/stock-adjustments/17"
 );
 
 const headers = {
@@ -24766,7 +24990,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/supplier-interactions?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/supplier-interactions?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -24774,7 +24998,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/supplier-interactions"
+    "http://127.0.0.1.nip.io/api/v1/supplier-interactions"
 );
 
 const params = {
@@ -24926,7 +25150,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/supplier-interactions" \
+    "http://127.0.0.1.nip.io/api/v1/supplier-interactions" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -24942,7 +25166,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/supplier-interactions"
+    "http://127.0.0.1.nip.io/api/v1/supplier-interactions"
 );
 
 const headers = {
@@ -25159,7 +25383,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/supplier-interactions/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/supplier-interactions/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -25167,7 +25391,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/supplier-interactions/17"
+    "http://127.0.0.1.nip.io/api/v1/supplier-interactions/17"
 );
 
 const headers = {
@@ -25334,7 +25558,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/supplier-interactions/17" \
+    "http://127.0.0.1.nip.io/api/v1/supplier-interactions/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -25350,7 +25574,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/supplier-interactions/17"
+    "http://127.0.0.1.nip.io/api/v1/supplier-interactions/17"
 );
 
 const headers = {
@@ -25605,7 +25829,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/supplier-interactions/17" \
+    "http://127.0.0.1.nip.io/api/v1/supplier-interactions/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -25613,7 +25837,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/supplier-interactions/17"
+    "http://127.0.0.1.nip.io/api/v1/supplier-interactions/17"
 );
 
 const headers = {
@@ -25783,7 +26007,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/suppliers/metrics" \
+    --get "http://127.0.0.1.nip.io/api/v1/suppliers/metrics" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -25791,7 +26015,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/suppliers/metrics"
+    "http://127.0.0.1.nip.io/api/v1/suppliers/metrics"
 );
 
 const headers = {
@@ -25927,7 +26151,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/suppliers/1/historical-purchases" \
+    --get "http://127.0.0.1.nip.io/api/v1/suppliers/1/historical-purchases" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -25935,7 +26159,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/suppliers/1/historical-purchases"
+    "http://127.0.0.1.nip.io/api/v1/suppliers/1/historical-purchases"
 );
 
 const headers = {
@@ -26099,7 +26323,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/suppliers/1/product-history" \
+    --get "http://127.0.0.1.nip.io/api/v1/suppliers/1/product-history" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -26107,7 +26331,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/suppliers/1/product-history"
+    "http://127.0.0.1.nip.io/api/v1/suppliers/1/product-history"
 );
 
 const headers = {
@@ -26271,7 +26495,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/suppliers?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/suppliers?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -26279,7 +26503,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/suppliers"
+    "http://127.0.0.1.nip.io/api/v1/suppliers"
 );
 
 const params = {
@@ -26431,7 +26655,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/suppliers" \
+    "http://127.0.0.1.nip.io/api/v1/suppliers" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -26450,7 +26674,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/suppliers"
+    "http://127.0.0.1.nip.io/api/v1/suppliers"
 );
 
 const headers = {
@@ -26706,7 +26930,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/suppliers/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/suppliers/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -26714,7 +26938,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/suppliers/17"
+    "http://127.0.0.1.nip.io/api/v1/suppliers/17"
 );
 
 const headers = {
@@ -26881,7 +27105,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/suppliers/17" \
+    "http://127.0.0.1.nip.io/api/v1/suppliers/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -26900,7 +27124,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/suppliers/17"
+    "http://127.0.0.1.nip.io/api/v1/suppliers/17"
 );
 
 const headers = {
@@ -27194,7 +27418,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/suppliers/17" \
+    "http://127.0.0.1.nip.io/api/v1/suppliers/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -27202,7 +27426,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/suppliers/17"
+    "http://127.0.0.1.nip.io/api/v1/suppliers/17"
 );
 
 const headers = {
@@ -27372,7 +27596,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/tax/active-rate" \
+    --get "http://127.0.0.1.nip.io/api/v1/tax/active-rate" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -27380,7 +27604,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/tax/active-rate"
+    "http://127.0.0.1.nip.io/api/v1/tax/active-rate"
 );
 
 const headers = {
@@ -27515,7 +27739,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/taxes?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/taxes?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -27523,7 +27747,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/taxes"
+    "http://127.0.0.1.nip.io/api/v1/taxes"
 );
 
 const params = {
@@ -27675,7 +27899,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/taxes/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/taxes/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -27683,7 +27907,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/taxes/17"
+    "http://127.0.0.1.nip.io/api/v1/taxes/17"
 );
 
 const headers = {
@@ -27850,7 +28074,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/taxes/17" \
+    "http://127.0.0.1.nip.io/api/v1/taxes/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -27864,7 +28088,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/taxes/17"
+    "http://127.0.0.1.nip.io/api/v1/taxes/17"
 );
 
 const headers = {
@@ -28107,7 +28331,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/transactions?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/transactions?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -28115,7 +28339,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/transactions"
+    "http://127.0.0.1.nip.io/api/v1/transactions"
 );
 
 const params = {
@@ -28267,7 +28491,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/transactions/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/transactions/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -28275,7 +28499,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/transactions/17"
+    "http://127.0.0.1.nip.io/api/v1/transactions/17"
 );
 
 const headers = {
@@ -28446,7 +28670,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/units?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/units?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -28454,7 +28678,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/units"
+    "http://127.0.0.1.nip.io/api/v1/units"
 );
 
 const params = {
@@ -28606,7 +28830,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/units" \
+    "http://127.0.0.1.nip.io/api/v1/units" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -28619,7 +28843,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/units"
+    "http://127.0.0.1.nip.io/api/v1/units"
 );
 
 const headers = {
@@ -28797,7 +29021,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/units/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/units/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -28805,7 +29029,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/units/17"
+    "http://127.0.0.1.nip.io/api/v1/units/17"
 );
 
 const headers = {
@@ -28972,7 +29196,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/units/17" \
+    "http://127.0.0.1.nip.io/api/v1/units/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -28985,7 +29209,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/units/17"
+    "http://127.0.0.1.nip.io/api/v1/units/17"
 );
 
 const headers = {
@@ -29201,7 +29425,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/units/17" \
+    "http://127.0.0.1.nip.io/api/v1/units/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -29209,7 +29433,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/units/17"
+    "http://127.0.0.1.nip.io/api/v1/units/17"
 );
 
 const headers = {
@@ -29379,7 +29603,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/settings" \
+    --get "http://127.0.0.1.nip.io/api/v1/settings" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -29387,7 +29611,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/settings"
+    "http://127.0.0.1.nip.io/api/v1/settings"
 );
 
 const headers = {
@@ -29540,7 +29764,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/settings/theme-mode" \
+    "http://127.0.0.1.nip.io/api/v1/settings/theme-mode" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -29552,7 +29776,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/settings/theme-mode"
+    "http://127.0.0.1.nip.io/api/v1/settings/theme-mode"
 );
 
 const headers = {
@@ -29725,7 +29949,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/users/roles-permissions" \
+    --get "http://127.0.0.1.nip.io/api/v1/users/roles-permissions" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -29733,7 +29957,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/users/roles-permissions"
+    "http://127.0.0.1.nip.io/api/v1/users/roles-permissions"
 );
 
 const headers = {
@@ -29881,7 +30105,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/users?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/users?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -29889,7 +30113,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/users"
+    "http://127.0.0.1.nip.io/api/v1/users"
 );
 
 const params = {
@@ -30041,7 +30265,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/users" \
+    "http://127.0.0.1.nip.io/api/v1/users" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -30073,7 +30297,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/users"
+    "http://127.0.0.1.nip.io/api/v1/users"
 );
 
 const headers = {
@@ -30382,7 +30606,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/users/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/users/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -30390,7 +30614,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/users/17"
+    "http://127.0.0.1.nip.io/api/v1/users/17"
 );
 
 const headers = {
@@ -30557,7 +30781,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/users/17" \
+    "http://127.0.0.1.nip.io/api/v1/users/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -30589,7 +30813,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/users/17"
+    "http://127.0.0.1.nip.io/api/v1/users/17"
 );
 
 const headers = {
@@ -30936,7 +31160,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/users/17" \
+    "http://127.0.0.1.nip.io/api/v1/users/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -30944,7 +31168,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/users/17"
+    "http://127.0.0.1.nip.io/api/v1/users/17"
 );
 
 const headers = {
@@ -31114,7 +31338,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/warehouses/1/set-main" \
+    "http://127.0.0.1.nip.io/api/v1/warehouses/1/set-main" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -31122,7 +31346,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/warehouses/1/set-main"
+    "http://127.0.0.1.nip.io/api/v1/warehouses/1/set-main"
 );
 
 const headers = {
@@ -31291,7 +31515,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/warehouses/1/unset-main" \
+    "http://127.0.0.1.nip.io/api/v1/warehouses/1/unset-main" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -31299,7 +31523,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/warehouses/1/unset-main"
+    "http://127.0.0.1.nip.io/api/v1/warehouses/1/unset-main"
 );
 
 const headers = {
@@ -31468,7 +31692,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/warehouses?per_page=25" \
+    --get "http://127.0.0.1.nip.io/api/v1/warehouses?per_page=25" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -31476,7 +31700,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/warehouses"
+    "http://127.0.0.1.nip.io/api/v1/warehouses"
 );
 
 const params = {
@@ -31628,7 +31852,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/v1/warehouses" \
+    "http://127.0.0.1.nip.io/api/v1/warehouses" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -31643,7 +31867,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/warehouses"
+    "http://127.0.0.1.nip.io/api/v1/warehouses"
 );
 
 const headers = {
@@ -31858,7 +32082,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/v1/warehouses/17" \
+    --get "http://127.0.0.1.nip.io/api/v1/warehouses/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -31866,7 +32090,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/warehouses/17"
+    "http://127.0.0.1.nip.io/api/v1/warehouses/17"
 );
 
 const headers = {
@@ -32033,7 +32257,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/v1/warehouses/17" \
+    "http://127.0.0.1.nip.io/api/v1/warehouses/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -32048,7 +32272,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/warehouses/17"
+    "http://127.0.0.1.nip.io/api/v1/warehouses/17"
 );
 
 const headers = {
@@ -32311,7 +32535,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/v1/warehouses/17" \
+    "http://127.0.0.1.nip.io/api/v1/warehouses/17" \
     --header "Authorization: Bearer {YOUR_API_TOKEN}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -32319,7 +32543,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/v1/warehouses/17"
+    "http://127.0.0.1.nip.io/api/v1/warehouses/17"
 );
 
 const headers = {

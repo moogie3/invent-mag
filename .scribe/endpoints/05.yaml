@@ -1,18 +1,18 @@
-name: 'Sales Pipelines'
+name: Suppliers
 description: ''
 endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: 'api/v1/sales-pipelines/{pipeline_id}/stages'
+      - GET
+    uri: api/v1/suppliers/metrics
     metadata:
       custom: []
-      groupName: 'Sales Pipelines'
+      groupName: Suppliers
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Add Stage to Pipeline'
+      title: 'Get Supplier Metrics'
       description: ''
       authenticated: true
       deprecated: false
@@ -20,207 +20,18 @@ endpoints:
       Authorization: 'Bearer {YOUR_API_TOKEN}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters:
-      pipeline_id:
-        custom: []
-        name: pipeline_id
-        description: 'The ID of the pipeline.'
-        required: true
-        example: 17
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      pipeline:
-        custom: []
-        name: pipeline
-        description: 'The ID of the sales pipeline.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      pipeline_id: 17
-      pipeline: 1
+    urlParameters: []
+    cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      name:
-        custom: []
-        name: name
-        description: 'The name of the new stage.'
-        required: true
-        example: '"Qualification"'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      is_closed:
-        custom: []
-        name: is_closed
-        description: 'Whether this stage represents a closed state.'
-        required: false
-        example: false
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      name: '"Qualification"'
-      is_closed: false
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 201
-        content: '{"id":1,"sales_pipeline_id":1,"name":"Qualification","position":0,"is_closed":false,"created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T12:00:00.000000Z"}'
-        headers: []
-        description: 'Stage Created'
-      -
-        custom: []
-        status: 401
-        content: '{"message": "Unauthenticated."}'
-        headers: []
-        description: Unauthenticated
-      -
-        custom: []
-        status: 404
-        content: '{"message": "Sales pipeline not found."}'
-        headers: []
-        description: 'Pipeline Not Found'
-      -
-        custom: []
-        status: 422
-        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
-        headers: []
-        description: 'Validation Error'
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - POST
-    uri: 'api/v1/sales-pipelines/{pipeline_id}/stages/reorder'
-    metadata:
-      custom: []
-      groupName: 'Sales Pipelines'
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Reorder Stages in Pipeline'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      pipeline_id:
-        custom: []
-        name: pipeline_id
-        description: 'The ID of the pipeline.'
-        required: true
-        example: 17
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      pipeline:
-        custom: []
-        name: pipeline
-        description: 'The ID of the sales pipeline.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      pipeline_id: 17
-      pipeline: 1
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      stages:
-        custom: []
-        name: stages
-        description: 'An array of stage objects with id and new position.'
-        required: true
-        example:
-          - consequatur
-        type: 'string[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'stages[].id':
-        custom: []
-        name: 'stages[].id'
-        description: 'The <code>id</code> of an existing record in the pipeline_stages table.'
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'stages[].position':
-        custom: []
-        name: 'stages[].position'
-        description: 'Must be at least 0.'
-        required: true
-        example: 45
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'stages.*.id':
-        custom: []
-        name: 'stages.*.id'
-        description: 'The ID of the stage.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      'stages.*.position':
-        custom: []
-        name: 'stages.*.position'
-        description: 'The new position of the stage.'
-        required: true
-        example: 0
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      stages:
-        - consequatur
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"message": "Stages reordered successfully"}'
+        content: '{"total_suppliers":10,"new_this_month":2}'
         headers: []
         description: Success
       -
@@ -229,18 +40,6 @@ endpoints:
         content: '{"message": "Unauthenticated."}'
         headers: []
         description: Unauthenticated
-      -
-        custom: []
-        status: 404
-        content: '{"message": "Sales pipeline not found."}'
-        headers: []
-        description: 'Pipeline Not Found'
-      -
-        custom: []
-        status: 422
-        content: '{"message":"The stages field is required.","errors":{"stages":["The stages field is required."]}}'
-        headers: []
-        description: 'Validation Error'
     responseFields: []
     auth:
       - headers
@@ -253,15 +52,157 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/sales-pipelines
+    uri: 'api/v1/suppliers/{id}/historical-purchases'
     metadata:
       custom: []
-      groupName: 'Sales Pipelines'
+      groupName: Suppliers
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the sales pipelines.'
+      title: 'Get Supplier Historical Purchases'
       description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the supplier.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"historical_purchases":[{"id":1,"invoice":"PO-001","order_date":"2023-01-01",...}]}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Supplier not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
+        status: 500
+        content: '{"message": "Failed to load historical purchases: Internal server error."}'
+        headers: []
+        description: 'Server Error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/suppliers/{id}/product-history'
+    metadata:
+      custom: []
+      groupName: Suppliers
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get Supplier Product History'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the supplier.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"product_history":[{"product_name":"Product A","last_supplied_date":"2023-01-01",...}]}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Supplier not found."}'
+        headers: []
+        description: 'Not Found'
+      -
+        custom: []
+        status: 500
+        content: '{"message": "Failed to load product history: Internal server error."}'
+        headers: []
+        description: 'Server Error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/suppliers
+    metadata:
+      custom: []
+      groupName: Suppliers
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Display a listing of the suppliers.'
+      description: 'Retrieves a paginated list of suppliers.'
       authenticated: true
       deprecated: false
     headers:
@@ -274,7 +215,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of pipelines to return per page. Defaults to 15.'
+        description: 'The number of suppliers to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -291,7 +232,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"Main Pipeline",...}],"links":{...},"meta":{...}}'
+        content: '{"data":[{"id":1,"code":"SUP-001","name":"Supplier A",...}],"links":{...},"meta":{...}}'
         headers: []
         description: Success
       -
@@ -312,10 +253,10 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/sales-pipelines
+    uri: api/v1/suppliers
     metadata:
       custom: []
-      groupName: 'Sales Pipelines'
+      groupName: Suppliers
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -332,49 +273,109 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      name:
+      code:
         custom: []
-        name: name
-        description: 'The name of the sales pipeline.'
+        name: code
+        description: 'The unique code for the supplier.'
         required: true
-        example: 'Initial Sales Pipeline'
+        example: SUP-001
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      description:
+      name:
         custom: []
-        name: description
-        description: 'A description of the sales pipeline.'
+        name: name
+        description: 'The name of the supplier.'
+        required: true
+        example: 'Supplier A'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'The address of the supplier.'
         required: false
-        example: 'Pipeline for initial customer contact.'
+        example: '123 Main St'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      is_default:
+      phone_number:
         custom: []
-        name: is_default
-        description: 'Is this the default pipeline.'
+        name: phone_number
+        description: 'The phone number of the supplier.'
         required: false
-        example: false
-        type: boolean
+        example: 555-1234
+        type: string
         enumValues: []
         exampleWasSpecified: true
-        nullable: false
+        nullable: true
+        deprecated: false
+      location:
+        custom: []
+        name: location
+        description: 'The location of the supplier.'
+        required: false
+        example: IN
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      payment_terms:
+        custom: []
+        name: payment_terms
+        description: 'The payment terms with the supplier.'
+        required: false
+        example: 'Net 30'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'The email address of the supplier.'
+        required: false
+        example: supplierA@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      image:
+        custom: []
+        name: image
+        description: "The URL or path to the supplier's image."
+        required: false
+        example: 'http://example.com/image1.jpg'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
         deprecated: false
     cleanBodyParameters:
-      name: 'Initial Sales Pipeline'
-      description: 'Pipeline for initial customer contact.'
-      is_default: false
+      code: SUP-001
+      name: 'Supplier A'
+      address: '123 Main St'
+      phone_number: 555-1234
+      location: IN
+      payment_terms: 'Net 30'
+      email: supplierA@example.com
+      image: 'http://example.com/image1.jpg'
     fileParameters: []
     responses:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":1,"name":"Initial Sales Pipeline",...}}'
+        content: '{"data":{"id":1,"code":"SUP-001","name":"Supplier A",...}}'
         headers: []
         description: Success
       -
@@ -401,15 +402,15 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/sales-pipelines/{id}'
+    uri: 'api/v1/suppliers/{id}'
     metadata:
       custom: []
-      groupName: 'Sales Pipelines'
+      groupName: Suppliers
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified sales pipeline.'
-      description: ''
+      title: 'Display the specified supplier.'
+      description: 'Retrieves a single supplier by its ID.'
       authenticated: true
       deprecated: false
     headers:
@@ -420,7 +421,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the sales pipeline.'
+        description: 'The ID of the supplier.'
         required: true
         example: 17
         type: integer
@@ -428,10 +429,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      sales_pipeline:
+      supplier:
         custom: []
-        name: sales_pipeline
-        description: 'The ID of the sales pipeline.'
+        name: supplier
+        description: 'The ID of the supplier.'
         required: true
         example: '1'
         type: string
@@ -441,7 +442,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      sales_pipeline: '1'
+      supplier: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -451,7 +452,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"Main Pipeline","description":"Main sales pipeline.","is_default":true,...}}'
+        content: '{"data":{"id":1,"code":"SUP-001","name":"Supplier A",...}}'
         headers: []
         description: Success
       -
@@ -463,7 +464,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Sales pipeline not found."}'
+        content: '{"message": "Supplier not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []
@@ -479,10 +480,10 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/sales-pipelines/{id}'
+    uri: 'api/v1/suppliers/{id}'
     metadata:
       custom: []
-      groupName: 'Sales Pipelines'
+      groupName: Suppliers
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -498,7 +499,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the sales pipeline.'
+        description: 'The ID of the supplier.'
         required: true
         example: 17
         type: integer
@@ -506,10 +507,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      sales_pipeline:
+      supplier:
         custom: []
-        name: sales_pipeline
-        description: 'The ID of the sales pipeline.'
+        name: supplier
+        description: 'The ID of the supplier.'
         required: true
         example: 1
         type: integer
@@ -519,28 +520,17 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      sales_pipeline: 1
+      supplier: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      description:
+      code:
         custom: []
-        name: description
-        description: 'A description of the sales pipeline.'
-        required: false
-        example: 'Pipeline for new leads.'
+        name: code
+        description: 'The unique code for the supplier.'
+        required: true
+        example: SUP-002
         type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      is_default:
-        custom: []
-        name: is_default
-        description: 'Is this the default pipeline.'
-        required: false
-        example: true
-        type: boolean
         enumValues: []
         exampleWasSpecified: true
         nullable: false
@@ -548,24 +538,95 @@ endpoints:
       name:
         custom: []
         name: name
-        description: 'The name of the sales pipeline.'
+        description: 'The name of the supplier.'
         required: true
-        example: 'New Sales Pipeline'
+        example: 'Supplier B'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'The address of the supplier.'
+        required: false
+        example: '456 Oak Ave'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      phone_number:
+        custom: []
+        name: phone_number
+        description: 'The phone number of the supplier.'
+        required: false
+        example: 555-5678
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      location:
+        custom: []
+        name: location
+        description: 'The location of the supplier.'
+        required: false
+        example: OUT
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      payment_terms:
+        custom: []
+        name: payment_terms
+        description: 'The payment terms with the supplier.'
+        required: false
+        example: 'Net 60'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'The email address of the supplier.'
+        required: false
+        example: supplierb@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      image:
+        custom: []
+        name: image
+        description: "The URL or path to the supplier's image."
+        required: false
+        example: 'http://example.com/image2.jpg'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
     cleanBodyParameters:
-      description: 'Pipeline for new leads.'
-      is_default: true
-      name: 'New Sales Pipeline'
+      code: SUP-002
+      name: 'Supplier B'
+      address: '456 Oak Ave'
+      phone_number: 555-5678
+      location: OUT
+      payment_terms: 'Net 60'
+      email: supplierb@example.com
+      image: 'http://example.com/image2.jpg'
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"New Sales Pipeline",...}}'
+        content: '{"data":{"id":1,"code":"SUP-002","name":"Supplier B",...}}'
         headers: []
         description: Success
       -
@@ -577,7 +638,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Sales pipeline not found."}'
+        content: '{"message": "Supplier not found."}'
         headers: []
         description: 'Not Found'
       -
@@ -598,10 +659,10 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/v1/sales-pipelines/{id}'
+    uri: 'api/v1/suppliers/{id}'
     metadata:
       custom: []
-      groupName: 'Sales Pipelines'
+      groupName: Suppliers
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -617,7 +678,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the sales pipeline.'
+        description: 'The ID of the supplier.'
         required: true
         example: 17
         type: integer
@@ -625,10 +686,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      sales_pipeline:
+      supplier:
         custom: []
-        name: sales_pipeline
-        description: 'The ID of the sales pipeline to delete.'
+        name: supplier
+        description: 'The ID of the supplier to delete.'
         required: true
         example: 1
         type: integer
@@ -638,7 +699,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      sales_pipeline: 1
+      supplier: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -660,7 +721,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Sales pipeline not found."}'
+        content: '{"message": "Supplier not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []

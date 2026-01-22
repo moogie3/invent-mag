@@ -1,18 +1,18 @@
-name: Payments
+name: 'Journal Entries'
 description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/payments
+    uri: api/v1/journal-entries
     metadata:
       custom: []
-      groupName: Payments
+      groupName: 'Journal Entries'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the payments.'
+      title: 'Display a listing of the journal entries.'
       description: ''
       authenticated: true
       deprecated: false
@@ -26,7 +26,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of payments to return per page. Defaults to 15.'
+        description: 'The number of entries to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -43,7 +43,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"amount":100,"payment_date":"2025-11-28",...}],"links":{...},"meta":{...}}'
+        content: '{"data":[{"id":1,"date":"2025-11-28","description":"Initial investment",...}],"links":{...},"meta":{...}}'
         headers: []
         description: Success
       -
@@ -64,10 +64,10 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/payments
+    uri: api/v1/journal-entries
     metadata:
       custom: []
-      groupName: Payments
+      groupName: 'Journal Entries'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -84,21 +84,10 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      amount:
+      date:
         custom: []
-        name: amount
-        description: 'The amount of the payment.'
-        required: true
-        example: 100.0
-        type: number
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      payment_date:
-        custom: []
-        name: payment_date
-        description: 'The date of the payment.'
+        name: date
+        description: 'The date of the journal entry.'
         required: true
         example: '2025-11-28'
         type: date
@@ -106,63 +95,62 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      payment_method:
+      description:
         custom: []
-        name: payment_method
-        description: 'The payment method.'
+        name: description
+        description: 'The description of the journal entry.'
         required: true
-        example: Cash
+        example: 'Initial investment'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      notes:
+      sourceable_id:
         custom: []
-        name: notes
-        description: 'The notes for the payment.'
+        name: sourceable_id
+        description: 'The ID of the sourceable model.'
         required: false
-        example: 'Paid in full'
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      sourceable_type:
+        custom: []
+        name: sourceable_type
+        description: 'The type of the sourceable model.'
+        required: false
+        example: App\\Models\\User
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      paymentable_id:
+      transactions:
         custom: []
-        name: paymentable_id
-        description: 'The ID of the model the payment belongs to (e.g., Purchase, Sales).'
+        name: transactions
+        description: 'A JSON string of transactions. Must be a valid JSON string.'
         required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      paymentable_type:
-        custom: []
-        name: paymentable_type
-        description: 'The fully qualified class name of the model the payment belongs to (e.g., App\Models\Purchase, App\Models\Sales).'
-        required: true
-        example: App\Models\Purchase
+        example: '[{"account_name":"Cash","type":"debit","amount":100},{"account_name":"Inventory","type":"credit","amount":100}]'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      amount: 100.0
-      payment_date: '2025-11-28'
-      payment_method: Cash
-      notes: 'Paid in full'
-      paymentable_id: 1
-      paymentable_type: App\Models\Purchase
+      date: '2025-11-28'
+      description: 'Initial investment'
+      sourceable_id: 1
+      sourceable_type: App\\Models\\User
+      transactions: '[{"account_name":"Cash","type":"debit","amount":100},{"account_name":"Inventory","type":"credit","amount":100}]'
     fileParameters: []
     responses:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":1,"amount":100,"payment_date":"2025-11-28",...}}'
+        content: '{"data":{"id":1,"date":"2025-11-28","description":"Initial investment",...}}'
         headers: []
         description: Success
       -
@@ -174,7 +162,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"The amount field is required.","errors":{"amount":["The amount field is required."]}}'
+        content: '{"message":"The date field is required.","errors":{"date":["The date field is required."]}}'
         headers: []
         description: 'Validation Error'
     responseFields: []
@@ -189,14 +177,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/payments/{id}'
+    uri: 'api/v1/journal-entries/{id}'
     metadata:
       custom: []
-      groupName: Payments
+      groupName: 'Journal Entries'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified payment.'
+      title: 'Display the specified journal entry.'
       description: ''
       authenticated: true
       deprecated: false
@@ -208,7 +196,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the payment.'
+        description: 'The ID of the journal entry.'
         required: true
         example: 17
         type: integer
@@ -216,10 +204,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      payment:
+      journal_entry:
         custom: []
-        name: payment
-        description: 'The ID of the payment.'
+        name: journal_entry
+        description: 'The ID of the journal entry.'
         required: true
         example: '1'
         type: string
@@ -229,7 +217,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      payment: '1'
+      journal_entry: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -239,7 +227,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"amount":100,"payment_date":"2025-11-28",...}}'
+        content: '{"data":{"id":1,"date":"2025-11-28","description":"Initial investment",...}}'
         headers: []
         description: Success
       -
@@ -251,7 +239,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Payment not found."}'
+        content: '{"message": "Journal entry not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []
@@ -267,10 +255,10 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/payments/{id}'
+    uri: 'api/v1/journal-entries/{id}'
     metadata:
       custom: []
-      groupName: Payments
+      groupName: 'Journal Entries'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -286,7 +274,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the payment.'
+        description: 'The ID of the journal entry.'
         required: true
         example: 17
         type: integer
@@ -294,10 +282,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      payment:
+      journal_entry:
         custom: []
-        name: payment
-        description: 'The ID of the payment.'
+        name: journal_entry
+        description: 'The ID of the journal entry.'
         required: true
         example: '1'
         type: string
@@ -307,25 +295,14 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      payment: '1'
+      journal_entry: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      amount:
+      date:
         custom: []
-        name: amount
-        description: 'The amount of the payment.'
-        required: true
-        example: 100.0
-        type: number
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      payment_date:
-        custom: []
-        name: payment_date
-        description: 'The date of the payment.'
+        name: date
+        description: 'The date of the journal entry.'
         required: true
         example: '2025-11-28'
         type: date
@@ -333,63 +310,50 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      payment_method:
+      description:
         custom: []
-        name: payment_method
-        description: 'The payment method.'
+        name: description
+        description: 'The description of the journal entry.'
         required: true
-        example: Cash
+        example: 'Initial investment'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      notes:
+      sourceable_id:
         custom: []
-        name: notes
-        description: 'The notes for the payment.'
+        name: sourceable_id
+        description: 'The ID of the sourceable model.'
         required: false
-        example: 'Paid in full'
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      sourceable_type:
+        custom: []
+        name: sourceable_type
+        description: 'The type of the sourceable model.'
+        required: false
+        example: App\\Models\\User
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      paymentable_id:
-        custom: []
-        name: paymentable_id
-        description: 'The ID of the paymentable model (e.g., Purchase, Sales).'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      paymentable_type:
-        custom: []
-        name: paymentable_type
-        description: 'The type of the paymentable model (e.g., "App\\Models\\Purchase", "App\\Models\\Sales").'
-        required: true
-        example: App\\Models\\Purchase
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
     cleanBodyParameters:
-      amount: 100.0
-      payment_date: '2025-11-28'
-      payment_method: Cash
-      notes: 'Paid in full'
-      paymentable_id: 1
-      paymentable_type: App\\Models\\Purchase
+      date: '2025-11-28'
+      description: 'Initial investment'
+      sourceable_id: 1
+      sourceable_type: App\\Models\\User
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"amount":100,"payment_date":"2025-11-28",...}}'
+        content: '{"data":{"id":1,"date":"2025-11-28","description":"Initial investment (Updated)",...}}'
         headers: []
         description: Success
       -
@@ -401,13 +365,13 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Payment not found."}'
+        content: '{"message": "Journal entry not found."}'
         headers: []
         description: 'Not Found'
       -
         custom: []
         status: 422
-        content: '{"message":"The amount field is required.","errors":{"amount":["The amount field is required."]}}'
+        content: '{"message":"The date field is required.","errors":{"date":["The date field is required."]}}'
         headers: []
         description: 'Validation Error'
     responseFields: []
@@ -422,10 +386,10 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/v1/payments/{id}'
+    uri: 'api/v1/journal-entries/{id}'
     metadata:
       custom: []
-      groupName: Payments
+      groupName: 'Journal Entries'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -441,7 +405,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the payment.'
+        description: 'The ID of the journal entry.'
         required: true
         example: 17
         type: integer
@@ -449,10 +413,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      payment:
+      journal_entry:
         custom: []
-        name: payment
-        description: 'The ID of the payment.'
+        name: journal_entry
+        description: 'The ID of the journal entry.'
         required: true
         example: '1'
         type: string
@@ -462,7 +426,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      payment: '1'
+      journal_entry: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -484,7 +448,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Payment not found."}'
+        content: '{"message": "Journal entry not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []

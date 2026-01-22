@@ -35,9 +35,13 @@ class AccountingServiceTest extends TestCase
         $sale = Sales::factory()->create();
         $date = Carbon::now();
 
+        $tenantId = app('currentTenant')->id;
+        $arAccount = Account::where('code', '1130-' . $tenantId)->first();
+        $revenueAccount = Account::where('code', '4100-' . $tenantId)->first();
+
         $transactions = [
-            ['account_name' => 'accounting.accounts.accounts_receivable.name', 'type' => 'debit', 'amount' => 100.00],
-            ['account_name' => 'accounting.accounts.sales_revenue.name', 'type' => 'credit', 'amount' => 100.00],
+            ['account_name' => $arAccount->name, 'type' => 'debit', 'amount' => 100.00],
+            ['account_name' => $revenueAccount->name, 'type' => 'credit', 'amount' => 100.00],
         ];
 
         $journalEntry = $this->accountingService->createJournalEntry(
@@ -57,14 +61,14 @@ class AccountingServiceTest extends TestCase
 
         $this->assertDatabaseHas('transactions', [
             'journal_entry_id' => $journalEntry->id,
-            'account_id' => Account::where('name', 'accounting.accounts.accounts_receivable.name')->first()->id,
+            'account_id' => $arAccount->id,
             'type' => 'debit',
             'amount' => 100.00,
         ]);
 
         $this->assertDatabaseHas('transactions', [
             'journal_entry_id' => $journalEntry->id,
-            'account_id' => Account::where('name', 'accounting.accounts.sales_revenue.name')->first()->id,
+            'account_id' => $revenueAccount->id,
             'type' => 'credit',
             'amount' => 100.00,
         ]);
@@ -96,7 +100,7 @@ class AccountingServiceTest extends TestCase
     public function it_throws_an_exception_for_invalid_account_name()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Account 'Non-existent Account' not found.");
+        $this->expectExceptionMessage("Account 'Non-existent Account' not found for the current tenant.");
 
         $sale = Sales::factory()->create();
         $date = Carbon::now();

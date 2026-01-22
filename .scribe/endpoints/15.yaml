@@ -1,18 +1,18 @@
-name: 'Currency Settings'
+name: Categories
 description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/currency-settings
+    uri: api/v1/categories
     metadata:
       custom: []
-      groupName: 'Currency Settings'
+      groupName: Categories
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the currency settings.'
+      title: 'Display a listing of the categories.'
       description: ''
       authenticated: true
       deprecated: false
@@ -26,7 +26,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of settings to return per page. Defaults to 15.'
+        description: 'The number of categories to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -43,7 +43,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"currency_symbol":"$","decimal_separator":".",...}}'
+        content: '{"data":[{"id":1,"name":"Electronics","description":"Electronic components and devices",...}],"links":{...},"meta":{...}}'
         headers: []
         description: Success
       -
@@ -63,12 +63,178 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - PUT
-      - PATCH
-    uri: 'api/v1/currency-settings/{id}'
+      - POST
+    uri: api/v1/categories
     metadata:
       custom: []
-      groupName: 'Currency Settings'
+      groupName: Categories
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Store a newly created resource in storage.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'The name of the category.'
+        required: true
+        example: '"Electronics"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'The description of the category.'
+        required: false
+        example: '"Electronic components and devices"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      parent_id:
+        custom: []
+        name: parent_id
+        description: 'The ID of the parent category.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      name: '"Electronics"'
+      description: '"Electronic components and devices"'
+      parent_id: 1
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: '{"data":{"id":1,"name":"Electronics","description":"Electronic components and devices",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 422
+        content: '{"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        headers: []
+        description: 'Validation Error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/categories/{id}'
+    metadata:
+      custom: []
+      groupName: Categories
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Display the specified category.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the category.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      category:
+        custom: []
+        name: category
+        description: 'The ID of the category.'
+        required: true
+        example: '1'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 17
+      category: '1'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"name":"Electronics","description":"Electronic components and devices",...}}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Category not found."}'
+        headers: []
+        description: 'Not Found'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/v1/categories/{id}'
+    metadata:
+      custom: []
+      groupName: Categories
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -84,18 +250,18 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the currency setting.'
+        description: 'The ID of the category.'
         required: true
-        example: consequatur
-        type: string
+        example: 17
+        type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      currency_setting:
+      category:
         custom: []
-        name: currency_setting
-        description: 'The ID of the currency setting.'
+        name: category
+        description: 'The ID of the category.'
         required: true
         example: '1'
         type: string
@@ -104,102 +270,54 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: consequatur
-      currency_setting: '1'
+      id: 17
+      category: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      currency_symbol:
+      name:
         custom: []
-        name: currency_symbol
-        description: 'The currency symbol.'
+        name: name
+        description: 'The name of the category.'
         required: true
-        example: '"$"'
+        example: '"Electronics"'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      decimal_separator:
+      description:
         custom: []
-        name: decimal_separator
-        description: 'The decimal separator.'
-        required: true
-        example: '"."'
+        name: description
+        description: 'The description of the category.'
+        required: false
+        example: '"Electronic components and devices"'
         type: string
         enumValues: []
         exampleWasSpecified: true
-        nullable: false
+        nullable: true
         deprecated: false
-      thousand_separator:
+      parent_id:
         custom: []
-        name: thousand_separator
-        description: 'The thousand separator.'
-        required: true
-        example: '","'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      decimal_places:
-        custom: []
-        name: decimal_places
-        description: 'The number of decimal places.'
-        required: true
-        example: 2
+        name: parent_id
+        description: 'The ID of the parent category.'
+        required: false
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      position:
-        custom: []
-        name: position
-        description: 'The position of the currency symbol.'
-        required: true
-        example: '"prefix"'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      currency_code:
-        custom: []
-        name: currency_code
-        description: 'The currency code.'
-        required: true
-        example: '"USD"'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      locale:
-        custom: []
-        name: locale
-        description: 'The locale.'
-        required: true
-        example: '"en_US"'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
+        nullable: true
         deprecated: false
     cleanBodyParameters:
-      currency_symbol: '"$"'
-      decimal_separator: '"."'
-      thousand_separator: '","'
-      decimal_places: 2
-      position: '"prefix"'
-      currency_code: '"USD"'
-      locale: '"en_US"'
+      name: '"Electronics"'
+      description: '"Electronic components and devices"'
+      parent_id: 1
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"currency_symbol":"¥","decimal_separator":",",...}}'
+        content: '{"data":{"id":1,"name":"Electronics (Updated)","description":"Updated description","created_at":"2025-12-01T12:00:00.000000Z","updated_at":"2025-12-01T13:00:00.000000Z"}}'
         headers: []
         description: Success
       -
@@ -211,15 +329,92 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Currency setting not found."}'
+        content: '{"message": "Category not found."}'
         headers: []
         description: 'Not Found'
       -
         custom: []
         status: 422
-        content: '{"message":"The currency_symbol field is required.","errors":{"currency_symbol":["The currency_symbol field is required."]}}'
+        content: '{"success":false,"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
         headers: []
         description: 'Validation Error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/categories/{id}'
+    metadata:
+      custom: []
+      groupName: Categories
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Remove the specified resource from storage.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the category.'
+        required: true
+        example: 17
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      category:
+        custom: []
+        name: category
+        description: 'The ID of the category.'
+        required: true
+        example: '1'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 17
+      category: '1'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+      -
+        custom: []
+        status: 404
+        content: '{"message": "Category not found."}'
+        headers: []
+        description: 'Not Found'
     responseFields: []
     auth:
       - headers

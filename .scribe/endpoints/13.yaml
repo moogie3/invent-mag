@@ -1,18 +1,65 @@
-name: Accounts
+name: Taxes
 description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/accounts
+    uri: api/v1/tax/active-rate
     metadata:
       custom: []
-      groupName: Accounts
+      groupName: Taxes
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the accounts.'
+      title: 'Get Active Tax Rate'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_API_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"tax_rate":0.10}'
+        headers: []
+        description: Success
+      -
+        custom: []
+        status: 401
+        content: '{"message": "Unauthenticated."}'
+        headers: []
+        description: Unauthenticated
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/taxes
+    metadata:
+      custom: []
+      groupName: Taxes
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Display a listing of the taxes.'
       description: ''
       authenticated: true
       deprecated: false
@@ -26,7 +73,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of accounts to return per page. Defaults to 15.'
+        description: 'The number of taxes to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -43,7 +90,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"Cash Account","code":"1110",...}],"links":{...},"meta":{...}}'
+        content: '{"data":{"id":1,"name":"VAT","rate":0.1,...}}'
         headers: []
         description: Success
       -
@@ -52,143 +99,6 @@ endpoints:
         content: '{"message": "Unauthenticated."}'
         headers: []
         description: Unauthenticated
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - POST
-    uri: api/v1/accounts
-    metadata:
-      custom: []
-      groupName: Accounts
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Store a newly created resource in storage.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      parent_id:
-        custom: []
-        name: parent_id
-        description: 'The ID of the parent account.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      name:
-        custom: []
-        name: name
-        description: 'The name of the account.'
-        required: true
-        example: Cash
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      code:
-        custom: []
-        name: code
-        description: 'The account code. Must be unique.'
-        required: true
-        example: '1110'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: 'The type of the account.'
-        required: true
-        example: asset
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the account.'
-        required: false
-        example: 'Cash on hand'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
-      is_active:
-        custom: []
-        name: is_active
-        description: 'Whether the account is active.'
-        required: true
-        example: true
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      level:
-        custom: []
-        name: level
-        description: 'The level of the account in the hierarchy.'
-        required: true
-        example: 2
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      parent_id: 1
-      name: Cash
-      code: '1110'
-      type: asset
-      description: 'Cash on hand'
-      is_active: true
-      level: 2
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 201
-        content: '{"data":{"id":1,"name":"Cash Account","code":"1110",...}}'
-        headers: []
-        description: Success
-      -
-        custom: []
-        status: 401
-        content: '{"message": "Unauthenticated."}'
-        headers: []
-        description: Unauthenticated
-      -
-        custom: []
-        status: 422
-        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
-        headers: []
-        description: 'Validation Error'
     responseFields: []
     auth:
       - headers
@@ -201,14 +111,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/accounts/{id}'
+    uri: 'api/v1/taxes/{id}'
     metadata:
       custom: []
-      groupName: Accounts
+      groupName: Taxes
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified account.'
+      title: 'Display the specified tax.'
       description: ''
       authenticated: true
       deprecated: false
@@ -220,7 +130,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the account.'
+        description: 'The ID of the tax.'
         required: true
         example: 17
         type: integer
@@ -228,20 +138,20 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      account:
+      tax:
         custom: []
-        name: account
-        description: 'The ID of the account.'
+        name: tax
+        description: 'The ID of the tax.'
         required: true
-        example: 1
-        type: integer
+        example: '1'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
       id: 17
-      account: 1
+      tax: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -251,7 +161,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"Cash Account","code":"1110",...}}'
+        content: '{"data":{"id":1,"name":"VAT","rate":0.1,"is_active":true,...}}'
         headers: []
         description: Success
       -
@@ -263,7 +173,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Account not found."}'
+        content: '{"message": "Tax not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []
@@ -279,10 +189,10 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/accounts/{id}'
+    uri: 'api/v1/taxes/{id}'
     metadata:
       custom: []
-      groupName: Accounts
+      groupName: Taxes
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -298,7 +208,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the account.'
+        description: 'The ID of the tax.'
         required: true
         example: 17
         type: integer
@@ -306,114 +216,66 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      account:
+      tax:
         custom: []
-        name: account
-        description: 'The ID of the account.'
+        name: tax
+        description: 'The ID of the tax.'
         required: true
-        example: 1
-        type: integer
+        example: '1'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
       id: 17
-      account: 1
+      tax: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      parent_id:
-        custom: []
-        name: parent_id
-        description: 'The ID of the parent account.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
       name:
         custom: []
         name: name
-        description: 'The name of the account.'
+        description: 'The name of the tax.'
         required: true
-        example: Cash
+        example: VAT
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      type:
+      rate:
         custom: []
-        name: type
-        description: 'The type of the account.'
+        name: rate
+        description: 'The tax rate.'
         required: true
-        example: asset
-        type: string
+        example: '0.10'
+        type: numeric
         enumValues: []
         exampleWasSpecified: true
         nullable: false
-        deprecated: false
-      description:
-        custom: []
-        name: description
-        description: 'The description of the account.'
-        required: false
-        example: 'Cash on hand'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
         deprecated: false
       is_active:
         custom: []
         name: is_active
-        description: 'Whether the account is active.'
-        required: true
+        description: 'Is the tax active.'
+        required: false
         example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      code:
-        custom: []
-        name: code
-        description: 'The account code. Must be unique.'
-        required: true
-        example: '1110'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      level:
-        custom: []
-        name: level
-        description: 'The level of the account in the hierarchy.'
-        required: true
-        example: 2
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
     cleanBodyParameters:
-      parent_id: 1
-      name: Cash
-      type: asset
-      description: 'Cash on hand'
+      name: VAT
+      rate: '0.10'
       is_active: true
-      code: '1110'
-      level: 2
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"Cash Account (Updated)","code":"1110",...}}'
+        content: '{"data":{"id":1,"name":"VAT","rate":0.10,"is_active":true,...}}'
         headers: []
         description: Success
       -
@@ -425,7 +287,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Account not found."}'
+        content: '{"message": "Tax not found."}'
         headers: []
         description: 'Not Found'
       -
@@ -434,89 +296,6 @@ endpoints:
         content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
         headers: []
         description: 'Validation Error'
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|ZsUkaBJJzRLVFuXlWRNS1bPWaHcEghu7uYRUTPoyf990ac6e'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - DELETE
-    uri: 'api/v1/accounts/{id}'
-    metadata:
-      custom: []
-      groupName: Accounts
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Remove the specified resource from storage.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_API_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the account.'
-        required: true
-        example: 17
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      account:
-        custom: []
-        name: account
-        description: 'The ID of the account.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 17
-      account: 1
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 204
-        content: ''
-        headers: []
-        description: Success
-      -
-        custom: []
-        status: 401
-        content: '{"message": "Unauthenticated."}'
-        headers: []
-        description: Unauthenticated
-      -
-        custom: []
-        status: 404
-        content: '{"message": "Account not found."}'
-        headers: []
-        description: 'Not Found'
-      -
-        custom: []
-        status: 422
-        content: '{"message": "Account cannot be deleted because it has transactions or child accounts."}'
-        headers: []
-        description: 'Deletion Failed'
     responseFields: []
     auth:
       - headers

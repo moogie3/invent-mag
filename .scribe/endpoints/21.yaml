@@ -1,18 +1,18 @@
-name: Roles
+name: 'Purchase Order Items'
 description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/roles
+    uri: api/v1/po-items
     metadata:
       custom: []
-      groupName: Roles
+      groupName: 'Purchase Order Items'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display a listing of the roles.'
+      title: 'Display a listing of the purchase order items.'
       description: ''
       authenticated: true
       deprecated: false
@@ -26,7 +26,7 @@ endpoints:
       per_page:
         custom: []
         name: per_page
-        description: 'The number of roles to return per page. Defaults to 15.'
+        description: 'The number of items to return per page. Defaults to 15.'
         required: false
         example: 25
         type: integer
@@ -43,7 +43,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"Admin","guard_name":"web","permissions":["view-users","edit-users"]},...],"links":{...},"meta":{...}}'
+        content: '{"data":[{"id":1,"po_id":1,"product_id":1,"quantity":10,...}],"links":{...},"meta":{...}}'
         headers: []
         description: Success
       -
@@ -64,10 +64,10 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/roles
+    uri: api/v1/po-items
     metadata:
       custom: []
-      groupName: Roles
+      groupName: 'Purchase Order Items'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -84,39 +84,99 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      name:
+      po_id:
         custom: []
-        name: name
-        description: 'The name of the role.'
+        name: po_id
+        description: 'The ID of the purchase order.'
         required: true
-        example: Admin
-        type: string
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      permissions:
+      product_id:
         custom: []
-        name: permissions
-        description: 'The <code>name</code> of an existing record in the permissions table.'
-        required: false
-        example:
-          - consequatur
-        type: 'string[]'
+        name: product_id
+        description: 'The ID of the product.'
+        required: true
+        example: 1
+        type: integer
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         deprecated: false
+      quantity:
+        custom: []
+        name: quantity
+        description: 'The quantity of the product.'
+        required: true
+        example: 10
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'The price of the product.'
+        required: true
+        example: 100.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount:
+        custom: []
+        name: discount
+        description: 'The discount applied to the item. Must be at least 0.'
+        required: false
+        example: 5.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      discount_type:
+        custom: []
+        name: discount_type
+        description: 'The type of discount (fixed or percentage).'
+        required: false
+        example: fixed
+        type: string
+        enumValues:
+          - fixed
+          - percentage
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      expiry_date:
+        custom: []
+        name: expiry_date
+        description: 'The expiry date of the product (if applicable). Must be a valid date.'
+        required: false
+        example: '2025-12-31'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     cleanBodyParameters:
-      name: Admin
-      permissions:
-        - consequatur
+      po_id: 1
+      product_id: 1
+      quantity: 10
+      price: 100.0
+      discount: 5.0
+      discount_type: fixed
+      expiry_date: '2025-12-31'
     fileParameters: []
     responses:
       -
         custom: []
         status: 201
-        content: '{"data":{"id":1,"name":"Admin","guard_name":"web",...}}'
+        content: '{"data":{"id":1,"po_id":1,"product_id":1,"quantity":10,...}}'
         headers: []
         description: Success
       -
@@ -128,7 +188,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        content: '{"message":"The po_id field is required.","errors":{"po_id":["The po_id field is required."]}}'
         headers: []
         description: 'Validation Error'
     responseFields: []
@@ -143,14 +203,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/roles/{id}'
+    uri: 'api/v1/po-items/{id}'
     metadata:
       custom: []
-      groupName: Roles
+      groupName: 'Purchase Order Items'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Display the specified role.'
+      title: 'Display the specified purchase order item.'
       description: ''
       authenticated: true
       deprecated: false
@@ -162,7 +222,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the role.'
+        description: 'The ID of the po item.'
         required: true
         example: 17
         type: integer
@@ -170,10 +230,10 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      role:
+      po_item:
         custom: []
-        name: role
-        description: 'The ID of the role.'
+        name: po_item
+        description: 'The ID of the purchase order item.'
         required: true
         example: '1'
         type: string
@@ -183,7 +243,7 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 17
-      role: '1'
+      po_item: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -193,7 +253,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"Admin","guard_name":"web","permissions":["view-users","edit-users"]}}'
+        content: '{"data":{"id":1,"po_id":1,"product_id":1,"quantity":10,...}}'
         headers: []
         description: Success
       -
@@ -205,7 +265,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Role not found."}'
+        content: '{"message": "Purchase order item not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []
@@ -221,10 +281,10 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/roles/{id}'
+    uri: 'api/v1/po-items/{id}'
     metadata:
       custom: []
-      groupName: Roles
+      groupName: 'Purchase Order Items'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -240,7 +300,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the role.'
+        description: 'The ID of the po item.'
         required: true
         example: 17
         type: integer
@@ -248,56 +308,116 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      role:
+      po_item:
         custom: []
-        name: role
-        description: 'The ID of the role.'
+        name: po_item
+        description: 'The ID of the purchase order item.'
         required: true
-        example: 1
-        type: integer
+        example: '1'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
       id: 17
-      role: 1
+      po_item: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      permissions:
+      po_id:
         custom: []
-        name: permissions
-        description: 'The <code>name</code> of an existing record in the permissions table.'
+        name: po_id
+        description: 'The ID of the purchase order. The <code>id</code> of an existing record in the po table.'
         required: false
-        example:
-          - consequatur
-        type: 'string[]'
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      name:
+      product_id:
         custom: []
-        name: name
-        description: 'The name of the role.'
+        name: product_id
+        description: 'The ID of the product. The <code>id</code> of an existing record in the products table.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      quantity:
+        custom: []
+        name: quantity
+        description: 'The quantity of the product.'
         required: true
-        example: Editor
-        type: string
+        example: 10
+        type: integer
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'The price of the product.'
+        required: true
+        example: 100.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount:
+        custom: []
+        name: discount
+        description: 'The discount applied to the item. Must be at least 0.'
+        required: false
+        example: 5.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      discount_type:
+        custom: []
+        name: discount_type
+        description: 'The type of discount (fixed or percentage).'
+        required: false
+        example: fixed
+        type: string
+        enumValues:
+          - fixed
+          - percentage
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      expiry_date:
+        custom: []
+        name: expiry_date
+        description: 'The expiry date of the product (if applicable). Must be a valid date.'
+        required: false
+        example: '2025-12-31'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     cleanBodyParameters:
-      permissions:
-        - consequatur
-      name: Editor
+      po_id: 1
+      product_id: 1
+      quantity: 10
+      price: 100.0
+      discount: 5.0
+      discount_type: fixed
+      expiry_date: '2025-12-31'
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"data":{"id":1,"name":"Editor","guard_name":"web",...}}'
+        content: '{"data":{"id":1,"po_id":1,"product_id":1,"quantity":10,...}}'
         headers: []
         description: Success
       -
@@ -309,13 +429,13 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Role not found."}'
+        content: '{"message": "Purchase order item not found."}'
         headers: []
         description: 'Not Found'
       -
         custom: []
         status: 422
-        content: '{"message":"The name field is required.","errors":{"name":["The name field is required."]}}'
+        content: '{"message":"The quantity field is required.","errors":{"quantity":["The quantity field is required."]}}'
         headers: []
         description: 'Validation Error'
     responseFields: []
@@ -330,10 +450,10 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/v1/roles/{id}'
+    uri: 'api/v1/po-items/{id}'
     metadata:
       custom: []
-      groupName: Roles
+      groupName: 'Purchase Order Items'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -349,7 +469,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the role.'
+        description: 'The ID of the po item.'
         required: true
         example: 17
         type: integer
@@ -357,20 +477,20 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      role:
+      po_item:
         custom: []
-        name: role
-        description: 'The ID of the role to delete.'
+        name: po_item
+        description: 'The ID of the purchase order item.'
         required: true
-        example: 1
-        type: integer
+        example: '1'
+        type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
       id: 17
-      role: 1
+      po_item: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -392,7 +512,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message": "Role not found."}'
+        content: '{"message": "Purchase order item not found."}'
         headers: []
         description: 'Not Found'
     responseFields: []

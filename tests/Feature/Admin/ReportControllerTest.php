@@ -97,22 +97,25 @@ class ReportControllerTest extends TestCase
 
     public function test_bulk_mark_as_paid_marks_transactions_as_paid()
     {
-        $transactionIds = [1, 2, 3];
-        $this->transactionServiceMock->shouldReceive('bulkMarkAsPaid')->with($transactionIds)->andReturn(3);
+        $transactions = [
+            ['id' => 1, 'type' => 'sale'],
+            ['id' => 2, 'type' => 'purchase']
+        ];
+        $this->transactionServiceMock->shouldReceive('bulkMarkAsPaid')->with($transactions)->andReturn(2);
 
-        $response = $this->actingAs($this->user)->post(route('admin.transactions.bulk-mark-paid'), ['transaction_ids' => $transactionIds]);
+        $response = $this->actingAs($this->user)->post(route('admin.transactions.bulk-mark-paid'), ['transactions' => $transactions]);
 
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
-            'message' => 'Successfully marked 3 transaction(s) as paid.',
-            'updated_count' => 3,
+            'message' => 'Successfully marked 2 transaction(s) as paid.',
+            'updated_count' => 2,
         ]);
     }
 
     public function test_bulk_mark_as_paid_handles_no_transactions_selected()
     {
-        $response = $this->actingAs($this->user)->post(route('admin.transactions.bulk-mark-paid'), ['transaction_ids' => []]);
+        $response = $this->actingAs($this->user)->post(route('admin.transactions.bulk-mark-paid'), ['transactions' => []]);
 
         $response->assertStatus(400);
         $response->assertJson([

@@ -33,10 +33,11 @@ class PurchaseReturnControllerTest extends TestCase
         $this->user->assignRole('superuser');
 
         // Ensure the authenticated user has the necessary accounting settings
+        $tenantId = app('currentTenant')->id;
         $this->user->accounting_settings = [
-            'cash_account_id' => Account::where('name', 'accounting.accounts.cash.name')->first()->id,
-            'accounts_payable_account_id' => Account::where('name', 'accounting.accounts.accounts_payable.name')->first()->id,
-            'inventory_account_id' => Account::where('name', 'accounting.accounts.inventory.name')->first()->id,
+            'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
+            'accounts_payable_account_id' => Account::where('code', '2110-' . $tenantId)->first()->id,
+            'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
         ];
         $this->user->save();
         $this->actingAs($this->user);

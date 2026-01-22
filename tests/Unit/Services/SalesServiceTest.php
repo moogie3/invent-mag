@@ -37,11 +37,12 @@ class SalesServiceTest extends TestCase
         $this->seed(AccountSeeder::class);
 
         // Retrieve SAK-compliant accounts from the seeder
-        $cash = Account::where('name', 'accounting.accounts.cash.name')->first();
-        $accountsReceivable = Account::where('name', 'accounting.accounts.accounts_receivable.name')->first();
-        $salesRevenue = Account::where('name', 'accounting.accounts.sales_revenue.name')->first();
-        $costOfGoodsSold = Account::where('name', 'accounting.accounts.cost_of_goods_sold.name')->first();
-        $inventory = Account::where('name', 'accounting.accounts.inventory.name')->first();
+        $tenantId = app('currentTenant')->id;
+        $cash = Account::where('code', '1110-' . $tenantId)->first();
+        $accountsReceivable = Account::where('code', '1130-' . $tenantId)->first();
+        $salesRevenue = Account::where('code', '4100-' . $tenantId)->first();
+        $costOfGoodsSold = Account::where('code', '5200-' . $tenantId)->first();
+        $inventory = Account::where('code', '1140-' . $tenantId)->first();
 
         // Ensure accounts exist
         $this->assertNotNull($cash, 'Cash account not found in seeder.');

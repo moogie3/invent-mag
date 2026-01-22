@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 servers:
   -
-    url: 'http://localhost'
+    url: 'http://127.0.0.1.nip.io'
 tags:
   -
     name: Accounts
@@ -21,6 +21,9 @@ tags:
     description: ''
   -
     name: Customers
+    description: ''
+  -
+    name: Endpoints
     description: ''
   -
     name: 'Journal Entries'
@@ -117,7 +120,6 @@ paths:
             type: integer
             description: 'The number of accounts to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -207,17 +209,14 @@ paths:
                   type: string
                   description: 'The name of the account.'
                   example: Cash
-                  nullable: false
                 code:
                   type: string
                   description: 'The account code. Must be unique.'
                   example: '1110'
-                  nullable: false
                 type:
                   type: string
                   description: 'The type of the account.'
                   example: asset
-                  nullable: false
                 description:
                   type: string
                   description: 'The description of the account.'
@@ -227,12 +226,10 @@ paths:
                   type: boolean
                   description: 'Whether the account is active.'
                   example: true
-                  nullable: false
                 level:
                   type: integer
                   description: 'The level of the account in the hierarchy.'
                   example: 2
-                  nullable: false
               required:
                 - name
                 - code
@@ -358,12 +355,10 @@ paths:
                   type: string
                   description: 'The name of the account.'
                   example: Cash
-                  nullable: false
                 type:
                   type: string
                   description: 'The type of the account.'
                   example: asset
-                  nullable: false
                 description:
                   type: string
                   description: 'The description of the account.'
@@ -373,17 +368,14 @@ paths:
                   type: boolean
                   description: 'Whether the account is active.'
                   example: true
-                  nullable: false
                 code:
                   type: string
                   description: 'The account code. Must be unique.'
                   example: '1110'
-                  nullable: false
                 level:
                   type: integer
                   description: 'The level of the account in the hierarchy.'
                   example: 2
-                  nullable: false
               required:
                 - name
                 - type
@@ -474,7 +466,6 @@ paths:
             type: integer
             description: 'The number of categories to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -563,7 +554,6 @@ paths:
                   type: string
                   description: 'The name of the category.'
                   example: '"Electronics"'
-                  nullable: false
                 description:
                   type: string
                   description: 'The description of the category.'
@@ -719,7 +709,6 @@ paths:
                   type: string
                   description: 'The name of the category.'
                   example: '"Electronics"'
-                  nullable: false
                 description:
                   type: string
                   description: 'The description of the category.'
@@ -804,7 +793,6 @@ paths:
             type: integer
             description: 'The number of settings to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -902,37 +890,30 @@ paths:
                   type: string
                   description: 'The currency symbol.'
                   example: '"$"'
-                  nullable: false
                 decimal_separator:
                   type: string
                   description: 'The decimal separator.'
                   example: '"."'
-                  nullable: false
                 thousand_separator:
                   type: string
                   description: 'The thousand separator.'
                   example: '","'
-                  nullable: false
                 decimal_places:
                   type: integer
                   description: 'The number of decimal places.'
                   example: 2
-                  nullable: false
                 position:
                   type: string
                   description: 'The position of the currency symbol.'
                   example: '"prefix"'
-                  nullable: false
                 currency_code:
                   type: string
                   description: 'The currency code.'
                   example: '"USD"'
-                  nullable: false
                 locale:
                   type: string
                   description: 'The locale.'
                   example: '"en_US"'
-                  nullable: false
               required:
                 - currency_symbol
                 - decimal_separator
@@ -974,7 +955,6 @@ paths:
             type: integer
             description: 'The number of interactions to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -1059,12 +1039,10 @@ paths:
                   type: integer
                   description: 'The ID of the customer.'
                   example: 1
-                  nullable: false
                 type:
                   type: string
                   description: 'The type of interaction.'
                   example: '"call"'
-                  nullable: false
                 notes:
                   type: string
                   description: 'The notes for the interaction.'
@@ -1074,12 +1052,10 @@ paths:
                   type: date
                   description: 'The date of the interaction.'
                   example: '"2025-11-28"'
-                  nullable: false
                 user_id:
                   type: integer
                   description: 'The ID of the user.'
                   example: 1
-                  nullable: false
               required:
                 - customer_id
                 - type
@@ -1199,12 +1175,10 @@ paths:
                   type: integer
                   description: 'The ID of the customer.'
                   example: 1
-                  nullable: false
                 type:
                   type: string
                   description: 'The type of interaction.'
                   example: '"call"'
-                  nullable: false
                 notes:
                   type: string
                   description: 'The notes for the interaction.'
@@ -1214,12 +1188,10 @@ paths:
                   type: date
                   description: 'The date of the interaction.'
                   example: '"2025-11-28"'
-                  nullable: false
                 user_id:
                   type: integer
                   description: 'The ID of the user.'
                   example: 1
-                  nullable: false
               required:
                 - customer_id
                 - type
@@ -1381,27 +1353,22 @@ paths:
                   type: string
                   description: 'The name of the customer.'
                   example: '"Quick Customer"'
-                  nullable: false
                 email:
                   type: string
                   description: 'The email of the customer.'
                   example: '"quick@example.com"'
-                  nullable: false
                 phone_number:
                   type: string
                   description: 'The phone number.'
                   example: '"555-555-5555"'
-                  nullable: false
                 address:
                   type: string
                   description: 'The address of the customer.'
                   example: '"123 Quick St"'
-                  nullable: false
                 payment_terms:
                   type: string
                   description: 'The payment terms.'
                   example: '"Net 30"'
-                  nullable: false
               required:
                 - name
                 - email
@@ -1691,7 +1658,6 @@ paths:
             type: integer
             description: 'The number of customers to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -1813,17 +1779,14 @@ paths:
                   type: string
                   description: 'The name of the customer.'
                   example: 'John Doe'
-                  nullable: false
                 address:
                   type: string
                   description: 'The address of the customer.'
                   example: '123 Main St'
-                  nullable: false
                 phone_number:
                   type: string
                   description: 'The phone number of the customer.'
                   example: 555-1234
-                  nullable: false
                 email:
                   type: string
                   description: 'The email of the customer. Must be unique.'
@@ -1833,7 +1796,6 @@ paths:
                   type: string
                   description: 'The payment terms.'
                   example: 'Net 30'
-                  nullable: false
               required:
                 - name
                 - address
@@ -2035,17 +1997,14 @@ paths:
                   type: string
                   description: 'The name of the customer.'
                   example: 'Jane Doe'
-                  nullable: false
                 address:
                   type: string
                   description: 'The address of the customer.'
                   example: '456 Oak Ave'
-                  nullable: false
                 phone_number:
                   type: string
                   description: 'The phone number of the customer.'
                   example: 555-5678
-                  nullable: false
                 email:
                   type: string
                   description: 'The email of the customer. Must be unique.'
@@ -2055,7 +2014,6 @@ paths:
                   type: string
                   description: 'The payment terms.'
                   example: 'Net 60'
-                  nullable: false
     delete:
       summary: 'Delete the specified customer.'
       operationId: deleteTheSpecifiedCustomer
@@ -2112,6 +2070,67 @@ paths:
         required: true
         schema:
           type: integer
+  /api/register:
+    post:
+      summary: 'Handle an incoming registration request.'
+      operationId: handleAnIncomingRegistrationRequest
+      description: ''
+      parameters: []
+      responses:
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The password field confirmation does not match.'
+                  errors:
+                    password:
+                      - 'The password field confirmation does not match.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The password field confirmation does not match.'
+                  errors:
+                    type: object
+                    properties:
+                      password:
+                        type: array
+                        example:
+                          - 'The password field confirmation does not match.'
+                        items:
+                          type: string
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                shopname:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: amniihfqcoynlazghdtqt
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: andreanne00@example.org
+                password:
+                  type: string
+                  description: ''
+                  example: 'O[2UZ5ij-e/dl4m{o,'
+              required:
+                - name
+                - shopname
+                - email
+                - password
   /api/v1/journal-entries:
     get:
       summary: 'Display a listing of the journal entries.'
@@ -2128,7 +2147,6 @@ paths:
             type: integer
             description: 'The number of entries to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -2213,12 +2231,10 @@ paths:
                   type: date
                   description: 'The date of the journal entry.'
                   example: '2025-11-28'
-                  nullable: false
                 description:
                   type: string
                   description: 'The description of the journal entry.'
                   example: 'Initial investment'
-                  nullable: false
                 sourceable_id:
                   type: integer
                   description: 'The ID of the sourceable model.'
@@ -2233,7 +2249,6 @@ paths:
                   type: string
                   description: 'A JSON string of transactions. Must be a valid JSON string.'
                   example: '[{"account_name":"Cash","type":"debit","amount":100},{"account_name":"Inventory","type":"credit","amount":100}]'
-                  nullable: false
               required:
                 - date
                 - description
@@ -2352,12 +2367,10 @@ paths:
                   type: date
                   description: 'The date of the journal entry.'
                   example: '2025-11-28'
-                  nullable: false
                 description:
                   type: string
                   description: 'The description of the journal entry.'
                   example: 'Initial investment'
-                  nullable: false
                 sourceable_id:
                   type: integer
                   description: 'The ID of the sourceable model.'
@@ -2593,7 +2606,6 @@ paths:
             type: integer
             description: 'The number of payments to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -2678,17 +2690,14 @@ paths:
                   type: number
                   description: 'The amount of the payment.'
                   example: 100.0
-                  nullable: false
                 payment_date:
                   type: date
                   description: 'The date of the payment.'
                   example: '2025-11-28'
-                  nullable: false
                 payment_method:
                   type: string
                   description: 'The payment method.'
                   example: Cash
-                  nullable: false
                 notes:
                   type: string
                   description: 'The notes for the payment.'
@@ -2698,12 +2707,10 @@ paths:
                   type: integer
                   description: 'The ID of the model the payment belongs to (e.g., Purchase, Sales).'
                   example: 1
-                  nullable: false
                 paymentable_type:
                   type: string
                   description: 'The fully qualified class name of the model the payment belongs to (e.g., App\Models\Purchase, App\Models\Sales).'
                   example: App\Models\Purchase
-                  nullable: false
               required:
                 - amount
                 - payment_date
@@ -2824,17 +2831,14 @@ paths:
                   type: number
                   description: 'The amount of the payment.'
                   example: 100.0
-                  nullable: false
                 payment_date:
                   type: date
                   description: 'The date of the payment.'
                   example: '2025-11-28'
-                  nullable: false
                 payment_method:
                   type: string
                   description: 'The payment method.'
                   example: Cash
-                  nullable: false
                 notes:
                   type: string
                   description: 'The notes for the payment.'
@@ -2844,12 +2848,10 @@ paths:
                   type: integer
                   description: 'The ID of the paymentable model (e.g., Purchase, Sales).'
                   example: 1
-                  nullable: false
                 paymentable_type:
                   type: string
                   description: 'The type of the paymentable model (e.g., "App\\Models\\Purchase", "App\\Models\\Sales").'
                   example: App\\Models\\Purchase
-                  nullable: false
               required:
                 - amount
                 - payment_date
@@ -2975,17 +2977,14 @@ paths:
                   type: string
                   description: 'The product code.'
                   example: '"PROD-001"'
-                  nullable: false
                 name:
                   type: string
                   description: 'The name of the product.'
                   example: '"New Product"'
-                  nullable: false
                 stock_quantity:
                   type: integer
                   description: 'The initial stock quantity.'
                   example: 100
-                  nullable: false
                 low_stock_threshold:
                   type: integer
                   description: 'Must be at least 1.'
@@ -2995,27 +2994,22 @@ paths:
                   type: number
                   description: 'The purchase price.'
                   example: 99.99
-                  nullable: false
                 selling_price:
                   type: number
                   description: 'The selling price.'
                   example: 149.99
-                  nullable: false
                 category_id:
                   type: integer
                   description: 'The ID of the category.'
                   example: 1
-                  nullable: false
                 units_id:
                   type: integer
                   description: 'The ID of the unit.'
                   example: 1
-                  nullable: false
                 supplier_id:
                   type: integer
                   description: 'The ID of the supplier.'
                   example: 1
-                  nullable: false
                 warehouse_id:
                   type: integer
                   description: 'nullable The ID of the warehouse.'
@@ -3203,29 +3197,24 @@ paths:
                         type: integer
                         description: 'The <code>id</code> of an existing record in the products table.'
                         example: 17
-                        nullable: false
                       stock_quantity:
                         type: integer
                         description: 'Must be at least 0.'
                         example: 45
-                        nullable: false
                       '*':
                         type: object
                         description: ''
                         example:
                           id: 4
-                        nullable: false
                         properties:
                           id:
                             type: integer
                             description: 'The ID of the product to update.'
                             example: 4
-                            nullable: false
                           stock_quantity:
                             type: integer
                             description: 'The new stock quantity.'
                             example: 100
-                            nullable: false
                         required:
                           - id
                           - stock_quantity
@@ -3314,17 +3303,14 @@ paths:
                   type: integer
                   description: 'The ID of the product to adjust.'
                   example: 4
-                  nullable: false
                 adjustment_amount:
                   type: number
                   description: 'The amount to adjust the stock by. Example : 100'
                   example: 11613.31890586
-                  nullable: false
                 adjustment_type:
                   type: string
                   description: 'The type of adjustment. Must be one of increase, decrease, correction.'
                   example: increase
-                  nullable: false
                 reason:
                   type: string
                   description: 'nullable A reason for the adjustment.'
@@ -3350,7 +3336,6 @@ paths:
             type: string
             description: 'The search query.'
             example: consequatur
-            nullable: false
       responses:
         200:
           description: Success
@@ -3607,7 +3592,6 @@ paths:
             type: string
             description: 'The barcode to search for.'
             example: '7981373950433'
-            nullable: false
       responses:
         200:
           description: Success
@@ -3653,7 +3637,6 @@ paths:
                   type: string
                   description: ''
                   example: consequatur
-                  nullable: false
               required:
                 - barcode
   /api/v1/products:
@@ -3672,7 +3655,6 @@ paths:
             type: integer
             description: 'The number of products to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -3757,27 +3739,22 @@ paths:
                   type: string
                   description: 'The name of the product.'
                   example: 'Laptop Pro'
-                  nullable: false
                 code:
                   type: string
                   description: 'A unique code for the product.'
                   example: LP-001
-                  nullable: false
                 price:
                   type: number
                   description: 'The cost price of the product.'
                   example: 1200.5
-                  nullable: false
                 selling_price:
                   type: number
                   description: 'The selling price of the product.'
                   example: 1499.99
-                  nullable: false
                 category_id:
                   type: integer
                   description: 'The ID of the category.'
                   example: 2
-                  nullable: false
                 supplier_id:
                   type: integer
                   description: 'The ID of the supplier.'
@@ -3787,7 +3764,6 @@ paths:
                   type: integer
                   description: 'The ID of the unit.'
                   example: 1
-                  nullable: false
                 warehouse_id:
                   type: integer
                   description: 'The ID of the warehouse.'
@@ -3924,27 +3900,22 @@ paths:
                   type: string
                   description: 'The name of the product.'
                   example: 'Laptop Pro v2'
-                  nullable: false
                 code:
                   type: string
                   description: 'The product code. Must be unique.'
                   example: LP-001
-                  nullable: false
                 price:
                   type: number
                   description: 'The cost price of the product.'
                   example: 1250.0
-                  nullable: false
                 selling_price:
                   type: number
                   description: 'The selling price of the product.'
                   example: 1499.99
-                  nullable: false
                 category_id:
                   type: integer
                   description: 'The ID of the category.'
                   example: 2
-                  nullable: false
                 supplier_id:
                   type: integer
                   description: 'The ID of the supplier.'
@@ -3954,7 +3925,6 @@ paths:
                   type: integer
                   description: 'The ID of the unit.'
                   example: 1
-                  nullable: false
                 warehouse_id:
                   type: integer
                   description: 'The ID of the warehouse.'
@@ -4074,17 +4044,14 @@ paths:
                   type: string
                   description: 'The product code.'
                   example: '"PROD-001"'
-                  nullable: false
                 name:
                   type: string
                   description: 'The product name.'
                   example: '"New Product"'
-                  nullable: false
                 stock_quantity:
                   type: integer
                   description: 'The initial stock quantity.'
                   example: 100
-                  nullable: false
                 low_stock_threshold:
                   type: integer
                   description: 'Must be at least 1.'
@@ -4094,27 +4061,22 @@ paths:
                   type: number
                   description: 'The purchase price of the product.'
                   example: 99.99
-                  nullable: false
                 selling_price:
                   type: number
                   description: 'The selling price of the product.'
                   example: 149.99
-                  nullable: false
                 category_id:
                   type: integer
                   description: 'The ID of the product category.'
                   example: 1
-                  nullable: false
                 units_id:
                   type: integer
                   description: 'The ID of the product unit.'
                   example: 1
-                  nullable: false
                 supplier_id:
                   type: integer
                   description: 'The ID of the product supplier.'
                   example: 1
-                  nullable: false
                 warehouse_id:
                   type: integer
                   description: 'The <code>id</code> of an existing record in the warehouses table.'
@@ -4133,7 +4095,7 @@ paths:
                 has_expiry:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
                   nullable: true
               required:
                 - code
@@ -4211,7 +4173,6 @@ paths:
             type: integer
             description: 'The number of items to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -4296,22 +4257,18 @@ paths:
                   type: integer
                   description: 'The ID of the purchase order.'
                   example: 1
-                  nullable: false
                 product_id:
                   type: integer
                   description: 'The ID of the product.'
                   example: 1
-                  nullable: false
                 quantity:
                   type: integer
                   description: 'The quantity of the product.'
                   example: 10
-                  nullable: false
                 price:
                   type: number
                   description: 'The price of the product.'
                   example: 100.0
-                  nullable: false
                 discount:
                   type: number
                   description: 'The discount applied to the item. Must be at least 0.'
@@ -4321,10 +4278,10 @@ paths:
                   type: string
                   description: 'The type of discount (fixed or percentage).'
                   example: fixed
-                  nullable: true
                   enum:
                     - fixed
                     - percentage
+                  nullable: true
                 expiry_date:
                   type: string
                   description: 'The expiry date of the product (if applicable). Must be a valid date.'
@@ -4449,22 +4406,18 @@ paths:
                   type: integer
                   description: 'The ID of the purchase order. The <code>id</code> of an existing record in the po table.'
                   example: 1
-                  nullable: false
                 product_id:
                   type: integer
                   description: 'The ID of the product. The <code>id</code> of an existing record in the products table.'
                   example: 1
-                  nullable: false
                 quantity:
                   type: integer
                   description: 'The quantity of the product.'
                   example: 10
-                  nullable: false
                 price:
                   type: number
                   description: 'The price of the product.'
                   example: 100.0
-                  nullable: false
                 discount:
                   type: number
                   description: 'The discount applied to the item. Must be at least 0.'
@@ -4474,10 +4427,10 @@ paths:
                   type: string
                   description: 'The type of discount (fixed or percentage).'
                   example: fixed
-                  nullable: true
                   enum:
                     - fixed
                     - percentage
+                  nullable: true
                 expiry_date:
                   type: string
                   description: 'The expiry date of the product (if applicable). Must be a valid date.'
@@ -4895,17 +4848,14 @@ paths:
                   type: number
                   description: 'The payment amount.'
                   example: 100.0
-                  nullable: false
                 payment_date:
                   type: date
                   description: 'The date of the payment.'
                   example: '2023-10-27'
-                  nullable: false
                 payment_method:
                   type: string
                   description: 'The method of payment.'
                   example: 'Bank Transfer'
-                  nullable: false
                 notes:
                   type: string
                   description: 'nullable Any notes about the payment.'
@@ -4940,7 +4890,6 @@ paths:
             type: integer
             description: 'The number of purchase orders to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -5025,27 +4974,22 @@ paths:
                   type: string
                   description: 'The invoice number.'
                   example: '"INV-2023-001"'
-                  nullable: false
                 supplier_id:
                   type: integer
                   description: 'The ID of the supplier.'
                   example: 1
-                  nullable: false
                 order_date:
                   type: date
                   description: 'The date of the order.'
                   example: '"2023-10-26"'
-                  nullable: false
                 due_date:
                   type: date
                   description: 'The due date of the payment.'
                   example: '2023-11-26'
-                  nullable: false
                 products:
                   type: string
                   description: 'A JSON string of products. Must be a valid JSON string.'
                   example: '[{"product_id":1,"quantity":10,"price":100,"discount":0,"discount_type":"fixed","expiry_date":"2025-12-31"}]'
-                  nullable: false
                 discount_total:
                   type: numeric
                   description: 'The total discount applied.'
@@ -5060,22 +5004,18 @@ paths:
                   type: integer
                   description: 'The ID of the user.'
                   example: 1
-                  nullable: false
                 payment_type:
                   type: string
                   description: 'The payment type (e.g., Cash, Credit Card).'
                   example: '"Cash"'
-                  nullable: false
                 total:
                   type: numeric
                   description: 'The total amount of the purchase order.'
                   example: '1500.00'
-                  nullable: false
                 status:
                   type: string
                   description: 'The status of the purchase order (e.g., Pending, Paid).'
                   example: '"Pending"'
-                  nullable: false
               required:
                 - invoice
                 - supplier_id
@@ -5199,22 +5139,18 @@ paths:
                   type: integer
                   description: 'The ID of the supplier.'
                   example: 2
-                  nullable: false
                 order_date:
                   type: date
                   description: 'The date of the order.'
                   example: '2023-10-27'
-                  nullable: false
                 due_date:
                   type: date
                   description: 'The due date of the payment.'
                   example: '2023-11-27'
-                  nullable: false
                 products:
                   type: string
                   description: 'A JSON string of products. Must be a valid JSON string.'
                   example: '[{"product_id":1,"quantity":10,"price":100,"discount":0,"discount_type":"fixed","expiry_date":"2025-12-31"}]'
-                  nullable: false
                 discount_total:
                   type: numeric
                   description: 'The total discount applied.'
@@ -5239,17 +5175,14 @@ paths:
                   type: string
                   description: 'The invoice number.'
                   example: INV-2023-002
-                  nullable: false
                 user_id:
                   type: integer
                   description: 'The ID of the user.'
                   example: 1
-                  nullable: false
                 total:
                   type: numeric
                   description: 'The total amount of the purchase order.'
                   example: '2000.00'
-                  nullable: false
               required:
                 - products
     delete:
@@ -5414,7 +5347,6 @@ paths:
             type: integer
             description: 'The page number to retrieve.'
             example: 1
-            nullable: false
         -
           in: query
           name: per_page
@@ -5425,7 +5357,6 @@ paths:
             type: integer
             description: 'The number of items to return per page. Defaults to 20.'
             example: 20
-            nullable: false
       responses:
         200:
           description: Success
@@ -5464,7 +5395,6 @@ paths:
             type: integer
             description: 'The number of transactions per page.'
             example: 25
-            nullable: false
         -
           in: query
           name: type
@@ -5475,7 +5405,6 @@ paths:
             type: string
             description: "Filter by type (e.g., 'purchase', 'sale')."
             example: consequatur
-            nullable: false
         -
           in: query
           name: status
@@ -5486,7 +5415,6 @@ paths:
             type: string
             description: "Filter by status (e.g., 'paid', 'due')."
             example: consequatur
-            nullable: false
         -
           in: query
           name: date_range
@@ -5497,7 +5425,6 @@ paths:
             type: string
             description: "Date range filter ('today', 'this_week', 'this_month', 'all')."
             example: "'this_month'"
-            nullable: false
         -
           in: query
           name: search
@@ -5508,7 +5435,6 @@ paths:
             type: string
             description: 'Search term.'
             example: consequatur
-            nullable: false
         -
           in: query
           name: start_date
@@ -5519,7 +5445,6 @@ paths:
             type: string
             description: 'date Start date for filtering.'
             example: '2023-01-01'
-            nullable: false
         -
           in: query
           name: end_date
@@ -5530,7 +5455,6 @@ paths:
             type: string
             description: 'date End date for filtering.'
             example: '2023-12-31'
-            nullable: false
         -
           in: query
           name: sort
@@ -5541,7 +5465,6 @@ paths:
             type: string
             description: 'Field to sort by.'
             example: date
-            nullable: false
         -
           in: query
           name: direction
@@ -5552,7 +5475,6 @@ paths:
             type: string
             description: 'Sort direction (asc or desc).'
             example: desc
-            nullable: false
       responses:
         200:
           description: Success
@@ -5811,7 +5733,6 @@ paths:
                   type: string
                   description: "The type of the transaction ('purchase' or 'sale')."
                   example: '"sale"'
-                  nullable: false
               required:
                 - type
     parameters:
@@ -5839,7 +5760,6 @@ paths:
             type: integer
             description: 'The number of roles to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -5924,7 +5844,6 @@ paths:
                   type: string
                   description: 'The name of the role.'
                   example: Admin
-                  nullable: false
                 permissions:
                   type: array
                   description: 'The <code>name</code> of an existing record in the permissions table.'
@@ -6082,7 +6001,6 @@ paths:
                   type: string
                   description: 'The name of the role.'
                   example: Editor
-                  nullable: false
               required:
                 - name
     delete:
@@ -6129,7 +6047,7 @@ paths:
         in: path
         name: id
         description: 'The ID of the role.'
-        example: 17
+        example: 1
         required: true
         schema:
           type: integer
@@ -6157,7 +6075,6 @@ paths:
             type: integer
             description: 'The number of items to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -6312,7 +6229,6 @@ paths:
                   type: integer
                   description: 'The ID of the new pipeline stage.'
                   example: 2
-                  nullable: false
               required:
                 - pipeline_stage_id
     parameters:
@@ -6434,7 +6350,6 @@ paths:
             type: integer
             description: 'The number of opportunities to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -6519,22 +6434,18 @@ paths:
                   type: integer
                   description: 'The ID of the customer.'
                   example: 1
-                  nullable: false
                 sales_pipeline_id:
                   type: integer
                   description: 'The ID of the sales pipeline.'
                   example: 1
-                  nullable: false
                 pipeline_stage_id:
                   type: integer
                   description: 'The ID of the pipeline stage.'
                   example: 1
-                  nullable: false
                 name:
                   type: string
                   description: 'The name of the sales opportunity.'
                   example: 'New Client Project'
-                  nullable: false
                 description:
                   type: string
                   description: 'A description of the sales opportunity.'
@@ -6549,7 +6460,6 @@ paths:
                   type: string
                   description: 'The status of the opportunity (e.g., Open, Won, Lost).'
                   example: Open
-                  nullable: false
                 amount:
                   type: numeric
                   description: 'The estimated amount of the opportunity.'
@@ -6682,22 +6592,18 @@ paths:
                   type: integer
                   description: 'The ID of the customer.'
                   example: 1
-                  nullable: false
                 sales_pipeline_id:
                   type: integer
                   description: 'The ID of the sales pipeline.'
                   example: 1
-                  nullable: false
                 pipeline_stage_id:
                   type: integer
                   description: 'The ID of the pipeline stage.'
                   example: 1
-                  nullable: false
                 name:
                   type: string
                   description: 'The name of the sales opportunity.'
                   example: 'New Client Project'
-                  nullable: false
                 description:
                   type: string
                   description: 'A description of the sales opportunity.'
@@ -6712,7 +6618,6 @@ paths:
                   type: string
                   description: 'The status of the opportunity (e.g., Open, Won, Lost).'
                   example: Open
-                  nullable: false
                 items:
                   type: array
                   description: 'A list of product items for the opportunity.'
@@ -6724,7 +6629,6 @@ paths:
                   type: numeric
                   description: 'The estimated amount of the opportunity.'
                   example: '50000.00'
-                  nullable: false
               required:
                 - customer_id
                 - sales_pipeline_id
@@ -6803,7 +6707,6 @@ paths:
             type: integer
             description: 'The number of items to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -7242,17 +7145,14 @@ paths:
                   type: number
                   description: 'The payment amount.'
                   example: 100.0
-                  nullable: false
                 payment_date:
                   type: date
                   description: 'The date of the payment.'
                   example: '2023-10-27'
-                  nullable: false
                 payment_method:
                   type: string
                   description: 'The method of payment.'
                   example: 'Bank Transfer'
-                  nullable: false
                 notes:
                   type: string
                   description: 'nullable Any notes about the payment.'
@@ -7365,7 +7265,6 @@ paths:
             type: integer
             description: 'The number of sales orders to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -7455,22 +7354,18 @@ paths:
                   type: integer
                   description: 'The ID of the customer.'
                   example: 1
-                  nullable: false
                 order_date:
                   type: date
                   description: 'The date of the order.'
                   example: '2023-10-26'
-                  nullable: false
                 due_date:
                   type: date
                   description: 'The due date of the payment.'
                   example: '2023-11-26'
-                  nullable: false
                 products:
                   type: string
                   description: 'A JSON string of products. Must be a valid JSON string.'
                   example: '[{"product_id":1,"quantity":5,"customer_price":100,"discount":0,"discount_type":"fixed"}]'
-                  nullable: false
                 discount_total:
                   type: number
                   description: 'The total discount applied. Must be at least 0.'
@@ -7480,70 +7375,58 @@ paths:
                   type: string
                   description: 'The type of discount.'
                   example: fixed
-                  nullable: true
                   enum:
                     - fixed
                     - percentage
+                  nullable: true
                 user_id:
                   type: integer
                   description: 'The ID of the user.'
                   example: 1
-                  nullable: false
                 payment_type:
                   type: string
                   description: 'The payment type (e.g., Cash, Credit Card).'
                   example: Cash
-                  nullable: false
                 order_discount:
                   type: numeric
                   description: 'The total discount applied.'
                   example: '5.00'
-                  nullable: false
                 order_discount_type:
                   type: string
                   description: 'The type of discount (e.g., percentage, fixed).'
                   example: fixed
-                  nullable: false
                 total:
                   type: numeric
                   description: 'The total amount of the sales order.'
                   example: '1500.00'
-                  nullable: false
                 status:
                   type: string
                   description: 'The status of the sales order (e.g., Pending, Paid).'
                   example: Pending
-                  nullable: false
                 tax_rate:
                   type: numeric
                   description: 'The tax rate applied.'
                   example: '0.05'
-                  nullable: false
                 total_tax:
                   type: numeric
                   description: 'The total tax amount.'
                   example: '75.00'
-                  nullable: false
                 amount_received:
                   type: numeric
                   description: 'The amount received.'
                   example: '1575.00'
-                  nullable: false
                 change_amount:
                   type: numeric
                   description: 'The change amount.'
                   example: '0.00'
-                  nullable: false
                 is_pos:
                   type: boolean
                   description: 'Is this a point of sale transaction.'
                   example: true
-                  nullable: false
                 sales_opportunity_id:
                   type: integer
                   description: 'The ID of the sales opportunity.'
                   example: 1
-                  nullable: false
               required:
                 - invoice
                 - customer_id
@@ -7667,22 +7550,18 @@ paths:
                   type: integer
                   description: 'The ID of the customer.'
                   example: 2
-                  nullable: false
                 order_date:
                   type: date
                   description: 'The date of the order.'
                   example: '2023-10-27'
-                  nullable: false
                 due_date:
                   type: date
                   description: 'The due date of the payment.'
                   example: '2023-11-27'
-                  nullable: false
                 products:
                   type: string
                   description: 'A JSON string of products. Must be a valid JSON string.'
                   example: '[{"product_id":1,"quantity":5,"customer_price":100,"discount":0,"discount_type":"fixed"}]'
-                  nullable: false
                 discount_total:
                   type: number
                   description: 'The total discount applied. Must be at least 0.'
@@ -7692,10 +7571,10 @@ paths:
                   type: string
                   description: 'The type of discount.'
                   example: fixed
-                  nullable: true
                   enum:
                     - fixed
                     - percentage
+                  nullable: true
                 status:
                   type: string
                   description: 'The status of the sales order (e.g., Pending, Paid).'
@@ -7715,52 +7594,42 @@ paths:
                   type: integer
                   description: 'The ID of the user.'
                   example: 1
-                  nullable: false
                 order_discount:
                   type: numeric
                   description: 'The total discount applied.'
                   example: '10.00'
-                  nullable: false
                 order_discount_type:
                   type: string
                   description: 'The type of discount (e.g., percentage, fixed).'
                   example: percentage
-                  nullable: false
                 total:
                   type: numeric
                   description: 'The total amount of the sales order.'
                   example: '2000.00'
-                  nullable: false
                 tax_rate:
                   type: numeric
                   description: 'The tax rate applied.'
                   example: '0.05'
-                  nullable: false
                 total_tax:
                   type: numeric
                   description: 'The total tax amount.'
                   example: '100.00'
-                  nullable: false
                 amount_received:
                   type: numeric
                   description: 'The amount received.'
                   example: '2000.00'
-                  nullable: false
                 change_amount:
                   type: numeric
                   description: 'The change amount.'
                   example: '0.00'
-                  nullable: false
                 is_pos:
                   type: boolean
                   description: 'Is this a point of sale transaction.'
                   example: false
-                  nullable: false
                 sales_opportunity_id:
                   type: integer
                   description: 'The ID of the sales opportunity.'
                   example: 1
-                  nullable: false
               required:
                 - products
     delete:
@@ -7923,17 +7792,14 @@ paths:
                   type: string
                   description: 'The new name of the stage.'
                   example: Negotiation
-                  nullable: false
                 position:
                   type: integer
                   description: 'The new position of the stage.'
                   example: 1
-                  nullable: false
                 is_closed:
                   type: boolean
                   description: 'Whether this stage represents a closed state.'
                   example: false
-                  nullable: false
               required:
                 - name
                 - position
@@ -8097,12 +7963,10 @@ paths:
                   type: string
                   description: 'The name of the new stage.'
                   example: '"Qualification"'
-                  nullable: false
                 is_closed:
                   type: boolean
                   description: 'Whether this stage represents a closed state.'
                   example: false
-                  nullable: false
               required:
                 - name
     parameters:
@@ -8240,7 +8104,6 @@ paths:
             type: integer
             description: 'The number of pipelines to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -8325,7 +8188,6 @@ paths:
                   type: string
                   description: 'The name of the sales pipeline.'
                   example: 'Initial Sales Pipeline'
-                  nullable: false
                 description:
                   type: string
                   description: 'A description of the sales pipeline.'
@@ -8335,7 +8197,6 @@ paths:
                   type: boolean
                   description: 'Is this the default pipeline.'
                   example: false
-                  nullable: false
               required:
                 - name
   '/api/v1/sales-pipelines/{id}':
@@ -8457,12 +8318,10 @@ paths:
                   type: boolean
                   description: 'Is this the default pipeline.'
                   example: true
-                  nullable: false
                 name:
                   type: string
                   description: 'The name of the sales pipeline.'
                   example: 'New Sales Pipeline'
-                  nullable: false
               required:
                 - name
     delete:
@@ -8537,7 +8396,6 @@ paths:
             type: integer
             description: 'The number of adjustments to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -8633,7 +8491,6 @@ paths:
             type: integer
             description: 'The number of interactions to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -8718,12 +8575,10 @@ paths:
                   type: integer
                   description: 'The ID of the supplier.'
                   example: 1
-                  nullable: false
                 type:
                   type: string
                   description: 'The type of interaction (e.g., Call, Email, Meeting).'
                   example: Email
-                  nullable: false
                 notes:
                   type: string
                   description: 'Notes about the interaction.'
@@ -8733,12 +8588,10 @@ paths:
                   type: date
                   description: 'The date of the interaction.'
                   example: '2023-10-26'
-                  nullable: false
                 user_id:
                   type: integer
                   description: 'The ID of the user.'
                   example: 1
-                  nullable: false
               required:
                 - supplier_id
                 - type
@@ -8858,12 +8711,10 @@ paths:
                   type: integer
                   description: 'The ID of the supplier.'
                   example: 1
-                  nullable: false
                 type:
                   type: string
                   description: 'The type of interaction (e.g., Call, Email, Meeting).'
                   example: Call
-                  nullable: false
                 notes:
                   type: string
                   description: 'Notes about the interaction.'
@@ -8873,12 +8724,10 @@ paths:
                   type: date
                   description: 'The date of the interaction.'
                   example: '2023-10-27'
-                  nullable: false
                 user_id:
                   type: integer
                   description: 'The ID of the user.'
                   example: 1
-                  nullable: false
               required:
                 - supplier_id
                 - type
@@ -9115,7 +8964,6 @@ paths:
             type: integer
             description: 'The number of suppliers to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -9200,12 +9048,10 @@ paths:
                   type: string
                   description: 'The unique code for the supplier.'
                   example: SUP-001
-                  nullable: false
                 name:
                   type: string
                   description: 'The name of the supplier.'
                   example: 'Supplier A'
-                  nullable: false
                 address:
                   type: string
                   description: 'The address of the supplier.'
@@ -9353,12 +9199,10 @@ paths:
                   type: string
                   description: 'The unique code for the supplier.'
                   example: SUP-002
-                  nullable: false
                 name:
                   type: string
                   description: 'The name of the supplier.'
                   example: 'Supplier B'
-                  nullable: false
                 address:
                   type: string
                   description: 'The address of the supplier.'
@@ -9497,7 +9341,6 @@ paths:
             type: integer
             description: 'The number of taxes to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -9634,17 +9477,14 @@ paths:
                   type: string
                   description: 'The name of the tax.'
                   example: VAT
-                  nullable: false
                 rate:
                   type: numeric
                   description: 'The tax rate.'
                   example: '0.10'
-                  nullable: false
                 is_active:
                   type: boolean
                   description: 'Is the tax active.'
                   example: true
-                  nullable: false
               required:
                 - name
                 - rate
@@ -9681,7 +9521,6 @@ paths:
             type: integer
             description: 'The number of transactions to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -9777,7 +9616,6 @@ paths:
             type: integer
             description: 'The number of units to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -9862,12 +9700,10 @@ paths:
                   type: string
                   description: 'The name of the unit.'
                   example: Piece
-                  nullable: false
                 symbol:
                   type: string
                   description: 'The symbol of the unit.'
                   example: pc
-                  nullable: false
               required:
                 - name
                 - symbol
@@ -9985,12 +9821,10 @@ paths:
                   type: string
                   description: 'The symbol of the unit.'
                   example: kg
-                  nullable: false
                 name:
                   type: string
                   description: 'The name of the unit.'
                   example: Kilogram
-                  nullable: false
               required:
                 - symbol
                 - name
@@ -10231,7 +10065,6 @@ paths:
                   type: string
                   description: "The new theme mode. Must be 'light' or 'dark'."
                   example: '"dark"'
-                  nullable: false
               required:
                 - theme_mode
   /api/v1/users/roles-permissions:
@@ -10313,7 +10146,6 @@ paths:
             type: integer
             description: 'The number of users to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -10398,53 +10230,46 @@ paths:
                   type: string
                   description: 'The name of the user.'
                   example: 'John Doe'
-                  nullable: false
                 email:
                   type: string
                   description: 'The email address of the user.'
                   example: john.doe@example.com
-                  nullable: false
                 password:
                   type: confirmation
                   description: 'string required The password for the user.'
                   example: password123
-                  nullable: false
                 roles:
                   type: object
                   description: 'An array of role names to assign to the user.'
                   example:
                     - Admin
                     - Manager
-                  nullable: true
                   properties: {  }
+                  nullable: true
                 permissions:
                   type: object
                   description: 'An array of permission names to assign to the user.'
                   example:
                     - view-users
                     - create-users
-                  nullable: true
                   properties: {  }
+                  nullable: true
                 shopname:
                   type: string
                   description: 'The shop name of the user.'
                   example: "John's Shop"
-                  nullable: false
                 address:
                   type: string
                   description: 'The address of the user.'
                   example: '123 Main St'
-                  nullable: false
                 avatar:
                   type: string
                   description: "The URL or path to the user's avatar."
                   example: 'http://example.com/avatar1.jpg'
-                  nullable: false
                 timezone:
                   type: string
                   description: 'The timezone of the user.'
                   example: Asia/Jakarta
-                  nullable: false
                 system_settings:
                   type: array
                   description: 'System settings for the user.'
@@ -10576,7 +10401,6 @@ paths:
                   type: string
                   description: 'The name of the user.'
                   example: 'Jane Doe'
-                  nullable: false
                 password:
                   type: confirmationstring
                   description: 'The password for the user.'
@@ -10588,41 +10412,36 @@ paths:
                   example:
                     - Admin
                     - Manager
-                  nullable: true
                   properties: {  }
+                  nullable: true
                 permissions:
                   type: object
                   description: 'An array of permission names to assign to the user.'
                   example:
                     - view-users
                     - create-users
-                  nullable: true
                   properties: {  }
+                  nullable: true
                 email:
                   type: string
                   description: 'The email address of the user.'
                   example: jane.doe@example.com
-                  nullable: false
                 shopname:
                   type: string
                   description: 'The shop name of the user.'
                   example: "Jane's Shop"
-                  nullable: false
                 address:
                   type: string
                   description: 'The address of the user.'
                   example: '456 Oak Ave'
-                  nullable: false
                 avatar:
                   type: string
                   description: "The URL or path to the user's avatar."
                   example: 'http://example.com/avatar2.jpg'
-                  nullable: false
                 timezone:
                   type: string
                   description: 'The timezone of the user.'
                   example: America/New_York
-                  nullable: false
                 system_settings:
                   type: array
                   description: 'System settings for the user.'
@@ -10868,7 +10687,6 @@ paths:
             type: integer
             description: 'The number of warehouses to return per page. Defaults to 15.'
             example: 25
-            nullable: false
       responses:
         200:
           description: Success
@@ -10957,7 +10775,6 @@ paths:
                   type: string
                   description: 'The name of the warehouse.'
                   example: 'Secondary Warehouse'
-                  nullable: false
                 address:
                   type: string
                   description: 'The address of the warehouse.'
@@ -10972,7 +10789,6 @@ paths:
                   type: boolean
                   description: 'Is this the main warehouse.'
                   example: false
-                  nullable: false
               required:
                 - name
   '/api/v1/warehouses/{id}':
@@ -11119,12 +10935,10 @@ paths:
                   type: boolean
                   description: 'Is this the main warehouse.'
                   example: true
-                  nullable: false
                 name:
                   type: string
                   description: 'The name of the warehouse.'
                   example: 'Main Warehouse'
-                  nullable: false
               required:
                 - name
     delete:

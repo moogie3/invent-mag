@@ -12,11 +12,15 @@ class Transaction extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'journal_entry_id',
         'account_id',
         'type',
         'amount',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $casts = [

@@ -11,12 +11,16 @@ class CustomerInteraction extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'customer_id',
         'user_id',
         'type',
         'notes',
         'interaction_date',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $casts = [

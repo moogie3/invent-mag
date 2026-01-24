@@ -12,7 +12,6 @@ class Supplier extends Model
     use HasFactory, BelongsToTenant;
     protected $table = 'suppliers';
     protected $fillable = [
-        'tenant_id',
         'code',
         'name',
         'address',
@@ -21,6 +20,11 @@ class Supplier extends Model
         'payment_terms',
         'email',
         'image'
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected function image(): \Illuminate\Database\Eloquent\Casts\Attribute

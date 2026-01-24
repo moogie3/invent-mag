@@ -11,11 +11,15 @@ class Warehouse extends Model
     use HasFactory, BelongsToTenant;
     protected $table = 'warehouses';
     protected $fillable = [
-        'tenant_id',
         'name',
         'address',
         'description',
         'is_main',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     /**

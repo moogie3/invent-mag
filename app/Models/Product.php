@@ -13,7 +13,6 @@ class Product extends Model
     use HasFactory, BelongsToTenant;
     protected $table = 'products';
     protected $fillable = [
-        'tenant_id',
         'code',
         'barcode',
         'name',
@@ -28,6 +27,11 @@ class Product extends Model
         'has_expiry',
         'low_stock_threshold',
         'warehouse_id', // Add this field to fillable
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $casts = [

@@ -12,7 +12,6 @@ class Account extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'parent_id',
         'name',
         'code',
@@ -20,6 +19,11 @@ class Account extends Model
         'description',
         'level',
         'is_active',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $casts = [

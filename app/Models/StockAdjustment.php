@@ -14,7 +14,6 @@ class StockAdjustment extends Model
     protected $table = 'stock_adjustments';
 
     protected $fillable = [
-        'tenant_id',
         'product_id',
         'adjustment_type',
         'quantity_before',
@@ -22,6 +21,11 @@ class StockAdjustment extends Model
         'adjustment_amount',
         'reason',
         'adjusted_by',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $casts = [

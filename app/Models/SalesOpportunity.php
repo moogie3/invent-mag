@@ -11,7 +11,6 @@ class SalesOpportunity extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'customer_id',
         'sales_pipeline_id',
         'pipeline_stage_id',
@@ -21,6 +20,11 @@ class SalesOpportunity extends Model
         'expected_close_date',
         'status',
         'sales_id',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $casts = [

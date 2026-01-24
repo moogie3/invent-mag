@@ -12,12 +12,16 @@ class PurchaseReturnItem extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'purchase_return_id',
         'product_id',
         'quantity',
         'price',
         'total',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     /**

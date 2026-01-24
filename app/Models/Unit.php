@@ -11,8 +11,12 @@ class Unit extends Model
     use HasFactory, BelongsToTenant;
     protected $table = 'units';
     protected $fillable = [
-        'tenant_id',
         'name',
         'symbol',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 }

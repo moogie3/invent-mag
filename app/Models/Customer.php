@@ -14,13 +14,17 @@ class Customer extends Model
     protected $table = 'customers';
 
     protected $fillable = [
-        'tenant_id',
         'name',
         'address',
         'phone_number',
         'payment_terms',
         'email',
         'image'
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected function image(): \Illuminate\Database\Eloquent\Casts\Attribute

@@ -16,11 +16,6 @@ use Illuminate\Http\Request;
  */
 class AccountController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('can:view-accounts');
-    }
-
     /**
      * Display a listing of the accounts.
      *
@@ -33,6 +28,7 @@ class AccountController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('view-chart-of-accounts');
         $perPage = $request->query('per_page', 15);
         $accounts = Account::with('parent')->paginate($perPage);
         return AccountResource::collection($accounts);
@@ -57,6 +53,7 @@ class AccountController extends Controller
      */
     public function store(StoreAccountRequest $request)
     {
+        $this->authorize('edit-chart-of-accounts');
         $validated = $request->validated();
 
         $level = 0;
@@ -85,6 +82,7 @@ class AccountController extends Controller
      */
     public function show(Account $account)
     {
+        $this->authorize('view-chart-of-accounts');
         return new AccountResource($account->load('parent', 'children'));
     }
 
@@ -109,6 +107,7 @@ class AccountController extends Controller
      */
     public function update(UpdateAccountRequest $request, Account $account)
     {
+        $this->authorize('edit-chart-of-accounts');
         $validated = $request->validated();
 
         $level = 0;
@@ -138,6 +137,7 @@ class AccountController extends Controller
      */
     public function destroy(Account $account)
     {
+        $this->authorize('delete-chart-of-accounts');
         if ($account->transactions()->exists() || $account->children()->exists()) {
             return response()->json(['message' => 'Account cannot be deleted because it has transactions or child accounts.'], 422);
         }

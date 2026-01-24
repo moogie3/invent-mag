@@ -15,16 +15,21 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable, HasRoles, HasApiTokens, BelongsToTenant;
     protected $table = 'users';
     protected $fillable = [
-        'tenant_id',
         'name',
         'shopname',
         'address',
         'email',
-        'password',
         'avatar',
         'timezone',
+    ];
+
+    protected $guarded = [
+        'id',
+        'password',
+        'tenant_id',
         'system_settings',
-        'accounting_settings'
+        'accounting_settings',
+        'email_verified_at',
     ];
 
     protected $hidden = [

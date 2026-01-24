@@ -12,12 +12,16 @@ class SalesReturnItem extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'sales_return_id',
         'product_id',
         'quantity',
         'price',
         'total',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     /**

@@ -10,5 +10,10 @@ class Tax extends Model
 {
     use HasFactory, BelongsToTenant;
 
-    protected $fillable = ['tenant_id', 'name', 'rate', 'is_active'];
+    protected $fillable = ['name', 'rate', 'is_active'];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
+    ];
 }

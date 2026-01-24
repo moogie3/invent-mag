@@ -11,11 +11,15 @@ class PipelineStage extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'sales_pipeline_id',
         'name',
         'position',
         'is_closed',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     public function pipeline()

@@ -2,109 +2,196 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // User Management Permissions
-        Permission::firstOrCreate(['name' => 'view-users']);
-        Permission::firstOrCreate(['name' => 'create-users']);
-        Permission::firstOrCreate(['name' => 'edit-users']);
-        Permission::firstOrCreate(['name' => 'delete-users']);
+        // Define all permissions
+        $permissions = [
+            // Products
+            'view-products',
+            'create-products',
+            'edit-products',
+            'delete-products',
+            
+            // Purchase Orders
+            'view-purchase-orders',
+            'create-purchase-orders',
+            'edit-purchase-orders',
+            'delete-purchase-orders',
+            
+            // Sales
+            'view-sales',
+            'create-sales',
+            'edit-sales',
+            'delete-sales',
+            
+            // Warehouses
+            'view-warehouses',
+            'create-warehouses',
+            'edit-warehouses',
+            'delete-warehouses',
+            
+            // Reports
+            'view-reports',
+            'view-financial-reports',
+            'edit-transactions',
+            
+            // Accounting
+            'view-accounting',
+            'view-chart-of-accounts',
+            'edit-chart-of-accounts',
+            'delete-chart-of-accounts',
+            'view-journal',
+            'view-general-ledger',
+            'view-trial-balance',
+            
+            // POS
+            'access-pos',
+            'delete-pos-transactions',
+            
+            // Suppliers
+            'view-supplier',
+            'create-supplier',
+            'edit-supplier',
+            'delete-supplier',
+            
+            // Customers
+            'view-customer',
+            'create-customer',
+            'edit-customer',
+            'delete-customer',
 
-        // Role Management Permissions
-        Permission::firstOrCreate(['name' => 'view-roles']);
-        Permission::firstOrCreate(['name' => 'create-roles']);
-        Permission::firstOrCreate(['name' => 'edit-roles']);
-        Permission::firstOrCreate(['name' => 'delete-roles']);
+            // User Management
+            'view-users',
+            'create-users',
+            'edit-users',
+            'delete-users',
 
-        // Product Management Permissions
-        Permission::firstOrCreate(['name' => 'view-products']);
-        Permission::firstOrCreate(['name' => 'create-products']);
-        Permission::firstOrCreate(['name' => 'edit-products']);
-        Permission::firstOrCreate(['name' => 'delete-products']);
+            // Role Management
+            'view-roles',
+            'create-roles',
+            'edit-roles',
+            'delete-roles',
 
-        // Sales Management Permissions
-        Permission::firstOrCreate(['name' => 'view-sales']);
-        Permission::firstOrCreate(['name' => 'create-sales']);
-        Permission::firstOrCreate(['name' => 'edit-sales']);
-        Permission::firstOrCreate(['name' => 'delete-sales']);
+            // Sales Return Management
+            'view-sales-returns',
+            'create-sales-returns',
+            'edit-sales-returns',
+            'delete-sales-returns',
 
-        // Sales Return Management Permissions
-        Permission::firstOrCreate(['name' => 'view-sales-returns']);
-        Permission::firstOrCreate(['name' => 'create-sales-returns']);
-        Permission::firstOrCreate(['name' => 'edit-sales-returns']);
-        Permission::firstOrCreate(['name' => 'delete-sales-returns']);
+            // Other general permissions
+            'access-dashboard',
 
-        // Report Viewing Permissions
-        Permission::firstOrCreate(['name' => 'view-reports']);
+            // Purchase Return Management
+            'view-purchase-returns',
+            'create-purchase-returns',
+            'edit-purchase-returns',
+            'delete-purchase-returns',
 
-        // Other general permissions
-        Permission::firstOrCreate(['name' => 'access-dashboard']);
+            // Sales Pipeline
+            'view-sales-pipeline',
+            'manage-sales-pipelines',
+            'manage-pipeline-stages',
+            'manage-sales-opportunities',
 
-        // PO Management Permissions
-        Permission::firstOrCreate(['name' => 'view-po']);
-        Permission::firstOrCreate(['name' => 'create-po']);
-        Permission::firstOrCreate(['name' => 'edit-po']);
-        Permission::firstOrCreate(['name' => 'delete-po']);
+            // Payment
+            'view-payments',
+            'create-payments',
+            'edit-payments',
+            'delete-payments',
 
-        // Purchase Return Management Permissions
-        Permission::firstOrCreate(['name' => 'view-purchase-returns']);
-        Permission::firstOrCreate(['name' => 'create-purchase-returns']);
-        Permission::firstOrCreate(['name' => 'edit-purchase-returns']);
-        Permission::firstOrCreate(['name' => 'delete-purchase-returns']);
+            // Customer Interaction
+            'view-customer-interactions',
+            'create-customer-interactions',
+            'edit-customer-interactions',
+            'delete-customer-interactions',
+        ];
 
-        // Warehouse Management Permissions
-        Permission::firstOrCreate(['name' => 'view-warehouse']);
-        Permission::firstOrCreate(['name' => 'create-warehouse']);
-        Permission::firstOrCreate(['name' => 'edit-warehouse']);
-        Permission::firstOrCreate(['name' => 'delete-warehouse']);
+        // Create all permissions
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
 
-        // POS Management Permissions
-        Permission::firstOrCreate(['name' => 'view-pos']);
-        Permission::firstOrCreate(['name' => 'create-pos']);
-        Permission::firstOrCreate(['name' => 'edit-pos']);
-        Permission::firstOrCreate(['name' => 'delete-pos']);
+        // Assign permissions to roles
+        $this->assignToSuperuser();
+        $this->assignToAdmin();
+        $this->assignToManager();
+        $this->assignToStaff();
+    }
 
-        // Customer Management Permissions
-        Permission::firstOrCreate(['name' => 'view-customer']);
-        Permission::firstOrCreate(['name' => 'create-customer']);
-        Permission::firstOrCreate(['name' => 'edit-customer']);
-        Permission::firstOrCreate(['name' => 'delete-customer']);
+    private function assignToSuperuser()
+    {
+        $role = Role::findOrCreate('superuser');
+        $role->givePermissionTo(Permission::all());
+    }
 
-        // Supplier Management Permissions
-        Permission::firstOrCreate(['name' => 'view-supplier']);
-        Permission::firstOrCreate(['name' => 'create-supplier']);
-        Permission::firstOrCreate(['name' => 'edit-supplier']);
-        Permission::firstOrCreate(['name' => 'delete-supplier']);
+    private function assignToAdmin()
+    {
+        $role = Role::findOrCreate('admin');
+        $permissions = [
+            // Full access except superuser functions
+            'view-products', 'create-products', 'edit-products', 'delete-products',
+            'view-purchase-orders', 'create-purchase-orders', 'edit-purchase-orders', 'delete-purchase-orders',
+            'view-sales', 'create-sales', 'edit-sales', 'delete-sales',
+            'view-warehouses', 'create-warehouses', 'edit-warehouses', 'delete-warehouses',
+            'view-reports', 'view-financial-reports', 'edit-transactions',
+            'view-accounting', 'view-chart-of-accounts', 'edit-chart-of-accounts', 'delete-chart-of-accounts',
+            'view-journal', 'view-general-ledger', 'view-trial-balance',
+            'access-pos', 'delete-pos-transactions',
+            'view-supplier', 'create-supplier', 'edit-supplier', 'delete-supplier',
+            'view-customer', 'create-customer', 'edit-customer', 'delete-customer',
+            'view-users', 'create-users', 'edit-users', 'delete-users',
+            'view-roles', 'create-roles', 'edit-roles', 'delete-roles',
+            'view-sales-returns', 'create-sales-returns', 'edit-sales-returns', 'delete-sales-returns',
+            'access-dashboard',
+            'view-purchase-returns', 'create-purchase-returns', 'edit-purchase-returns', 'delete-purchase-returns',
+            'view-sales-pipeline', 'manage-sales-pipelines', 'manage-pipeline-stages', 'manage-sales-opportunities',
+            'view-payments', 'create-payments', 'edit-payments', 'delete-payments',
+            'view-customer-interactions', 'create-customer-interactions', 'edit-customer-interactions', 'delete-customer-interactions',
+        ];
+        $role->syncPermissions($permissions);
+    }
 
-        // Sales Pipeline Permissions
-        Permission::firstOrCreate(['name' => 'view-sales-pipeline']);
-        Permission::firstOrCreate(['name' => 'manage-sales-pipelines']);
-        Permission::firstOrCreate(['name' => 'manage-pipeline-stages']);
-        Permission::firstOrCreate(['name' => 'manage-sales-opportunities']);
+    private function assignToManager()
+    {
+        $role = Role::findOrCreate('manager');
+        $permissions = [
+            // View all, create/edit most, delete some
+            'view-products', 'create-products', 'edit-products',
+            'view-purchase-orders', 'create-purchase-orders', 'edit-purchase-orders',
+            'view-sales', 'create-sales', 'edit-sales',
+            'view-warehouses', 'create-warehouses', 'edit-warehouses',
+            'view-reports', 'view-financial-reports',
+            'view-accounting', 'view-chart-of-accounts', 'view-journal', 'view-general-ledger',
+            'access-pos',
+            'view-supplier', 'create-supplier', 'edit-supplier',
+            'view-customer', 'create-customer', 'edit-customer',
+            'access-dashboard',
+        ];
+        $role->syncPermissions($permissions);
+    }
 
-        // Accounting Permissions
-        Permission::firstOrCreate(['name' => 'view-accounting']);
-        Permission::firstOrCreate(['name' => 'view-accounts']);
-
-        // Payment Permissions
-        Permission::firstOrCreate(['name' => 'view-payments']);
-        Permission::firstOrCreate(['name' => 'create-payments']);
-        Permission::firstOrCreate(['name' => 'edit-payments']);
-        Permission::firstOrCreate(['name' => 'delete-payments']);
-
-        // Customer Interaction Permissions
-        Permission::firstOrCreate(['name' => 'view-customer-interactions']);
-        Permission::firstOrCreate(['name' => 'create-customer-interactions']);
-        Permission::firstOrCreate(['name' => 'edit-customer-interactions']);
-        Permission::firstOrCreate(['name' => 'delete-customer-interactions']);
+    private function assignToStaff()
+    {
+        $role = Role::findOrCreate('staff');
+        $permissions = [
+            // View and create only
+            'view-products', 'create-products',
+            'view-purchase-orders',
+            'view-sales', 'create-sales',
+            'view-warehouses',
+            'view-reports',
+            'access-pos',
+            'view-supplier',
+            'view-customer', 'create-customer',
+            'access-dashboard',
+        ];
+        $role->syncPermissions($permissions);
     }
 }
+

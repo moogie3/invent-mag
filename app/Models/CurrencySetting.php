@@ -10,7 +10,12 @@ class CurrencySetting extends Model
 {
     use HasFactory, BelongsToTenant;
     protected $table = 'currency_settings';
-    protected $fillable = ['tenant_id', 'currency_symbol', 'decimal_separator', 'thousand_separator', 'decimal_places', 'position', 'currency_code', 'locale'];
+    protected $fillable = ['currency_symbol', 'decimal_separator', 'thousand_separator', 'decimal_places', 'position', 'currency_code', 'locale'];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
+    ];
 
     /**
      * Create a new factory instance for the model.

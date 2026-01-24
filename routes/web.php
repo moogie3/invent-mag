@@ -69,26 +69,82 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
         // Product Routes
         Route::prefix('product')->group(function () {
-            Route::get('/', [ProductController::class, 'index'])->name('admin.product');
-            Route::get('/create', [ProductController::class, 'create'])->name('admin.product.create');
-            Route::post('/store', [ProductController::class, 'store'])->name('admin.product.store');
-            Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('admin.product.edit');
-            Route::get('/view/{id}', [ProductController::class, 'view'])->name('admin.product.view');
-            Route::put('/update/{id}', [ProductController::class, 'update'])->name('admin.product.update');
-            Route::delete('/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
-            Route::get('/modal-view/{id}', [ProductController::class, 'modalView'])->name('admin.product.modal-view');
-            Route::get('/{id}/adjustment-log', [ProductController::class, 'getAdjustmentLog'])->name('admin.product.adjustment-log');
-            Route::post('/quick-create', [ProductController::class, 'quickCreate'])->name('admin.product.quickCreate');
-            Route::post('/bulk-delete', [ProductController::class, 'bulkDelete'])->name('product.bulk-delete');
-            Route::post('/bulk-export', [ProductController::class, 'bulkExport'])->name('product.bulk-export');
-            Route::post('/bulk-stock-details', [ProductController::class, 'bulkStockDetails'])->name('product.bulk-stock-details');
-            Route::post('/bulk-update-stock', [ProductController::class, 'bulkUpdateStock'])->name('product.bulk-update-stock');
-            Route::post('/adjust-stock', [ProductController::class, 'adjustStock'])->name('admin.product.adjust-stock');
-            Route::get('/search', [ProductController::class, 'search'])->name('admin.product.search');
-            Route::get('/search-by-barcode', [ProductController::class, 'searchByBarcode'])->name('admin.product.search-by-barcode');
-            Route::get('/metrics', [ProductController::class, 'getProductMetrics'])->name('admin.product.metrics');
-            Route::get('/expiring-soon', [ProductController::class, 'getExpiringSoonProducts'])->name('admin.product.expiring-soon');
-        });
+    Route::get('/', [ProductController::class, 'index'])
+        ->name('admin.product')
+        ->middleware('can:view-products');
+    
+    Route::get('/create', [ProductController::class, 'create'])
+        ->name('admin.product.create')
+        ->middleware('can:create-products');
+    
+    Route::post('/store', [ProductController::class, 'store'])
+        ->name('admin.product.store')
+        ->middleware('can:create-products');
+    
+    Route::get('/edit/{id}', [ProductController::class, 'edit'])
+        ->name('admin.product.edit')
+        ->middleware('can:edit-products');
+    
+    Route::put('/update/{id}', [ProductController::class, 'update'])
+        ->name('admin.product.update')
+        ->middleware('can:edit-products');
+    
+    Route::delete('/destroy/{id}', [ProductController::class, 'destroy'])
+        ->name('admin.product.destroy')
+        ->middleware('can:delete-products');
+    
+    Route::get('/view/{id}', [ProductController::class, 'view'])
+        ->name('admin.product.view')
+        ->middleware('can:view-products');
+    
+    Route::get('/modal-view/{id}', [ProductController::class, 'modalView'])
+        ->name('admin.product.modal-view')
+        ->middleware('can:view-products');
+    
+    Route::get('/{id}/adjustment-log', [ProductController::class, 'getAdjustmentLog'])
+        ->name('admin.product.adjustment-log')
+        ->middleware('can:view-products');
+    
+    Route::post('/quick-create', [ProductController::class, 'quickCreate'])
+        ->name('admin.product.quickCreate')
+        ->middleware('can:create-products');
+    
+    Route::post('/bulk-delete', [ProductController::class, 'bulkDelete'])
+        ->name('product.bulk-delete')
+        ->middleware('can:delete-products');
+    
+    Route::post('/bulk-export', [ProductController::class, 'bulkExport'])
+        ->name('product.bulk-export')
+        ->middleware('can:view-products');
+    
+    Route::post('/bulk-stock-details', [ProductController::class, 'bulkStockDetails'])
+        ->name('product.bulk-stock-details')
+        ->middleware('can:view-products');
+    
+    Route::post('/bulk-update-stock', [ProductController::class, 'bulkUpdateStock'])
+        ->name('product.bulk-update-stock')
+        ->middleware('can:edit-products');
+    
+    Route::post('/adjust-stock', [ProductController::class, 'adjustStock'])
+        ->name('admin.product.adjust-stock')
+        ->middleware('can:edit-products');
+    
+    Route::get('/search', [ProductController::class, 'search'])
+        ->name('admin.product.search')
+        ->middleware('can:view-products');
+    
+    Route::get('/search-by-barcode', [ProductController::class, 'searchByBarcode'])
+        ->name('admin.product.search-by-barcode')
+        ->middleware('can:view-products');
+    
+    Route::get('/metrics', [ProductController::class, 'getProductMetrics'])
+        ->name('admin.product.metrics')
+        ->middleware('can:view-products');
+    
+    Route::get('/expiring-soon', [ProductController::class, 'getExpiringSoonProducts'])
+        ->name('admin.product.expiring-soon')
+        ->middleware('can:view-products');
+});
 
         // Supplier Routes
         Route::prefix('supplier')->group(function () {
@@ -161,24 +217,70 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
         // Purchase Order Routes
         Route::prefix('po')->group(function () {
-            Route::get('/', [PurchaseController::class, 'index'])->name('admin.po');
-            Route::get('/create', [PurchaseController::class, 'create'])->name('admin.po.create');
-            Route::post('/store', [PurchaseController::class, 'store'])->name('admin.po.store');
-            Route::get('/edit/{id}', [PurchaseController::class, 'edit'])->name('admin.po.edit');
-            Route::get('/view/{id}', [PurchaseController::class, 'view'])->name('admin.po.view');
-            Route::put('/update/{id}', [PurchaseController::class, 'update'])->name('admin.po.update');
-            Route::delete('/destroy/{id}', [PurchaseController::class, 'destroy'])->name('admin.po.destroy');
-            Route::get('/product/{id}', [PurchaseController::class, 'getProductDetails'])->name('admin.po.product.details');
-            Route::get('/modal-view/{id}', [PurchaseController::class, 'modalView'])->name('admin.po.modal-view');
-            Route::post('/bulk-delete', [PurchaseController::class, 'bulkDelete'])->name('po.bulk-delete');
-            Route::post('/bulk-mark-paid', [PurchaseController::class, 'bulkMarkPaid'])->name('po.bulk-mark-paid');
-            Route::post('/bulk-export', [PurchaseController::class, 'bulkExport'])->name('po.bulk-export');
-            Route::get('/metrics', [PurchaseController::class, 'getPurchaseMetrics'])->name('admin.po.metrics');
-            Route::get('/expiring-soon', [PurchaseController::class, 'getExpiringSoonPurchases'])->name('admin.po.expiring-soon');
-            Route::get('/print/{id}', [PurchaseController::class, 'print'])->name('admin.po.print');
-            Route::post('/{id}/payment', [PurchaseController::class, 'addPayment'])->name('admin.po.add-payment');
+            Route::get('/', [PurchaseController::class, 'index'])
+                ->name('admin.po')
+                ->middleware('can:view-purchase-orders');
+            
+            Route::get('/create', [PurchaseController::class, 'create'])
+                ->name('admin.po.create')
+                ->middleware('can:create-purchase-orders');
+            
+            Route::post('/store', [PurchaseController::class, 'store'])
+                ->name('admin.po.store')
+                ->middleware('can:create-purchase-orders');
+            
+            Route::get('/edit/{id}', [PurchaseController::class, 'edit'])
+                ->name('admin.po.edit')
+                ->middleware('can:edit-purchase-orders');
+            
+            Route::get('/view/{id}', [PurchaseController::class, 'view'])
+                ->name('admin.po.view')
+                ->middleware('can:view-purchase-orders');
+            
+            Route::put('/update/{id}', [PurchaseController::class, 'update'])
+                ->name('admin.po.update')
+                ->middleware('can:edit-purchase-orders');
+            
+            Route::delete('/destroy/{id}', [PurchaseController::class, 'destroy'])
+                ->name('admin.po.destroy')
+                ->middleware('can:delete-purchase-orders');
+            
+            Route::get('/product/{id}', [PurchaseController::class, 'getProductDetails'])
+                ->name('admin.po.product.details')
+                ->middleware('can:view-purchase-orders');
+            
+            Route::get('/modal-view/{id}', [PurchaseController::class, 'modalView'])
+                ->name('admin.po.modal-view')
+                ->middleware('can:view-purchase-orders');
+            
+            Route::post('/bulk-delete', [PurchaseController::class, 'bulkDelete'])
+                ->name('po.bulk-delete')
+                ->middleware('can:delete-purchase-orders');
+            
+            Route::post('/bulk-mark-paid', [PurchaseController::class, 'bulkMarkPaid'])
+                ->name('po.bulk-mark-paid')
+                ->middleware('can:edit-purchase-orders');
+            
+            Route::post('/bulk-export', [PurchaseController::class, 'bulkExport'])
+                ->name('po.bulk-export')
+                ->middleware('can:view-purchase-orders');
+            
+            Route::get('/metrics', [PurchaseController::class, 'getPurchaseMetrics'])
+                ->name('admin.po.metrics')
+                ->middleware('can:view-purchase-orders');
+            
+            Route::get('/expiring-soon', [PurchaseController::class, 'getExpiringSoonPurchases'])
+                ->name('admin.po.expiring-soon')
+                ->middleware('can:view-purchase-orders');
+            
+            Route::get('/print/{id}', [PurchaseController::class, 'print'])
+                ->name('admin.po.print')
+                ->middleware('can:view-purchase-orders');
+            
+            Route::post('/{id}/payment', [PurchaseController::class, 'addPayment'])
+                ->name('admin.po.add-payment')
+                ->middleware('can:edit-purchase-orders');
         });
-
         // Purchase Return Routes
         Route::get('por/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.por.items');
         Route::get('por/{por}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.por.modal-view');
@@ -190,25 +292,75 @@ Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])-
 
 
         // Sales Routes
-        Route::prefix('sales')->group(function () {
-            Route::get('/', [SalesController::class, 'index'])->name('admin.sales');
-            Route::get('/create', [SalesController::class, 'create'])->name('admin.sales.create');
-            Route::post('/store', [SalesController::class, 'store'])->name('admin.sales.store');
-            Route::get('/edit/{id}', [SalesController::class, 'edit'])->name('admin.sales.edit');
-            Route::get('/view/{id}', [SalesController::class, 'view'])->name('admin.sales.view');
-            Route::put('/update/{id}', [SalesController::class, 'update'])->name('admin.sales.update');
-            Route::delete('/destroy/{id}', [SalesController::class, 'destroy'])->name('admin.sales.destroy');
-            Route::get('/product/{id}', [SalesController::class, 'getInvoiceDetails'])->name('admin.sales.product.details');
-            Route::get('/modal-view/{id}', [SalesController::class, 'modalViews'])->name('admin.sales.modal-view');
-            Route::post('/bulk-delete', [SalesController::class, 'bulkDelete'])->name('sales.bulk-delete');
-            Route::post('/bulk-mark-paid', [SalesController::class, 'bulkMarkPaid'])->name('sales.bulk-mark-paid');
-            Route::post('/bulk-export', [SalesController::class, 'bulkExport'])->name('sales.bulk-export');
-            Route::get('/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])->name('admin.sales.get-customer-price');
-            Route::get('/metrics', [SalesController::class, 'getSalesMetrics'])->name('admin.sales.metrics');
-            Route::get('/expiring-soon', [SalesController::class, 'getExpiringSoonSales'])->name('admin.sales.expiring-soon');
-            Route::get('/print/{id}', [SalesController::class, 'print'])->name('admin.sales.print');
-            Route::post('/{id}/payment', [SalesController::class, 'addPayment'])->name('admin.sales.add-payment');
-        });
+Route::prefix('sales')->group(function () {
+    Route::get('/', [SalesController::class, 'index'])
+        ->name('admin.sales')
+        ->middleware('can:view-sales');
+    
+    Route::get('/create', [SalesController::class, 'create'])
+        ->name('admin.sales.create')
+        ->middleware('can:create-sales');
+    
+    Route::post('/store', [SalesController::class, 'store'])
+        ->name('admin.sales.store')
+        ->middleware('can:create-sales');
+    
+    Route::get('/edit/{id}', [SalesController::class, 'edit'])
+        ->name('admin.sales.edit')
+        ->middleware('can:edit-sales');
+    
+    Route::get('/view/{id}', [SalesController::class, 'view'])
+        ->name('admin.sales.view')
+        ->middleware('can:view-sales');
+    
+    Route::put('/update/{id}', [SalesController::class, 'update'])
+        ->name('admin.sales.update')
+        ->middleware('can:edit-sales');
+    
+    Route::delete('/destroy/{id}', [SalesController::class, 'destroy'])
+        ->name('admin.sales.destroy')
+        ->middleware('can:delete-sales');
+    
+    Route::get('/product/{id}', [SalesController::class, 'getInvoiceDetails'])
+        ->name('admin.sales.product.details')
+        ->middleware('can:view-sales');
+    
+    Route::get('/modal-view/{id}', [SalesController::class, 'modalViews'])
+        ->name('admin.sales.modal-view')
+        ->middleware('can:view-sales');
+    
+    Route::post('/bulk-delete', [SalesController::class, 'bulkDelete'])
+        ->name('sales.bulk-delete')
+        ->middleware('can:delete-sales');
+    
+    Route::post('/bulk-mark-paid', [SalesController::class, 'bulkMarkPaid'])
+        ->name('sales.bulk-mark-paid')
+        ->middleware('can:edit-sales');
+    
+    Route::post('/bulk-export', [SalesController::class, 'bulkExport'])
+        ->name('sales.bulk-export')
+        ->middleware('can:view-sales');
+    
+    Route::get('/get-customer-price/{customer}/{product}', [SalesController::class, 'getCustomerPrice'])
+        ->name('admin.sales.get-customer-price')
+        ->middleware('can:view-sales');
+    
+    Route::get('/metrics', [SalesController::class, 'getSalesMetrics'])
+        ->name('admin.sales.metrics')
+        ->middleware('can:view-sales');
+    
+    Route::get('/expiring-soon', [SalesController::class, 'getExpiringSoonSales'])
+        ->name('admin.sales.expiring-soon')
+        ->middleware('can:view-sales');
+    
+    Route::get('/print/{id}', [SalesController::class, 'print'])
+        ->name('admin.sales.print')
+        ->middleware('can:view-sales');
+    
+    Route::post('/{id}/payment', [SalesController::class, 'addPayment'])
+        ->name('admin.sales.add-payment')
+        ->middleware('can:edit-sales');
+});
 
         // Sales Return Routes
         Route::get('sales-returns/sale/{sale}', [SalesReturnController::class, 'getSalesItems'])->name('admin.sales-returns.items');
@@ -233,49 +385,147 @@ Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])-
 
         // Warehouse Routes
         Route::prefix('warehouses')->group(function () {
-            Route::get('/', [WarehouseController::class, 'index'])->name('admin.warehouse');
-            Route::get('/create', [WarehouseController::class, 'create'])->name('admin.warehouse.create');
-            Route::post('/store', [WarehouseController::class, 'store'])->name('admin.warehouse.store');
-            Route::get('/edit/{id}', [WarehouseController::class, 'edit'])->name('admin.warehouse.edit');
-            Route::get('/view/{id}', [WarehouseController::class, 'view'])->name('admin.warehouse.view');
-            Route::put('/update/{id}', [WarehouseController::class, 'update'])->name('admin.warehouse.update');
-            Route::delete('/destroy/{id}', [WarehouseController::class, 'destroy'])->name('admin.warehouse.destroy');
-            Route::get('/{id}/set-main', [WarehouseController::class, 'setMain'])->name('admin.warehouse.set-main');
-            Route::get('/{id}/unset-main', [WarehouseController::class, 'unsetMain'])->name('admin.warehouse.unset-main');
-            Route::post('/export', [WarehouseController::class, 'exportAll'])->name('admin.warehouse.export');
+            Route::get('/', [WarehouseController::class, 'index'])
+                ->name('admin.warehouse')
+                ->middleware('can:view-warehouses');
+            
+            Route::get('/create', [WarehouseController::class, 'create'])
+                ->name('admin.warehouse.create')
+                ->middleware('can:create-warehouses');
+            
+            Route::post('/store', [WarehouseController::class, 'store'])
+                ->name('admin.warehouse.store')
+                ->middleware('can:create-warehouses');
+            
+            Route::get('/edit/{id}', [WarehouseController::class, 'edit'])
+                ->name('admin.warehouse.edit')
+                ->middleware('can:edit-warehouses');
+            
+            Route::get('/view/{id}', [WarehouseController::class, 'view'])
+                ->name('admin.warehouse.view')
+                ->middleware('can:view-warehouses');
+            
+            Route::put('/update/{id}', [WarehouseController::class, 'update'])
+                ->name('admin.warehouse.update')
+                ->middleware('can:edit-warehouses');
+            
+            Route::delete('/destroy/{id}', [WarehouseController::class, 'destroy'])
+                ->name('admin.warehouse.destroy')
+                ->middleware('can:delete-warehouses');
+            
+            Route::get('/{id}/set-main', [WarehouseController::class, 'setMain'])
+                ->name('admin.warehouse.set-main')
+                ->middleware('can:edit-warehouses');
+            
+            Route::get('/{id}/unset-main', [WarehouseController::class, 'unsetMain'])
+                ->name('admin.warehouse.unset-main')
+                ->middleware('can:edit-warehouses');
+            
+            Route::post('/export', [WarehouseController::class, 'exportAll'])
+                ->name('admin.warehouse.export')
+                ->middleware('can:view-warehouses');
         });
-
         // POS Routes
         Route::prefix('pos')->group(function () {
-            Route::get('/', [POSController::class, 'index'])->name('admin.pos');
-            Route::get('/create', [POSController::class, 'create'])->name('admin.pos.create');
-            Route::post('/store', [POSController::class, 'store'])->name('admin.pos.store');
-            Route::get('/edit/{id}', [POSController::class, 'edit'])->name('admin.pos.edit');
-            Route::get('/view/{id}', [POSController::class, 'view'])->name('admin.pos.view');
-            Route::put('/update/{id}', [POSController::class, 'update'])->name('admin.pos.update');
-            Route::delete('/destroy/{id}', [POSController::class, 'destroy'])->name('admin.pos.destroy');
-            Route::get('/receipt/{id}', [POSController::class, 'receipt'])->name('admin.pos.receipt');
-            Route::get('/print-receipt/{id}', [POSController::class, 'printReceipt'])->name('admin.pos.print-receipt');
+            Route::get('/', [POSController::class, 'index'])
+                ->name('admin.pos')
+                ->middleware('can:access-pos');
+            
+            Route::get('/create', [POSController::class, 'create'])
+                ->name('admin.pos.create')
+                ->middleware('can:access-pos');
+            
+            Route::post('/store', [POSController::class, 'store'])
+                ->name('admin.pos.store')
+                ->middleware('can:access-pos');
+            
+            Route::get('/edit/{id}', [POSController::class, 'edit'])
+                ->name('admin.pos.edit')
+                ->middleware('can:access-pos');
+            
+            Route::get('/view/{id}', [POSController::class, 'view'])
+                ->name('admin.pos.view')
+                ->middleware('can:access-pos');
+            
+            Route::put('/update/{id}', [POSController::class, 'update'])
+                ->name('admin.pos.update')
+                ->middleware('can:access-pos');
+            
+            Route::delete('/destroy/{id}', [POSController::class, 'destroy'])
+                ->name('admin.pos.destroy')
+                ->middleware('can:delete-pos-transactions');
+            
+            Route::get('/receipt/{id}', [POSController::class, 'receipt'])
+                ->name('admin.pos.receipt')
+                ->middleware('can:access-pos');
+            
+            Route::get('/print-receipt/{id}', [POSController::class, 'printReceipt'])
+                ->name('admin.pos.print-receipt')
+                ->middleware('can:access-pos');
         });
-
         // Reports Routes
-        Route::prefix('reports')->group(function () {
-            Route::get('/income-statement', [ReportController::class, 'incomeStatement'])->name('admin.reports.income-statement');
-            Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])->name('admin.reports.balance-sheet');
-            Route::get('/aged-receivables', [ReportController::class, 'agedReceivables'])->name('admin.reports.aged-receivables');
-            Route::get('/aged-payables', [ReportController::class, 'agedPayables'])->name('admin.reports.aged-payables');
-            Route::get('/adjustment-log', [ReportController::class, 'adjustmentLog'])->name('admin.reports.adjustment-log');
-            Route::get('/recent-transactions', [ReportController::class, 'recentTransactions'])->name('admin.reports.recent-transactions');
-            Route::post('/income-statement/export', [ReportController::class, 'exportIncomeStatement'])->name('admin.reports.income-statement.export');
-            Route::post('/balance-sheet/export', [ReportController::class, 'exportBalanceSheet'])->name('admin.reports.balance-sheet.export');
-            Route::post('/aged-receivables/export', [ReportController::class, 'exportAgedReceivables'])->name('admin.reports.aged-receivables.export');
-            Route::post('/aged-payables/export', [ReportController::class, 'exportAgedPayables'])->name('admin.reports.aged-payables.export');
-            Route::post('/adjustment-log/export', [ReportController::class, 'exportAdjustmentLog'])->name('admin.reports.adjustment-log.export');
-            Route::post('/recent-transactions/export', [ReportController::class, 'exportRecentTransactions'])->name('admin.reports.recent-transactions.export');
-            Route::post('/recent-transactions/bulk-export', [ReportController::class, 'bulkExport'])->name('admin.reports.recent-transactions.bulk-export');
-            Route::post('/{id}/mark-paid', [ReportController::class, 'markAsPaid'])->name('admin.transactions.mark-paid');
-            Route::post('/bulk-mark-paid', [ReportController::class, 'bulkMarkAsPaid'])->name('admin.transactions.bulk-mark-paid');
-        });
+Route::prefix('reports')->group(function () {
+    Route::get('/income-statement', [ReportController::class, 'incomeStatement'])
+        ->name('admin.reports.income-statement')
+        ->middleware('can:view-financial-reports');
+    
+    Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])
+        ->name('admin.reports.balance-sheet')
+        ->middleware('can:view-financial-reports');
+    
+    Route::get('/aged-receivables', [ReportController::class, 'agedReceivables'])
+        ->name('admin.reports.aged-receivables')
+        ->middleware('can:view-financial-reports');
+    
+    Route::get('/aged-payables', [ReportController::class, 'agedPayables'])
+        ->name('admin.reports.aged-payables')
+        ->middleware('can:view-financial-reports');
+    
+    Route::get('/adjustment-log', [ReportController::class, 'adjustmentLog'])
+        ->name('admin.reports.adjustment-log')
+        ->middleware('can:view-reports');
+    
+    Route::get('/recent-transactions', [ReportController::class, 'recentTransactions'])
+        ->name('admin.reports.recent-transactions')
+        ->middleware('can:view-reports');
+    
+    // Export routes
+    Route::post('/income-statement/export', [ReportController::class, 'exportIncomeStatement'])
+        ->name('admin.reports.income-statement.export')
+        ->middleware('can:view-financial-reports');
+    
+    Route::post('/balance-sheet/export', [ReportController::class, 'exportBalanceSheet'])
+        ->name('admin.reports.balance-sheet.export')
+        ->middleware('can:view-financial-reports');
+    
+    Route::post('/aged-receivables/export', [ReportController::class, 'exportAgedReceivables'])
+        ->name('admin.reports.aged-receivables.export')
+        ->middleware('can:view-financial-reports');
+    
+    Route::post('/aged-payables/export', [ReportController::class, 'exportAgedPayables'])
+        ->name('admin.reports.aged-payables.export')
+        ->middleware('can:view-financial-reports');
+    
+    Route::post('/adjustment-log/export', [ReportController::class, 'exportAdjustmentLog'])
+        ->name('admin.reports.adjustment-log.export')
+        ->middleware('can:view-reports');
+    
+    Route::post('/recent-transactions/export', [ReportController::class, 'exportRecentTransactions'])
+        ->name('admin.reports.recent-transactions.export')
+        ->middleware('can:view-reports');
+    
+    Route::post('/recent-transactions/bulk-export', [ReportController::class, 'bulkExport'])
+        ->name('admin.reports.recent-transactions.bulk-export')
+        ->middleware('can:view-reports');
+    
+    Route::post('/{id}/mark-paid', [ReportController::class, 'markAsPaid'])
+        ->name('admin.transactions.mark-paid')
+        ->middleware('can:edit-transactions');
+    
+    Route::post('/bulk-mark-paid', [ReportController::class, 'bulkMarkAsPaid'])
+        ->name('admin.transactions.bulk-mark-paid')
+        ->middleware('can:edit-transactions');
+});
 
         // Notification Routes
         Route::prefix('notifications')->group(function () {
@@ -351,25 +601,67 @@ Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])-
         });
 
         // Accounting Routes
-        Route::prefix('accounting')->group(function () {
-            Route::get('/', fn() => redirect()->route('admin.accounting.ledger'));
-            Route::get('/chart-of-accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'chartOfAccounts'])->name('admin.accounting.chart');
-            Route::get('/journal', [\App\Http\Controllers\Admin\AccountingController::class, 'journal'])->name('admin.accounting.journal');
-            Route::get('/general-ledger', [\App\Http\Controllers\Admin\AccountingController::class, 'generalLedger'])->name('admin.accounting.ledger');
-            Route::get('/trial-balance', [\App\Http\Controllers\Admin\AccountingController::class, 'trialBalance'])->name('admin.accounting.trial_balance');
-            Route::post('/journal/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportJournal'])->name('admin.accounting.journal.export');
-            Route::post('/general-ledger/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportGeneralLedger'])->name('admin.accounting.ledger.export');
-            Route::post('/trial-balance/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportTrialBalance'])->name('admin.accounting.trial_balance.export');
-            
-            // COA Management
-            Route::get('/accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsIndex'])->name('admin.accounting.accounts.index');
-            Route::get('/accounts/create', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsCreate'])->name('admin.accounting.accounts.create');
-            Route::post('/accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsStore'])->name('admin.accounting.accounts.store');
-            Route::get('/accounts/{account}/edit', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsEdit'])->name('admin.accounting.accounts.edit');
-            Route::put('/accounts/{account}', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsUpdate'])->name('admin.accounting.accounts.update');
-            Route::delete('/accounts/{account}', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsDestroy'])->name('admin.accounting.accounts.destroy');
-            Route::post('/accounts/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportAll'])->name('admin.accounting.accounts.export');
-        });
+Route::prefix('accounting')->middleware('can:view-accounting')->group(function () {
+    Route::get('/', fn() => redirect()->route('admin.accounting.ledger'));
+    
+    Route::get('/chart-of-accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'chartOfAccounts'])
+        ->name('admin.accounting.chart')
+        ->middleware('can:view-chart-of-accounts');
+    
+    Route::get('/journal', [\App\Http\Controllers\Admin\AccountingController::class, 'journal'])
+        ->name('admin.accounting.journal')
+        ->middleware('can:view-journal');
+    
+    Route::get('/general-ledger', [\App\Http\Controllers\Admin\AccountingController::class, 'generalLedger'])
+        ->name('admin.accounting.ledger')
+        ->middleware('can:view-general-ledger');
+    
+    Route::get('/trial-balance', [\App\Http\Controllers\Admin\AccountingController::class, 'trialBalance'])
+        ->name('admin.accounting.trial_balance')
+        ->middleware('can:view-trial-balance');
+    
+    // Export routes
+    Route::post('/journal/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportJournal'])
+        ->name('admin.accounting.journal.export')
+        ->middleware('can:view-journal');
+    
+    Route::post('/general-ledger/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportGeneralLedger'])
+        ->name('admin.accounting.ledger.export')
+        ->middleware('can:view-general-ledger');
+    
+    Route::post('/trial-balance/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportTrialBalance'])
+        ->name('admin.accounting.trial_balance.export')
+        ->middleware('can:view-trial-balance');
+    
+    // COA Management
+    Route::get('/accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsIndex'])
+        ->name('admin.accounting.accounts.index')
+        ->middleware('can:view-chart-of-accounts');
+    
+    Route::get('/accounts/create', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsCreate'])
+        ->name('admin.accounting.accounts.create')
+        ->middleware('can:edit-chart-of-accounts');
+    
+    Route::post('/accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsStore'])
+        ->name('admin.accounting.accounts.store')
+        ->middleware('can:edit-chart-of-accounts');
+    
+    Route::get('/accounts/{account}/edit', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsEdit'])
+        ->name('admin.accounting.accounts.edit')
+        ->middleware('can:edit-chart-of-accounts');
+    
+    Route::put('/accounts/{account}', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsUpdate'])
+        ->name('admin.accounting.accounts.update')
+        ->middleware('can:edit-chart-of-accounts');
+    
+    Route::delete('/accounts/{account}', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsDestroy'])
+        ->name('admin.accounting.accounts.destroy')
+        ->middleware('can:delete-chart-of-accounts');
+    
+    Route::post('/accounts/export', [\App\Http\Controllers\Admin\AccountingController::class, 'exportAll'])
+        ->name('admin.accounting.accounts.export')
+        ->middleware('can:view-chart-of-accounts');
+});
     });
 });
 

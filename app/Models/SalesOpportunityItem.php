@@ -12,11 +12,15 @@ class SalesOpportunityItem extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'sales_opportunity_id',
         'product_id',
         'quantity',
         'price',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $casts = [

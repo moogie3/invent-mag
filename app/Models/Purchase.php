@@ -28,7 +28,6 @@ class Purchase extends Model
         use HasFactory, BelongsToTenant;
         protected $table = 'po';
         protected $fillable = [
-            'tenant_id',
             'invoice',
             'supplier_id',
             'user_id',
@@ -39,6 +38,11 @@ class Purchase extends Model
             'discount_total_type',
             'total',
             'status',
+        ];
+
+        protected $guarded = [
+            'id',
+            'tenant_id',
         ];
     
         public static array $statuses = [

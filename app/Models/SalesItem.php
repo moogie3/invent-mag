@@ -11,7 +11,6 @@ class SalesItem extends Model
     use HasFactory, BelongsToTenant;
     protected $table = 'sales_items';
     protected $fillable = [
-        'tenant_id',
         'sales_id',
         'product_id',
         'quantity',
@@ -19,6 +18,11 @@ class SalesItem extends Model
         'discount_type',
         'customer_price',
         'total',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $with = ['product'];

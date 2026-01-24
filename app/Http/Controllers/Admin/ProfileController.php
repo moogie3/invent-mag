@@ -2,7 +2,8 @@
 
     use App\Http\Controllers\Controller;
     use App\Services\ProfileService;
-    use Illuminate\Http\Request;
+    use App\Services\SecurityLogger;
+use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\Hash;
 
@@ -70,10 +71,15 @@
 
         // Verify current password
         if (!Hash::check($request->current_password, Auth::user()->password)) {
+            SecurityLogger::logFailedLogin(Auth::user()->email, 'Incorrect current password');
             return redirect()->back()->with('error', __('messages.current_password_incorrect'));
         }
-
+    
         $result = $this->profileService->updatePassword(Auth::user(), $request->password);
+    
+        if ($result['success']) {
+            SecurityLogger::logPasswordChange(Auth::user());
+        }
 
         if (!$result['success']) {
             if ($request->ajax()) {

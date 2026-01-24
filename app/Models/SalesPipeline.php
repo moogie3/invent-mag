@@ -11,10 +11,14 @@ class SalesPipeline extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'name',
         'description',
         'is_default',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     public function stages()

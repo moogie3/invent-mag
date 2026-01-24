@@ -14,13 +14,17 @@ class PurchaseReturn extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'purchase_id',
         'user_id',
         'return_date',
         'reason',
         'total_amount',
         'status',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     public static array $statuses = [

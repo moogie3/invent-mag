@@ -11,13 +11,17 @@ class Payment extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'paymentable_id',
         'paymentable_type',
         'amount',
         'payment_date',
         'payment_method',
         'notes',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $casts = [

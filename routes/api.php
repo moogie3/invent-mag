@@ -1,16 +1,37 @@
 <?php
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1;
+use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\RegisteredUserController;
 use App\Http\Controllers\Api\TenantLookupController;
+use App\Http\Controllers\Api\V1;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
-// Public registration route
-Route::post('/register', [RegisteredUserController::class, 'store']);
+// Public routes - strict throttling
+Route::middleware(['throttle:auth'])->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [RegisteredUserController::class, 'store'])
+        ->middleware('throttle:3,60'); // Only 3 registrations per hour per IP
+});
+
 Route::post('/lookup-tenant', [TenantLookupController::class, 'lookup']);
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+// Protected routes - standard API throttling
+Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('v1')->group(function () {
+    Route::post('/refresh-token', function (Request $request) {
+        $user = $request->user();
+        
+        // Revoke old tokens
+        $user->tokens()->delete();
+        
+        // Create new token
+        $token = $user->createToken('auth_token', ['*'], now()->addDay())->plainTextToken;
+        
+        return response()->json([
+            'token' => $token,
+            'expires_at' => now()->addDay()->toISOString(),
+        ]);
+    })->name('api.refresh-token');
+
     // Customer routes
     Route::post('customers/quick-create', [V1\CustomerController::class, 'quickCreate']);
     Route::get('customers/metrics', [V1\CustomerController::class, 'getMetrics']);

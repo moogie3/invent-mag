@@ -17,17 +17,13 @@ class AccountApiTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 
-    protected User $userWithoutPermission;
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->seed(RoleSeeder::class);
         $this->seed(AccountSeeder::class); // Ensure initial accounts are present
-        $this->user->assignRole('superuser');
-
-        $this->userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
+        $this->user->givePermissionTo(['view-chart-of-accounts', 'edit-chart-of-accounts']);
     }
 
     #[Test]
@@ -42,7 +38,8 @@ class AccountApiTest extends TestCase
     #[Test]
     public function user_without_permission_cannot_view_accounts()
     {
-        $this->actingAs($this->userWithoutPermission, 'sanctum')
+        $userWithoutPermission = User::factory()->create(['tenant_id' => $this->tenant->id]);
+        $this->actingAs($userWithoutPermission, 'sanctum')
             ->getJson('/api/v1/accounts')
             ->assertStatus(403);
     }

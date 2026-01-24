@@ -24,6 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
             \Spatie\Multitenancy\Http\Middleware\NeedsTenant::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\DebugModeMiddleware::class,
+            \App\Http\Middleware\SecurityHeaders::class,
+        ]);
+
+        $middleware->api(append: [
+            'throttle:api',
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
@@ -33,6 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+            'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

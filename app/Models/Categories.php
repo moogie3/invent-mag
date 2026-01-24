@@ -15,10 +15,14 @@ class Categories extends Model
     protected $table = 'categories';
 
     protected $fillable = [
-        'tenant_id',
         'name',
         'description',
         'parent_id'
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     /**

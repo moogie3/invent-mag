@@ -11,7 +11,6 @@ class POItem extends Model
     use HasFactory, BelongsToTenant;
     protected $table = 'po_items';
     protected $fillable = [
-        'tenant_id',
         'po_id',
         'product_id',
         'quantity',
@@ -21,6 +20,11 @@ class POItem extends Model
         'total',
         'expiry_date',
         'remaining_quantity'
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $casts = [

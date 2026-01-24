@@ -13,11 +13,15 @@ class JournalEntry extends Model
     use HasFactory, BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'date',
         'description',
         'sourceable_id',
         'sourceable_type',
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $casts = [

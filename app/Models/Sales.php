@@ -31,7 +31,6 @@ class Sales extends Model
 
     protected $table = 'sales';
     protected $fillable = [
-        'tenant_id',
         'invoice',
         'customer_id',
         'user_id',
@@ -48,6 +47,11 @@ class Sales extends Model
         'change_amount',
         'is_pos',
         'sales_opportunity_id'
+    ];
+
+    protected $guarded = [
+        'id',
+        'tenant_id',
     ];
 
     protected $with = ['salesItems'];

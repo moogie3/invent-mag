@@ -127,5 +127,27 @@ class FortifyServiceProvider extends ServiceProvider
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
+
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)
+                ->by($request->user()?->id ?: $request->ip())
+                ->response(function (Request $request, array $headers) {
+                    return response()->json([
+                        'message' => 'Too many requests. Please try again later.',
+                        'retry_after' => $headers['Retry-After'] ?? 60
+                    ], 429);
+                });
+        });
+
+        RateLimiter::for('auth', function (Request $request) {
+            return Limit::perMinute(5)
+                ->by($request->ip())
+                ->response(function (Request $request, array $headers) {
+                    return response()->json([
+                        'message' => 'Too many login attempts. Please try again in ' . 
+                                     ($headers['Retry-After'] ?? 60) . ' seconds.',
+                    ], 429);
+                });
+        });
     }
 }

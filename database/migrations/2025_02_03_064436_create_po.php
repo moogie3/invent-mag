@@ -18,13 +18,13 @@ return new class extends Migration
             $table->string('invoice');
             $table->integer('supplier_id');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null')->after('supplier_id');
-            $table->timestamp('order_date')->useCurrent();
+            $table->timestamp('order_date')->useCurrent()->index();
             $table->timestamp('due_date')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->enum('payment_type', ['Cash', 'Card', 'Transfer', 'eWallet', '-'])->default('-');
             $table->decimal('discount_total', 10, 2)->default(0);
             $table->enum('discount_total_type', ['percentage', 'fixed'])->default('fixed');
             $table->decimal('total', 15, 2);
-            $table->enum('status', ['Unpaid', 'Paid', 'Partial', 'Returned']);
+            $table->enum('status', ['Unpaid', 'Paid', 'Partial', 'Returned'])->index();
             $table->timestamps();
         });
 

@@ -375,7 +375,7 @@ export class SalesOrderCreate extends SalesOrderModule {
         });
 
         const orderDiscountAmount = this.calculateOrderDiscount(
-            totalBeforeDiscounts,
+            subtotal,
             this.orderDiscount,
             this.orderDiscountType,
         );

@@ -194,8 +194,16 @@ class PurchaseService
             }
 
             // Retrieve account names using the IDs from settings
-            $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
-            $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
+            // Retrieve account names using the IDs from settings
+            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+            $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id']);
+
+            if (!$inventoryAccount || !$accountsPayableAccount) {
+                throw new \Exception('Required accounts (Inventory, Accounts Payable) not found. Please check Accounting Settings.');
+            }
+
+            $inventoryAccountName = $inventoryAccount->name;
+            $accountsPayableAccountName = $accountsPayableAccount->name;
 
             // Create Journal Entry for the purchase
             $transactions = [
@@ -319,8 +327,16 @@ class PurchaseService
             }
 
             // Retrieve account names using the IDs from settings
-            $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
-            $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;
+            // Retrieve account names using the IDs from settings
+            $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id']);
+            $cashAccount = Account::find($accountingSettings['cash_account_id']);
+
+            if (!$accountsPayableAccount || !$cashAccount) {
+                throw new \Exception('Required accounts (Accounts Payable, Cash) not found. Please check Accounting Settings.');
+            }
+
+            $accountsPayableAccountName = $accountsPayableAccount->name;
+            $cashAccountName = $cashAccount->name;
 
             // Create Journal Entry for the payment
             $transactions = [
@@ -625,8 +641,15 @@ class PurchaseService
                 throw new \Exception('Accounting settings for inventory or accounts payable are not configured.');
             }
 
-            $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
-            $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
+            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+            $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id']);
+
+            if (!$inventoryAccount || !$accountsPayableAccount) {
+                throw new \Exception('Required accounts (Inventory, Accounts Payable) not found for Purchase Return. Please check Accounting Settings.');
+            }
+
+            $inventoryAccountName = $inventoryAccount->name;
+            $accountsPayableAccountName = $accountsPayableAccount->name;
 
             $transactions = [
                 ['account_name' => $accountsPayableAccountName, 'type' => 'debit', 'amount' => $totalReturnAmount],

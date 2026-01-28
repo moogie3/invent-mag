@@ -83,7 +83,7 @@ class SalesHelper
             $totalProductDiscount += $discountPerUnit * $item->quantity;
         }
 
-        $orderDiscount = self::calculateDiscount($subtotalBeforeDiscounts, $discountTotal, $discountTotalType);
+        $orderDiscount = self::calculateDiscount($subtotal, $discountTotal, $discountTotalType);
         $taxableAmount = $subtotal - $orderDiscount;
         $taxAmount = self::calculateTaxAmount($taxableAmount, $taxRate);
         $finalTotal = $taxableAmount + $taxAmount;

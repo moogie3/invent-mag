@@ -88,9 +88,12 @@ class SalesService
         $itemCount = $sales->salesItems->count();
         $subtotal = 0;
         $totalItemDiscount = 0;
+        $subtotalBeforeDiscounts = 0;
 
         foreach ($sales->salesItems as $item) {
             $itemSubtotal = $item->customer_price * $item->quantity;
+            $subtotalBeforeDiscounts += $itemSubtotal;
+            
             if ($item->discount_type === 'percentage') {
                 $itemDiscountAmount = ($itemSubtotal * $item->discount) / 100;
             } else {
@@ -185,7 +188,12 @@ class SalesService
 
             $subTotal = 0;
             foreach ($products as $product) {
-                $subTotal += $product['customer_price'] * $product['quantity'];
+                $subTotal += SalesHelper::calculateTotal(
+                    $product['customer_price'], 
+                    $product['quantity'], 
+                    $product['discount'] ?? 0, 
+                    $product['discount_type'] ?? 'fixed'
+                );
             }
 
             $orderDiscount = $data['discount_total'] ?? 0;
@@ -265,10 +273,20 @@ class SalesService
             $accountingSettings = Auth::user()->accounting_settings;
 
             // Retrieve account names using the IDs from settings
-            $salesRevenueAccountName = Account::find($accountingSettings['sales_revenue_account_id'])->name;
-            $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
-            $costOfGoodsSoldAccountName = Account::find($accountingSettings['cost_of_goods_sold_account_id'])->name;
-            $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+            // Retrieve account names using the IDs from settings
+            $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id']);
+            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
+            $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id']);
+            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+
+            if (!$salesRevenueAccount || !$accountsReceivableAccount || !$costOfGoodsSoldAccount || !$inventoryAccount) {
+                throw new \Exception('One or more required accounts (Sales Revenue, AR, COGS, Inventory) not found. Please check Accounting Settings.');
+            }
+
+            $salesRevenueAccountName = $salesRevenueAccount->name;
+            $accountsReceivableAccountName = $accountsReceivableAccount->name;
+            $costOfGoodsSoldAccountName = $costOfGoodsSoldAccount->name;
+            $inventoryAccountName = $inventoryAccount->name;
 
             // Create Journal Entry for the sale
             $transactions = [
@@ -335,7 +353,7 @@ class SalesService
 
             $orderDiscount = $data['order_discount'] ?? 0;
             $orderDiscountType = $data['order_discount_type'] ?? 'fixed';
-            $orderDiscountAmount = SalesHelper::calculateDiscount($subtotalBeforeDiscounts, $orderDiscount, $orderDiscountType);
+            $orderDiscountAmount = SalesHelper::calculateDiscount($subTotal, $orderDiscount, $orderDiscountType);
 
             $tax = Tax::where('is_active', 1)->first();
             $taxRate = $tax ? $tax->rate : 0;
@@ -431,8 +449,16 @@ class SalesService
             }
 
             // Retrieve account names using the IDs from settings
-            $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;
-            $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+            // Retrieve account names using the IDs from settings
+            $cashAccount = Account::find($accountingSettings['cash_account_id']);
+            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
+
+            if (!$cashAccount || !$accountsReceivableAccount) {
+                throw new \Exception('Required accounts (Cash, AR) not found. Please check Accounting Settings.');
+            }
+
+            $cashAccountName = $cashAccount->name;
+            $accountsReceivableAccountName = $accountsReceivableAccount->name;
 
             // Create Journal Entry for the payment
             $transactions = [
@@ -734,8 +760,15 @@ class SalesService
                 throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
             }
 
-            $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
-            $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
+
+            if (!$inventoryAccount || !$accountsReceivableAccount) {
+                throw new \Exception('Required accounts (Inventory, AR) not found for Sales Return. Please check Accounting Settings.');
+            }
+
+            $inventoryAccountName = $inventoryAccount->name;
+            $accountsReceivableAccountName = $accountsReceivableAccount->name;
 
             $transactions = [
                 ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],

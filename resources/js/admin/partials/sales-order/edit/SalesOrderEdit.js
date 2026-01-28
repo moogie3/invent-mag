@@ -163,8 +163,7 @@ export class SalesOrderEdit extends SalesOrderModule {
         let orderDiscountAmount = 0;
 
         if (discountTotalType === "percentage") {
-            orderDiscountAmount =
-                subtotalBeforeDiscounts * (discountTotalValue / 100);
+            orderDiscountAmount = subtotal * (discountTotalValue / 100);
         } else {
             orderDiscountAmount = discountTotalValue;
         }

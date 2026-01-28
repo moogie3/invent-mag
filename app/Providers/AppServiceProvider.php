@@ -82,5 +82,16 @@ class AppServiceProvider extends ServiceProvider
         if (app()->environment('production')) {
         URL::forceScheme('https');
         }
+
+        \Illuminate\Support\Facades\RateLimiter::for('api', function (\Illuminate\Http\Request $request) {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(60)
+                ->by($request->user()?->id ?: $request->ip())
+                ->response(function (\Illuminate\Http\Request $request, array $headers) {
+                    return response()->json([
+                        'message' => 'Too many requests. Please try again later.',
+                        'retry_after' => $headers['Retry-After'] ?? 60
+                    ], 429);
+                });
+        });
     }
 }

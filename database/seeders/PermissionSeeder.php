@@ -52,6 +52,9 @@ class PermissionSeeder extends Seeder
             
             // POS
             'access-pos',
+            'view-pos',
+            'create-pos',
+            'edit-pos',
             'delete-pos-transactions',
             
             // Suppliers
@@ -110,6 +113,14 @@ class PermissionSeeder extends Seeder
             'create-customer-interactions',
             'edit-customer-interactions',
             'delete-customer-interactions',
+
+            // Additional missing ones
+            'view-po',
+            'create-po',
+            'edit-po',
+            'view-warehouse',
+            'create-warehouse',
+            'edit-warehouse',
         ];
 
         // Create all permissions

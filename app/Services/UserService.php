@@ -30,11 +30,12 @@ class UserService
 
     public function createUser(array $data): User
     {
-        $user = User::create([
+        $user = new User([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
         ]);
+        $user->password = $data['password'];
+        $user->save();
 
         if (isset($data['roles'])) {
             $user->syncRoles($data['roles']);
@@ -55,7 +56,7 @@ class UserService
         ]);
 
         if (isset($data['password'])) {
-            $user->password = Hash::make($data['password']);
+            $user->password = $data['password'];
             $user->save();
         }
 

@@ -454,7 +454,7 @@ class AccountingCoaTemplateTest extends TestCase
     #[Test]
     public function a_user_can_apply_the_universal_coa_template(){
         // AccountSeeder already creates accounts, which will be truncated
-        $this->assertCount(44, Account::all());
+        $this->assertCount(50, Account::all());
 
         $response = $this->post(route('admin.setting.apply-coa-template'), [
             'template' => 'universal.json',
@@ -472,7 +472,7 @@ class AccountingCoaTemplateTest extends TestCase
     public function a_user_can_apply_the_indonesian_coa_template()
     {
         // AccountSeeder already creates accounts, which will be truncated
-        $this->assertCount(44, Account::all());
+        $this->assertCount(50, Account::all());
 
         $response = $this->post(route('admin.setting.apply-coa-template'), [
             'template' => 'indonesian.json',

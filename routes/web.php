@@ -156,7 +156,9 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::put('/update/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update')->middleware('can:edit-supplier');
             Route::delete('/destroy/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy')->middleware('can:delete-supplier');
             Route::get('/metrics', [SupplierController::class, 'getMetrics'])->name('admin.supplier.metrics')->middleware('can:view-supplier');
-            Route::post('/export', [SupplierController::class, 'exportAll'])->name('admin.supplier.export');
+            Route::post('/export', [SupplierController::class, 'exportAll'])
+                ->name('admin.supplier.export')
+                ->middleware('can:view-supplier');
 
         });
 
@@ -172,47 +174,69 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::post('/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate')->middleware('can:create-customer');
             Route::get('/metrics', [CustomerController::class, 'getMetrics'])->name('admin.customer.metrics')->middleware('can:view-customer');
             Route::get('/{customer}/historical-purchases', [CustomerCrmController::class, 'getHistoricalPurchases'])->name('admin.customer.historical-purchases')->middleware('can:view-customer');
-            Route::post('/export', [CustomerController::class, 'exportAll'])->name('admin.customer.export');
+            Route::post('/export', [CustomerController::class, 'exportAll'])
+                ->name('admin.customer.export')
+                ->middleware('can:view-customer');
         });
 
-        // CRM Routes
-        Route::get('/customers/{id}/crm-details', [CustomerCrmController::class, 'show']);
-        Route::post('/customers/{id}/interactions', [CustomerCrmController::class, 'storeInteraction']);
-        Route::get('/customers/{id}/historical-purchases', [CustomerCrmController::class, 'getHistoricalPurchases']);
-        Route::get('/customers/{id}/product-history', [CustomerCrmController::class, 'getProductHistory']);
+        // CRM Routes - Protected by customer permissions
+        Route::middleware('can:view-customer')->group(function () {
+            Route::get('/customers/{id}/crm-details', [CustomerCrmController::class, 'show'])->where('id', '[0-9]+');
+            Route::get('/customers/{id}/historical-purchases', [CustomerCrmController::class, 'getHistoricalPurchases'])->where('id', '[0-9]+');
+            Route::get('/customers/{id}/product-history', [CustomerCrmController::class, 'getProductHistory'])->where('id', '[0-9]+');
+        });
+        
+        Route::middleware('can:create-customer-interactions')->group(function () {
+            Route::post('/customers/{id}/interactions', [CustomerCrmController::class, 'storeInteraction'])->where('id', '[0-9]+');
+        });
 
-        // SRM Routes
-        Route::get('/suppliers/{id}/srm-details', [SupplierCrmController::class, 'show']);
-        Route::post('/suppliers/{id}/interactions', [SupplierCrmController::class, 'storeInteraction']);
-        Route::get('/suppliers/{id}/historical-purchases', [SupplierCrmController::class, 'getHistoricalPurchases']);
-        Route::get('/suppliers/{id}/product-history', [SupplierCrmController::class, 'getProductHistory']);
+        // SRM Routes - Protected by supplier permissions
+        Route::middleware('can:view-supplier')->group(function () {
+            Route::get('/suppliers/{id}/srm-details', [SupplierCrmController::class, 'show'])->where('id', '[0-9]+');
+            Route::get('/suppliers/{id}/historical-purchases', [SupplierCrmController::class, 'getHistoricalPurchases'])->where('id', '[0-9]+');
+            Route::get('/suppliers/{id}/product-history', [SupplierCrmController::class, 'getProductHistory'])->where('id', '[0-9]+');
+        });
+        
+        Route::middleware('can:edit-supplier')->group(function () {
+            Route::post('/suppliers/{id}/interactions', [SupplierCrmController::class, 'storeInteraction'])->where('id', '[0-9]+');
+        });
 
-        // Sales Pipeline Routes
-        Route::get('/sales-pipeline', [SalesPipelineController::class, 'index'])->name('admin.sales_pipeline.index');
+        // Sales Pipeline Routes - Protected by sales pipeline permissions
+        Route::middleware('can:view-sales-pipeline')->group(function () {
+            Route::get('/sales-pipeline', [SalesPipelineController::class, 'index'])->name('admin.sales_pipeline.index');
 
-        Route::prefix('sales-pipeline')->group(function () {
-            // Pipelines
-            Route::get('/pipelines', [SalesPipelineController::class, 'indexPipelines'])->name('admin.sales_pipeline.pipelines.index');
-            Route::post('/pipelines', [SalesPipelineController::class, 'storePipeline'])->name('admin.sales_pipeline.pipelines.store');
-            Route::put('/pipelines/{pipeline}', [SalesPipelineController::class, 'updatePipeline'])->name('admin.sales_pipeline.pipelines.update');
-            Route::delete('/pipelines/{pipeline}', [SalesPipelineController::class, 'destroyPipeline'])->name('admin.sales_pipeline.pipelines.destroy');
-
-            // Stages
-            Route::post('/pipelines/{pipeline}/stages', [SalesPipelineController::class, 'storeStage'])->name('admin.sales_pipeline.stages.store');
-            Route::put('/stages/{stage}', [SalesPipelineController::class, 'updateStage'])->name('admin.sales_pipeline.stages.update');
-            Route::delete('/stages/{stage}', [SalesPipelineController::class, 'destroyStage'])->name('admin.sales_pipeline.stages.destroy');
-            Route::post('/pipelines/{pipeline}/stages/reorder', [SalesPipelineController::class, 'reorderStages'])->name('admin.sales_pipeline.stages.reorder');
-
-            // Opportunities
-            Route::get('/opportunities', [SalesPipelineController::class, 'indexOpportunities'])->name('admin.sales_pipeline.opportunities.index');
-            Route::post('/opportunities', [SalesPipelineController::class, 'storeOpportunity'])->name('admin.sales_pipeline.opportunities.store');
-            Route::post('/opportunities/{opportunity}', [SalesPipelineController::class, 'updateOpportunity'])->name('admin.sales_pipeline.opportunities.update');
-            Route::get('/opportunities/{opportunity}', [SalesPipelineController::class, 'showOpportunity'])->name('admin.sales_pipeline.opportunities.show');
-            Route::delete('/opportunities/{opportunity}', [SalesPipelineController::class, 'destroyOpportunity'])->name('admin.sales_pipeline.opportunities.destroy');
-            Route::put('/opportunities/{opportunity}/move', [SalesPipelineController::class, 'moveOpportunity'])->name('admin.sales_pipeline.opportunities.move');
-            Route::get('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'showConvertForm'])->name('admin.sales_pipeline.opportunities.convert.show');
-            Route::post('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'convertToSalesOrder'])->name('admin.sales_pipeline.opportunities.convert');
-            Route::post('/export', [SalesPipelineController::class, 'exportAll'])->name('admin.sales-pipeline.export');
+            Route::prefix('sales-pipeline')->group(function () {
+                // View routes
+                Route::get('/pipelines', [SalesPipelineController::class, 'indexPipelines'])->name('admin.sales_pipeline.pipelines.index');
+                Route::get('/opportunities', [SalesPipelineController::class, 'indexOpportunities'])->name('admin.sales_pipeline.opportunities.index');
+                Route::get('/opportunities/{opportunity}', [SalesPipelineController::class, 'showOpportunity'])->name('admin.sales_pipeline.opportunities.show');
+                Route::get('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'showConvertForm'])->name('admin.sales_pipeline.opportunities.convert.show');
+                Route::post('/export', [SalesPipelineController::class, 'exportAll'])->name('admin.sales-pipeline.export');
+                
+                // Pipeline management routes
+                Route::middleware('can:manage-sales-pipelines')->group(function () {
+                    Route::post('/pipelines', [SalesPipelineController::class, 'storePipeline'])->name('admin.sales_pipeline.pipelines.store');
+                    Route::put('/pipelines/{pipeline}', [SalesPipelineController::class, 'updatePipeline'])->name('admin.sales_pipeline.pipelines.update');
+                    Route::delete('/pipelines/{pipeline}', [SalesPipelineController::class, 'destroyPipeline'])->name('admin.sales_pipeline.pipelines.destroy');
+                });
+                
+                // Stage management routes
+                Route::middleware('can:manage-pipeline-stages')->group(function () {
+                    Route::post('/pipelines/{pipeline}/stages', [SalesPipelineController::class, 'storeStage'])->name('admin.sales_pipeline.stages.store');
+                    Route::put('/stages/{stage}', [SalesPipelineController::class, 'updateStage'])->name('admin.sales_pipeline.stages.update');
+                    Route::delete('/stages/{stage}', [SalesPipelineController::class, 'destroyStage'])->name('admin.sales_pipeline.stages.destroy');
+                    Route::post('/pipelines/{pipeline}/stages/reorder', [SalesPipelineController::class, 'reorderStages'])->name('admin.sales_pipeline.stages.reorder');
+                });
+                
+                // Opportunity management routes
+                Route::middleware('can:manage-sales-opportunities')->group(function () {
+                    Route::post('/opportunities', [SalesPipelineController::class, 'storeOpportunity'])->name('admin.sales_pipeline.opportunities.store');
+                    Route::post('/opportunities/{opportunity}', [SalesPipelineController::class, 'updateOpportunity'])->name('admin.sales_pipeline.opportunities.update');
+                    Route::delete('/opportunities/{opportunity}', [SalesPipelineController::class, 'destroyOpportunity'])->name('admin.sales_pipeline.opportunities.destroy');
+                    Route::put('/opportunities/{opportunity}/move', [SalesPipelineController::class, 'moveOpportunity'])->name('admin.sales_pipeline.opportunities.move');
+                    Route::post('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'convertToSalesOrder'])->name('admin.sales_pipeline.opportunities.convert');
+                });
+            });
         });
 
         // Purchase Order Routes
@@ -281,14 +305,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.po.add-payment')
                 ->middleware('can:edit-purchase-orders');
         });
-        // Purchase Return Routes
-        Route::get('por/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.por.items');
-        Route::get('por/{por}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.por.modal-view');
-        Route::resource('por', PurchaseReturnController::class)->names('admin.por');
-        Route::post('por/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.por.bulk-delete');
-        Route::post('por/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.por.bulk-complete');
-        Route::post('por/bulk-cancel', [PurchaseReturnController::class, 'bulkCancel'])->name('admin.por.bulk-cancel');
-Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])->name('admin.por.bulk-export');
+
 
 
         // Sales Routes

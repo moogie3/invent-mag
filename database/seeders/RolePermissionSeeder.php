@@ -23,32 +23,28 @@ class RolePermissionSeeder extends Seeder
         $staffRole = Role::firstOrCreate(['name' => 'staff']);
         $staffRole->givePermissionTo([
             'access-dashboard',
-            'view-pos',
-            'create-pos',
-            'edit-pos',
+            'access-pos',
             'view-sales',
             'create-sales',
             'edit-sales',
-            'view-po',
-            'create-po',
-            'edit-po',
+            'view-purchase-orders',
+            'create-purchase-orders',
+            'edit-purchase-orders',
             'view-products',
             'create-products',
             'edit-products',
-            'view-warehouse',
-            'create-warehouse',
-            'edit-warehouse',
+            'view-warehouses',
+            'create-warehouses',
+            'edit-warehouses',
         ]);
 
         // Create POS Role and assign permissions
         $posRole = Role::firstOrCreate(['name' => 'pos']);
         $posRole->givePermissionTo([
             'access-dashboard',
-            'view-pos',
-            'create-pos',
+            'access-pos',
             'view-sales',
-            'delete-sales',
-            'view-warehouse',
+            'view-warehouses',
             'view-products',
             'view-reports',
         ]);

@@ -15,6 +15,7 @@ use App\Models\CurrencySetting;
 use App\Models\Tax;
 use App\Models\Account;
 use Database\Seeders\AccountSeeder;
+use Illuminate\Support\Facades\Log;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -46,15 +47,16 @@ class CreateNewUser implements CreatesNewUsers
         $tenant->makeCurrent();
 
         // Now create user in tenant context
-        $user = User::create([
+        $user = new User([
             'name' => $input['name'],
             'email' => $input['email'],
-            'password' => Hash::make($input['password']),
             'shopname' => $input['shopname'] ?? null,
             'address' => $input['address'] ?? null,
             'avatar' => $input['avatar'] ?? null,
             'timezone' => $input['timezone'] ?? null,
         ]);
+        $user->password = $input['password'];
+        $user->save();
 
         // Assign role inside tenant context
 
@@ -104,12 +106,18 @@ class CreateNewUser implements CreatesNewUsers
         $cashAccount = Account::where('name', 'accounting.accounts.cash.name - ' . $tenantName)->first();
         $accountsPayableAccount = Account::where('name', 'accounting.accounts.accounts_payable.name - ' . $tenantName)->first();
         $inventoryAccount = Account::where('name', 'accounting.accounts.inventory.name - ' . $tenantName)->first();
+        $salesRevenueAccount = Account::where('name', 'accounting.accounts.sales_revenue.name - ' . $tenantName)->first();
+        $accountsReceivableAccount = Account::where('name', 'accounting.accounts.accounts_receivable.name - ' . $tenantName)->first();
+        $costOfGoodsSoldAccount = Account::where('name', 'accounting.accounts.cost_of_goods_sold.name - ' . $tenantName)->first();
 
-        if ($cashAccount && $accountsPayableAccount && $inventoryAccount) {
+        if ($cashAccount && $accountsPayableAccount && $inventoryAccount && $salesRevenueAccount && $accountsReceivableAccount && $costOfGoodsSoldAccount) {
             $user->accounting_settings = [
                 'cash_account_id' => $cashAccount->id,
                 'accounts_payable_account_id' => $accountsPayableAccount->id,
                 'inventory_account_id' => $inventoryAccount->id,
+                'sales_revenue_account_id' => $salesRevenueAccount->id,
+                'accounts_receivable_account_id' => $accountsReceivableAccount->id,
+                'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
             ];
             $user->save();
         }

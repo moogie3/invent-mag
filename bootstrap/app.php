@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         \Spatie\Multitenancy\MultitenancyServiceProvider::class, // Ensure Spatie is loaded before Fortify
         FortifyServiceProvider::class, // Ensure Fortify is loaded
+        \App\Providers\TestingServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);

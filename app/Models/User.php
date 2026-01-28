@@ -27,8 +27,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'id',
         'password',
         'tenant_id',
-        'system_settings',
-        'accounting_settings',
         'email_verified_at',
     ];
 
@@ -40,6 +38,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'password' => 'hashed',
             'system_settings' => 'array',
             'accounting_settings' => 'array',
         ];

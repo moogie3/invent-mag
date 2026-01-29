@@ -358,14 +358,14 @@ export class SalesOrderCreate extends SalesOrderModule {
         let itemDiscount = 0;
 
         this.products.forEach((product) => {
-            const priceInCents = Math.round(product.price * 100);
+            const priceInCents = Math.round(product.customer_price * 100);
             const productSubtotal = (priceInCents * product.quantity) / 100;
             totalBeforeDiscounts += productSubtotal;
 
             subtotal += product.total;
 
             const productDiscount = this.calculateDiscountAmount(
-                product.price,
+                product.customer_price,
                 product.quantity,
                 product.discount,
                 product.discountType,
@@ -649,7 +649,7 @@ export class SalesOrderCreate extends SalesOrderModule {
                 product.quantity = newQuantity;
             }
         } else if (target.classList.contains("price-input")) {
-            product.price = parseFloat(target.value) || 0;
+            product.customer_price = parseFloat(target.value) || 0;
         } else if (target.classList.contains("discount-input")) {
             product.discount = parseFloat(target.value) || 0;
         }
@@ -682,7 +682,7 @@ export class SalesOrderCreate extends SalesOrderModule {
 
     updateProductInTable(product, targetElement) {
         product.total = this.calculateTotal(
-            product.price,
+            product.customer_price,
             product.quantity,
             product.discount,
             product.discountType,

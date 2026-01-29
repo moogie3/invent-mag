@@ -88,11 +88,9 @@ class SalesService
         $itemCount = $sales->salesItems->count();
         $subtotal = 0;
         $totalItemDiscount = 0;
-        $subtotalBeforeDiscounts = 0;
 
         foreach ($sales->salesItems as $item) {
             $itemSubtotal = $item->customer_price * $item->quantity;
-            $subtotalBeforeDiscounts += $itemSubtotal;
             
             if ($item->discount_type === 'percentage') {
                 $itemDiscountAmount = ($itemSubtotal * $item->discount) / 100;

@@ -70,13 +70,14 @@ class PurchaseReturnSeeder extends Seeder
 
             foreach ($selectedPoItems as $poItem) {
                 $returnQuantity = rand(1, $poItem->quantity); // Return a quantity less than or equal to original
-                $itemTotal = $returnQuantity * $poItem->price;
+                $netUnitPrice = $poItem->total / $poItem->quantity;
+                $itemTotal = $returnQuantity * $netUnitPrice;
                 $totalReturnAmount += $itemTotal;
 
                 $returnItemsData[] = [
                     'product_id' => $poItem->product_id,
                     'quantity' => $returnQuantity,
-                    'price' => $poItem->price,
+                    'price' => $netUnitPrice,
                     'total' => $itemTotal,
                     'tenant_id' => $tenantId,
                 ];

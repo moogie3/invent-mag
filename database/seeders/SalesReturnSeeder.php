@@ -70,13 +70,14 @@ class SalesReturnSeeder extends Seeder
 
             foreach ($selectedSalesItems as $salesItem) {
                 $returnQuantity = rand(1, $salesItem->quantity); // Return a quantity less than or equal to original
-                $itemTotal = $returnQuantity * $salesItem->price; // Use salesItem's price, not customer_price
+                $netUnitPrice = $salesItem->total / $salesItem->quantity;
+                $itemTotal = $returnQuantity * $netUnitPrice; 
                 $totalReturnAmount += $itemTotal;
 
                 $returnItemsData[] = [
                     'product_id' => $salesItem->product_id,
                     'quantity' => $returnQuantity,
-                    'price' => $salesItem->price,
+                    'price' => $netUnitPrice,
                     'total' => $itemTotal,
                     'tenant_id' => $tenantId,
                 ];

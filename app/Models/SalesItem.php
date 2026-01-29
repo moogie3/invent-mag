@@ -39,6 +39,10 @@ class SalesItem extends Model
         return $this->customer_price;
     }
 
+    public function setPriceAttribute($value) {
+        $this->attributes['customer_price'] = $value;
+    }
+
     // Explicitly define the factory for the model
     protected static function newFactory()
     {

@@ -53,6 +53,101 @@ class PurchaseReturnService
         ];
     }
 
+    public function createPurchaseReturn(array $data): PurchaseReturn
+    {
+        return DB::transaction(function () use ($data) {
+            $purchase = Purchase::findOrFail($data['purchase_id']);
+            $items = json_decode($data['items'], true);
+            if (!$items || !is_array($items)) {
+                throw new \Exception('Invalid items data');
+            }
+
+            // Filter for items that are actually being returned
+            $returnedItems = array_filter($items, function($item) {
+                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
+            });
+
+            if (empty($returnedItems)) {
+                throw new \Exception('No items selected for return.');
+            }
+
+            // Recalculate total amount on the backend to ensure data integrity
+            $totalReturnAmount = 0;
+            foreach ($returnedItems as $itemData) {
+                $totalReturnAmount += ($itemData['return_price'] ?? $itemData['price']) * $itemData['returned_quantity'];
+            }
+
+            $purchaseReturn = PurchaseReturn::create([
+                'purchase_id' => $purchase->id,
+                'user_id' => Auth::id(),
+                'return_date' => $data['return_date'],
+                'reason' => $data['reason'] ?? null,
+                'total_amount' => $totalReturnAmount,
+                'status' => $data['status'],
+            ]);
+
+            foreach ($returnedItems as $itemData) {
+                $returnPrice = $itemData['return_price'] ?? $itemData['price'];
+                $returnedQuantity = $itemData['returned_quantity'];
+
+                PurchaseReturnItem::create([
+                    'purchase_return_id' => $purchaseReturn->id,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $returnedQuantity,
+                    'price' => $returnPrice,
+                    'total' => $returnPrice * $returnedQuantity,
+                ]);
+
+                // Decrement stock for the returned product
+                $product = Product::find($itemData['product_id']);
+                if ($product) {
+                    $product->decrement('stock_quantity', $returnedQuantity);
+                }
+            }
+
+            // Update original purchase status
+            $totalPurchasedQuantity = $purchase->items->sum('quantity');
+            $totalReturnedQuantity = $purchase->purchaseReturns()->with('items')->get()->flatMap->items->sum('quantity');
+
+
+            if ($totalReturnedQuantity >= $totalPurchasedQuantity) {
+                $purchase->update(['status' => 'Returned']);
+            } elseif ($totalReturnedQuantity > 0) {
+                $purchase->update(['status' => 'Partial']);
+            }
+
+            // Create Journal Entry for the return
+            $accountingSettings = Auth::user()->accounting_settings;
+            if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_payable_account_id'])) {
+                throw new \Exception('Accounting settings for inventory or accounts payable are not configured.');
+            }
+
+            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+            $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id']);
+
+            if (!$inventoryAccount || !$accountsPayableAccount) {
+                throw new \Exception('Required accounts (Inventory, Accounts Payable) not found for Purchase Return. Please check Accounting Settings.');
+            }
+
+            $inventoryAccountName = $inventoryAccount->name;
+            $accountsPayableAccountName = $accountsPayableAccount->name;
+
+            $transactions = [
+                ['account_name' => $accountsPayableAccountName, 'type' => 'debit', 'amount' => $totalReturnAmount],
+                ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],
+            ];
+
+            $this->accountingService->createJournalEntry(
+                "Purchase Return for PO #{$purchase->invoice}",
+                Carbon::parse($data['return_date']),
+                $transactions,
+                $purchaseReturn
+            );
+
+            return $purchaseReturn;
+        });
+    }
+
     public function updatePurchaseReturn(PurchaseReturn $purchaseReturn, array $data): PurchaseReturn
     {
         return DB::transaction(function () use ($purchaseReturn, $data) {

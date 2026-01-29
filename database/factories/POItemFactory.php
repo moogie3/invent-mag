@@ -21,7 +21,11 @@ class POItemFactory extends Factory
     {
         $quantity = $this->faker->numberBetween(1, 100);
         $price = $this->faker->randomFloat(2, 10, 200);
-        $total = $quantity * $price;
+        $discount = $this->faker->randomFloat(2, 0, 10);
+        $discountType = $this->faker->randomElement(['fixed', 'percentage']);
+        
+        $discountAmountPerUnit = $discountType === 'percentage' ? ($price * $discount) / 100 : $discount;
+        $total = ($price - $discountAmountPerUnit) * $quantity;
         $expiryDate = $this->faker->boolean(70) ? $this->faker->dateTimeBetween('now', '+1 year')->format('Y-m-d H:i:s') : null;
 
         return [
@@ -29,8 +33,8 @@ class POItemFactory extends Factory
             'product_id' => Product::factory(),
             'quantity' => $quantity,
             'price' => $price,
-            'discount' => $this->faker->randomFloat(2, 0, 10),
-            'discount_type' => $this->faker->randomElement(['fixed', 'percentage']),
+            'discount' => $discount,
+            'discount_type' => $discountType,
             'total' => $total,
             'expiry_date' => $expiryDate,
             'remaining_quantity' => $quantity,

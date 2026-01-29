@@ -46,13 +46,15 @@ class PurchaseReturnController extends Controller
             'status' => 'required|string',
         ]);
 
-        $this->purchaseService->createPurchaseReturn($request->all());
+        $this->purchaseReturnService->createPurchaseReturn($request->all());
 
         return redirect()->route('admin.por.index')->with('success', 'Purchase return created successfully.');
     }
 
     public function show(PurchaseReturn $por)
     {
+        $por->load(['purchase.supplier', 'items.product']);
+
         $statusClass = PurchaseReturnHelper::getStatusClass($por->status);
         $statusText = PurchaseReturnHelper::getStatusText($por->status);
 

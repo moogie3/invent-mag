@@ -21,11 +21,11 @@ class SecurityHeaders
         // Content Security Policy
         $response->headers->set('Content-Security-Policy', 
             "default-src 'self'; " .
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; " .
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " .
-            "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data:; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com; " .
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://rsms.me; " .
+            "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data: https://rsms.me; " .
             "img-src 'self' data: https:; " .
-            "connect-src 'self';"
+            "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;"
         );
 
         return $response;

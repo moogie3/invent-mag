@@ -268,17 +268,4 @@ export class SalesOrderEdit extends SalesOrderModule {
         this.isSubmitting = true;
         this.elements.form.submit(); // Manually submit the form after serialization
     }
-
-    calculateTotal(price, quantity, discount, discountType) {
-        let itemTotal = price * quantity;
-        let discountAmount = 0;
-        if (discount > 0) {
-            if (discountType === "percentage") {
-                discountAmount = itemTotal * (discount / 100);
-            } else {
-                discountAmount = discount * quantity;
-            }
-        }
-        return itemTotal - discountAmount;
-    }
 }

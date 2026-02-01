@@ -2,14 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Models\Categories; // Corrected model name
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
-// Removed Spatie actions as we are using Tenant::makeCurrent() and Tenant::forgetCurrent()
-// use Spatie\Multitenancy\Actions\ForgetCurrentTenantAction;
-// use Spatie\Multitenancy\Actions\MakeCurrentTenantAction;
 
 class MultiTenancyTest extends TestCase
 {
@@ -18,55 +15,84 @@ class MultiTenancyTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        // Ensure no tenant is current before each test (important for clean state)
         Tenant::forgetCurrent();
-
-        // Seed global permissions and roles once for the entire test run
-        $this->artisan('db:seed', ['--class' => 'PermissionSeeder']);
-        $this->artisan('db:seed', ['--class' => 'RoleSeeder']);
-        $this->artisan('db:seed', ['--class' => 'RolePermissionSeeder']);
     }
 
     /** @test */
     public function tenants_cannot_see_each_others_data(): void
     {
-        // 1. Create Tenant A and its user
+        // 1. Setup Tenant A
         $tenantA = Tenant::create(['name' => 'Tenant A', 'domain' => 'tenant-a.localhost']);
         $tenantA->makeCurrent();
-        $this->artisan('db:seed', ['--class' => 'UserSeeder']); // Seed user for Tenant A
-        $userA = User::where('tenant_id', $tenantA->id)->first(); // Get the user created for Tenant A
-        $this->assertNotNull($userA, 'User A should exist for Tenant A');
-        $this->actingAs($userA);
-
-        // Create data for Tenant A
-        Categories::create(['name' => 'Category A for Tenant A', 'description' => 'Description A', 'tenant_id' => $tenantA->id]); // Explicitly set tenant_id
-        $this->assertCount(1, Categories::all(), 'Tenant A should see its own category.');
-        $this->assertEquals('Category A for Tenant A', Categories::first()->name);
-
-        // 2. Create Tenant B and its user
-        Tenant::forgetCurrent(); // Forget current tenant before creating new one
+        $userA = User::factory()->create(['email' => 'user@tenant-a.com', 'tenant_id' => $tenantA->id]);
+        
+        // 2. Setup Tenant B
+        Tenant::forgetCurrent();
         $tenantB = Tenant::create(['name' => 'Tenant B', 'domain' => 'tenant-b.localhost']);
         $tenantB->makeCurrent();
-        $this->artisan('db:seed', ['--class' => 'UserSeeder']); // Seed user for Tenant B
-        $userB = User::where('tenant_id', $tenantB->id)->first(); // Get the user created for Tenant B
-        $this->assertNotNull($userB, 'User B should exist for Tenant B');
+        $userB = User::factory()->create(['email' => 'user@tenant-b.com', 'tenant_id' => $tenantB->id]);
+
+        // 3. Verify Isolation
         $this->actingAs($userB);
+        // Ensure standard queries obey tenant scope (example with Users table itself)
+        $this->assertNull(User::find($userA->id), 'Tenant B should not find User A via standard query.');
+        $this->assertNotNull(User::find($userB->id), 'Tenant B should find User B.');
+    }
 
-        // Verify Tenant B sees no data from Tenant A
-        $this->assertCount(0, Categories::all(), 'Tenant B should not see Tenant A\'s categories.');
+    /** @test */
+    public function cross_tenant_login_is_blocked()
+    {
+        // 1. Setup Tenant A with a user
+        $tenantA = Tenant::create(['name' => 'Tenant A', 'domain' => 'tenant-a.localhost']);
+        $userA = User::factory()->create([
+            'email' => 'admin@tenant-a.com',
+            'password' => Hash::make('password'),
+            'tenant_id' => $tenantA->id
+        ]);
 
-        // Create data for Tenant B
-        Categories::create(['name' => 'Category B for Tenant B', 'description' => 'Description B', 'tenant_id' => $tenantB->id]); // Explicitly set tenant_id
-        $this->assertCount(1, Categories::all(), 'Tenant B should see its own category.');
-        $this->assertEquals('Category B for Tenant B', Categories::first()->name);
+        // 2. Setup Tenant B (Empty)
+        $tenantB = Tenant::create(['name' => 'Tenant B', 'domain' => 'tenant-b.localhost']);
 
-        // 3. Switch back to Tenant A and verify data isolation
-        Tenant::forgetCurrent();
+        // 3. Simulate being on Tenant B
+        $tenantB->makeCurrent();
+
+        // 4. Attempt to login using Tenant A's credentials
+        // We use the route name to ensure we hit the correct endpoint, 
+        // effectively simulating being on the current tenant's login page
+        $response = $this->post(route('admin.login'), [
+            'email' => 'admin@tenant-a.com',
+            'password' => 'password',
+        ]);
+
+        // 5. Expectation: Login Fails (Validation Error)
+        // because User A does not exist in Tenant B's scope.
+        $response->assertSessionHasErrors(['email']);
+        $this->assertGuest();
+    }
+
+    /** @test */
+    public function correct_tenant_login_succeeds()
+    {
+        // 1. Setup Tenant A with a user
+        $tenantA = Tenant::create(['name' => 'Tenant A', 'domain' => 'tenant-a.localhost']);
+        $userA = User::factory()->create([
+            'email' => 'admin@tenant-a.com',
+            'password' => Hash::make('password'),
+            'tenant_id' => $tenantA->id
+        ]);
+
+        // 2. Simulate being on Tenant A
         $tenantA->makeCurrent();
-        $this->actingAs($userA); // Act as user A again
-        $this->assertCount(1, Categories::all(), 'Tenant A should still see its own category after switching back.');
-        $this->assertEquals('Category A for Tenant A', Categories::first()->name);
-        $this->assertNotEquals('Category B for Tenant B', Categories::first()->name, 'Tenant A should not see Tenant B\'s categories after switching back.');
+
+        // 3. Attempt to login
+        $response = $this->post(route('admin.login'), [
+            'email' => 'admin@tenant-a.com',
+            'password' => 'password',
+        ]);
+
+        // 4. Expectation: Login Succeeds
+        $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
+        $this->assertEquals($userA->id, auth()->id());
     }
 }

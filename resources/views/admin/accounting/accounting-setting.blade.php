@@ -3,6 +3,7 @@
 @section('title', __('messages.accounting_settings'))
 
 @section('content')
+    <meta name="apply-template-warning" content="{{ __('messages.apply_template_warning') }}">
     <div class="page-wrapper">
         <div class="page-wrapper">
             <div class="page-body">
@@ -21,37 +22,32 @@
                                 <div class="card-body">
                                     <form action="{{ route('admin.setting.accounting.update') }}" method="POST">
                                         @csrf
-                                        <!-- Chart of Accounts Template -->
+                                        <!-- Reset COA Section -->
                                         <div class="settings-section mb-5">
                                             <div class="settings-section-header">
-                                                <div class="settings-icon-wrapper">
-                                                    <i class="ti ti-file-text"></i>
+                                                <div class="settings-icon-wrapper text-warning bg-warning-lt">
+                                                    <i class="ti ti-alert-triangle"></i>
                                                 </div>
                                                 <div class="settings-section-title">
-                                                    <h3 class="mb-1">{{ __('messages.chart_of_accounts_template') }}</h3>
+                                                    <h3 class="mb-1 text-warning">{{ __('messages.reset_chart_of_accounts') }}</h3>
                                                     <p class="text-muted mb-0 small">
-                                                        {{ __('messages.apply_a_coa_template_to_get_started') }}
+                                                        {{ __('messages.reset_coa_description') }}
                                                     </p>
                                                 </div>
                                             </div>
                                             <div class="settings-section-content">
-                                                <div class="row g-3">
-                                                    <div class="col-md-4">
-                                                        <div class="form-label">{{ __('messages.select_template') }}</div>
-                                                        <select name="template" id="coaTemplateSelect" class="form-select"
-                                                            required>
-                                                            <option value="universal.json"
-                                                                @if ($activeCoaTemplate == 'universal.json') selected @endif>
-                                                                {{ __('messages.universal_coa') }}</option>
-                                                            <option value="indonesian.json"
-                                                                @if ($activeCoaTemplate == 'indonesian.json') selected @endif>
-                                                                {{ __('messages.indonesian_coa') }}</option>
-                                                        </select>
+                                                <div class="alert alert-warning" role="alert">
+                                                    <h4 class="alert-title">{{ __('messages.warning') }}</h4>
+                                                    <div class="text-muted">
+                                                        {{ __('messages.reset_coa_warning_text') }}
                                                     </div>
-                                                    <div class="col-md-4 d-flex align-items-end">
-                                                        <button type="button" id="applyCoaTemplateBtn"
-                                                            class="btn btn-warning">{{ __('messages.apply_template') }}</button>
-                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-end">
+                                                    <button type="button" data-bs-toggle="modal" data-bs-target="#coaResetConfirmationModal"
+                                                        class="btn btn-warning">
+                                                        <i class="ti ti-refresh me-2"></i>
+                                                        {{ __('messages.reset_to_default') }}
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -176,35 +172,38 @@
             </div>
         </div>
     </div>
-@endsection
 
-<div class="modal modal-blur fade" id="coaTemplateConfirmationModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            <div class="modal-status bg-warning"></div>
-            <div class="modal-body text-center py-4">
-                <i class="ti ti-alert-triangle icon mb-2 text-warning icon-lg"></i>
-                <h3>{{ __('messages.are_you_sure') }}</h3>
-                <div class="text-muted" id="coaTemplateConfirmationModalMessage"></div>
-            </div>
-            <div class="modal-footer">
-                <div class="w-100">
-                    <div class="row">
-                        <div class="col">
-                            <a href="#" class="btn w-100" data-bs-dismiss="modal">
-                                {{ __('messages.cancel') }}
-                            </a>
-                        </div>
-                        <div class="col">
-                            <a href="#" class="btn btn-warning w-100"
-                                id="coaTemplateConfirmationModalConfirmBtn">
-                                {{ __('messages.confirm') }}
-                            </a>
+    {{-- COA Reset Confirmation Modal --}}
+    <div class="modal modal-blur fade" id="coaResetConfirmationModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-status bg-danger"></div>
+                <div class="modal-body text-center py-4">
+                    <i class="ti ti-alert-triangle icon mb-2 text-danger icon-lg"></i>
+                    <h3>{{ __('messages.are_you_sure') }}</h3>
+                    <div class="text-muted">{{ __('messages.reset_coa_warning_message') }}</div>
+                </div>
+                <div class="modal-footer">
+                    <div class="w-100">
+                        <div class="row">
+                            <div class="col">
+                                <a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                    {{ __('messages.cancel') }}
+                                </a>
+                            </div>
+                            <div class="col">
+                                <form action="{{ route('admin.setting.reset-coa-default') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        {{ __('messages.reset') }}
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+@endsection

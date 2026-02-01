@@ -169,23 +169,23 @@ class SalesSeeder extends Seeder
             }
 
             // Create Journal Entry for the sale
-            $tenantName = app('currentTenant')->name;
+            $tenantId = app('currentTenant')->id;
             try {
                 // 1. Record the revenue and accounts receivable
                 $revenueTransactions = [
-                    ['account_name' => 'accounting.accounts.accounts_receivable.name - ' . $tenantName, 'type' => 'debit', 'amount' => $finalCalculatedTotal],
-                    ['account_name' => 'accounting.accounts.sales_revenue.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalSalesAmount],
+                    ['account_code' => '1130-' . $tenantId, 'type' => 'debit', 'amount' => $finalCalculatedTotal],
+                    ['account_code' => '4100-' . $tenantId, 'type' => 'credit', 'amount' => $totalSalesAmount],
                 ];
                 if ($totalTaxAmount > 0) {
-                    $revenueTransactions[] = ['account_name' => 'accounting.accounts.output_vat.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalTaxAmount];
+                    $revenueTransactions[] = ['account_code' => '2130-' . $tenantId, 'type' => 'credit', 'amount' => $totalTaxAmount];
                 }
                 $this->accountingService->createJournalEntry("Sale - Invoice {$sales->invoice}", $orderDate, $revenueTransactions, $sales);
 
                 // 2. Record the cost of goods sold
                 if ($totalCostOfGoods > 0) {
                     $cogsTransactions = [
-                        ['account_name' => 'accounting.accounts.cost_of_goods_sold.name - ' . $tenantName, 'type' => 'debit', 'amount' => $totalCostOfGoods],
-                        ['account_name' => 'accounting.accounts.inventory.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalCostOfGoods],
+                        ['account_code' => '5200-' . $tenantId, 'type' => 'debit', 'amount' => $totalCostOfGoods],
+                        ['account_code' => '1140-' . $tenantId, 'type' => 'credit', 'amount' => $totalCostOfGoods],
                     ];
                     $this->accountingService->createJournalEntry("COGS for Invoice {$sales->invoice}", $orderDate, $cogsTransactions, $sales);
                 }
@@ -193,8 +193,8 @@ class SalesSeeder extends Seeder
                 // 3. Record the payment, if any
                 if ($paidAmount > 0) {
                     $paymentTransactions = [
-                        ['account_name' => 'accounting.accounts.cash.name - ' . $tenantName, 'type' => 'debit', 'amount' => $paidAmount],
-                        ['account_name' => 'accounting.accounts.accounts_receivable.name - ' . $tenantName, 'type' => 'credit', 'amount' => $paidAmount],
+                        ['account_code' => '1110-' . $tenantId, 'type' => 'debit', 'amount' => $paidAmount],
+                        ['account_code' => '1130-' . $tenantId, 'type' => 'credit', 'amount' => $paidAmount],
                     ];
                     $this->accountingService->createJournalEntry("Payment for Invoice {$sales->invoice}", $orderDate, $paymentTransactions, $sales);
                 }

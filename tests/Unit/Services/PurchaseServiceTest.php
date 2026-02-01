@@ -57,6 +57,9 @@ class PurchaseServiceTest extends TestCase
                 'cash_account_id' => $cash->id,
             ]
         ]);
+        
+        $this->user = $this->user->fresh();
+        Auth::setUser($this->user);
     }
 
     #[Test]

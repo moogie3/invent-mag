@@ -86,14 +86,14 @@
 
         <!-- Items Table -->
         <div class="card border mb-4">
-            <div class="card-header py-2">
-                <h4 class="card-title mb-0"><i
-                        class="ti ti-list me-2 text-info"></i>{{ __('messages.sales_order_items_title') }}
+            <div class="card-header bg-light py-2">
+                <h4 class="card-title mb-0">
+                    <i class="ti ti-list me-2 text-info"></i>{{ __('messages.sales_order_items_title') }}
                 </h4>
             </div>
             <div class="table-responsive">
                 <table class="table card-table table-vcenter table-hover">
-                    <thead>
+                    <thead class="bg-light">
                         <tr>
                             <th class="text-center" style="width: 60px">{{ __('messages.no') }}</th>
                             <th>{{ __('messages.table_product') }}</th>

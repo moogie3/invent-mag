@@ -139,18 +139,20 @@ class SalesHelperTest extends TestCase
             (object)['customer_price' => 100, 'quantity' => 1, 'discount' => 10, 'discount_type' => 'percentage'], // 90
             (object)['customer_price' => 50, 'quantity' => 2, 'discount' => 5, 'discount_type' => 'fixed'], // (50-5)*2 = 90
         ]; // Subtotal after product discounts = 90 + 90 = 180
-        // Subtotal before product discounts = 100*1 + 50*2 = 200
-        $summary = SalesHelper::calculateInvoiceSummary($items, 10, 'percentage', 10); // Order discount 10% of 200 = 20
-        // Taxable amount = 180 - 20 = 160
-        // Tax amount = 10% of 160 = 16
-        // Final total = 160 + 16 = 176
+        
+        $summary = SalesHelper::calculateInvoiceSummary($items, 10, 'percentage', 10); 
+        // Order discount 10% of 180 (Subtotal) = 18.0
+        // Taxable amount = 180 - 18 = 162
+        // Tax amount = 10% of 162 = 16.2
+        // Final total = 162 + 16.2 = 178.2
+        
         $this->assertEquals([
             'subtotal' => 180.0,
             'itemCount' => 2,
-            'totalProductDiscount' => 10.0 + 10.0, // 10% of 100 = 10, fixed 5 * 2 = 10
-            'orderDiscount' => 20.0,
-            'taxAmount' => 16.0,
-            'finalTotal' => 176.0,
+            'totalProductDiscount' => 20.0, // 10% of 100 = 10, fixed 5 * 2 = 10. Total 20.
+            'orderDiscount' => 18.0,
+            'taxAmount' => 16.2,
+            'finalTotal' => 178.2,
         ], $summary);
     }
 

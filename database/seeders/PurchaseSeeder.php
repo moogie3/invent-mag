@@ -139,28 +139,28 @@ class PurchaseSeeder extends Seeder
             }
 
             // Create Journal Entry
-            $tenantName = app('currentTenant')->name;
+            $tenantId = app('currentTenant')->id;
             $transactions = [];
             $description = "Purchase of goods, invoice {$purchase->invoice}";
 
             // Debit Inventory for the full purchase amount
-            $transactions[] = ['account_name' => 'accounting.accounts.inventory.name - ' . $tenantName, 'type' => 'debit', 'amount' => $totalPurchaseAmount];
+            $transactions[] = ['account_code' => '1140-' . $tenantId, 'type' => 'debit', 'amount' => $totalPurchaseAmount];
 
             if ($status === 'Paid') {
                 // Credit Cash for the full amount
-                $transactions[] = ['account_name' => 'accounting.accounts.cash.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalPurchaseAmount];
+                $transactions[] = ['account_code' => '1110-' . $tenantId, 'type' => 'credit', 'amount' => $totalPurchaseAmount];
             } elseif ($status === 'Unpaid') {
                 // Credit Accounts Payable for the full amount
-                $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalPurchaseAmount];
+                $transactions[] = ['account_code' => '2110-' . $tenantId, 'type' => 'credit', 'amount' => $totalPurchaseAmount];
             } elseif ($status === 'Partial') {
                 // Credit Cash for the paid amount
                 if ($paidAmount > 0) {
-                    $transactions[] = ['account_name' => 'accounting.accounts.cash.name - ' . $tenantName, 'type' => 'credit', 'amount' => $paidAmount];
+                    $transactions[] = ['account_code' => '1110-' . $tenantId, 'type' => 'credit', 'amount' => $paidAmount];
                 }
                 // Credit Accounts Payable for the remaining balance
                 $remainingBalance = $totalPurchaseAmount - $paidAmount;
                 if ($remainingBalance > 0) {
-                    $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name - ' . $tenantName, 'type' => 'credit', 'amount' => $remainingBalance];
+                    $transactions[] = ['account_code' => '2110-' . $tenantId, 'type' => 'credit', 'amount' => $remainingBalance];
                 }
             }
             

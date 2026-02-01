@@ -49,11 +49,17 @@ class SalesPipelineService
 
     public function createPipeline(array $data): SalesPipeline
     {
+        if (isset($data['is_default']) && $data['is_default']) {
+            SalesPipeline::where('is_default', true)->update(['is_default' => false]);
+        }
         return SalesPipeline::create($data);
     }
 
     public function updatePipeline(SalesPipeline $pipeline, array $data): SalesPipeline
     {
+        if (isset($data['is_default']) && $data['is_default']) {
+            SalesPipeline::where('id', '!=', $pipeline->id)->update(['is_default' => false]);
+        }
         $pipeline->update($data);
         return $pipeline;
     }
@@ -191,31 +197,10 @@ class SalesPipelineService
     public function deleteOpportunity(SalesOpportunity $opportunity): void
     {
         DB::transaction(function () use ($opportunity) {
-            // If the opportunity was converted to a sales order, delete the sales order and roll back stock
-            if ($opportunity->sales_id) {
-                $salesOrder = Sales::find($opportunity->sales_id);
-                if ($salesOrder) {
-                    foreach ($salesOrder->salesItems as $item) {
-                        $product = Product::find($item->product_id);
-                        if ($product) {
-                            // Determine the correct stock attribute and increment
-                            $stockAttribute = null;
-                            if (isset($product->stock_quantity)) {
-                                $stockAttribute = 'stock_quantity';
-                            } elseif (isset($product->quantity)) {
-                                $stockAttribute = 'quantity';
-                            } elseif (isset($product->stock)) {
-                                $stockAttribute = 'stock';
-                            }
-
-                            if ($stockAttribute) {
-                                $product->increment($stockAttribute, $item->quantity);
-                            }
-                        }
-                    }
-                    $salesOrder->delete(); // This will also delete salesItems due to cascade on delete if set up, or manually if not.
-                }
-            }
+            // When deleting an opportunity, we DO NOT delete the linked Sales Order.
+            // The Sales Order is a financial record and must persist even if the opportunity is removed.
+            // The database foreign key is set to ON DELETE SET NULL, so the link will be cleared automatically.
+            
             $opportunity->delete();
         });
     }

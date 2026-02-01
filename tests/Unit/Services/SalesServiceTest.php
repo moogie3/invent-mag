@@ -62,6 +62,10 @@ class SalesServiceTest extends TestCase
                 'inventory_account_id' => $inventory->id,
             ]
         ]);
+        
+        // Refresh the user instance and update Auth
+        $this->user = $this->user->fresh();
+        Auth::setUser($this->user);
     }
 
     #[Test]

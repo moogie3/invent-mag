@@ -23,13 +23,27 @@
                 {{ \App\Helpers\CurrencyHelper::format($finalTotal) }}
             </div>
         </div>
+
+        @php
+            // Calculate total completed returns
+            $totalReturned = $pos->purchaseReturns->where('status', 'Completed')->sum('total_amount');
+            $adjustedBalance = max(0, $pos->balance - $totalReturned);
+        @endphp
+
+        @if($totalReturned > 0)
+        <div class="d-flex justify-content-between text-warning mb-2">
+            <span>{{ __('messages.returned') }}</span>
+            <span>- {{ \App\Helpers\CurrencyHelper::format($totalReturned) }}</span>
+        </div>
+        @endif
+
         <div class="d-flex justify-content-between text-success mb-2">
             <span>{{ __('messages.total_paid') }}</span>
             <span>{{ \App\Helpers\CurrencyHelper::format($pos->total_paid) }}</span>
         </div>
         <div class="d-flex justify-content-between text-danger">
             <span>{{ __('messages.balance') }}</span>
-            <span>{{ \App\Helpers\CurrencyHelper::format($pos->balance) }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($adjustedBalance) }}</span>
         </div>
     </div>
 </div>

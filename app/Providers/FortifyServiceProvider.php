@@ -86,33 +86,20 @@ class FortifyServiceProvider extends ServiceProvider
                 abort(response()->view('errors.429', ['seconds' => $seconds], 429));
             }
 
-            // Find the user by email, ignoring the tenant scope
-            $user = User::withoutGlobalScope(TenantScope::class)
-                        ->where('email', $request->email)
-                        ->first();
+            // Find the user by email, respecting the global TenantScope automatically.
+            // Since User model has BelongsToTenant trait and global TenantScope,
+            // this query will ONLY look for users where tenant_id matches the current tenant.
+            $user = User::where('email', $request->email)->first();
 
-            // If no user/tenant, hit the limiter and fail.
-            if (! $user || ! $user->tenant) {
+            // If user not found (in this tenant) or password fails:
+            if (! $user || ! Hash::check($request->password, $user->password)) {
                 RateLimiter::hit($throttleKey);
                 throw ValidationException::withMessages(['email' => [__('auth.failed')]]);
             }
 
-            // If wrong domain, hit the limiter and redirect.
-            if ($user->tenant->domain !== $request->getHost()) {
-                RateLimiter::hit($throttleKey);
-                $redirectUrl = "http://{$user->tenant->domain}" . $request->getRequestUri();
-                abort(redirect()->away($redirectUrl)->withInput($request->only('email')));
-            }
-
-            // If password matches, clear the limiter and return the user.
-            if (Hash::check($request->password, $user->password)) {
-                RateLimiter::clear($throttleKey);
-                return $user;
-            }
-
-            // If password fails, hit the limiter and fail.
-            RateLimiter::hit($throttleKey);
-            throw ValidationException::withMessages(['email' => [__('auth.failed')]]);
+            // If we get here, the user exists IN THIS TENANT and password is correct.
+            RateLimiter::clear($throttleKey);
+            return $user;
         });
 
         // Rate limiting configuration

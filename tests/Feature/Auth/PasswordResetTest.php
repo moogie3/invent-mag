@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Auth;
 class PasswordResetTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
-    use RefreshDatabase, CreatesTenant;
 
     public function setUp(): void
     {
@@ -71,8 +70,8 @@ class PasswordResetTest extends TestCase
             $response = $this->post('/admin/reset-password', [
                 'token' => $notification->token,
                 'email' => $this->user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
+                'password' => 'StrongUniquePass!789',
+                'password_confirmation' => 'StrongUniquePass!789',
             ]);
 
             $response

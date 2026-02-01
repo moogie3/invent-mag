@@ -110,15 +110,14 @@ class PurchaseReturnSeeder extends Seeder
             }
 
             // Create Journal Entry for Purchase Return
-            $tenantName = app('currentTenant')->name;
             $description = "Purchase Return for PO {$purchase->invoice}, Return #{$purchaseReturn->id}";
             $transactions = [];
 
             // Debit Accounts Payable / Cash (depending on original payment type or refund status)
             // For simplicity, we'll assume a credit to a Purchase Returns account and debit to AP/Cash
             // More complex logic might be needed here based on refund status
-            $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name - ' . $tenantName, 'type' => 'debit', 'amount' => $totalReturnAmount];
-            $transactions[] = ['account_name' => 'accounting.accounts.inventory.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Adjust inventory
+            $transactions[] = ['account_code' => '2110-' . $tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount];
+            $transactions[] = ['account_code' => '1140-' . $tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Adjust inventory
 
             try {
                 $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $purchaseReturn);

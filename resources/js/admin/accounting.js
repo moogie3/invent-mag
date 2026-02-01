@@ -3,77 +3,83 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (coaTemplateModalElement) {
         const applyCoaTemplateBtn = document.getElementById("applyCoaTemplateBtn");
-        const coaTemplateConfirmationModal = new bootstrap.Modal(coaTemplateModalElement, {});
-        const coaTemplateConfirmationModalMessage = document.getElementById(
-            "coaTemplateConfirmationModalMessage"
-        );
-        const coaTemplateConfirmationModalConfirmBtn = document.getElementById(
-            "coaTemplateConfirmationModalConfirmBtn"
-        );
+        const coaTemplateConfirmationModalMessage = document.getElementById("coaTemplateConfirmationModalMessage");
+        const coaTemplateConfirmationModalConfirmBtn = document.getElementById("coaTemplateConfirmationModalConfirmBtn");
 
+        // Function to update modal message
+        const updateModalMessage = () => {
+            const templateSelect = document.getElementById("coaTemplateSelect");
+            if (!templateSelect || !coaTemplateConfirmationModalMessage) return;
+
+            const selectedOption = templateSelect.options[templateSelect.selectedIndex];
+            const selectedTemplateDisplayName = selectedOption.textContent;
+            
+            // Set modal message
+            const templateName = selectedTemplateDisplayName;
+            const warningMessage = document.querySelector('meta[name="apply-template-warning"]')?.content || 
+                `Are you sure you want to apply the <strong>${templateName}</strong> Chart of Accounts template? This will overwrite existing accounts, <strong>delete all historical journal entries and transactions</strong>, and cannot be undone.`;
+            
+            coaTemplateConfirmationModalMessage.innerHTML = warningMessage.replace('{template}', `<strong>${templateName}</strong>`);
+        };
+
+        // Update message on button click (primary method)
         if (applyCoaTemplateBtn) {
-            applyCoaTemplateBtn.addEventListener("click", function () {
+            applyCoaTemplateBtn.addEventListener("click", updateModalMessage);
+        }
+
+        // Also update on modal show (backup method)
+        coaTemplateModalElement.addEventListener('show.bs.modal', updateModalMessage);
+
+        // Handle confirmation button click
+        if (coaTemplateConfirmationModalConfirmBtn) {
+            coaTemplateConfirmationModalConfirmBtn.addEventListener("click", function() {
+                console.log('Confirm button clicked');
+                
+                // Find the close button to hide modal via DOM click (safest way without bootstrap object)
+                const closeBtn = coaTemplateModalElement.querySelector('[data-bs-dismiss="modal"]');
+                if (closeBtn) closeBtn.click();
+
+                if (applyCoaTemplateBtn) {
+                    applyCoaTemplateBtn.disabled = true;
+                    applyCoaTemplateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Applying...';
+                }
+
                 const templateSelect = document.getElementById("coaTemplateSelect");
-                const selectedOption = templateSelect.options[templateSelect.selectedIndex];
-                const selectedTemplateDisplayName = selectedOption.textContent;
                 const selectedTemplateValue = templateSelect.value;
-                const originalButtonText = this.innerHTML;
 
-                // Set modal message
-                coaTemplateConfirmationModalMessage.innerHTML = `Are you sure you want to apply the <strong>${selectedTemplateDisplayName}</strong> Chart of Accounts template? This will overwrite existing accounts, <strong>delete all historical journal entries and transactions</strong>, and cannot be undone.`;
-                coaTemplateConfirmationModal.show();
-
-                // Handle confirmation
-                coaTemplateConfirmationModalConfirmBtn.onclick = () => {
-                    coaTemplateConfirmationModal.hide();
-                    this.disabled = true;
-                    this.innerHTML =
-                        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Applying...';
-
-                    fetch("/admin/settings/apply-coa-template", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": document
-                                .querySelector('meta[name="csrf-token"]')
-                                .getAttribute("content"),
-                            Accept: "application/json",
-                            "X-Requested-With": "XMLHttpRequest",
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            template: selectedTemplateValue,
-                        }),
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.success) {
-                                InventMagApp.showToast(
-                                    "Success",
-                                    data.message,
-                                    "success"
-                                );
-                                setTimeout(() => window.location.reload(), 1500);
-                            } else {
-                                InventMagApp.showToast(
-                                    "Error",
-                                    data.message || "An error occurred.",
-                                    "error"
-                                );
-                            }
-                        })
-                        .catch((error) => {
-                            console.error("Error:", error);
-                            InventMagApp.showToast(
-                                "Error",
-                                "An unexpected error occurred.",
-                                "error"
-                            );
-                        })
-                        .finally(() => {
-                            this.disabled = false;
-                            this.innerHTML = originalButtonText;
-                        });
-                };
+                fetch("/admin/settings/apply-coa-template", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                        Accept: "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        template: selectedTemplateValue,
+                    }),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        InventMagApp.showToast("Success", data.message, "success");
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        InventMagApp.showToast("Error", data.message || "An error occurred.", "error");
+                        if (applyCoaTemplateBtn) {
+                            applyCoaTemplateBtn.disabled = false;
+                            applyCoaTemplateBtn.innerHTML = 'Apply Template'; // Reset text
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    InventMagApp.showToast("Error", "An unexpected error occurred.", "error");
+                    if (applyCoaTemplateBtn) {
+                        applyCoaTemplateBtn.disabled = false;
+                        applyCoaTemplateBtn.innerHTML = 'Apply Template';
+                    }
+                });
             });
         }
     }
@@ -95,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function exportAccounts(exportOption) {
     const form = document.createElement("form");
     form.method = "POST";
-    form.action = "/admin/accounting/export-all";
+    form.action = "/admin/accounting/accounts/export";
     form.style.display = "none";
 
     const csrf = document.querySelector('meta[name="csrf-token"]');

@@ -25,7 +25,8 @@ class DashboardController extends Controller
         $reportType = $request->get('report_type', 'all');
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
-        $dateRange = $request->get('date_range', 'this_month');
+        // Default to 'this_year' to ensure data visibility especially at the start of a month
+        $dateRange = $request->get('date_range', 'this_year');
         $categoryId = $request->get('category_id');
 
         $dates = $this->dashboardService->calculateDateRange($dateRange, $startDate, $endDate);

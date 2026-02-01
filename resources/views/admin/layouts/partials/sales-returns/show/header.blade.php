@@ -17,10 +17,10 @@
                     <i class="ti ti-edit me-2"></i>
                     {{ __('messages.edit') }}
                 </a>
-                <button onclick="window.print()" class="btn btn-primary">
+                <a href="{{ route('admin.sales-returns.print', $salesReturn->id) }}" target="_blank" class="btn btn-primary">
                     <i class="ti ti-printer me-2"></i>
                     {{ __('messages.print') }}
-                </button>
+                </a>
             </div>
         </div>
     </div>

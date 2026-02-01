@@ -130,8 +130,7 @@ class PermissionSeeder extends Seeder
 
         // Assign permissions to roles
         $this->assignToSuperuser();
-        $this->assignToAdmin();
-        $this->assignToManager();
+        $this->assignToPos();
         $this->assignToStaff();
     }
 
@@ -141,11 +140,23 @@ class PermissionSeeder extends Seeder
         $role->givePermissionTo(Permission::all());
     }
 
-    private function assignToAdmin()
+    private function assignToPos()
     {
-        $role = Role::findOrCreate('admin');
+        $role = Role::findOrCreate('pos');
         $permissions = [
-            // Full access except superuser functions
+            'view-products', 'create-products',
+            'view-sales', 'create-sales',
+            'access-pos', 'delete-pos-transactions',
+            'view-customer', 'create-customer', 'edit-customer', 'delete-customer',
+            'view-sales-returns', 'create-sales-returns', 'edit-sales-returns', 'delete-sales-returns',
+            'access-dashboard',
+        ];
+        $role->syncPermissions($permissions);
+    }
+    private function assignToStaff()
+    {
+        $role = Role::findOrCreate('staff');
+        $permissions = [
             'view-products', 'create-products', 'edit-products', 'delete-products',
             'view-purchase-orders', 'create-purchase-orders', 'edit-purchase-orders', 'delete-purchase-orders',
             'view-sales', 'create-sales', 'edit-sales', 'delete-sales',
@@ -156,51 +167,12 @@ class PermissionSeeder extends Seeder
             'access-pos', 'delete-pos-transactions',
             'view-supplier', 'create-supplier', 'edit-supplier', 'delete-supplier',
             'view-customer', 'create-customer', 'edit-customer', 'delete-customer',
-            'view-users', 'create-users', 'edit-users', 'delete-users',
-            'view-roles', 'create-roles', 'edit-roles', 'delete-roles',
             'view-sales-returns', 'create-sales-returns', 'edit-sales-returns', 'delete-sales-returns',
             'access-dashboard',
             'view-purchase-returns', 'create-purchase-returns', 'edit-purchase-returns', 'delete-purchase-returns',
             'view-sales-pipeline', 'manage-sales-pipelines', 'manage-pipeline-stages', 'manage-sales-opportunities',
             'view-payments', 'create-payments', 'edit-payments', 'delete-payments',
             'view-customer-interactions', 'create-customer-interactions', 'edit-customer-interactions', 'delete-customer-interactions',
-        ];
-        $role->syncPermissions($permissions);
-    }
-
-    private function assignToManager()
-    {
-        $role = Role::findOrCreate('manager');
-        $permissions = [
-            // View all, create/edit most, delete some
-            'view-products', 'create-products', 'edit-products',
-            'view-purchase-orders', 'create-purchase-orders', 'edit-purchase-orders',
-            'view-sales', 'create-sales', 'edit-sales',
-            'view-warehouses', 'create-warehouses', 'edit-warehouses',
-            'view-reports', 'view-financial-reports',
-            'view-accounting', 'view-chart-of-accounts', 'view-journal', 'view-general-ledger',
-            'access-pos',
-            'view-supplier', 'create-supplier', 'edit-supplier',
-            'view-customer', 'create-customer', 'edit-customer',
-            'access-dashboard',
-        ];
-        $role->syncPermissions($permissions);
-    }
-
-    private function assignToStaff()
-    {
-        $role = Role::findOrCreate('staff');
-        $permissions = [
-            // View and create only
-            'view-products', 'create-products',
-            'view-purchase-orders',
-            'view-sales', 'create-sales',
-            'view-warehouses',
-            'view-reports',
-            'access-pos',
-            'view-supplier',
-            'view-customer', 'create-customer',
-            'access-dashboard',
         ];
         $role->syncPermissions($permissions);
     }

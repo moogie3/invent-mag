@@ -20,7 +20,6 @@ class RoleSeeder extends Seeder
         $superuserRole = Role::updateOrCreate(['name' => 'superuser', 'guard_name' => 'web']);
         Role::updateOrCreate(['name' => 'staff', 'guard_name' => 'web']);
         Role::updateOrCreate(['name' => 'pos', 'guard_name' => 'web']);
-        Role::updateOrCreate(['name' => 'accountant', 'guard_name' => 'web']);
 
         // Assign all permissions to the superuser role
         $allPermissions = Permission::all();

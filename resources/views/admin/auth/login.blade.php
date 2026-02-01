@@ -16,9 +16,6 @@
                 <div class="mb-2">
                     <label class="form-label">
                         Password
-                        <span class="form-label-description">
-                            <a href="{{ route('admin.password.request') }}">Forgot password</a>
-                        </span>
                     </label>
                     <div class="input-group input-group-flat">
                         <input type="password" name="password" class="form-control" placeholder="Your password"
@@ -38,6 +35,6 @@
         </div>
     </div>
     <div class="text-center text-secondary mt-3">
-        Don't have account yet? <a href="{{ route('admin.register') }}" tabindex="-1">Sign up</a>
+        <a href="{{ route('admin.password.request') }}">Forgot password?</a>
     </div>
 @endsection

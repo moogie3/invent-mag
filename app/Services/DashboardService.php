@@ -18,7 +18,7 @@ class DashboardService
     public function getDashboardData(array $dates = [], $reportType = 'all', $categoryId = null)
     {
         if (empty($dates) || !isset($dates['start']) || !isset($dates['end'])) {
-            $dates = $this->calculateDateRange('this_month');
+            $dates = $this->calculateDateRange('this_year');
         }
         $totalLiability = Purchase::sum('total');
         $unpaidLiability = Purchase::where('status', 'Unpaid')->sum('total');

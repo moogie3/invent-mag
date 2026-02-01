@@ -29,9 +29,9 @@
     <div class="card-body p-4">
         <div class="row g-4 mb-4">
             <div class="col-md-6">
-                <div class="card bg-light border-0 h-100">
+                <div class="card border-0 h-100">
                     <div class="card-body p-3">
-                        <h4 class="card-title mb-3"><i class="ti ti-building-store me-2 text-primary"></i>{{ __('messages.supplier_title') }}
+                        <h4 class="card-title mb-3"><i class="ti ti-building-store me-2 text-info"></i>{{ __('messages.supplier_title') }}
                         </h4>
                         <h5 class="mb-2">{{ $pos->supplier->name }}</h5>
                         <div class="text-muted mb-1"><i class="ti ti-map-pin me-1"></i>
@@ -44,9 +44,9 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card bg-light border-0 h-100">
+                <div class="card border-0 h-100">
                     <div class="card-body p-3">
-                        <h4 class="card-title mb-3"><i class="ti ti-calendar-event me-2 text-primary"></i>{{ __('messages.po_order_information_title') }}
+                        <h4 class="card-title mb-3"><i class="ti ti-calendar-event me-2 text-info"></i>{{ __('messages.po_order_information_title') }}
                             </h4>
                         <div class="d-flex justify-content-between mb-2">
                             <div><strong>{{ __('messages.po_order_date') }}</strong></div>
@@ -83,7 +83,7 @@
 
         <div class="card border mb-4">
             <div class="card-header bg-light py-2">
-                <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-primary"></i>{{ __('messages.po_order_items_title') }}</h4>
+                <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-info"></i>{{ __('messages.po_order_items_title') }}</h4>
             </div>
             <div class="table-responsive">
                 <table class="table card-table table-vcenter table-hover">
@@ -145,10 +145,10 @@
                                     @if ($item->discount > 0)
                                         <span class="text-danger">
                                             {{ $item->discount_type === __('messages.percentage') ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
-                                </span>
-                            @else
-                                {{ __('messages.not_available') }}
-                            @endif
+                                        </span>
+                                    @else
+                                        -
+                                    @endif
                         </td>
                         <td class="text-end">
                             {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalAmount) }}
@@ -169,9 +169,9 @@
 
         <div class="row">
             <div class="col-md-6">
-                <div class="card border-0 bg-light">
+                <div class="card border-0">
                     <div class="card-body p-3">
-                        <h5 class="card-title mb-3"><i class="ti ti-info-circle me-2 text-primary"></i>{{ __('messages.po_order_summary_title') }}
+                        <h5 class="card-title mb-3"><i class="ti ti-info-circle me-2 text-info"></i>{{ __('messages.po_order_summary_title') }}
                         </h5>
                         <div class="mb-2">
                             <i class="ti ti-package me-1"></i> {{ __('messages.po_total_items') }} <strong>{{ $itemCount }}</strong>

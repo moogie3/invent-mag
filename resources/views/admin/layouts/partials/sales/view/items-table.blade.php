@@ -35,6 +35,13 @@
                             $item->discount,
                             $item->discount_type,
                         );
+
+                        // Calculate returned quantity for this item
+                        $returnedQty = $sales->salesReturns
+                            ->where('status', 'Completed')
+                            ->flatMap(fn($sr) => $sr->items)
+                            ->where('product_id', $item->product_id)
+                            ->sum('quantity');
                     @endphp
 
                     <tr>
@@ -45,15 +52,24 @@
                                 <small class="text-muted">{{ __('messages.sku_colon') }} {{ $item->product->sku }}</small>
                             @endif
                         </td>
-                        <td class="text-center">{{ $item->quantity }}</td>
+                        <td class="text-center">
+                            {{ $item->quantity }}
+                            @if($returnedQty > 0)
+                                <br><small class="text-danger">(-{{ $returnedQty }} {{ __('messages.returned') }})</small>
+                            @endif
+                        </td>
                         <td class="text-end">
                             {{ \App\Helpers\CurrencyHelper::formatWithPosition($item->customer_price) }}
                         </td>
                         <td class="text-end">
                             @if ($item->discount > 0)
-                                <span class="text-danger">
-                                    {{ $item->discount_type === __('messages.percentage') ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
-                                </span>
+                                @if ($item->discount_type === 'percentage')
+                                    <span class="text-danger">{{ $item->discount }}%</span>
+                                    <br><small class="text-muted">({{ \App\Helpers\CurrencyHelper::formatWithPosition(($item->customer_price * $item->discount) / 100) }} {{ __('messages.per_unit') }})</small>
+                                @else
+                                    <span class="text-danger">{{ \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}</span>
+                                    <br><small class="text-muted">({{ __('messages.fixed') }})</small>
+                                @endif
                             @else
                                 {{ __('messages.not_available') }}
                             @endif

@@ -257,7 +257,7 @@ class SalesPipelineServiceTest extends TestCase
     }
 
     #[Test]
-    public function it_rolls_back_stock_when_deleting_a_converted_opportunity()
+    public function it_does_not_delete_sales_order_or_rollback_stock_when_deleting_converted_opportunity()
     {
         $opportunity = SalesOpportunity::factory()->hasItems(1, ['quantity' => 3, 'price' => 100])->create(['status' => 'won']);
         $product = Product::find($opportunity->items->first()->product_id);
@@ -268,8 +268,13 @@ class SalesPipelineServiceTest extends TestCase
 
         $this->salesPipelineService->deleteOpportunity($opportunity->fresh());
 
-        $this->assertDatabaseMissing('sales', ['id' => $salesOrder->id]);
+        // Opportunity should be gone
         $this->assertDatabaseMissing('sales_opportunities', ['id' => $opportunity->id]);
-        $this->assertEquals(10, $product->fresh()->stock_quantity);
+
+        // Sales Order should still exist
+        $this->assertDatabaseHas('sales', ['id' => $salesOrder->id]);
+
+        // Stock should REMAIN deducted (still 7, not 10)
+        $this->assertEquals(7, $product->fresh()->stock_quantity);
     }
 }

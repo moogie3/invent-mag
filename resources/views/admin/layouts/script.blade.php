@@ -25,9 +25,12 @@
     @vite('resources/js/admin/recentts.js')
 @endif
 
-{{-- SCRIPT FOR ADMIN LOGIN --}}
-@if (request()->is('admin/login', 'admin/register', 'forgot-password'))
+{{-- SCRIPT FOR ADMIN LOGIN & PASSWORD RESET --}}
+@if (request()->is('admin/login', 'admin/register', 'forgot-password', 'admin/reset-password/*'))
     @vite('resources/js/admin/auth.js')
+    @if (request()->is('admin/reset-password/*'))
+        @vite('resources/js/admin/reset-password.js')
+    @endif
 @endif
 
 {{-- SCRIPT FOR USER MANAGEMENT --}}
@@ -114,7 +117,7 @@
 @endif
 
 {{-- SCRIPT FOR ACCOUNTING settings --}}
-@if (request()->is('admin/accounting/accounting-setting', 'admin/accounting/journal', 'admin/accounting/general-ledger', 'admin/reports/income-statement', 'admin/reports/balance-sheet', 'admin/reports/aged-receivables', 'admin/reports/aged-payables'))
+@if (request()->is('admin/settings/accounting', 'admin/accounting/accounting-setting', 'admin/accounting/journal', 'admin/accounting/general-ledger', 'admin/reports/income-statement', 'admin/reports/balance-sheet', 'admin/reports/aged-receivables', 'admin/reports/aged-payables'))
     @vite('resources/js/admin/accounting.js')
 @endif
 

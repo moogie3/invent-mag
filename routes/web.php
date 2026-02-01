@@ -15,10 +15,6 @@ use App\Http\Controllers\Auth\LoginController;
 // Admin Authentication Routes
 Route::middleware('web')->prefix('admin')->group(function () {
     Route::middleware('guest')->group(function () {
-        // Register
-        Route::get('/register', fn() => view('admin.auth.register'))->name('admin.register');
-        Route::post('/register', [RegisteredUserController::class, 'store'])->name('admin.register.post');
-
         // Login
         Route::get('/login', function (Request $request) {
             $email = $request->session()->get('attempted_email');
@@ -42,8 +38,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
         Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('admin.password.email');
 
         // Reset Password
-        Route::get('/reset-password/{token}', fn($token) => view('admin.auth.reset-password', ['token' => $token]))->name('admin.password.reset');
-        Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('admin.password.update');
+        Route::get('/reset-password/{token}', fn($token) => view('admin.auth.reset-password', ['token' => $token]))->name('password.reset');
+        Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.update');
     });
 
     // Email Verification Success Page
@@ -614,7 +610,7 @@ Route::prefix('reports')->group(function () {
             Route::put('/update-theme-mode', [SettingsController::class, 'updateThemeMode'])->name('admin.setting.update-theme-mode');
             Route::get('/accounting', [\App\Http\Controllers\Admin\AccountingController::class, 'accounting'])->name('admin.setting.accounting');
             Route::post('/accounting', [\App\Http\Controllers\Admin\AccountingController::class, 'updateAccounting'])->name('admin.setting.accounting.update');
-            Route::post('/apply-coa-template', [\App\Http\Controllers\Admin\AccountingController::class, 'applyCoaTemplate'])->name('admin.setting.apply-coa-template');
+            Route::post('/reset-coa-default', [\App\Http\Controllers\Admin\AccountingController::class, 'resetToDefault'])->name('admin.setting.reset-coa-default');
         });
 
         // Accounting Routes

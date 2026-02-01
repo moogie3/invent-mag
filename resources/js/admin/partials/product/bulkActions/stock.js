@@ -245,6 +245,12 @@ function handleBulkStockUpdate() {
         return;
     }
 
+    // Sanitize updates to only include necessary fields for the server
+    const payloadUpdates = updates.map(({ id, stock_quantity }) => ({
+        id,
+        stock_quantity
+    }));
+
     fetch("/admin/product/bulk-update-stock", {
         method: "POST",
         headers: {
@@ -253,8 +259,8 @@ function handleBulkStockUpdate() {
             Accept: "application/json",
         },
         body: JSON.stringify({
-            updates,
-            reason: bulkAdjustmentReason,
+            updates: payloadUpdates,
+            reason: bulkAdjustmentReason || null,
         }),
     })
         .then((response) => {

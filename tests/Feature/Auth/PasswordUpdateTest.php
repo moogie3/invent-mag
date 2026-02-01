@@ -12,7 +12,6 @@ use PHPUnit\Framework\Attributes\Test;
 class PasswordUpdateTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
-    use RefreshDatabase, CreatesTenant;
 
     public function setUp(): void
     {
@@ -28,15 +27,15 @@ class PasswordUpdateTest extends TestCase
             ->from('/admin/profile')
             ->put(route('user-password.update'), [
                 'current_password' => 'password',
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
+                'password' => 'StrongUniquePass!789',
+                'password_confirmation' => 'StrongUniquePass!789',
             ]);
 
         $response
             ->assertSessionHasNoErrors()
             ->assertRedirect('/admin/profile');
 
-        $this->assertTrue(Hash::check('new-password', $this->user->refresh()->password));
+        $this->assertTrue(Hash::check('StrongUniquePass!789', $this->user->refresh()->password));
     }
 
     #[Test]
@@ -47,8 +46,8 @@ class PasswordUpdateTest extends TestCase
             ->from('/admin/profile')
             ->put(route('user-password.update'), [
                 'current_password' => 'wrong-password',
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
+                'password' => 'StrongUniquePass!789',
+                'password_confirmation' => 'StrongUniquePass!789',
             ]);
 
         $response

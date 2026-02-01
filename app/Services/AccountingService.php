@@ -34,9 +34,17 @@ class AccountingService
 
             foreach ($transactions as $tx) {
                 $tenantId = app('currentTenant')->id;
-                $account = Account::where('name', $tx['account_name'])->where('tenant_id', $tenantId)->first();
+                $account = null;
+
+                if (isset($tx['account_code'])) {
+                    $account = Account::where('code', $tx['account_code'])->where('tenant_id', $tenantId)->first();
+                } elseif (isset($tx['account_name'])) {
+                    $account = Account::where('name', $tx['account_name'])->where('tenant_id', $tenantId)->first();
+                }
+
                 if (!$account) {
-                    throw new Exception("Account '{$tx['account_name']}' not found for the current tenant.");
+                    $identifier = $tx['account_code'] ?? $tx['account_name'] ?? 'Unknown';
+                    throw new Exception("Account '{$identifier}' not found for the current tenant.");
                 }
 
                 $journalEntry->transactions()->create([
@@ -62,8 +70,8 @@ class AccountingService
         $credits = 0;
 
         foreach ($transactions as $tx) {
-            if (!isset($tx['account_name'], $tx['type'], $tx['amount'])) {
-                throw new Exception('Each transaction must have an account_name, type, and amount.');
+            if ((!isset($tx['account_name']) && !isset($tx['account_code'])) || !isset($tx['type'], $tx['amount'])) {
+                throw new Exception('Each transaction must have an account_name or account_code, type, and amount.');
             }
 
             if ($tx['type'] === 'debit') {

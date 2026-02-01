@@ -110,14 +110,13 @@ class SalesReturnSeeder extends Seeder
             }
 
             // Create Journal Entry for Sales Return
-            $tenantName = app('currentTenant')->name;
             $description = "Sales Return for Sales Invoice {$sale->invoice}, Return #{$salesReturn->id}";
             $transactions = [];
 
             // Debit Sales Returns (or a specific return expense account)
             // Credit Accounts Receivable / Cash (depending on original payment type or refund status)
-            $transactions[] = ['account_name' => 'accounting.accounts.sales_revenue.name - ' . $tenantName, 'type' => 'debit', 'amount' => $totalReturnAmount]; // Reduce revenue
-            $transactions[] = ['account_name' => 'accounting.accounts.accounts_receivable.name - ' . $tenantName, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Reduce AR
+            $transactions[] = ['account_code' => '4100-' . $tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount]; // Reduce revenue
+            $transactions[] = ['account_code' => '1130-' . $tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Reduce AR
 
             try {
                 $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $salesReturn);

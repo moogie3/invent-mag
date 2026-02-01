@@ -39,12 +39,12 @@ class UserSeeder extends Seeder
         }
 
         // Set default accounting settings
-        $cashAccount = Account::where('name', 'accounting.accounts.cash.name - ' . $tenantName)->first();
-        $accountsPayableAccount = Account::where('name', 'accounting.accounts.accounts_payable.name - ' . $tenantName)->first();
-        $inventoryAccount = Account::where('name', 'accounting.accounts.inventory.name - ' . $tenantName)->first();
-        $salesRevenueAccount = Account::where('name', 'accounting.accounts.sales_revenue.name - ' . $tenantName)->first();
-        $accountsReceivableAccount = Account::where('name', 'accounting.accounts.accounts_receivable.name - ' . $tenantName)->first();
-        $costOfGoodsSoldAccount = Account::where('name', 'accounting.accounts.cost_of_goods_sold.name - ' . $tenantName)->first();
+        $cashAccount = Account::where('code', '1110-' . $tenantId)->first();
+        $accountsPayableAccount = Account::where('code', '2110-' . $tenantId)->first();
+        $inventoryAccount = Account::where('code', '1140-' . $tenantId)->first();
+        $salesRevenueAccount = Account::where('code', '4100-' . $tenantId)->first();
+        $accountsReceivableAccount = Account::where('code', '1130-' . $tenantId)->first();
+        $costOfGoodsSoldAccount = Account::where('code', '5200-' . $tenantId)->first();
 
 
         if ($cashAccount && $accountsPayableAccount && $inventoryAccount && $salesRevenueAccount && $accountsReceivableAccount && $costOfGoodsSoldAccount) {

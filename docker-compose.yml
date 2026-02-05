@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # The Laravel Application (PHP-FPM)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: invent-mag-app
+    container_name: invent-mag-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./storage:/var/www/storage
+      - ./bootstrap/cache:/var/www/bootstrap/cache
+    environment:
+      APP_NAME: "${APP_NAME:-Invent-MAG}"
+      APP_ENV: "${APP_ENV:-production}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
+      APP_URL: "${APP_URL:-http://localhost}"
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: "${DB_DATABASE:-invent_mag_be}"
+      DB_USERNAME: "${DB_USERNAME:-invent_mag_user}"
+      DB_PASSWORD: "${DB_PASSWORD:-secret_password}"
+    networks:
+      - invent-mag-network
+
+  # The Web Server (Nginx)
+  webserver:
+    image: nginx:alpine
+    container_name: invent-mag-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - app
+    networks:
+      - invent-mag-network
+
+  # The Database (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: invent-mag-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE:-invent_mag_be}"
+      MYSQL_USER: "${DB_USERNAME:-invent_mag_user}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-secret_password}"
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-secret_password}"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - invent-mag-network
+
+  # Queue Worker (Optional - Uncomment if needed in production)
+  # queue:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: invent-mag-queue
+  #   restart: unless-stopped
+  #   command: "php artisan queue:work --tries=3"
+  #   volumes:
+  #     - ./storage:/var/www/storage
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - invent-mag-network
+
+networks:
+  invent-mag-network:
+    driver: bridge
+
+volumes:
+  dbdata:

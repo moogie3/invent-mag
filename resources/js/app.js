@@ -14,7 +14,7 @@ window.applyTheme = function (themeMode) {
     const body = document.body;
     let appliedTheme = themeMode;
 
-    console.log("Applying theme mode:", themeMode);
+    // console.log("Applying theme mode:", themeMode);
 
     
 
@@ -35,9 +35,9 @@ window.applyTheme = function (themeMode) {
         body.classList.add("light-mode");
     }
 
-    console.log("Theme applied. Body classes:", body.classList.toString());
-    console.log("data-bs-theme:", body.getAttribute("data-bs-theme"));
-    console.log("data-theme-mode:", body.getAttribute("data-theme-mode"));
+    // console.log("Theme applied. Body classes:", body.classList.toString());
+    // console.log("data-bs-theme:", body.getAttribute("data-bs-theme"));
+    // console.log("data-theme-mode:", body.getAttribute("data-theme-mode"));
 
     // Trigger a custom event to notify other parts of the app
     window.dispatchEvent(
@@ -49,13 +49,13 @@ window.applyTheme = function (themeMode) {
 
 // Apply initial theme on page load
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("DOM loaded, applying initial theme...");
+    // console.log("DOM loaded, applying initial theme...");
 
     // Get the initial theme mode from the body's data-bs-theme attribute
     let initialThemeMode =
         document.body.getAttribute("data-bs-theme") || "light";
 
-    console.log("Initial theme mode from body:", initialThemeMode);
+    // console.log("Initial theme mode from body:", initialThemeMode);
 
     // Apply the theme
     window.applyTheme(initialThemeMode);

@@ -479,7 +479,7 @@ export function loadHistoricalPurchases(id) {
 }
 
 export function loadProductHistory(id) {
-    console.log("loadProductHistory called for supplier ID:", id);
+    // console.log("loadProductHistory called for supplier ID:", id);
     const productHistoryContent = document.getElementById(
         "srmProductHistoryContent"
     );
@@ -494,10 +494,10 @@ export function loadProductHistory(id) {
         return;
     }
 
-    console.log("Fetching product history from:", `/admin/suppliers/${id}/product-history`);
+    // console.log("Fetching product history from:", `/admin/suppliers/${id}/product-history`);
     fetch(`/admin/suppliers/${id}/product-history`)
         .then((response) => {
-            console.log("Product history fetch response received:", response);
+            // console.log("Product history fetch response received:", response);
             if (!response.ok) {
                 throw new Error(
                     `HTTP error! status: ${response.status}`
@@ -506,13 +506,13 @@ export function loadProductHistory(id) {
             return response.json();
         })
         .then((data) => {
-            console.log("Product history data received:", data);
+            // console.log("Product history data received:", data);
             if (productHistoryContent) {
                 if (
                     data.product_history &&
                     data.product_history.length > 0
                 ) {
-                    console.log("Product history found, populating content.");
+                    // console.log("Product history found, populating content.");
                     let contentHtml = `
             <div class="accordion" id="srmProductHistoryAccordion">
         `;
@@ -597,7 +597,7 @@ export function loadProductHistory(id) {
         `;
                     hideSrmNoProductHistoryMessage(); // Hide empty message if data is loaded
                     productHistoryContent.innerHTML = contentHtml;
-                    console.log("Product history content populated.");
+                    // console.log("Product history content populated.");
                 } else {
                     showSrmNoProductHistoryMessage();
                 }

@@ -157,8 +157,8 @@
 
             // Set form action URL
             var updateUrl = button.data('update-url');
-            console.log('Warehouse ID:', id);
-            console.log('Update URL:', updateUrl);
+            // console.log('Warehouse ID:', id);
+            // console.log('Update URL:', updateUrl);
             modal.find('form').attr('action', updateUrl);
         });
 

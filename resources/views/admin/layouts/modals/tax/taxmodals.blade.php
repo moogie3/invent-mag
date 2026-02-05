@@ -63,8 +63,8 @@
                 // Wait a bit for the modal to fully show
                 setTimeout(() => {
                     // Debug: Log all form elements to see what's available
-                    console.log('All forms:', document.forms);
-                    console.log('All inputs:', document.querySelectorAll('input'));
+                    // console.log('All forms:', document.forms);
+                    // console.log('All inputs:', document.querySelectorAll('input'));
 
                     // Try to find the tax settings form - update this selector to match your actual form
                     const form = document.querySelector('#taxSettingsForm') ||
@@ -72,8 +72,8 @@
                         document.querySelector('form');
 
                     if (form) {
-                        console.log('Found form:', form);
-                        console.log('Form inputs:', form.querySelectorAll('input, select'));
+                        // console.log('Found form:', form);
+                        // console.log('Form inputs:', form.querySelectorAll('input, select'));
                     }
 
                     // Multiple attempts to find tax name input
@@ -90,7 +90,7 @@
                     for (const selector of nameSelectors) {
                         taxNameInput = document.querySelector(selector);
                         if (taxNameInput) {
-                            console.log('Found tax name input with selector:', selector);
+                            // console.log('Found tax name input with selector:', selector);
                             break;
                         }
                     }
@@ -109,7 +109,7 @@
                     for (const selector of rateSelectors) {
                         taxRateInput = document.querySelector(selector);
                         if (taxRateInput) {
-                            console.log('Found tax rate input with selector:', selector);
+                            // console.log('Found tax rate input with selector:', selector);
                             break;
                         }
                     }
@@ -129,7 +129,7 @@
                     for (const selector of checkboxSelectors) {
                         isActiveInput = document.querySelector(selector);
                         if (isActiveInput) {
-                            console.log('Found checkbox input with selector:', selector);
+                            // console.log('Found checkbox input with selector:', selector);
                             break;
                         }
                     }
@@ -139,7 +139,7 @@
                     const taxRate = taxRateInput ? taxRateInput.value.trim() : '';
                     const isActive = isActiveInput ? isActiveInput.checked : false;
 
-                    console.log('Retrieved values:', {
+                    // console.log('Retrieved values:', {
                         taxNameInput: !!taxNameInput,
                         taxRateInput: !!taxRateInput,
                         isActiveInput: !!isActiveInput,
@@ -193,16 +193,16 @@
         const saveButton = document.querySelector('[data-bs-target="#confirmModal"]');
         if (saveButton) {
             saveButton.addEventListener('click', function() {
-                console.log('Save button clicked - checking form data');
+                // console.log('Save button clicked - checking form data');
 
                 // Try to get form data as backup
                 const forms = document.querySelectorAll('form');
                 forms.forEach((form, index) => {
-                    console.log(`Form ${index}:`, form);
-                    const formData = new FormData(form);
-                    console.log('Form data entries:');
-                    for (let pair of formData.entries()) {
-                        console.log(pair[0] + ': ' + pair[1]);
+                    // console.log(`Form ${index}:`, form);
+                    
+                    // console.log('Form data entries:');
+                    
+                        // console.log(pair[0] + ': ' + pair[1]);
                     }
                 });
             });

@@ -144,9 +144,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (pathname.includes("edit") && pathname.includes("sales")) {
-                console.log(
-                    "Force initializing SalesOrderEdit due to edit page detection",
-                );
+                // console.log(
+                //     "Force initializing SalesOrderEdit due to edit page detection",
+                // );
                 window.salesApp = new SalesOrderEdit();
             }
         } catch (error) {
@@ -154,9 +154,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (pathname.includes("edit") && pathname.includes("sales")) {
                 try {
-                    console.log(
-                        "Emergency fallback: Attempting to initialize SalesOrderEdit",
-                    );
+                    // console.log(
+                    //     "Emergency fallback: Attempting to initialize SalesOrderEdit",
+                    // );
                     window.salesApp = new SalesOrderEdit();
                 } catch (fallbackError) {
                     console.error(
@@ -175,7 +175,7 @@ if (typeof window.setDeleteFormAction === "undefined") {
         const deleteForm = document.getElementById("deleteForm");
         if (deleteForm) {
             deleteForm.action = url;
-            console.log("Fallback: Delete form action set to:", url);
+            // console.log("Fallback: Delete form action set to:", url);
         } else {
             console.error("Fallback: Delete form not found");
         }
@@ -185,7 +185,7 @@ if (typeof window.setDeleteFormAction === "undefined") {
 // Fallback for loadSalesDetails if initialization fails
 if (typeof window.loadSalesDetails === "undefined") {
     window.loadSalesDetails = function (id) {
-        console.log("Fallback loadSalesDetails called for ID:", id);
+        // console.log("Fallback loadSalesDetails called for ID:", id);
     };
 }
 

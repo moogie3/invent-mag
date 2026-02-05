@@ -143,14 +143,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 const deleteForm = document.getElementById("deleteForm");
                 if (deleteForm) {
                     deleteForm.action = url;
-                    console.log("Fallback: Delete form action set to:", url);
+                    // console.log("Fallback: Delete form action set to:", url);
                 } else {
                     console.error("Fallback: Delete form not found");
                 }
             };
 
             window.loadPoDetails = function (id) {
-                console.log("Fallback loadPoDetails called for ID:", id);
+                // console.log("Fallback loadPoDetails called for ID:", id);
             };
         }
     }, 250);

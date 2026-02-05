@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // Handle confirmation button click
         if (coaTemplateConfirmationModalConfirmBtn) {
             coaTemplateConfirmationModalConfirmBtn.addEventListener("click", function() {
-                console.log('Confirm button clicked');
+                // console.log('Confirm button clicked');
                 
                 // Find the close button to hide modal via DOM click (safest way without bootstrap object)
                 const closeBtn = coaTemplateModalElement.querySelector('[data-bs-dismiss="modal"]');

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Supplier;
+use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,6 +25,7 @@ class PurchaseFactory extends Factory
         return [
             'invoice' => 'PO-' . $this->faker->unique()->randomNumber(5),
             'supplier_id' => Supplier::factory(),
+            'warehouse_id' => Warehouse::factory(), // Added for multi-warehouse
             'order_date' => $orderDate,
             'due_date' => $dueDate,
             'payment_type' => $this->faker->randomElement(['Cash', 'Transfer']),

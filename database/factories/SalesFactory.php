@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Customer;
 use App\Models\User;
+use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -38,6 +39,7 @@ class SalesFactory extends Factory
             'change_amount' => $this->faker->randomFloat(2, 0, 100),
             'is_pos' => $this->faker->boolean(),
             'sales_opportunity_id' => null, // Assuming this can be null
+            'warehouse_id' => Warehouse::factory(), // Added for multi-warehouse
         ];
     }
 }

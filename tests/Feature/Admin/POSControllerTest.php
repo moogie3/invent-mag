@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
+use App\Models\ProductWarehouse;
 use App\Models\Warehouse;
 use Database\Factories\SalesFactory;
 use Illuminate\Support\Facades\Storage;
@@ -35,7 +36,17 @@ class POSControllerTest extends TestCase
 
         Warehouse::factory()->create(['is_main' => true]);
         $this->customer = Customer::factory()->create();
-        $this->product = Product::factory()->create(['stock_quantity' => 10]); // Ensure stock
+        $this->product = Product::factory()->create();
+        
+        // Ensure stock exists using updateOrCreate
+        ProductWarehouse::updateOrCreate(
+            [
+                'product_id' => $this->product->id,
+                'warehouse_id' => Warehouse::first()->id,
+                'tenant_id' => $this->product->tenant_id
+            ],
+            ['quantity' => 10]
+        );
     }
 
     public function tearDown(): void

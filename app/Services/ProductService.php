@@ -7,6 +7,7 @@ use App\Models\Categories;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
+use App\Models\ProductWarehouse;
 use App\Helpers\CurrencyHelper;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\DB;
@@ -16,9 +17,24 @@ use Illuminate\Support\Str;
 
 class ProductService
 {
-    public function getPaginatedProducts(int $entries)
+    public function getPaginatedProducts(int $entries, array $filters = [])
     {
-        return Product::with(['category', 'supplier', 'unit', 'warehouse'])->paginate($entries);
+        $query = Product::with(['category', 'supplier', 'unit']);
+
+        // Constrain the eager loaded warehouses if a filter is applied
+        $query->with(['warehouses' => function ($q) use ($filters) {
+            if (isset($filters['warehouse_id']) && $filters['warehouse_id']) {
+                $q->where('warehouses.id', $filters['warehouse_id']);
+            }
+        }]);
+
+        if (isset($filters['warehouse_id']) && $filters['warehouse_id']) {
+            $query->whereHas('warehouses', function ($q) use ($filters) {
+                $q->where('warehouses.id', $filters['warehouse_id']);
+            });
+        }
+
+        return $query->paginate($entries);
     }
 
     public function getProductFormData()
@@ -29,6 +45,7 @@ class ProductService
             'suppliers' => Supplier::all(),
             'warehouses' => Warehouse::all(),
             'mainWarehouse' => Warehouse::where('is_main', true)->first(),
+            // 'lowStockProducts' => Product::getLowStockProducts(), // This static method on model is broken, logic moved to service
             'lowStockProducts' => Product::getLowStockProducts(),
         ];
     }
@@ -37,12 +54,10 @@ class ProductService
     {
         $data['has_expiry'] = !empty($data['has_expiry']);
 
-        if (empty($data['warehouse_id'])) {
-            $mainWarehouse = Warehouse::where('is_main', true)->first();
-            if ($mainWarehouse) {
-                $data['warehouse_id'] = $mainWarehouse->id;
-            }
-        }
+        // Remove warehouse_id from data as it's no longer on the products table
+        // We will use it to initialize stock in the pivot table if provided
+        $initialWarehouseId = $data['warehouse_id'] ?? null;
+        unset($data['warehouse_id']);
 
         if (isset($data['image'])) {
             $image = $data['image'];
@@ -51,16 +66,36 @@ class ProductService
             $data['image'] = $imageName;
         }
 
-        return Product::create($data);
+        $product = Product::create($data);
+
+        // Initialize stock in the pivot table
+        if ($initialWarehouseId) {
+            $warehouse = Warehouse::find($initialWarehouseId);
+        } else {
+            $warehouse = Warehouse::where('is_main', true)->first();
+        }
+
+        if ($warehouse) {
+            ProductWarehouse::create([
+                'product_id' => $product->id,
+                'warehouse_id' => $warehouse->id,
+                'quantity' => 0, // Initial stock is 0, add via Purchase/Adjustment
+                'tenant_id' => $product->tenant_id,
+            ]);
+        }
+
+        return $product;
     }
 
     public function quickCreateProduct(array $data)
     {
         $product = $this->createProduct($data);
-        $product->load(['unit', 'warehouse']);
+        $product->load(['unit']);
 
         $product->unit_symbol = $product->unit->symbol;
-        $product->warehouse_name = $product->warehouse ? $product->warehouse->name : 'None';
+        // Warehouse name is now ambiguous as product can be in multiple, return Main or 'Multiple'
+        $mainWarehouse = $product->warehouses()->where('is_main', true)->first();
+        $product->warehouse_name = $mainWarehouse ? $mainWarehouse->name : 'Multiple';
         $product->image_url = $product->image;
 
         return $product;
@@ -69,13 +104,9 @@ class ProductService
     public function updateProduct(Product $product, array $data)
     {
         $data['has_expiry'] = !empty($data['has_expiry']);
-
-        if (empty($data['warehouse_id'])) {
-            $mainWarehouse = Warehouse::where('is_main', true)->first();
-            if ($mainWarehouse) {
-                $data['warehouse_id'] = $mainWarehouse->id;
-            }
-        }
+        
+        // warehouse_id is no longer updatable on the product itself
+        unset($data['warehouse_id']);
 
         if (isset($data['image'])) {
             $oldImageName = $product->getRawOriginal('image');
@@ -139,7 +170,7 @@ class ProductService
 
     public function bulkExportProducts(array $filters, ?array $ids, string $exportOption)
     {
-        $query = Product::with(['category', 'supplier', 'unit', 'warehouse']);
+        $query = Product::with(['category', 'supplier', 'unit', 'warehouses']);
         
         if ($ids) {
             $query->whereIn('id', $ids);
@@ -151,7 +182,10 @@ class ProductService
                 $query->where('supplier_id', $filters['supplier_id']);
             }
             if (isset($filters['warehouse_id']) && $filters['warehouse_id']) {
-                $query->where('warehouse_id', $filters['warehouse_id']);
+                // Filter by existence in warehouse pivot
+                $query->whereHas('warehouses', function($q) use ($filters) {
+                    $q->where('warehouses.id', $filters['warehouse_id']);
+                });
             }
             if (isset($filters['units_id']) && $filters['units_id']) {
                 $query->where('units_id', $filters['units_id']);
@@ -206,9 +240,9 @@ class ProductService
                         $product->name,
                         $product->category->name,
                         $product->supplier->name,
-                        $product->warehouse->name,
+                        $product->warehouses->pluck('name')->implode(', '), // Multi warehouse support
                         $product->unit->name,
-                        $product->stock_quantity,
+                        $product->total_stock, // Use accessor
                         CurrencyHelper::format($product->price),
                         CurrencyHelper::format($product->selling_price),
                     ]);
@@ -225,24 +259,40 @@ class ProductService
 
     public function bulkUpdateStock(array $updates, ?string $reason, ?int $adjustedBy)
     {
+        // Bulk update now targets the Main Warehouse by default or needs a strategy.
+        // For simplicity in this refactor, we assume updates apply to the Main Warehouse
+        // or we require warehouse_id in the updates array.
+        
+        $mainWarehouse = Warehouse::where('is_main', true)->first();
+        if (!$mainWarehouse) {
+             throw new \Exception('Main warehouse not found for bulk update.');
+        }
+
         $updatedCount = 0;
         $stockChanges = [];
 
-        DB::transaction(function () use ($updates, $reason, $adjustedBy, &$updatedCount, &$stockChanges) {
+        DB::transaction(function () use ($updates, $reason, $adjustedBy, $mainWarehouse, &$updatedCount, &$stockChanges) {
             foreach ($updates as $update) {
                 $product = Product::findOrFail($update['id']);
-                $originalStock = $product->stock_quantity;
+                
+                // Get stock for the main warehouse
+                $stockRecord = ProductWarehouse::firstOrCreate(
+                    ['product_id' => $product->id, 'warehouse_id' => $mainWarehouse->id, 'tenant_id' => $product->tenant_id],
+                    ['quantity' => 0]
+                );
+
+                $originalStock = $stockRecord->quantity;
                 $newStock = $update['stock_quantity'];
 
                 if ($originalStock != $newStock) {
-                    $product->update([
-                        'stock_quantity' => $newStock,
+                    $stockRecord->update([
+                        'quantity' => $newStock,
                     ]);
 
                     $updatedCount++;
 
                     $adjustmentAmount = abs($newStock - $originalStock);
-                    $adjustmentType = 'correction'; // Default to correction
+                    $adjustmentType = 'correction';
 
                     if ($newStock > $originalStock) {
                         $adjustmentType = 'increase';
@@ -252,12 +302,14 @@ class ProductService
 
                     \App\Models\StockAdjustment::create([
                         'product_id' => $product->id,
+                        'warehouse_id' => $mainWarehouse->id, // Track warehouse
                         'adjustment_type' => $adjustmentType,
                         'quantity_before' => $originalStock,
                         'quantity_after' => $newStock,
                         'adjustment_amount' => $adjustmentAmount,
-                        'reason' => $reason ?? 'Bulk stock update',
+                        'reason' => $reason ?? 'Bulk stock update (Main Warehouse)',
                         'adjusted_by' => $adjustedBy,
+                        'tenant_id' => $product->tenant_id,
                     ]);
 
                     $stockChanges[] = [
@@ -278,39 +330,53 @@ class ProductService
         ];
     }
 
-    public function adjustProductStock(Product $product, float $adjustmentAmount, string $adjustmentType, ?string $reason, ?int $adjustedBy): Product
+    public function adjustProductStock(Product $product, float $adjustmentAmount, string $adjustmentType, ?string $reason, ?int $adjustedBy, int $warehouseId = null): Product
     {
-        DB::transaction(function () use ($product, $adjustmentAmount, $adjustmentType, $reason, $adjustedBy) {
-            $quantityBefore = $product->stock_quantity;
+        // If no warehouse specified, use Main
+        if (!$warehouseId) {
+            $warehouseId = Product::getMainWarehouseId();
+        }
+        
+        if (!$warehouseId) {
+             throw new \Exception('No warehouse specified and no main warehouse found.');
+        }
+
+        DB::transaction(function () use ($product, $adjustmentAmount, $adjustmentType, $reason, $adjustedBy, $warehouseId) {
+            
+            $stockRecord = ProductWarehouse::firstOrCreate(
+                ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
+                ['quantity' => 0]
+            );
+
+            $quantityBefore = $stockRecord->quantity;
             $quantityAfter = $quantityBefore;
 
             if ($adjustmentType === 'increase') {
-                $product->increment('stock_quantity', $adjustmentAmount);
+                $stockRecord->increment('quantity', $adjustmentAmount);
                 $quantityAfter = $quantityBefore + $adjustmentAmount;
             } elseif ($adjustmentType === 'decrease') {
-                // Ensure we don't go below zero
                 $newQuantity = max(0, $quantityBefore - $adjustmentAmount);
-                $product->update(['stock_quantity' => $newQuantity]);
+                $stockRecord->update(['quantity' => $newQuantity]);
                 $quantityAfter = $newQuantity;
             } elseif ($adjustmentType === 'correction') {
-                // For correction, adjustmentAmount is the target quantity
-                $product->update(['stock_quantity' => $adjustmentAmount]);
+                $stockRecord->update(['quantity' => $adjustmentAmount]);
                 $quantityAfter = $adjustmentAmount;
             }
 
             // Record the adjustment
             \App\Models\StockAdjustment::create([
                 'product_id' => $product->id,
+                'warehouse_id' => $warehouseId, // Track warehouse
                 'adjustment_type' => $adjustmentType,
                 'quantity_before' => $quantityBefore,
                 'quantity_after' => $quantityAfter,
                 'adjustment_amount' => $adjustmentAmount,
                 'reason' => $reason,
                 'adjusted_by' => $adjustedBy,
+                'tenant_id' => $product->tenant_id,
             ]);
         });
 
-        $product->refresh(); // Refresh the product model to get the latest stock_quantity
         return $product;
     }
 

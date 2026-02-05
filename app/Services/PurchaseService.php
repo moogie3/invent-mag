@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Purchase;
 use App\Models\POItem;
 use App\Models\Product;
+use App\Models\ProductWarehouse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\PurchaseHelper;
@@ -15,6 +16,7 @@ use Carbon\Carbon;
 use App\Models\Account;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnItem;
+use App\Models\Warehouse; // Added
 use Dompdf\Dompdf;
 
 class PurchaseService
@@ -43,7 +45,8 @@ class PurchaseService
 
         $pos = $query->paginate($entries);
 
-
+        // Load warehouse for filtering/display
+        $pos->load('warehouse');
 
         $totalinvoice = $pos->total();
         $items = POItem::all();
@@ -92,8 +95,9 @@ class PurchaseService
         $pos = Purchase::all();
         $suppliers = Supplier::all();
         $products = Product::all();
+        $warehouses = Warehouse::all(); // Added
 
-        return compact('pos', 'suppliers', 'products');
+        return compact('pos', 'suppliers', 'products', 'warehouses');
     }
 
     public function getPurchaseEditData($id)
@@ -108,8 +112,9 @@ class PurchaseService
         $products = Product::all();
         $items = POItem::all();
         $isPaid = $pos->status == 'Paid';
+        $warehouses = Warehouse::all(); // Added
 
-        return compact('pos', 'suppliers', 'products', 'items', 'isPaid');
+        return compact('pos', 'suppliers', 'products', 'items', 'isPaid', 'warehouses');
     }
 
     public function getPurchaseViewData($id)
@@ -145,17 +150,17 @@ class PurchaseService
                 throw new \Exception('Invalid product data');
             }
 
-            /** @var \App\Models\Purchase $purchase */
             $purchase = Purchase::create([
                 'invoice' => $data['invoice'],
                 'supplier_id' => $data['supplier_id'],
                 'user_id' => Auth::id(),
+                'warehouse_id' => $data['warehouse_id'], // Added
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
                 'discount_total' => $data['discount_total'] ?? 0,
                 'discount_total_type' => $data['discount_total_type'] ?? 'fixed',
                 'status' => 'Unpaid',
-                'total' => 0, // Will be calculated after items are added
+                'total' => 0,
             ]);
 
             $totalAmount = 0;
@@ -174,12 +179,17 @@ class PurchaseService
                 ]);
                 $totalAmount += $itemTotal;
 
-                $product = Product::where('id', $productData['product_id'])
-                                  ->where('tenant_id', $purchase->tenant_id)
-                                  ->first();
-                if ($product) {
-                    $product->increment('stock_quantity', $productData['quantity']);
-                }
+                // Update Stock in Pivot Table
+                $stockRecord = ProductWarehouse::firstOrCreate(
+                    [
+                        'product_id' => $productData['product_id'],
+                        'warehouse_id' => $purchase->warehouse_id,
+                        'tenant_id' => $purchase->tenant_id
+                    ],
+                    ['quantity' => 0]
+                );
+                
+                $stockRecord->increment('quantity', $productData['quantity']);
             }
 
             $orderDiscount = PurchaseHelper::calculateDiscount($totalAmount, $purchase->discount_total, $purchase->discount_total_type);
@@ -232,19 +242,22 @@ class PurchaseService
 
             // Revert old stock quantities before deleting items
             foreach ($purchase->items as $oldItem) {
-                $product = Product::where('id', $oldItem->product_id)
-                                  ->where('tenant_id', $purchase->tenant_id)
-                                  ->first();
-                if ($product) {
-                    $product->decrement('stock_quantity', $oldItem->quantity);
+                $stockRecord = ProductWarehouse::where('product_id', $oldItem->product_id)
+                    ->where('warehouse_id', $purchase->warehouse_id)
+                    ->where('tenant_id', $purchase->tenant_id)
+                    ->first();
+                
+                if ($stockRecord) {
+                    $stockRecord->decrement('quantity', $oldItem->quantity);
                 }
             }
             $purchase->items()->delete();
 
-            // Update the main purchase details, excluding status for now
+            // Update the main purchase details
             $purchase->update([
                 'invoice' => $data['invoice'],
                 'supplier_id' => $data['supplier_id'],
+                'warehouse_id' => $data['warehouse_id'], // Update warehouse
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
                 'discount_total' => $data['discount_total'] ?? 0,
@@ -268,12 +281,16 @@ class PurchaseService
                 ]);
                 $totalAmount += $itemTotal;
 
-                $product = Product::where('id', $productData['product_id'])
-                                  ->where('tenant_id', $purchase->tenant_id)
-                                  ->first();
-                if ($product) {
-                    $product->increment('stock_quantity', $productData['quantity']);
-                }
+                // Add new stock to (possibly new) warehouse
+                $stockRecord = \App\Models\ProductWarehouse::firstOrCreate(
+                    [
+                        'product_id' => $productData['product_id'],
+                        'warehouse_id' => $purchase->warehouse_id, // Use updated warehouse ID
+                        'tenant_id' => $purchase->tenant_id
+                    ],
+                    ['quantity' => 0]
+                );
+                $stockRecord->increment('quantity', $productData['quantity']);
             }
 
             $orderDiscount = PurchaseHelper::calculateDiscount($totalAmount, $purchase->discount_total, $purchase->discount_total_type);
@@ -376,10 +393,16 @@ class PurchaseService
     {
         DB::transaction(function () use ($purchase) {
             foreach ($purchase->items as $item) {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $product->decrement('stock_quantity', $item->quantity);
+                // Decrement stock from the specific warehouse
+                $stockRecord = ProductWarehouse::where('product_id', $item->product_id)
+                    ->where('warehouse_id', $purchase->warehouse_id)
+                    ->where('tenant_id', $purchase->tenant_id)
+                    ->first();
+
+                if ($stockRecord) {
+                    $stockRecord->decrement('quantity', $item->quantity);
                 }
+                
                 // Delete the POItem as well
                 $item->delete();
             }

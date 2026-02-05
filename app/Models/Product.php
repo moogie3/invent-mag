@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Concerns\BelongsToTenant;
+use App\Models\ProductWarehouse;
 
 class Product extends Model
 {
@@ -20,13 +21,13 @@ class Product extends Model
         'image',
         'price',
         'selling_price',
-        'stock_quantity',
+        // 'stock_quantity', // Removed for multi-warehouse support
         'category_id',
         'supplier_id',
         'units_id',
         'has_expiry',
         'low_stock_threshold',
-        'warehouse_id', // Add this field to fillable
+        // 'warehouse_id', // Removed for multi-warehouse support
     ];
 
     protected $guarded = [
@@ -37,15 +38,35 @@ class Product extends Model
     protected $casts = [
         'price' => 'float',
         'selling_price' => 'float',
-        'stock_quantity' => 'float',
+        // 'stock_quantity' => 'float', // Removed
         'has_expiry' => 'boolean',
         'low_stock_threshold' => 'integer',
-        'warehouse_id' => 'integer', // Fixed the missing quote
+        // 'warehouse_id' => 'integer', // Removed
     ];
 
-    public function warehouse(): BelongsTo
+    protected $appends = ['stock_quantity', 'total_stock'];
+
+    public function warehouses()
     {
-        return $this->belongsTo(Warehouse::class, 'warehouse_id');
+        return $this->belongsToMany(Warehouse::class, 'product_warehouse')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
+
+    public function productWarehouses()
+    {
+        return $this->hasMany(ProductWarehouse::class);
+    }
+
+    public function getTotalStockAttribute()
+    {
+        return (float) $this->productWarehouses()->sum('quantity');
+    }
+
+    public function getStockQuantityAttribute()
+    {
+        // Backward compatibility accessor
+        return $this->total_stock;
     }
 
     // Add this method to get the main warehouse ID or null if none set
@@ -107,9 +128,10 @@ class Product extends Model
      */
     public static function getLowStockProducts()
     {
-        // This query uses a subquery to compare each product's stock_quantity
-        // against its own threshold or the default threshold
-        return self::whereRaw('stock_quantity <= COALESCE(low_stock_threshold, ?)', [self::DEFAULT_LOW_STOCK_THRESHOLD])->get();
+        // Filter in PHP to be database agnostic (SQLite/MySQL compatible)
+        return self::with('productWarehouses')->get()->filter(function ($product) {
+            return $product->total_stock <= $product->getLowStockThreshold();
+        })->values(); // Reset keys
     }
 
     /**
@@ -119,7 +141,7 @@ class Product extends Model
      */
     public static function lowStockCount(): int
     {
-        return self::whereRaw('stock_quantity <= COALESCE(low_stock_threshold, ?)', [self::DEFAULT_LOW_STOCK_THRESHOLD])->count();
+        return self::getLowStockProducts()->count();
     }
 
     /**

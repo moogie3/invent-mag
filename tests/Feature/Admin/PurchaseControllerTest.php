@@ -27,6 +27,7 @@ class PurchaseControllerTest extends TestCase
 
     protected Supplier $supplier;
     protected Product $product;
+    protected Warehouse $warehouse; // Added
 
     protected function setUp(): void
     {
@@ -46,7 +47,7 @@ class PurchaseControllerTest extends TestCase
         $this->user->save();
         $this->actingAs($this->user);
 
-        Warehouse::factory()->create(['is_main' => true]);
+        $this->warehouse = Warehouse::factory()->create(['is_main' => true]); // Added
         $this->supplier = Supplier::factory()->create();
         $this->product = Product::factory()->create();
     }
@@ -84,6 +85,7 @@ class PurchaseControllerTest extends TestCase
         $purchaseData = [
             'invoice' => 'PO-' . rand(10000, 99999),
             'supplier_id' => $this->supplier->id,
+            'warehouse_id' => $this->warehouse->id, // Added
             'order_date' => Carbon::now()->format('Y-m-d'),
             'due_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
             'discount_total' => 10,
@@ -106,6 +108,7 @@ class PurchaseControllerTest extends TestCase
 
         $this->assertDatabaseHas('po', [
             'supplier_id' => $this->supplier->id,
+            'warehouse_id' => $this->warehouse->id, // Added
             'invoice' => $purchaseData['invoice'],
         ]);
 
@@ -142,6 +145,7 @@ class PurchaseControllerTest extends TestCase
         $updateData = [
             'invoice' => $purchase->invoice,
             'supplier_id' => $this->supplier->id,
+            'warehouse_id' => $this->warehouse->id, // Added
             'order_date' => Carbon::now()->format('Y-m-d'),
             'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
             'discount_total' => 5,
@@ -372,6 +376,7 @@ class PurchaseControllerTest extends TestCase
         $invalidData = [
             'invoice' => '', // required
             'supplier_id' => 999, // not exists
+            'warehouse_id' => 999, // not exists (Added)
             'order_date' => 'not-a-date', // invalid date
             'due_date' => 'not-a-date', // invalid date
             'products' => 'not-a-json-string', // invalid json
@@ -379,7 +384,7 @@ class PurchaseControllerTest extends TestCase
 
         $response = $this->post(route('admin.po.store'), $invalidData);
 
-        $response->assertSessionHasErrors(['invoice', 'supplier_id', 'order_date', 'due_date', 'products']);
+        $response->assertSessionHasErrors(['invoice', 'supplier_id', 'warehouse_id', 'order_date', 'due_date', 'products']);
         $response->assertStatus(302); // Redirect back on validation error
     }
 
@@ -390,6 +395,7 @@ class PurchaseControllerTest extends TestCase
         $invalidData = [
             'invoice' => '', // required
             'supplier_id' => 999, // not exists
+            'warehouse_id' => 999, // not exists (Added)
             'order_date' => 'not-a-date', // invalid date
             'due_date' => 'not-a-date', // invalid date
             'products' => 'not-a-json-string', // invalid json
@@ -397,7 +403,7 @@ class PurchaseControllerTest extends TestCase
 
         $response = $this->put(route('admin.po.update', $purchase->id), $invalidData);
 
-        $response->assertSessionHasErrors(['invoice', 'supplier_id', 'order_date', 'due_date', 'products']);
+        $response->assertSessionHasErrors(['invoice', 'supplier_id', 'warehouse_id', 'order_date', 'due_date', 'products']);
         $response->assertStatus(302); // Redirect back on validation error
     }
 
@@ -422,6 +428,7 @@ class PurchaseControllerTest extends TestCase
         $purchaseData = [
             'invoice' => 'PO-12345',
             'supplier_id' => $this->supplier->id,
+            'warehouse_id' => $this->warehouse->id, // Added
             'order_date' => Carbon::now()->format('Y-m-d'),
             'due_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
             'products' => json_encode([
@@ -453,6 +460,7 @@ class PurchaseControllerTest extends TestCase
         $updateData = [
             'invoice' => $purchase->invoice,
             'supplier_id' => $this->supplier->id,
+            'warehouse_id' => $this->warehouse->id, // Added
             'order_date' => Carbon::now()->format('Y-m-d'),
             'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
             'products' => json_encode([

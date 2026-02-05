@@ -85,6 +85,7 @@ class SalesController extends Controller
         $request->validate([
             'invoice' => 'nullable|string|unique:sales,invoice',
             'customer_id' => 'required|exists:customers,id',
+            'warehouse_id' => 'required|exists:warehouses,id', // Added
             'order_date' => 'required|date',
             'due_date' => 'required|date',
             'products' => 'required|json',
@@ -109,6 +110,7 @@ class SalesController extends Controller
         $request->validate([
             'invoice' => ['nullable', 'string', Rule::unique('sales', 'invoice')->ignore($sale->id)->where('tenant_id', $sale->tenant_id)],
             'customer_id' => 'required|exists:customers,id',
+            'warehouse_id' => 'required|exists:warehouses,id', // Added
             'order_date' => 'required|date',
             'due_date' => 'required|date',
             'products' => 'required|json',

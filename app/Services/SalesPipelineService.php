@@ -7,6 +7,8 @@ use App\Models\PipelineStage;
 use App\Models\SalesOpportunity;
 use App\Models\Sales;
 use App\Models\SalesItem;
+use App\Models\ProductWarehouse;
+use App\Models\Warehouse;
 use App\Models\Product;
 use App\Models\Tax;
 use Illuminate\Support\Facades\DB;
@@ -246,10 +248,21 @@ class SalesPipelineService
             $taxAmount = round($subTotal * ($taxRate / 100));
             $grandTotal = round($subTotal + $taxAmount);
 
+            // Assign to Main Warehouse by default for pipeline conversions
+            $mainWarehouse = Warehouse::where('is_main', true)->first();
+            if (!$mainWarehouse) {
+                // Fallback to first available if no main
+                $mainWarehouse = Warehouse::first();
+                if (!$mainWarehouse) {
+                     throw new \Exception('No warehouse available to fulfill this order.');
+                }
+            }
+
             $salesOrder = Sales::create([
                 'invoice' => $invoice,
                 'customer_id' => $opportunity->customer_id,
                 'user_id' => Auth::id(),
+                'warehouse_id' => $mainWarehouse->id, // Added
                 'order_date' => now(),
                 'due_date' => $opportunity->expected_close_date ?? now()->addDays(30),
                 'payment_type' => '-',
@@ -274,24 +287,28 @@ class SalesPipelineService
                     'total' => round($item->quantity * $item->price),
                 ]);
 
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    // Determine the correct stock attribute
-                    $stockAttribute = null;
-                    if (isset($product->stock_quantity)) {
-                        $stockAttribute = 'stock_quantity';
-                    } elseif (isset($product->quantity)) {
-                        $stockAttribute = 'quantity';
-                    } elseif (isset($product->stock)) {
-                        $stockAttribute = 'stock';
-                    }
+                // Deduct from Main Warehouse pivot
+                $stockRecord = ProductWarehouse::where('product_id', $item->product_id)
+                    ->where('warehouse_id', $mainWarehouse->id)
+                    ->where('tenant_id', $opportunity->tenant_id ?? Auth::user()->tenant_id)
+                    ->first();
 
-                    if ($stockAttribute) {
-                        if ($product->{$stockAttribute} < $item->quantity) {
-                            throw new \Exception('Insufficient stock for product: ' . $product->name . '. Available: ' . $product->{$stockAttribute} . ', Requested: ' . $item->quantity);
-                        }
-                        $product->decrement($stockAttribute, $item->quantity);
-                    }
+                $currentStock = $stockRecord ? $stockRecord->quantity : 0;
+
+                if ($currentStock < $item->quantity) {
+                    throw new \Exception('Insufficient stock for product: ' . $item->product->name . '. Available: ' . $currentStock . ', Requested: ' . $item->quantity);
+                }
+
+                if ($stockRecord) {
+                    $stockRecord->decrement('quantity', $item->quantity);
+                } else {
+                    // This case shouldn't happen if validation passes, but create pivot if missing and allowed
+                    ProductWarehouse::create([
+                        'product_id' => $item->product_id,
+                        'warehouse_id' => $mainWarehouse->id,
+                        'quantity' => -$item->quantity,
+                        'tenant_id' => $opportunity->tenant_id ?? Auth::user()->tenant_id
+                    ]);
                 }
             }
 

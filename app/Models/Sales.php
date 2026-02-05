@@ -46,7 +46,8 @@ class Sales extends Model
         'amount_received',
         'change_amount',
         'is_pos',
-        'sales_opportunity_id'
+        'sales_opportunity_id',
+        'warehouse_id', // Added
     ];
 
     protected $guarded = [
@@ -76,6 +77,11 @@ class Sales extends Model
     ];
 
     // Relationships
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'warehouse_id');
+    }
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'customer_id');

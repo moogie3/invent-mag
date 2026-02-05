@@ -8,6 +8,7 @@ use App\Models\Categories;
 use App\Models\Unit;
 use App\Models\Supplier;
 use App\Models\Warehouse;
+use App\Models\ProductWarehouse;
 
 class ProductSeeder extends Seeder
 {
@@ -29,13 +30,13 @@ class ProductSeeder extends Seeder
 
         $faker = \Faker\Factory::create();
 
-        Product::updateOrCreate([
+        $product1 = Product::updateOrCreate([
             'code' => 'TR11',
             'tenant_id' => $tenantId,
         ],[
             'barcode' => '1234567890123' . '-' . $tenantId,
             'name' => 'Near Low Stock Capacitor',
-            'stock_quantity' => 9, // low_stock_threshold is 10, so this is low stock
+            // 'stock_quantity' => 9, // low_stock_threshold is 10, so this is low stock
             'low_stock_threshold' => 10,
             'price' => 600.00,
             'selling_price' => 1100.00,
@@ -43,18 +44,26 @@ class ProductSeeder extends Seeder
             'units_id' => $faker->randomElement($unitIds),
             'supplier_id' => $faker->randomElement($supplierIds),
             'description' => 'Capacitor close to low stock',
-            'warehouse_id' => $faker->randomElement($warehouseIds),
+            // 'warehouse_id' => $faker->randomElement($warehouseIds), // Removed
             'image' => null,
             'has_expiry' => false,
         ]);
+        
+        // Add stock to main warehouse
+        ProductWarehouse::create([
+            'product_id' => $product1->id,
+            'warehouse_id' => $faker->randomElement($warehouseIds),
+            'quantity' => 9,
+            'tenant_id' => $tenantId,
+        ]);
 
-        Product::updateOrCreate([
+        $product2 = Product::updateOrCreate([
             'code' => 'TR12',
             'tenant_id' => $tenantId,
         ],[
             'barcode' => $faker->unique()->ean13() . '-' . $tenantId,
             'name' => 'Expired Diode',
-            'stock_quantity' => 15,
+            // 'stock_quantity' => 15,
             'low_stock_threshold' => 10,
             'price' => 180.00,
             'selling_price' => 350.00,
@@ -62,18 +71,25 @@ class ProductSeeder extends Seeder
             'units_id' => $faker->randomElement($unitIds),
             'supplier_id' => $faker->randomElement($supplierIds),
             'description' => 'Diode product already expired',
-            'warehouse_id' => $faker->randomElement($warehouseIds),
+            // 'warehouse_id' => $faker->randomElement($warehouseIds),
             'image' => null,
             'has_expiry' => true,
         ]);
 
-        Product::updateOrCreate([
+        ProductWarehouse::create([
+            'product_id' => $product2->id,
+            'warehouse_id' => $faker->randomElement($warehouseIds),
+            'quantity' => 15,
+            'tenant_id' => $tenantId,
+        ]);
+
+        $product3 = Product::updateOrCreate([
             'code' => 'TR13',
             'tenant_id' => $tenantId,
         ],[
             'barcode' => $faker->unique()->ean13() . '-' . $tenantId,
             'name' => 'Near Expiry Crystal Oscillator',
-            'stock_quantity' => 50,
+            // 'stock_quantity' => 50,
             'low_stock_threshold' => 20,
             'price' => 950.00,
             'selling_price' => 1700.00,
@@ -81,18 +97,25 @@ class ProductSeeder extends Seeder
             'units_id' => $faker->randomElement($unitIds),
             'supplier_id' => $faker->randomElement($supplierIds),
             'description' => 'Crystal oscillator expiring soon',
-            'warehouse_id' => $faker->randomElement($warehouseIds),
+            // 'warehouse_id' => $faker->randomElement($warehouseIds),
             'image' => null,
             'has_expiry' => true,
         ]);
 
-        Product::updateOrCreate([
+        ProductWarehouse::create([
+            'product_id' => $product3->id,
+            'warehouse_id' => $faker->randomElement($warehouseIds),
+            'quantity' => 50,
+            'tenant_id' => $tenantId,
+        ]);
+
+        $product4 = Product::updateOrCreate([
             'code' => 'TR14',
             'tenant_id' => $tenantId,
         ],[
             'barcode' => $faker->unique()->ean13() . '-' . $tenantId,
             'name' => 'Low Stock LED',
-            'stock_quantity' => 0,
+            // 'stock_quantity' => 0,
             'low_stock_threshold' => 5,
             'price' => 90.00,
             'selling_price' => 160.00,
@@ -100,18 +123,25 @@ class ProductSeeder extends Seeder
             'units_id' => $faker->randomElement($unitIds),
             'supplier_id' => $faker->randomElement($supplierIds),
             'description' => 'LED near expiry and low stock',
-            'warehouse_id' => $faker->randomElement($warehouseIds),
+            // 'warehouse_id' => $faker->randomElement($warehouseIds),
             'image' => null,
             'has_expiry' => true,
         ]);
 
-        Product::updateOrCreate([
+        ProductWarehouse::create([
+            'product_id' => $product4->id,
+            'warehouse_id' => $faker->randomElement($warehouseIds),
+            'quantity' => 0,
+            'tenant_id' => $tenantId,
+        ]);
+
+        $product5 = Product::updateOrCreate([
             'code' => 'TR15',
             'tenant_id' => $tenantId,
         ],[
             'barcode' => $faker->unique()->ean13() . '-' . $tenantId,
             'name' => 'Expired Voltage Regulator',
-            'stock_quantity' => 0,
+            // 'stock_quantity' => 0,
             'low_stock_threshold' => 10,
             'price' => 1400.00,
             'selling_price' => 2600.00,
@@ -119,9 +149,16 @@ class ProductSeeder extends Seeder
             'units_id' => $faker->randomElement($unitIds),
             'supplier_id' => $faker->randomElement($supplierIds),
             'description' => 'Voltage regulator expired long ago',
-            'warehouse_id' => $faker->randomElement($warehouseIds),
+            // 'warehouse_id' => $faker->randomElement($warehouseIds),
             'image' => null,
             'has_expiry' => true,
+        ]);
+
+        ProductWarehouse::create([
+            'product_id' => $product5->id,
+            'warehouse_id' => $faker->randomElement($warehouseIds),
+            'quantity' => 0,
+            'tenant_id' => $tenantId,
         ]);
     }
 }

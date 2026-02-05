@@ -66,10 +66,25 @@ function renderProductDetails(data) {
     setText("productCode", `Code: ${data.code}`);
     setText("productCategory", data.category?.name || "N/A");
     setText("productUnit", data.unit?.symbol || "N/A");
-    setText("productQuantity", data.stock_quantity);
+    setText("productQuantity", data.stock_quantity || data.total_stock || "0");
     setText("productSupplier", data.supplier?.name || "N/A");
-    setText("productWarehouse", data.warehouse?.name || "N/A");
-
+    
+    let warehouseText = "N/A";
+    // Check if warehouses relation exists and has items
+    if (data.warehouses && Array.isArray(data.warehouses) && data.warehouses.length > 0) {
+        warehouseText = data.warehouses.map(w => {
+            const qty = w.pivot ? w.pivot.quantity : 0;
+            return `${w.name}: ${qty}`;
+        }).join("<br>");
+    } else if (data.warehouse && data.warehouse.name) {
+        // Fallback for old structure
+        warehouseText = data.warehouse.name;
+    }
+    
+    // Allow HTML for warehouse list (multiline)
+    const warehouseEl = document.getElementById("productWarehouse");
+    if (warehouseEl) warehouseEl.innerHTML = warehouseText;
+    
     const threshold = data.low_stock_threshold || 10;
     const stockElement = document.getElementById("stockStatus");
     const isLowStock = data.stock_quantity <= threshold;

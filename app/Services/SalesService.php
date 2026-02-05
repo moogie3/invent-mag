@@ -18,6 +18,8 @@ use Carbon\Carbon;
 use App\Models\Account;
 use App\Models\SalesReturn;
 use App\Models\SalesReturnItem;
+use App\Models\Warehouse; // Added
+use App\Models\ProductWarehouse;
 use Dompdf\Dompdf;
 
 class SalesService
@@ -31,7 +33,7 @@ class SalesService
 
     public function getSalesIndexData(array $filters, int $entries)
     {
-        $query = Sales::with(['product', 'customer', 'user']);
+        $query = Sales::with(['product', 'customer', 'user', 'warehouse']); // Added warehouse
 
         if (isset($filters['month']) && $filters['month']) {
             $query->whereMonth('order_date', $filters['month']);
@@ -63,8 +65,9 @@ class SalesService
         $products = Product::all();
         $items = SalesItem::all();
         $tax = Tax::where('is_active', 1)->first();
+        $warehouses = Warehouse::all(); // Added
 
-        return compact('sales', 'customers', 'products', 'items', 'tax');
+        return compact('sales', 'customers', 'products', 'items', 'tax', 'warehouses');
     }
 
     public function getSalesEditData($id)
@@ -73,8 +76,9 @@ class SalesService
         $customers = Customer::all();
         $tax = Tax::where('is_active', 1)->first();
         $isPaid = $sales->status == 'Paid';
+        $warehouses = Warehouse::all(); // Added
 
-        return compact('sales', 'customers', 'tax', 'isPaid');
+        return compact('sales', 'customers', 'tax', 'isPaid', 'warehouses');
     }
 
     public function getSalesViewData($id)
@@ -210,6 +214,7 @@ class SalesService
                 'invoice' => $invoice,
                 'customer_id' => $data['customer_id'],
                 'user_id' => Auth::id(),
+                'warehouse_id' => $data['warehouse_id'], // Added
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
                 'tax_rate' => $taxRate,
@@ -244,26 +249,45 @@ class SalesService
                     'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed'),
                 ]);
 
-                if ($product) {
-                    $product->decrement('stock_quantity', $productData['quantity']);
+                // Deduct stock from specific warehouse
+                $stockRecord = ProductWarehouse::where('product_id', $product->id)
+                    ->where('warehouse_id', $sale->warehouse_id)
+                    ->where('tenant_id', $sale->tenant_id)
+                    ->first();
 
-                    // FEFO Logic
-                    $poItems = POItem::where('product_id', $product->id)
-                        ->where('remaining_quantity', '>', 0)
-                        ->orderBy('expiry_date', 'asc')
-                        ->get();
+                if (!$stockRecord || $stockRecord->quantity < $productData['quantity']) {
+                     // Optional: Throw error if strict stock checking is enabled
+                     // throw new \Exception("Insufficient stock in the selected warehouse for product {$product->name}");
+                }
 
-                    $quantityToDecrement = $productData['quantity'];
+                if ($stockRecord) {
+                    $stockRecord->decrement('quantity', $productData['quantity']);
+                } else {
+                    // Create negative stock record if allowed (backorder)
+                    ProductWarehouse::create([
+                        'product_id' => $product->id,
+                        'warehouse_id' => $sale->warehouse_id,
+                        'quantity' => -$productData['quantity'],
+                        'tenant_id' => $sale->tenant_id
+                    ]);
+                }
 
-                    foreach ($poItems as $poItem) {
-                        if ($quantityToDecrement <= 0) {
-                            break;
-                        }
+                // FEFO Logic (Global Batch Tracking)
+                $poItems = POItem::where('product_id', $product->id)
+                    ->where('remaining_quantity', '>', 0)
+                    ->orderBy('expiry_date', 'asc')
+                    ->get();
 
-                        $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
-                        $poItem->decrement('remaining_quantity', $decrement);
-                        $quantityToDecrement -= $decrement;
+                $quantityToDecrement = $productData['quantity'];
+
+                foreach ($poItems as $poItem) {
+                    if ($quantityToDecrement <= 0) {
+                        break;
                     }
+
+                    $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
+                    $poItem->decrement('remaining_quantity', $decrement);
+                    $quantityToDecrement -= $decrement;
                 }
             }
 
@@ -313,30 +337,32 @@ class SalesService
                 throw new \Exception('Invalid product data');
             }
 
-            // Revert old stock quantities
+            // Revert old stock quantities to the original warehouse
             foreach ($sale->salesItems as $oldItem) {
-                $product = Product::where('id', $oldItem->product_id)
-                                  ->where('tenant_id', $sale->tenant_id)
-                                  ->first();
-                if ($product) {
-                    $product->increment('stock_quantity', $oldItem->quantity);
+                $stockRecord = ProductWarehouse::where('product_id', $oldItem->product_id)
+                    ->where('warehouse_id', $sale->warehouse_id)
+                    ->where('tenant_id', $sale->tenant_id)
+                    ->first();
 
-                    // Revert remaining quantity
-                    $poItems = POItem::where('product_id', $product->id)
-                        ->orderBy('expiry_date', 'desc')
-                        ->get();
+                if ($stockRecord) {
+                    $stockRecord->increment('quantity', $oldItem->quantity);
+                }
 
-                    $quantityToIncrement = $oldItem->quantity;
+                // Revert remaining quantity (Global Batch)
+                $poItems = POItem::where('product_id', $oldItem->product_id)
+                    ->orderBy('expiry_date', 'desc')
+                    ->get();
 
-                    foreach ($poItems as $poItem) {
-                        if ($quantityToIncrement <= 0) {
-                            break;
-                        }
+                $quantityToIncrement = $oldItem->quantity;
 
-                        $increment = min($poItem->quantity - $poItem->remaining_quantity, $quantityToIncrement);
-                        $poItem->increment('remaining_quantity', $increment);
-                        $quantityToIncrement -= $increment;
+                foreach ($poItems as $poItem) {
+                    if ($quantityToIncrement <= 0) {
+                        break;
                     }
+
+                    $increment = min($poItem->quantity - $poItem->remaining_quantity, $quantityToIncrement);
+                    $poItem->increment('remaining_quantity', $increment);
+                    $quantityToIncrement -= $increment;
                 }
             }
 
@@ -361,6 +387,7 @@ class SalesService
 
             $sale->update([
                 'customer_id' => $data['customer_id'],
+                'warehouse_id' => $data['warehouse_id'], // Update warehouse
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
                 'tax_rate' => $taxRate,
@@ -388,8 +415,19 @@ class SalesService
                     'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed'),
                 ]);
 
-                $product->decrement('stock_quantity', $productData['quantity']);
+                // Deduct from NEW warehouse
+                $stockRecord = ProductWarehouse::firstOrCreate(
+                    [
+                        'product_id' => $product->id,
+                        'warehouse_id' => $sale->warehouse_id,
+                        'tenant_id' => $sale->tenant_id
+                    ],
+                    ['quantity' => 0]
+                );
+                
+                $stockRecord->decrement('quantity', $productData['quantity']);
 
+                // Reduct from batch (FEFO)
                 $poItems = POItem::where('product_id', $product->id)
                     ->where('remaining_quantity', '>', 0)
                     ->orderBy('expiry_date', 'asc')
@@ -498,28 +536,31 @@ class SalesService
             // This is left as a future improvement.
 
             foreach ($sale->salesItems as $item) {
-                $product = Product::where('id', $item->product_id)
-                                  ->where('tenant_id', $sale->tenant_id)
-                                  ->first();
-                if ($product) {
-                    $product->increment('stock_quantity', $item->quantity);
+                // Revert stock to the warehouse it was sold from
+                $stockRecord = ProductWarehouse::where('product_id', $item->product_id)
+                    ->where('warehouse_id', $sale->warehouse_id)
+                    ->where('tenant_id', $sale->tenant_id)
+                    ->first();
 
-                    // Revert remaining quantity
-                    $poItems = POItem::where('product_id', $product->id)
-                        ->orderBy('expiry_date', 'desc')
-                        ->get();
+                if ($stockRecord) {
+                    $stockRecord->increment('quantity', $item->quantity);
+                }
 
-                    $quantityToIncrement = $item->quantity;
+                // Revert remaining quantity (Global Batch)
+                $poItems = POItem::where('product_id', $item->product_id)
+                    ->orderBy('expiry_date', 'desc')
+                    ->get();
 
-                    foreach ($poItems as $poItem) {
-                        if ($quantityToIncrement <= 0) {
-                            break;
-                        }
+                $quantityToIncrement = $item->quantity;
 
-                        $increment = min($poItem->quantity - $poItem->remaining_quantity, $quantityToIncrement);
-                        $poItem->increment('remaining_quantity', $increment);
-                        $quantityToIncrement -= $increment;
+                foreach ($poItems as $poItem) {
+                    if ($quantityToIncrement <= 0) {
+                        break;
                     }
+
+                    $increment = min($poItem->quantity - $poItem->remaining_quantity, $quantityToIncrement);
+                    $poItem->increment('remaining_quantity', $increment);
+                    $quantityToIncrement -= $increment;
                 }
             }
             $sale->delete();
@@ -767,6 +808,48 @@ class SalesService
 
             $inventoryAccountName = $inventoryAccount->name;
             $accountsReceivableAccountName = $accountsReceivableAccount->name;
+
+            // Create Sales Return
+            $salesReturn = SalesReturn::create([
+                'sales_id' => $sale->id,
+                'user_id' => Auth::id(),
+                'return_date' => $data['return_date'],
+                'reason' => $data['reason'],
+                'total_amount' => $totalReturnAmount,
+                'status' => $data['status'],
+            ]);
+
+            foreach ($items as $itemData) {
+                SalesReturnItem::create([
+                    'sales_return_id' => $salesReturn->id,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $itemData['quantity'],
+                    'price' => $itemData['price'],
+                    'total' => $itemData['price'] * $itemData['quantity'],
+                ]);
+
+                // Increment stock in the original warehouse
+                $stockRecord = \App\Models\ProductWarehouse::firstOrCreate(
+                    [
+                        'product_id' => $itemData['product_id'],
+                        'warehouse_id' => $sale->warehouse_id,
+                        'tenant_id' => $sale->tenant_id
+                    ],
+                    ['quantity' => 0]
+                );
+                
+                $stockRecord->increment('quantity', $itemData['quantity']);
+            }
+
+            // Update original sales status
+            $totalSoldQuantity = $sale->salesItems->sum('quantity');
+            $totalReturnedQuantity = $sale->salesReturns->flatMap->items->sum('quantity');
+
+            if ($totalReturnedQuantity >= $totalSoldQuantity) {
+                $sale->update(['status' => 'Returned']);
+            } else {
+                $sale->update(['status' => 'Partial']);
+            }
 
             $transactions = [
                 ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],

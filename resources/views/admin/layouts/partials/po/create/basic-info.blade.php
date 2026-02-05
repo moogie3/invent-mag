@@ -15,6 +15,16 @@
         </select>
     </div>
     <div class="col-md-2">
+        <label class="form-label fw-bold">{{ __('messages.warehouse') }}</label>
+        <select class="form-select" name="warehouse_id" id="warehouse_id">
+            @foreach ($warehouses as $warehouse)
+                <option value="{{ $warehouse->id }}">
+                    {{ $warehouse->name }} {{ $warehouse->is_main ? __('messages.table_main') : '' }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.po_order_date') }}</label>
         <input type="date" class="form-control" name="order_date" id="order_date" />
     </div>

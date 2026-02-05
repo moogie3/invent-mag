@@ -24,7 +24,11 @@ class ProductController extends Controller
     {
         try {
             $entries = $request->input('entries', 10);
-            $products = $this->productService->getPaginatedProducts($entries);
+            $filters = $request->only(['warehouse_id']); // Add other filters if needed
+            
+            // Pass filters to service
+            $products = $this->productService->getPaginatedProducts($entries, $filters);
+            
             $totalproduct = Product::count();
             $lowStockCount = Product::lowStockCount();
             $expiringSoonCount = $this->productService->getExpiringSoonPOItemsCount();
@@ -54,7 +58,7 @@ class ProductController extends Controller
     public function modalView($id)
     {
         try {
-            $product = Product::with(['category', 'supplier', 'unit', 'warehouse', 'poItems' => function($query) {
+            $product = Product::with(['category', 'supplier', 'unit', 'warehouses', 'poItems' => function($query) {
                 $query->where('remaining_quantity', '>', 0)->orderBy('expiry_date', 'asc');
             }])->findOrFail($id);
             $product->formatted_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->price);
@@ -86,14 +90,14 @@ class ProductController extends Controller
         $request->validate([
             'code' => 'required|string',
             'name' => 'required|string',
-            'stock_quantity' => 'required|integer',
+            'stock_quantity' => 'nullable|integer', // Optional opening stock
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
             'category_id' => 'required|integer',
             'units_id' => 'required|integer',
             'supplier_id' => 'required|integer',
-            'warehouse_id' => 'nullable|integer',
+            'warehouse_id' => 'nullable|integer', // For initial stock placement
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'has_expiry' => 'sometimes|boolean',
@@ -165,14 +169,14 @@ class ProductController extends Controller
             'code' => 'string',
             'barcode' => 'nullable|string|unique:products,barcode,' . $product->id,
             'name' => 'string',
-            'stock_quantity' => 'integer',
+            // 'stock_quantity' => 'integer', // Removed from update
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'numeric',
             'selling_price' => 'numeric',
             'category_id' => 'integer',
             'units_id' => 'integer',
             'supplier_id' => 'integer',
-            'warehouse_id' => 'nullable|integer|exists:warehouses,id',
+            // 'warehouse_id' => 'nullable|integer|exists:warehouses,id', // Removed from update
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'has_expiry' => 'sometimes|boolean',

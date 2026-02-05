@@ -16,7 +16,9 @@
             <button class="table-sort fs-4 py-3" data-sort="sort-name">{{ __('messages.name') }}</button>
         </th>
         <th class="no-print sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-quantity">{{ __('messages.qty') }}</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-quantity">
+                {{ isset($selectedWarehouse) ? __('messages.qty') . ' (' . $selectedWarehouse->name . ')' : __('messages.qty') . ' (' . __('messages.total') . ')' }}
+            </button>
         </th>
         <th class="no-print sticky-top " style="z-index: 1020;">
             <button class="table-sort fs-4 py-3" data-sort="sort-category">{{ __('messages.cat') }}</button>

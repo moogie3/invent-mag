@@ -26,6 +26,7 @@ class SalesControllerTest extends TestCase
 
     protected Customer $customer;
     protected Product $product;
+    protected Warehouse $warehouse; // Added
 
     protected function setUp(): void
     {
@@ -47,9 +48,19 @@ class SalesControllerTest extends TestCase
         $this->user->save();
         $this->actingAs($this->user);
 
-        Warehouse::factory()->create(['is_main' => true]);
+        $this->warehouse = Warehouse::factory()->create(['is_main' => true]); // Added
         $this->customer = Customer::factory()->create();
         $this->product = Product::factory()->create();
+        
+        // Ensure product has stock in the warehouse
+        ProductWarehouse::updateOrCreate(
+            [
+                'product_id' => $this->product->id,
+                'warehouse_id' => $this->warehouse->id,
+                'tenant_id' => $tenantId
+            ],
+            ['quantity' => 100]
+        );
     }
 
     public function tearDown(): void
@@ -86,6 +97,7 @@ class SalesControllerTest extends TestCase
         $salesData = [
             'invoice' => 'INV-' . rand(10000, 99999),
             'customer_id' => $this->customer->id,
+            'warehouse_id' => $this->warehouse->id, // Added
             'order_date' => Carbon::now()->format('Y-m-d'),
             'due_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
             'discount_total' => 10,
@@ -107,6 +119,7 @@ class SalesControllerTest extends TestCase
 
         $this->assertDatabaseHas('sales', [
             'customer_id' => $this->customer->id,
+            'warehouse_id' => $this->warehouse->id, // Added
             'invoice' => $salesData['invoice'],
         ]);
 
@@ -140,10 +153,20 @@ class SalesControllerTest extends TestCase
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
 
         $newProduct = Product::factory()->create();
+        // Ensure new product has stock
+        \App\Models\ProductWarehouse::updateOrCreate(
+            [
+                'product_id' => $newProduct->id,
+                'warehouse_id' => $this->warehouse->id,
+                'tenant_id' => $sale->tenant_id
+            ],
+            ['quantity' => 100]
+        );
 
         $updateData = [
             'invoice' => $sale->invoice,
             'customer_id' => $this->customer->id,
+            'warehouse_id' => $this->warehouse->id, // Added
             'order_date' => Carbon::now()->format('Y-m-d'),
             'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
             'order_discount' => 5, // Changed from 'discount_total'

@@ -21,6 +21,20 @@
         </div>
 
         <div class="d-flex justify-content-between mb-2">
+            <div><strong>{{ __('messages.warehouse') }}</strong></div>
+            <div>
+                <select class="form-select form-select-sm" name="warehouse_id" id="warehouse_id">
+                    @foreach ($warehouses as $warehouse)
+                        <option value="{{ $warehouse->id }}"
+                            {{ $pos->warehouse_id == $warehouse->id ? 'selected' : '' }}>
+                            {{ $warehouse->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-2">
             <div><strong>{{ __('messages.po_payment_type') }}</strong></div>
             <div>
                 <select class="form-select form-select-sm" name="payment_type" id="payment_type"

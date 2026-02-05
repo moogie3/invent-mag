@@ -103,9 +103,17 @@ class PurchaseReturnSeeder extends Seeder
                 $purchaseReturnItem = $purchaseReturn->items()->create($itemData);
 
                 // Update product stock (increment as it's a return to stock)
-                $product = Product::find($purchaseReturnItem->product_id);
-                if ($product) {
-                    $product->increment('stock_quantity', $purchaseReturnItem->quantity);
+                // Note: Purchase return usually means returning TO supplier, so stock should DECREMENT.
+                // But if the logic implies reversing a purchase, it depends on when stock was added.
+                // Assuming Purchase adds to stock, Return reduces stock.
+                
+                $stockRecord = \App\Models\ProductWarehouse::where('product_id', $purchaseReturnItem->product_id)
+                    ->where('warehouse_id', $purchase->warehouse_id)
+                    ->where('tenant_id', $tenantId)
+                    ->first();
+
+                if ($stockRecord) {
+                    $stockRecord->decrement('quantity', $purchaseReturnItem->quantity);
                 }
             }
 

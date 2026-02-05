@@ -31,6 +31,7 @@ class Purchase extends Model
             'invoice',
             'supplier_id',
             'user_id',
+            'warehouse_id', // Added
             'order_date',
             'due_date',
             'payment_type',
@@ -56,8 +57,14 @@ class Purchase extends Model
     
         protected $attributes = [
         'status' => 'Unpaid',
+        'payment_type' => '-',
         ];
     
+        public function warehouse(): BelongsTo
+        {
+            return $this->belongsTo(Warehouse::class, 'warehouse_id');
+        }
+
         public function supplier(): BelongsTo
         {
             return $this->belongsTo(Supplier::class, 'supplier_id');

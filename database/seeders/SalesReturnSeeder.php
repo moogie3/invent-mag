@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\SalesReturn;
 use App\Models\Sales;
 use App\Models\SalesItem;
+use App\Models\ProductWarehouse;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\SalesReturnItem;
@@ -102,10 +103,21 @@ class SalesReturnSeeder extends Seeder
             foreach ($returnItemsData as $itemData) {
                 $salesReturnItem = $salesReturn->items()->create($itemData);
 
-                // Update product stock (decrement as it's a customer return back to inventory)
-                $product = Product::find($salesReturnItem->product_id);
-                if ($product) {
-                    $product->increment('stock_quantity', $salesReturnItem->quantity);
+                // Update product stock (increment as it's a customer return back to inventory)
+                $stockRecord = ProductWarehouse::where('product_id', $salesReturnItem->product_id)
+                    ->where('warehouse_id', $sale->warehouse_id)
+                    ->where('tenant_id', $tenantId)
+                    ->first();
+
+                if ($stockRecord) {
+                    $stockRecord->increment('quantity', $salesReturnItem->quantity);
+                } else {
+                     ProductWarehouse::create([
+                        'product_id' => $salesReturnItem->product_id,
+                        'warehouse_id' => $sale->warehouse_id,
+                        'quantity' => $salesReturnItem->quantity,
+                        'tenant_id' => $tenantId,
+                    ]);
                 }
             }
 

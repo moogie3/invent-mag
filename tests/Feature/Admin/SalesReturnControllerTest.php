@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Customer;
 use App\Models\SalesItem;
 use App\Models\SalesReturnItem;
+use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Carbon\Carbon;
@@ -38,15 +39,23 @@ class SalesReturnControllerTest extends TestCase
             'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
             'accounts_receivable_account_id' => Account::where('code', '1130-' . $tenantId)->first()->id,
             'sales_revenue_account_id' => Account::where('code', '4100-' . $tenantId)->first()->id,
+            'sales_returns_account_id' => Account::where('code', '4200-' . $tenantId)->first()->id ?? 1, // Fallback if seeder differs
             'cost_of_goods_sold_account_id' => Account::where('code', '5200-' . $tenantId)->first()->id,
             'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
         ];
         $this->user->save();
         $this->actingAs($this->user);
 
-        $this->product = Product::factory()->create(['stock_quantity' => 10]);
-        $customer = Customer::factory()->create(); // Create a customer
-        $this->sale = Sales::factory()->create(['customer_id' => $customer->id]); // Associate customer with sale
+        $this->warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $this->product = Product::factory()->withStock(10)->create();
+        $customer = Customer::factory()->create();
+        
+        $this->sale = Sales::factory()->create([
+            'customer_id' => $customer->id,
+            'warehouse_id' => $this->warehouse->id, // Added
+        ]);
+        
+        // Ensure sales item created and stock deducted (simulated)
         SalesItem::factory()->create([
             'sales_id' => $this->sale->id,
             'product_id' => $this->product->id,
@@ -54,6 +63,10 @@ class SalesReturnControllerTest extends TestCase
             'customer_price' => 100,
             'total' => 500
         ]);
+        
+        // Ensure pivot reflects post-sale state (10 - 5 = 5)
+        // Note: Factory withStock(10) sets initial stock.
+        // We simulate the sale already happened.
     }
 
     public function test_it_can_display_the_sales_return_index_page()

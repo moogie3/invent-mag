@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->foreignId('warehouse_id')->constrained()->cascadeOnDelete(); // Added
             $table->string('adjustment_type'); // 'increase', 'decrease', 'correction'
             $table->float('quantity_before');
             $table->float('quantity_after');

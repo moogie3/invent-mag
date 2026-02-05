@@ -733,6 +733,8 @@ return [
     'due_date' => 'Due Date',
     'amount' => 'Amount',
     'payment_type' => 'Payment Type',
+    'payment_typet' => 'Payment',
+    'warehouset' => "Gudang",
     'purchasing' => 'Purchasing',
     'create_purchase_order' => 'Create Purchase Order',
     'save_purchase_order' => 'Save Purchase Order',
@@ -1307,4 +1309,6 @@ return [
     'reset_to_default' => 'Atur Ulang ke Default',
     'reset_coa_warning_message' => 'Ini akan menghapus semua data akuntansi Anda dan mengatur ulang Bagan Akun ke default. Apakah Anda yakin?',
     'reset' => 'Atur Ulang',
+    'all_warehouses' => 'Semua Gudang',
+    'total' => 'Total',
 ];

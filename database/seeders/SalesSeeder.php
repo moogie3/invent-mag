@@ -8,6 +8,8 @@ use App\Models\Customer;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\SalesItem;
+use App\Models\Warehouse;
+use App\Models\ProductWarehouse;
 use App\Services\AccountingService;
 use Carbon\Carbon;
 
@@ -42,34 +44,38 @@ class SalesSeeder extends Seeder
         $users = User::where('tenant_id', $tenantId)->get();
         $products = Product::where('tenant_id', $tenantId)->get();
 
-        if ($customers->isEmpty() || $users->isEmpty() || $products->isEmpty()) {
-            $this->command->info('Skipping SalesSeeder for tenant ' . app('currentTenant')->name . ': No customers, users, or products found. Please run their respective seeders first.');
+        $warehouseIds = Warehouse::where('tenant_id', $tenantId)->pluck('id')->toArray(); // Fetch warehouse IDs
+
+        if ($customers->isEmpty() || $users->isEmpty() || $products->isEmpty() || empty($warehouseIds)) {
+            $this->command->info('Skipping SalesSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
             return;
         }
 
         for ($i = 0; $i < 100; $i++) { // Create 100 sample sales
             $customer = $customers->random();
             $user = $users->random();
-            $orderDate = Carbon::now()->subMonths(rand(0, 11))->subDays(rand(0, 29)); // Sales over the last 12 months
+            $warehouseId = collect($warehouseIds)->random(); // Pick a warehouse
+            $orderDate = Carbon::now()->subMonths(rand(0, 11))->subDays(rand(0, 29));
             $dueDate = $orderDate->copy()->addDays(rand(7, 30));
             $paymentType = collect(['Cash', 'Card', 'Transfer', 'eWallet', '-'])->random();
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
 
-            $invoiceNumber = $i + 1; // Use loop counter for invoice number
+            $invoiceNumber = $i + 1;
             $invoice = 'INV-' . str_pad($invoiceNumber, 5, '0', STR_PAD_LEFT) . '-' . $tenantId;
 
             $sales = Sales::create([
                 'invoice' => $invoice,
                 'customer_id' => $customer->id,
                 'user_id' => $user->id,
+                'warehouse_id' => $warehouseId, // Added warehouse
                 'order_date' => $orderDate,
                 'due_date' => $dueDate,
                 'payment_type' => $paymentType,
                 'order_discount' => rand(0, 20),
                 'order_discount_type' => collect(['percentage', 'fixed'])->random(),
-                'tax_rate' => 10, // Example tax rate
-                'total_tax' => 0, // Will be calculated
-                'total' => 0, // Will be calculated from items
+                'tax_rate' => 10,
+                'total_tax' => 0,
+                'total' => 0,
                 'status' => $status,
                 'is_pos' => false,
                 'tenant_id' => $tenantId,
@@ -136,6 +142,38 @@ class SalesSeeder extends Seeder
 
             foreach ($salesItemsData as $itemData) {
                 SalesItem::create(array_merge(['sales_id' => $sales->id], $itemData));
+                
+                // Decrement stock from the selected warehouse (if it exists in seeding context)
+                // For seeding, assume stock was added via Purchase first. If not, this goes negative.
+                // To fix negative stock in seeders, we should ensure PurchaseSeeder runs BEFORE SalesSeeder
+                // OR initialize stock with a positive value.
+                
+                $stockRecord = ProductWarehouse::where('product_id', $itemData['product_id'])
+                    ->where('warehouse_id', $sales->warehouse_id)
+                    ->where('tenant_id', $tenantId)
+                    ->first();
+                
+                if ($stockRecord) {
+                    // Ensure enough stock exists before selling to avoid negative numbers in seed
+                    if ($stockRecord->quantity < $itemData['quantity']) {
+                         $stockRecord->update(['quantity' => $stockRecord->quantity + 100]);
+                    }
+                    $stockRecord->decrement('quantity', $itemData['quantity']);
+                } else {
+                    // Initialize with POSITIVE stock to avoid negative numbers during initial seed
+                    ProductWarehouse::create([
+                        'product_id' => $itemData['product_id'],
+                        'warehouse_id' => $sales->warehouse_id,
+                        'quantity' => 100, // Start with 100, then decrement will make it 100 - sold
+                        'tenant_id' => $tenantId
+                    ]);
+                    // Re-fetch to decrement properly
+                    $stockRecord = \App\Models\ProductWarehouse::where('product_id', $itemData['product_id'])
+                        ->where('warehouse_id', $sales->warehouse_id)
+                        ->where('tenant_id', $tenantId)
+                        ->first();
+                    $stockRecord->decrement('quantity', $itemData['quantity']);
+                }
             }
 
             $sales->update([

@@ -7,6 +7,8 @@ use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\POItem;
+use App\Models\Warehouse;
+use App\Models\ProductWarehouse;
 use App\Services\AccountingService;
 use Carbon\Carbon;
 
@@ -30,14 +32,16 @@ class PurchaseSeeder extends Seeder
 
         $suppliers = Supplier::where('tenant_id', $tenantId)->get();
         $products = Product::where('tenant_id', $tenantId)->get();
+        $warehouseIds = Warehouse::where('tenant_id', $tenantId)->pluck('id')->toArray();
 
-        if ($suppliers->isEmpty() || $products->isEmpty()) {
-            $this->command->info('Skipping PurchaseSeeder for tenant ' . app('currentTenant')->name . ': No suppliers or products found. Please run SupplierSeeder and ProductSeeder first.');
+        if ($suppliers->isEmpty() || $products->isEmpty() || empty($warehouseIds)) {
+            $this->command->info('Skipping PurchaseSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
             return;
         }
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $supplier = $suppliers->random();
+            $warehouseId = collect($warehouseIds)->random();
             $orderDate = Carbon::now()->subDays(rand(0, 29));
             $dueDate = $orderDate->copy()->addDays(rand(7, 30));
             $paymentType = collect(['Cash', 'Transfer', '-'])->random();
@@ -46,12 +50,13 @@ class PurchaseSeeder extends Seeder
             $purchase = Purchase::create([
                 'invoice' => 'PO-' . str_pad(Purchase::where('tenant_id', $tenantId)->count() + 1, 5, '0', STR_PAD_LEFT),
                 'supplier_id' => $supplier->id,
+                'warehouse_id' => $warehouseId, // Added
                 'order_date' => $orderDate,
                 'due_date' => $dueDate,
                 'payment_type' => $paymentType,
                 'discount_total' => rand(0, 50),
                 'discount_total_type' => collect(['percentage', 'fixed'])->random(),
-                'total' => 0, // Will be calculated from items
+                'total' => 0,
                 'status' => $status,
                 'tenant_id' => $tenantId,
             ]);
@@ -105,10 +110,16 @@ class PurchaseSeeder extends Seeder
                     'tenant_id' => $tenantId,
                 ], $itemData));
 
-                // Update product stock_quantity
-                if ($product) {
-                    $product->increment('stock_quantity', $itemData['quantity']);
-                }
+                // Update product stock in warehouse
+                $stockRecord = ProductWarehouse::firstOrCreate(
+                    [
+                        'product_id' => $product->id,
+                        'warehouse_id' => $purchase->warehouse_id,
+                        'tenant_id' => $tenantId
+                    ],
+                    ['quantity' => 0]
+                );
+                $stockRecord->increment('quantity', $itemData['quantity']);
             }
 
             $purchase->update(['total' => $totalPurchaseAmount]);

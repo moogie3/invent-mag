@@ -10,6 +10,19 @@
                 </h2>
             </div>
             <div class="col-auto ms-auto d-flex gap-2">
+                <form action="{{ route('admin.product') }}" method="GET" class="d-inline-flex gap-2">
+                    <select name="warehouse_id" class="form-select" style="min-width: 200px;">
+                        <option value="">{{ __('messages.all_warehouses') }}</option>
+                        @foreach ($warehouses as $warehouse)
+                            <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                                {{ $warehouse->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="ti ti-filter"></i>
+                    </button>
+                </form>
                 <div class="dropdown d-inline-block">
                     <button class="btn btn-secondary dropdown-toggle" type="button"
                         id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">

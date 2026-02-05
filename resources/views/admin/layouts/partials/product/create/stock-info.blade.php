@@ -1,7 +1,7 @@
 <div class="mb-4 pb-2">
     <div class="row g-3">
         <div class="col-md-4">
-            <label class="form-label">{{ __('messages.product_stock_quantity') }}</label>
+            <label class="form-label">{{ __('messages.product_opening_stock_main_warehouse') }}</label>
             <input type="number" class="form-control" name="stock_quantity" placeholder="0">
         </div>
         <div class="col-md-4">

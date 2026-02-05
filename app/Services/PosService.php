@@ -12,6 +12,8 @@ use App\Models\Categories;
 use App\Models\Customer;
 use App\Models\Supplier;
 use App\Models\Unit;
+use App\Models\Warehouse;
+use App\Models\ProductWarehouse;
 
 class PosService
 {
@@ -72,10 +74,18 @@ class PosService
         }
         $invoice = 'POS-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
 
+        // Assign to Main Warehouse by default for POS
+        $mainWarehouse = Warehouse::where('is_main', true)->first();
+        if (!$mainWarehouse) {
+            // Fallback
+            $mainWarehouse = Warehouse::first();
+        }
+
         $sale = Sales::create([
             'invoice' => $invoice,
             'customer_id' => $data['customer_id'],
             'user_id' => Auth::id(),
+            'warehouse_id' => $mainWarehouse ? $mainWarehouse->id : null, // Added
             'order_date' => $data['transaction_date'],
             'due_date' => $data['transaction_date'],
             'tax_rate' => $taxRate,
@@ -115,12 +125,24 @@ class PosService
                 'total' => $productSubtotal,
             ]);
 
-            if (isset($productModel->stock_quantity)) {
-                $productModel->decrement('stock_quantity', $product['quantity']);
-            } elseif (isset($productModel->quantity)) {
-                $productModel->decrement('quantity', $product['quantity']);
-            } elseif (isset($productModel->stock)) {
-                $productModel->decrement('stock', $product['quantity']);
+            // Deduct stock from Main Warehouse
+            if ($mainWarehouse) {
+                $stockRecord = ProductWarehouse::where('product_id', $productModel->id)
+                    ->where('warehouse_id', $mainWarehouse->id)
+                    ->where('tenant_id', $productModel->tenant_id)
+                    ->first();
+
+                if ($stockRecord) {
+                    $stockRecord->decrement('quantity', $product['quantity']);
+                } else {
+                    // Create negative stock if allowed
+                    ProductWarehouse::create([
+                        'product_id' => $productModel->id,
+                        'warehouse_id' => $mainWarehouse->id,
+                        'quantity' => -$product['quantity'],
+                        'tenant_id' => $productModel->tenant_id
+                    ]);
+                }
             }
         }
 

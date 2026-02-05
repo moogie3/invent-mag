@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('invoice');
             $table->integer('supplier_id');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null')->after('supplier_id');
+            $table->foreignId('warehouse_id')->constrained()->cascadeOnDelete(); // Added for multi-warehouse support
             $table->timestamp('order_date')->useCurrent()->index();
             $table->timestamp('due_date')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->enum('payment_type', ['Cash', 'Card', 'Transfer', 'eWallet', '-'])->default('-');

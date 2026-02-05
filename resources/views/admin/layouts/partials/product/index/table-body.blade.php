@@ -18,10 +18,15 @@
             <td class="sort-code no-print">{{ $product->code }}</td>
             <td class="sort-name">{{ $product->name }}</td>
             <td class="sort-quantity no-print text-center">
-                <div class="fw-bold">{{ $product->stock_quantity }}</div>
                 @php
-                    [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($product->stock_quantity, $product->low_stock_threshold);
+                    $displayStock = $product->total_stock;
+                    if (isset($selectedWarehouse) && $selectedWarehouse) {
+                        $pivot = $product->warehouses->firstWhere('id', $selectedWarehouse->id);
+                        $displayStock = $pivot ? $pivot->pivot->quantity : 0;
+                    }
+                    [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($displayStock, $product->low_stock_threshold);
                 @endphp
+                <div class="fw-bold">{{ $displayStock }}</div>
                 @if ($badgeClass)
                     <span class="{{ $badgeClass }}">{{ $badgeText }}</span>
                     @if ($product->low_stock_threshold)

@@ -20,8 +20,8 @@
     </div>
 
     <div class="col-md-3">
-        <label class="form-label">{{ __('messages.product_stock_quantity') }}</label>
-        <input type="text" name="stock_quantity" class="form-control" value="{{ $products->stock_quantity }}">
+        <label class="form-label">{{ __('messages.product_stock_quantity') }} <i class="ti ti-info-circle text-muted" data-bs-toggle="tooltip" title="Total stock across all warehouses. Use Adjust Stock to change."></i></label>
+        <input type="text" class="form-control" value="{{ $products->total_stock }}" readonly disabled>
     </div>
 
     <div class="col-md-3">

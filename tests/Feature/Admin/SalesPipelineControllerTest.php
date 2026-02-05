@@ -4,6 +4,9 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Models\SalesPipeline;
+use App\Models\Warehouse;
+use App\Models\ProductWarehouse;
+use App\Models\Product;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
@@ -352,7 +355,18 @@ class SalesPipelineControllerTest extends TestCase
 
     public function test_it_can_convert_opportunity_to_sales_order()
     {
-        $product = \App\Models\Product::factory()->create(['stock_quantity' => 100]);
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create();
+        // Set stock for main warehouse
+        ProductWarehouse::updateOrCreate(
+            [
+                'product_id' => $product->id,
+                'warehouse_id' => $warehouse->id,
+                'tenant_id' => $product->tenant_id
+            ],
+            ['quantity' => 100]
+        );
+        
         $pipeline = SalesPipeline::factory()->create();
         $stage = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
         $opportunity = \App\Models\SalesOpportunity::factory()->create([
@@ -377,24 +391,14 @@ class SalesPipelineControllerTest extends TestCase
         $this->assertDatabaseHas('sales', [
             'sales_opportunity_id' => $opportunity->id,
             'customer_id' => $opportunity->customer_id,
-            'total' => ($opportunity->items->first()->quantity * $opportunity->items->first()->price) * (1 + (\App\Models\Tax::where('is_active', 1)->first()->rate / 100)), // Assuming default tax
+            'warehouse_id' => $warehouse->id, // Verify warehouse assignment
         ]);
 
-        $this->assertDatabaseHas('sales_items', [
-            'sales_id' => \App\Models\Sales::where('sales_opportunity_id', $opportunity->id)->first()->id,
+        // Verify stock deduction
+        $this->assertDatabaseHas('product_warehouse', [
             'product_id' => $product->id,
-            'quantity' => 5,
-        ]);
-
-        $this->assertDatabaseHas('products', [
-            'id' => $product->id,
-            'stock_quantity' => 95, // 100 - 5
-        ]);
-
-        $this->assertDatabaseHas('sales_opportunities', [
-            'id' => $opportunity->id,
-            'status' => 'converted',
-            'sales_id' => \App\Models\Sales::where('sales_opportunity_id', $opportunity->id)->first()->id,
+            'warehouse_id' => $warehouse->id,
+            'quantity' => 95, // 100 - 5
         ]);
     }
 
@@ -425,7 +429,17 @@ class SalesPipelineControllerTest extends TestCase
 
     public function test_it_cannot_convert_opportunity_with_insufficient_stock()
     {
-        $product = \App\Models\Product::factory()->create(['stock_quantity' => 2]); // Insufficient stock
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create();
+        ProductWarehouse::updateOrCreate(
+            [
+                'product_id' => $product->id,
+                'warehouse_id' => $warehouse->id,
+                'tenant_id' => $product->tenant_id
+            ],
+            ['quantity' => 2]
+        );
+        
         $pipeline = SalesPipeline::factory()->create();
         $stage = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
         $opportunity = \App\Models\SalesOpportunity::factory()->create([

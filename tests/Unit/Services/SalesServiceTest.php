@@ -8,6 +8,8 @@ use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\User;
 use App\Models\Account;
+use App\Models\Warehouse; // Added
+use App\Models\ProductWarehouse;
 use App\Services\AccountingService;
 use App\Services\SalesService;
 use Tests\TestCase;
@@ -111,6 +113,7 @@ class SalesServiceTest extends TestCase
         $this->assertArrayHasKey('customers', $data);
         $this->assertArrayHasKey('tax', $data);
         $this->assertArrayHasKey('isPaid', $data);
+        $this->assertArrayHasKey('warehouses', $data); // Added check
     }
 
     #[Test]
@@ -143,13 +146,22 @@ class SalesServiceTest extends TestCase
     public function it_can_create_a_sale()
     {
         $customer = Customer::factory()->create();
-        $product = Product::factory()->create(['stock_quantity' => 10, 'price' => 50]);
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        
+        $product = Product::factory()->create(['price' => 50]);
+        // Set initial stock in warehouse
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
         $products = json_encode([
             ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
         ]);
         $data = [
             'products' => $products,
             'customer_id' => $customer->id,
+            'warehouse_id' => $warehouse->id, // Added
             'order_date' => now()->toDateString(),
             'due_date' => now()->addMonth()->toDateString(),
         ];
@@ -159,22 +171,37 @@ class SalesServiceTest extends TestCase
         $sale = $this->salesService->createSale($data);
 
         $this->assertInstanceOf(Sales::class, $sale);
-        $this->assertDatabaseHas('sales', ['id' => $sale->id, 'customer_id' => $customer->id]);
+        $this->assertDatabaseHas('sales', ['id' => $sale->id, 'customer_id' => $customer->id, 'warehouse_id' => $warehouse->id]);
         $this->assertDatabaseHas('sales_items', ['sales_id' => $sale->id, 'product_id' => $product->id]);
-        $this->assertEquals(8, $product->fresh()->stock_quantity);
+        
+        // Verify stock in pivot table
+        $this->assertDatabaseHas('product_warehouse', [
+            'product_id' => $product->id,
+            'warehouse_id' => $warehouse->id,
+            'quantity' => 8
+        ]);
     }
 
     #[Test]
     public function it_creates_a_journal_entry_on_sale_creation()
     {
         $customer = Customer::factory()->create();
-        $product = Product::factory()->create(['stock_quantity' => 10, 'price' => 50]); // Purchase price = 50
+        $warehouse = Warehouse::factory()->create();
+        
+        $product = Product::factory()->create(['price' => 50]);
+        // Set initial stock
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
         $products = json_encode([
             ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100], // Selling price = 100
         ]);
         $data = [
             'products' => $products,
             'customer_id' => $customer->id,
+            'warehouse_id' => $warehouse->id,
             'order_date' => now()->toDateString(),
             'due_date' => now()->addMonth()->toDateString(),
         ];
@@ -244,18 +271,36 @@ class SalesServiceTest extends TestCase
     #[Test]
     public function it_can_update_a_sale()
     {
-        $sale = Sales::factory()->has(SalesItem::factory()->count(1), 'salesItems')->create();
-        $oldItem = $sale->salesItems->first();
-        $product = Product::find($oldItem->product_id);
-        $initialStock = $product->stock_quantity;
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
 
-        $newProduct = Product::factory()->create(['stock_quantity' => 20]);
+        $sale = Sales::factory()->create(['warehouse_id' => $warehouse->id]);
+        $oldItem = SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1]);
+        
+        // Stock should have been decremented when sale was created (conceptually)
+        // Since we created sale/items directly via factory, stock wasn't auto-decremented.
+        // Let's manually set pivot to what it "should" be after sale: 9.
+        ProductWarehouse::where('product_id', $product->id)
+            ->where('warehouse_id', $warehouse->id)
+            ->update(['quantity' => 9]);
+
+        $newProduct = Product::factory()->create();
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $newProduct->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $newProduct->tenant_id],
+            ['quantity' => 20]
+        );
+
         $products = json_encode([
             ['product_id' => $newProduct->id, 'quantity' => 5, 'customer_price' => 200, 'discount' => 10, 'discount_type' => 'percentage'],
         ]);
         $data = [
             'products' => $products,
             'customer_id' => $sale->customer_id,
+            'warehouse_id' => $warehouse->id,
             'order_date' => now()->toDateString(),
             'due_date' => now()->addMonths(2)->toDateString(),
             'order_discount' => 5,
@@ -267,8 +312,12 @@ class SalesServiceTest extends TestCase
         $this->assertDatabaseHas('sales', ['id' => $sale->id, 'order_discount' => 5]);
         $this->assertDatabaseMissing('sales_items', ['id' => $oldItem->id]);
         $this->assertDatabaseHas('sales_items', ['sales_id' => $sale->id, 'product_id' => $newProduct->id]);
-        $this->assertEquals($initialStock + $oldItem->quantity, Product::find($oldItem->product_id)->fresh()->stock_quantity);
-        $this->assertEquals(15, $newProduct->fresh()->stock_quantity);
+        
+        // Old product stock should revert: 9 + 1 = 10
+        $this->assertDatabaseHas('product_warehouse', ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'quantity' => 10]);
+        
+        // New product stock should decrement: 20 - 5 = 15
+        $this->assertDatabaseHas('product_warehouse', ['product_id' => $newProduct->id, 'warehouse_id' => $warehouse->id, 'quantity' => 15]);
     }
 
     #[Test]
@@ -313,22 +362,48 @@ class SalesServiceTest extends TestCase
     #[Test]
     public function it_can_delete_a_sale()
     {
-        $sale = Sales::factory()->has(SalesItem::factory()->count(1), 'salesItems')->create();
-        $item = $sale->salesItems->first();
-        $product = Product::find($item->product_id);
-        $initialStock = $product->stock_quantity;
+        $warehouse = Warehouse::factory()->create();
+        $sale = Sales::factory()->create(['warehouse_id' => $warehouse->id]);
+        $product = Product::factory()->create();
+        $item = SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1]);
+        
+        // Setup initial stock state as if sale happened
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 9]
+        );
 
         $this->salesService->deleteSale($sale);
 
         $this->assertDatabaseMissing('sales', ['id' => $sale->id]);
         $this->assertDatabaseMissing('sales_items', ['id' => $item->id]);
-        $this->assertEquals($initialStock + $item->quantity, $product->fresh()->stock_quantity);
+        
+        // Stock should revert: 9 + 1 = 10
+        $this->assertDatabaseHas('product_warehouse', [
+            'product_id' => $product->id,
+            'warehouse_id' => $warehouse->id,
+            'quantity' => 10
+        ]);
     }
 
     #[Test]
     public function it_can_bulk_delete_sales()
     {
-        $sales = Sales::factory()->count(3)->has(SalesItem::factory()->count(1), 'salesItems')->create();
+        $warehouse = Warehouse::factory()->create();
+        // Create 3 sales
+        $sales = Sales::factory()->count(3)->create(['warehouse_id' => $warehouse->id]);
+        
+        foreach($sales as $sale) {
+            $product = Product::factory()->create();
+            SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1]);
+            
+            // Init stock
+            ProductWarehouse::updateOrCreate(
+                ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $sale->tenant_id],
+                ['quantity' => 9]
+            );
+        }
+
         $ids = $sales->pluck('id')->toArray();
 
         $this->salesService->bulkDeleteSales($ids);

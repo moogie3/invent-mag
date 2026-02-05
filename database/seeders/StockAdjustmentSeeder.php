@@ -7,6 +7,8 @@ use Illuminate\Database\Seeder;
 use App\Models\StockAdjustment;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Warehouse;
+use App\Models\ProductWarehouse;
 
 class StockAdjustmentSeeder extends Seeder
 {
@@ -20,23 +22,35 @@ class StockAdjustmentSeeder extends Seeder
         $products = Product::where('tenant_id', $tenantId)->get();
         $users = User::where('tenant_id', $tenantId)->get();
 
-        if ($products->isEmpty() || $users->isEmpty()) {
-            $this->command->info('Skipping StockAdjustmentSeeder for tenant ' . app('currentTenant')->name . ': Products or Users not found. Please run their seeders first.');
+        $warehouses = Warehouse::where('tenant_id', $tenantId)->get();
+
+        if ($products->isEmpty() || $users->isEmpty() || $warehouses->isEmpty()) {
+            $this->command->info('Skipping StockAdjustmentSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
             return;
         }
 
         foreach ($products as $product) {
+            $warehouse = $warehouses->random();
+            
+            // Get current stock from pivot or init at 0
+            $stockRecord = ProductWarehouse::firstOrCreate(
+                ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $tenantId],
+                ['quantity' => 0]
+            );
+
             StockAdjustment::create([
                 'product_id' => $product->id,
+                'warehouse_id' => $warehouse->id, // Added
                 'adjustment_type' => 'increase',
-                'quantity_before' => $product->stock_quantity,
-                'quantity_after' => $product->stock_quantity + 10,
+                'quantity_before' => $stockRecord->quantity,
+                'quantity_after' => $stockRecord->quantity + 10,
                 'adjustment_amount' => 10,
                 'reason' => 'Initial stock adjustment',
                 'adjusted_by' => $users->random()->id,
                 'tenant_id' => $tenantId,
             ]);
-            $product->increment('stock_quantity', 10);
+            
+            $stockRecord->increment('quantity', 10);
         }
     }
 }

@@ -83,6 +83,7 @@ class PurchaseController extends Controller
         $request->validate([
             'invoice' => 'required|string|unique:po,invoice',
             'supplier_id' => 'required|exists:suppliers,id',
+            'warehouse_id' => 'required|exists:warehouses,id', // Added
             'order_date' => 'required|date',
             'due_date' => 'required|date',
             'products' => 'required|json',
@@ -107,6 +108,7 @@ class PurchaseController extends Controller
         $request->validate([
             'invoice' => ['required', 'string', Rule::unique('po', 'invoice')->ignore($purchase->id)->where('tenant_id', $purchase->tenant_id)],
             'supplier_id' => 'required|exists:suppliers,id',
+            'warehouse_id' => 'required|exists:warehouses,id', // Added
             'order_date' => 'required|date',
             'due_date' => 'required|date',
             'products' => 'required|json',

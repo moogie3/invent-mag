@@ -10,6 +10,9 @@
             <button class="table-sort fs-4 py-3" data-sort="sort-invoice">{{ __('messages.invoice') }}</button>
         </th>
         <th class="sticky-top " style="z-index: 1020;">
+            <button class="table-sort fs-4 py-3" data-sort="sort-warehouse">{{ __('messages.warehouse') }}</button>
+        </th>
+        <th class="sticky-top " style="z-index: 1020;">
             <button class="table-sort fs-4 py-3" data-sort="sort-supplier">{{ __('messages.supplier') }}</button>
         </th>
         <th class="sticky-top " style="z-index: 1020;">

@@ -4,6 +4,7 @@
     </td>
     <td class="sort-no no-print">{{ $pos->firstItem() + $index }}</td>
     <td class="sort-invoice">{{ $po->invoice }}</td>
+    <td class="sort-warehouse">{{ $po->warehouse->name ?? 'N/A' }}</td>
     <td class="sort-supplier">{{ $po->supplier->name }}</td>
     <td class="sort-orderdate">{{ $po->order_date->format('d F Y') }}</td>
     <td class="sort-duedate" data-date="{{ $po->due_date->format('Y-m-d') }}">

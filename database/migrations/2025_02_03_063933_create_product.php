@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('barcode')->unique()->nullable();
             $table->string('name');
             $table->index('name');
-            $table->integer('stock_quantity');
+            // $table->integer('stock_quantity'); // Removed for multi-warehouse support
             $table->integer('low_stock_threshold')->nullable();
             $table->decimal('price', 15, 2);
             $table->decimal('selling_price', 15, 2);
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->integer('units_id');
             $table->integer('supplier_id');
             $table->text('description')->nullable();
-            $table->integer('warehouse_id');
+            // $table->integer('warehouse_id'); // Removed for multi-warehouse support
             $table->string('image')->nullable();
             $table->boolean('has_expiry')->default(false);
             $table->timestamps();

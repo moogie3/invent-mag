@@ -343,6 +343,7 @@ return [
     'category' => 'Category',
     'unit' => 'Unit',
     'product_stock_quantity' => 'Stock Quantity',
+    'product_opening_stock_main_warehouse' => 'Opening Stock (Main Warehouse)',
     'product_low_stock_threshold' => 'Low Stock Threshold',
     'supplier' => 'Supplier',
     'warehouse' => 'Warehouse',
@@ -733,6 +734,8 @@ return [
     'due_date' => 'Due Date',
     'amount' => 'Amount',
     'payment_type' => 'Payment Type',
+    'payment_typet' => 'Payment',
+    'warehouset' => "WM",
     'purchasing' => 'Purchasing',
     'create_purchase_order' => 'Create Purchase Order',
     'save_purchase_order' => 'Save Purchase Order',
@@ -1307,4 +1310,6 @@ return [
     'reset_to_default' => 'Reset to Default',
     'reset_coa_warning_message' => 'This will delete all your accounting data and reset the Chart of Accounts to the default. Are you sure?',
     'reset' => 'Reset',
+    'all_warehouses' => 'All Warehouses',
+    'total' => 'Total',
 ];

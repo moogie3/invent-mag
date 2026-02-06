@@ -22,9 +22,9 @@ return new class extends Migration
             $table->integer('low_stock_threshold')->nullable();
             $table->decimal('price', 15, 2);
             $table->decimal('selling_price', 15, 2);
-            $table->integer('category_id');
-            $table->integer('units_id');
-            $table->integer('supplier_id');
+            $table->foreignId('category_id')->constrained('categories')->restrictOnDelete();
+            $table->foreignId('units_id')->constrained('units')->restrictOnDelete();
+            $table->foreignId('supplier_id')->constrained('suppliers')->restrictOnDelete();
             $table->text('description')->nullable();
             // $table->integer('warehouse_id'); // Removed for multi-warehouse support
             $table->string('image')->nullable();

@@ -39,8 +39,15 @@ class ProductController extends Controller
             $lowStockProducts = Product::getLowStockProducts();
             $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
 
-            return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts') + $formData);
+            // Get selected warehouse if warehouse_id is provided
+            $selectedWarehouse = null;
+            if (isset($filters['warehouse_id']) && $filters['warehouse_id']) {
+                $selectedWarehouse = Warehouse::find($filters['warehouse_id']);
+            }
+
+            return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts', 'selectedWarehouse') + $formData);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to load products index: ' . $e->getMessage(), ['exception' => $e]);
             return redirect()->back()->with('error', 'Error loading products. Please try again.');
         }
     }
@@ -51,6 +58,7 @@ class ProductController extends Controller
             $formData = $this->productService->getProductFormData();
             return view('admin.product.product-create', $formData);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to load product create form: ' . $e->getMessage(), ['exception' => $e]);
             return redirect()->route('admin.product')->with('error', 'Error loading form. Please try again.');
         }
     }
@@ -88,18 +96,18 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code' => 'required|string',
-            'name' => 'required|string',
-            'stock_quantity' => 'nullable|integer', // Optional opening stock
+            'code' => 'required|string|max:100',
+            'name' => 'required|string|max:255',
+            'stock_quantity' => 'nullable|integer|min:0', // Optional opening stock
             'low_stock_threshold' => 'nullable|integer|min:1',
-            'price' => 'required|numeric',
-            'selling_price' => 'required|numeric',
-            'category_id' => 'required|integer',
-            'units_id' => 'required|integer',
-            'supplier_id' => 'required|integer',
-            'warehouse_id' => 'nullable|integer', // For initial stock placement
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png',
+            'price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'category_id' => 'required|integer|exists:categories,id',
+            'units_id' => 'required|integer|exists:units,id',
+            'supplier_id' => 'required|integer|exists:suppliers,id',
+            'warehouse_id' => 'nullable|integer|exists:warehouses,id', // For initial stock placement
+            'description' => 'nullable|string|max:1000',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'has_expiry' => 'sometimes|boolean',
         ]);
 
@@ -107,6 +115,7 @@ class ProductController extends Controller
             $this->productService->createProduct($request->all());
             return redirect()->route('admin.product')->with('success', 'Product created');
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Product creation failed: ' . $e->getMessage(), ['exception' => $e, 'input' => $request->except('image')]);
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error creating product. Please try again.');
@@ -166,19 +175,17 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $request->validate([
-            'code' => 'string',
-            'barcode' => 'nullable|string|unique:products,barcode,' . $product->id,
-            'name' => 'string',
-            // 'stock_quantity' => 'integer', // Removed from update
+            'code' => 'required|string|max:100',
+            'barcode' => 'nullable|string|max:100|unique:products,barcode,' . $product->id,
+            'name' => 'required|string|max:255',
             'low_stock_threshold' => 'nullable|integer|min:1',
-            'price' => 'numeric',
-            'selling_price' => 'numeric',
-            'category_id' => 'integer',
-            'units_id' => 'integer',
-            'supplier_id' => 'integer',
-            // 'warehouse_id' => 'nullable|integer|exists:warehouses,id', // Removed from update
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png',
+            'price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'category_id' => 'required|integer|exists:categories,id',
+            'units_id' => 'required|integer|exists:units,id',
+            'supplier_id' => 'required|integer|exists:suppliers,id',
+            'description' => 'nullable|string|max:1000',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'has_expiry' => 'sometimes|boolean',
         ]);
 
@@ -186,6 +193,7 @@ class ProductController extends Controller
             $this->productService->updateProduct($product, $request->all());
             return redirect()->route('admin.product')->with('success', 'Product updated successfully');
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Product update failed for ID ' . $id . ': ' . $e->getMessage(), ['exception' => $e]);
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error updating product. Please try again.');

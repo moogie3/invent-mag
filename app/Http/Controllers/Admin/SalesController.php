@@ -97,6 +97,7 @@ class SalesController extends Controller
             $this->salesService->createSale($request->all());
             return redirect()->route('admin.sales')->with('success', 'Sale created successfully.');
         } catch (\Exception $e) {
+            Log::error('Sale creation failed: ' . $e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
                 ->withInput();
@@ -122,6 +123,7 @@ class SalesController extends Controller
             $this->salesService->updateSale($sale, $request->all());
             return redirect()->route('admin.sales.view', $id)->with('success', 'Sale updated successfully.');
         } catch (\Exception $e) {
+            Log::error('Sale update failed for ID ' . $id . ': ' . $e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
                 ->withInput();

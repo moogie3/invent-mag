@@ -3,6 +3,7 @@ import { PurchaseOrderEdit } from "./partials/purchase-order/edit/PurchaseOrderE
 import { PurchaseOrderView } from "./partials/purchase-order/view/PurchaseOrderView.js";
 import { PurchaseOrderBulkSelection } from "./partials/purchase-order/bulkActions/PurchaseOrderBulkSelection.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
+import { escapeHtml } from "./utils/sanitize.js";
 
 import {
     bulkDeletePO,
@@ -192,10 +193,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         data.forEach((po) => {
                             const row = document.createElement("tr");
                             row.innerHTML = `
-                            <td>${po.invoice}</td>
-                            <td>${po.supplier ? po.supplier.name : "N/A"}</td>
-                            <td class="text-center">${po.due_date}</td>
-                            <td class="text-end">${po.total}</td>
+                            <td>${escapeHtml(po.invoice)}</td>
+                            <td>${po.supplier ? escapeHtml(po.supplier.name) : "N/A"}</td>
+                            <td class="text-center">${escapeHtml(po.due_date)}</td>
+                            <td class="text-end">${escapeHtml(po.total)}</td>
                             <td class="text-end">
                                 <a href="/admin/po/view/${
                                     po.id

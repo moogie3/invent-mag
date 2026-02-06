@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->string('invoice');
-            $table->integer('supplier_id');
+            $table->foreignId('supplier_id')->constrained('suppliers')->restrictOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null')->after('supplier_id');
             $table->foreignId('warehouse_id')->constrained()->cascadeOnDelete(); // Added for multi-warehouse support
             $table->timestamp('order_date')->useCurrent()->index();

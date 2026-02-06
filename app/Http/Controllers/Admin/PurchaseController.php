@@ -95,6 +95,7 @@ class PurchaseController extends Controller
             $this->purchaseService->createPurchase($request->all());
             return redirect()->route('admin.po')->with('success', 'Purchase Order created successfully.');
         } catch (\Exception $e) {
+            Log::error('Purchase Order creation failed: ' . $e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
                 ->withInput();
@@ -120,6 +121,7 @@ class PurchaseController extends Controller
             $this->purchaseService->updatePurchase($purchase, $request->all());
             return redirect()->route('admin.po.view', $purchase->id)->with('success', 'Purchase order updated successfully.');
         } catch (\Exception $e) {
+            Log::error('Purchase Order update failed for ID ' . $id . ': ' . $e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
                 ->withInput();

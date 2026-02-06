@@ -9,6 +9,7 @@ import {
     exportAllSales,
 } from "./partials/sales-order/bulkActions/actions.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
+import { escapeHtml } from "./utils/sanitize.js";
 
 // Expose global functions for inline event handlers
 window.clearSalesSelection = function () {
@@ -224,12 +225,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         data.forEach((sale) => {
                             const row = document.createElement("tr");
                             row.innerHTML = `
-                            <td>${sale.invoice}</td>
+                            <td>${escapeHtml(sale.invoice)}</td>
                             <td>${
-                                sale.customer ? sale.customer.name : "N/A"
+                                sale.customer ? escapeHtml(sale.customer.name) : "N/A"
                             }</td>
-                            <td class="text-center">${sale.due_date}</td>
-                            <td class="text-end">${sale.total}</td>
+                            <td class="text-center">${escapeHtml(sale.due_date)}</td>
+                            <td class="text-end">${escapeHtml(sale.total)}</td>
                             <td class="text-end">
                                 <a href="/admin/sales/view/${
                                     sale.id

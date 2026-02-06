@@ -1,5 +1,6 @@
 import { setText, setBadge, getExpiryBadge } from '../utils/ui.js';
 import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+import { escapeHtml } from '../../../../utils/sanitize.js';
 
 export function initProductModal() {
     const printBtn = document.getElementById("productModalPrint");
@@ -37,12 +38,12 @@ export function initProductModal() {
                     .catch(error => {
                         const logContent = document.getElementById('productAdjustmentLogContent');
                         if (logContent) {
-                            logContent.innerHTML = `<div class="alert alert-danger">Error loading adjustment log: ${error.message}</div>`;
+                            logContent.innerHTML = `<div class="alert alert-danger">Error loading adjustment log: ${escapeHtml(error.message)}</div>`;
                         }
                     });
             })
             .catch((error) => {
-                content.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+                content.innerHTML = `<div class="alert alert-danger">Error: ${escapeHtml(error.message)}</div>`;
             });
     };
 }
@@ -210,8 +211,8 @@ function renderProductDetails(data) {
                     <tr>
                         <td><a href="/admin/po/edit/${item.po_id}">${item.po_id}</a></td>
                         <td>${item.quantity}</td>
-                        <td>${expiryDate}</td>
-                        <td><span class="${statusClass}">${status}</span></td>
+                        <td>${escapeHtml(expiryDate)}</td>
+                        <td><span class="${statusClass}">${escapeHtml(status)}</span></td>
                     </tr>
                 `;
             });

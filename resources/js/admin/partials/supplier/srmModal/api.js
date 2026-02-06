@@ -8,6 +8,7 @@ import {
 import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 import { formatDateToCustomString } from "../utils/date.js";
 import { getStatusBadgeHtml } from "../utils/status.js";
+import { escapeHtml } from "../../../../utils/sanitize.js";
 
 export function loadSrmData(id, page, append = false) {
     if (!id) {
@@ -161,20 +162,20 @@ function populateInteractions(interactions) {
                     "list-group-item",
                     "list-group-item-action"
                 );
-                interactionElement.innerHTML = `
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">${
-                        interaction.type.charAt(0).toUpperCase() +
-                        interaction.type.slice(1)
-                    } on ${new Date(
-                    interaction.interaction_date
-                ).toLocaleDateString("id-ID")}</h5>
-                    <small class="text-muted">by ${
-                        interaction.user ? interaction.user.name : "Unknown"
-                    }</small>
-                </div>
-                <p class="mb-1">${interaction.notes}</p>
-            `;
+                 interactionElement.innerHTML = `
+                 <div class="d-flex w-100 justify-content-between">
+                     <h5 class="mb-1">${
+                         interaction.type.charAt(0).toUpperCase() +
+                         interaction.type.slice(1)
+                     } on ${new Date(
+                     interaction.interaction_date
+                 ).toLocaleDateString("id-ID")}</h5>
+                     <small class="text-muted">by ${
+                         interaction.user ? escapeHtml(interaction.user.name) : "Unknown"
+                     }</small>
+                 </div>
+                 <p class="mb-1">${escapeHtml(interaction.notes)}</p>
+             `;
                 interactionTimeline.appendChild(interactionElement);
             });
         } else {
@@ -203,85 +204,85 @@ function populateTransactions(purchases) {
                 }">
                         <div class="d-flex w-100 justify-content-between">
                             <div>
-                                Invoice #${
-                                    purchase.invoice
-                                } - ${formatDateToCustomString(
-                    purchase.created_at
-                )}
-                                ${getStatusBadgeHtml(
-                                    purchase.status,
-                                    purchase.due_date
-                                )}
-                            </div>
-                            <div class="fw-bold">${formatCurrency(
-                                purchase.total_amount
-                            )}</div>
-                        </div>
-                    </button>
-                </h2>
-                <div id="collapse-${
-                    purchase.id
-                }" class="accordion-collapse collapse" aria-labelledby="heading-${
-                    purchase.id
-                }" data-bs-parent="#srmTransactionHistory">
-                    <div class="accordion-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(
-                                    purchase.date
-                                )}</p>
-                                <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(
-                                    purchase.due_date
-                                )}</p>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <p class="mb-1"><strong>Payment Type:</strong> ${
-                                    purchase.payment_method || "N/A"
-                                }</p>
-                            </div>
-                        </div>
-                        <h6 class="fs-4">Items:</h6>
-                        <div class="table-responsive">
-                            <table class="table table-sm table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th class="text-center">Qty</th>
-                                        <th class="text-end">Unit Price</th>
-                                        <th class="text-end">Line Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${
-                                        purchase.purchase_items &&
-                                        purchase.purchase_items.length > 0
-                                            ? purchase.purchase_items
-                                                  .map(
-                                                      (item) => `
-                                        <tr>
-                                            <td>${
-                                                item.product
-                                                    ? item.product.name
-                                                    : "N/A"
-                                            }</td>
-                                            <td class="text-center">${
-                                                item.quantity || 0
-                                            }</td>
-                                            <td class="text-end">${formatCurrency(
-                                                item.price || 0
-                                            )}</td>
-                                            <td class="text-end">${formatCurrency(
-                                                item.total || 0
-                                            )}</td>
-                                        </tr>
-                                    `
-                                                  )
-                                                  .join("")
-                                            : '<tr><td colspan="4" class="text-center">No items found</td></tr>'
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                 Invoice #${
+                                     escapeHtml(purchase.invoice)
+                                 } - ${formatDateToCustomString(
+                     purchase.created_at
+                 )}
+                                 ${getStatusBadgeHtml(
+                                     purchase.status,
+                                     purchase.due_date
+                                 )}
+                             </div>
+                             <div class="fw-bold">${formatCurrency(
+                                 purchase.total_amount
+                             )}</div>
+                         </div>
+                     </button>
+                 </h2>
+                 <div id="collapse-${
+                     purchase.id
+                 }" class="accordion-collapse collapse" aria-labelledby="heading-${
+                     purchase.id
+                 }" data-bs-parent="#srmTransactionHistory">
+                     <div class="accordion-body">
+                         <div class="row mb-3">
+                             <div class="col-md-6">
+                                 <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(
+                                     purchase.date
+                                 )}</p>
+                                 <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(
+                                     purchase.due_date
+                                 )}</p>
+                             </div>
+                             <div class="col-md-6 text-end">
+                                 <p class="mb-1"><strong>Payment Type:</strong> ${
+                                     escapeHtml(purchase.payment_method) || "N/A"
+                                 }</p>
+                             </div>
+                         </div>
+                         <h6 class="fs-4">Items:</h6>
+                         <div class="table-responsive">
+                             <table class="table table-sm table-bordered">
+                                 <thead>
+                                     <tr>
+                                         <th>Product</th>
+                                         <th class="text-center">Qty</th>
+                                         <th class="text-end">Unit Price</th>
+                                         <th class="text-end">Line Total</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody>
+                                     ${
+                                         purchase.purchase_items &&
+                                         purchase.purchase_items.length > 0
+                                             ? purchase.purchase_items
+                                                   .map(
+                                                       (item) => `
+                                         <tr>
+                                             <td>${
+                                                 item.product
+                                                     ? escapeHtml(item.product.name)
+                                                     : "N/A"
+                                             }</td>
+                                             <td class="text-center">${
+                                                 item.quantity || 0
+                                             }</td>
+                                             <td class="text-end">${formatCurrency(
+                                                 item.price || 0
+                                             )}</td>
+                                             <td class="text-end">${formatCurrency(
+                                                 item.total || 0
+                                             )}</td>
+                                         </tr>
+                                     `
+                                                   )
+                                                   .join("")
+                                             : '<tr><td colspan="4" class="text-center">No items found</td></tr>'
+                                     }
+                                 </tbody>
+                             </table>
+                         </div>
                         <div class="row mt-3">
                             <div class="col-md-12 text-end">
                                 <p class="mb-1"><strong>Subtotal:</strong> ${formatCurrency(
@@ -674,20 +675,20 @@ export function handleInteractionForm() {
                                 "list-group-item",
                                 "list-group-item-action"
                             );
-                            newInteraction.innerHTML = `
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1">${
-                                        data.type.charAt(0).toUpperCase() +
-                                        data.type.slice(1)
-                                    } on ${new Date(
-                                data.interaction_date
-                            ).toLocaleDateString("id-ID")}</h5>
-                                    <small class="text-muted">by ${
-                                        data.user ? data.user.name : "Unknown"
-                                    }</small>
-                                </div>
-                                <p class="mb-1">${data.notes}</p>
-                            `;
+                             newInteraction.innerHTML = `
+                                 <div class="d-flex w-100 justify-content-between">
+                                     <h5 class="mb-1">${
+                                         data.type.charAt(0).toUpperCase() +
+                                         data.type.slice(1)
+                                     } on ${new Date(
+                                 data.interaction_date
+                             ).toLocaleDateString("id-ID")}</h5>
+                                     <small class="text-muted">by ${
+                                         data.user ? escapeHtml(data.user.name) : "Unknown"
+                                     }</small>
+                                 </div>
+                                 <p class="mb-1">${escapeHtml(data.notes)}</p>
+                             `;
                             timeline.prepend(newInteraction);
                             safeToggleElement(
                                 "srmNoInteractionsMessage",

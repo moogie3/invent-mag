@@ -1,3 +1,5 @@
+import { escapeHtml } from '../utils/sanitize.js';
+
 document.addEventListener("DOMContentLoaded", function() {
     const coaTemplateModalElement = document.getElementById("coaTemplateConfirmationModal");
 
@@ -17,9 +19,11 @@ document.addEventListener("DOMContentLoaded", function() {
             // Set modal message
             const templateName = selectedTemplateDisplayName;
             const warningMessage = document.querySelector('meta[name="apply-template-warning"]')?.content || 
-                `Are you sure you want to apply the <strong>${templateName}</strong> Chart of Accounts template? This will overwrite existing accounts, <strong>delete all historical journal entries and transactions</strong>, and cannot be undone.`;
+                `Are you sure you want to apply the <strong>{template}</strong> Chart of Accounts template? This will overwrite existing accounts, <strong>delete all historical journal entries and transactions</strong>, and cannot be undone.`;
             
-            coaTemplateConfirmationModalMessage.innerHTML = warningMessage.replace('{template}', `<strong>${templateName}</strong>`);
+            // Use escapeHtml for the template name to prevent XSS
+            const safeTemplateName = escapeHtml(templateName);
+            coaTemplateConfirmationModalMessage.innerHTML = warningMessage.replace('{template}', `<strong>${safeTemplateName}</strong>`);
         };
 
         // Update message on button click (primary method)

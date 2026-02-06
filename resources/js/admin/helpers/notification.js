@@ -1,4 +1,5 @@
 import { playNotificationSound, playSuccessSound, playErrorSound } from '../utils/sound.js';
+import { escapeHtml } from '../../utils/sanitize.js';
 
 /**
  * Displays a modern, minimal toast notification.
@@ -85,6 +86,10 @@ window.InventMagApp.showToast = function (
 
     const currentType = typeStyles[type] || typeStyles.info;
 
+    // Sanitize user input to prevent XSS attacks
+    const safeTitle = escapeHtml(title);
+    const safeMessage = escapeHtml(message);
+
     toastElement.innerHTML = `
         <div class="toast-content ${currentType.bg} p-3 position-relative overflow-hidden"
              style="min-width: 320px;">
@@ -94,8 +99,8 @@ window.InventMagApp.showToast = function (
                     <i class="${currentType.icon} ${currentType.iconColor} fs-4"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <div class="fw-semibold text-dark mb-1" style="font-size: 0.95rem;">${title}</div>
-                    <div class="text-muted" style="font-size: 0.875rem; line-height: 1.4;">${message}</div>
+                    <div class="fw-semibold text-dark mb-1" style="font-size: 0.95rem;">${safeTitle}</div>
+                    <div class="text-muted" style="font-size: 0.875rem; line-height: 1.4;">${safeMessage}</div>
                 </div>
                 <button type="button" class="btn-close ms-3 mt-1" data-bs-dismiss="toast" aria-label="Close"
                         style="font-size: 0.75rem; opacity: 0.6;"
@@ -144,13 +149,17 @@ window.InventMagApp.showToast = function (
 
 // Global function for confirmation modal
 window.showConfirmModal = function (title, message, onConfirm) {
+    // Sanitize inputs to prevent XSS
+    const safeTitle = escapeHtml(title);
+    const safeMessage = escapeHtml(message);
+    
     const confirmModalHtml = `
         <div class="modal modal-blur fade" id="confirmModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <div class="modal-title">${title}</div>
-                        <div>${message}</div>
+                        <div class="modal-title">${safeTitle}</div>
+                        <div>${safeMessage}</div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
@@ -203,6 +212,10 @@ window.showAuthModal = function (title, message, type) {
         playErrorSound();
     }
 
+    // Sanitize inputs to prevent XSS
+    const safeTitle = escapeHtml(title);
+    const safeMessage = escapeHtml(message);
+
     const authModalHtml = `
         <div class="modal modal-blur fade" id="statusModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
@@ -211,8 +224,8 @@ window.showAuthModal = function (title, message, type) {
                     <div class="modal-status ${modalStatusClass}"></div>
                     <div class="modal-body text-center py-5 px-4">
                         <i class="${iconClass} d-block mx-auto mb-3" style="font-size: 3rem;"></i>
-                        <h3 class="fw-bold mb-3" style="font-size: 1.15rem;">${title}</h3>
-                        <div class="text-muted" style="font-size: 1.1rem; line-height: 1.5;">${message}</div>
+                        <h3 class="fw-bold mb-3" style="font-size: 1.15rem;">${safeTitle}</h3>
+                        <div class="text-muted" style="font-size: 1.1rem; line-height: 1.5;">${safeMessage}</div>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 import { originalProductData } from './state.js';
 import { initBulkSelection, restoreCheckboxStates, updateBulkActionsBarVisibility, getSelectedProductIds } from '../bulkActions/selection.js';
 import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+import { escapeHtml } from '../../../../utils/sanitize.js';
 
 export function renderSearchResults(products) {
     const tableBody = document.querySelector("table tbody");
@@ -22,6 +23,7 @@ export function renderSearchResults(products) {
             const isSelected = selectedProductIds.has(product.id.toString());
 
             return `
+            return `
             <tr data-id="${product.id}">
                 <td><input type="checkbox" class="form-check-input row-checkbox" value="${
                     product.id
@@ -29,11 +31,11 @@ export function renderSearchResults(products) {
                 <td class="sort-no">${index + 1}</td>
                 <td class="sort-image" style="width:120px">
                     <img src="${product.image || "/img/default_placeholder.png"}"
-                         width="80px" height="80px" alt="${product.name}"
+                         width="80px" height="80px" alt="${escapeHtml(product.name)}"
                          onerror="this.src='/img/default_placeholder.png'">
                 </td>
-                <td class="sort-code no-print">${product.code || "N/A"}</td>
-                <td class="sort-name">${product.name}</td>
+                <td class="sort-code no-print">${escapeHtml(product.code) || "N/A"}</td>
+                <td class="sort-name">${escapeHtml(product.name)}</td>
                 <td class="sort-quantity no-print text-center">
                     ${product.stock_quantity}
                     ${
@@ -43,9 +45,9 @@ export function renderSearchResults(products) {
                     }
                 </td>
                 <td class="sort-category no-print">${
-                    product.category?.name || "N/A"
+                    escapeHtml(product.category?.name) || "N/A"
                 }</td>
-                <td class="sort-unit">${product.unit?.symbol || "N/A"}</td>
+                <td class="sort-unit">${escapeHtml(product.unit?.symbol) || "N/A"}</td>
                 <td class="sort-price text-center">${formatCurrency(
                     product.price
                 )}</td>
@@ -53,7 +55,7 @@ export function renderSearchResults(products) {
                     product.selling_price
                 )}</td>
                 <td class="sort-supplier text-center">${
-                    product.supplier?.name || "N/A"
+                    escapeHtml(product.supplier?.name) || "N/A"
                 }</td>
                 <td class="no-print" style="text-align:center">
                     <div class="dropdown">
@@ -94,10 +96,11 @@ export function renderSearchResults(products) {
 }
 
 export function showNoResults(message = "No products found matching your search.") {
+    const safeMessage = escapeHtml(message);
     document.querySelector("table tbody").innerHTML = `
         <tr><td colspan="100%" class="text-center py-5">
             <div class="spinner-border text-primary"></div>
-            <p class="mt-3 text-muted">${message}</p>
+            <p class="mt-3 text-muted">${safeMessage}</p>
         </td></tr>
     `;
 
@@ -108,10 +111,11 @@ export function showNoResults(message = "No products found matching your search.
 }
 
 export function showSearchError(errorMessage = "Search error occurred.") {
+    const safeErrorMessage = escapeHtml(errorMessage);
     document.querySelector("table tbody").innerHTML = `
         <tr><td colspan="100%" class="text-center py-5">
             <i class="ti ti-alert-circle fs-1 text-danger"></i>
-            <p class="mt-3 text-danger">${errorMessage}</p>
+            <p class="mt-3 text-danger">${safeErrorMessage}</p>
             <button class="btn btn-outline-primary mt-2" onclick="window.location.reload()">
                 <i class="ti ti-refresh me-2"></i> Refresh
             </button>

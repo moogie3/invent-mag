@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Warehouse;
+use App\Models\ProductWarehouse;
 use App\Models\Account;
 use Database\Factories\SalesFactory;
 use Illuminate\Support\Facades\Storage;

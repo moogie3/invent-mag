@@ -45,7 +45,7 @@ class DashboardServiceTest extends TestCase
         $customer = Customer::factory()->create();
         $supplier = Supplier::factory()->create(['location' => 'IN']);
         $category = Categories::factory()->create();
-        $product = Product::factory()->create(['category_id' => $category->id, 'stock_quantity' => 5, 'low_stock_threshold' => 10]);
+        $product = Product::factory()->withStock(5)->create(['category_id' => $category->id, 'low_stock_threshold' => 10]);
 
         // Sales data for this month
         $sale1 = Sales::factory()->create([
@@ -72,7 +72,7 @@ class DashboardServiceTest extends TestCase
             'status' => 'Paid',
             'due_date' => now()->addDays(30)
         ]);
-        POItem::factory()->create(['po_id' => $purchase1->id, 'product_id' => $product->id, 'quantity' => 5, 'price' => 10]);
+        POItem::factory()->create(['po_id' => $purchase1->id, 'product_id' => $product->id, 'quantity' => 5, 'price' => 10, 'expiry_date' => null]);
 
         $purchase2 = Purchase::factory()->create([
             'supplier_id' => $supplier->id,

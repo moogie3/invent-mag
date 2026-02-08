@@ -13,6 +13,7 @@ use App\Models\PurchaseReturnItem;
 use App\Models\Product;
 use App\Models\Account;
 use Dompdf\Dompdf;
+use App\Models\ProductWarehouse;
 use App\Helpers\CurrencyHelper;
 
 class PurchaseReturnService
@@ -101,7 +102,11 @@ class PurchaseReturnService
                 // Decrement stock for the returned product
                 $product = Product::find($itemData['product_id']);
                 if ($product) {
-                    $product->decrement('stock_quantity', $returnedQuantity);
+                    // Decrement stock from the first available warehouse
+                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
+                    if ($stockRecord) {
+                        $stockRecord->decrement('quantity', $returnedQuantity);
+                    }
                 }
             }
 
@@ -160,7 +165,11 @@ class PurchaseReturnService
             foreach ($purchaseReturn->items as $oldItem) {
                 $product = Product::find($oldItem->product_id);
                 if ($product) {
-                    $product->increment('stock_quantity', $oldItem->quantity);
+                    // Increment stock back to the first available warehouse
+                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
+                    if ($stockRecord) {
+                        $stockRecord->increment('quantity', $oldItem->quantity);
+                    }
                 }
             }
             $purchaseReturn->items()->delete();
@@ -209,7 +218,11 @@ class PurchaseReturnService
                 // Decrement stock for the returned product
                 $product = Product::find($itemData['product_id']);
                 if ($product) {
-                    $product->decrement('stock_quantity', $returnedQuantity);
+                    // Decrement stock from the first available warehouse
+                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
+                    if ($stockRecord) {
+                        $stockRecord->decrement('quantity', $returnedQuantity);
+                    }
                 }
             }
             $purchase = $purchaseReturn->purchase;

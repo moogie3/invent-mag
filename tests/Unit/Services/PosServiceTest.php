@@ -79,8 +79,8 @@ class PosServiceTest extends TestCase
         Auth::login($user);
 
         $customer = Customer::factory()->create();
-        $product1 = Product::factory()->create(['selling_price' => 100, 'stock_quantity' => 10]);
-        $product2 = Product::factory()->create(['selling_price' => 50, 'stock_quantity' => 20]);
+        $product1 = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+        $product2 = Product::factory()->withStock(20)->create(['selling_price' => 50]);
 
         $productsPayload = json_encode([
             ['id' => $product1->id, 'quantity' => 2, 'price' => 100],

@@ -14,6 +14,7 @@ use App\Models\Product;
 use App\Models\Account;
 use Dompdf\Dompdf;
 use App\Helpers\CurrencyHelper;
+use App\Models\ProductWarehouse;
 
 class SalesReturnService
 {
@@ -88,7 +89,13 @@ class SalesReturnService
                     ]);
 
                     $product = Product::find($itemData['product_id']);
-                    $product->increment('stock_quantity', $itemData['returned_quantity']);
+                    if ($product) {
+                        // Increment stock in the first available warehouse
+                        $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
+                        if ($stockRecord) {
+                            $stockRecord->increment('quantity', $itemData['returned_quantity']);
+                        }
+                    }
                 }
             }
 
@@ -135,7 +142,11 @@ class SalesReturnService
             foreach ($salesReturn->items as $oldItem) {
                 $product = Product::find($oldItem->product_id);
                 if ($product) {
-                    $product->decrement('stock_quantity', $oldItem->quantity);
+                    // Decrement stock from the first available warehouse
+                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
+                    if ($stockRecord) {
+                        $stockRecord->decrement('quantity', $oldItem->quantity);
+                    }
                 }
             }
             $salesReturn->items()->delete();
@@ -171,7 +182,11 @@ class SalesReturnService
 
                 $product = Product::find($itemData['product_id']);
                 if ($product) {
-                    $product->increment('stock_quantity', $returnedQuantity);
+                    // Increment stock in the first available warehouse
+                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
+                    if ($stockRecord) {
+                        $stockRecord->increment('quantity', $returnedQuantity);
+                    }
                 }
             }
 

@@ -9,7 +9,7 @@ import {
     exportAllSales,
 } from "./partials/sales-order/bulkActions/actions.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
-import { escapeHtml } from "./utils/sanitize.js";
+import { escapeHtml } from "../utils/sanitize.js";
 
 // Expose global functions for inline event handlers
 window.clearSalesSelection = function () {
@@ -227,7 +227,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             row.innerHTML = `
                             <td>${escapeHtml(sale.invoice)}</td>
                             <td>${
-                                sale.customer ? escapeHtml(sale.customer.name) : "N/A"
+                                sale.customer
+                                    ? escapeHtml(sale.customer.name)
+                                    : "N/A"
                             }</td>
                             <td class="text-center">${escapeHtml(sale.due_date)}</td>
                             <td class="text-end">${escapeHtml(sale.total)}</td>

@@ -203,14 +203,16 @@ class SalesPipelineServiceTest extends TestCase
     public function it_can_convert_an_opportunity_to_a_sales_order()
     {
         $opportunity = SalesOpportunity::factory()->hasItems(1, ['quantity' => 2, 'price' => 100])->create(['status' => 'won']);
-        Product::find($opportunity->items->first()->product_id)->update(['stock_quantity' => 10]);
+        $product = Product::find($opportunity->items->first()->product_id);
+        $stockRecord = $product->productWarehouses()->first();
+        $stockRecord->update(['quantity' => 10]);
 
         $salesOrder = $this->salesPipelineService->convertToSalesOrder($opportunity);
 
         $this->assertInstanceOf(Sales::class, $salesOrder);
         $this->assertDatabaseHas('sales', ['sales_opportunity_id' => $opportunity->id]);
         $this->assertDatabaseHas('sales_opportunities', ['id' => $opportunity->id, 'status' => 'converted', 'sales_id' => $salesOrder->id]);
-        $this->assertEquals(8, Product::find($opportunity->items->first()->product_id)->stock_quantity);
+        $this->assertEquals(8, $product->fresh()->stock_quantity);
     }
 
     #[Test]
@@ -251,7 +253,9 @@ class SalesPipelineServiceTest extends TestCase
         $this->expectExceptionMessageMatches('/Insufficient stock for product:/');
 
         $opportunity = SalesOpportunity::factory()->hasItems(1, ['quantity' => 10, 'price' => 100])->create(['status' => 'won']);
-        Product::find($opportunity->items->first()->product_id)->update(['stock_quantity' => 5]);
+        $product = Product::find($opportunity->items->first()->product_id);
+        $stockRecord = $product->productWarehouses()->first();
+        $stockRecord->update(['quantity' => 5]);
 
         $this->salesPipelineService->convertToSalesOrder($opportunity);
     }
@@ -261,7 +265,8 @@ class SalesPipelineServiceTest extends TestCase
     {
         $opportunity = SalesOpportunity::factory()->hasItems(1, ['quantity' => 3, 'price' => 100])->create(['status' => 'won']);
         $product = Product::find($opportunity->items->first()->product_id);
-        $product->update(['stock_quantity' => 10]);
+        $stockRecord = $product->productWarehouses()->first();
+        $stockRecord->update(['quantity' => 10]);
 
         $salesOrder = $this->salesPipelineService->convertToSalesOrder($opportunity);
         $this->assertEquals(7, $product->fresh()->stock_quantity);

@@ -41,7 +41,7 @@ class NotificationServiceTest extends TestCase
         Purchase::factory()->create(['due_date' => now()->addDays(3), 'status' => 'Unpaid']);
         $sale = Sales::factory()->create(['due_date' => now(), 'status' => 'Unpaid']);
         // Low stock product
-        Product::factory()->create(['stock_quantity' => 5, 'low_stock_threshold' => 10]);
+        Product::factory()->withStock(5)->create(['low_stock_threshold' => 10]);
         // Expiring POItem
         $product = Product::factory()->create();
         $purchase = Purchase::factory()->create(['due_date' => now()->addYear(), 'status' => 'Paid']);
@@ -99,8 +99,8 @@ class NotificationServiceTest extends TestCase
         Sales::factory()->create(['due_date' => now(), 'status' => 'Paid']); // This should not be counted
 
         // Low stock products
-        Product::factory()->count(4)->create(['stock_quantity' => 5, 'low_stock_threshold' => 10]);
-        Product::factory()->create(['stock_quantity' => 15, 'low_stock_threshold' => 10]); // This should not be counted
+        Product::factory()->count(4)->withStock(5)->create(['low_stock_threshold' => 10]);
+        Product::factory()->withStock(15)->create(['low_stock_threshold' => 10]); // This should not be counted
 
         // 2. Call the service method
         $counts = $this->notificationService->getNotificationCounts();

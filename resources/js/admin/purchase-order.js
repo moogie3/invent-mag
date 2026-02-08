@@ -3,7 +3,7 @@ import { PurchaseOrderEdit } from "./partials/purchase-order/edit/PurchaseOrderE
 import { PurchaseOrderView } from "./partials/purchase-order/view/PurchaseOrderView.js";
 import { PurchaseOrderBulkSelection } from "./partials/purchase-order/bulkActions/PurchaseOrderBulkSelection.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
-import { escapeHtml } from "./utils/sanitize.js";
+import { escapeHtml } from "../utils/sanitize.js";
 
 import {
     bulkDeletePO,

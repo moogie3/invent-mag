@@ -32,7 +32,7 @@ class PurchaseReturnServiceTest extends TestCase
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->user->assignRole('superuser'); // Ensure the user has permissions for services
         
-        $this->product = Product::factory()->create(['stock_quantity' => 100]);
+        $this->product = Product::factory()->withStock(100)->create();
         $this->purchase = Purchase::factory()->create();
         
         // Mock AccountingService
@@ -78,7 +78,9 @@ class PurchaseReturnServiceTest extends TestCase
             'quantity' => 1
         ]);
         
-        $this->product->decrement('stock_quantity', 1);
+        // Decrement stock from ProductWarehouse instead of Product directly
+        $stockRecord = $this->product->productWarehouses()->first();
+        $stockRecord->decrement('quantity', 1);
         $this->product->refresh();
         $this->assertEquals(99, $this->product->stock_quantity);
 

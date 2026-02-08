@@ -779,7 +779,11 @@ class SalesService
                                   ->where('tenant_id', $sale->tenant_id)
                                   ->first();
                 if ($product) {
-                    $product->increment('stock_quantity', $itemData['quantity']);
+                    // Increment stock in the first available warehouse
+                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
+                    if ($stockRecord) {
+                        $stockRecord->increment('quantity', $itemData['quantity']);
+                    }
                 }
             }
 

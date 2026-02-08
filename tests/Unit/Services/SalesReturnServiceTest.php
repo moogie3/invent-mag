@@ -32,7 +32,7 @@ class SalesReturnServiceTest extends TestCase
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->user->assignRole('superuser'); // Ensure the user has permissions for services
 
-        $this->product = Product::factory()->create(['stock_quantity' => 100]);
+        $this->product = Product::factory()->withStock(100)->create();
         $this->sale = Sales::factory()->create();
         
         // Mock AccountingService
